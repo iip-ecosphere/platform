@@ -1,0 +1,78 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.iip-ecosphere.platform</groupId>
+  <artifactId>platformDependencies</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>platformDependencies</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <eclipse.milo.version>0.5.2</eclipse.milo.version>
+    <basyx.version>0.0.1-SNAPSHOT</basyx.version>
+  </properties>
+
+  <repositories>       
+    <repository>
+      <id>SSE</id>
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+    
+      <!-- OPC-UA -->
+    
+      <dependency>
+        <groupId>org.eclipse.milo</groupId>
+        <artifactId>sdk-client</artifactId>
+        <version>${eclipse.milo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.milo</groupId>
+        <artifactId>sdk-server</artifactId>
+        <version>${eclipse.milo.version}</version>
+      </dependency>
+    
+      <!-- BaSyx (AAS) - SSE-version as long as BaSys does not deploy to Maven -->
+    
+      <dependency>
+        <groupId>org.eclipse.basyx</groupId>
+        <artifactId>basyx.components.lib</artifactId>
+        <version>${basyx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.basyx</groupId>
+        <artifactId>basyx.components.sqlregistry</artifactId>
+        <version>${basyx.version}</version>
+      </dependency>      
+        <dependency>
+        <groupId>org.eclipse.basyx</groupId>
+        <artifactId>basyx.components.AASServer</artifactId>
+        <version>${basyx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.basyx</groupId>
+        <artifactId>basyx.sdk</artifactId>
+        <version>${basyx.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+    
+      <!-- testing dependencies -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
