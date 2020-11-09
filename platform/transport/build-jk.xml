@@ -13,9 +13,10 @@
             <include name="transport-*.*.*-SNAPSHOT.jar"/>
           </fileset>
         </path>
+        <local name="temp"/>
+        <property name="temp" refid="jarFile.id"/>
         <local name="jarFile"/>
-        <property name="jarFile" refid="jarFile.id"/>
-        <basename property="$jarFile" file="$jarFile"/>  
+        <basename property="jarFile" file="${temp}"/>
 	    <mvnDeploy folderName="IIP-transport-layer" pomFile="pom.xml" jarFolder="target/" jarFile="${jarFile}" />
 	</target>
 </project>
