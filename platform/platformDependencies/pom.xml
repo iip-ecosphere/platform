@@ -17,6 +17,7 @@
     <basyx.version>0.0.1-SNAPSHOT</basyx.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
     <junit.version>4.12</junit.version>
+    <rabbitmq.version>5.10.0</rabbitmq.version>
     
     <java.source>8</java.source> <!-- for now due to edge deployment/initial experience -->
     <java.target>8</java.target>
@@ -47,14 +48,22 @@
       <!-- MQTT -->
       
       <dependency>
-	    <groupId>org.eclipse.paho</groupId>
-	    <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
         <version>${eclipse.paho.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.paho</groupId>
         <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         <version>${eclipse.paho.version}</version>
+      </dependency>
+      
+      <!-- AMQP -->
+      
+      <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>${rabbitmq.version}</version>
       </dependency>
     
       <!-- OPC-UA -->
