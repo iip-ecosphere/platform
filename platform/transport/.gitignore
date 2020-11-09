@@ -1,2 +1,3 @@
 target/*
 src/test/extensions/*
+/target/
