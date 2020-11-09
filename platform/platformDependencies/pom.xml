@@ -16,8 +16,9 @@
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <basyx.version>0.0.1-SNAPSHOT</basyx.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
+    <junit.version>4.12</junit.version>
     
-    <java.source>8</java.source>
+    <java.source>8</java.source> <!-- for now due to edge deployment/initial experience -->
     <java.target>8</java.target>
     <java.release>8</java.release>
     <java.encoding>Cp1252</java.encoding>
@@ -98,7 +99,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
