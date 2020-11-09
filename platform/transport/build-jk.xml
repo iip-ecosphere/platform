@@ -7,6 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="package"/>
 	    <mvnDeploy folderName="IIP-transport-layer" pomFile="pom.xml" jarFolder="target/" jarFile="transport-*.*.*-SNAPSHOT.jar" />
 	</target>
 </project>
