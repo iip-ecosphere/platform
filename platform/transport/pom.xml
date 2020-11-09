@@ -60,7 +60,7 @@
          <configuration>
            <source>${java.source}</source>
            <target>${java.target}</target>
-           <release>${java.release}</release>
+            <!-- <release>${java.release}</release> does not work on Jenkins -->
            <encoding>${java.encoding}</encoding>
          </configuration>
        </plugin>
