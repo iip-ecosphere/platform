@@ -50,7 +50,7 @@ public class AbstractTransportConnectorTest {
      * @param serializer the serializer to use
      * @throws IOException in case that connection/communication fails
      */
-    public static void doMqttTest(String host, int port, Serializer<Product> serializer) throws IOException {
+    public static void doTest(String host, int port, Serializer<Product> serializer) throws IOException {
         Product data1 = new Product("prod1", 10.2);
         Product data2 = new Product("prod2", 5.1);
 

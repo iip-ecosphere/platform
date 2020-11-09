@@ -37,8 +37,8 @@ public class PahoMqttV5TransportConnectorTest {
         final int port = 8883;
         TestHiveMqServer server = new TestHiveMqServer();
         server.start("localhost", port);
-        AbstractTransportConnectorTest.doMqttTest("localhost", port, new ProductJsonSerializer());
-        AbstractTransportConnectorTest.doMqttTest("localhost", port, new ProductProtobufSerializer());
+        AbstractTransportConnectorTest.doTest("localhost", port, new ProductJsonSerializer());
+        AbstractTransportConnectorTest.doTest("localhost", port, new ProductProtobufSerializer());
         server.stop();
         TransportFactory.setFactoryImplementation(old);
     }
