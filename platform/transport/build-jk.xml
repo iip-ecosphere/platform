@@ -14,7 +14,8 @@
           </fileset>
         </path>
         <local name="jarFile"/>
-        <property name="jarFile" refid="jarFile.id"/>  
+        <property name="jarFile" refid="jarFile.id"/>
+        <basename property="$jarFile" file="$jarFile"/>  
 	    <mvnDeploy folderName="IIP-transport-layer" pomFile="pom.xml" jarFolder="target/" jarFile="${jarFile}" />
 	</target>
 </project>
