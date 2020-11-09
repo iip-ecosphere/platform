@@ -13,7 +13,14 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
+    <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <basyx.version>0.0.1-SNAPSHOT</basyx.version>
+    <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
+    
+    <java.source>8</java.source>
+    <java.target>8</java.target>
+    <java.release>8</java.release>
+    <java.encoding>Cp1252</java.encoding>
   </properties>
 
   <repositories>       
@@ -27,6 +34,27 @@
 
   <dependencyManagement>
     <dependencies>
+    
+      <!-- Protobuf  -->
+      
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>      
+      
+      <!-- MQTT -->
+      
+      <dependency>
+	    <groupId>org.eclipse.paho</groupId>
+	    <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+        <version>${eclipse.paho.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+        <version>${eclipse.paho.version}</version>
+      </dependency>
     
       <!-- OPC-UA -->
     
@@ -70,9 +98,10 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>3.8.1</version>
+        <version>4.12</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  
 </project>
