@@ -3,7 +3,8 @@ package de.iip_ecosphere.platform.transport.serialization;
 import java.io.IOException;
 
 /**
- * A data serializer (so far for homogeneous streams, may require unique ids).
+ * A data serializer (so far for homogeneous streams, may require unique ids). Open: Do we have to cope with 
+ * <b>null</b> values here?
  * 
  * @param <T> the type to be serialized
  * @author Holger Eichelberger, SSE
@@ -28,6 +29,16 @@ public interface Serializer<T> {
      */
     public T deserialize(byte[] data) throws IOException;
 
+    /**
+     * Creates a new value instance and copies the values from {@code origin} to the new instance.
+     * Use the {@link SerializerRegistry} to implement cloning of nested object values.
+     *  
+     * @param origin the object to clone
+     * @return the cloned object
+     * @throws IOException in case that cloning/serialization operations fail
+     */
+    public T clone(T origin) throws IOException;
+    
     /**
      * The type to be handled by this serializer.
      * 

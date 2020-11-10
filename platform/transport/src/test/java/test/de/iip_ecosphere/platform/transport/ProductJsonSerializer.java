@@ -38,6 +38,11 @@ public class ProductJsonSerializer implements Serializer<Product> {
         }
         return result;
     }
+    
+    @Override
+    public Product clone(Product origin) throws IOException {
+        return new Product(origin.getDescription(), origin.getPrice());
+    }
 
     /**
      * Reads a string field from a JSON object.

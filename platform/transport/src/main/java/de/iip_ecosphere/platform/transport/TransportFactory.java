@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.transport;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.impl.PahoMqttV3TransportConnector;
 
 /**
@@ -59,6 +60,15 @@ public class TransportFactory {
      */
     public static TransportConnector createConnector() {
         return instance.createConnector();
+    }
+    
+    /**
+     * Creates a direct memory transfer connector instance.
+     * 
+     * @return the direct memory connector instance
+     */
+    public static TransportConnector createDirectMemoryConnector() {
+        return new DirectMemoryTransferTransportConnector();
     }
 
 }

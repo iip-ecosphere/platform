@@ -106,7 +106,6 @@ public abstract class AbstractTransportConnector implements TransportConnector {
                 callback.received(serializer.deserialize(data));
             }
         }
-
     }
 
     /**

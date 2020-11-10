@@ -49,7 +49,7 @@ public interface TransportConnector {
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException;
 
     /**
-     * Composes a hierarchical stream name (in the syntax/semantic of the
+     * Composes a hierarchical stream name (in the syntax/semantics of the
      * connector).
      * 
      * @param parent the parent name (may be {@link #EMPTY_PARENT} for top-level streams)

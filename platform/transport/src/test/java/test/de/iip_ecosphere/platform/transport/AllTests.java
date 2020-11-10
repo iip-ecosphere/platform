@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     PahoMqttV3TransportConnectorTest.class, 
-    PahoMqttV5TransportConnectorTest.class
+    PahoMqttV5TransportConnectorTest.class,
+    DirectMemoryTransportConnectorTest.class
 })
 public class AllTests {
 }

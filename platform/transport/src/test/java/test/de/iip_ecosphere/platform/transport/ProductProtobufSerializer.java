@@ -26,6 +26,11 @@ public class ProductProtobufSerializer implements Serializer<Product> {
         ProductOuterClass.Product prod = ProductOuterClass.Product.parseFrom(data);
         return new Product(prod.getDescription(), prod.getPrice());
     }
+    
+    @Override
+    public Product clone(Product origin) throws IOException {
+        return new Product(origin.getDescription(), origin.getPrice());
+    }
 
     @Override
     public Class<Product> getType() {

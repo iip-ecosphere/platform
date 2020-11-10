@@ -7,14 +7,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.TransportFactoryImplementation;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.impl.PahoMqttV3TransportConnector;
 
-/**
- * Tests the {@link PahoMqttV3TransportConnector}.
- * 
- * @author Holger Eichelberger, SSE
- */
-public class PahoMqttV3TransportConnectorTest {
+public class DirectMemoryTransportConnectorTest {
 
     /**
      * Tests the connector through explicitly setting/resetting the factory
@@ -24,22 +18,20 @@ public class PahoMqttV3TransportConnectorTest {
      * @throws IOException in case that connection/communication fails
      */
     @Test
-    public void testPahoConnector() throws IOException {
+    public void testMemoryConnector() throws IOException {
+        // just for the test as it is based on the factory
         TransportFactoryImplementation old = TransportFactory
             .setFactoryImplementation(new TransportFactoryImplementation() {
 
                 @Override
                 public TransportConnector createConnector() {
-                    return new PahoMqttV3TransportConnector();
+                    return TransportFactory.createDirectMemoryConnector();
                 }
             });
-
-        final int port = 8883;
-        TestHiveMqServer server = new TestHiveMqServer();
-        server.start("localhost", port);
-        AbstractTransportConnectorTest.doTest("localhost", port, new ProductJsonSerializer());
-        AbstractTransportConnectorTest.doTest("localhost", port, new ProductProtobufSerializer());
-        server.stop();
+        
+        AbstractTransportConnectorTest.doTest("", 0, new ProductJsonSerializer());
+        AbstractTransportConnectorTest.doTest("", 0, new ProductProtobufSerializer());
+        
         TransportFactory.setFactoryImplementation(old);
     }
 
