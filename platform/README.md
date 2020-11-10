@@ -1,6 +1,11 @@
 #IIP-Ecosphere platform
 
-This is for all code realizing the IIP-Ecosphere platform.
+This is for all code realizing the IIP-Ecosphere platform. So far present:
+* Connection and Transport Layer
+    * Transport component (MQTT)
+    * Transport extension for AMQP
+
+More to come soon. 
 
 #Guidelines (to be refined)
 * Java projects are created with Eclipse (2019-08). Use iipCodeFormatter.xml
