@@ -1,4 +1,4 @@
-#IIP-Ecosphere transport layer extension for AMQP (based on RabbitMQ)
+# IIP-Ecosphere transport layer extension for AMQP (based on RabbitMQ)
 
 Extends the transport layer in terms of the AMQP protocol. This extension is optional. 
 This implementation ships with an [AMQP 1.0](https://www.amqp.org/) client as  transport connectors based on 
