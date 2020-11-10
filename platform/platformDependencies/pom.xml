@@ -61,9 +61,11 @@
       <!-- AMQP -->
       
       <dependency>
+        <!-- Apache Public License 2.0 or Mozilla Public License 2.0 -->
         <groupId>com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
         <version>${rabbitmq.version}</version>
+        <optional>true</optional>
       </dependency>
     
       <!-- OPC-UA -->
