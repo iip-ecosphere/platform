@@ -1,6 +1,7 @@
 #IIP-Ecosphere platform
 
 This is for all code realizing the IIP-Ecosphere platform. So far present:
+* Managed Platform dependencies
 * Connection and Transport Layer
     * Transport component (MQTT)
     * Transport extension for AMQP
@@ -16,8 +17,11 @@ More to come soon.
   local definition named ``IIP Code Conventions``to Checkstyle before importing 
   the other projects.
 * The Java package prefix shall be ``de.iip-ecosphere.platform``
+* Java files shall contain the license header. Existing files can be used as a template.
 * Building Java-parts happens with Maven (based on centralized dependency 
-  management/parent POM). Groups are or start with ``de.iip-ecosphere.platform``
+  management/parent POM). Groups are or start with ``de.iip-ecosphere.platform`` 
+  to comply with Maven central deployment. Also ensure that POMs contain a valid URL, description, licenses, 
+  developers and scm section. Existing POMs can be used as a template. 
 * CI and SNAPSHOT deployment currently are done via SSE-CI/SSE-Maven-Repo. 
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
   file that executes Maven and deploys the artifacts.
