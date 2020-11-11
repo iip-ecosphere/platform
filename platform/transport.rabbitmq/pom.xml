@@ -4,7 +4,42 @@
   <artifactId>transport.rabbitmq</artifactId>
   <packaging>jar</packaging>
   <name>transport.rabbitmq</name>
+  <description>The binary version of the transport extension for AMQP of the IIP-Ecosphere platform.</description>
+  <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
   
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>Eclipse Public License, Version 1.0</name>
+      <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <developers>
+    <developer>
+      <id>eichelbe</id>
+      <name>Holger Eichelberger</name>
+      <email>eichelberger@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/mitglieder/dr-holger-eichelberger/</url>
+      <organization>SUH</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+  </developers>
+  
+  <scm>
+    <url>https://github.com/iip-ecosphere/platform.git</url>
+  </scm>
+    
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
