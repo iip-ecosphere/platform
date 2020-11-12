@@ -56,30 +56,13 @@ public class RabbitMqAmqpTransportConnectorTest {
     @Test
     public void testPahoConnector() throws IOException {
         TransportFactoryImplementation old = TransportFactory
-            .setFactoryImplementation(new TransportFactoryImplementation() {
+            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
 
                 @Override
                 public TransportConnector createConnector() {
                     return new FakeAuthConnector();
                 }
 
-                /**
-                 * Creates an inter-process connector.
-                 * 
-                 * @return the created connector instance
-                 */
-                public TransportConnector createIpcConnector() {
-                    return new FakeAuthConnector();
-                }
-
-                /**
-                 * Creates a direct memory transfer connector instance.
-                 * 
-                 * @return the direct memory connector instance
-                 */
-                public TransportConnector createDirectMemoryConnector() {
-                    return new FakeAuthConnector();
-                }
             });
 
         final int port = 8883;
