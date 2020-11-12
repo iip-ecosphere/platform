@@ -2,7 +2,7 @@
 
 This is for all code realizing the IIP-Ecosphere platform. So far present:
 * Managed Platform dependencies
-* Connection and Transport Layer
+* Transport Layer
     * Transport component (MQTT)
     * Transport extension for AMQP
 
