@@ -38,15 +38,56 @@ public class TransportFactory {
          */
         public TransportConnector createConnector();
 
+        /**
+         * Creates an inter-process connector.
+         * 
+         * @return the created connector instance
+         */
+        public TransportConnector createIpcConnector();
+
+        /**
+         * Creates a direct memory transfer connector instance.
+         * 
+         * @return the direct memory connector instance
+         */
+        public TransportConnector createDirectMemoryConnector();
+        
     }
 
-    private static TransportFactoryImplementation instance = new TransportFactoryImplementation() {
+    /**
+     * Provides a basic implementation factory. Here, inter-process connector creation is delegated to 
+     * {@link #createConnector()} and the direct memory connector goes for the default implementation 
+     * {@link DirectMemoryTransferTransportConnector}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public abstract static class BaseFactoryImplementation implements TransportFactoryImplementation {
+
+        @Override
+        public TransportConnector createIpcConnector() {
+            return createConnector();
+        }
+
+        @Override
+        public TransportConnector createDirectMemoryConnector() {
+            return new DirectMemoryTransferTransportConnector();
+        }
+        
+    }
+    
+    /**
+     * The default factory implementation (to be able to return to this instance if needed).
+     */
+    private static final TransportFactoryImplementation DEFAULT = new BaseFactoryImplementation() {
 
         @Override
         public TransportConnector createConnector() {
             return new PahoMqttV3TransportConnector();
         }
+        
     };
+    
+    private static TransportFactoryImplementation instance = DEFAULT;
 
     /**
      * Changes the factory implementation. May be replaced by an injection-based
@@ -73,12 +114,21 @@ public class TransportFactory {
     }
     
     /**
+     * Creates an inter-process connector.
+     * 
+     * @return the created connector instance
+     */
+    public static TransportConnector createIpcConnector() {
+        return instance.createIpcConnector();
+    }
+    
+    /**
      * Creates a direct memory transfer connector instance.
      * 
      * @return the direct memory connector instance
      */
     public static TransportConnector createDirectMemoryConnector() {
-        return new DirectMemoryTransferTransportConnector();
+        return instance.createDirectMemoryConnector();
     }
 
 }

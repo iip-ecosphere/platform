@@ -36,13 +36,13 @@ public class PahoMqttV5TransportConnectorTest {
     @Test
     public void testPahoConnector() throws IOException {
         TransportFactoryImplementation old = TransportFactory
-                .setFactoryImplementation(new TransportFactoryImplementation() {
+            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
 
-                    @Override
-                    public TransportConnector createConnector() {
-                        return new PahoMqttV5TransportConnector();
-                    }
-                });
+                @Override
+                public TransportConnector createConnector() {
+                    return new PahoMqttV5TransportConnector();
+                }
+            });
 
         final int port = 8883;
         TestHiveMqServer server = new TestHiveMqServer();

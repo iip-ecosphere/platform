@@ -31,7 +31,7 @@ public class DirectMemoryTransportConnectorTest {
     public void testMemoryConnector() throws IOException {
         // just for the test as it is based on the factory
         TransportFactoryImplementation old = TransportFactory
-            .setFactoryImplementation(new TransportFactoryImplementation() {
+            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
 
                 @Override
                 public TransportConnector createConnector() {

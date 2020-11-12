@@ -36,7 +36,7 @@ public class PahoMqttV3TransportConnectorTest {
     @Test
     public void testPahoConnector() throws IOException {
         TransportFactoryImplementation old = TransportFactory
-            .setFactoryImplementation(new TransportFactoryImplementation() {
+            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
 
                 @Override
                 public TransportConnector createConnector() {
