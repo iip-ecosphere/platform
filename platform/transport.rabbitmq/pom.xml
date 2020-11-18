@@ -135,7 +135,7 @@
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${iip-ecosphere.version}</version>
     </dependency>
     <dependency>
       <groupId>com.rabbitmq</groupId>
