@@ -68,8 +68,8 @@ public class RabbitMqAmqpTransportConnectorTest {
         final int port = 8883;
         TestQpidServer server = new TestQpidServer();
         server.start("localhost", port);
-        AbstractTransportConnectorTest.doTest("localhost", port, new ProductJsonSerializer());
-        AbstractTransportConnectorTest.doTest("localhost", port, new ProductProtobufSerializer());
+        AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
+        AbstractTransportConnectorTest.doTest("localhost", port, ProductProtobufSerializer.class);
         server.stop();
         TransportFactory.setFactoryImplementation(old);        
     }
