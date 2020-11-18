@@ -10,13 +10,13 @@
 	    <maven pomFile="pom.xml" goal="package"/>
 	    <path id="jarFile.id">
           <fileset dir="target">
-            <include name="transport.rabbitmq-*.*.*-SNAPSHOT.jar"/>
+            <include name="transport.amqp-*.*.*-SNAPSHOT.jar"/>
           </fileset>
         </path>
         <local name="temp"/>
         <property name="temp" refid="jarFile.id"/>
         <local name="jarFile"/>
         <basename property="jarFile" file="${temp}"/>
-	    <mvnDeploy folderName="IIP-transport-rabbitmq" pomFile="pom.xml" jarFolder="target/" jarFile="${jarFile}" />
+	    <mvnDeploy folderName="IIP-transport-amqp" pomFile="pom.xml" jarFolder="target/" jarFile="${jarFile}" />
 	</target>
 </project>
