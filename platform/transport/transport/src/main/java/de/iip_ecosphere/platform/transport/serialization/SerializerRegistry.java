@@ -10,6 +10,7 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport.serialization;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,42 @@ public class SerializerRegistry {
     @SuppressWarnings("unchecked")
     public static <T> Serializer<T> getSerializer(Class<T> type) {
         return (Serializer<T>) serializers.get(type);
+    }
+    
+    /**
+     * Returns whether a serializer is known for the given {@code type}.
+     * 
+     * @param type the type to query for
+     * @return {@code true} if there is a registered serizalizer, {@code false} else
+     */
+    public static boolean hasSerializer(Class<?> type) {
+        return serializers.get(type) != null;
+    }
+    
+    /**
+     * Registers a serializer through its type. An accessible no-arg constructor is required for {@code type}.
+     * 
+     * @param type the type of the serializer to register
+     * @throws IllegalArgumentException if the required no-arg constructor on {@code type} cannot be found, called 
+     *   or executed, i.e., there is no instance to register
+     */
+    public static void registerSerializer(Class<Serializer<?>> type) throws IllegalArgumentException {
+        try {
+            registerSerializer(type.getConstructor().newInstance());
+            // multi-catch for potentially outdated edge JVM
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
