@@ -57,15 +57,16 @@ public class AbstractTransportConnectorTest {
      * 
      * @param host the host to use (usually "localhost")
      * @param port the TCP port to use
-     * @param serializer the serializer to use
+     * @param serializerType the serializer type to use
      * @throws IOException in case that connection/communication fails
      */
-    public static void doTest(String host, int port, Serializer<Product> serializer) throws IOException {
+    public static void doTest(String host, int port, Class<? extends Serializer<Product>> serializerType) 
+        throws IOException {
         Product data1 = new Product("prod1", 10.2);
         Product data2 = new Product("prod2", 5.1);
 
-        System.out.println("Using serializer: " + serializer.getClass().getSimpleName());
-        SerializerRegistry.registerSerializer(serializer);
+        System.out.println("Using serializer: " + serializerType.getSimpleName());
+        SerializerRegistry.registerSerializer(serializerType);
         TransportParameter param1 = new TransportParameter(host, port, "cl1");
         TransportConnector cl1 = TransportFactory.createConnector();
         System.out.println("Connecting connector 1");

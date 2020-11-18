@@ -50,11 +50,12 @@ public class SerializerRegistry {
     /**
      * Registers a serializer through its type. An accessible no-arg constructor is required for {@code type}.
      * 
+     * @param <T> the type to be serialized
      * @param type the type of the serializer to register
      * @throws IllegalArgumentException if the required no-arg constructor on {@code type} cannot be found, called 
      *   or executed, i.e., there is no instance to register
      */
-    public static void registerSerializer(Class<Serializer<?>> type) throws IllegalArgumentException {
+    public static <T> void registerSerializer(Class<? extends Serializer<T>> type) throws IllegalArgumentException {
         try {
             registerSerializer(type.getConstructor().newInstance());
             // multi-catch for potentially outdated edge JVM

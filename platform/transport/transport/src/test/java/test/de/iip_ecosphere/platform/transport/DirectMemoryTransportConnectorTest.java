@@ -39,8 +39,8 @@ public class DirectMemoryTransportConnectorTest {
                 }
             });
         
-        AbstractTransportConnectorTest.doTest("", 0, new ProductJsonSerializer());
-        AbstractTransportConnectorTest.doTest("", 0, new ProductProtobufSerializer());
+        AbstractTransportConnectorTest.doTest("", 0, ProductJsonSerializer.class);
+        AbstractTransportConnectorTest.doTest("", 0, ProductProtobufSerializer.class);
         
         TransportFactory.setFactoryImplementation(old);
     }
