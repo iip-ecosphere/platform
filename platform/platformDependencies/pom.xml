@@ -46,6 +46,9 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <iip-ecosphere.version>0.0.1-SNAPSHOT</iip-ecosphere.version>
+    
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <basyx.version>0.0.1-SNAPSHOT</basyx.version>
