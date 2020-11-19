@@ -128,10 +128,16 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @throws IOException in case that problems occur during serialization
      */
     protected <T> byte[] serialize(String stream, T data) throws IOException {
+        byte[] result;
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>) data.getClass();
         Serializer<T> serializer = SerializerRegistry.getSerializer(cls);
-        return serializer.serialize(data);
+        if (null != serializer) {
+            result = serializer.serialize(data);
+        } else {
+            result = new byte[0];
+        }
+        return result;
     }
 
 }

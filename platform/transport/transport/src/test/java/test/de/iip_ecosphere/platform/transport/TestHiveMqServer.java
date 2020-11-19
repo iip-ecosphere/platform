@@ -11,6 +11,9 @@
 package test.de.iip_ecosphere.platform.transport;
 
 import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+
 import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
@@ -32,14 +35,18 @@ public class TestHiveMqServer {
     public void start(String host, int port) {
         if (null == hiveMQ) {
             String tmp = System.getProperty("java.io.tmpdir");
+            File hiveTmp = new File(tmp, "hivemq");
+            FileUtils.deleteQuietly(hiveTmp);
+            hiveTmp.mkdir();
+
             System.setProperty("HIVEMQ_PORT", Integer.toString(port));
             System.setProperty("HIVEMQ_ADDRESS", host);
-            System.setProperty("hivemq.log.folder", tmp);
+            System.setProperty("hivemq.log.folder", hiveTmp.getAbsolutePath());
             
             File cfg = new File("./src/test");
             final EmbeddedHiveMQBuilder embeddedHiveMQBuilder = EmbeddedHiveMQBuilder.builder()
                 .withConfigurationFolder(cfg.toPath())
-                .withDataFolder(new File(tmp).toPath())
+                .withDataFolder(hiveTmp.toPath())
                 .withExtensionsFolder(new File(cfg, "extensions").toPath());
     
             hiveMQ = embeddedHiveMQBuilder.build();

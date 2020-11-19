@@ -25,7 +25,8 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 
 /**
- * A MQTT v3 connector based on Eclipse Paho.
+ * A MQTT v3 connector based on Eclipse Paho. This implementation is potentially
+ * not thread-safe, i.e., it may require a sending queue.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -76,7 +77,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
         } catch (MqttException e) {
-            throw new IOException(e.getMessage(), e);
+            throw new IOException(e);
         }
     }
 
@@ -86,7 +87,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
         try {
             waitForCompletion(client.subscribe(stream, MqttQoS.AT_LEAST_ONCE.value()));
         } catch (MqttException e) {
-            throw new IOException(e.getMessage(), e);
+            throw new IOException(e);
         }
     }
 
@@ -96,7 +97,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
             waitForCompletion(client.disconnect());
             client.close();
         } catch (MqttException e) {
-            throw new IOException(e.getMessage(), e);
+            throw new IOException(e);
         }
     }
 
@@ -128,7 +129,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
                 waitForCompletion(token);
             }
         } catch (MqttException e) {
-            throw new IOException(e.getMessage(), e);
+            throw new IOException(e);
         }
     }
 
