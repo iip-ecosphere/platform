@@ -17,7 +17,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.TransportFactoryImplementation;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.impl.PahoMqttV5TransportConnector;
+import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.ProductProtobufSerializer;
