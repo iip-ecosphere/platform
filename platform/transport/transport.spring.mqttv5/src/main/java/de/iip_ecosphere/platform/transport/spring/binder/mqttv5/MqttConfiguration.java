@@ -17,7 +17,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Represents the configuration options of a MQTT v3 client.
+ * Represents the configuration options of a MQTT v5 client.
  * 
  * @author Holger Eichelberger, SSE
  */
