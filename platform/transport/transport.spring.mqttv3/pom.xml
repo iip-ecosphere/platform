@@ -66,7 +66,13 @@
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.mqttv3</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport.mqttv3</artifactId>
