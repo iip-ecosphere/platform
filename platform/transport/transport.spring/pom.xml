@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>transport.spring</artifactId>
+  <packaging>jar</packaging>
+  <name>transport.spring</name>
+  <description>The Spring cloud stream basis extending the transport component of the IIP-Ecosphere platform.</description>
+  
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+  
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+     <dependency>
+         <groupId>org.springframework.cloud</groupId>
+         <artifactId>spring-cloud-stream</artifactId>
+     </dependency>
+     <dependency>
+         <groupId>org.springframework.cloud</groupId>
+         <artifactId>spring-cloud-commons</artifactId>
+     </dependency>
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+	    <groupId>org.springframework.cloud</groupId>
+	    <artifactId>spring-cloud-stream</artifactId>
+        <version>3.0.9.RELEASE</version>
+	    <type>test-jar</type>
+	    <scope>test</scope>
+	    <classifier>test-binder</classifier>
+	</dependency>
+  </dependencies>
+</project>
