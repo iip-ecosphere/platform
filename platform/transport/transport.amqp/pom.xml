@@ -4,7 +4,7 @@
   <artifactId>transport.amqp</artifactId>
   <packaging>jar</packaging>
   <name>transport.amqp</name>
-  <description>The binary version of the transport extension for AMQP of the IIP-Ecosphere platform.</description>
+  <description>The plain AMQP transport extension of the IIP-Ecosphere platform.</description>
   
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
