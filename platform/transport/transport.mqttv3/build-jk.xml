@@ -8,15 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
     <target name="maven"> 
         <maven pomFile="pom.xml" goal="package"/>
-        <path id="jarFile.id">
-          <fileset dir="target">
-            <include name="transport.mqtt*.*.*-SNAPSHOT.jar"/>
-          </fileset>
-        </path>
-        <local name="temp"/>
-        <property name="temp" refid="jarFile.id"/>
-        <local name="jarFile"/>
-        <basename property="jarFile" file="${temp}"/>
-        <mvnDeploy folderName="IIP-transport-mqttv3" pomFile="pom.xml" jarFolder="target/" jarFile="${jarFile}" />
+        <mvnDeployResolveArtifact folderName="IIP-transport-mqttv3" pomFile="pom.xml" jarFolder="target" artifactPattern="transport.mqtt*.*.*-SNAPSHOT.jar" />
     </target>
 </project>
