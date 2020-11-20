@@ -5,137 +5,18 @@
   <packaging>jar</packaging>
   <name>transport.amqp</name>
   <description>The binary version of the transport extension for AMQP of the IIP-Ecosphere platform.</description>
-  <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
   
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-    <license>
-      <name>Eclipse Public License, Version 1.0</name>
-      <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  
-  <developers>
-    <developer>
-      <id>eichelbe</id>
-      <name>Holger Eichelberger</name>
-      <email>eichelberger@sse.uni-hildesheim.de</email>
-      <url>https://sse.uni-hildesheim.de/mitglieder/dr-holger-eichelberger/</url>
-      <organization>SUH</organization>
-      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>Europe/Berlin</timezone>
-    </developer>
-  </developers>
-  
-  <scm>
-    <url>https://github.com/iip-ecosphere/platform.git</url>
-  </scm>
-    
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
      <version>0.0.1-SNAPSHOT</version>
   </parent>
   
-  <repositories>       
-    <repository>
-      <id>SSE</id>
-      <name>SSE</name>
-      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
-  
-  <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>de.iip-ecosphere.platform</groupId>
-            <artifactId>platformDependencies</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency> 
-    </dependencies>
-  </dependencyManagement>
-  
-  <build>
-    <plugins>
-    
-       <plugin>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <version>3.7.0</version>
-         <configuration>
-           <source>${java.source}</source>
-           <target>${java.target}</target>
-           <release>${java.release}</release>
-           <encoding>${java.encoding}</encoding>
-         </configuration>
-       </plugin>
-       
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <show>private</show>
-          <encoding>${java.encoding}</encoding>
-          <source>${java.source}</source>
-          <excludePackageNames>test.de.iip_ecosphere.platform.transport.proto</excludePackageNames>
-        </configuration>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <goals>
-              <goal>javadoc</goal>
-              <goal>test-javadoc</goal>
-              <goal>jar</goal>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-       
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
-        <configuration>
-          <includes>
-            <include>**/AllTests.class</include>
-          </includes>
-        </configuration>
-      </plugin>     
-
-    </plugins>
-  </build>
-  
   <dependencies>
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
-      <version>${iip-ecosphere.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.rabbitmq</groupId>
@@ -151,7 +32,7 @@
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
