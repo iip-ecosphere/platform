@@ -1,0 +1,2 @@
+mqttv5Binder:\
+de.iip_ecosphere.platform.transport.spring.binder.mqttv5.MqttV5MessageBinderConfiguration
