@@ -25,28 +25,34 @@ import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.SubscribableChannel;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.MimeType;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 import de.iip_ecosphere.platform.transport.spring.binder.mqttv3.MqttClient;
 import test.de.iip_ecosphere.platform.transport.mqttv3.TestHiveMqServer;
 import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 
+/**
+ * Test class for the message binder. This class uses the application configuration from transport.spring!
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.properties")
 @RunWith(SpringRunner.class)
-@ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
 public class MqttV3MessageBinderTest {
 
     private static TestHiveMqServer server;
@@ -163,6 +169,16 @@ public class MqttV3MessageBinderTest {
         @StreamListener("input2")
         public void receiveInput(String value) {
             received = value;
+        }
+        
+        /**
+         * Creates a custom message converter.
+         * 
+         * @return the custom message converter
+         */
+        @Bean
+        public MessageConverter customMessageConverter() {
+            return new SerializerMessageConverter(new MimeType("application", "ser-string"));
         }
       
     }
