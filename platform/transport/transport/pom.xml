@@ -32,12 +32,6 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- A Java MQTT server for testing -->
-    <dependency>
-      <groupId>com.hivemq</groupId>
-      <artifactId>hivemq-community-edition-embedded</artifactId>
-      <version>2020.4</version>
-    </dependency>
     <!-- A bit JSON for testing serialization/deserialization -->
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>

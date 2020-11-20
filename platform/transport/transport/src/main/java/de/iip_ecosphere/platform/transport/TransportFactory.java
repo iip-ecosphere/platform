@@ -12,13 +12,13 @@ package de.iip_ecosphere.platform.transport;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.impl.PahoMqttV3TransportConnector;
 
 /**
  * A factory for creating transport connector instances. This factory shall
  * ensure that the entire platform runs with the same connector instances,
  * however, provides at the same time the flexibility to exchange the creation
- * process.
+ * process. As there is no default connector in this artifact anymore, the factory 
+ * must be configured by a {@lin TransportFactoryImplementation} before use. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -82,7 +82,7 @@ public class TransportFactory {
 
         @Override
         public TransportConnector createConnector() {
-            return new PahoMqttV3TransportConnector();
+            return new DirectMemoryTransferTransportConnector();
         }
         
     };
