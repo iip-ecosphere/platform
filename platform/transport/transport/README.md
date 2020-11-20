@@ -13,9 +13,6 @@ mechnisms that shall be defined accordingly in upstream layers. Type translators
 specific into more general types required by reusable components, i.e., the translators act as input or output type 
 adapters. Serializers are bidirectional type translators.
 
-This implementation ships with [MQTT](https://mqtt.org/) v3 and v5 clients as default transport connectors based on 
-[Eclipse Paho](https://www.eclipse.org/paho/). As explained above, there are no default transport serializers included. 
-
 For the moment, the regression tests exercise the transport connectors with simple JSON and [Google protobuf](https://developers.google.com/protocol-buffers) serialization against [HiveMQ](https://www.hivemq.com) as MQTT broker 
 supporting MQTT v3 and v5. Dependencies to the json-simple library, Google protobuf and HiveQM are used for testing 
 only and not required for platform execution.
