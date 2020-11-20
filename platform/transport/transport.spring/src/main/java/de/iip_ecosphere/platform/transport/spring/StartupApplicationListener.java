@@ -42,20 +42,10 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     Serializer<?> ser = (Serializer<?>) Class.forName(s).getConstructor().newInstance();
                     SerializerRegistry.registerSerializer(ser);
                     LOGGER.info("Registered Serializer " + s);
-                } catch (ClassNotFoundException e) {
-                    LOGGER.error("Serializer class " + s + " not found");
-                } catch (InstantiationException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s);
-                } catch (IllegalAccessException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s + ": No-arg constructor not accessible");
-                } catch (IllegalArgumentException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s + ": Argument problem.");
-                } catch (InvocationTargetException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s + ": Execution problem.");
-                } catch (NoSuchMethodException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s + ": No-arg constructor not found.");
-                } catch (SecurityException e) {
-                    LOGGER.error("Cannot instantiate serializer " + s + ": Security problem.");
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException | NoSuchMethodException | SecurityException
+                        | ClassNotFoundException e) {
+                    LOGGER.error("Serializer class " + s + " cannot be registered: " + e.getMessage());
                 }
             }
             done = true;
