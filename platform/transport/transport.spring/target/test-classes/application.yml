@@ -1,7 +1,0 @@
-serialization:
-    serializers[0]: test.de.iip_ecosphere.platform.transport.spring.StringSerializer
-spring:
-    cloud:
-        stream:
-            default:
-                contentType: application/ser-string
