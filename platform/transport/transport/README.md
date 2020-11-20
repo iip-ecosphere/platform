@@ -9,7 +9,9 @@ At the moment, we assume homogeneous streams. Heterogeneous streams may be added
 
 For turning objects into their transport representation, we use as serialization interfaces. However, we assume that
 the object classes will be defined in upstream layers, i.e., this component ships without type-specific serialization 
-mechnisms that shall be defined accordingly in upstream layers.
+mechnisms that shall be defined accordingly in upstream layers. Type translators are intended to translate application
+specific into more general types required by reusable components, i.e., the translators act as input or output type 
+adapters. Serializers are bidirectional type translators.
 
 This implementation ships with [MQTT](https://mqtt.org/) v3 and v5 clients as default transport connectors based on 
 [Eclipse Paho](https://www.eclipse.org/paho/). As explained above, there are no default transport serializers included. 

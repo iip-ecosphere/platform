@@ -27,7 +27,7 @@ public class ProductJsonSerializer implements Serializer<Product> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public byte[] serialize(Product value) throws IOException {
+    public byte[] to(Product value) throws IOException {
         JSONObject json = new JSONObject();
         json.put("description", value.getDescription());
         json.put("price", value.getPrice());
@@ -35,7 +35,7 @@ public class ProductJsonSerializer implements Serializer<Product> {
     }
 
     @Override
-    public Product deserialize(byte[] data) throws IOException {
+    public Product from(byte[] data) throws IOException {
         Product result;
         try {
             JSONParser parser = new JSONParser();

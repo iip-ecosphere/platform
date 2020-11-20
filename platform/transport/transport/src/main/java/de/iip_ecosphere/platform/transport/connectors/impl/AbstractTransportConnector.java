@@ -113,7 +113,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         if (null != callback) {
             Serializer<T> serializer = SerializerRegistry.getSerializer(callback.getType());
             if (null != serializer) {
-                callback.received(serializer.deserialize(data));
+                callback.received(serializer.from(data));
             }
         }
     }
@@ -133,7 +133,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         Class<T> cls = (Class<T>) data.getClass();
         Serializer<T> serializer = SerializerRegistry.getSerializer(cls);
         if (null != serializer) {
-            result = serializer.serialize(data);
+            result = serializer.to(data);
         } else {
             result = new byte[0];
         }

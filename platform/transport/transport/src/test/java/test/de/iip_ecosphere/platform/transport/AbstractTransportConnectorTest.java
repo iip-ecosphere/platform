@@ -52,8 +52,7 @@ public class AbstractTransportConnectorTest {
     }
     
     /**
-     * Implements the test using the {@link TransportFactory}, i.e., starts the
-     * {@link TestMqttServer} on the given host/port and communicates with it.
+     * Implements the test using the {@link TransportFactory}.
      * 
      * @param host the host to use (usually "localhost")
      * @param port the TCP port to use

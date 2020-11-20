@@ -19,7 +19,7 @@ import java.io.IOException;
  * @param <T> the type to be serialized
  * @author Holger Eichelberger, SSE
  */
-public interface Serializer<T> {
+public interface Serializer<T> extends TypeTranslator<T, byte[]> {
 
     /**
      * Serializes a value into a byte array.
@@ -28,7 +28,7 @@ public interface Serializer<T> {
      * @return the serialized data
      * @throws IOException in case that serialization fails
      */
-    public byte[] serialize(T value) throws IOException;
+    public byte[] to(T value) throws IOException;
 
     /**
      * Deserializes a byte array into a value.
@@ -37,7 +37,7 @@ public interface Serializer<T> {
      * @return the serialized object
      * @throws IOException in case that serialization fails
      */
-    public T deserialize(byte[] data) throws IOException;
+    public T from(byte[] data) throws IOException;
 
     /**
      * Creates a new value instance and copies the values from {@code origin} to the new instance.

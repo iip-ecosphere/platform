@@ -23,7 +23,7 @@ import test.de.iip_ecosphere.platform.transport.proto.ProductOuterClass;
 public class ProductProtobufSerializer implements Serializer<Product> {
 
     @Override
-    public byte[] serialize(Product value) throws IOException {
+    public byte[] to(Product value) throws IOException {
         ProductOuterClass.Product prod = ProductOuterClass.Product.newBuilder()
             .setDescription(value.getDescription())
             .setPrice(value.getPrice())
@@ -32,7 +32,7 @@ public class ProductProtobufSerializer implements Serializer<Product> {
     }
 
     @Override
-    public Product deserialize(byte[] data) throws IOException {
+    public Product from(byte[] data) throws IOException {
         ProductOuterClass.Product prod = ProductOuterClass.Product.parseFrom(data);
         return new Product(prod.getDescription(), prod.getPrice());
     }
