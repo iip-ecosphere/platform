@@ -5,7 +5,7 @@
   <artifactId>transport</artifactId>
   <packaging>jar</packaging>
   <name>transport</name>
-  <description>The binary version of the transport component of the IIP-Ecosphere platform.</description>
+  <description>The transport component as basis of the transport layer of the IIP-Ecosphere platform.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>

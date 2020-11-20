@@ -24,6 +24,8 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
  * A MQTT v3 connector based on Eclipse Paho. This implementation is potentially

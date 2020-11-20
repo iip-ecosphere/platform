@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package de.iip_ecosphere.platform.transport.connectors.impl;
+package de.iip_ecosphere.platform.transport.connectors.basics;
 
 /**
  * MQTT quality levels. Included as own class as so far non quality definition
@@ -16,7 +16,7 @@ package de.iip_ecosphere.platform.transport.connectors.impl;
  * 
  * @author Holger Eichelberger, SSE
  */
-enum MqttQoS {
+public enum MqttQoS {
     
     AT_MOST_ONCE(0), 
     AT_LEAST_ONCE(1), 

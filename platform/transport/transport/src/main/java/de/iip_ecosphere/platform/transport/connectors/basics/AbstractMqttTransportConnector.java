@@ -8,7 +8,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package de.iip_ecosphere.platform.transport.connectors.impl;
+package de.iip_ecosphere.platform.transport.connectors.basics;
+
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * An abstract MQTT transport connector.
