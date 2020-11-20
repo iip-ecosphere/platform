@@ -24,11 +24,10 @@ More to come soon.
   the other projects.
 * The Java package prefix shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 
 * Java files shall contain the license header. Existing files can be used as a template.
-* Building Java-parts happens with Maven (based on centralized dependency 
-  management/parent POM). Groups are or start with ``de.iip-ecosphere.platform`` 
-  to comply with Maven central deployment. Also ensure that POMs contain a valid URL, description, licenses, 
-  developers and SCM section. Existing POMs can be used as a template. Use existing test artificts for reuse and, 
-  where possible, build your tests on existing functionality. 
+* Building Java-parts happens with Maven (based on a parent POM). Groups are or start with ``de.iip-ecosphere.platform`` to comply with Maven central deployment. Use basic information from the parent 
+  POM as far as possible, e.g., valid URL, description, licenses, developers and SCM section. Redefine parts only if 
+  needed except for dependencies - please define explicitly your minimum set of required dependencies (easing later
+  deployment) Use existing test artificts for reuse and, where possible, build your tests on existing functionality. 
 * CI and SNAPSHOT deployment currently are done via SSE-CI/SSE-Maven-Repo. 
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
   file that executes Maven and deploys the artifacts.
