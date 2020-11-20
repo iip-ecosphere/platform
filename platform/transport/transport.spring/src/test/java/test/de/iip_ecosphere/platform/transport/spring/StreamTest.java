@@ -27,7 +27,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MimeType;
 
@@ -40,7 +39,6 @@ import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
  * @author Holger Eichelberger, SSE
  */
 @SpringBootTest(classes = StreamTest.class)
-@TestPropertySource(locations = "classpath:test.properties")
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
 public class StreamTest {

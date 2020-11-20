@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
@@ -29,7 +28,6 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  * @author Holger Eichelberger, SSE
  */
 @SpringBootTest(classes = SerializerTest.class)
-@TestPropertySource(locations = "classpath:test.properties")
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
 public class SerializerTest {
