@@ -28,7 +28,7 @@ import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTranspo
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
- * A MQTT v3 connector based on Eclipse Paho. This implementation is potentially
+ * A MQTT v5 connector based on Eclipse Paho. This implementation is potentially
  * not thread-safe, i.e., it may require a sending queue.
  * 
  * @author Holger Eichelberger, SSE
