@@ -41,7 +41,7 @@ public class MqttV5MessageBinderProvisioner implements ProvisioningProvider<Cons
     }
 
     /**
-     * Implements a message destination for MQTT v3.
+     * Implements a message destination for MQTT v5.
      * 
      * @author Holger Eichelberger, SSE
      */

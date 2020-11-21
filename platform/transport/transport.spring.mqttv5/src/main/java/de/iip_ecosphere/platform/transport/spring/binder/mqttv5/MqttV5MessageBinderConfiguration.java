@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Represents the MQTT v3 message binder plugin.
+ * Represents the MQTT v5 message binder plugin.
  * 
  * @author Holger Eichelberger, SSE
  */

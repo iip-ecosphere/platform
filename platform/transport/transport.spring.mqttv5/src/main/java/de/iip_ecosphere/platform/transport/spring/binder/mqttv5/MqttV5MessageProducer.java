@@ -18,7 +18,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 
 /**
- * Implements a MQTT v3 message producer.
+ * Implements a MQTT v5 message producer.
  * 
  * @author Holger Eichelberger, SSE
  */

@@ -21,7 +21,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 /**
- * A MQTT v3 message binder turning messages to be sent into MQTT messages.
+ * A MQTT v5 message binder turning messages to be sent into MQTT messages.
  * 
  * @author Holger Eichelberger, SSE
  */
