@@ -1,11 +1,15 @@
 #IIP-Ecosphere platform
 
 This is for all code realizing the IIP-Ecosphere platform. So far present:
-* Managed Platform dependencies
+* Managed Platform dependencies (parent POM)
 * Transport Layer
     * Transport component
-    * Transport extension for MQTT v3 and v5
-    * Transport extension for AMQP
+         * Transport connector for MQTT v3 and v5
+         * Transport connector for AMQP
+    * Optional transport support for [Spring cloud stream](https://spring.io/projects/spring-cloud-stream)
+         * Transport connector binder for MQTT v3 and v5
+         * Transport connector binder for AMQP
+ * Services and Connections Layer (starting)
 
 More to come soon. 
 
