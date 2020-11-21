@@ -1,0 +1,2 @@
+amqpBinder:\
+de.iip_ecosphere.platform.transport.spring.binder.amqp.AmqpMessageBinderConfiguration
