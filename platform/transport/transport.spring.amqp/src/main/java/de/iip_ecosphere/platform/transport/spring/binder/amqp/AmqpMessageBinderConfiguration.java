@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Represents the MQTT v3 message binder plugin.
+ * Represents the AMQP message binder plugin.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -32,7 +32,7 @@ public class AmqpMessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public AmqpMessageBinderProvisioner mqttMessageBinderProvisioner() {
+    public AmqpMessageBinderProvisioner amqpMessageBinderProvisioner() {
         return new AmqpMessageBinderProvisioner();
     }
 
@@ -44,7 +44,7 @@ public class AmqpMessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public AmqpMessageBinder mqttMessageBinder(AmqpMessageBinderProvisioner messageBinderProvisioner) {
+    public AmqpMessageBinder amqpMessageBinder(AmqpMessageBinderProvisioner messageBinderProvisioner) {
         return new AmqpMessageBinder(null, messageBinderProvisioner);
     }
 

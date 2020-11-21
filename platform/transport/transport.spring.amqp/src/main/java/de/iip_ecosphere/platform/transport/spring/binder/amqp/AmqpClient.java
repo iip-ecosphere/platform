@@ -85,7 +85,7 @@ public class AmqpClient {
     
     /**
      * The send consumer running in parallel taking {@link SendEntry send entries} from {@link AmqpClient#queue} to
-     * pass them on to the MQTT client for sending.
+     * pass them on to the AMQP client for sending.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -128,9 +128,9 @@ public class AmqpClient {
     }
     
     /**
-     * Creates the client based on a given MQTT client configuration.
+     * Creates the client based on a given AMQP client configuration.
      * 
-     * @param config the MQTT configuration to take the connection information from
+     * @param config the AMQP configuration to take the connection information from
      */
     static synchronized void createClient(AmqpConfiguration config) {
         if (null == channel) {

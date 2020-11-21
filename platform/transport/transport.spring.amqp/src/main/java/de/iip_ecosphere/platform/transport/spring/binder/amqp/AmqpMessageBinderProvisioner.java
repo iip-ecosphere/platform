@@ -30,22 +30,22 @@ public class AmqpMessageBinderProvisioner implements ProvisioningProvider<Consum
     public ProducerDestination provisionProducerDestination(String name, ProducerProperties properties)
             throws ProvisioningException {
         AmqpClient.createClient(options);
-        return new MqttMessageDestination(name);
+        return new AmqpMessageDestination(name);
     }
 
     @Override
     public ConsumerDestination provisionConsumerDestination(String name, String group, ConsumerProperties properties)
             throws ProvisioningException {
         AmqpClient.createClient(options);
-        return new MqttMessageDestination(name);
+        return new AmqpMessageDestination(name);
     }
 
     /**
-     * Implements a message destination for MQTT v3.
+     * Implements a message destination for AMQP v3.
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class MqttMessageDestination implements ProducerDestination, ConsumerDestination {
+    private class AmqpMessageDestination implements ProducerDestination, ConsumerDestination {
 
         private final String destination;
 
@@ -54,7 +54,7 @@ public class AmqpMessageBinderProvisioner implements ProvisioningProvider<Consum
          * 
          * @param destination the destination (topic)
          */
-        private MqttMessageDestination(final String destination) {
+        private AmqpMessageDestination(final String destination) {
             this.destination = destination;
         }
 
