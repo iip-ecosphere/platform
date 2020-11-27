@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 public class SerializerConfiguration {
     
     private List<String> serializers = new ArrayList<String>();
+    private String name = "";
     
     /**
      * Returns the qualified serializer class names to register.
@@ -37,6 +38,15 @@ public class SerializerConfiguration {
      */
     public List<String> getSerializers() {
         return serializers;
+    }
+    
+    /**
+     * Returns the wire name of the registry.
+     *  
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
     // setters required for @ConfigurationProperties
@@ -48,6 +58,15 @@ public class SerializerConfiguration {
      */
     public void setSerializers(List<String> serializers) {
         this.serializers = serializers;
+    }
+
+    /**
+     * Changes the wire name.
+     * 
+     * @param name the wire name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

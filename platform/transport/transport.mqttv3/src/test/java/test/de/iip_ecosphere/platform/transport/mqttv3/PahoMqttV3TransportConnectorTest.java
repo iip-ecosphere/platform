@@ -12,6 +12,7 @@ package test.de.iip_ecosphere.platform.transport.mqttv3;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.transport.TransportFactory;
@@ -44,8 +45,15 @@ public class PahoMqttV3TransportConnectorTest {
             public TransportConnector createConnector() {
                 return new PahoMqttV3TransportConnector();
             }
+
+            @Override
+            public String getName() {
+                return PahoMqttV3TransportConnector.NAME;
+            }
+            
         });
 
+        Assert.assertEquals(PahoMqttV3TransportConnector.NAME, TransportFactory.getConnectorName());
         final int port = 8883;
         TestHiveMqServer server = new TestHiveMqServer();
         server.start("localhost", port);

@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
  */
 public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector {
 
+    public static final String NAME = "MQTT v5";
     private MqttAsyncClient client;
 
     /**
@@ -160,5 +161,11 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
     private void waitForCompletion(IMqttToken token) throws MqttException {
         token.waitForCompletion(getActionTimeout());
     }
+    
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
 
 }

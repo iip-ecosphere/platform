@@ -12,6 +12,7 @@ package test.de.iip_ecosphere.platform.transport.connectors.rabbitmq;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.rabbitmq.client.ConnectionFactory;
@@ -62,8 +63,14 @@ public class RabbitMqAmqpTransportConnectorTest {
                 return new FakeAuthConnector();
             }
 
+            @Override
+            public String getName() {
+                return FakeAuthConnector.NAME;
+            }
+
         });
 
+        Assert.assertEquals(FakeAuthConnector.NAME, TransportFactory.getConnectorName());
         final int port = 8883;
         TestQpidServer server = new TestQpidServer();
         server.start("localhost", port);

@@ -1,6 +1,7 @@
 serialization:
     serializers[0]: test.de.iip_ecosphere.platform.transport.spring.StringSerializer
     serializers[1]: a.b.c.D
+    name: custom
 transport:
     mainTransportClassName: test.de.iip_ecosphere.platform.transport.spring.FakeTransportConnector1
     interProcessClassName: test.de.iip_ecosphere.platform.transport.spring.FakeTransportConnector2

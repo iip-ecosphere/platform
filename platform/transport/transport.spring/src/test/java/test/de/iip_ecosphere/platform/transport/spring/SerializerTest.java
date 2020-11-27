@@ -40,6 +40,7 @@ public class SerializerTest {
     public void testSerializer() {
         SpringApplication.run(SerializerTest.class);
         Assert.assertTrue(SerializerRegistry.hasSerializer(String.class));
+        Assert.assertEquals("custom", SerializerRegistry.getName());
     }
     
 }

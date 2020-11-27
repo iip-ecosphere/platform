@@ -29,6 +29,8 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
  */
 public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
 
+    public static final String NAME = "AMQP";
+    
     private Connection connection;
     private Channel channel;
 
@@ -116,6 +118,11 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
             // nothing for now
         }
         connection.close();
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

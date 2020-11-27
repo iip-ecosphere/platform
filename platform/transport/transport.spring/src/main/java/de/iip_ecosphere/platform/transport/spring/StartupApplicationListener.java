@@ -60,6 +60,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                 LOGGER.info("Registered Serializer " + s);
             }
         }
+        SerializerRegistry.setName(cfg.getName());
     }
     
     /**
@@ -101,6 +102,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
             TransportConnector conn = obtainInstance(className, context, TransportConnector.class);
             if (null != conn) {
                 final Class<? extends TransportConnector> cls = conn.getClass();
+                final String name = conn.getName();
                 result = new ConnectorCreator() {
                     
                     @Override
@@ -114,6 +116,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                             // we already tested this before
                         }
                         return result;
+                    }
+
+                    @Override
+                    public String getName() {
+                        return name;
                     }
                 };
             }

@@ -37,5 +37,10 @@ public class FakeTransportConnector1 implements TransportConnector {
     @Override
     public void disconnect() throws IOException {
     }
+    
+    @Override
+    public String getName() {
+        return "Fake 1";
+    }
 
 }
