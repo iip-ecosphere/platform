@@ -37,6 +37,13 @@ public class TransportFactory {
          * @return the created connector instance
          */
         public TransportConnector createConnector();
+
+        /**
+         * Returns the descriptive name of the connector.
+         *   
+         * @return the name
+         */
+        public String getName();
         
     }
     
@@ -48,6 +55,11 @@ public class TransportFactory {
         @Override
         public TransportConnector createConnector() {
             return new DirectMemoryTransferTransportConnector();
+        }
+
+        @Override
+        public String getName() {
+            return DirectMemoryTransferTransportConnector.NAME;
         }
         
     };
@@ -129,6 +141,15 @@ public class TransportFactory {
      */
     public static TransportConnector createDirectMemoryConnector() {
         return dmCreator.createConnector();
+    }
+    
+    /**
+     * Returns the descriptive name of the main connector.
+     * 
+     * @return the descriptive name
+     */
+    public static String getConnectorName() {
+        return mainCreator.getName();
     }
 
 }

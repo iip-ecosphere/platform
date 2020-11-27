@@ -56,6 +56,11 @@ public class DirectMemoryTransportConnectorTest {
         public void disconnect() throws IOException {
         }
         
+        @Override
+        public String getName() {
+            return "Fake";
+        }
+        
     }
     
     private static final DirectMemoryTransferTransportConnector MY_DM_CONNECTOR 
@@ -77,6 +82,12 @@ public class DirectMemoryTransportConnectorTest {
             public TransportConnector createConnector() {
                 return MY_DM_CONNECTOR;
             }
+
+            @Override
+            public String getName() {
+                return DirectMemoryTransferTransportConnector.NAME;
+            }
+            
         };
         
         ConnectorCreator fake = new ConnectorCreator() {
@@ -85,7 +96,12 @@ public class DirectMemoryTransportConnectorTest {
             public TransportConnector createConnector() {
                 return MY_FAKE_CONNECTOR;
             }
-            
+
+            @Override
+            public String getName() {
+                return "Fake";
+            }
+
         };
 
         ConnectorCreator mainOld = TransportFactory.setMainImplementation(dmc);
@@ -96,6 +112,7 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertTrue(TransportFactory.createConnector() == MY_DM_CONNECTOR);
         Assert.assertTrue(TransportFactory.createDirectMemoryConnector() == MY_FAKE_CONNECTOR);
         Assert.assertTrue(TransportFactory.createIpcConnector() == MY_FAKE_CONNECTOR);
+        Assert.assertEquals(DirectMemoryTransferTransportConnector.NAME, TransportFactory.getConnectorName());
 
         AbstractTransportConnectorTest.doTest("", 0, ProductJsonSerializer.class);
         MY_DM_CONNECTOR.clear(); // just as we want to have constants

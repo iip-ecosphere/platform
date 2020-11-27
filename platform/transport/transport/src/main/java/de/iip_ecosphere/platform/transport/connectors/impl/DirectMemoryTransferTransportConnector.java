@@ -30,6 +30,8 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public class DirectMemoryTransferTransportConnector extends AbstractTransportConnector {
 
+    public static final String NAME = "IIP-Ecosphere direct memory transfer";
+    
     private static Map<String, List<DirectMemoryTransferTransportConnector>> subscriptions 
         = new HashMap<String, List<DirectMemoryTransferTransportConnector>>();
 
@@ -104,7 +106,12 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
             }
         }
     }
-    
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     /**
      * Clears everything.
      */

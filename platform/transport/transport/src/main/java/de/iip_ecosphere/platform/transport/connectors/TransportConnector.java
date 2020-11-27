@@ -84,4 +84,11 @@ public interface TransportConnector {
      */
     public void disconnect() throws IOException;
 
+    /**
+     * Returns a descriptive name of the transport protocol being implemented.
+     * 
+     * @return the name of the protocol
+     */
+    public String getName();
+    
 }

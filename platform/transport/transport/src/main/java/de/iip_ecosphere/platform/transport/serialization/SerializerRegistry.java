@@ -24,6 +24,7 @@ import java.util.Map;
 public class SerializerRegistry {
 
     private static Map<Class<?>, Serializer<?>> serializers = Collections.synchronizedMap(new HashMap<>());
+    private static String wireName = "";
 
     /**
      * Returns a serializer instance.
@@ -101,6 +102,27 @@ public class SerializerRegistry {
      */
     public static void unregisterSerializer(Class<?> type) {
         serializers.remove(type);
+    }
+    
+    /**
+     * Returns the descriptive name of this factory indicating the utilized wire format.
+     * 
+     * @return the descriptive name
+     */
+    public static String getName() {
+        return wireName;
+    }
+
+    /**
+     * Changes the descriptive name of this factory indicating the utilized wire format.
+     * 
+     * @param name the descriptive name
+     * @return the descriptive name before this call
+     */
+    public static String setName(String name) {
+        String old = name;
+        wireName = name;
+        return old;
     }
 
 }
