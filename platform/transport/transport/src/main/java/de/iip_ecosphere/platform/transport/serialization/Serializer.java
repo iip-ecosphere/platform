@@ -22,24 +22,6 @@ import java.io.IOException;
 public interface Serializer<T> extends TypeTranslator<T, byte[]> {
 
     /**
-     * Serializes a value into a byte array.
-     * 
-     * @param value the value to be serialized
-     * @return the serialized data
-     * @throws IOException in case that serialization fails
-     */
-    public byte[] to(T value) throws IOException;
-
-    /**
-     * Deserializes a byte array into a value.
-     * 
-     * @param data the data to be deserialized
-     * @return the serialized object
-     * @throws IOException in case that serialization fails
-     */
-    public T from(byte[] data) throws IOException;
-
-    /**
      * Creates a new value instance and copies the values from {@code origin} to the new instance.
      * Use the {@link SerializerRegistry} to implement cloning of nested object values.
      *  

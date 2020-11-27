@@ -20,4 +20,13 @@ public interface TypeTranslator<S, T> {
      */
     public T to(S source) throws IOException;
     
+    /**
+     * Deserializes a target value into a source value.
+     * 
+     * @param data the data to be translated back
+     * @return the serialized object
+     * @throws IOException in case that serialization fails
+     */
+    public S from(T data) throws IOException;
+    
 }

@@ -29,7 +29,7 @@ public class TransportFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface TransportFactoryImplementation {
+    public interface ConnectorCreator {
 
         /**
          * Creates a connector instance.
@@ -37,48 +37,13 @@ public class TransportFactory {
          * @return the created connector instance
          */
         public TransportConnector createConnector();
-
-        /**
-         * Creates an inter-process connector.
-         * 
-         * @return the created connector instance
-         */
-        public TransportConnector createIpcConnector();
-
-        /**
-         * Creates a direct memory transfer connector instance.
-         * 
-         * @return the direct memory connector instance
-         */
-        public TransportConnector createDirectMemoryConnector();
-        
-    }
-
-    /**
-     * Provides a basic implementation factory. Here, inter-process connector creation is delegated to 
-     * {@link #createConnector()} and the direct memory connector goes for the default implementation 
-     * {@link DirectMemoryTransferTransportConnector}.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public abstract static class BaseFactoryImplementation implements TransportFactoryImplementation {
-
-        @Override
-        public TransportConnector createIpcConnector() {
-            return createConnector();
-        }
-
-        @Override
-        public TransportConnector createDirectMemoryConnector() {
-            return new DirectMemoryTransferTransportConnector();
-        }
         
     }
     
     /**
      * The default factory implementation (to be able to return to this instance if needed).
      */
-    private static final TransportFactoryImplementation DEFAULT = new BaseFactoryImplementation() {
+    private static final ConnectorCreator DEFAULT = new ConnectorCreator() {
 
         @Override
         public TransportConnector createConnector() {
@@ -87,22 +52,57 @@ public class TransportFactory {
         
     };
     
-    private static TransportFactoryImplementation instance = DEFAULT;
+    private static ConnectorCreator mainCreator = DEFAULT;
+    
+    private static ConnectorCreator ipcCreator = DEFAULT;
+    
+    private static ConnectorCreator dmCreator = DEFAULT;
 
     /**
-     * Changes the factory implementation. May be replaced by an injection-based
+     * Changes the main factory implementation. May be replaced by an injection-based
      * mechanism, so far required for testing.
      * 
      * @param inst the factory implementation instance (ignored if <b>null</b>)
      * @return the factory implementation instance before calling this method
      */
-    public static TransportFactoryImplementation setFactoryImplementation(TransportFactoryImplementation inst) {
-        TransportFactoryImplementation old = instance;
+    public static ConnectorCreator setMainImplementation(ConnectorCreator inst) {
+        ConnectorCreator old = mainCreator;
         if (null != inst) {
-            instance = inst;
+            mainCreator = inst;
         }
         return old;
     }
+    
+    /**
+     * Changes the inter-process factory implementation. May be replaced by an injection-based
+     * mechanism, so far required for testing.
+     * 
+     * @param inst the factory implementation instance (ignored if <b>null</b>)
+     * @return the factory implementation instance before calling this method
+     */
+    public static ConnectorCreator setIpcImplementation(ConnectorCreator inst) {
+        ConnectorCreator old = ipcCreator;
+        if (null != inst) {
+            ipcCreator = inst;
+        }
+        return old;
+    }
+    
+    /**
+     * Changes the direct memory factory implementation. May be replaced by an injection-based
+     * mechanism, so far required for testing.
+     * 
+     * @param inst the factory implementation instance (ignored if <b>null</b>)
+     * @return the factory implementation instance before calling this method
+     */
+    public static ConnectorCreator setDmImplementation(ConnectorCreator inst) {
+        ConnectorCreator old = dmCreator;
+        if (null != inst) {
+            dmCreator = inst;
+        }
+        return old;
+    }
+    
 
     /**
      * Creates a connector instance.
@@ -110,7 +110,7 @@ public class TransportFactory {
      * @return the created connector instance
      */
     public static TransportConnector createConnector() {
-        return instance.createConnector();
+        return mainCreator.createConnector();
     }
     
     /**
@@ -119,7 +119,7 @@ public class TransportFactory {
      * @return the created connector instance
      */
     public static TransportConnector createIpcConnector() {
-        return instance.createIpcConnector();
+        return ipcCreator.createConnector();
     }
     
     /**
@@ -128,7 +128,7 @@ public class TransportFactory {
      * @return the direct memory connector instance
      */
     public static TransportConnector createDirectMemoryConnector() {
-        return instance.createDirectMemoryConnector();
+        return dmCreator.createConnector();
     }
 
 }

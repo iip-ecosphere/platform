@@ -104,5 +104,12 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
             }
         }
     }
+    
+    /**
+     * Clears everything.
+     */
+    public void clear() {
+        subscriptions.clear();
+    }
 
 }
