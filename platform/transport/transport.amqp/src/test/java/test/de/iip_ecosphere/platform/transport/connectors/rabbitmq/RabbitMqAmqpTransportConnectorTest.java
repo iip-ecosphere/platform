@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.rabbitmq.client.ConnectionFactory;
 
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.TransportFactory.TransportFactoryImplementation;
+import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
@@ -55,15 +55,14 @@ public class RabbitMqAmqpTransportConnectorTest {
      */
     @Test
     public void testPahoConnector() throws IOException {
-        TransportFactoryImplementation old = TransportFactory
-            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
+        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 
-                @Override
-                public TransportConnector createConnector() {
-                    return new FakeAuthConnector();
-                }
+            @Override
+            public TransportConnector createConnector() {
+                return new FakeAuthConnector();
+            }
 
-            });
+        });
 
         final int port = 8883;
         TestQpidServer server = new TestQpidServer();
@@ -71,7 +70,7 @@ public class RabbitMqAmqpTransportConnectorTest {
         AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
         AbstractTransportConnectorTest.doTest("localhost", port, ProductProtobufSerializer.class);
         server.stop();
-        TransportFactory.setFactoryImplementation(old);        
+        TransportFactory.setMainImplementation(old);        
     }
     
 }

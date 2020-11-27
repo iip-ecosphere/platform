@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.TransportFactory.TransportFactoryImplementation;
+import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
@@ -38,14 +38,13 @@ public class PahoMqttV3TransportConnectorTest {
      */
     @Test
     public void testPahoConnector() throws IOException {
-        TransportFactoryImplementation old = TransportFactory
-            .setFactoryImplementation(new TransportFactory.BaseFactoryImplementation() {
+        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 
-                @Override
-                public TransportConnector createConnector() {
-                    return new PahoMqttV3TransportConnector();
-                }
-            });
+            @Override
+            public TransportConnector createConnector() {
+                return new PahoMqttV3TransportConnector();
+            }
+        });
 
         final int port = 8883;
         TestHiveMqServer server = new TestHiveMqServer();
@@ -53,7 +52,7 @@ public class PahoMqttV3TransportConnectorTest {
         AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
         AbstractTransportConnectorTest.doTest("localhost", port, ProductProtobufSerializer.class);
         server.stop();
-        TransportFactory.setFactoryImplementation(old);
+        TransportFactory.setMainImplementation(old);
     }
 
 }
