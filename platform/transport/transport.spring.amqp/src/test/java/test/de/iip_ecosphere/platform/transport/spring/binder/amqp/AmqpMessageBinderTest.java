@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -59,6 +60,9 @@ public class AmqpMessageBinderTest {
 
     private static TestQpidServer server;
     private static String received;
+
+    @Autowired
+    private TransportParameter params;
     
     /**
      * Initializes the test by starting an embedded AMQP server and by sending back received results on the output
@@ -128,7 +132,12 @@ public class AmqpMessageBinderTest {
         // wait for delivery
         sleep(2000);
         // and assert composed result
-        Assert.assertEquals("config DMG-1 world", received);
+        Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
+        
+        Assert.assertNotNull("The autowired transport parameters shall not be null", params);
+        Assert.assertEquals("localhost", params.getHost());
+        Assert.assertEquals(8883, params.getPort());
+        Assert.assertEquals("", params.getClientId()); // no client ids here
     }
 
     /**

@@ -11,10 +11,15 @@
 
 package de.iip_ecosphere.platform.transport.spring.binder.mqttv5;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 
 /**
  * Represents the MQTT v5 message binder plugin.
@@ -46,6 +51,20 @@ public class MqttV5MessageBinderConfiguration {
     @ConditionalOnMissingBean
     public MqttV5MessageBinder mqttMessageBinder(MqttV5MessageBinderProvisioner messageBinderProvisioner) {
         return new MqttV5MessageBinder(null, messageBinderProvisioner);
+    }
+
+    /**
+     * Provides a transport parameter instance configured through the binder configuration.
+     * 
+     * @param ctx the current application context (autowired)
+     * @param config the actual MQTT configuration
+     * @return the transport parameter instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public TransportParameter mqttTransportParameter(@Autowired ApplicationContext ctx, 
+        @Autowired MqttConfiguration config) {
+        return BeanHelper.registerInParentContext(ctx, config.toTransportParameter(), "mqtt v5");
     }
 
 }

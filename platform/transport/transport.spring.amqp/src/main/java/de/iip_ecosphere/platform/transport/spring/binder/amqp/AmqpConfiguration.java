@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+
 /**
  * Represents the configuration options of an AMQP client.
  * 
@@ -134,6 +136,17 @@ public class AmqpConfiguration {
      */
     public void setFilteredTopics(List<String> filteredTopics) {
         this.filteredTopics = filteredTopics;
+    }
+
+    // converter
+    
+    /**
+     * Turns the actual configuration into a {@link TransportParameter} instance.
+     * 
+     * @return the transport parameter instance
+     */
+    public TransportParameter toTransportParameter() {
+        return new TransportParameter(getHost(), getPort(), "");
     }
 
 }

@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -57,6 +58,9 @@ public class MqttV5MessageBinderTest {
 
     private static TestHiveMqServer server;
     private static String received;
+    
+    @Autowired
+    private TransportParameter params;
     
     /**
      * Initializes the test by starting an embedded MQTT server and by sending back received results on the output
@@ -115,7 +119,12 @@ public class MqttV5MessageBinderTest {
         // wait for delivery
         sleep(2000);
         // and assert composed result
-        Assert.assertEquals("config DMG-1 world", received);
+        Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
+
+        Assert.assertNotNull("The autowired transport parameters shall not be null", params);
+        Assert.assertEquals("localhost", params.getHost());
+        Assert.assertEquals(8883, params.getPort());
+        Assert.assertEquals("test", params.getClientId());
     }
 
     /**
