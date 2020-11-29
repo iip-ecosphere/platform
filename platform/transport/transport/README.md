@@ -1,6 +1,6 @@
-# Transport layer of the IIP-Ecosphere platform (basics)
+# Transport Component in the Transport Layer of the IIP-Ecosphere platform
 
-The transport layer/component shall provide a simple frontend for the upstream layers/components to communicate in 
+The Transport Component shall provide a simple frontend for the upstream layers/components to communicate in 
 stream-based soft-realtime manner. At the same time this component shall enable flexibility and simplicity in the 
 communication, allowing to exchange the underlying transport protocol if needed (before platform startup), e.g., due 
 to license issues. 

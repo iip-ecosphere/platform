@@ -9,7 +9,8 @@ This is for all code realizing the IIP-Ecosphere platform. So far present:
     * Optional transport support for [Spring cloud stream](https://spring.io/projects/spring-cloud-stream)
          * Transport connector binder for MQTT v3 and v5
          * Transport connector binder for AMQP
- * Services and Connections Layer (starting)
+    * Connections component
+ * Services (starting)
 
 More to come soon. 
 

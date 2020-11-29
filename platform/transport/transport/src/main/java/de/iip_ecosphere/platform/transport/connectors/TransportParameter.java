@@ -31,9 +31,24 @@ public class TransportParameter {
      * @param clientId the unique client identifier
      */
     public TransportParameter(String host, int port, String clientId) {
+        this(host, port, clientId, 1000, 2000);
+    }
+
+    /**
+     * Creates a transport parameter instance.
+     * 
+     * @param host     the network name of the host
+     * @param port     the TCP communication port of the host
+     * @param clientId the unique client identifier
+     * @param actionTimeout the timeout in milliseconds for send/receive actions
+     * @param keepAlive the time to keep a connection alive (heartbeat) in milliseconds
+     */
+    public TransportParameter(String host, int port, String clientId, int actionTimeout, int keepAlive) {
         this.host = host;
         this.port = port;
         this.clientId = clientId;
+        this.actionTimeout = actionTimeout;
+        this.keepAlive = keepAlive;
     }
 
     /**
