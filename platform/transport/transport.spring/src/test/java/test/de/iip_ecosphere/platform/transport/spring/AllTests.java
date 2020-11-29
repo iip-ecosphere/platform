@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     SerializerTest.class, 
     StreamTest.class,
-    TransportFactoryConfigurationTest.class
+    TransportFactoryConfigurationTest.class,
+    BeanHelperTest.class
 })
 public class AllTests {
 }
