@@ -8,4 +8,5 @@ bound by generated glue code to the respective streaming approach.
 
 This component is directly based on the transport components. This component provides basic classes, e.g., type 
 conversion based on the serialization mechanism defined in the transport component. Protocol-specific binders are
-defined in further projects named `transport.streaming.<protocol>`.
+defined in further projects named `transport.streaming.<protocol>`. For uniform usage and a future transport 
+AAS Protocol-specific binders shall exhibit the (default) server connection information as TransportParameter bean.
