@@ -37,6 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MimeType;
 
+import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
@@ -73,7 +74,7 @@ public class MqttV5MessageBinderTest {
         final String host = "localhost";
         final int port = 8883;
         server.start(host, port);
-        sleep(1000);
+        Utils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final PahoMqttV5TransportConnector infra = new PahoMqttV5TransportConnector();
         try {
@@ -98,7 +99,7 @@ public class MqttV5MessageBinderTest {
             System.out.println("CONNECTOR PROBLEM " + e.getMessage());
         }
         System.out.println("Started infra client on " + host + " " + port);
-        sleep(1000);
+        Utils.sleep(1000);
     }
     
     /**
@@ -117,7 +118,7 @@ public class MqttV5MessageBinderTest {
     @Test
     public void testMessages() {
         // wait for delivery
-        sleep(2000);
+        Utils.sleep(2000);
         // and assert composed result
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
 
@@ -190,18 +191,6 @@ public class MqttV5MessageBinderTest {
             return new SerializerMessageConverter(new MimeType("application", "ser-string"));
         }
       
-    }
-
-    /**
-     * Sleeps the actual thread for some milliseconds.
-     * 
-     * @param ms the milliseconds to sleep
-     */
-    public static void sleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-        }
     }
 
 }

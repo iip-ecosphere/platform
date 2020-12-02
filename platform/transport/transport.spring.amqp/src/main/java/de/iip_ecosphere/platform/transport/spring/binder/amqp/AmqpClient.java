@@ -27,6 +27,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import de.iip_ecosphere.platform.transport.Utils;
+
 /**
  * A central AMQP client for all binders to reduce resource usage. Typically, different binders subscribe to different
  * topics. The implementation uses queuing/a consumer pattern to cope with threading problems.
@@ -105,10 +107,7 @@ public class AmqpClient {
                         throw new RuntimeException(e);
                     }
                 }
-                try {
-                    Thread.sleep(2);
-                } catch (InterruptedException e) {
-                }
+                Utils.sleep(2);
             }
         }
         

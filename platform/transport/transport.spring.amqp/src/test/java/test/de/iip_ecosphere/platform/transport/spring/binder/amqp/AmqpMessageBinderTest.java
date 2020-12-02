@@ -39,6 +39,7 @@ import org.springframework.util.MimeType;
 
 import com.rabbitmq.client.ConnectionFactory;
 
+import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportConnector;
@@ -79,7 +80,7 @@ public class AmqpMessageBinderTest {
         } catch (IOException e) {
             Assert.fail("BROKER PROBLEM " + e.getMessage());
         }
-        sleep(1000);
+        Utils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final RabbitMqAmqpTransportConnector infra = new RabbitMqAmqpTransportConnector() {
             
@@ -111,7 +112,7 @@ public class AmqpMessageBinderTest {
             Assert.fail("CONNECTOR PROBLEM " + e.getMessage());
         }
         System.out.println("Started infra client on " + host + " " + port);
-        sleep(1000);
+        Utils.sleep(1000);
     }
     
     /**
@@ -130,7 +131,7 @@ public class AmqpMessageBinderTest {
     @Test
     public void testMessages() {
         // wait for delivery
-        sleep(2000);
+        Utils.sleep(2000);
         // and assert composed result
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
         
@@ -203,18 +204,6 @@ public class AmqpMessageBinderTest {
             return new SerializerMessageConverter(new MimeType("application", "ser-string"));
         }
       
-    }
-
-    /**
-     * Sleeps the actual thread for some milliseconds.
-     * 
-     * @param ms the milliseconds to sleep
-     */
-    public static void sleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-        }
     }
 
 }
