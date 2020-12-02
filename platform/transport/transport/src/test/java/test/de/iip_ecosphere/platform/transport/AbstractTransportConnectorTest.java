@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -85,10 +86,7 @@ public class AbstractTransportConnectorTest {
         System.out.println("Sending/Receiving");
         cl1.syncSend(stream1, data1);
         cl2.syncSend(stream2, data2);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-        }
+        Utils.sleep(2000);
         assertProduct(data1, cb2);
         assertProduct(data2, cb1);
 
@@ -108,10 +106,7 @@ public class AbstractTransportConnectorTest {
     private static void assertProduct(Product expected, Callback received) {
         int count = 0;
         while (received.data == null && count < 10) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+            Utils.sleep(100);
             count++;
         }
         Assert.assertNotNull(received.data);
