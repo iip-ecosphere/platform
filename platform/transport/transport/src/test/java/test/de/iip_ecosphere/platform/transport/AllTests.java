@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     DirectMemoryTransportConnectorTest.class,
-    SerializerRegistryTest.class
+    SerializerRegistryTest.class,
+    UtilsTest.class
 })
 public class AllTests {
 }
