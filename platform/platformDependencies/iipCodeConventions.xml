@@ -29,6 +29,12 @@
       <property name="checkFormat" value="IllegalCatchCheck"/>
     </module>
 
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="checkstyle: stop exception type check"/>
+      <property name="onCommentFormat" value="checkstyle: resume exception type check"/>
+      <property name="checkFormat" value="IllegalThrowsCheck"/>
+    </module>
+
     <module name="JavadocMethod">
         <property name="excludeScope" value="anoninner"/>
 		<property name="scope" value="private"/>
@@ -253,9 +259,12 @@
 			<property name="illegalClassNames" value="java.lang.Exception, java.lang.Throwable, java.lang.RuntimeException"/>
   		<property name="severity" value="error"/>
 		</module>
+		<!-- desirable but not always possible, fails with one/multiple lambdas 
 		<module name="ReturnCount">
 		    <property name="max" value="1"/>
+		    <property name="tokens" value="CTOR_DEF, METHOD_DEF"/>
 		</module>
+		 -->
 		<module name="DeclarationOrder">
 		  <property name="severity" value="error"/>
 		</module>
