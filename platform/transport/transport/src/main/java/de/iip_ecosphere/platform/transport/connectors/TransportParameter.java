@@ -23,6 +23,10 @@ public class TransportParameter {
     private String clientId;
     private int keepAlive = 2000; // unclear default for now, may require different constructor
 
+    // inspired by OPC UA, just an idea for UKL
+    //private X509Certificate certificate;
+    //private KeyPair keyPair;
+
     /**
      * Creates a transport parameter instance.
      * 
