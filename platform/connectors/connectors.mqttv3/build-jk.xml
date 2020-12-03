@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-connectors-mqttv3" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.mqttv3-*.*.*-SNAPSHOT.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-connectors-mqttv3" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.mqttv3-*.*.*.jar" />
 	</target>
 </project>
