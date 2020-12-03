@@ -20,9 +20,9 @@ public class TransportParameter {
 
     private String host;
     private int port;
-    private int actionTimeout = 1000; // unclear default for now, may require different constructor
-    private String applicationId;
-    private int keepAlive = 2000; // unclear default for now, may require different constructor
+    private int actionTimeout = 1000;
+    private String applicationId = "";
+    private int keepAlive = 2000; 
 
     // inspired by OPC UA, just an idea for UKL
     //private X509Certificate certificate;
@@ -52,12 +52,12 @@ public class TransportParameter {
          */
         public static TransportParameterBuilder newBuilder(String host, int port) {
             TransportParameterBuilder builder = new TransportParameterBuilder();
-            builder.instance = new TransportParameter(host, port, "");
+            builder.instance = new TransportParameter(host, port);
             return builder;
         }
 
         /**
-         * Defines the optional application id.
+         * Defines the optional application id. Optional, remains empty if unset.
          * 
          * @param applicationId the client/application id
          * @return <b>this</b>
@@ -68,7 +68,7 @@ public class TransportParameter {
         }
 
         /**
-         * Sets the keep alive time.
+         * Sets the keep alive time. Optional, remains 2000 if unset.
          * 
          * @param keepAlive the time to keep a connection alive (heartbeat) in milliseconds
          * @return <b>this</b>
@@ -79,7 +79,7 @@ public class TransportParameter {
         }
 
         /**
-         * Sets the action timeout.
+         * Sets the action timeout. Optional, remains 1000 if unset.
          * 
          * @param actionTimeout the timeout in milliseconds for send/receive actions
          * @return <b>this</b>
@@ -105,27 +105,10 @@ public class TransportParameter {
      * 
      * @param host     the network name of the host
      * @param port     the TCP communication port of the host
-     * @param clientId the unique client identifier
      */
-    public TransportParameter(String host, int port, String clientId) {
-        this(host, port, clientId, 1000, 2000);
-    }
-
-    /**
-     * Creates a transport parameter instance.
-     * 
-     * @param host     the network name of the host
-     * @param port     the TCP communication port of the host
-     * @param applicationId the unique application/client identifier
-     * @param actionTimeout the timeout in milliseconds for send/receive actions
-     * @param keepAlive the time to keep a connection alive (heartbeat) in milliseconds
-     */
-    public TransportParameter(String host, int port, String applicationId, int actionTimeout, int keepAlive) {
+    private TransportParameter(String host, int port) {
         this.host = host;
         this.port = port;
-        this.applicationId = applicationId;
-        this.actionTimeout = actionTimeout;
-        this.keepAlive = keepAlive;
     }
 
     /**

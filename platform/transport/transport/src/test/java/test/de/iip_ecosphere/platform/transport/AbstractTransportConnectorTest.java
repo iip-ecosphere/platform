@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
@@ -67,7 +68,7 @@ public class AbstractTransportConnectorTest {
 
         System.out.println("Using serializer: " + serializerType.getSimpleName());
         SerializerRegistry.registerSerializer(serializerType);
-        TransportParameter param1 = new TransportParameter(host, port, "cl1");
+        TransportParameter param1 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl1").build();
         TransportConnector cl1 = TransportFactory.createConnector();
         System.out.println("Connecting connector 1");
         cl1.connect(param1);
@@ -76,7 +77,7 @@ public class AbstractTransportConnectorTest {
         final Callback cb1 = new Callback();
         cl1.setReceptionCallback(stream2, cb1);
 
-        TransportParameter param2 = new TransportParameter(host, port, "cl2");
+        TransportParameter param2 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl2").build();
         TransportConnector cl2 = TransportFactory.createConnector();
         System.out.println("Connecting connector 2");
         cl2.connect(param2);
