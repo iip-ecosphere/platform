@@ -41,21 +41,21 @@ public @interface MachineConnector {
     
     /**
      * Whether the machine connector supports hierarchical qualified names in the model (requires {@link #hasModel()} 
-     * is {@code true)).
+     * is {@code true}).
      * 
      * @return {@code true} for hierarchical names, {@code false} else
      */
     public boolean supportsHierarchicalQNames() default true;
 
     /**
-     * Whether the machine connector supports calls via the model (requires {@link #hasModel()} is {@code true)).
+     * Whether the machine connector supports calls via the model (requires {@link #hasModel()} is {@code true}).
      * 
      * @return {@code true} for calls, {@code false} for no calls
      */
     public boolean supportsModelCalls() default true;
 
     /**
-     * Whether the machine connector supports properties via the model (requires {@link #hasModel()} is {@code true)).
+     * Whether the machine connector supports properties via the model (requires {@link #hasModel()} is {@code true}).
      * 
      * @return {@code true} for properties, {@code false} for no properties
      */
@@ -63,7 +63,7 @@ public @interface MachineConnector {
 
     /**
      * Whether the machine connector supports user-defined structs in the model (requires {@link #hasModel()} 
-     * is {@code true)).
+     * is {@code true}).
      * 
      * @return {@code true} for user-defined structs, {@code false} for no structs
      */
@@ -80,7 +80,7 @@ public @interface MachineConnector {
     
     /**
      * Whether the machine connector can work with Java values on the model directly and does not need conversation to 
-     * connector-specific instances(requires {@link #hasModel()} is {@code true)).
+     * connector-specific instances(requires {@link #hasModel()} is {@code true}).
      * 
      * @return {@code true} for object-based values, {@code false} if conversation is required
      */

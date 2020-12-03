@@ -13,6 +13,7 @@ package de.iip_ecosphere.platform.connectors.types;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
 /**

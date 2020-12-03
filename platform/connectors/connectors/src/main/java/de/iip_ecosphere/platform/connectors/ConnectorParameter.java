@@ -160,7 +160,7 @@ public class ConnectorParameter {
          * Sets the endpoint identities. Optional, if not called, anonymous identity is assumed.
          * 
          * @param identityToken the client identity token per endpoint URL (may be <b>null</b> for anonymous), an 
-         *   {@link ConnectorProperties#ANY_ENDPOINT} denotes just all endpoints
+         *   {@link #ANY_ENDPOINT} denotes just all endpoints
          * @return <b>this</b>
          */
         public ConnectorParameterBuilder setIdentities(Map<String, IdentityToken> identityToken) {

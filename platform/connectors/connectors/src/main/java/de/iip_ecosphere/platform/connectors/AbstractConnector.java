@@ -156,7 +156,7 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
     
     /**
      * Reads data from the underlying machine. Used for polling, but shall then be implemented by returning 
-     * at least a dummy object so that the {@link #installPollTask(ConnectorParameter) polling task} can initiate
+     * at least a dummy object so that the {@link #installPollTask() polling task} can initiate
      * a translation request and forward it to the {@link #callback}. In particular, can be a dummy object or
      * the actual changes in the model if {@link MachineConnector#hasModel()}. 
      * 
