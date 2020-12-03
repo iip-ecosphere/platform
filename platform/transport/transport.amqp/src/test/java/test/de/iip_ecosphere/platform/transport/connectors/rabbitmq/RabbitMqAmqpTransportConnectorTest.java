@@ -55,7 +55,7 @@ public class RabbitMqAmqpTransportConnectorTest {
      * @throws IOException in case that connection/communication fails
      */
     @Test
-    public void testPahoConnector() throws IOException {
+    public void testRabbitMqConnector() throws IOException {
         ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 
             @Override
