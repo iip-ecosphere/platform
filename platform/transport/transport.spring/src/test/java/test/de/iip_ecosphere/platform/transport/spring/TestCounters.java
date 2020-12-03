@@ -12,7 +12,7 @@ class TestCounters {
 
     private static int toCount = 0;
     private static int fromCount = 0;
-    private static int copyCount = 0;
+    private static int cloneCount = 0;
     
     /**
      * Resets all counters.
@@ -20,7 +20,7 @@ class TestCounters {
     static void reset() {
         toCount = 0;
         fromCount = 0;
-        copyCount = 0;
+        cloneCount = 0;
     }
 
     /**
@@ -31,17 +31,17 @@ class TestCounters {
     }
 
     /**
-     * Increases the from-counter (related to the {@link Serializer#from(Object) to-method} of the serializers.
+     * Increases the from-counter (related to the {@link Serializer#from(Object) from-method} of the serializers.
      */
     static void increaseFrom() {
         fromCount++;
     }
     
     /**
-     * Increases the copy-counter (related to the {@link Serializer#copy(Object) copy-method} of the serializers.
+     * Increases the clone-counter (related to the {@link Serializer#clone(Object) clone-method} of the serializers.
      */
-    static void increaseCopy() {
-        copyCount++;
+    static void increaseClone() {
+        cloneCount++;
     }
 
     /**
@@ -65,10 +65,10 @@ class TestCounters {
     /**
      * Returns the copy-counter value.
      * 
-     * @return the number of calls to {@link Serializer#copy(Object)}
+     * @return the number of calls to {@link Serializer#clone(Object)}
      */
-    static int getCopyCount() {
-        return copyCount;
+    static int getCloneCount() {
+        return cloneCount;
     }
 
 }

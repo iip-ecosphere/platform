@@ -31,7 +31,7 @@ public class StringSerializer implements Serializer<String> {
 
     @Override
     public String clone(String origin) throws IOException {
-        TestCounters.increaseCopy();
+        TestCounters.increaseClone();
         return new String(origin);
     }
 

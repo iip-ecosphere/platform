@@ -15,7 +15,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
 import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 
 /**
- * Brings up a spring application doing nothing rather than testing the {@link BeanHelper].
+ * Brings up a spring application doing nothing rather than testing the {@link BeanHelper}.
  * 
  * @author Holger Eichelberger, SSE
  */

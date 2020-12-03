@@ -59,7 +59,7 @@ public class StreamTest {
             //System.out.println(new String(target.receive().getPayload()));
             Assert.assertEquals(1, TestCounters.getFromCount());
             Assert.assertEquals(1, TestCounters.getToCount());
-            Assert.assertEquals(0, TestCounters.getCopyCount());
+            Assert.assertEquals(0, TestCounters.getCloneCount());
         }        
     }
     
