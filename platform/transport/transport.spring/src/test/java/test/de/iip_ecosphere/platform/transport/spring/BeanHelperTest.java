@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 
 /**
@@ -32,7 +33,7 @@ public class BeanHelperTest {
     @Test
     public void testBeanHelper() {
         final String beanName = "myTpBean";
-        TransportParameter bean = new TransportParameter("h", 1111, "c");
+        TransportParameter bean = TransportParameterBuilder.newBuilder("h", 1111).setApplicationId("c").build();
         // test context does not have a child context as a binder has
         AnnotationConfigApplicationContext child = new AnnotationConfigApplicationContext();
         child.setParent(ctx);
