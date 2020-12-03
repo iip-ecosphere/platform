@@ -29,6 +29,78 @@ public class TransportParameter {
     //private KeyPair keyPair;
 
     /**
+     * A builder for transport parameter. Connectors shall indicate the required settings.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TransportParameterBuilder {
+
+        private TransportParameter instance;
+
+        /**
+         * Prevents external creation.
+         */
+        private TransportParameterBuilder() {
+        }
+        
+        /**
+         * Creates a new builder.
+         * 
+         * @param host     the network name of the host
+         * @param port     the TCP communication port of the host
+         * @return the builder instance
+         */
+        public static TransportParameterBuilder newBuilder(String host, int port) {
+            TransportParameterBuilder builder = new TransportParameterBuilder();
+            builder.instance = new TransportParameter(host, port, "");
+            return builder;
+        }
+
+        /**
+         * Defines the optional application id.
+         * 
+         * @param applicationId the client/application id
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setApplicationId(String applicationId) {
+            instance.applicationId = applicationId;
+            return this;
+        }
+
+        /**
+         * Sets the keep alive time.
+         * 
+         * @param keepAlive the time to keep a connection alive (heartbeat) in milliseconds
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setKeepAlive(int keepAlive) {
+            instance.keepAlive = keepAlive;
+            return this;
+        }
+
+        /**
+         * Sets the action timeout.
+         * 
+         * @param actionTimeout the timeout in milliseconds for send/receive actions
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setActionTimeout(int actionTimeout) {
+            instance.actionTimeout = actionTimeout;
+            return this;
+        }
+
+        /**
+         * Returns the created instance.
+         * 
+         * @return the created instance
+         */
+        public TransportParameter build() {
+            return instance;
+        }
+        
+    }
+    
+    /**
      * Creates a transport parameter instance.
      * 
      * @param host     the network name of the host
