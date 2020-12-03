@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="IIP-Ecosphere connectors OPC-UA" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- deploy to SSE Mvn repo -->
+	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="package"/>
+		<mvnDeployResolveArtifact folderName="IIP-connectors-opcua" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.opcuav1-*.*.*-SNAPSHOT.jar" />
+	</target>
+</project>
