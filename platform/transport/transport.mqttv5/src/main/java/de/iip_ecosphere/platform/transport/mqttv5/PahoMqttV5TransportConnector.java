@@ -28,8 +28,9 @@ import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTranspo
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
- * A MQTT v5 connector based on Eclipse Paho. This implementation is potentially
- * not thread-safe, i.e., it may require a sending queue.
+ * A MQTT v5 connector based on Eclipse Paho. Requires {@link TransportParameter#getApplicationId()}.
+ * 
+ * This implementation is potentially not thread-safe, i.e., it may require a sending queue.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -88,7 +89,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
         super.connect(params);
         try {
             String broker = "tcp://" + params.getHost() + ":" + params.getPort();
-            client = new MqttAsyncClient(broker, getClientId(), new MemoryPersistence());
+            client = new MqttAsyncClient(broker, getApplicationId(), new MemoryPersistence());
             client.setCallback(new Callback());
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             connOpts.setCleanStart(true);
