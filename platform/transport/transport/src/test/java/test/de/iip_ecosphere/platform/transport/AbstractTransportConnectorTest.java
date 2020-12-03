@@ -70,6 +70,7 @@ public class AbstractTransportConnectorTest {
         SerializerRegistry.registerSerializer(serializerType);
         TransportParameter param1 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl1").build();
         TransportConnector cl1 = TransportFactory.createConnector();
+        Assert.assertTrue(cl1.getName().length() > 0);
         System.out.println("Connecting connector 1");
         cl1.connect(param1);
         final String stream1 = cl1.composeStreamName("", "stream1");
@@ -79,6 +80,7 @@ public class AbstractTransportConnectorTest {
 
         TransportParameter param2 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl2").build();
         TransportConnector cl2 = TransportFactory.createConnector();
+        Assert.assertTrue(cl2.getName().length() > 0);
         System.out.println("Connecting connector 2");
         cl2.connect(param2);
         final Callback cb2 = new Callback();
