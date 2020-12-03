@@ -18,7 +18,7 @@ import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferT
  * ensure that the entire platform runs with the same connector instances,
  * however, provides at the same time the flexibility to exchange the creation
  * process. As there is no default connector in this artifact anymore, the factory 
- * must be configured by a {@link TransportFactoryImplementation} before use. 
+ * must be configured by instances of {@link ConnectorCreator} before use. 
  * 
  * @author Holger Eichelberger, SSE
  */
