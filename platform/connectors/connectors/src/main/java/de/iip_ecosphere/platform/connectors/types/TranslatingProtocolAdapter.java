@@ -25,7 +25,6 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
  * @param <D> the model data type (see @link {@link ModelAccess})
- * @param <C> the wrapped connector type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
