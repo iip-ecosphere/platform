@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="IIP-Ecosphere connectors mqttv3" default="maven" basedir=".">
+<project name="IIP-Ecosphere connectors mqttv5" default="maven" basedir=".">
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-connectors-mqttv5" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors-*.*.*-SNAPSHOT.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-connectors-mqttv5" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors-mqttv5*.*.*-SNAPSHOT.jar" />
 	</target>
 </project>
