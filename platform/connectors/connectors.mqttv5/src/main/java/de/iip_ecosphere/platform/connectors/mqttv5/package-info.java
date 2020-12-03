@@ -1,4 +1,4 @@
 /**
- * The MQTT v3 connectors extension.
+ * The MQTT v5 connectors extension.
  */
 package de.iip_ecosphere.platform.connectors.mqttv5;

@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
- * Implements the generic MQTT v3 connector. Requires {@link ConnectorParameter#getApplicationId()} 
+ * Implements the generic MQTT v5 connector. Requires {@link ConnectorParameter#getApplicationId()} 
  * and {@link ConnectorParameter#getKeepAlive()}.
  * 
  * This implementation is potentially not thread-safe, i.e., it may require a sending queue.
