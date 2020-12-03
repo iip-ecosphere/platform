@@ -86,7 +86,7 @@ public class MqttConfiguration {
     /**
      * Returns the connection schema.
      * 
-     * @return the connection schema ({@value #schema} by default)
+     * @return the connection schema ("tcp" by default)
      */
     public String getSchema() {
         return schema;
@@ -104,7 +104,7 @@ public class MqttConfiguration {
     /**
      * Returns the keep-alive time between heartbeats.
      * 
-     * @return the keep-alive time in ms ({@value #keepAlive} by default)
+     * @return the keep-alive time in ms (60000 by default)
      */
     public int getKeepAlive() {
         return keepAlive;
@@ -113,7 +113,7 @@ public class MqttConfiguration {
     /**
      * Returns the action timeout to wait for the broker to complete an action.
      *
-     * @return the action timeout in ms ({@value #keepAlive} by default)
+     * @return the action timeout in ms (1000 by default)
      */
     public int getActionTimeout() {
         return actionTimeout;

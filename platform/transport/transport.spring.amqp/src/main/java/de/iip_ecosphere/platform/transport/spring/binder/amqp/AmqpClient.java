@@ -168,7 +168,7 @@ public class AmqpClient {
     }
 
     /**
-     * Subscribes to {@link topic} if {@code topic} is not blacklisted by 
+     * Subscribes to {@code topic} if {@code topic} is not blacklisted by 
      * {@link AmqpConfiguration#isFilteredTopic(String)}.
      * 
      * @param topic the topic to unsubscribe from
@@ -194,7 +194,7 @@ public class AmqpClient {
     }
     
     /**
-     * Unsubscribes from {@link topic} if {@code topic} is not blacklisted by 
+     * Unsubscribes from {@code topic} if {@code topic} is not blacklisted by 
      * {@link AmqpConfiguration#isFilteredTopic(String)}.
      * 
      * @param topic the topic to unsubscribe from

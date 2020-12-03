@@ -210,7 +210,7 @@ public class MqttClient {
     }
 
     /**
-     * Subscribes to {@link topic} if {@code topic} is not blacklisted by 
+     * Subscribes to {@code topic} if {@code topic} is not blacklisted by 
      * {@link MqttConfiguration#isFilteredTopic(String)}.
      * 
      * @param topic the topic to unsubscribe from
@@ -233,7 +233,7 @@ public class MqttClient {
     }
     
     /**
-     * Unsubscribes from {@link topic} if {@code topic} is not blacklisted by 
+     * Unsubscribes from {@code topic} if {@code topic} is not blacklisted by 
      * {@link MqttConfiguration#isFilteredTopic(String)}.
      * 
      * @param topic the topic to unsubscribe from
