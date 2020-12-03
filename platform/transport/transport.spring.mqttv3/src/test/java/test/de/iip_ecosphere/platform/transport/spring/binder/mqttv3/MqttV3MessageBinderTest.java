@@ -125,7 +125,7 @@ public class MqttV3MessageBinderTest {
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
         Assert.assertEquals(8883, params.getPort());
-        Assert.assertEquals("test", params.getClientId());
+        Assert.assertEquals("test", params.getApplicationId());
     }
 
     /**

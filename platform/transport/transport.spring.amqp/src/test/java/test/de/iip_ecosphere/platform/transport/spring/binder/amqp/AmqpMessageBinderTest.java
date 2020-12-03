@@ -138,7 +138,7 @@ public class AmqpMessageBinderTest {
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
         Assert.assertEquals(8883, params.getPort());
-        Assert.assertEquals("", params.getClientId()); // no client ids here
+        Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
 
     /**
