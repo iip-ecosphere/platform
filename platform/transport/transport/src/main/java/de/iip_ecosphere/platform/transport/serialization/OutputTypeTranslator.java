@@ -12,7 +12,7 @@ import java.io.IOException;
 public interface OutputTypeTranslator<S, T> {
 
     /**
-     * Translates a source value into a target value.
+     * Translates a source value into a target value ("output <b>to</b> external").
      * 
      * @param source the source value to be translated
      * @return the target value

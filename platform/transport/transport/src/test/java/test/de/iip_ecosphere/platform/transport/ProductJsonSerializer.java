@@ -40,7 +40,7 @@ public class ProductJsonSerializer implements Serializer<Product> {
         try {
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(new String(data));
-            result = new Product(readString(obj, "description"), readDouble(obj, "price", 0));
+            result = new Product(JsonUtils.readString(obj, "description"), JsonUtils.readDouble(obj, "price", 0));
         } catch (ParseException e) {
             throw new IOException(e.getMessage(), e);
         } catch (ClassCastException e) {
@@ -52,36 +52,6 @@ public class ProductJsonSerializer implements Serializer<Product> {
     @Override
     public Product clone(Product origin) throws IOException {
         return new Product(origin.getDescription(), origin.getPrice());
-    }
-
-    /**
-     * Reads a string field from a JSON object.
-     * 
-     * @param obj   the object to read from
-     * @param field the field to read from
-     * @return the string value or <b>null</b>
-     */
-    private static String readString(JSONObject obj, String field) {
-        Object tmp = obj.get(field);
-        return null == tmp ? null : tmp.toString();
-    }
-
-    /**
-     * Reads a double field from a JSON object.
-     * 
-     * @param obj   the object to read from
-     * @param field the field to read from
-     * @param dflt  the default value
-     * @return the double value, if not accessible {@code dflt}
-     * @throws IOException if parsing the double value fails
-     */
-    private static double readDouble(JSONObject obj, String field, double dflt) throws IOException {
-        try {
-            Object tmp = obj.get(field);
-            return null == tmp ? dflt : Double.parseDouble(tmp.toString());
-        } catch (NumberFormatException e) {
-            throw new IOException(e.getMessage(), e);
-        }
     }
 
     @Override

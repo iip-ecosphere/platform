@@ -59,12 +59,12 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     }
 
     /**
-     * The unique identifier of the client.
+     * The unique application/client identifier.
      * 
      * @return the client identifier
      */
-    protected String getClientId() {
-        return params.getClientId();
+    protected String getApplicationId() {
+        return params.getApplicationId();
     }
 
     /**

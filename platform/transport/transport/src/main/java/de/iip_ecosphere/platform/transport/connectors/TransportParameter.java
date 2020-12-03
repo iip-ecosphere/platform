@@ -11,7 +11,8 @@
 package de.iip_ecosphere.platform.transport.connectors;
 
 /**
- * Captures common transport parameter for all connector types.
+ * Captures common transport parameter for all connector types. Connectors shall document which of the
+ * optional settings are required.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -20,7 +21,7 @@ public class TransportParameter {
     private String host;
     private int port;
     private int actionTimeout = 1000; // unclear default for now, may require different constructor
-    private String clientId;
+    private String applicationId;
     private int keepAlive = 2000; // unclear default for now, may require different constructor
 
     // inspired by OPC UA, just an idea for UKL
@@ -43,14 +44,14 @@ public class TransportParameter {
      * 
      * @param host     the network name of the host
      * @param port     the TCP communication port of the host
-     * @param clientId the unique client identifier
+     * @param applicationId the unique application/client identifier
      * @param actionTimeout the timeout in milliseconds for send/receive actions
      * @param keepAlive the time to keep a connection alive (heartbeat) in milliseconds
      */
-    public TransportParameter(String host, int port, String clientId, int actionTimeout, int keepAlive) {
+    public TransportParameter(String host, int port, String applicationId, int actionTimeout, int keepAlive) {
         this.host = host;
         this.port = port;
-        this.clientId = clientId;
+        this.applicationId = applicationId;
         this.actionTimeout = actionTimeout;
         this.keepAlive = keepAlive;
     }
@@ -92,12 +93,12 @@ public class TransportParameter {
     }
 
     /**
-     * Returns the unique client identifier.
+     * Returns the unique application/client identifier.
      * 
-     * @return the unique client identifier
+     * @return the unique application/client identifier
      */
-    public String getClientId() {
-        return clientId;
+    public String getApplicationId() {
+        return applicationId;
     }
 
     // TODO per stream: authentication, TLS

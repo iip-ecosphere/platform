@@ -12,7 +12,7 @@ import java.io.IOException;
 public interface InputTypeTranslator<T, S> {
     
     /**
-     * Deserializes a target value into a source value.
+     * Deserializes a target value into a source value ("input <b>from</b> external").
      * 
      * @param data the data to be translated back
      * @return the serialized object
