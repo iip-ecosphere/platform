@@ -17,6 +17,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 
 /**
  * Represents the configuration options of a MQTT v5 client.
@@ -192,7 +193,12 @@ public class MqttConfiguration {
      * @return the transport parameter instance
      */
     public TransportParameter toTransportParameter() {
-        return new TransportParameter(getHost(), getPort(), getClientId(), getActionTimeout(), getKeepAlive());
+        return TransportParameterBuilder
+            .newBuilder(getHost(), getPort())
+            .setApplicationId(getClientId())
+            .setActionTimeout(getActionTimeout())
+            .setKeepAlive(getKeepAlive())
+            .build();
     }
 
 }

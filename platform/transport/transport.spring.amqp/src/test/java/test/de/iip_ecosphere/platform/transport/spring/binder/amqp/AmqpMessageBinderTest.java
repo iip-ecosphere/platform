@@ -42,6 +42,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
@@ -91,7 +92,7 @@ public class AmqpMessageBinderTest {
             
         };
         try {
-            infra.connect(new TransportParameter(host, port, "infra"));
+            infra.connect(TransportParameterBuilder.newBuilder(host, port).setApplicationId("infra").build());
             infra.setReceptionCallback("amqpBinder", new ReceptionCallback<String>() {
     
                 @Override

@@ -40,6 +40,7 @@ import org.springframework.util.MimeType;
 import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
@@ -78,7 +79,7 @@ public class MqttV5MessageBinderTest {
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final PahoMqttV5TransportConnector infra = new PahoMqttV5TransportConnector();
         try {
-            infra.connect(new TransportParameter(host, port, "infra"));
+            infra.connect(TransportParameterBuilder.newBuilder(host, port).setApplicationId("infra").build());
             infra.setReceptionCallback("mqttv5Binder", new ReceptionCallback<String>() {
     
                 @Override
