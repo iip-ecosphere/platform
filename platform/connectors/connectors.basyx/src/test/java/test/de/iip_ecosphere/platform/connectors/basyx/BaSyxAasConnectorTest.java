@@ -70,7 +70,7 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-//import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
+import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 
 /**
  * Tests {@link BaSyxAasConnector} with polling and no security.
@@ -409,7 +409,7 @@ public class BaSyxAasConnectorTest {
         BaSyxAasConnector<MachineData, MachineCommand> connector = new BaSyxAasConnector<>(
             new TranslatingProtocolAdapter<Object, Object, MachineData, MachineCommand, Object>(
                  new OutputTranslator(false), new InputTranslator()));
-        //ConnectorTest.assertInstance(connector, false);
+        ConnectorTest.assertInstance(connector, false);
         Assert.assertTrue(connector.getName().length() > 0);
         connector.setReceptionCallback(new ReceptionCallback<MachineData>() {
             
@@ -425,7 +425,7 @@ public class BaSyxAasConnectorTest {
             }
         });
         connector.connect(params);
-        //ConnectorTest.assertInstance(connector, true);
+        ConnectorTest.assertInstance(connector, true);
         LOGGER.info("AAS connector started");
 
         block(count, 2); // init changes powConsumption and lotSize
@@ -466,9 +466,9 @@ public class BaSyxAasConnectorTest {
         Assert.assertEquals(1, tmp.lotSize);
         Assert.assertTrue(tmp.powerConsumption < 1);
 
-        //ConnectorTest.assertInstance(connector, true);
+        ConnectorTest.assertInstance(connector, true);
         connector.disconnect();
-        //ConnectorTest.assertInstance(connector, false);
+        ConnectorTest.assertInstance(connector, false);
         LOGGER.info("AAS connector disconnected");
     }
     
