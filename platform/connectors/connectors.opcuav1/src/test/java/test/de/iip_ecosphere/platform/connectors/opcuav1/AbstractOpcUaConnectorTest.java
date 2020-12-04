@@ -45,6 +45,7 @@ public class AbstractOpcUaConnectorTest {
     public static final String VENDOR_NAME2 = "PhoenixContact";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOpcUaConnectorTest.class);
     private static ServerSetup setup;
+    private static OpcUaConnector<?, ?> lastConnector;
 
     /**
      * Defines the setup instance.
@@ -273,7 +274,17 @@ public class AbstractOpcUaConnectorTest {
         connector.disconnect();
         ConnectorTest.assertInstance(connector, false);
         LOGGER.info("OPC connector disconnected");
-        connector.dispose();
+        lastConnector = connector;
+    }
+    
+    /**
+     * Disposes the last connector by freeing shared resources. Shall be called only once per test as afterwards
+     * the Eclipse Milo does not work anymore.
+     */
+    static void dispose() {
+        if (null != lastConnector) {
+            lastConnector.dispose();
+        }
     }
     
 }

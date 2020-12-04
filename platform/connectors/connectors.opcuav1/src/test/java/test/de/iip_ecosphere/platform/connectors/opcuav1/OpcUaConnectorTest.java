@@ -60,6 +60,7 @@ public class OpcUaConnectorTest extends AbstractOpcUaConnectorTest {
             LOGGER.info("OPC UA server stopped");
             testServer = null;
         }
+        AbstractOpcUaConnectorTest.dispose(); // this is dangerous and shall only be done at the very end
     }
 
     /**
