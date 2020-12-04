@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTran
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-//import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
+import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.Namespace;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.VendorStruct;
 
@@ -187,7 +187,7 @@ public class AbstractOpcUaConnectorTest {
         OpcUaConnector<MachineData, MachineCommand> connector = new OpcUaConnector<>(
             new TranslatingProtocolAdapter<DataItem<Variant>, Object, MachineData, MachineCommand, Variant>(
                  new OutputTranslator(withNotifications), new InputTranslator()));
-        //ConnectorTest.assertInstance(connector, false);
+        ConnectorTest.assertInstance(connector, false);
         Assert.assertTrue(connector.getName().length() > 0);
         connector.setReceptionCallback(new ReceptionCallback<MachineData>() {
             
@@ -203,12 +203,11 @@ public class AbstractOpcUaConnectorTest {
             }
         });
         connector.connect(setup.getConnectorParameter());
-        //ConnectorTest.assertInstance(connector, true);
+        ConnectorTest.assertInstance(connector, true);
         LOGGER.info("OPC connector started");
 
         block(count, 2); // init changes powConsumption and lotSize
         
-        // TODO with struct, namespace setup
         MachineData tmp = md.get();
         Assert.assertNotNull("We shall have received some data although the machine is not running", tmp);
         Assert.assertEquals(1, tmp.lotSize);
@@ -249,9 +248,9 @@ public class AbstractOpcUaConnectorTest {
         Assert.assertTrue(tmp.powerConsumption < 1);
         Assert.assertEquals(Namespace.VENDOR_NAME, tmp.vendor);
 
-        //ConnectorTest.assertInstance(connector, true);
+        ConnectorTest.assertInstance(connector, true);
         connector.disconnect();
-        //ConnectorTest.assertInstance(connector, false);
+        ConnectorTest.assertInstance(connector, false);
         LOGGER.info("OPC connector disconnected");
     }
     
