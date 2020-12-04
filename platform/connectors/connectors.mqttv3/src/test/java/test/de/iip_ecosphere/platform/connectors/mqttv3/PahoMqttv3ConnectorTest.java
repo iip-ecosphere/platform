@@ -74,6 +74,7 @@ public class PahoMqttv3ConnectorTest {
      * @throws IOException in case that connection/communication fails
      */
     public static void doTest(String host, int port) throws IOException {
+        ConnectorTest.assertDescriptorRegistration(PahoMqttv3Connector.Descriptor.class);
         Product prod1 = new Product("prod1", 10.2);
         Product prod2 = new Product("prod2", 5.1);
 
