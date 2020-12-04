@@ -24,20 +24,24 @@ import java.util.Map;
 public class ConnectorParameter {
 
     public static final String ANY_ENDPOINT = "";
+    public static final String DEFAULT_SCHEMA = "tcp";
+    public static final int DEFAULT_REQUEST_TIMEOUT = 5000;
+    public static final int DEFAULT_NOTIFICATION_INTERVAL = 1000;
+    public static final int DEFAULT_KEEP_ALIVE = 2000;
     
     // taken from OPC UA, preliminary
     private X509Certificate certificate;
     private KeyPair keyPair;
     private Map<String, IdentityToken> identityToken;
-    private String schema = "tcp";
+    private String schema = DEFAULT_SCHEMA;
     private int port;
     private String host;
-    private int requestTimeout = 5000;
+    private int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private String endpointPath = "";
     private String applicationId = "";
     private String applicationDescription = "";
-    private int notificationInterval = 1000;
-    private int keepAlive = 2000;
+    private int notificationInterval = DEFAULT_NOTIFICATION_INTERVAL;
+    private int keepAlive = DEFAULT_KEEP_ALIVE;
     
     /**
      * Builds a connector parameter object.
@@ -55,7 +59,8 @@ public class ConnectorParameter {
         }
         
         /**
-         * Creates a new connector parameter builder with required basic information. Schema is set to "tcp".
+         * Creates a new connector parameter builder with required basic information. Schema is set to 
+         * "{@value ConnectorParameter#DEFAULT_SCHEMA}".
          * 
          * @param host the host to connect to
          * @param port the port to connect to
@@ -70,7 +75,8 @@ public class ConnectorParameter {
          * 
          * @param host the host to connect to
          * @param port the port to connect to
-         * @param schema protocol schema, usually "tcp" (also if value is <b>null</b>)
+         * @param schema protocol schema, usually "{@value ConnectorParameter#DEFAULT_SCHEMA}" (
+         *     also if value is <b>null</b>)
          * @return the connector parameter builder
          */
         public static ConnectorParameterBuilder newBuilder(String host, int port, String schema) {
@@ -96,7 +102,8 @@ public class ConnectorParameter {
         /**
          * Sets the request timeout.
          * 
-         * @param requestTimeout the request timeout. Optional, if not called uses the default value of 5000 ms.
+         * @param requestTimeout the request timeout. Optional, if not called uses the default value of 
+         * {@value ConnectorParameter#DEFAULT_REQUEST_TIMEOUT} ms.
          * @return <b>this</b>
          */
         public ConnectorParameterBuilder setRequestTimeout(int requestTimeout) {
@@ -107,7 +114,8 @@ public class ConnectorParameter {
         /**
          * Sets the keep alive time for connection heartbeats/reconnects (if supported).
          * 
-         * @param keepAlive the keep alive time. Optional, if not called uses the default value of 2000 ms.
+         * @param keepAlive the keep alive time. Optional, if not called uses the default value of 
+         * {@value ConnectorParameter#DEFAULT_KEEP_ALIVE} ms.
          * @return <b>this</b>
          */
         public ConnectorParameterBuilder setKeepAlive(int keepAlive) {
@@ -120,7 +128,8 @@ public class ConnectorParameter {
          * values. This may happen via events, notifications or polling depending on the connector
          * implementation.
          * 
-         * @param notificationInterval the notification interval in ms, disabled if less than 1, default is {@code 1000}
+         * @param notificationInterval the notification interval in ms, disabled if less than 1, default is 
+         * {@value ConnectorParameter#DEFAULT_NOTIFICATION_INTERVAL}
          * @return the polling period
          */
         public ConnectorParameterBuilder setNotificationInterval(int notificationInterval) {

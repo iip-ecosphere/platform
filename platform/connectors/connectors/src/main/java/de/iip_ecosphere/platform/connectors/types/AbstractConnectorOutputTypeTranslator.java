@@ -15,15 +15,15 @@ package de.iip_ecosphere.platform.connectors.types;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
 /**
- * An abstract basic implementation of the {@link ConnectorInputTypeTranslator} to store the {@link ModelAccess}.
+ * An abstract basic implementation of the {@link ConnectorOutputTypeTranslator} to store the {@link ModelAccess}.
  * 
- * @param <T> the target type (see {@link ConnectorInputTypeTranslator})
- * @param <S> the source type (see {@link ConnectorInputTypeTranslator})
+ * @param <S> the source type (see {@link ConnectorOutputTypeTranslator})
+ * @param <T> the target type (see {@link ConnectorOutputTypeTranslator})
  * @param <D> the protocol-specific data type for values (see {@link ModelAccess})
  *  
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractInputConnectorTypeTranslator<T, S, D> implements ConnectorInputTypeTranslator<T, S, D> {
+public abstract class AbstractConnectorOutputTypeTranslator<S, T, D> implements ConnectorOutputTypeTranslator<S, T, D> {
 
     private ModelAccess<D> modelAccess;
     

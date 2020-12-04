@@ -28,6 +28,10 @@
  * {@link de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator} and 
  * {@link de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator}.
  * 
+ * A connector shall define a {@link de.iip_ecosphere.platform.connectors.ConnectorDescriptor} as top-level 
+ * inner class and register the descriptor as service, i.e. provide 
+ * {@code de.iip_ecosphere.platform.connectors.ConnectorDescriptor} file in the {@code META-INF/services} folder. 
+ * 
  * To ease working with the type translations, a connector may have a 
  * {@link de.iip_ecosphere.platform.connectors.types.ProtocolAdapter}, its basic implementation 
  * {@link de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter} utilizes the refined type 

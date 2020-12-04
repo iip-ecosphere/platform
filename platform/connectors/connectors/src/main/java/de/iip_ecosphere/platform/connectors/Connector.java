@@ -17,7 +17,8 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
- * The interface of a platform/machine connector.
+ * The interface of a platform/machine connector. A connector shall define a {@link ConnectorDescriptor} as top-level 
+ * inner class and register the descriptor as service.
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform

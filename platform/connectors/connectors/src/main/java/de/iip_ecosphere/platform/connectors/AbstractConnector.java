@@ -23,7 +23,8 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
  * Provides a reusable base of a {@link Connector} implementation using the {@link ProtocolAdapter}. Call 
- * {@link #initializeModelAccess()} on {@link #connect(ConnectorParameter)} as soon as the connector is connected. 
+ * {@link #initializeModelAccess()} on {@link #connect(ConnectorParameter)} as soon as the connector is connected.
+ * Handles interactions with {@link ConnectorRegistry}. 
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -53,7 +54,8 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
     
     /**
      * Connects the connector to the underlying machine/platform. Calls {@link #connectImpl(ConnectorParameter)} 
-     * and if successful (no exception thrown) {@link #initializeModelAccess()}. 
+     * and if successful (no exception thrown) {@link #initializeModelAccess()}. Calls 
+     * {@link ConnectorRegistry#registerConnector(Connector)}. 
      * 
      * @param params connection parameter
      * @throws IOException in case that connecting fails
@@ -63,6 +65,7 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
         this.params = params;
         connectImpl(params);
         initializeModelAccess();
+        ConnectorRegistry.registerConnector(this);
     }
     
     /**
@@ -109,6 +112,15 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
             timer.scheduleAtFixedRate(pollTask, 0, pollingPeriod);
         }
     }
+    
+    /**
+     * Returns whether we are polling or waiting for events.
+     * 
+     * @return {@code true} for polling, {@code false} for events
+     */
+    protected boolean isPolling() {
+        return null != pollTask;
+    }
 
     /**
      * Uninstall poll task.
@@ -122,6 +134,27 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
             timer = null;
         }
     }
+    
+    /**
+     * Disconnects the connector from the underlying machine/platform.
+     * Calls {@link #disconnectImpl()}, {@link #uninstallPollTask()} 
+     * and {@link ConnectorRegistry#unregisterConnector(Connector)}.
+     * 
+     * @throws IOException in case that connecting fails
+     */
+    @Override
+    public final void disconnect() throws IOException {
+        ConnectorRegistry.unregisterConnector(this);
+        disconnectImpl();
+        uninstallPollTask(); // does not hurt if it is not running
+    }
+    
+    /**
+     * Called by {@link #disconnect()}.
+     * 
+     * @throws IOException if problems occur while disconnecting
+     */
+    protected abstract void disconnectImpl() throws IOException;
     
     @Override
     public void write(CI data) throws IOException {
