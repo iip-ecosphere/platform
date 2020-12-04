@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.connectors.opcuav1;
 
+import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
+
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 
@@ -19,12 +21,11 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
  * Represents a monitored, changed data item send to the {@link ConnectorOutputTypeTranslator} for detailed change
  * data, but only if enabled through {@link ModelAccess#setDetailNotifiedItem(boolean)}. 
  * 
- * @param <D> the protocol-specific data type for values, parameters and return values (see {@link ModelAccess})
  * @author Holger Eichelberger, SSE
  */
-public class DataItem<D> {
+public class DataItem {
     
-    private D data;
+    private Variant data;
     private Object identifier;
     
     /**
@@ -33,7 +34,7 @@ public class DataItem<D> {
      * @param identifier the data item identifier in the model, usually a string but who knows in Milo
      * @param data the new data
      */
-    public DataItem(Object identifier, D data) {
+    public DataItem(Object identifier, Variant data) {
         this.identifier = identifier;
         this.data = data;
     }
@@ -43,7 +44,7 @@ public class DataItem<D> {
      * 
      * @return the changed ata
      */
-    public D getData() {
+    public Variant getData() {
         return data;
     }
 

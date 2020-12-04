@@ -93,7 +93,7 @@ public class PahoMqttv3ConnectorTest {
                 PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product, Object>(outSer), 
                 CMD_CHANNEL, new ConnectorInputTypeAdapter<Command, Object>(inSer)));
         ConnectorTest.assertInstance(mConnector, false);
-        Assert.assertTrue(mConnector.getName().length() > 0);
+        ConnectorTest.assertConnectorProperties(mConnector);
         mConnector.connect(cParams);
         ConnectorTest.assertInstance(mConnector, true);
         mConnector.setReceptionCallback(new ReceptionCallback<Product>() {

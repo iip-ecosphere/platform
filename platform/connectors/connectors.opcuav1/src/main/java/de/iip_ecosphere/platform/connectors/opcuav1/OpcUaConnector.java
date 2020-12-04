@@ -93,11 +93,11 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector // default values sufficient
-public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>, Object, CO, CI, Variant> {
+public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI, Variant> {
 
     public static final String NAME = "OPC UA v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnector.class);
-    private static final DataItem<Variant> DUMMY = new DataItem<Variant>(null, null);
+    private static final DataItem DUMMY = new DataItem(null, null);
     private static final String FIELD_BINARY_ENCODING_ID = "BINARY_ENCODING_ID";
     private OpcUaClient client;
     private ConnectorParameter params;
@@ -126,7 +126,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>,
      * 
      * @param adapter the protocol adapter
      */
-    public OpcUaConnector(ProtocolAdapter<DataItem<Variant>, Object, CO, CI, Variant> adapter) {
+    public OpcUaConnector(ProtocolAdapter<DataItem, Object, CO, CI, Variant> adapter) {
         super(adapter);
         adapter.setModelAccess(new OpcUaModelAccess());
     }
@@ -263,7 +263,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>,
     }
 
     @Override
-    protected DataItem<Variant> read() throws IOException {
+    protected DataItem read() throws IOException {
         return DUMMY; // regardless, if we are asked, we do not report the changes; typeTranslator will compose the data
     }
 
@@ -545,10 +545,10 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>,
          */
         private void onSubscriptionValue(UaMonitoredItem item, DataValue value) {
             try {
-                DataItem<Variant> details;
+                DataItem details;
                 if (isDetailNotifiedItemEnabled()) {
                     Object nodeId = item.getReadValueId().getNodeId().getIdentifier();
-                    details = new DataItem<Variant>(nodeId, value.getValue());
+                    details = new DataItem(nodeId, value.getValue());
                 } else {
                     details = null;
                 }
