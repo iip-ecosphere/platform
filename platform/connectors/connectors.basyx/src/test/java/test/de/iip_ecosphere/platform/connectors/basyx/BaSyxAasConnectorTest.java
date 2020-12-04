@@ -417,6 +417,7 @@ public class BaSyxAasConnectorTest {
      */
     @Test
     public void testWithPolling() throws IOException {
+        ConnectorTest.assertDescriptorRegistration(BaSyxAasConnector.Descriptor.class);
         ConnectorParameter params = ConnectorParameterBuilder
             .newBuilder(AAS_IP, AAS_PORT)
             .setApplicationInformation(AAS_URN, "")
