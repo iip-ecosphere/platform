@@ -75,4 +75,32 @@ public interface Connector <O, I, CO, CI, D> {
      */
     public String getName();
     
+    /**
+     * Returns the input type to the protocol.
+     * 
+     * @return the input type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends I> getProtocolInputType();
+
+    /**
+     * Returns the input type from the IIP-Ecosphere platform.
+     * 
+     * @return the input type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends CI> getConnectorInputType();
+    
+    /**
+     * Returns the output type of the protocol.
+     * 
+     * @return the output type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends O> getProtocolOutputType();
+    
+    /**
+     * Returns the output type to the IIP-Ecosphere platform.
+     * 
+     * @return the output type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends CO> getConnectorOutputType();
+    
 }

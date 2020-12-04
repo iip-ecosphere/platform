@@ -67,4 +67,24 @@ public class TranslatingProtocolAdapter<O, I, CO, CI, D> extends AbstractProtoco
         outputTranslator.initializeModelAccess();
     }
     
+    @Override
+    public Class<? extends I> getProtocolInputType() {
+        return inputTranslator.getSourceType();
+    }
+    
+    @Override
+    public Class<? extends CI> getConnectorInputType() {
+        return inputTranslator.getTargetType();
+    }
+    
+    @Override
+    public Class<? extends O> getProtocolOutputType() {
+        return outputTranslator.getSourceType();
+    }
+    
+    @Override
+    public Class<? extends CO> getConnectorOutputType() {
+        return outputTranslator.getTargetType();
+    }
+    
 }

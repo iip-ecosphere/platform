@@ -48,6 +48,34 @@ public interface ProtocolAdapter <O, I, CO, CI, D> {
     public CO adaptOutput(O data) throws IOException;
     
     /**
+     * Returns the input type to the protocol.
+     * 
+     * @return the input type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends I> getProtocolInputType();
+
+    /**
+     * Returns the input type from the IIP-Ecosphere platform.
+     * 
+     * @return the input type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends CI> getConnectorInputType();
+    
+    /**
+     * Returns the output type of the protocol.
+     * 
+     * @return the output type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends O> getProtocolOutputType();
+    
+    /**
+     * Returns the output type to the IIP-Ecosphere platform.
+     * 
+     * @return the output type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
+     */
+    public Class<? extends CO> getConnectorOutputType();
+    
+    /**
      * Returns the instance abstracting the access to the underlying model.
      * 
      * @return the instance, may be <b>null</b> if {@link MachineConnector#hasModel()} is {@code false}

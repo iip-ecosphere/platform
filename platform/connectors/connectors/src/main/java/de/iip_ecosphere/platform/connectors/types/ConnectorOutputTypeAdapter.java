@@ -46,6 +46,16 @@ public class ConnectorOutputTypeAdapter<T, D> implements ConnectorOutputTypeTran
 
     @Override
     public void initializeModelAccess() throws IOException {
+    }
+
+    @Override
+    public Class<? extends byte[]> getSourceType() {
+        return byte[].class;
+    }
+
+    @Override
+    public Class<? extends T> getTargetType() {
+        return serializer.getType();
     };
     
 }

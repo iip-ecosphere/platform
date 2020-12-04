@@ -47,43 +47,6 @@ import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
 public class ConnectorTest {
     
     /**
-     * Tests creating connector parameters.
-     */
-    @Test
-    public void testConnectorParameter() {
-        ConnectorParameter params = ConnectorParameterBuilder
-            .newBuilder("aaa", 1234)
-            .build();
-        Assert.assertEquals("aaa", params.getHost());
-        Assert.assertEquals(1234, params.getPort());
-        Assert.assertEquals("", params.getApplicationId());
-        Assert.assertEquals("", params.getApplicationDescription());
-        Assert.assertEquals("", params.getEndpointPath());
-        Assert.assertEquals(ConnectorParameter.DEFAULT_SCHEMA, params.getSchema());
-        Assert.assertEquals(ConnectorParameter.DEFAULT_KEEP_ALIVE, params.getKeepAlive());
-        Assert.assertEquals(ConnectorParameter.DEFAULT_NOTIFICATION_INTERVAL, params.getNotificationInterval());
-
-        params = ConnectorParameterBuilder
-            .newBuilder("aaa", 1234, "xyz")
-            .setApplicationInformation("aI", "aD")
-            .setEndpointPath("epp/")
-            .setKeepAlive(2345)
-            .setNotificationInterval(9999)
-            .setRequestTimeout(3421)
-            .build();
-
-        Assert.assertEquals("aaa", params.getHost());
-        Assert.assertEquals(1234, params.getPort());
-        Assert.assertEquals("xyz", params.getSchema());
-        Assert.assertEquals("aI", params.getApplicationId());
-        Assert.assertEquals("aD", params.getApplicationDescription());
-        Assert.assertEquals("epp/", params.getEndpointPath());
-        Assert.assertEquals(2345, params.getKeepAlive());
-        Assert.assertEquals(9999, params.getNotificationInterval());
-        Assert.assertEquals(3421, params.getRequestTimeout());
-    }
-    
-    /**
      * Asserts the registration of {@code cls}.
      * 
      * @param cls the descriptor class to look for in {@link ConnectorRegistry}
@@ -120,6 +83,20 @@ public class ConnectorTest {
         } else {
             Assert.assertFalse(found);
         }
+    }
+    
+    /**
+     * Tests the connector instance itself.
+     * 
+     * @param connector the connector instance
+     */
+    public static void assertConnectorProperties(Connector<?, ?, ?, ?, ?> connector) {
+        Assert.assertTrue(connector.getName().length() > 0);
+        // may be null but shall not intests
+        Assert.assertNotNull(connector.getConnectorInputType());
+        Assert.assertNotNull(connector.getConnectorOutputType());
+        Assert.assertNotNull(connector.getProtocolOutputType());
+        Assert.assertNotNull(connector.getProtocolInputType());
     }
 
     /**
@@ -184,6 +161,16 @@ public class ConnectorTest {
             return new Object(); // irrelevant but to receive something in the test
         }
 
+        @Override
+        public Class<? extends Object> getSourceType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<? extends Command> getTargetType() {
+            return Command.class;
+        }
+
     }
     
     /**
@@ -229,6 +216,16 @@ public class ConnectorTest {
             return new Product(acc.toString(acc.get("sProp")), acc.toDouble(acc.get("dProp")));
         }
 
+        @Override
+        public Class<? extends Object> getSourceType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<? extends Product> getTargetType() {
+            return Product.class;
+        }
+
     }
 
     /**
@@ -247,7 +244,7 @@ public class ConnectorTest {
         TranslatingProtocolAdapter<Object, Object, Product, Command, ModelDataType> adapter 
             = new TranslatingProtocolAdapter<>(out, in);
         MyModelConnector<Product, Command> instance = new MyModelConnector<>(adapter);
-        Assert.assertTrue(instance.getName().length() > 0);
+        assertConnectorProperties(instance);
         assertInstance(instance, false);
         instance.connect(params);
         assertInstance(instance, true);
@@ -303,7 +300,7 @@ public class ConnectorTest {
         Product outData = new Product("abc", 2.3);
         Command inData = new Command("def");
         MyChannelConnector<Product, Command> instance = new MyChannelConnector<>(adapter);
-        Assert.assertTrue(instance.getName().length() > 0);
+        assertConnectorProperties(instance);
         assertInstance(instance, false);
         instance.connect(params);
         assertInstance(instance, true);

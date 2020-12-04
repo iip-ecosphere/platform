@@ -56,4 +56,14 @@ public class ConnectorInputTypeAdapter<S, D> implements ConnectorInputTypeTransl
         this.modelAccess = modelAccess;
     }
     
+    @Override
+    public Class<? extends byte[]> getSourceType() {
+        return byte[].class;
+    }
+
+    @Override
+    public Class<? extends S> getTargetType() {
+        return serializer.getType();
+    };
+    
 }

@@ -36,5 +36,19 @@ public interface ConnectorOutputTypeTranslator<S, T, D> extends OutputTypeTransl
      * @throws IOException in case the initialization fails, e.g., monitors cannot be set up
      */
     public void initializeModelAccess() throws IOException;
+ 
+    /**
+     * Returns the source type.
+     * 
+     * @return the source type
+     */
+    public Class<? extends S> getSourceType();
+
+    /**
+     * Returns the target type.
+     * 
+     * @return the target type
+     */
+    public Class<? extends T> getTargetType();
     
 }

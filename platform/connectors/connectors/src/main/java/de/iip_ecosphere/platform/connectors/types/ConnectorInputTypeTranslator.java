@@ -26,5 +26,19 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <D> the protocol-specific data type for values (see {@link ModelAccessProvider}) 
  */
 public interface ConnectorInputTypeTranslator<T, S, D> extends InputTypeTranslator<T, S>, ModelAccessProvider<D> {
-    
+ 
+    /**
+     * Returns the source type.
+     * 
+     * @return the source type
+     */
+    public Class<? extends S> getSourceType();
+
+    /**
+     * Returns the target type.
+     * 
+     * @return the target type
+     */
+    public Class<? extends T> getTargetType();
+
 }

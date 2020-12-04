@@ -229,4 +229,24 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
         }        
     }
 
+    @Override
+    public Class<? extends I> getProtocolInputType() {
+        return adapter.getProtocolInputType();
+    }
+    
+    @Override
+    public Class<? extends CI> getConnectorInputType() {
+        return adapter.getConnectorInputType();
+    }
+    
+    @Override
+    public Class<? extends O> getProtocolOutputType() {
+        return adapter.getProtocolOutputType();
+    }
+    
+    @Override
+    public Class<? extends CO> getConnectorOutputType() {
+        return adapter.getConnectorOutputType();
+    }
+
 }
