@@ -201,6 +201,7 @@ public class AbstractOpcUaConnectorTest {
      * @throws IOException in case that creating the connector fails
      */
     public void testConnector(boolean withNotifications) throws IOException {
+        ConnectorTest.assertDescriptorRegistration(OpcUaConnector.Descriptor.class);
         AtomicReference<MachineData> md = new AtomicReference<MachineData>();
         AtomicInteger count = new AtomicInteger(0);
         
