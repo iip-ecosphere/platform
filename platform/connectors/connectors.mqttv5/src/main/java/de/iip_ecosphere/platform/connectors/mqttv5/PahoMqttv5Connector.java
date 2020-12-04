@@ -26,7 +26,8 @@ import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
-import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
@@ -44,13 +45,31 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
     supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, acceptsObject = false)
-public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[], CO, CI, Object> {
+public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI, Object> {
 
+    public static final String NAME = "MQTT v5";
     private static final Logger LOGGER = Logger.getLogger(PahoMqttv5Connector.class.getName());
     private MqttAsyncClient client;
-    private String inputChannel;
-    private String outputChannel;
 
+    /**
+     * The descriptor of this connector (see META-INF/services).
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements ConnectorDescriptor {
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return PahoMqttv5Connector.class;
+        }
+        
+    }
+    
     /**
      * Creates a connector instance.
      * 
@@ -58,8 +77,6 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[
      */
     public PahoMqttv5Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI, Object> adapter) {
         super(adapter);
-        this.inputChannel = adapter.getInputChannel();
-        this.outputChannel = adapter.getOutputChannel();
     }
 
     /**
@@ -113,7 +130,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
             try {
-                waitForCompletion(client.subscribe(outputChannel, MqttQoS.AT_LEAST_ONCE.value()));
+                waitForCompletion(client.subscribe(getOutputChannel(), MqttQoS.AT_LEAST_ONCE.value()));
             } catch (MqttException e) {
                 throw new IOException(e);
             }
@@ -133,7 +150,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[
     }
 
     @Override
-    public void disconnect() throws IOException {
+    public void disconnectImpl() throws IOException {
         try {
             waitForCompletion(client.disconnect());
             client.close();
@@ -148,7 +165,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[
 
     @Override
     public String getName() {
-        return "MQTT v5";
+        return NAME;
     }
 
     @Override
@@ -156,7 +173,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractConnector<byte[], byte[
         MqttMessage message = new MqttMessage(data);
         message.setQos(MqttQoS.AT_LEAST_ONCE.value());
         try {
-            IMqttToken token = client.publish(inputChannel, message);
+            IMqttToken token = client.publish(getInputChannel(), message);
             waitForCompletion(token); // for now
         } catch (MqttException e) {
             throw new IOException(e);

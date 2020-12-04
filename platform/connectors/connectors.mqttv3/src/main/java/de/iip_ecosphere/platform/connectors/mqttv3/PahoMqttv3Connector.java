@@ -25,7 +25,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
@@ -43,13 +44,31 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
     supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, acceptsObject = false)
-public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[], CO, CI, Object> {
+public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI, Object> {
 
+    public static final String NAME = "MQTT v3";
     private static final Logger LOGGER = Logger.getLogger(PahoMqttv3Connector.class.getName());
     private MqttAsyncClient client;
-    private String inputChannel;
-    private String outputChannel;
 
+    /**
+     * The descriptor of this connector (see META-INF/services).
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements ConnectorDescriptor {
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return PahoMqttv3Connector.class;
+        }
+        
+    }
+    
     /**
      * Creates a connector instance.
      * 
@@ -57,8 +76,6 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[
      */
     public PahoMqttv3Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI, Object> adapter) {
         super(adapter);
-        this.inputChannel = adapter.getInputChannel();
-        this.outputChannel = adapter.getOutputChannel();
     }
 
     /**
@@ -97,7 +114,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
             try {
-                waitForCompletion(client.subscribe(outputChannel, MqttQoS.AT_LEAST_ONCE.value()));
+                waitForCompletion(client.subscribe(getOutputChannel(), MqttQoS.AT_LEAST_ONCE.value()));
             } catch (MqttException e) {
                 throw new IOException(e);
             }
@@ -117,7 +134,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[
     }
 
     @Override
-    public void disconnect() throws IOException {
+    public void disconnectImpl() throws IOException {
         try {
             waitForCompletion(client.disconnect());
             client.close();
@@ -132,7 +149,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[
 
     @Override
     public String getName() {
-        return "MQTT v3";
+        return NAME;
     }
 
     @Override
@@ -140,7 +157,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractConnector<byte[], byte[
         MqttMessage message = new MqttMessage(data);
         message.setQos(MqttQoS.AT_LEAST_ONCE.value());
         try {
-            IMqttDeliveryToken token = client.publish(inputChannel, message);
+            IMqttDeliveryToken token = client.publish(getInputChannel(), message);
             waitForCompletion(token); // for now
         } catch (MqttException e) {
             throw new IOException(e);

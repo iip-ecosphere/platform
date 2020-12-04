@@ -34,10 +34,10 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import org.junit.Assert;
 import test.de.iip_ecosphere.platform.transport.Product;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
+//import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.mqttv3.TestHiveMqServer;
-
 
 /**
  * Implements a test for {@link PahoMqttv3Connector}. Data is sent via the test server from a transport connector
@@ -92,8 +92,10 @@ public class PahoMqttv3ConnectorTest {
             new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command, Object>(
                 PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product, Object>(outSer), 
                 CMD_CHANNEL, new ConnectorInputTypeAdapter<Command, Object>(inSer)));
+        //ConnectorTest.assertInstance(mConnector, false);
         Assert.assertTrue(mConnector.getName().length() > 0);
         mConnector.connect(cParams);
+        //ConnectorTest.assertInstance(mConnector, true);
         mConnector.setReceptionCallback(new ReceptionCallback<Product>() {
             
             @Override
@@ -138,8 +140,10 @@ public class PahoMqttv3ConnectorTest {
         }
 
         System.out.println("Cleaning up");
+        //ConnectorTest.assertInstance(mConnector, true);
         mConnector.disconnect();
         tConnector.disconnect();
+        //ConnectorTest.assertInstance(mConnector, false);
         
         SerializerRegistry.unregisterSerializer(outSer);
         SerializerRegistry.unregisterSerializer(inSer);

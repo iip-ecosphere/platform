@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.IdentityToken;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
@@ -94,12 +95,32 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 @MachineConnector // default values sufficient
 public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>, Object, CO, CI, Variant> {
 
+    public static final String NAME = "OPC UA v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnector.class);
     private static final DataItem<Variant> DUMMY = new DataItem<Variant>(null, null);
     private static final String FIELD_BINARY_ENCODING_ID = "BINARY_ENCODING_ID";
     private OpcUaClient client;
     private ConnectorParameter params;
 
+    /**
+     * The descriptor of this connector (see META-INF/services).
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements ConnectorDescriptor {
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return OpcUaConnector.class;
+        }
+        
+    }
+    
     /**
      * Creates an instance and installs the protocol adapter.
      * 
@@ -216,7 +237,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>,
     }
 
     @Override
-    public void disconnect() throws IOException {
+    public void disconnectImpl() throws IOException {
         if (null != client) {
             try {
                 client.disconnect().get();
@@ -224,12 +245,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem<Variant>,
                 throw new IOException(e); // also for interrupted?
             }
         }
-        uninstallPollTask();
     }
 
     @Override
     public String getName() {
-        return "OPC UA v1";
+        return NAME;
     }
 
     @Override

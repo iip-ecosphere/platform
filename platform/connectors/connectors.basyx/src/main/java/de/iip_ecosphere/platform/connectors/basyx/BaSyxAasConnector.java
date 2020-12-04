@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
@@ -49,6 +50,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
 public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI, Object> {
 
+    public static final String NAME = "BaSyx/AAS";
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxAasConnector.class);
     private static final Object DUMMY = new Object();
 
@@ -59,6 +61,25 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     @SuppressWarnings("unused")
     private ConnectorParameter params;
 
+    /**
+     * The descriptor of this connector (see META-INF/services).
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements ConnectorDescriptor {
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return BaSyxAasConnector.class;
+        }
+        
+    }
+    
     /**
      * Creates an instance and installs the protocol adapter.
      * 
@@ -102,7 +123,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     }
 
     @Override
-    public void disconnect() throws IOException {
+    public void disconnectImpl() throws IOException {
         // if anything to be cleaned up, do it here
         clear(); 
     }
@@ -114,7 +135,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
 
     @Override
     public String getName() {
-        return "BaSyx/AAS";
+        return NAME;
     }
 
     @Override
