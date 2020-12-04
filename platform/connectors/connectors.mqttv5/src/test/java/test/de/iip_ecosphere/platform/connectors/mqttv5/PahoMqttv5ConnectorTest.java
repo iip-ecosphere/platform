@@ -145,9 +145,9 @@ public class PahoMqttv5ConnectorTest {
         mConnector.disconnect();
         tConnector.disconnect();
         ConnectorTest.assertInstance(mConnector, false);
-        
         SerializerRegistry.unregisterSerializer(outSer);
         SerializerRegistry.unregisterSerializer(inSer);
+        mConnector.dispose();
         
         Assert.assertEquals(2, received.size());
         Assert.assertEquals(prod1.getDescription(), received.get(0).getCommand());
