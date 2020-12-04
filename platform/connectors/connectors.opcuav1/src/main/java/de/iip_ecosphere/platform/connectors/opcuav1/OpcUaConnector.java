@@ -132,7 +132,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     }
     
     @Override
-    public void connectImpl(ConnectorParameter params) throws IOException {
+    protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == client) {
             this.params = params;
             String endpointURL = "opc." + params.getSchema() + "://" + params.getHost() + ":" + params.getPort() 
@@ -237,7 +237,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     }
 
     @Override
-    public void disconnectImpl() throws IOException {
+    protected void disconnectImpl() throws IOException {
         if (null != client) {
             try {
                 client.disconnect().get();

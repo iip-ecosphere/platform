@@ -273,6 +273,7 @@ public class AbstractOpcUaConnectorTest {
         connector.disconnect();
         ConnectorTest.assertInstance(connector, false);
         LOGGER.info("OPC connector disconnected");
+        connector.dispose();
     }
     
 }

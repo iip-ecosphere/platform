@@ -93,7 +93,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     // checkstyle: stop exception type check
     
     @Override
-    public void connectImpl(ConnectorParameter params) throws IOException {
+    protected void connectImpl(ConnectorParameter params) throws IOException {
         this.params = params;
         if (null == connectedAAS) {
             try {
@@ -123,7 +123,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     }
 
     @Override
-    public void disconnectImpl() throws IOException {
+    protected void disconnectImpl() throws IOException {
         // if anything to be cleaned up, do it here
         clear(); 
     }

@@ -491,6 +491,7 @@ public class BaSyxAasConnectorTest {
         connector.disconnect();
         ConnectorTest.assertInstance(connector, false);
         LOGGER.info("AAS connector disconnected");
+        connector.dispose();
     }
     
 }

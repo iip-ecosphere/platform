@@ -134,7 +134,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     }
 
     @Override
-    public void disconnectImpl() throws IOException {
+    protected void disconnectImpl() throws IOException {
         try {
             waitForCompletion(client.disconnect());
             client.close();
