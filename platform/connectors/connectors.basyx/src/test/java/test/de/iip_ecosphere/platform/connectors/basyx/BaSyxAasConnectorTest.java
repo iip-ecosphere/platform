@@ -160,7 +160,9 @@ public class BaSyxAasConnectorTest {
         lotSizeProperty.setIdShort(NAME_VAR_LOTSIZE);
         lotSizeProperty.set(VABLambdaProviderHelper.createSimple(() -> {
             return machine.getLotSize(); 
-        }, null), PropertyValueTypeDef.Integer);
+        }, (param) -> {
+                machine.setLotSize((int) param); 
+            }), PropertyValueTypeDef.Integer);
         
         Property powConsumptionProperty = new Property();
         powConsumptionProperty.setIdShort(NAME_VAR_POWCONSUMPTION);
@@ -189,11 +191,11 @@ public class BaSyxAasConnectorTest {
 
         Operation stopMachineOperation = new Operation();
         stopMachineOperation.setIdShort(NAME_OP_STOPMACHINE);
-        stopMachineOperation.setInvocable(createInvokable(TestControlComponent.OPMODE_STOPPING, () -> {
+        stopMachineOperation.setInvocable(createInvokable(TestControlComponent.OPMODE_STOPPING/*, () -> {
             lotSizeProperty.set(VABLambdaProviderHelper.createSimple(() -> { // force reset 
                 return machine.getLotSize(); 
             }, null), PropertyValueTypeDef.Integer);
-        }));
+        }*/));
         machineSubModel.addSubModelElement(stopMachineOperation);
         
         // Setting identifiers. 
@@ -260,32 +262,18 @@ public class BaSyxAasConnectorTest {
     }
 
     /**
-     * Creates an invokable without attachment.
-     *  
-     * @param opMode the operation mode to trigger
-     * @return the invokable
-     */
-    private static Function<Object[], Object> createInvokable(String opMode) {
-        return createInvokable(opMode, null);
-    }
-
-    /**
      * Creates an invokable for an AAS-VAB operation.
      * 
      * @param opMode the op mode to trigger the control component
-     * @param attachment optional other function to be executed after operation
      * @return the invokable
      */
-    private static Function<Object[], Object> createInvokable(String opMode, Runnable attachment) {
+    private static Function<Object[], Object> createInvokable(String opMode) {
         return (params) -> {
             VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(AAS_IP, VAB_PORT)));
             proxy.setModelPropertyValue("status/opMode", opMode);
             Object result = proxy.invokeOperation("/operations/service/start", params);
             while (!proxy.getModelPropertyValue("status/exState").equals(ExecutionState.COMPLETE.getValue())) {
                 Utils.sleep(500);
-            }
-            if (null != attachment) {
-                attachment.run();
             }
             proxy.invokeOperation("operations/service/reset");
             return result;
