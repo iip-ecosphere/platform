@@ -43,8 +43,8 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, acceptsObject = false)
-public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI, Object> {
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MQTT v3";
     private static final Logger LOGGER = Logger.getLogger(PahoMqttv3Connector.class.getName());
@@ -74,7 +74,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
      * 
      * @param adapter the protocol adapter
      */
-    public PahoMqttv3Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI, Object> adapter) {
+    public PahoMqttv3Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI> adapter) {
         super(adapter);
     }
 

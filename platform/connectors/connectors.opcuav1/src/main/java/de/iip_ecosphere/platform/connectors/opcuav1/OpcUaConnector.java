@@ -93,7 +93,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector // default values sufficient
-public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI, Variant> {
+public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI> {
 
     public static final String NAME = "OPC UA v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnector.class);
@@ -126,7 +126,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      * 
      * @param adapter the protocol adapter
      */
-    public OpcUaConnector(ProtocolAdapter<DataItem, Object, CO, CI, Variant> adapter) {
+    public OpcUaConnector(ProtocolAdapter<DataItem, Object, CO, CI> adapter) {
         super(adapter);
         adapter.setModelAccess(new OpcUaModelAccess());
     }
@@ -277,7 +277,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected class OpcUaModelAccess extends AbstractModelAccess<Variant> {
+    protected class OpcUaModelAccess extends AbstractModelAccess {
 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
@@ -297,14 +297,18 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
 
         @Override
-        public Variant call(String qName, Variant... args) throws IOException {
-            Variant callResult;
+        public Object call(String qName, Object... args) throws IOException {
+            Object callResult;
             int pos = qName.lastIndexOf(SEPARATOR_CHAR);
             if (pos > 1) {
+                Variant[] a = new Variant[args.length];
+                for (int i = 0; i < args.length; i++) {
+                    a[i] = new Variant(args[i]);
+                }
                 CallMethodRequest request = new CallMethodRequest(
-                    new NodeId(2, qName.substring(0, pos)), new NodeId(2, qName), args);    
+                    new NodeId(2, qName.substring(0, pos)), new NodeId(2, qName), a);    
                 try {
-                    callResult = client.call(request).thenCompose(result -> {
+                    Variant cr = client.call(request).thenCompose(result -> {
                         StatusCode statusCode = result.getStatusCode();
     
                         if (statusCode.isGood()) {
@@ -322,6 +326,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                             return f;
                         }
                     }).get();
+                    if (null != cr) {
+                        callResult = cr.getValue();
+                    } else {
+                        callResult = null;
+                    }
                 } catch (ExecutionException | InterruptedException e) {
                     throw new IOException(e);
                 }
@@ -332,12 +341,17 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
 
         @Override
-        public Variant get(String qName) throws IOException {
-            Variant result;
+        public Object get(String qName) throws IOException {
+            Object result;
             try {
                 UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
                 DataValue value = node.readValue();
-                result = value.getValue();
+                Variant r = value.getValue();
+                if (null != r) {
+                    result = r.getValue();
+                } else {
+                    result = null;
+                }
             } catch (UaException e) {
                 throw new IOException(e);
             }
@@ -345,10 +359,10 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
 
         @Override
-        public void set(String qName, Variant value) throws IOException {
+        public void set(String qName, Object value) throws IOException {
             try {
                 UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
-                node.writeValue(new DataValue(value));
+                node.writeValue(new DataValue(new Variant(value)));
             } catch (UaException e) {
                 throw new IOException(e);
             }
@@ -444,48 +458,6 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             }
         }
 
-        @Override
-        public Variant fromInt(int value) throws IOException {
-            return new Variant(value);
-        }
-
-        @Override
-        public Variant fromString(String value) throws IOException {
-            return new Variant(value);
-        }
-
-        @Override
-        public Variant fromDouble(double value) throws IOException {
-            return new Variant(value);
-        }
-
-        @Override
-        public int toInt(Variant value) throws IOException {
-            try {
-                return (int) value.getValue();
-            } catch (ClassCastException e) {
-                throw new IOException(e);
-            }
-        }
-
-        @Override
-        public String toString(Variant value) throws IOException {
-            try {
-                return (String) value.getValue();
-            } catch (ClassCastException e) {
-                throw new IOException(e);
-            }
-        }
-
-        @Override
-        public double toDouble(Variant value) throws IOException {
-            try {
-                return (double) value.getValue();
-            } catch (ClassCastException e) {
-                throw new IOException(e);
-            }
-        }
-        
         @Override
         public void monitor(String... qName) throws IOException {
             try {

@@ -48,7 +48,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
-public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI, Object> {
+public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     public static final String NAME = "BaSyx/AAS";
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxAasConnector.class);
@@ -85,7 +85,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
      * 
      * @param adapter the protocol adapter
      */
-    public BaSyxAasConnector(ProtocolAdapter<Object, Object, CO, CI, Object> adapter) {
+    public BaSyxAasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
         super(adapter);
         adapter.setModelAccess(new BaSyxModelAccess());
     }
@@ -158,7 +158,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class BaSyxModelAccess extends AbstractModelAccess<Object> {
+    private class BaSyxModelAccess extends AbstractModelAccess {
 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
@@ -277,36 +277,6 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
         @Override
         public void registerCustomType(Class<?> cls) throws IOException {
             throw new IOException("Structs are not implemented in AAS"); // see @MachineConnector
-        }
-
-        @Override
-        public Object fromInt(int value) throws IOException {
-            return value;
-        }
-
-        @Override
-        public Object fromString(String value) throws IOException {
-            return value;
-        }
-
-        @Override
-        public Object fromDouble(double value) throws IOException {
-            return value;
-        }
-
-        @Override
-        public int toInt(Object value) throws IOException {
-            return (int) value;
-        }
-
-        @Override
-        public String toString(Object value) throws IOException {
-            return (String) value;
-        }
-
-        @Override
-        public double toDouble(Object value) throws IOException {
-            return (double) value;
         }
 
         @Override

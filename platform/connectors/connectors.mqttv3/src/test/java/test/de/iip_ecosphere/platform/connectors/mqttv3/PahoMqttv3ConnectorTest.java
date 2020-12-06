@@ -90,9 +90,9 @@ public class PahoMqttv3ConnectorTest {
         SerializerRegistry.registerSerializer(inSer);
         
         PahoMqttv3Connector<Product, Command> mConnector = new PahoMqttv3Connector<>(
-            new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command, Object>(
-                PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product, Object>(outSer), 
-                CMD_CHANNEL, new ConnectorInputTypeAdapter<Command, Object>(inSer)));
+            new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
+                PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product>(outSer), 
+                CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)));
         ConnectorTest.assertInstance(mConnector, false);
         ConnectorTest.assertConnectorProperties(mConnector);
         mConnector.connect(cParams);
