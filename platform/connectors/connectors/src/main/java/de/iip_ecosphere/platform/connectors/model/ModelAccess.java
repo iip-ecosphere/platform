@@ -31,13 +31,10 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
  * 
  * Initially we considered having direct access into the connector instance as fallback. However, in the mean time
  * we believe that we then have to adjust the abstraction accordingly.
- * 
- * @param <D> the protocol-specific data type for values, parameters and return values; {@code Object} indicates that 
- *   the  protocol accepts (at least) Java primitive types as object Wrappers. In that case, the conversion functions
- *   may be superfluous (see {@link MachineConnector#acceptsObject()} is {@code true}). 
+ *   
  * @author Holger Eichelberger, SSE
  */
-public interface ModelAccess <D> {
+public interface ModelAccess {
     
     /**
      * Returns the qualified name separator.
@@ -56,8 +53,7 @@ public interface ModelAccess <D> {
      * @throws IOException in case that the call fails or calls are not implemented (see 
      * {@link MachineConnector#supportsModelCalls()} is {@code false})
      */
-    @SuppressWarnings("unchecked")
-    public D call(String qName, D... args) throws IOException;
+    public Object call(String qName, Object... args) throws IOException;
     
     /**
      * Returns a property value.
@@ -67,7 +63,7 @@ public interface ModelAccess <D> {
      * @throws IOException in case that the access fails or reading properties is not implemented (see 
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
-    public D get(String qName) throws IOException;
+    public Object get(String qName) throws IOException;
 
     /**
      * Changes a property value.
@@ -77,7 +73,7 @@ public interface ModelAccess <D> {
      * @throws IOException in case that the access fails or setting properties is not implemented (see 
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
-    public void set(String qName, D value) throws IOException;
+    public void set(String qName, Object value) throws IOException;
 
     // complex types
     
@@ -119,74 +115,6 @@ public interface ModelAccess <D> {
      *   fails or structs are not supported (see {@link MachineConnector#supportsModelStructs()} is {@code false})
      */
     public void registerCustomType(Class<?> cls) throws IOException;
-
-    // converters to D
-
-    /**
-     * Turns a Java int value into a model value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the Java int value
-     * @return the model value
-     * @throws IOException if the conversion fails
-     */
-    public D fromInt(int value) throws IOException;
-
-    /**
-     * Turns a Java String value into a model value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the Java String value
-     * @return the model value
-     * @throws IOException if the conversion fails
-     */
-    public D fromString(String value) throws IOException;
-
-    /**
-     * Turns a Java double value into a model value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the Java double value
-     * @return the model value
-     * @throws IOException if the conversion fails
-     */
-    public D fromDouble(double value) throws IOException;
-    
-    // further types missing
-    
-    // converters from D
-
-    /**
-     * Turns a model int value into a Java value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the model int value
-     * @return the Java int value
-     * @throws IOException if the conversion fails
-     */
-    public int toInt(D value) throws IOException;
-
-    /**
-     * Turns a model String value into a Java value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the model String value
-     * @return the Java String value
-     * @throws IOException if the conversion fails
-     */
-    public String toString(D value) throws IOException;
-
-    /**
-     * Turns a model double value into a Java value. May not be needed if the model accepts Java values as object 
-     * directly (see {@link MachineConnector#acceptsObject()} is {@code true}). [conversion]
-     * 
-     * @param value the model double value
-     * @return the Java double value
-     * @throws IOException if the conversion fails
-     */
-    public double toDouble(D value) throws IOException;
-    
-    // further types missing
     
     // monitoring
     

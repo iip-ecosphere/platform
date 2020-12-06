@@ -19,9 +19,9 @@ import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
  * 
  * @author Holger Eichelberger, SSE
  */
-@MachineConnector(hasModel = false, acceptsObject = true, supportsEvents = false, supportsHierarchicalQNames = false, 
+@MachineConnector(hasModel = false, supportsEvents = false, supportsHierarchicalQNames = false, 
     supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
-public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI, Object> {
+public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MyChannelConnector";
     private Deque<byte[]> offers = new LinkedBlockingDeque<byte[]>();
@@ -51,7 +51,7 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
      * 
      * @param adapter the protocol adapter
      */
-    public MyChannelConnector(ChannelProtocolAdapter<byte[], byte[], CO, CI, Object> adapter) {
+    public MyChannelConnector(ChannelProtocolAdapter<byte[], byte[], CO, CI> adapter) {
         super(adapter);
     }
 

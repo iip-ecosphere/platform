@@ -25,9 +25,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  *
  * @param <S> the source type (see {@link TypeTranslator})
  * @param <T> the target type (see {@link TypeTranslator})
- * @param <D> the protocol-specific data type for values (see {@link ModelAccessProvider}) 
  */
-public interface ConnectorOutputTypeTranslator<S, T, D> extends OutputTypeTranslator<S, T>, ModelAccessProvider<D> {
+public interface ConnectorOutputTypeTranslator<S, T> extends OutputTypeTranslator<S, T>, ModelAccessProvider {
     
     /**
      * Called to initialize the model access, e.g., to setup notifications. Called only, when the connector is 

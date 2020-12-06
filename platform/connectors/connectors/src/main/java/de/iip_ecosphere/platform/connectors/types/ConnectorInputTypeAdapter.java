@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.connectors.types;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
-import de.iip_ecosphere.platform.connectors.model.ModelAccessProvider;
 import de.iip_ecosphere.platform.transport.serialization.InputTypeTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
@@ -23,14 +22,13 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  * Adapts a basic input translator/serializer for reuse.
  * 
  * @param <S> the source type (see {@link InputTypeTranslator})
- * @param <D> the protocol-specific data type for values (see {@link ModelAccessProvider}) 
  *
  * @author Holger Eichelberger, SSE
  */
-public class ConnectorInputTypeAdapter<S, D> implements ConnectorInputTypeTranslator<S, byte[], D> {
+public class ConnectorInputTypeAdapter<S> implements ConnectorInputTypeTranslator<S, byte[]> {
 
     private Serializer<S> serializer;
-    private ModelAccess<D> modelAccess;
+    private ModelAccess modelAccess;
 
     /**
      * Creates an instance.
@@ -47,12 +45,12 @@ public class ConnectorInputTypeAdapter<S, D> implements ConnectorInputTypeTransl
     }
 
     @Override
-    public ModelAccess<D> getModelAccess() {
+    public ModelAccess getModelAccess() {
         return modelAccess;
     }
 
     @Override
-    public void setModelAccess(ModelAccess<D> modelAccess) {
+    public void setModelAccess(ModelAccess modelAccess) {
         this.modelAccess = modelAccess;
     }
     

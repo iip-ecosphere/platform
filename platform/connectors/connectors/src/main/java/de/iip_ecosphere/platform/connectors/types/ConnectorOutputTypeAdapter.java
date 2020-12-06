@@ -3,7 +3,6 @@ package de.iip_ecosphere.platform.connectors.types;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
-import de.iip_ecosphere.platform.connectors.model.ModelAccessProvider;
 import de.iip_ecosphere.platform.transport.serialization.OutputTypeTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
@@ -11,14 +10,13 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  * Adapts a basic output translator/serializer for reuse.
  * 
  * @param <T> the target type (see {@link OutputTypeTranslator})
- * @param <D> the protocol-specific data type for values (see {@link ModelAccessProvider}) 
  *
  * @author Holger Eichelberger, SSE
  */
-public class ConnectorOutputTypeAdapter<T, D> implements ConnectorOutputTypeTranslator<byte[], T, D> {
+public class ConnectorOutputTypeAdapter<T> implements ConnectorOutputTypeTranslator<byte[], T> {
 
     private Serializer<T> serializer;
-    private ModelAccess<D> modelAccess;
+    private ModelAccess modelAccess;
     
     /**
      * Creates an instance.
@@ -35,12 +33,12 @@ public class ConnectorOutputTypeAdapter<T, D> implements ConnectorOutputTypeTran
     }
 
     @Override
-    public ModelAccess<D> getModelAccess() {
+    public ModelAccess getModelAccess() {
         return modelAccess;
     }
 
     @Override
-    public void setModelAccess(ModelAccess<D> modelAccess) {
+    public void setModelAccess(ModelAccess modelAccess) {
         this.modelAccess = modelAccess;
     }
 

@@ -19,23 +19,21 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * Refines the {@link TypeTranslator} for the use with machine connectors.
  * 
  * @author Holger Eichelberger, SSE
- *
- * @param <D> the protocol-specific data type for values (see {@link ModelAccess}) 
  */
-public interface ModelAccessProvider<D> {
+public interface ModelAccessProvider {
 
     /**
      * Returns the model access instance to be used during type translations.
      * 
      * @return the model access instance, may be <b>null</b> (see {@link MachineConnector#hasModel()})
      */
-    public ModelAccess<D> getModelAccess();
+    public ModelAccess getModelAccess();
 
     /**
      * Defines the model access. Handle with care, shall be called (indirectly) by the connector only.
      * 
      * @param modelAccess the model access
      */
-    public void setModelAccess(ModelAccess<D> modelAccess);
+    public void setModelAccess(ModelAccess modelAccess);
     
 }

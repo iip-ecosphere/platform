@@ -15,10 +15,9 @@ package de.iip_ecosphere.platform.connectors.model;
 /**
  * Basic implementation of the model access.
  * 
- * @param <D> the protocol-specific data type for values (see {@link ModelAccess}
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractModelAccess<D> implements ModelAccess<D> {
+public abstract class AbstractModelAccess implements ModelAccess {
 
     private boolean detailNotifications = false; 
     private Boolean useNotifications;

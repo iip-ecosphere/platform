@@ -25,8 +25,8 @@ import java.util.ServiceLoader;
  */
 public class ConnectorRegistry {
     
-    private static final List<Connector<?, ?, ?, ?, ?>> INSTANCES 
-        = Collections.synchronizedList(new ArrayList<Connector<?, ?, ?, ?, ?>>());
+    private static final List<Connector<?, ?, ?, ?>> INSTANCES 
+        = Collections.synchronizedList(new ArrayList<Connector<?, ?, ?, ?>>());
     
     /**
      * Returns the service loader for connector descriptors.
@@ -52,7 +52,7 @@ public class ConnectorRegistry {
      * 
      * @param instance the instance
      */
-    public static void registerConnector(Connector<?, ?, ?, ?, ?> instance) {
+    public static void registerConnector(Connector<?, ?, ?, ?> instance) {
         INSTANCES.add(instance);
         // notify AAS in parallel?
     }
@@ -62,7 +62,7 @@ public class ConnectorRegistry {
      * 
      * @param instance the instance
      */
-    public static void unregisterConnector(Connector<?, ?, ?, ?, ?> instance) {
+    public static void unregisterConnector(Connector<?, ?, ?, ?> instance) {
         INSTANCES.remove(instance);
         // notify AAS in parallel?
     }
@@ -81,7 +81,7 @@ public class ConnectorRegistry {
      * 
      * @return an iterator over all instances
      */
-    public static Iterator<Connector<?, ?, ?, ?, ?>> getRegisteredConnectorInstances() {
+    public static Iterator<Connector<?, ?, ?, ?>> getRegisteredConnectorInstances() {
         return INSTANCES.iterator();
     }
 

@@ -33,9 +33,9 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * 
  * @author Holger Eichelberger, SSE
  */
-@MachineConnector(hasModel = true, acceptsObject = false, supportsEvents = false, supportsHierarchicalQNames = true, 
+@MachineConnector(hasModel = true, supportsEvents = false, supportsHierarchicalQNames = true, 
     supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
-public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI, ModelDataType> {
+public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     public static final String NAME = "MyModelConnector";
     private Deque<Object> offers = new LinkedBlockingDeque<Object>();
@@ -65,7 +65,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
      * 
      * @param adapter the protocol adapter
      */
-    public MyModelConnector(ProtocolAdapter<Object, Object, CO, CI, ModelDataType> adapter) {
+    public MyModelConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
         super(adapter);
         adapter.setModelAccess(new MyModelAccess());
     }
@@ -108,16 +108,15 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class MyModelAccess extends AbstractModelAccess<ModelDataType> {
+    private class MyModelAccess extends AbstractModelAccess {
 
         /**
          * Represents a model entry.
          * 
-         * @param <D> the datatype
          * @author Holger Eichelberger, SSE
          */
-        private class Entry<D> {
-            private D value;
+        private class Entry {
+            private Object value;
             private boolean notify;
 
             /**
@@ -126,15 +125,15 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
              * @param value the value
              * @param notify notify by sending
              */
-            private Entry(D value, boolean notify) {
+            private Entry(Object value, boolean notify) {
                 this.value = value;
                 this.notify = notify;
             }
             
         }
         
-        private Map<String, Entry<ModelDataType>> model = new HashMap<>();
-        private Map<String, Entry<Object>> structs = new HashMap<>();
+        private Map<String, Entry> model = new HashMap<>();
+        private Map<String, Entry> structs = new HashMap<>();
         
         /**
          * Creates an instance.
@@ -149,12 +148,12 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        public ModelDataType call(String qName, ModelDataType... args) throws IOException {
+        public ModelDataType call(String qName, Object... args) throws IOException {
             return null;
         }
 
         @Override
-        public ModelDataType get(String qName) throws IOException {
+        public Object get(String qName) throws IOException {
             if (model.containsKey(qName)) {
                 return model.get(qName).value;
             } else {
@@ -163,16 +162,16 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        public void set(String qName, ModelDataType value) throws IOException {
+        public void set(String qName, Object value) throws IOException {
             if (structs.containsKey(qName)) {
                 throw new IOException(qName + " is already registered for a struct");
             }
-            Entry<ModelDataType> entry;
+            Entry entry;
             if (model.containsKey(qName)) {
                 entry = model.get(qName);
                 entry.value = value;
             } else {
-                entry = new Entry<ModelDataType>(value, false);
+                entry = new Entry(value, false);
                 model.put(qName, entry);
             }
             notify(entry);
@@ -181,7 +180,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         @Override
         public <T> T getStruct(String qName, Class<T> type) throws IOException {
             T result;
-            Entry<Object> ent = structs.get(qName);
+            Entry ent = structs.get(qName);
             if (null == ent) {
                 throw new IOException("Element " + qName + " does not exist");
             } else if (type.isInstance(ent.value)) {
@@ -197,12 +196,12 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
             if (model.containsKey(qName)) {
                 throw new IOException(qName + " is already registered for primitive property");
             }
-            Entry<Object> entry;
+            Entry entry;
             if (structs.containsKey(qName)) {
                 entry = structs.get(qName);
                 entry.value = value;
             } else {
-                entry = new Entry<Object>(value, false);
+                entry = new Entry(value, false);
                 structs.put(qName, entry);
             }
             notify(entry);
@@ -213,7 +212,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
          * 
          * @param entry the entry to notify for
          */
-        private void notify(Entry<?> entry) {
+        private void notify(Entry entry) {
             if (entry.notify) {
                 try {
                     received(entry.value);
@@ -229,43 +228,13 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        public ModelDataType fromInt(int value) throws IOException {
-            return new ModelDataType(value);
-        }
-
-        @Override
-        public ModelDataType fromString(String value) throws IOException {
-            return new ModelDataType(value);
-        }
-
-        @Override
-        public ModelDataType fromDouble(double value) throws IOException {
-            return new ModelDataType(value);
-        }
-
-        @Override
-        public int toInt(ModelDataType value) throws IOException {
-            return value.getIntValue();
-        }
-
-        @Override
-        public String toString(ModelDataType value) throws IOException {
-            return value.getStringValue();
-        }
-
-        @Override
-        public double toDouble(ModelDataType value) throws IOException {
-            return value.getDobuleValue();
-        }
-
-        @Override
         public void monitor(String... qName) throws IOException {
             for (String n : qName) {
-                Entry<ModelDataType> me = model.get(n);
+                Entry me = model.get(n);
                 if (null != me) {
                     me.notify = true;
                 } else {
-                    Entry<Object> se = structs.get(n);
+                    Entry se = structs.get(n);
                     if (null != se) {
                         se.notify = true;
                     } else {

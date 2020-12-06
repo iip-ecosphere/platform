@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.connectors;
 
-import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 
 /**
@@ -22,11 +21,10 @@ import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractChannelConnector<O, I, CO, CI, D> extends AbstractConnector<O, I, CO, CI, D> {
+public abstract class AbstractChannelConnector<O, I, CO, CI> extends AbstractConnector<O, I, CO, CI> {
 
     private String inputChannel;
     private String outputChannel;
@@ -36,7 +34,7 @@ public abstract class AbstractChannelConnector<O, I, CO, CI, D> extends Abstract
      * 
      * @param adapter the protocol adapter
      */
-    protected AbstractChannelConnector(ChannelProtocolAdapter<O, I, CO, CI, D> adapter) {
+    protected AbstractChannelConnector(ChannelProtocolAdapter<O, I, CO, CI> adapter) {
         super(adapter);
         this.inputChannel = adapter.getInputChannel();
         this.outputChannel = adapter.getOutputChannel();

@@ -13,7 +13,6 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 
-import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
@@ -24,11 +23,10 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  *
  * @author Holger Eichelberger, SSE
  */
-public interface Connector <O, I, CO, CI, D> {
+public interface Connector <O, I, CO, CI> {
     
     /**
      * Connects the connector to the underlying machine/platform.

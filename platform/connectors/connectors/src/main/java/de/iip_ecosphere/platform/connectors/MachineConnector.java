@@ -78,12 +78,4 @@ public @interface MachineConnector {
      */
     public boolean supportsEvents() default true;
     
-    /**
-     * Whether the machine connector can work with Java values on the model directly and does not need conversation to 
-     * connector-specific instances(requires {@link #hasModel()} is {@code true}).
-     * 
-     * @return {@code true} for object-based values, {@code false} if conversation is required
-     */
-    public boolean acceptsObject() default false;
-    
 }

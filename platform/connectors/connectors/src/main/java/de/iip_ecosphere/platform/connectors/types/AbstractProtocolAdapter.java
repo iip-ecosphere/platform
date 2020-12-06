@@ -21,20 +21,19 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractProtocolAdapter <O, I, CO, CI, D> implements ProtocolAdapter <O, I, CO, CI, D> {
+public abstract class AbstractProtocolAdapter<O, I, CO, CI> implements ProtocolAdapter<O, I, CO, CI> {
     
-    private ModelAccess<D> modelAccess;
+    private ModelAccess modelAccess;
     
     /**
      * Returns the instance abstracting the access to the underlying model.
      * 
      * @return the instance, may be <b>null</b> if {@link MachineConnector#hasModel()} is {@code false}
      */
-    public final ModelAccess<D> getModelAccess() {
+    public final ModelAccess getModelAccess() {
         return modelAccess;
     }
 
@@ -43,7 +42,7 @@ public abstract class AbstractProtocolAdapter <O, I, CO, CI, D> implements Proto
      * 
      * @param modelAccess the model access
      */
-    public void setModelAccess(ModelAccess<D> modelAccess) {
+    public void setModelAccess(ModelAccess modelAccess) {
         this.modelAccess = modelAccess;
     }
     

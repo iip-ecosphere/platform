@@ -23,11 +23,10 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ProtocolAdapter <O, I, CO, CI, D> {
+public interface ProtocolAdapter <O, I, CO, CI> {
     
     /**
      * Adapts the input from the IIP-Ecosphere platform to the underlying machine/platform.
@@ -80,14 +79,14 @@ public interface ProtocolAdapter <O, I, CO, CI, D> {
      * 
      * @return the instance, may be <b>null</b> if {@link MachineConnector#hasModel()} is {@code false}
      */
-    public ModelAccess<D> getModelAccess();
+    public ModelAccess getModelAccess();
 
     /**
      * Defines the model access. Handle with care, shall be called by connector only.
      * 
      * @param modelAccess the model access
      */
-    public void setModelAccess(ModelAccess<D> modelAccess);
+    public void setModelAccess(ModelAccess modelAccess);
     
     /**
      * Called to initialize the model access, e.g., to setup notifications. Called only, when the connector is 

@@ -72,8 +72,8 @@ public class ConnectorTest {
      * @param registered if {@code true}, fails if {@code connector} is not registered; if {@code false}, fails 
      *   if {@code connector} is registered,   
      */
-    public static void assertInstance(Connector<?, ?, ?, ?, ?> connector, boolean registered) {
-        Iterator<Connector<?, ?, ?, ?, ?>> iter = ConnectorRegistry.getRegisteredConnectorInstances();
+    public static void assertInstance(Connector<?, ?, ?, ?> connector, boolean registered) {
+        Iterator<Connector<?, ?, ?, ?>> iter = ConnectorRegistry.getRegisteredConnectorInstances();
         boolean found = false;
         while (iter.hasNext()) {
             found = iter.next() == connector;
@@ -90,9 +90,9 @@ public class ConnectorTest {
      * 
      * @param connector the connector instance
      */
-    public static void assertConnectorProperties(Connector<?, ?, ?, ?, ?> connector) {
+    public static void assertConnectorProperties(Connector<?, ?, ?, ?> connector) {
         Assert.assertTrue(connector.getName().length() > 0);
-        // may be null but shall not intests
+        // may be null but shall not in tests
         Assert.assertNotNull(connector.getConnectorInputType());
         Assert.assertNotNull(connector.getConnectorOutputType());
         Assert.assertNotNull(connector.getProtocolOutputType());
@@ -144,17 +144,17 @@ public class ConnectorTest {
      * @author Holger Eichelberger, SSE
      */
     private static class ModelInputTranslator 
-        extends AbstractConnectorInputTypeTranslator<Command, Object, ModelDataType> {
+        extends AbstractConnectorInputTypeTranslator<Command, Object> {
 
         @Override
         public Object from(Command data) throws IOException {
             // the actual job - translate the command
-            ModelAccess<ModelDataType> acc = getModelAccess();
-            acc.set("sProp", acc.fromString(data.getCommand()));
+            ModelAccess acc = getModelAccess();
+            acc.set("sProp", data.getCommand());
             // and some testing
-            Assert.assertEquals(10, acc.toInt(acc.get("iProp")));
-            Assert.assertEquals(data.getCommand(), acc.toString(acc.get("sProp")));
-            Assert.assertEquals(2.3, acc.toDouble(acc.get("dProp")), 0.01);
+            Assert.assertEquals(10, acc.get("iProp"));
+            Assert.assertEquals(data.getCommand(), acc.get("sProp"));
+            Assert.assertEquals(2.3, (double) acc.get("dProp"), 0.01);
             MyStruct s = acc.getStruct("struct", MyStruct.class);
             Assert.assertNotNull(s);
             Assert.assertEquals("xmas", s.data);
@@ -179,7 +179,7 @@ public class ConnectorTest {
      * @author Holger Eichelberger, SSE
      */
     private static class ModelOutputTranslator 
-        extends AbstractConnectorOutputTypeTranslator<Object, Product, ModelDataType> {
+        extends AbstractConnectorOutputTypeTranslator<Object, Product> {
 
         private boolean withEvents;
         
@@ -194,26 +194,26 @@ public class ConnectorTest {
         
         @Override
         public void initializeModelAccess() throws IOException {
-            ModelAccess<ModelDataType> acc = getModelAccess();
+            ModelAccess acc = getModelAccess();
             // for test - populate the model
-            acc.set("iProp", acc.fromInt(10));
-            acc.set("sProp", acc.fromString("HERE"));
-            acc.set("dProp", acc.fromDouble(2.3));
+            acc.set("iProp", 10);
+            acc.set("sProp", "HERE");
+            acc.set("dProp", 2.3);
             acc.setStruct("struct", new MyStruct("xmas"));
             acc.useNotifications(withEvents);
         }
 
         @Override
         public Product to(Object source) throws IOException {
-            ModelAccess<ModelDataType> acc = getModelAccess();
+            ModelAccess acc = getModelAccess();
             // some testing
             Assert.assertTrue(acc.getQSeparator().length() > 0);
-            Assert.assertEquals(10, acc.toInt(acc.get("iProp")));
+            Assert.assertEquals(10, acc.get("iProp"));
             MyStruct s = acc.getStruct("struct", MyStruct.class);
             Assert.assertNotNull(s);
             Assert.assertEquals("xmas", s.data);
             // and the actual job
-            return new Product(acc.toString(acc.get("sProp")), acc.toDouble(acc.get("dProp")));
+            return new Product((String) acc.get("sProp"), (double) acc.get("dProp"));
         }
 
         @Override
@@ -237,11 +237,11 @@ public class ConnectorTest {
     private void testModelConnector(boolean withEvents) throws IOException {
         assertDescriptorRegistration(MyModelConnector.Descriptor.class);
         ConnectorParameter params = ConnectorParameterBuilder.newBuilder("", 1234).build();
-        ConnectorInputTypeTranslator<Command, Object, ModelDataType> in = new ModelInputTranslator(); 
-        ConnectorOutputTypeTranslator<Object, Product, ModelDataType> out = new ModelOutputTranslator(withEvents);
+        ConnectorInputTypeTranslator<Command, Object> in = new ModelInputTranslator(); 
+        ConnectorOutputTypeTranslator<Object, Product> out = new ModelOutputTranslator(withEvents);
 
         Command inData = new Command("def");
-        TranslatingProtocolAdapter<Object, Object, Product, Command, ModelDataType> adapter 
+        TranslatingProtocolAdapter<Object, Object, Product, Command> adapter 
             = new TranslatingProtocolAdapter<>(out, in);
         MyModelConnector<Product, Command> instance = new MyModelConnector<>(adapter);
         assertConnectorProperties(instance);
@@ -292,10 +292,10 @@ public class ConnectorTest {
         ProductJsonSerializer outSer = new ProductJsonSerializer();
         CommandJsonSerializer inSer = new CommandJsonSerializer();
         ConnectorParameter params = ConnectorParameterBuilder.newBuilder("", 1234).build();
-        ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command, Object> adapter 
+        ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command> adapter 
             = new ChannelTranslatingProtocolAdapter<>(
-                "out", new ConnectorOutputTypeAdapter<Product, Object>(outSer), 
-                "in", new ConnectorInputTypeAdapter<Command, Object>(inSer));
+                "out", new ConnectorOutputTypeAdapter<Product>(outSer), 
+                "in", new ConnectorInputTypeAdapter<Command>(inSer));
         
         Product outData = new Product("abc", 2.3);
         Command inData = new Command("def");

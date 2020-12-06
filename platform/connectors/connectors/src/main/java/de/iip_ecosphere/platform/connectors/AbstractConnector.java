@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -30,14 +29,13 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O, I, CO, CI, D>, 
+public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I, CO, CI>, 
     NotificationChangedListener {
 
-    private ProtocolAdapter<O, I, CO, CI, D> adapter;
+    private ProtocolAdapter<O, I, CO, CI> adapter;
     private ReceptionCallback<CO> callback;
     private Timer timer;
     private TimerTask pollTask;
@@ -48,7 +46,7 @@ public abstract class AbstractConnector<O, I, CO, CI, D> implements Connector<O,
      * 
      * @param adapter the protocol adapter
      */
-    protected AbstractConnector(ProtocolAdapter<O, I, CO, CI, D> adapter) {
+    protected AbstractConnector(ProtocolAdapter<O, I, CO, CI> adapter) {
         this.adapter = adapter;
     }
     

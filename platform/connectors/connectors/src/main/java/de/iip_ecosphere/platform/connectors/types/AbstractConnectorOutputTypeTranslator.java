@@ -19,21 +19,20 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
  * 
  * @param <S> the source type (see {@link ConnectorOutputTypeTranslator})
  * @param <T> the target type (see {@link ConnectorOutputTypeTranslator})
- * @param <D> the protocol-specific data type for values (see {@link ModelAccess})
  *  
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractConnectorOutputTypeTranslator<S, T, D> implements ConnectorOutputTypeTranslator<S, T, D> {
+public abstract class AbstractConnectorOutputTypeTranslator<S, T> implements ConnectorOutputTypeTranslator<S, T> {
 
-    private ModelAccess<D> modelAccess;
+    private ModelAccess modelAccess;
     
     @Override
-    public ModelAccess<D> getModelAccess() {
+    public ModelAccess getModelAccess() {
         return modelAccess;
     }
 
     @Override
-    public void setModelAccess(ModelAccess<D> modelAccess) {
+    public void setModelAccess(ModelAccess modelAccess) {
         this.modelAccess = modelAccess;
     }
 

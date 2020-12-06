@@ -1,6 +1,5 @@
 package de.iip_ecosphere.platform.connectors.types;
 
-import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -10,12 +9,11 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ChannelTranslatingProtocolAdapter<O, I, CO, CI, D> extends TranslatingProtocolAdapter<O, I, CO, CI, D> 
-    implements ChannelProtocolAdapter<O, I, CO, CI, D> {
+public class ChannelTranslatingProtocolAdapter<O, I, CO, CI> extends TranslatingProtocolAdapter<O, I, CO, CI> 
+    implements ChannelProtocolAdapter<O, I, CO, CI> {
 
     private String outputChannel;
     private String inputChannel;
@@ -31,8 +29,8 @@ public class ChannelTranslatingProtocolAdapter<O, I, CO, CI, D> extends Translat
      * @param inputTranslator the input translator
      */
     public ChannelTranslatingProtocolAdapter(String outputChannel, 
-        ConnectorOutputTypeTranslator<O, CO, D> outputTranslator, String inputChannel, 
-        ConnectorInputTypeTranslator<CI, I, D> inputTranslator) {
+        ConnectorOutputTypeTranslator<O, CO> outputTranslator, String inputChannel, 
+        ConnectorInputTypeTranslator<CI, I> inputTranslator) {
         super(outputTranslator, inputTranslator);
         this.outputChannel = outputChannel;
         this.inputChannel = inputChannel;

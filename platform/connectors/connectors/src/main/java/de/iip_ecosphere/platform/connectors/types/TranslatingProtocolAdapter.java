@@ -28,10 +28,10 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TranslatingProtocolAdapter<O, I, CO, CI, D> extends AbstractProtocolAdapter<O, I, CO, CI, D> {
+public class TranslatingProtocolAdapter<O, I, CO, CI> extends AbstractProtocolAdapter<O, I, CO, CI> {
 
-    private ConnectorOutputTypeTranslator<O, CO, D> outputTranslator;
-    private ConnectorInputTypeTranslator<CI, I, D> inputTranslator;
+    private ConnectorOutputTypeTranslator<O, CO> outputTranslator;
+    private ConnectorInputTypeTranslator<CI, I> inputTranslator;
     
     /**
      * Creates a translating protocol adapter.
@@ -39,8 +39,8 @@ public class TranslatingProtocolAdapter<O, I, CO, CI, D> extends AbstractProtoco
      * @param outputTranslator the output translator
      * @param inputTranslator the input translator
      */
-    public TranslatingProtocolAdapter(ConnectorOutputTypeTranslator<O, CO, D> outputTranslator, 
-            ConnectorInputTypeTranslator<CI, I, D> inputTranslator) {
+    public TranslatingProtocolAdapter(ConnectorOutputTypeTranslator<O, CO> outputTranslator, 
+        ConnectorInputTypeTranslator<CI, I> inputTranslator) {
         this.outputTranslator = outputTranslator;
         this.inputTranslator = inputTranslator;
     }
@@ -56,7 +56,7 @@ public class TranslatingProtocolAdapter<O, I, CO, CI, D> extends AbstractProtoco
     }
 
     @Override
-    public void setModelAccess(ModelAccess<D> modelAccess) {
+    public void setModelAccess(ModelAccess modelAccess) {
         super.setModelAccess(modelAccess);
         outputTranslator.setModelAccess(modelAccess);
         inputTranslator.setModelAccess(modelAccess);
