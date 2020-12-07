@@ -11,9 +11,14 @@
         <property name="fileExtensions" value="java"/>
 	</module>
     <module name="FileTabCharacter">
-		  <property name="severity" value="error"/>
-		  <property name="fileExtensions" value="java"/>
+	    <property name="severity" value="error"/>
+  	    <property name="fileExtensions" value="java"/>
 	</module>
+    <module name="LineLength">
+       <property name="ignorePattern" value="^$"/>
+       <property name="max" value="120"/>
+       <property name="severity" value="error"/>
+    </module>
 
   <module name="TreeWalker">
 
@@ -38,20 +43,26 @@
     <module name="JavadocMethod">
         <property name="excludeScope" value="anoninner"/>
 		<property name="scope" value="private"/>
-		<property name="allowUndeclaredRTE" value="true"/>
-		<property name="allowMissingJavadoc" value="false"/>
-		<property name="allowMissingPropertyJavadoc" value="false"/>
 		<property name="severity" value="error"/>
+	</module>
+	<module name="MissingJavadocMethod">
+	   <property name="scope" value="private"/>
 	</module>
     <module name="JavadocType">
         <property name="excludeScope" value="anoninner"/>
 		<property name="scope" value="private"/>
 		<property name="severity" value="error"/>
 	</module>
+	<module name="MissingJavadocType">
+        <property name="excludeScope" value="anoninner"/>
+        <property name="scope" value="private"/>
+  	</module>
     <module name="JavadocVariable">
         <property name="excludeScope" value="anoninner"/>
 		<property name="scope" value="private"/>
 		<property name="severity" value="error"/>
+	</module>
+	<module name="MissingJavadocPackage">
 	</module>
     <module name="JavadocStyle">
 		<property name="checkFirstSentence" value="true"/>
@@ -122,11 +133,6 @@
 		<!--<module name="ExecutableStatementCounts">
 		    <property name="max" value="30"/>
 		</module>-->
-    <module name="LineLength">
-		    <property name="ignorePattern" value="^$"/>
-		    <property name="max" value="120"/>
-				<property name="severity" value="error"/>
-		</module>
     <module name="MethodLength">
 		  <property name="max" value="80"/>
 			<property name="countEmpty" value="true"/>

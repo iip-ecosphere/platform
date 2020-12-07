@@ -26,7 +26,7 @@ More to come soon with next focus on edge/stream performance, configuration inte
 * For now, we use JDK 8 in order to be compliant with Edge devices. To have exchangable projects across development 
   installations, use in Eclipse the execution environment JavaSE-1.8 as JRE system library. This may be relaxed in 
   future.
-* A related Java checkstyle definition is based on Checkstyle 8.18. The style 
+* A related Java checkstyle definition is based on Checkstyle 8.35. The style 
   definition is in ``platformDependencies`` and shall be added as a project 
   local definition named ``IIP Code Conventions``to Checkstyle before importing 
   the other projects.
