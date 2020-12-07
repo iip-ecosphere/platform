@@ -22,6 +22,11 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 import org.junit.Assert;
 
+/**
+ * A transport connector that uses the memory for transport communication.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class DirectMemoryTransportConnectorTest {
 
     /**
