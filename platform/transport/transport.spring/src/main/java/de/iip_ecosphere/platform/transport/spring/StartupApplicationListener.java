@@ -28,6 +28,12 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
+/**
+ * Implements operations to be carried out at application start, e.g., setting up configured serializers or the
+ * transport factory..
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 @Component
 @EnableConfigurationProperties({SerializerConfiguration.class, TransportFactoryConfiguration.class})
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {

@@ -15,6 +15,11 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
+/**
+ * A test string serializers which counts the calls in {@link TestCounters}.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class StringSerializer implements Serializer<String> {
 
     @Override
