@@ -20,6 +20,11 @@ import org.springframework.cloud.stream.provisioning.ProvisioningException;
 import org.springframework.cloud.stream.provisioning.ProvisioningProvider;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provisions producer and consumer destinations.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 @Component
 public class MqttV5MessageBinderProvisioner implements ProvisioningProvider<ConsumerProperties, ProducerProperties> {
 

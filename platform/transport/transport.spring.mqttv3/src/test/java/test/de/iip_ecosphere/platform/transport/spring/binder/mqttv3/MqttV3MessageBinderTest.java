@@ -146,6 +146,11 @@ public class MqttV3MessageBinderTest {
 
     }
     
+    /**
+     * A simple test processor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     @SpringBootApplication
     @EnableBinding(Proc.class)
     public static class MyProcessor {

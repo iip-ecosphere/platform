@@ -159,6 +159,11 @@ public class AmqpMessageBinderTest {
 
     }
     
+    /**
+     * A simple test processor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     @SpringBootApplication
     @EnableBinding(Proc.class)
     public static class MyProcessor {
