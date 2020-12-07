@@ -168,6 +168,11 @@ public class VendorStruct implements UaStructure {
             .toString();
     }
 
+    /**
+     * Serialization Codec.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     public static class Codec extends GenericDataTypeCodec<VendorStruct> {
         @Override
         public Class<VendorStruct> getType() {
