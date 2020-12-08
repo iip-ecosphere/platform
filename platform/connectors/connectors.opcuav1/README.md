@@ -6,4 +6,4 @@ OPC UA v1 machine/platform for bi-directional access to machines and already ins
 - Connectors AAS 
 - Authentication/Security
 - Unsure: further custom types apart from Structs
-
+- Create a test against another server than Milo
