@@ -27,7 +27,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * A central AMQP client for all binders to reduce resource usage. Typically, different binders subscribe to different
@@ -107,7 +107,7 @@ public class AmqpClient {
                         throw new RuntimeException(e);
                     }
                 }
-                Utils.sleep(2);
+                TimeUtils.sleep(2);
             }
         }
         

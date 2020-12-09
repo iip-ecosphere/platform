@@ -37,7 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MimeType;
 
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
@@ -75,7 +75,7 @@ public class MqttV5MessageBinderTest {
         final String host = "localhost";
         final int port = 8883;
         server.start(host, port);
-        Utils.sleep(1000);
+        TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final PahoMqttV5TransportConnector infra = new PahoMqttV5TransportConnector();
         try {
@@ -100,7 +100,7 @@ public class MqttV5MessageBinderTest {
             System.out.println("CONNECTOR PROBLEM " + e.getMessage());
         }
         System.out.println("Started infra client on " + host + " " + port);
-        Utils.sleep(1000);
+        TimeUtils.sleep(1000);
     }
     
     /**
@@ -119,7 +119,7 @@ public class MqttV5MessageBinderTest {
     @Test
     public void testMessages() {
         // wait for delivery
-        Utils.sleep(2000);
+        TimeUtils.sleep(2000);
         // and assert composed result
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
 

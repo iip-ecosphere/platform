@@ -29,7 +29,7 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
@@ -177,7 +177,7 @@ public class MqttClient {
                         throw new RuntimeException(e);
                     }
                 }
-                Utils.sleep(2);
+                TimeUtils.sleep(2);
             }
         }
         
