@@ -113,4 +113,9 @@ public class BaSyxAasFactory extends AasFactory {
         return new BaSyxDeploymentBuilder(contextPath, host, port);
     }
 
+    @Override
+    public String getName() {
+        return "AAS/BaSyx";
+    }
+
 }
