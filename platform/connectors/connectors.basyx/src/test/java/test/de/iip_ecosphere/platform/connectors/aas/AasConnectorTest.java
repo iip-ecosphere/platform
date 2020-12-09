@@ -47,6 +47,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParamete
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
+import test.de.iip_ecosphere.platform.support.aas.basyx.TestControlComponent;
+import test.de.iip_ecosphere.platform.support.aas.basyx.TestMachine;
 
 /**
  * Tests {@link AasConnector} with polling and no security.
