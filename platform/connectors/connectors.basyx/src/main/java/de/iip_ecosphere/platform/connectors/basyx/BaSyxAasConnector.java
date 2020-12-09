@@ -13,19 +13,7 @@
 package de.iip_ecosphere.platform.connectors.basyx;
 
 import java.io.IOException;
-import java.util.Map;
 
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
-import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
-import org.eclipse.basyx.aas.registration.api.IAASRegistryService;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
-import org.eclipse.basyx.vab.protocol.api.IConnectorProvider;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +23,11 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.SubModel;
 
 /**
  * A generic Asset Administration Shell/BaSxy connector. We use hierarchical names to identify sub-models
@@ -54,10 +47,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxAasConnector.class);
     private static final Object DUMMY = new Object();
 
-    private ConnectedAssetAdministrationShellManager manager;
-    private ConnectedAssetAdministrationShell connectedAAS;
-    private IAASRegistryService registry;
-    private IConnectorProvider connectorProvider;
+    private Aas connectedAAS;
     @SuppressWarnings("unused")
     private ConnectorParameter params;
 
@@ -96,36 +86,17 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     protected void connectImpl(ConnectorParameter params) throws IOException {
         this.params = params;
         if (null == connectedAAS) {
-            try {
-                String uri = "http://" + params.getHost() + ":" + params.getPort() + "/" + params.getEndpointPath();
-                registry = new AASRegistryProxy(uri);
-                connectorProvider = new HTTPConnectorProvider();
-                manager = new ConnectedAssetAdministrationShellManager(registry, connectorProvider);
-                ModelUrn aasURN = new ModelUrn(params.getApplicationId());
-                connectedAAS = manager.retrieveAAS(aasURN);
-            } catch (Exception e) {
-                clear();
-                throw new IOException(e); 
-            }
+            connectedAAS = AasFactory.getInstance().retrieveAas(params.getHost(), params.getPort(), 
+                params.getEndpointPath(), params.getApplicationId());
         }
     }
     
     // checkstyle: resume exception type check
-    
-    /**
-     * Clears the connection-relevant attributes.
-     */
-    private void clear() {
-        registry = null;
-        connectorProvider = null; 
-        manager = null;
-        connectedAAS = null;
-    }
 
     @Override
     protected void disconnectImpl() throws IOException {
         // if anything to be cleaned up, do it here
-        clear(); 
+        connectedAAS = null; 
     }
 
     @Override
@@ -182,24 +153,19 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
          * @return the property
          * @throws IOException if the poperty cannot be found/retrieved
          */
-        private IProperty findProperty(String qName) throws IOException {
-            IProperty result = null;
+        private Property findProperty(String qName) throws IOException {
+            Property result = null;
             int pos = qName.indexOf(SEPARATOR_CHAR);
             if (pos > 1) {
                 String subModelName = qName.substring(0, pos);
                 String elementName = qName.substring(pos + 1);
-                Map<String, ISubModel> submodels = connectedAAS.getSubModels();
-                ISubModel subModel = submodels.get(subModelName);
+                SubModel subModel = connectedAAS.getSubModel(subModelName);
                 if (null != subModel) {
-                    Map<String, ISubmodelElement> properties = subModel.getSubmodelElements();
-                    Object prop = properties.get(elementName);
+                    Property prop = subModel.getProperty(elementName);
                     if (null == prop) {
                         throw new IOException("Property " + elementName + " in " + qName + " does not exist");
-                    } else if (prop instanceof IProperty) {
-                        result = (IProperty) properties.get(elementName);
                     } else {
-                        throw new IOException("Submodel element " + elementName + " in " + qName 
-                            + " is not a property rather than a " + prop.getClass().getSimpleName());    
+                        result = prop;
                     }
                 } else {
                     throw new IOException("Submodel " + subModelName + "in " + qName + " does not exist");    
@@ -219,11 +185,9 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
             if (pos > 1) {
                 String subModelName = qName.substring(0, pos);
                 String operationName = qName.substring(pos + 1);
-                Map<String, ISubModel> submodels = connectedAAS.getSubModels();
-                ISubModel subModel = submodels.get(subModelName);
+                SubModel subModel = connectedAAS.getSubModel(subModelName);
                 if (null != subModel) {
-                    Map<String, IOperation> operations = subModel.getOperations();
-                    IOperation operation = operations.get(operationName);
+                    Operation operation = subModel.getOperation(operationName, args.length);
                     if (null != operation) {
                         try {
                             result = operation.invoke(args);
@@ -245,8 +209,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
         @Override
         public Object get(String qName) throws IOException {
             try {
-                IProperty property = findProperty(qName);
-                return property.get();
+                return findProperty(qName).getValue();
             } catch (Exception e) {
                 throw new IOException("Accessing " + qName + ": " + e.getMessage(), e);
             }
@@ -255,8 +218,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
         @Override
         public void set(String qName, Object value) throws IOException {
             try {
-                IProperty property = findProperty(qName);
-                property.set(value); // writes into model, may not be reflected further
+                findProperty(qName).setValue(value); // writes into model, may not be reflected further
             } catch (Exception e) {
                 throw new IOException("Accessing " + qName + ": " + e.getMessage(), e);
             }

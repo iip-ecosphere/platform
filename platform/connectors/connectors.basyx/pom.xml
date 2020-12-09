@@ -25,27 +25,19 @@
      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.lib</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.sqlregistry</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas.basyx</artifactId>
+     <version>${project.version}</version>
     </dependency>
   
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.AASServer</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.sdk</artifactId>
-      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
      <dependency>
@@ -61,7 +53,21 @@
      <version>${project.version}</version>
      <type>test-jar</type>
      <scope>test</scope>
-    </dependency> 
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas.basyx</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
+    </dependency>     
     
   </dependencies>
   

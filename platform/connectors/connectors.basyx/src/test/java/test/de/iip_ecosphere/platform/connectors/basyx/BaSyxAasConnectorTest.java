@@ -13,47 +13,14 @@
 package test.de.iip_ecosphere.platform.connectors.basyx;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import javax.annotation.processing.Generated;
-import javax.servlet.http.HttpServlet;
 
-import org.apache.catalina.startup.Tomcat;
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistryService;
-import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
-import org.eclipse.basyx.aas.registration.restapi.DirectoryModelProvider;
-import org.eclipse.basyx.aas.restapi.AASModelProvider;
-import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
 import org.eclipse.basyx.models.controlcomponent.ControlComponent;
-import org.eclipse.basyx.models.controlcomponent.ExecutionState;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
-import org.eclipse.basyx.submodel.metamodel.map.SubModel;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
-import org.eclipse.basyx.submodel.restapi.SubModelProvider;
-import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
-import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
-import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProviderHelper;
-import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
-import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
-import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
-import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -67,6 +34,15 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -100,7 +76,8 @@ public class BaSyxAasConnectorTest {
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
     private static final String REGISTRY_PATH = "registry";
     
-    private static AASHTTPServer httpServer;
+    private static Server httpServer;
+    private static Server ccServer;
     
     static {
         QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
@@ -119,8 +96,17 @@ public class BaSyxAasConnectorTest {
     @BeforeClass
     public static void init() throws SocketException, UnknownHostException {
         TestMachine machine = new TestMachine();
-        startControlComponent(machine);
-        startAAS(machine);
+        ccServer = createControlComponent(machine);
+        Aas aas = createAAS(machine);
+
+        DeploymentBuilder dBuilder = AasFactory.getInstance().createDeploymentBuilder(AAS_IP, AAS_PORT);
+        dBuilder.addInMemoryRegistry(REGISTRY_PATH);
+        dBuilder.deploy(aas);
+        httpServer = dBuilder.createServer(3000);
+        
+        ccServer.start();
+        httpServer.start();
+
         LOGGER.info("AAS server started");
     }
     
@@ -129,7 +115,8 @@ public class BaSyxAasConnectorTest {
      */
     @AfterClass
     public static void shutdown() {
-        httpServer.shutdown();
+        httpServer.stop();
+        ccServer.stop();
         LOGGER.info("AAS server stopped");
     }
     
@@ -137,147 +124,52 @@ public class BaSyxAasConnectorTest {
      * This method creates a control component for the {@link TestMachine}.
      * 
      * @param machine the machine instance
+     * @return the test control component
      */
-    private static void startControlComponent(TestMachine machine) {
+    private static Server createControlComponent(TestMachine machine) {
         ControlComponent cc = new TestControlComponent(machine);
-        // Server where the control component is reachable.
-        VABMapProvider ccProvider = new VABMapProvider(cc);
-        BaSyxTCPServer<VABMapProvider> server = new BaSyxTCPServer<>(ccProvider, VAB_PORT);
-        server.start();
+        return BaSyxDeploymentBuilder.createControlComponent(cc, VAB_PORT);        
     }
     
     /**
      * This method creates and starts the Asset Administration Shell.
      * 
      * @param machine the test machine instance
+     * @return the created AAS instance
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    public static void startAAS(TestMachine machine) throws SocketException, UnknownHostException {
-        SubModel machineSubModel = new SubModel();
-        
-        Property lotSizeProperty = new Property();
-        lotSizeProperty.setIdShort(NAME_VAR_LOTSIZE);
-        lotSizeProperty.set(VABLambdaProviderHelper.createSimple(() -> {
-            return machine.getLotSize(); 
-        }, (param) -> {
-                machine.setLotSize((int) param); 
-            }), PropertyValueTypeDef.Integer);
-        
-        Property powConsumptionProperty = new Property();
-        powConsumptionProperty.setIdShort(NAME_VAR_POWCONSUMPTION);
-        powConsumptionProperty.set(VABLambdaProviderHelper.createSimple(() -> {
-            return machine.getPowerConsumption();  
-        }, null), PropertyValueTypeDef.Double);
-            
-        machineSubModel.addSubModelElement(lotSizeProperty);
-        machineSubModel.addSubModelElement(powConsumptionProperty);
-        
-        // Creating the Operations
-        Operation startMachineOperation = new Operation();
-        startMachineOperation.setIdShort(NAME_OP_STARTMACHINE);
-        startMachineOperation.setInvocable(createInvokable(TestControlComponent.OPMODE_STARTING));
-        machineSubModel.addSubModelElement(startMachineOperation);
-
-        Operation configureMachineOperation = new Operation();
-        configureMachineOperation.setIdShort(NAME_OP_RECONFIGURE);
-        configureMachineOperation.setInvocable(createInvokable(TestControlComponent.OPMODE_CONFIGURING));
-        List<OperationVariable> configureMachineParams = new ArrayList<>();
-        OperationVariable paramLotSize = new OperationVariable();
-        // strange, cannot set name or type
-        configureMachineParams.add(paramLotSize);
-        configureMachineOperation.setInputVariables(configureMachineParams);
-        machineSubModel.addSubModelElement(configureMachineOperation);
-
-        Operation stopMachineOperation = new Operation();
-        stopMachineOperation.setIdShort(NAME_OP_STOPMACHINE);
-        stopMachineOperation.setInvocable(createInvokable(TestControlComponent.OPMODE_STOPPING/*, () -> {
-            lotSizeProperty.set(VABLambdaProviderHelper.createSimple(() -> { // force reset 
+    public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
+        AasFactory factory = AasFactory.getInstance();
+        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
+        SubModelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
+            .setType(Type.INTEGER)
+            .bind(() -> {
                 return machine.getLotSize(); 
-            }, null), PropertyValueTypeDef.Integer);
-        }*/));
-        machineSubModel.addSubModelElement(stopMachineOperation);
+            }, (param) -> {
+                    machine.setLotSize((int) param); 
+                })
+            .build();
+        subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
+            .setType(Type.DOUBLE)
+            .bind(() -> {
+                return machine.getPowerConsumption(); 
+            }, null)
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
+            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STARTING, AAS_IP, VAB_PORT))
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
+            .addInputVariable()
+            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_CONFIGURING, AAS_IP, VAB_PORT))
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
+            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, AAS_IP, VAB_PORT))
+            .build();
         
-        // Setting identifiers. 
-        machineSubModel.setIdShort(NAME_SUBMODEL);
-        machineSubModel.setIdentification(IdentifierType.CUSTOM, NAME_SUBMODEL);
-
-        // AAS
-        AssetAdministrationShell aas = new AssetAdministrationShell();
-        ModelUrn aasURN = new ModelUrn(AAS_URN);
-        aas.setIdentification(aasURN);
-        aas.setIdShort(NAME_AAS);
-
-        //Wrapping Submodels in IModelProvider
-        AASModelProvider aasProvider = new AASModelProvider(aas);
-        SubModelProvider machineSMProvider = new SubModelProvider(machineSubModel);
-        VABMultiSubmodelProvider fullProvider = new VABMultiSubmodelProvider();
-        fullProvider.setAssetAdministrationShell(aasProvider);
-        fullProvider.addSubmodel(NAME_SUBMODEL, machineSMProvider);
-        
-        HttpServlet aasServlet = new VABHTTPInterface<IModelProvider>(fullProvider);
-        IAASRegistryService registry = new InMemoryRegistry();
-        IModelProvider registryProvider = new DirectoryModelProvider(registry);
-        HttpServlet registryServlet = new VABHTTPInterface<IModelProvider>(registryProvider);
-        
-        // Register descriptors.
-        AASDescriptor aasDescriptor = new AASDescriptor(aas, "http://" + AAS_IP + ":" 
-            + AAS_PORT + "/" + NAME_AAS + "/aas");
-        aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(machineSubModel, "http://" + AAS_IP + ":" 
-            + AAS_PORT + "/" + NAME_AAS + "/aas/submodels/" + NAME_SUBMODEL + "/submodel"));       
-        registry.register(aasDescriptor);
-        
-        // Deploy the AAS on a HTTP server
-        BaSyxContext context = new BaSyxContext("", "", AAS_IP, AAS_PORT);
-        context.addServletMapping("/" + NAME_AAS + "/*", aasServlet);
-        context.addServletMapping("/" + REGISTRY_PATH + "/*", registryServlet);
-        httpServer = startServer(new AASHTTPServer(context), 3000);
-    }
-    
-    /**
-     * Starts and tries to wait for the server to come up. Unfortunately, no support for this here, just an
-     * unblocking call.
-     * 
-     * @param httpServer the server instance
-     * @param minWaitingTime the minimum waiting time
-     * @return {@code server}
-     */
-    private static AASHTTPServer startServer(AASHTTPServer httpServer, int minWaitingTime) {
-        httpServer.start();
-        boolean fallbackWaiting = true;
-        try {
-            Field tomcatField = AASHTTPServer.class.getField("tomcat");
-            Tomcat tomcat = (Tomcat) tomcatField.get(httpServer);
-            tomcat.wait();
-            fallbackWaiting = false;
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InterruptedException e) {
-        }
-        if (fallbackWaiting) {
-            Utils.sleep(3000); // the server does not tell us when it is ready
-        }
-        return httpServer;
-    }
-
-    /**
-     * Creates an invokable for an AAS-VAB operation.
-     * 
-     * @param opMode the op mode to trigger the control component
-     * @return the invokable
-     */
-    private static Function<Object[], Object> createInvokable(String opMode) {
-        return (params) -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(AAS_IP, VAB_PORT)));
-            proxy.setModelPropertyValue("status/opMode", opMode);
-            Object result = proxy.invokeOperation("/operations/service/start", params);
-            while (!proxy.getModelPropertyValue("status/exState").equals(ExecutionState.COMPLETE.getValue())) {
-                Utils.sleep(500);
-            }
-            proxy.invokeOperation("operations/service/reset");
-            return result;
-        };
+        subModelBuilder.build();
+        return aasBuilder.build();
     }
     
     /**
