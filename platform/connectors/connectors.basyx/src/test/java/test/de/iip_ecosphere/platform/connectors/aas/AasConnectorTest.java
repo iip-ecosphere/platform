@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.connectors.basyx;
+package test.de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.basyx.BaSyxAasConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
@@ -45,15 +44,16 @@ import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
+import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 
 /**
- * Tests {@link BaSyxAasConnector} with polling and no security.
+ * Tests {@link AasConnector} with polling and no security.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAasConnectorTest {
+public class AasConnectorTest {
 
     public static final String QNAME_VAR_LOTSIZE;
     public static final String QNAME_VAR_POWCONSUMPTION;
@@ -69,7 +69,7 @@ public class BaSyxAasConnectorTest {
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
     private static final String NAME_OP_STOPMACHINE = "stopMachine";
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxAasConnectorTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_IP = "localhost";
     private static final int AAS_PORT = 4000;
     private static final int VAB_PORT = 4001;
@@ -297,7 +297,7 @@ public class BaSyxAasConnectorTest {
      */
     @Test
     public void testWithPolling() throws IOException {
-        ConnectorTest.assertDescriptorRegistration(BaSyxAasConnector.Descriptor.class);
+        ConnectorTest.assertDescriptorRegistration(AasConnector.Descriptor.class);
         ConnectorParameter params = ConnectorParameterBuilder
             .newBuilder(AAS_IP, AAS_PORT)
             .setApplicationInformation(AAS_URN, "")
@@ -307,7 +307,7 @@ public class BaSyxAasConnectorTest {
         AtomicReference<MachineData> md = new AtomicReference<MachineData>();
         AtomicInteger count = new AtomicInteger(0);
         
-        BaSyxAasConnector<MachineData, MachineCommand> connector = new BaSyxAasConnector<>(
+        AasConnector<MachineData, MachineCommand> connector = new AasConnector<>(
             new TranslatingProtocolAdapter<Object, Object, MachineData, MachineCommand>(
                  new OutputTranslator(false), new InputTranslator()));
         ConnectorTest.assertInstance(connector, false);

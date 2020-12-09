@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.connectors.basyx;
+package de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubModel;
 
 /**
- * A generic Asset Administration Shell/BaSxy connector. We use hierarchical names to identify sub-models
+ * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
  * and elements within. Requires the model URN as {@link ConnectorParameter#getApplicationId()}, e.g., 
  * "urn:::AAS:::testMachines#" and the registry URL part, e.g. "registry" in 
  * {@link ConnectorParameter#getEndpointPath()}. 
@@ -41,10 +41,9 @@ import de.iip_ecosphere.platform.support.aas.SubModel;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
-public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
+public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
-    public static final String NAME = "BaSyx/AAS";
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxAasConnector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AasConnector.class);
     private static final Object DUMMY = new Object();
 
     private Aas connectedAAS;
@@ -60,12 +59,12 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
 
         @Override
         public String getName() {
-            return NAME;
+            return getConnectorName();
         }
 
         @Override
         public Class<?> getType() {
-            return BaSyxAasConnector.class;
+            return AasConnector.class;
         }
         
     }
@@ -75,9 +74,9 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
      * 
      * @param adapter the protocol adapter
      */
-    public BaSyxAasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
+    public AasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
         super(adapter);
-        adapter.setModelAccess(new BaSyxModelAccess());
+        adapter.setModelAccess(new AasModelAccess());
     }
 
     // checkstyle: stop exception type check
@@ -106,7 +105,7 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
 
     @Override
     public String getName() {
-        return NAME;
+        return getConnectorName();
     }
 
     @Override
@@ -125,11 +124,11 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
     }
 
     /**
-     * Implements the model access for AAS/BaSyx.
+     * Implements the model access for AAS.
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class BaSyxModelAccess extends AbstractModelAccess {
+    private class AasModelAccess extends AbstractModelAccess {
 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
@@ -137,8 +136,8 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
         /**
          * Creates the instance and binds the listener to the creating connector instance.
          */
-        protected BaSyxModelAccess() {
-            super(BaSyxAasConnector.this);
+        protected AasModelAccess() {
+            super(AasConnector.this);
         }
 
         @Override
@@ -246,6 +245,15 @@ public class BaSyxAasConnector<CO, CI> extends AbstractConnector<Object, Object,
             throw new IOException("Event-based monitoring is not supported. Please use polling.");
         }
         
+    }
+
+    /**
+     * Returns the connector name.
+     * 
+     * @return the connector name
+     */
+    private static String getConnectorName() {
+        return "AAS via " + AasFactory.getInstance().getName();
     }
 
 }

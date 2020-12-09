@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.connectors.basyx;
+package test.de.iip_ecosphere.platform.connectors.aas;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    BaSyxAasConnectorTest.class
+    AasConnectorTest.class
 })
 public class AllTests {
 }
