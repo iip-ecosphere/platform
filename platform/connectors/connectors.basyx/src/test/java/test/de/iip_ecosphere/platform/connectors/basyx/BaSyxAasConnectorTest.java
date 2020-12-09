@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTran
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -44,7 +45,6 @@ import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
-import de.iip_ecosphere.platform.transport.Utils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 
@@ -181,7 +181,7 @@ public class BaSyxAasConnectorTest {
     private void block(AtomicInteger count, int receptions) {
         int max = 20; // longer than polling interval in params, 30 may be required depending on machine speed
         while (count.get() < receptions && max > 0) {
-            Utils.sleep(200);
+            TimeUtils.sleep(200);
             max--;
         }
         Assert.assertTrue("Operation took too long", max > 0);

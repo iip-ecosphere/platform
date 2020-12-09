@@ -20,7 +20,7 @@ import org.eclipse.basyx.models.controlcomponent.SimpleControlComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * Implements a simple test control component.
@@ -78,7 +78,7 @@ public class TestControlComponent extends SimpleControlComponent implements Cont
     protected void startMachine() {
         new Thread(() -> {
             machine.start();
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             setExecutionState(ExecutionState.COMPLETE.getValue());
         }).start();
     }
@@ -89,7 +89,7 @@ public class TestControlComponent extends SimpleControlComponent implements Cont
     protected void configureMachine() {
         new Thread(() -> {
             machine.setLotSize(5); // TODO params
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             setExecutionState(ExecutionState.COMPLETE.getValue());
         }).start();
     }
@@ -100,7 +100,7 @@ public class TestControlComponent extends SimpleControlComponent implements Cont
     protected void stopMachine() {
         new Thread(() -> {
             machine.stop();
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             setExecutionState(ExecutionState.COMPLETE.getValue());
         }).start();
     }

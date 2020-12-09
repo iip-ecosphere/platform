@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
@@ -136,7 +136,7 @@ public class PahoMqttv3ConnectorTest {
 
         int count = 20;
         while (received.size() < 2 && count > 0) {
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             count--;
         }
 

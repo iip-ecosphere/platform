@@ -48,8 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import de.iip_ecosphere.platform.support.TimeUtils;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.DataTypeDictionaryManager;
-import test.de.iip_ecosphere.platform.connectors.opcuav1.Utils;
 
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ushort;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ubyte;
@@ -460,7 +460,7 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
                     }
 
                     //noinspection BusyWait
-                    Utils.sleep(500);
+                    TimeUtils.sleep(500);
                 }
             }, "bogus-event-poster");
 

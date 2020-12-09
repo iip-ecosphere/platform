@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.Namespace;
@@ -72,7 +73,7 @@ public class AbstractOpcUaConnectorTest {
     private void block(AtomicInteger count, int receptions) {
         int max = 20; // longer than polling interval in params, 30 may be required depending on machine speed
         while (count.get() < receptions && max > 0) {
-            Utils.sleep(200);
+            TimeUtils.sleep(200);
             max--;
         }
         Assert.assertTrue("Operation took too long", max > 0);
