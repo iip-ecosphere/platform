@@ -39,6 +39,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+     </dependency>    
+    <dependency>
       <groupId>org.eclipse.milo</groupId>
       <artifactId>sdk-server</artifactId>
       <scope>test</scope>
