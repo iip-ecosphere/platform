@@ -43,6 +43,11 @@ public class FakeAasFactory extends AasFactory {
     }
     
     @Override
+    public String getName() {
+        return "fake";
+    }
+    
+    @Override
     public AasBuilder createAasBuilder(String idShort, String urn) {
         return null;
     }

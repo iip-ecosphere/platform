@@ -62,6 +62,13 @@ public abstract class AasFactory {
             instance = newInstance;
         }
     }
+    
+    /**
+     * Returns the (descriptive) name of the factory.
+     * 
+     * @return the name of the factory
+     */
+    public abstract String getName();
 
     /**
      * Creates an AAS builder instance.

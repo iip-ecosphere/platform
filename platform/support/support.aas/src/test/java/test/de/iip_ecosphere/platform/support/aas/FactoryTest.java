@@ -34,7 +34,9 @@ public class FactoryTest {
         AasFactory instance = AasFactory.getInstance();
         Assert.assertNotNull(instance);
         Assert.assertTrue(instance instanceof FakeAasFactory);
+
         // it's just a fake
+        Assert.assertEquals("fake", instance.getName());
         Assert.assertNull(instance.createAasBuilder("", ""));
         Assert.assertNull(instance.createSubModelBuilder(""));
         Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
