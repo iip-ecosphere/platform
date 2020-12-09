@@ -19,6 +19,13 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
       <version>${project.version}</version>
+      <!-- conflicts with el-api from BaSyx! -->
+      <exclusions>
+	    <exclusion>
+	      <groupId>javax.el</groupId>
+	      <artifactId>el-api</artifactId>
+	    </exclusion>
+	  </exclusions>
     </dependency>
      <dependency>
          <groupId>org.springframework.cloud</groupId>
@@ -28,6 +35,7 @@
          <groupId>org.springframework.cloud</groupId>
          <artifactId>spring-cloud-commons</artifactId>
      </dependency>
+  
   
     <dependency>
       <groupId>junit</groupId>
