@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
-import de.iip_ecosphere.platform.transport.Utils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
@@ -270,7 +270,7 @@ public class ConnectorTest {
         int count = 30; // polling
         do {
             received = instance.pollReceived();
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             count--;
         } while (count > 0 && null == received);
         Assert.assertNotNull("nothing received", received);
@@ -330,7 +330,7 @@ public class ConnectorTest {
             if (null != data) {
                 received = inSer.from(data);
             }
-            Utils.sleep(100);
+            TimeUtils.sleep(100);
             count--;
         } while (count > 0 && null == received);
         Assert.assertNotNull("nothing received", received);
