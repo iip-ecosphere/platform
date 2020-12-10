@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubModel.BaSyxSubModelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
 
 /**
  * Wraps a BaSyx property.
@@ -57,14 +58,19 @@ public class BaSyxProperty implements Property {
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
         BaSyxPropertyBuilder(BaSyxSubModelBuilder parentBuilder, String idShort) {
+            if (null == idShort || 0 == idShort.length()) {
+                throw new IllegalArgumentException("idShort must be given");
+            }
             this.parentBuilder = parentBuilder;
             instance = new BaSyxProperty();
             property = new org.eclipse.basyx.submodel.metamodel.map.submodelelement
                 .dataelement.property.Property();
             property.setIdShort(idShort);
-            if (null == idShort || 0 == idShort.length()) {
-                throw new IllegalArgumentException("idShort must be given");
-            }
+        }
+        
+        @Override
+        public SubModelBuilder getParentBuilder() {
+            return parentBuilder;
         }
 
         @Override

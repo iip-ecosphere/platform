@@ -21,6 +21,7 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOpera
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 
 import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubModel.BaSyxSubModelBuilder;
 
 /**
@@ -78,6 +79,11 @@ public class BaSyxOperation implements Operation {
             }
         }
 
+        @Override
+        public SubModelBuilder getParentBuilder() {
+            return parentBuilder;
+        }
+        
         /**
          * Creates an operation variable. Just in case that we somewhen need name and type.
          * 

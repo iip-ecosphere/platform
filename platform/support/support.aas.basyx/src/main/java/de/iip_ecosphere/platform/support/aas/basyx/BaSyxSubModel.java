@@ -12,10 +12,14 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 
 import de.iip_ecosphere.platform.support.aas.SubModel;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -37,6 +41,7 @@ public class BaSyxSubModel extends AbstractSubModel<org.eclipse.basyx.submodel.m
 
         private BaSyxAasBuilder parentBuilder;
         private BaSyxSubModel instance;
+        private org.eclipse.basyx.submodel.metamodel.map.SubModel subModel;
         
         /**
          * Creates an instance. Prevents external creation.
@@ -50,21 +55,30 @@ public class BaSyxSubModel extends AbstractSubModel<org.eclipse.basyx.submodel.m
                 throw new IllegalArgumentException("idShort must be given");
             }
             this.parentBuilder = parentBuilder;
-            org.eclipse.basyx.submodel.metamodel.map.SubModel subModel 
-                = new org.eclipse.basyx.submodel.metamodel.map.SubModel();
+            subModel = new org.eclipse.basyx.submodel.metamodel.map.SubModel();
             subModel.setIdShort(idShort);
             subModel.setIdentification(IdentifierType.CUSTOM, idShort); // preliminary
             instance = new BaSyxSubModel(subModel);
         }
+        
+        @Override
+        public AasBuilder getParentBuilder() {
+            return parentBuilder;
+        }
 
         @Override
-        public PropertyBuilder createPropertyBuilder(String shortName) {
-            return new BaSyxProperty.BaSyxPropertyBuilder(this, shortName);
+        public PropertyBuilder createPropertyBuilder(String idShort) {
+            return new BaSyxProperty.BaSyxPropertyBuilder(this, idShort);
+        }
+
+        @Override
+        public ReferenceElementBuilder createReferenceElementBuilder(String idShort) {
+            return new BaSyxReferenceElement.BaSyxReferenceElementBuilder(this, idShort);
         }
         
         @Override
-        public OperationBuilder createOperationBuilder(String shortName) {
-            return new BaSyxOperation.BaSxyOperationBuilder(this, shortName);
+        public OperationBuilder createOperationBuilder(String idShort) {
+            return new BaSyxOperation.BaSxyOperationBuilder(this, idShort);
         }
         
         /**
@@ -89,9 +103,26 @@ public class BaSyxSubModel extends AbstractSubModel<org.eclipse.basyx.submodel.m
             return instance.register(property);
         }
 
+        /**
+         * Registers a reference element.
+         * 
+         * @param reference the reference
+         * @return {@code reference}
+         */
+        BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+            instance.getSubModel().addSubModelElement(reference.getReferenceElement());
+            return instance.register(reference);
+        }
+
         @Override
         public SubModel build() {
             return null == parentBuilder ? instance : parentBuilder.register(instance);
+        }
+
+        @Override
+        public Reference createReference() {
+            return new BaSyxReference(new org.eclipse.basyx.submodel.metamodel.map.reference.Reference(
+                subModel.getIdentification(), KeyElements.SUBMODEL, true));
         }
 
     }

@@ -20,6 +20,7 @@ import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.SubModel;
 import de.iip_ecosphere.platform.support.aas.SubModelElement;
 
@@ -77,6 +78,17 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
         subModelElements.add(property);
         return property;
     }
+    
+    /**
+     * Registers a reference element.
+     * 
+     * @param reference element the reference element
+     * @return {@code reference}
+     */
+    BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+        subModelElements.add(reference);
+        return reference;
+    }
 
     @Override
     public String getIdShort() {
@@ -120,6 +132,19 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
         for (DataElement elt : dataElements) {
             if (elt instanceof Property && elt.getIdShort().equals(idShort)) {
                 found = (Property) elt;
+                break;
+            }
+        }
+        return found;
+    }
+    
+    @Override
+    public ReferenceElement getReferenceElement(String idShort) {
+        // looping may not be efficient, let's see
+        ReferenceElement found = null;
+        for (SubModelElement elt : subModelElements) {
+            if (elt instanceof ReferenceElement && elt.getIdShort().equals(idShort)) {
+                found = (ReferenceElement) elt;
                 break;
             }
         }

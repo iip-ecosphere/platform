@@ -73,6 +73,8 @@ public class BaSyxTest {
         QNAME_OP_STOPMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STOPMACHINE;
     }
     
+    // TODO test reference/referenceElement
+    
     /**
      * Tests creating/reading an AAS.
      */
