@@ -12,8 +12,10 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
 /**
  * Represents an AAS sub-model.
@@ -31,6 +33,13 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
     public interface SubModelBuilder {
         
         /**
+         * Returns the parent builder.
+         * 
+         * @return the parent builder
+         */
+        public AasBuilder getParentBuilder();
+        
+        /**
          * Creates a builder for a contained property.
          * 
          * @param idShort the short name of the property
@@ -38,6 +47,15 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
         public PropertyBuilder createPropertyBuilder(String idShort);
+
+        /**
+         * Creates a builder for a contained reference element.
+         * 
+         * @param idShort the short name of the reference element
+         * @return the reference element builder
+         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
+         */
+        public ReferenceElementBuilder createReferenceElementBuilder(String idShort);
 
         /**
          * Creates a builder for a contained operation.
@@ -51,9 +69,16 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
         /**
          * Builds the instance.
          * 
-         * @return the aub-model instance
+         * @return the sub-model instance
          */
         public SubModel build();
+        
+        /**
+         * Creates a reference on the sub-model under construction.
+         * 
+         * @return the reference
+         */
+        public Reference createReference();
 
     }
     
@@ -64,6 +89,14 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
      * @return the property, <b>null</b> for none
      */
     public Property getProperty(String idShort);
+
+    /**
+     * Returns a reference element with the given name.
+     * 
+     * @param idShort the short id of the reference element
+     * @return the property, <b>null</b> for none
+     */
+    public ReferenceElement getReferenceElement(String idShort);
 
     /**
      * Returns an operation with the given name and the given number of arguments.

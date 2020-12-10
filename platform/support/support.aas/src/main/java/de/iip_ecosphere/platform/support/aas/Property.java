@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+
 /**
  * Represents an AAS.
  * 
@@ -30,6 +32,13 @@ public interface Property extends Element, DataElement {
      */
     public interface PropertyBuilder {
 
+        /**
+         * Returns the parent builder.
+         * 
+         * @return the parent builder
+         */
+        public SubModelBuilder getParentBuilder();
+        
         /**
          * Sets the type of the property (seems to be optional).
          * 
