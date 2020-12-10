@@ -47,8 +47,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     private static final Object DUMMY = new Object();
 
     private Aas connectedAAS;
-    @SuppressWarnings("unused")
-    private ConnectorParameter params;
+    private AasFactory factory;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -59,7 +58,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
         @Override
         public String getName() {
-            return getConnectorName();
+            return "Generic AAS connector";
         }
 
         @Override
@@ -75,7 +74,22 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
      * @param adapter the protocol adapter
      */
     public AasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
+        this(adapter, null);
+    }
+    
+    /**
+     * Creates an instance and installs the protocol adapter.
+     * 
+     * @param adapter the protocol adapter
+     * @param factory define the AasFactory to use, if <b>null</b> use {@link AasFactory#getInstance()}
+     */
+    public AasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter, AasFactory factory) {
         super(adapter);
+        if (null == factory) {
+            this.factory = AasFactory.getInstance();
+        } else {
+            this.factory = factory;
+        }
         adapter.setModelAccess(new AasModelAccess());
     }
 
@@ -83,9 +97,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
-        this.params = params;
         if (null == connectedAAS) {
-            connectedAAS = AasFactory.getInstance().retrieveAas(params.getHost(), params.getPort(), 
+            connectedAAS = factory.retrieveAas(params.getHost(), params.getPort(), 
                 params.getEndpointPath(), params.getApplicationId());
         }
     }
@@ -105,7 +118,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
     @Override
     public String getName() {
-        return getConnectorName();
+        return "AAS via factory " + factory.getName();
     }
 
     @Override
@@ -245,15 +258,6 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             throw new IOException("Event-based monitoring is not supported. Please use polling.");
         }
         
-    }
-
-    /**
-     * Returns the connector name.
-     * 
-     * @return the connector name
-     */
-    private static String getConnectorName() {
-        return "AAS via " + AasFactory.getInstance().getName();
     }
 
 }
