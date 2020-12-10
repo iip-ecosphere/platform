@@ -1,4 +1,5 @@
-/********************************************************************************
+/**
+ * ******************************************************************************
  * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -8,20 +9,22 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.support.iip_aas;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package de.iip_ecosphere.platform.support.iip_aas;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Defines the tests to be executed.
+ * Skips a (non-static) attribute from AAS representation.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ClassUtilityTest.class,
-    AasPartRegistryTest.class
-})
-public class AllTests {
+@Retention(RUNTIME)
+@Target(FIELD)
+public @interface Skip {
+
 }

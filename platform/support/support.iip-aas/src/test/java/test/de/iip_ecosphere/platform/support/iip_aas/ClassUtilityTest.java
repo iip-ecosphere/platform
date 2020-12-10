@@ -12,11 +12,18 @@
 
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
+import java.util.concurrent.ExecutionException;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.SubModel;
+import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
+import de.iip_ecosphere.platform.support.iip_aas.Skip;
 
 /**
  * Tests {@link ClassUtility}.
@@ -25,21 +32,64 @@ import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
  */
 public class ClassUtilityTest {
 
+    private static class Simple {
+        @SuppressWarnings("unused")
+        private int value;
+        
+        @SuppressWarnings("unused")
+        @Skip
+        private int secret;
+        
+    }
+    
+    private static class Base {
+        @SuppressWarnings("unused")
+        private String unknown;
+
+        @SuppressWarnings("unused")
+        private int[] values;
+    }
+    
+    private static class Complex extends Base {
+        @SuppressWarnings("unused")
+        private int otherValue;
+        
+        @SuppressWarnings("unused")
+        private Simple simple;
+    }
+    
     /**
      * Tests adding a type to an AAS.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void testAddTypeToClass() {
-        // TODO not the final test
-        ClassUtility.addType((Aas) null, null);
-    }
+    public void testAddTypeToClass() throws ExecutionException {
+        AasFactory factory = AasFactory.getInstance();
+        AasBuilder aasBuilder = factory.createAasBuilder("test", "urn:::AAS:::types#");
+        ClassUtility.addType(aasBuilder, Simple.class);
+        ClassUtility.addType(aasBuilder, Complex.class);
+        SubModelBuilder smBuilder = aasBuilder.createSubModelBuilder("test");
+        ClassUtility.addTypeSubModelElement(smBuilder, "input", Simple.class);
+        smBuilder.build();
+        Aas aas = aasBuilder.build();
+        
+        SubModel sm = aas.getSubModel(ClassUtility.getSubmodelName(Simple.class));
+        Assert.assertNotNull(sm);
+        Assert.assertNotNull(sm.getProperty("value"));
+        Assert.assertEquals("int", sm.getProperty("value").getValue());
+        Assert.assertNull(sm.getProperty("secret"));
 
-    /**
-     * Tests adding a type to a sub-model.
-     */
-    @Test
-    public void testAddTypeToSubModel() {
-        ClassUtility.addType((SubModel) null, null);
+        sm = aas.getSubModel(ClassUtility.getSubmodelName(Complex.class));
+        Assert.assertNotNull(sm);
+        Assert.assertNotNull(sm.getProperty("unknown"));
+        Assert.assertEquals("String", sm.getProperty("unknown").getValue());
+        Assert.assertNotNull(sm.getProperty("values"));
+        Assert.assertEquals("int[]", sm.getProperty("values").getValue());
+        Assert.assertNotNull(sm.getProperty("otherValue"));
+        Assert.assertEquals("int", sm.getProperty("otherValue").getValue());
+        Assert.assertNotNull(sm.getReferenceElement("simple"));
+        Assert.assertNotNull(sm.getReferenceElement("simple").getValue());
     }
 
 }
