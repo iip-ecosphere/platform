@@ -14,18 +14,40 @@ package de.iip_ecosphere.platform.transport;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
  * Implements the transport AAS contributor. Do not rename, this class is referenced in {@code META-INF/services}.
+ * 
+ * The created AAS sub-model has the following structure:
+ * <ul>
+ *   <li>Property: connectorName (String)</li>
+ *   <li>Property: serializerName (String)</li>
+ * </ul>
  * 
  * @author Holger Eichelberger, SSE
  */
 public class TransportAas implements AasContributor {
 
+    public static final String NAME_SUBMODEL = "IIP-Ecosphere.transport";
+    public static final String NAME_VAR_CONNECTOR = "connectorName";
+    public static final String NAME_VAR_SERIALIZER = "serializerName";
+    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder) {
-        // TODO Auto-generated method stub
+        SubmodelBuilder smB = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
+            .setType(Type.STRING)
+            .setValue(TransportFactory.getConnectorName())
+            .build();
+        smB.createPropertyBuilder(NAME_VAR_SERIALIZER)
+            .setType(Type.STRING)
+            .setValue(SerializerRegistry.getName())
+            .build();
+        smB.build();
         return null;
     }
 

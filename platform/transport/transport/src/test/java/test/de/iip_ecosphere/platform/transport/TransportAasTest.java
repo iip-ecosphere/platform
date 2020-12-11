@@ -12,11 +12,18 @@
 
 package test.de.iip_ecosphere.platform.transport;
 
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.transport.TransportAas;
+import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
  * Tests the transport AAS.
@@ -29,8 +36,19 @@ public class TransportAasTest {
      * Tests the transport AAS.
      */
     @Test
-    public void testAas() {
+    public void testAas() throws ExecutionException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(TransportAas.class));
+        Aas aas = AasPartRegistry.getAas(AasPartRegistry.build(), AasPartRegistry.NAME_AAS);
+        Assert.assertNotNull(aas);
+        
+        Submodel tsm = aas.getSubModel(TransportAas.NAME_SUBMODEL);
+        Assert.assertNotNull(tsm);
+        Property prop = tsm.getProperty(TransportAas.NAME_VAR_CONNECTOR);
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(TransportFactory.getConnectorName(), prop.getValue());
+        prop = tsm.getProperty(TransportAas.NAME_VAR_SERIALIZER);
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(SerializerRegistry.getName(), prop.getValue());
     }
 
 }
