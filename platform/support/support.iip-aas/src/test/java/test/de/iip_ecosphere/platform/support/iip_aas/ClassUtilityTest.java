@@ -36,7 +36,6 @@ public class ClassUtilityTest {
         @SuppressWarnings("unused")
         private int value;
         
-        @SuppressWarnings("unused")
         @Skip
         private int secret;
         

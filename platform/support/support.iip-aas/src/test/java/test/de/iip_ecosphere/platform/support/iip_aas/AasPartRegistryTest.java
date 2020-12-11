@@ -15,10 +15,12 @@ package test.de.iip_ecosphere.platform.support.iip_aas;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -26,7 +28,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 /**
- * Tests {@link AasPartRegistry}.
+ * Tests {@link AasPartRegistry}. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -70,6 +72,11 @@ public class AasPartRegistryTest {
      */
     @Test
     public void testPartRegistry() {
+        Assert.assertTrue(CollectionUtils.toSet(AasPartRegistry.contributors()).size() >= 2);
+        Set<Class<? extends AasContributor>> cClasses = AasPartRegistry.contributorClasses();
+        Assert.assertTrue(cClasses.contains(Contributor1.class));
+        Assert.assertTrue(cClasses.contains(Contributor2.class));
+        
         List<Aas> aas = AasPartRegistry.build();
         Assert.assertNotNull(aas);
         Assert.assertEquals(2, aas.size());
