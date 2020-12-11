@@ -19,6 +19,16 @@
      <artifactId>transport</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.iip-aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>junit</groupId>
@@ -33,18 +43,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>support.aas</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-     </dependency>    
-    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>1.1.1</version>
       <scope>test</scope>
     </dependency>
-    
   </dependencies>
 
 </project>
