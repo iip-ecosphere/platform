@@ -22,10 +22,10 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 /**
  * Implements the transport AAS contributor. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
- * The created AAS sub-model has the following structure:
+ * The created AAS sub-model has the following (very preliminary) structure:
  * <ul>
- *   <li>Property: connectorName (String)</li>
- *   <li>Property: serializerName (String)</li>
+ *   <li>Property: protocol (String)</li>
+ *   <li>Property: wireFormat (String)</li>
  * </ul>
  * 
  * @author Holger Eichelberger, SSE
@@ -33,8 +33,9 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 public class TransportAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "IIP-Ecosphere.transport";
-    public static final String NAME_VAR_CONNECTOR = "connectorName";
-    public static final String NAME_VAR_SERIALIZER = "serializerName";
+    public static final String NAME_VAR_CONNECTOR = "protocol";
+    public static final String NAME_VAR_SERIALIZER = "wireFormat";
+    // TODO endpoints?
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder) {
