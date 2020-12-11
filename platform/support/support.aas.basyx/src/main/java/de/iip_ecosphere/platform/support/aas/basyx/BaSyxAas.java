@@ -16,15 +16,15 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.SubModel;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
  * Wraps a BaSyx AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubModel> {
+public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubmodel> {
 
     /**
      * Builder for {@code BaSyxAas}.
@@ -62,8 +62,8 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubMode
         }
 
         @Override
-        public SubModelBuilder createSubModelBuilder(String shortId) {
-            return new BaSyxSubModel.BaSyxSubModelBuilder(this, shortId);
+        public SubmodelBuilder createSubModelBuilder(String shortId) {
+            return new BaSyxSubmodel.BaSyxSubmodelBuilder(this, shortId);
         }
 
         /**
@@ -72,7 +72,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubMode
          * @param subModel the submodel to register
          * @return {@code subModel}
          */
-        SubModel register(BaSyxSubModel subModel) {
+        Submodel register(BaSyxSubmodel subModel) {
             instance.getAas().addSubModel(subModel.getSubModel());
             instance.register(subModel);
             return subModel;

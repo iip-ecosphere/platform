@@ -18,7 +18,8 @@ import java.util.Map;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.SubModel;
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 
 
 /**
@@ -28,7 +29,7 @@ import de.iip_ecosphere.platform.support.aas.SubModel;
  * @param <S> the IIP-Ecosphere sub-model type to use/return
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends SubModel> implements Aas {
+public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends Submodel> implements Aas {
 
     private A aas;
     private Map<String, S> submodels = new HashMap<>();
@@ -67,7 +68,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
     }
     
     @Override
-    public SubModel getSubModel(String idShort) {
+    public Submodel getSubModel(String idShort) {
         return submodels.get(idShort);
     }
 
@@ -80,6 +81,15 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
     S register(S subModel) {
         submodels.put(subModel.getIdShort(), subModel);
         return subModel;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitAas(this);
+        for (Submodel sm : submodels.values()) {
+            sm.accept(visitor);
+        }
+        visitor.endAas(this);
     }
     
 }

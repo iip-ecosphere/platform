@@ -20,16 +20,15 @@ import java.util.function.Function;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Operation;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubModel.BaSyxSubModelBuilder;
 
 /**
  * Implements an AAS Operation wrapper for BaSyx.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxOperation implements Operation {
+public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     
     private IOperation operation;
     
@@ -55,7 +54,7 @@ public class BaSyxOperation implements Operation {
      */
     public static class BaSxyOperationBuilder implements OperationBuilder {
         
-        private BaSyxSubModelBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder parentBuilder;
         private BaSyxOperation instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation operation;
         private List<OperationVariable> inputVariables;
@@ -69,7 +68,7 @@ public class BaSyxOperation implements Operation {
          * @param idShort the short name of the operation
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
-        BaSxyOperationBuilder(BaSyxSubModelBuilder parentBuilder, String idShort) {
+        BaSxyOperationBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
             this.parentBuilder = parentBuilder;
             instance = new BaSyxOperation();
             operation = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation();
@@ -80,7 +79,7 @@ public class BaSyxOperation implements Operation {
         }
 
         @Override
-        public SubModelBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
             return parentBuilder;
         }
         
@@ -189,5 +188,15 @@ public class BaSyxOperation implements Operation {
     }
 
     // checkstyle: resume exception type check
+
+    @Override
+    IOperation getSubmodelElement() {
+        return operation;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitOperation(this);
+    }
 
 }

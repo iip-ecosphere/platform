@@ -17,12 +17,15 @@ import java.util.List;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
-import de.iip_ecosphere.platform.support.aas.SubModel;
-import de.iip_ecosphere.platform.support.aas.SubModelElement;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
 
 /**
  * Basic sub-model implementation.
@@ -30,20 +33,20 @@ import de.iip_ecosphere.platform.support.aas.SubModelElement;
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractSubModel<S extends ISubModel> implements SubModel {
+public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel, SubmodelElementsRegistrar {
 
-    private S subModel;
+    private S submodel;
     private List<Operation> operations = new ArrayList<>();
     private List<DataElement> dataElements = new ArrayList<>();
-    private List<SubModelElement> subModelElements = new ArrayList<>(); // just redundant?
+    private List<SubmodelElement> submodelElements = new ArrayList<>(); // just redundant?
 
     /**
      * Creates an instance. Prevents external creation.
      * 
-     * @param subModel the sub model instance
+     * @param submodel the sub model instance
      */
-    protected AbstractSubModel(S subModel) {
-        this.subModel = subModel;
+    protected AbstractSubmodel(S submodel) {
+        this.submodel = submodel;
     }
     
     /**
@@ -52,7 +55,7 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
      * @return the submodel instance
      */
     S getSubModel() {
-        return subModel;
+        return submodel;
     }
     
     /**
@@ -61,9 +64,9 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
      * @param operation the operation
      * @return {@code operation}
      */
-    BaSyxOperation register(BaSyxOperation operation) {
+    public BaSyxOperation register(BaSyxOperation operation) {
         operations.add(operation);
-        subModelElements.add(operation);
+        submodelElements.add(operation);
         return operation;
     }
     
@@ -73,31 +76,42 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
      * @param property the property
      * @return {@code property}
      */
-    BaSyxProperty register(BaSyxProperty property) {
+    public BaSyxProperty register(BaSyxProperty property) {
         dataElements.add(property);
-        subModelElements.add(property);
+        submodelElements.add(property);
         return property;
     }
     
     /**
      * Registers a reference element.
      * 
-     * @param reference element the reference element
+     * @param reference the reference element
      * @return {@code reference}
      */
-    BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-        subModelElements.add(reference);
+    public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+        submodelElements.add(reference);
         return reference;
+    }
+
+    /**
+     * Registers a sub-model element collection.
+     * 
+     * @param collection the element collection
+     * @return {@code collection}
+     */
+    public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+        submodelElements.add(collection);
+        return collection;
     }
 
     @Override
     public String getIdShort() {
-        return subModel.getIdShort();
+        return submodel.getIdShort();
     }
 
     @Override
-    public Iterable<SubModelElement> submodelElements() {
-        return subModelElements;
+    public Iterable<SubmodelElement> submodelElements() {
+        return submodelElements;
     }
 
     @Override
@@ -112,7 +126,7 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
 
     @Override
     public int getSubmodelElementsCount() {
-        return subModelElements.size();
+        return submodelElements.size();
     }
 
     @Override
@@ -124,25 +138,35 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
     public int getOperationsCount() {
         return operations.size();
     }
-
+    
     @Override
-    public Property getProperty(String idShort) {
+    public DataElement getDataElement(String idShort) {
         // looping may not be efficient, let's see
         Property found = null;
         for (DataElement elt : dataElements) {
-            if (elt instanceof Property && elt.getIdShort().equals(idShort)) {
+            if (elt.getIdShort().equals(idShort)) {
                 found = (Property) elt;
                 break;
             }
         }
         return found;
     }
+
+    @Override
+    public Property getProperty(String idShort) {
+        Property result = null;
+        DataElement tmp = getDataElement(idShort);
+        if (tmp instanceof Property) {
+            result = (Property) tmp;
+        }
+        return result;
+    }
     
     @Override
     public ReferenceElement getReferenceElement(String idShort) {
         // looping may not be efficient, let's see
         ReferenceElement found = null;
-        for (SubModelElement elt : subModelElements) {
+        for (SubmodelElement elt : submodelElements) {
             if (elt instanceof ReferenceElement && elt.getIdShort().equals(idShort)) {
                 found = (ReferenceElement) elt;
                 break;
@@ -174,6 +198,47 @@ public abstract class AbstractSubModel<S extends ISubModel> implements SubModel 
             }
         }
         return found;
+    }
+
+    @Override
+    public SubmodelElement getSubmodelElement(String idShort) {
+        // looping may not be efficient, let's see
+        SubmodelElement found = null;
+        for (SubmodelElement se : submodelElements) {
+            if (se.getIdShort().equals(idShort)) {
+                found = se;
+                break;
+            }
+        }
+        return found;
+    }
+    
+    @Override
+    public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
+        SubmodelElementCollection result = null;
+        SubmodelElement tmp = getSubmodelElement(idShort);
+        if (tmp instanceof SubmodelElementCollection) {
+            result = (SubmodelElementCollection) tmp;
+        }
+        return result;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitSubmodel(this);
+        for (DataElement de : dataElements) {
+            de.accept(visitor);
+        }
+        for (Operation op : operations) {
+            op.accept(visitor);
+        }
+        for (SubmodelElement se : submodelElements) {
+            // remaining elements
+            if (!(se instanceof DataElement && se instanceof Operation)) {
+                se.accept(visitor);
+            }
+        }
+        visitor.endSubmodel(this);
     }
 
 }

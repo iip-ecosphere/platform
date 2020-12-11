@@ -12,26 +12,22 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 
 /**
- * Represents a connected AAS.
+ * Implements an abstract BaSyx sub-model element wrapper.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationShell, BaSyxISubmodel> {
-    
-    /**
-     * Creates a connected AAS instance.
-     * 
-     * @param aas the implementing AAS
-     */
-    public BaSyxConnectedAas(ConnectedAssetAdministrationShell aas) {
-        super(aas);
-        for (ISubModel sm : aas.getSubModels().values()) {
-            register(new BaSyxISubmodel(sm));
-        }
-    }
+public abstract class BaSyxSubmodelElement implements SubmodelElement {
 
+    /**
+     * Returns the implementing sub-model element.
+     * 
+     * @return the submodel element
+     */
+    abstract ISubmodelElement getSubmodelElement();
+    
 }

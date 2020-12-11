@@ -28,8 +28,12 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.SubModel;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
@@ -51,6 +55,12 @@ public class BaSyxTest {
 
     private static final String NAME_AAS = "aasTest";
     private static final String NAME_SUBMODEL = "machine";
+    private static final String NAME_SUBMODELC_OUTER = "outer";
+    private static final String NAME_VAR_SUBMODELC_OUTER_VAR = "outerVar";
+    private static final String NAME_VAR_SUBMODELC_OUTER_REF = "outerRef";
+    private static final String NAME_SUBMODELC_INNER = "inner";
+    private static final String NAME_VAR_SUBMODELC_INNER_VAR = "innerVar";
+    private static final String NAME_VAR_SUBMODELC_INNER_REF = "innerRef";
     private static final String NAME_VAR_LOTSIZE = "lotSize";
     private static final String NAME_VAR_POWCONSUMPTION = "powerConsumption";
     private static final String NAME_OP_STARTMACHINE = "startMachine";
@@ -72,8 +82,6 @@ public class BaSyxTest {
         QNAME_OP_RECONFIGURE = NAME_SUBMODEL + "/" + NAME_OP_RECONFIGURE;
         QNAME_OP_STOPMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STOPMACHINE;
     }
-    
-    // TODO test reference/referenceElement
     
     /**
      * Tests creating/reading an AAS.
@@ -109,7 +117,7 @@ public class BaSyxTest {
     private static Aas createAas(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
-        SubModelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(() -> {
@@ -134,6 +142,20 @@ public class BaSyxTest {
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
             .build();
+        Reference subModelBuilderRef = subModelBuilder.createReference();
+        
+        SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
+            NAME_SUBMODELC_OUTER, false, true);
+        SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
+            NAME_SUBMODELC_INNER, false, true);
+        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.INTEGER).build();
+        smcBuilderInner.createReferenceElementBuilder(NAME_VAR_SUBMODELC_INNER_REF).setValue(subModelBuilderRef)
+            .build();
+        Reference smcBuilder1Ref = smcBuilderInner.createReference();
+        smcBuilderInner.build();
+        smcBuilderOuter.createPropertyBuilder(NAME_VAR_SUBMODELC_OUTER_VAR).setType(Type.STRING).build();
+        smcBuilderOuter.createReferenceElementBuilder(NAME_VAR_SUBMODELC_OUTER_REF).setValue(smcBuilder1Ref).build();
+        smcBuilderOuter.build();
         
         subModelBuilder.build();
         return aasBuilder.build();
@@ -151,7 +173,7 @@ public class BaSyxTest {
         Aas aas = factory.retrieveAas(HOST_AAS, PORT_AAS, REGISTRY_PATH, URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(1, aas.getSubmodelCount());
-        SubModel subModel = aas.submodels().iterator().next();
+        Submodel subModel = aas.submodels().iterator().next();
         Assert.assertNotNull(subModel);
         Assert.assertEquals(2, subModel.getDataElementsCount());
         Property lotSize = subModel.getProperty(NAME_VAR_LOTSIZE);
@@ -177,6 +199,20 @@ public class BaSyxTest {
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        
+        SubmodelElement se = subModel.getSubmodelElement(NAME_SUBMODELC_OUTER);
+        Assert.assertNotNull(se);
+        Assert.assertTrue(se instanceof SubmodelElementCollection);
+        SubmodelElementCollection secOuter = subModel.getSubmodelElementCollection(NAME_SUBMODELC_OUTER);
+        Assert.assertNotNull(secOuter);
+        Assert.assertTrue(se == secOuter);
+        Assert.assertNotNull(secOuter.getProperty(NAME_VAR_SUBMODELC_OUTER_VAR));
+        Assert.assertNotNull(secOuter.getReferenceElement(NAME_VAR_SUBMODELC_OUTER_REF));
+        
+        SubmodelElementCollection secInner = secOuter.getSubmodelElementCollection(NAME_SUBMODELC_INNER);
+        Assert.assertNotNull(secInner);
+        Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_VAR));
+        Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
     }
     
 }

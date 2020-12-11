@@ -2,17 +2,16 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubModel.BaSyxSubModelBuilder;
 
 /**
  * Implements the reference element wrapper.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxReferenceElement implements ReferenceElement {
+public class BaSyxReferenceElement extends BaSyxSubmodelElement implements ReferenceElement {
     
     private IReferenceElement reference;
     
@@ -23,7 +22,7 @@ public class BaSyxReferenceElement implements ReferenceElement {
      */
     public static class BaSyxReferenceElementBuilder implements ReferenceElementBuilder {
         
-        private BaSyxSubModelBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder parentBuilder;
         private BaSyxReferenceElement instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.ReferenceElement reference;
         
@@ -33,7 +32,7 @@ public class BaSyxReferenceElement implements ReferenceElement {
          * @param parentBuilder the parent builder
          * @param idShort the short id of the reference element
          */
-        BaSyxReferenceElementBuilder(BaSyxSubModelBuilder parentBuilder, String idShort) {
+        BaSyxReferenceElementBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
             if (null == idShort || 0 == idShort.length()) {
                 throw new IllegalArgumentException("idShort must be given");
             }
@@ -44,7 +43,7 @@ public class BaSyxReferenceElement implements ReferenceElement {
         }
         
         @Override
-        public SubModelBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
             return parentBuilder;
         }
 
@@ -72,6 +71,15 @@ public class BaSyxReferenceElement implements ReferenceElement {
     }
     
     /**
+     * Creates an instance and directly sets the reference.
+     * 
+     * @param reference the reference
+     */
+    BaSyxReferenceElement(IReferenceElement reference) {
+        this.reference = reference;
+    }
+    
+    /**
      * Returns the BaSyx reference element.
      * 
      * @return the BaSyx reference element
@@ -88,6 +96,16 @@ public class BaSyxReferenceElement implements ReferenceElement {
     @Override
     public Reference getValue() {
         return new BaSyxReference(reference.getValue());
+    }
+
+    @Override
+    IReferenceElement getSubmodelElement() {
+        return reference;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitReferenceElement(this);
     }
 
 }

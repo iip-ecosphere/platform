@@ -22,17 +22,16 @@ import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProviderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubModel.BaSyxSubModelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
 
 /**
  * Wraps a BaSyx property.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxProperty implements Property {
+public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxOperation.class);
     private IProperty property;
@@ -45,7 +44,7 @@ public class BaSyxProperty implements Property {
      */
     public static class BaSyxPropertyBuilder implements PropertyBuilder {
 
-        private BaSyxSubModelBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder parentBuilder;
         private BaSyxProperty instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property property;
         private PropertyValueTypeDef typeDef;
@@ -57,7 +56,7 @@ public class BaSyxProperty implements Property {
          * @param idShort the short name of the property
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
-        BaSyxPropertyBuilder(BaSyxSubModelBuilder parentBuilder, String idShort) {
+        BaSyxPropertyBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
             if (null == idShort || 0 == idShort.length()) {
                 throw new IllegalArgumentException("idShort must be given");
             }
@@ -69,7 +68,7 @@ public class BaSyxProperty implements Property {
         }
         
         @Override
-        public SubModelBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
             return parentBuilder;
         }
 
@@ -125,15 +124,6 @@ public class BaSyxProperty implements Property {
         this.property = property;
     }
 
-    /**
-     * Returns the BaSyx property instance.
-     * 
-     * @return the property instance
-     */
-    IProperty getProperty() {
-        return property;
-    }
-
     @Override
     public String getIdShort() {
         return property.getIdShort();
@@ -150,11 +140,21 @@ public class BaSyxProperty implements Property {
         }
     }
     
+    // checkstyle: resume exception type check
+    
     @Override
     public void setValue(Object value) throws ExecutionException {
         property.set(value);
     }
-    
-    // checkstyle: resume exception type check
+
+    @Override
+    IProperty getSubmodelElement() {
+        return property;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitProperty(this);
+    }
     
 }

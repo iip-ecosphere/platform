@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -69,8 +69,8 @@ public class BaSyxAasFactory extends AasFactory {
     }
 
     @Override
-    public SubModelBuilder createSubModelBuilder(String idShort) {
-        return new BaSyxSubModel.BaSyxSubModelBuilder(null, idShort);
+    public SubmodelBuilder createSubModelBuilder(String idShort) {
+        return new BaSyxSubmodel.BaSyxSubmodelBuilder(null, idShort);
     }
 
     /**

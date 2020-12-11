@@ -13,25 +13,25 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IDataElement;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 
 /**
  * Represents a generic sub-model just given in terms of the BaSyx interface.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxISubModel extends AbstractSubModel<ISubModel> {
+public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
 
     /**
      * Creates submodel instance.
      * 
      * @param subModel the instance
      */
-    public BaSyxISubModel(ISubModel subModel) {
+    public BaSyxISubmodel(ISubModel subModel) {
         super(subModel);
-        for (IDataElement elt : subModel.getDataElements().values()) {
+        BaSyxElementTranslator.registerDataElements(subModel.getDataElements(), this);
+        BaSyxElementTranslator.registerOperations(subModel.getOperations(), this);
+        BaSyxElementTranslator.registerRemainingSubmodelElements(subModel.getSubmodelElements(), this);
+        /*for (IDataElement elt : subModel.getDataElements().values()) {
             if (elt instanceof IProperty) {
                 register(new BaSyxProperty((IProperty) elt));
             } // TODO else
@@ -39,6 +39,14 @@ public class BaSyxISubModel extends AbstractSubModel<ISubModel> {
         for (IOperation op : subModel.getOperations().values()) {
             register(new BaSyxOperation(op));
         }
+        
+        for (ISubmodelElement se : subModel.getSubmodelElements().values()) {
+            if (se instanceof IReferenceElement) {
+                register(new BaSyxReferenceElement((IReferenceElement) se));
+            } else if (se instanceof ISubmodelElementCollection) {
+                register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
+            }
+        }*/
     }
 
 }

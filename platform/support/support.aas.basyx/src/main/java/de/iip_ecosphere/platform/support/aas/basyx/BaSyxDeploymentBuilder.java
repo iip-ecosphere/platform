@@ -38,7 +38,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
-import de.iip_ecosphere.platform.support.aas.SubModel;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
  * An initial BaSyx-specific deployment builder.
@@ -113,7 +113,7 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
 
         AASDescriptor aasDescriptor = new AASDescriptor(bAas.getAas(), "http://" + host + ":" 
             + port + "/" + idToUrlPath(aas.getIdShort()) + "/aas");
-        for (BaSyxSubModel subModel: bAas.submodels()) {
+        for (BaSyxSubmodel subModel: bAas.submodels()) {
             SubModelProvider subModelProvider = new SubModelProvider(subModel.getSubModel());
             fullProvider.addSubmodel(subModel.getIdShort(), subModelProvider);
             aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(subModel.getSubModel(), "http://" + host + ":" 
@@ -129,12 +129,12 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
     }
     
     @Override
-    public DeploymentBuilder deploy(SubModel subModel, String path) {
-        if (!(subModel instanceof BaSyxSubModel)) {
+    public DeploymentBuilder deploy(Submodel subModel, String path) {
+        if (!(subModel instanceof BaSyxSubmodel)) {
             throw new IllegalArgumentException("The subModel must be of instance BaSyxSubModel, i.e., created "
                 + "through the AasFactory.");
         }
-        SubmodelServlet smServlet = new SubmodelServlet(((BaSyxSubModel) subModel).getSubModel());
+        SubmodelServlet smServlet = new SubmodelServlet(((BaSyxSubmodel) subModel).getSubModel());
         context.addServletMapping(path + "/*", smServlet);
         return this;
     }
