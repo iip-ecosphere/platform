@@ -19,8 +19,8 @@ import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
-import de.iip_ecosphere.platform.support.aas.SubModelElement;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -41,7 +41,7 @@ public class ClassUtility {
      * @return the reference to the sub-model (<b>null</b> if nothing was created)
      */
     public static Reference addType(AasBuilder aasBuilder, Class<?> type) {
-        SubModelBuilder smb = aasBuilder.createSubModelBuilder(getSubmodelName(type));
+        SubmodelBuilder smb = aasBuilder.createSubModelBuilder(getSubmodelName(type));
         Reference result = addType(smb, type);
         smb.build();
         return result;
@@ -54,7 +54,7 @@ public class ClassUtility {
      * @param type the type to add
      * @return the reference to the type (<b>null</b> if nothing was created)
      */
-    private static Reference addType(SubModelBuilder subModelBuilder, Class<?> type) {
+    private static Reference addType(SubmodelBuilder subModelBuilder, Class<?> type) {
         Reference result;
         if (type.isPrimitive() || type.isArray()) {
             result = null;
@@ -85,9 +85,9 @@ public class ClassUtility {
      * @param type the type to represent in the element
      * @return the created sub-model element
      */
-    public static SubModelElement addTypeSubModelElement(SubModelBuilder subModelBuilder, String idShort, 
+    public static SubmodelElement addTypeSubModelElement(SubmodelBuilder subModelBuilder, String idShort, 
         Class<?> type) {
-        SubModelElement result;
+        SubmodelElement result;
         // TODO not modifiable properties
         if (type.isPrimitive() || String.class == type) {
             result = subModelBuilder

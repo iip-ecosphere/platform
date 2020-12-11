@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.SubModel;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Skip;
@@ -69,12 +69,12 @@ public class ClassUtilityTest {
         AasBuilder aasBuilder = factory.createAasBuilder("test", "urn:::AAS:::types#");
         ClassUtility.addType(aasBuilder, Simple.class);
         ClassUtility.addType(aasBuilder, Complex.class);
-        SubModelBuilder smBuilder = aasBuilder.createSubModelBuilder("test");
+        SubmodelBuilder smBuilder = aasBuilder.createSubModelBuilder("test");
         ClassUtility.addTypeSubModelElement(smBuilder, "input", Simple.class);
         smBuilder.build();
         Aas aas = aasBuilder.build();
         
-        SubModel sm = aas.getSubModel(ClassUtility.getSubmodelName(Simple.class));
+        Submodel sm = aas.getSubModel(ClassUtility.getSubmodelName(Simple.class));
         Assert.assertNotNull(sm);
         Assert.assertNotNull(sm.getProperty("value"));
         Assert.assertEquals("int", sm.getProperty("value").getValue());
