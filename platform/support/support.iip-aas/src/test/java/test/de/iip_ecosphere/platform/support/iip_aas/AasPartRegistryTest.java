@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,13 +86,28 @@ public class AasPartRegistryTest {
         for (Aas a : aas) {
             hashedAas.put(a.getIdShort(), a);
         }
-        Assert.assertNotNull(hashedAas.get(AasPartRegistry.ID_SHORT));
+        Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS));
         Assert.assertNotNull(hashedAas.get(NAME_MY_AAS));
         
-        Assert.assertNotNull(hashedAas.get(AasPartRegistry.ID_SHORT).getSubModel("c1"));
+        Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS).getSubModel("c1"));
         Assert.assertNotNull(hashedAas.get(NAME_MY_AAS).getSubModel("c2"));
         
         // TODO test deploy
+    }
+
+    /**
+     * Tests the {@link AasPartRegistry#getAas(List, String)} helper method.
+     */
+    @Test
+    public void testGet() {
+        List<Aas> list = new ArrayList<Aas>();
+        Assert.assertNull(AasPartRegistry.getAas(list, ""));
+        list.add(AasFactory.getInstance().createAasBuilder("test", "urn:::AAS:::test#").build());
+        Assert.assertNull(AasPartRegistry.getAas(list, ""));
+        Assert.assertNotNull(AasPartRegistry.getAas(list, "test"));
+        list.add(AasFactory.getInstance().createAasBuilder("test2", "urn:::AAS:::test2#").build());
+        Assert.assertNull(AasPartRegistry.getAas(list, ""));
+        Assert.assertNotNull(AasPartRegistry.getAas(list, "test"));
     }
 
 }

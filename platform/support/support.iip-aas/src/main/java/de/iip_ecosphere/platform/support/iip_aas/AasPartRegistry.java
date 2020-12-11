@@ -32,8 +32,15 @@ import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
  */
 public class AasPartRegistry {
 
-    public static final String ID_SHORT = "IIP-Ecosphere";
-    public static final String URN = "urn:::AAS:::iipEcosphere#";
+    /**
+     * The name of the top-level AAS created by this registry in {@link #build()}.
+     */
+    public static final String NAME_AAS = "IIP-Ecosphere";
+    
+    /**
+     * The URN of the top-level AAS created by this registry in {@link #build()}.
+     */
+    public static final String URN_AAS = "urn:::AAS:::iipEcosphere#";
     
     /**
      * Returns the contributor loader.
@@ -72,7 +79,7 @@ public class AasPartRegistry {
      */
     public static List<Aas> build() {
         List<Aas> aas = new ArrayList<>();
-        AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder(ID_SHORT, URN);
+        AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder(NAME_AAS, URN_AAS);
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();
@@ -101,6 +108,20 @@ public class AasPartRegistry {
             dBuilder.deploy(a);
         }
         return dBuilder.createServer(200);
+    }
+    
+    /**
+     * Returns the first AAS in {@code list} matching the given name. [utility]
+     * 
+     * @param list the list to consider
+     * @param idShort the short name to filter for
+     * @return the first AAS or <b>null</b> for none
+     */
+    public static Aas getAas(List<Aas> list, String idShort) {
+        return list.stream()
+            .filter(a -> a.getIdShort().equals(idShort))
+            .findFirst()
+            .orElse(null);
     }
 
 }
