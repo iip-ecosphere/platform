@@ -27,7 +27,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  */
 public class FakeAas extends FakeElement implements Aas {
 
-    private String idShort;
     private Map<String, Submodel> submodels = new HashMap<String, Submodel>();
     
     static class FakeAasBuilder implements AasBuilder {
@@ -74,11 +73,6 @@ public class FakeAas extends FakeElement implements Aas {
      */
     FakeAas(String idShort) {
         super(idShort);
-    }
-
-    @Override
-    public String getIdShort() {
-        return idShort;
     }
 
     @Override

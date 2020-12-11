@@ -22,7 +22,8 @@ import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
- * A faked factory that does nothing - just for testing.
+ * A faked factory that does nothing - just for testing. Do not rename, this class is referenced in 
+ * {@code META-INF/services}.
  * 
  * @author Holger Eichelberger, SSE
  */
