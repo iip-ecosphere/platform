@@ -24,6 +24,7 @@ import test.de.iip_ecosphere.platform.support.aas.PrintVisitorTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TimeUtilsTest.class,
+    CollectionUtilsTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
     PrintVisitorTest.class
 })
