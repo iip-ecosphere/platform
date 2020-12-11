@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * AAS factory for BaSyx.
+ * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
  * @author Holger Eichelberger, SSE
  */
