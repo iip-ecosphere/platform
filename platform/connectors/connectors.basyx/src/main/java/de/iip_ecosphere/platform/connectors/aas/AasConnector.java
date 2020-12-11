@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.SubModel;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
  * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
@@ -171,7 +171,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             if (pos > 1) {
                 String subModelName = qName.substring(0, pos);
                 String elementName = qName.substring(pos + 1);
-                SubModel subModel = connectedAAS.getSubModel(subModelName);
+                Submodel subModel = connectedAAS.getSubModel(subModelName);
                 if (null != subModel) {
                     Property prop = subModel.getProperty(elementName);
                     if (null == prop) {
@@ -197,7 +197,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             if (pos > 1) {
                 String subModelName = qName.substring(0, pos);
                 String operationName = qName.substring(pos + 1);
-                SubModel subModel = connectedAAS.getSubModel(subModelName);
+                Submodel subModel = connectedAAS.getSubModel(subModelName);
                 if (null != subModel) {
                     Operation operation = subModel.getOperation(operationName, args.length);
                     if (null != operation) {

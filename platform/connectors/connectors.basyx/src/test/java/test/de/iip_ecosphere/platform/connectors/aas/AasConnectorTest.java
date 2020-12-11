@@ -40,7 +40,7 @@ import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
@@ -144,7 +144,7 @@ public class AasConnectorTest {
     public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
-        SubModelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(() -> {
