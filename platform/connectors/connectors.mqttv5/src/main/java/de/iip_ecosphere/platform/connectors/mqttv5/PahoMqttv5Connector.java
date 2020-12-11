@@ -35,7 +35,7 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
  * Implements the generic MQTT v5 connector. Requires {@link ConnectorParameter#getApplicationId()} 
- * and {@link ConnectorParameter#getKeepAlive()}.
+ * and {@link ConnectorParameter#getKeepAlive()}. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
  * This implementation is potentially not thread-safe, i.e., it may require a sending queue.
  * 

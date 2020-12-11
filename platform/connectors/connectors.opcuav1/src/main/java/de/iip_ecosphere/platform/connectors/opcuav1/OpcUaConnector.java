@@ -75,7 +75,7 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
 /**
- * Implements the generic OPC UA connector.
+ * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
  * For custom types such as structs, the following must apply: <ul>
  *   <li>A class implements the datatype and its fields.</li>
