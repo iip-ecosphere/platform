@@ -20,10 +20,14 @@
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
+     <artifactId>support.aas</artifactId>
      <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.iip-aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
