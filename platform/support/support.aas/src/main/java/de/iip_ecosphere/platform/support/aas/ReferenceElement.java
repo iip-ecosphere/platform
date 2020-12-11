@@ -12,14 +12,12 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
-
 /**
  * Defines the interface for a reference element.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ReferenceElement extends SubModelElement {
+public interface ReferenceElement extends SubmodelElement {
 
     /**
      * Defines the interface for a reference element builder.
@@ -33,7 +31,7 @@ public interface ReferenceElement extends SubModelElement {
          * 
          * @return the parent builder
          */
-        public SubModelBuilder getParentBuilder();
+        public SubmodelElementContainerBuilder getParentBuilder();
         
         /**
          * Defines the value.

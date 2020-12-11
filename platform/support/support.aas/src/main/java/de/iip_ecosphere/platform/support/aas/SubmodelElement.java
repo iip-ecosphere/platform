@@ -17,7 +17,8 @@ package de.iip_ecosphere.platform.support.aas;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface SubModelElement extends Element, HasDataSpecification, Referable, Qualifiable, HasSemantics, HasKind {
+public interface SubmodelElement extends Element, HasDataSpecification, Referable, Qualifiable, HasSemantics, HasKind {
 
     //public String getModelType();
+    
 }

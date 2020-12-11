@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
+import test.de.iip_ecosphere.platform.support.aas.PrintVisitorTest;
 
 /**
  * Defines the tests to be executed.
@@ -23,7 +24,8 @@ import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TimeUtilsTest.class,
-    FactoryTest.class
+    FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
+    PrintVisitorTest.class
 })
 public class AllTests {
 }

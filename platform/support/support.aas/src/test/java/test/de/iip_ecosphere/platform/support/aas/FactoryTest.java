@@ -37,8 +37,8 @@ public class FactoryTest {
 
         // it's just a fake
         Assert.assertEquals("fake", instance.getName());
-        Assert.assertNull(instance.createAasBuilder("", ""));
-        Assert.assertNull(instance.createSubModelBuilder(""));
+        Assert.assertNotNull(instance.createAasBuilder("", ""));
+        Assert.assertNotNull(instance.createSubModelBuilder(""));
         Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
         
         Assert.assertNull(instance.createDeploymentBuilder("localhost", 1234));

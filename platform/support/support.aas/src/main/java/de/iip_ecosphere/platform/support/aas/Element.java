@@ -26,4 +26,11 @@ public interface Element {
      */
     public String getIdShort();
 
+    /**
+     * Accepts and handles a visitor.
+     * 
+     * @param visitor the visitor
+     */
+    public void accept(AasVisitor visitor);
+
 }

@@ -18,7 +18,7 @@ import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
  * A customizable factory for creating AAS instances independent of the underlying implementation.
@@ -89,7 +89,7 @@ public abstract class AasFactory {
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
      *   supported
      */
-    public abstract SubModelBuilder createSubModelBuilder(String idShort);
+    public abstract SubmodelBuilder createSubModelBuilder(String idShort);
     
     /**
      * Retrieves an AAS.

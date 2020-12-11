@@ -13,16 +13,13 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
-import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
-import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
 /**
  * Represents an AAS sub-model.
  * 
  * @author Holger Eichelberger, SSE
 */
-public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiable, HasDataSpecification, HasKind, 
+public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiable, HasDataSpecification, HasKind, 
     ElementContainer {
 
     /**
@@ -30,7 +27,7 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface SubModelBuilder {
+    public interface SubmodelBuilder extends SubmodelElementContainerBuilder {
         
         /**
          * Returns the parent builder.
@@ -40,48 +37,29 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
         public AasBuilder getParentBuilder();
         
         /**
-         * Creates a builder for a contained property.
-         * 
-         * @param idShort the short name of the property
-         * @return the property builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
-         */
-        public PropertyBuilder createPropertyBuilder(String idShort);
-
-        /**
-         * Creates a builder for a contained reference element.
-         * 
-         * @param idShort the short name of the reference element
-         * @return the reference element builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
-         */
-        public ReferenceElementBuilder createReferenceElementBuilder(String idShort);
-
-        /**
-         * Creates a builder for a contained operation.
-         * 
-         * @param idShort the short name of the operation
-         * @return the property builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
-         */
-        public OperationBuilder createOperationBuilder(String idShort);
-        
-        /**
-         * Builds the instance.
-         * 
-         * @return the sub-model instance
-         */
-        public SubModel build();
-        
-        /**
          * Creates a reference on the sub-model under construction.
          * 
          * @return the reference
          */
         public Reference createReference();
 
+        /**
+         * Builds the instance.
+         * 
+         * @return the sub-model instance
+         */
+        public Submodel build();
+
     }
-    
+
+    /**
+     * Returns a data element with the given name.
+     * 
+     * @param idShort the short id of the data element
+     * @return the data element, <b>null</b> for none
+     */
+    public DataElement getDataElement(String idShort);
+
     /**
      * Returns a property with the given name.
      * 
@@ -117,5 +95,21 @@ public interface SubModel extends Element, HasSemantics, Identifiable, Qualifiab
      * @return the property, <b>null</b> for none
      */
     public Operation getOperation(String idShort, int inArgs, int outArgs, int inOutArgs);
+
+    /**
+     * Returns a submodel element with the given name.
+     * 
+     * @param idShort the short id of the property
+     * @return the submodel element, <b>null</b> for none
+     */
+    public SubmodelElement getSubmodelElement(String idShort);
+
+    /**
+     * Returns a submodel element collection with the given name.
+     * 
+     * @param idShort the short id of the property
+     * @return the submodel collection element, <b>null</b> for none
+     */
+    public SubmodelElementCollection getSubmodelElementCollection(String idShort);
 
 }

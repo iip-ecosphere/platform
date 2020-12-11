@@ -48,7 +48,7 @@ public interface DeploymentBuilder {
      * @throws IllegalArgumentException if no registry was created before or {@code aas} was not created 
      *   by the corresponding {@link AasFactory}
      */
-    public DeploymentBuilder deploy(SubModel subModel, String path);
+    public DeploymentBuilder deploy(Submodel subModel, String path);
 
     /**
      * Starts the server.

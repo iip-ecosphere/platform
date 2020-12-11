@@ -10,13 +10,15 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.aas;
+package test.de.iip_ecosphere.platform.support.aas;
+
+import de.iip_ecosphere.platform.support.aas.Reference;
 
 /**
- * Defines the interface of a data element.
+ * Implements a fake reference pointing to nothing. Just the reference.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface DataElement extends SubmodelElement {
+public class FakeReference implements Reference {
 
 }

@@ -15,14 +15,12 @@ package de.iip_ecosphere.platform.support.aas;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
-
 /**
  * Represents an AAS operation.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Operation extends Element, SubModelElement {
+public interface Operation extends Element, SubmodelElement {
 
     /**
      * Builds an AAS operation.
@@ -36,7 +34,7 @@ public interface Operation extends Element, SubModelElement {
          * 
          * @return the parent builder
          */
-        public SubModelBuilder getParentBuilder();
+        public SubmodelElementContainerBuilder getParentBuilder();
         
         /**
          * Adds an input variable to the operation.

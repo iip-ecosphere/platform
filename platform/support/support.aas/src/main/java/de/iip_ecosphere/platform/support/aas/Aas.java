@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
  * Represents an AAS.
@@ -35,7 +35,7 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
          * @return the builder
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
-        public SubModelBuilder createSubModelBuilder(String idShort);
+        public SubmodelBuilder createSubModelBuilder(String idShort);
 
         /**
          * Builds the instance.
@@ -51,7 +51,7 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      * 
      * @return the sub-models
      */
-    public Iterable<? extends SubModel> submodels();
+    public Iterable<? extends Submodel> submodels();
     
     /**
      * Returns the number of sub-models.
@@ -66,6 +66,6 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      * @param idShort the short name to search for
      * @return the sub-model or <b>null</b> if there was none
      */
-    public SubModel getSubModel(String idShort);
+    public Submodel getSubModel(String idShort);
     
 }

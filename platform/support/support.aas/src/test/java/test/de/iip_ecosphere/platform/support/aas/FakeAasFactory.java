@@ -19,7 +19,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
-import de.iip_ecosphere.platform.support.aas.SubModel.SubModelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
  * A faked factory that does nothing - just for testing.
@@ -49,12 +49,12 @@ public class FakeAasFactory extends AasFactory {
     
     @Override
     public AasBuilder createAasBuilder(String idShort, String urn) {
-        return null;
+        return new FakeAas.FakeAasBuilder(idShort, urn);
     }
 
     @Override
-    public SubModelBuilder createSubModelBuilder(String idShort) {
-        return null;
+    public SubmodelBuilder createSubModelBuilder(String idShort) {
+        return new FakeSubmodel.FakeSubmodelBuilder(null, idShort);
     }
 
     @Override

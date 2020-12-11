@@ -10,13 +10,31 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.aas;
+package test.de.iip_ecosphere.platform.support.aas;
+
+import de.iip_ecosphere.platform.support.aas.Element;
 
 /**
- * Defines the interface of a data element.
+ * Implements a basis fake element.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface DataElement extends SubmodelElement {
+public abstract class FakeElement implements Element {
+
+    private String idShort;
+    
+    /**
+     * Creates the instance.
+     * 
+     * @param idShort the short id.
+     */
+    protected FakeElement(String idShort) {
+        this.idShort = idShort;
+    }
+    
+    @Override
+    public String getIdShort() {
+        return idShort;
+    }
 
 }

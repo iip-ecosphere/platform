@@ -10,7 +10,7 @@ public interface ElementContainer {
      * 
      * @return all sub-model elements
      */
-    public Iterable<SubModelElement> submodelElements();
+    public Iterable<SubmodelElement> submodelElements();
     
     /**
      * Returns the number of sub-model elements in the element container.
