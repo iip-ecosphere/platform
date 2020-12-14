@@ -21,8 +21,10 @@ import java.lang.annotation.Target;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
 /**
- * Indicates the capabilities of a connector, also to dynamically steer the code generation. Values shall be compliant
- * with the respective interfaces in the type hierarchy.
+ * Indicates the capabilities of a connector. This information is read out by {@link ConnectorsAas} to fill the 
+ * AAS of individual connectors. It may also be used to dynamically steer the code generation. Values shall be compliant
+ * with the respective interfaces in the type hierarchy. If no annotation is provided for a {@link Connector},
+ * the default values given here will be assumed.
  * 
  * @author Holger Eichelberger, SSE
  * @see ModelAccess
@@ -77,5 +79,7 @@ public @interface MachineConnector {
      * @return {@code true} for events, {@code false} for no events (polling is required)
      */
     public boolean supportsEvents() default true;
+    
+    // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }

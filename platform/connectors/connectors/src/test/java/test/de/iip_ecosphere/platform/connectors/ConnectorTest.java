@@ -15,7 +15,9 @@ package test.de.iip_ecosphere.platform.connectors;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.Connector;
@@ -33,7 +35,9 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
 import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.Product;
@@ -45,6 +49,24 @@ import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
  * @author Holger Eichelberger, SSE
  */
 public class ConnectorTest {
+
+    private static AasFactory original;
+    
+    /**
+     * Initializes this test.
+     */
+    @BeforeClass
+    public static void init() {
+        original = AasFactory.setInstance(FactoryTest.createDisabledFactory()); // otherwise service loader is consulted
+    }
+    
+    /**
+     * Shuts down this test.
+     */
+    @AfterClass
+    public static void shutdown() {
+        AasFactory.setInstance(original); // restore for follow-up tests
+    }
     
     /**
      * Asserts the registration of {@code cls}.

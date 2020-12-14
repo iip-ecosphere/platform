@@ -1,2 +1,4 @@
 test.de.iip_ecosphere.platform.connectors.MyChannelConnector$Descriptor
 test.de.iip_ecosphere.platform.connectors.MyModelConnector$Descriptor
+test.de.iip_ecosphere.platform.connectors.ConnectorsAasTest$Connector1Descriptor
+test.de.iip_ecosphere.platform.connectors.ConnectorsAasTest$Connector2Descriptor

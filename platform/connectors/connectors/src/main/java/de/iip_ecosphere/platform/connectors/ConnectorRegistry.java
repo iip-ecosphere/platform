@@ -54,7 +54,7 @@ public class ConnectorRegistry {
      */
     public static void registerConnector(Connector<?, ?, ?, ?> instance) {
         INSTANCES.add(instance);
-        // notify AAS in parallel?
+        ConnectorsAas.notifyAddConnector(instance);
     }
 
     /**
@@ -64,7 +64,7 @@ public class ConnectorRegistry {
      */
     public static void unregisterConnector(Connector<?, ?, ?, ?> instance) {
         INSTANCES.remove(instance);
-        // notify AAS in parallel?
+        ConnectorsAas.notifyRemoveConnector(instance);
     }
     
     /**
