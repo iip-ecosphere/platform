@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
@@ -21,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -37,8 +40,8 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     private S submodel;
     private List<Operation> operations = new ArrayList<>();
-    private List<DataElement> dataElements = new ArrayList<>();
-    private List<SubmodelElement> submodelElements = new ArrayList<>(); // just redundant?
+    private Map<String, DataElement> dataElements = new HashMap<>();
+    private List<SubmodelElement> submodelElements = new ArrayList<>(); // TODO shall be redundant or just remaining?
 
     /**
      * Creates an instance. Prevents external creation.
@@ -50,11 +53,11 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     }
     
     /**
-     * Returns the submodel instance.
+     * Returns the sub-model instance.
      * 
-     * @return the submodel instance
+     * @return the sub-model instance
      */
-    S getSubModel() {
+    S getSubmodel() {
         return submodel;
     }
     
@@ -77,7 +80,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
      * @return {@code property}
      */
     public BaSyxProperty register(BaSyxProperty property) {
-        dataElements.add(property);
+        dataElements.put(property.getIdShort(), property);
         submodelElements.add(property);
         return property;
     }
@@ -116,7 +119,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     @Override
     public Iterable<DataElement> dataElements() {
-        return dataElements;
+        return dataElements.values();
     }
 
     @Override
@@ -141,15 +144,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     
     @Override
     public DataElement getDataElement(String idShort) {
-        // looping may not be efficient, let's see
-        Property found = null;
-        for (DataElement elt : dataElements) {
-            if (elt.getIdShort().equals(idShort)) {
-                found = (Property) elt;
-                break;
-            }
-        }
-        return found;
+        return dataElements.get(idShort);
     }
 
     @Override
@@ -226,7 +221,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitSubmodel(this);
-        for (DataElement de : dataElements) {
+        for (DataElement de : dataElements.values()) {
             de.accept(visitor);
         }
         for (Operation op : operations) {
@@ -239,6 +234,11 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
             }
         }
         visitor.endSubmodel(this);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new BaSyxReference(getSubmodel().getReference());
     }
 
 }

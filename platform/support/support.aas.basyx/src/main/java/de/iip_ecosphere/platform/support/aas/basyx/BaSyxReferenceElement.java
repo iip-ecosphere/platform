@@ -22,7 +22,7 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
      */
     public static class BaSyxReferenceElementBuilder implements ReferenceElementBuilder {
         
-        private BaSyxSubmodelElementContainerBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxReferenceElement instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.ReferenceElement reference;
         
@@ -32,7 +32,7 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
          * @param parentBuilder the parent builder
          * @param idShort the short id of the reference element
          */
-        BaSyxReferenceElementBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
+        BaSyxReferenceElementBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort) {
             if (null == idShort || 0 == idShort.length()) {
                 throw new IllegalArgumentException("idShort must be given");
             }
@@ -43,7 +43,7 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
         }
         
         @Override
-        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder<?> getParentBuilder() {
             return parentBuilder;
         }
 

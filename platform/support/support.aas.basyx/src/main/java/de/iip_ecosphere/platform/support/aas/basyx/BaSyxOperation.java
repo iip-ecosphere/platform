@@ -54,7 +54,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
      */
     public static class BaSxyOperationBuilder implements OperationBuilder {
         
-        private BaSyxSubmodelElementContainerBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxOperation instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation operation;
         private List<OperationVariable> inputVariables;
@@ -68,7 +68,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
          * @param idShort the short name of the operation
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
-        BaSxyOperationBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
+        BaSxyOperationBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort) {
             this.parentBuilder = parentBuilder;
             instance = new BaSyxOperation();
             operation = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation();
@@ -79,7 +79,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         }
 
         @Override
-        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder<?> getParentBuilder() {
             return parentBuilder;
         }
         

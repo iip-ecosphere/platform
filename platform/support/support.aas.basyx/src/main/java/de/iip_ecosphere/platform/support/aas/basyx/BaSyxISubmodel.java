@@ -14,6 +14,13 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxConnectedAas.BaSyxConnectedAasBuilder;
+
 /**
  * Represents a generic sub-model just given in terms of the BaSyx interface.
  * 
@@ -21,32 +28,89 @@ import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
  */
 public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
 
+    private BaSyxConnectedAas parent;
+
     /**
-     * Creates submodel instance.
+     * The builder, just for adding elements.
      * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class BaSyxISubmodelBuilder extends BaSyxSubmodelElementContainerBuilder<ISubModel> 
+        implements SubmodelBuilder {
+        
+        private BaSyxConnectedAasBuilder parentBuilder;
+        private BaSyxISubmodel instance;
+        
+        /**
+         * Creates an instance from an existing BaSyx instance.
+         * 
+         * @param parentBuilder the parent builder
+         * @param instance the BaSyx instance
+         */
+        BaSyxISubmodelBuilder(BaSyxConnectedAasBuilder parentBuilder, BaSyxISubmodel instance) {
+            this.parentBuilder = parentBuilder;
+            this.instance = instance;
+        }
+
+        @Override
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
+            boolean allowDuplicates) {
+            SubmodelElementCollectionBuilder result;
+            SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
+                    ordered, allowDuplicates);
+            } else {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
+                   (BaSyxSubmodelElementCollection) sub);                
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder getParentBuilder() {
+            return null;
+        }
+
+        @Override
+        public AasBuilder getAasBuilder() {
+            return parentBuilder;
+        }
+
+        @Override
+        public Submodel build() {
+            // do not register, this already exists/is registered
+            return instance;
+        }
+
+        @Override
+        protected AbstractSubmodel<ISubModel> getInstance() {
+            return instance;
+        }
+
+    }
+    
+    /**
+     * Creates sub-model instance.
+     * 
+     * @param parent the parent AAS
      * @param subModel the instance
      */
-    public BaSyxISubmodel(ISubModel subModel) {
+    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubModel subModel) {
         super(subModel);
+        this.parent = parent;
         BaSyxElementTranslator.registerDataElements(subModel.getDataElements(), this);
         BaSyxElementTranslator.registerOperations(subModel.getOperations(), this);
         BaSyxElementTranslator.registerRemainingSubmodelElements(subModel.getSubmodelElements(), this);
-        /*for (IDataElement elt : subModel.getDataElements().values()) {
-            if (elt instanceof IProperty) {
-                register(new BaSyxProperty((IProperty) elt));
-            } // TODO else
-        }
-        for (IOperation op : subModel.getOperations().values()) {
-            register(new BaSyxOperation(op));
-        }
-        
-        for (ISubmodelElement se : subModel.getSubmodelElements().values()) {
-            if (se instanceof IReferenceElement) {
-                register(new BaSyxReferenceElement((IReferenceElement) se));
-            } else if (se instanceof ISubmodelElementCollection) {
-                register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
-            }
-        }*/
+    }
+
+    @Override
+    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
+        boolean allowDuplicates) {
+        BaSyxSubmodelElementContainerBuilder<ISubModel> secb = new BaSyxISubmodelBuilder(
+            new BaSyxConnectedAasBuilder(parent), this);
+        return new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
+            secb, idShort, ordered, allowDuplicates);
     }
 
 }

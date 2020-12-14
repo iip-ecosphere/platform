@@ -43,4 +43,14 @@ public class BaSyxReference implements Reference {
         return reference;
     }
     
+    @Override
+    public String toString() {
+        return null != reference ? reference.toString() : "<ref: null>";
+    }
+
+    @Override
+    public boolean hasReference() {
+        return reference != null;
+    }
+    
 }

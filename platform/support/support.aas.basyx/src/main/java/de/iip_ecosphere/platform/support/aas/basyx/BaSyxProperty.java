@@ -44,7 +44,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
      */
     public static class BaSyxPropertyBuilder implements PropertyBuilder {
 
-        private BaSyxSubmodelElementContainerBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxProperty instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property property;
         private PropertyValueTypeDef typeDef;
@@ -56,7 +56,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
          * @param idShort the short name of the property
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
-        BaSyxPropertyBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, String idShort) {
+        BaSyxPropertyBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort) {
             if (null == idShort || 0 == idShort.length()) {
                 throw new IllegalArgumentException("idShort must be given");
             }
@@ -68,7 +68,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         }
         
         @Override
-        public BaSyxSubmodelElementContainerBuilder getParentBuilder() {
+        public BaSyxSubmodelElementContainerBuilder<?> getParentBuilder() {
             return parentBuilder;
         }
 
@@ -94,7 +94,13 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         }
 
         // TODO check validity?
-        
+
+        @Override
+        public PropertyBuilder setValue(Type type, Object value) {
+            setType(type);
+            return setValue(value);
+        }
+
         @Override
         public PropertyBuilder setValue(Object value) {
             property.set(value);

@@ -19,20 +19,72 @@ import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-
 
 /**
  * Abstract implementation of the {@link Aas} interface.
  * 
  * @param <A> the BaSyx AAS type to wrap
- * @param <S> the IIP-Ecosphere sub-model type to use/return
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends Submodel> implements Aas {
+public abstract class AbstractAas<A extends IAssetAdministrationShell> implements Aas {
 
+    /**
+     * Represents the parent instance of a sub-model. Due to the two different AAS types in BaSyx, this
+     * cannot just be an AAS instance rather than a pseudo instance being able to provide the correct 
+     * operations.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    interface BaSyxSubmodelParent {
+        /**
+         * Creates an AAS builder on parent level.
+         * 
+         * @return the AAS builder
+         */
+        public BaSyxAbstractAasBuilder createAasBuilder();
+        
+    }
+    
+    /**
+     * An abstract builder for two concrete AAS types in BaSyx.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    abstract static class BaSyxAbstractAasBuilder implements AasBuilder {
+        
+        /**
+         * Registers a sub-model.
+         * 
+         * @param submodel the sub-model
+         * @return {@code submodel}
+         */
+        abstract Submodel register(BaSyxSubmodel submodel);
+        
+        /**
+         * Returns the sub-model parent.
+         * 
+         * @return the sub-model parent
+         */
+        abstract BaSyxSubmodelParent getSubmodelParent();
+
+        /**
+         * Returns the instance under creation.
+         * 
+         * @return the instance
+         */
+        abstract Aas getInstance(); 
+        
+        @Override
+        public Reference createReference() {
+            return getInstance().createReference();
+        }
+        
+    }
+    
     private A aas;
-    private Map<String, S> submodels = new HashMap<>();
+    private Map<String, Submodel> submodels = new HashMap<>();
 
     /**
      * Creates an instance. Prevents external creation.
@@ -42,13 +94,13 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
     protected AbstractAas(A aas) {
         this.aas = aas;
     }
-// TODO reduce to package; 
+
     /**
      * Returns the AAS instance.
      * 
      * @return the AAS instance
      */
-    public A getAas() {
+    A getAas() {
         return aas;
     }
     
@@ -58,7 +110,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
     }
 
     @Override
-    public Iterable<S> submodels() {
+    public Iterable<Submodel> submodels() {
         return submodels.values();
     }
 
@@ -73,14 +125,15 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
     }
 
     /**
-     * Registers a submodel.
+     * Registers a sub-model.
      * 
-     * @param subModel the submodel to register
+     * @param <S> the actual sub-model type
+     * @param submodel the sub-model to register
      * @return {@code subModel}
      */
-    S register(S subModel) {
-        submodels.put(subModel.getIdShort(), subModel);
-        return subModel;
+    <S extends Submodel> S register(S submodel) {
+        submodels.put(submodel.getIdShort(), submodel);
+        return submodel;
     }
 
     @Override
@@ -91,5 +144,10 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell, S extends
         }
         visitor.endAas(this);
     }
-    
+
+    @Override
+    public Reference createReference() {
+        return new BaSyxReference(getAas().getReference());
+    }
+
 }

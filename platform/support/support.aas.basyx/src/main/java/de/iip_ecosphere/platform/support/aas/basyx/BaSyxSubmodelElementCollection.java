@@ -15,13 +15,16 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -45,10 +48,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class BaSyxSubmodelElementCollectionBuilder extends BaSyxSubmodelElementContainerBuilder 
+    public static class BaSyxSubmodelElementCollectionBuilder extends BaSyxSubmodelElementContainerBuilder<ISubModel> 
         implements SubmodelElementCollectionBuilder {
         
-        private BaSyxSubmodelElementContainerBuilder parentBuilder;
+        private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxSubmodelElementCollection instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection collection;
         
@@ -61,7 +64,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * @param ordered whether the collection is ordered
          * @param allowDuplicates whether the collection allows duplicates
          */
-        BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder parentBuilder, 
+        BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
             String idShort, boolean ordered, boolean allowDuplicates) {
             this.parentBuilder = parentBuilder;
             this.instance = new BaSyxSubmodelElementCollection();
@@ -69,6 +72,26 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             this.collection.setIdShort(idShort);
             this.collection.setOrdered(ordered);
             this.collection.setOrdered(allowDuplicates);
+        }
+        
+        /**
+         * Creates an instance from an existing BaSyx instance.
+         * 
+         * @param parentBuilder the parent builder
+         * @param instance the BaSyx instance
+         */
+        BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+            BaSyxSubmodelElementCollection instance) {
+            this.parentBuilder = parentBuilder;
+            this.instance = instance;
+            if (instance.collection 
+                instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) {
+                this.collection = (org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) 
+                    instance.collection;
+            } else {
+                throw new IllegalArgumentException("Cannot create a " + getClass().getSimpleName() + " on a " 
+                    + instance.collection.getClass().getSimpleName());
+            }
         }
 
         @Override
@@ -89,7 +112,16 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
             boolean allowDuplicates) {
-            return new BaSyxSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+            SubmodelElementCollectionBuilder result;
+            SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
+                    ordered, allowDuplicates);
+            } else {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
+                   (BaSyxSubmodelElementCollection) sub);
+            }
+            return result;
         }
 
         @Override
@@ -126,6 +158,21 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             instance.collection = collection;
             return parentBuilder.register(instance);
         }
+
+        @Override
+        public AasBuilder getAasBuilder() {
+            return parentBuilder.getAasBuilder();
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder getParentBuilder() {
+            return parentBuilder;
+        }
+
+        @Override
+        protected AbstractSubmodel<ISubModel> getInstance() {
+            return null;
+        }
         
     }
     
@@ -145,19 +192,15 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         BaSyxElementTranslator.registerOperations(collection.getOperations(), this);
         BaSyxElementTranslator.registerRemainingSubmodelElements(collection.getSubmodelElements(), this);        
     }
-    
-    /**
-     * Returns the number of elements.
-     * 
-     * @return the number of elements
-     */
-    public int getSize() {
+
+    @Override
+    public int getElementsCount() {
         return elements.size();
     }
     
     @Override
     public Iterable<SubmodelElement> elements() {
-        return elements();
+        return elements;
     }
 
     @Override
@@ -251,6 +294,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             se.accept(visitor);
         }
         visitor.endSubmodelElementCollection(this);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new BaSyxReference(collection.getReference());
     }
 
 }

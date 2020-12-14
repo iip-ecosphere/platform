@@ -113,12 +113,15 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
 
         AASDescriptor aasDescriptor = new AASDescriptor(bAas.getAas(), "http://" + host + ":" 
             + port + "/" + idToUrlPath(aas.getIdShort()) + "/aas");
-        for (BaSyxSubmodel subModel: bAas.submodels()) {
-            SubModelProvider subModelProvider = new SubModelProvider(subModel.getSubModel());
-            fullProvider.addSubmodel(subModel.getIdShort(), subModelProvider);
-            aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(subModel.getSubModel(), "http://" + host + ":" 
-                + port + "/" + idToUrlPath(aas.getIdShort()) + "/aas/submodels/" + idToUrlPath(subModel.getIdShort()) 
-                + "/submodel"));       
+        for (Submodel sm: bAas.submodels()) {
+            if (sm instanceof BaSyxSubmodel) {
+                BaSyxSubmodel submodel = (BaSyxSubmodel) sm;
+                SubModelProvider subModelProvider = new SubModelProvider(submodel.getSubmodel());
+                fullProvider.addSubmodel(submodel.getIdShort(), subModelProvider);
+                aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(submodel.getSubmodel(), "http://" + host 
+                    + ":" + port + "/" + idToUrlPath(aas.getIdShort()) + "/aas/submodels/" 
+                    + idToUrlPath(submodel.getIdShort()) + "/submodel"));
+            } // connected sub-models are already deployed
         }
         
         HttpServlet aasServlet = new VABHTTPInterface<IModelProvider>(fullProvider);
@@ -134,7 +137,7 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
             throw new IllegalArgumentException("The subModel must be of instance BaSyxSubModel, i.e., created "
                 + "through the AasFactory.");
         }
-        SubmodelServlet smServlet = new SubmodelServlet(((BaSyxSubmodel) subModel).getSubModel());
+        SubmodelServlet smServlet = new SubmodelServlet(((BaSyxSubmodel) subModel).getSubmodel());
         context.addServletMapping(path + "/*", smServlet);
         return this;
     }

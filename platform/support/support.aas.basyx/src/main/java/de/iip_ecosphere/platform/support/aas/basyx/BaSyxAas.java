@@ -24,14 +24,14 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubmodel> {
+public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
 
     /**
      * Builder for {@code BaSyxAas}.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class BaSyxAasBuilder implements AasBuilder {
+    static class BaSyxAasBuilder extends BaSyxAbstractAasBuilder {
 
         private BaSyxAas instance;
         
@@ -56,26 +56,60 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubmode
             instance = new BaSyxAas(aas);
         }
 
+        /**
+         * Creates an instance from an existing BaSyx instance. Prevents external creation.
+         * 
+         * @param instance the BaSyx instance
+         */
+        BaSyxAasBuilder(BaSyxAas instance) {
+            this.instance = instance;
+        }
+
         @Override
         public Aas build() {
             return instance;
         }
 
         @Override
-        public SubmodelBuilder createSubModelBuilder(String shortId) {
-            return new BaSyxSubmodel.BaSyxSubmodelBuilder(this, shortId);
+        public SubmodelBuilder createSubModelBuilder(String idShort) {
+            SubmodelBuilder result;
+            Submodel sub =  instance.getSubModel(idShort);
+            if (null == instance.getSubModel(idShort)) {
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort);
+            } else { // no connected here
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
+            }
+            return result;
         }
 
+        @Override
+        public Submodel register(BaSyxSubmodel submodel) {
+            if (null == instance.getSubModel(submodel.getIdShort())) {
+                instance.getAas().addSubModel(submodel.getSubmodel());
+                instance.register(submodel);
+            }
+            return submodel;
+        }
+        
         /**
-         * Registers a submodel.
+         * Returns the instance under creation.
          * 
-         * @param subModel the submodel to register
-         * @return {@code subModel}
+         * @return the instance
          */
-        Submodel register(BaSyxSubmodel subModel) {
-            instance.getAas().addSubModel(subModel.getSubModel());
-            instance.register(subModel);
-            return subModel;
+        BaSyxAas getInstance() {
+            return instance;
+        }
+
+        @Override
+        public BaSyxSubmodelParent getSubmodelParent() {
+            return new BaSyxSubmodelParent() {
+
+                @Override
+                public BaSyxAbstractAasBuilder createAasBuilder() {
+                    return new BaSyxAasBuilder(instance);
+                }
+                
+            };
         }
         
     }
@@ -88,4 +122,10 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell, BaSyxSubmode
     private BaSyxAas(AssetAdministrationShell aas) {
         super(aas);
     }
+    
+    @Override
+    public SubmodelBuilder addSubmodel(String idShort) {
+        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort);
+    }
+
 }

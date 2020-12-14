@@ -21,14 +21,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -143,22 +146,50 @@ public class BaSyxTest {
             .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
             .build();
         Reference subModelBuilderRef = subModelBuilder.createReference();
+        Assert.assertNotNull(aasBuilder.createSubModelBuilder(NAME_SUBMODEL)); // for modification
         
         SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_OUTER, false, true);
         SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_INNER, false, true);
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.INTEGER).build();
-        smcBuilderInner.createReferenceElementBuilder(NAME_VAR_SUBMODELC_INNER_REF).setValue(subModelBuilderRef)
-            .build();
+        ReferenceElement re = smcBuilderInner.createReferenceElementBuilder(NAME_VAR_SUBMODELC_INNER_REF)
+            .setValue(subModelBuilderRef).build();
+        Assert.assertNotNull(re.getValue());
+        Assert.assertTrue(re.getValue().hasReference());
+        
         Reference smcBuilder1Ref = smcBuilderInner.createReference();
         smcBuilderInner.build();
         smcBuilderOuter.createPropertyBuilder(NAME_VAR_SUBMODELC_OUTER_VAR).setType(Type.STRING).build();
         smcBuilderOuter.createReferenceElementBuilder(NAME_VAR_SUBMODELC_OUTER_REF).setValue(smcBuilder1Ref).build();
-        smcBuilderOuter.build();
+        SubmodelElementCollection smcOuter = smcBuilderOuter.build();
+        assertSize(3, smcOuter.elements());
+        Assert.assertEquals(3, smcOuter.getElementsCount());
+        Assert.assertNotNull(smcOuter.getDataElement(NAME_VAR_SUBMODELC_OUTER_VAR));
+        Assert.assertNotNull(smcOuter.getElement(NAME_SUBMODELC_INNER));
+        Assert.assertNotNull(subModelBuilder.createSubmodelElementCollectionBuilder(
+            NAME_SUBMODELC_OUTER, false, true)); // for modification
         
-        subModelBuilder.build();
-        return aasBuilder.build();
+        Submodel submodel = subModelBuilder.build();
+        assertSize(3, submodel.operations());
+        assertSize(2, submodel.dataElements());
+        assertSize(6, submodel.submodelElements());
+        Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE, 1));
+        Assert.assertEquals(6, submodel.getSubmodelElementsCount());
+        Assert.assertNull(submodel.getReferenceElement("myRef"));
+        Aas aas = aasBuilder.build();
+        
+        // adding on local models
+        Submodel subAdd = aas.addSubmodel("sub-add").build();
+        Assert.assertNotNull(aas.getSubModel("sub-add"));
+        subAdd.addSubmodelElementCollection("sub-coll", true, true).build();
+        Assert.assertNotNull(aas.getSubModel("sub-add").getSubmodelElementCollection("sub-coll"));
+        submodel.addSubmodelElementCollection("sub-coll2", false, false).build();
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
+
+        aas.accept(new AasPrintVisitor()); // assert the accepts
+
+        return aas;
     }
     
     /**
@@ -172,38 +203,38 @@ public class BaSyxTest {
         AasFactory factory = AasFactory.getInstance();
         Aas aas = factory.retrieveAas(HOST_AAS, PORT_AAS, REGISTRY_PATH, URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
-        Assert.assertEquals(1, aas.getSubmodelCount());
-        Submodel subModel = aas.submodels().iterator().next();
-        Assert.assertNotNull(subModel);
-        Assert.assertEquals(2, subModel.getDataElementsCount());
-        Property lotSize = subModel.getProperty(NAME_VAR_LOTSIZE);
+        Assert.assertEquals(2, aas.getSubmodelCount());
+        Submodel submodel = aas.submodels().iterator().next();
+        Assert.assertNotNull(submodel);
+        Assert.assertEquals(2, submodel.getDataElementsCount());
+        Property lotSize = submodel.getProperty(NAME_VAR_LOTSIZE);
         Assert.assertNotNull(lotSize);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
-        Property powConsumption = subModel.getProperty(NAME_VAR_POWCONSUMPTION);
+        Property powConsumption = submodel.getProperty(NAME_VAR_POWCONSUMPTION);
         Assert.assertNotNull(powConsumption);
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
 
-        Assert.assertEquals(3, subModel.getOperationsCount());
-        Operation op = subModel.getOperation(NAME_OP_STARTMACHINE, 0, 0, 0);
+        Assert.assertEquals(3, submodel.getOperationsCount());
+        Operation op = submodel.getOperation(NAME_OP_STARTMACHINE, 0, 0, 0);
         Assert.assertNotNull(op);
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
-        op = subModel.getOperation(NAME_OP_RECONFIGURE, 1, 0, 0);
+        op = submodel.getOperation(NAME_OP_RECONFIGURE, 1, 0, 0);
         Assert.assertNotNull(op);
         op.invoke(5);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
-        op = subModel.getOperation(NAME_OP_STOPMACHINE, 0, 0, 0);
+        op = submodel.getOperation(NAME_OP_STOPMACHINE, 0, 0, 0);
         Assert.assertNotNull(op);
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
         
-        SubmodelElement se = subModel.getSubmodelElement(NAME_SUBMODELC_OUTER);
+        SubmodelElement se = submodel.getSubmodelElement(NAME_SUBMODELC_OUTER);
         Assert.assertNotNull(se);
         Assert.assertTrue(se instanceof SubmodelElementCollection);
-        SubmodelElementCollection secOuter = subModel.getSubmodelElementCollection(NAME_SUBMODELC_OUTER);
+        SubmodelElementCollection secOuter = submodel.getSubmodelElementCollection(NAME_SUBMODELC_OUTER);
         Assert.assertNotNull(secOuter);
         Assert.assertTrue(se == secOuter);
         Assert.assertNotNull(secOuter.getProperty(NAME_VAR_SUBMODELC_OUTER_VAR));
@@ -213,6 +244,40 @@ public class BaSyxTest {
         Assert.assertNotNull(secInner);
         Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_VAR));
         Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
+
+        // the lately added sub-models/elements
+        Assert.assertNotNull(aas.getSubModel("sub-add"));
+        Assert.assertNotNull(aas.getSubModel("sub-add").getSubmodelElementCollection("sub-coll"));
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
+
+        // adding on connected models
+        Submodel subAdd = aas.addSubmodel("conn-add").build();
+        Assert.assertNotNull(aas.getSubModel("conn-add"));
+        subAdd.addSubmodelElementCollection("conn-coll", true, true).build();
+        Assert.assertNotNull(aas.getSubModel("conn-add").getSubmodelElementCollection("conn-coll"));
+        submodel.addSubmodelElementCollection("conn-coll2", false, false).build();
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("conn-coll2"));
+        
+        aas.accept(new AasPrintVisitor()); // assert the accepts
+    }
+
+    /**
+     * Asserts an iterator contents (just) by counting the number of elements.
+     * 
+     * @param <T> the element type
+     * @param expectedSize the expected size
+     * @param iter the iterator to assert
+     */
+    private static <T> void assertSize(int expectedSize, Iterable<T> iter) {
+        Assert.assertEquals(expectedSize, CollectionUtils.toList(iter.iterator()).size());
+    }
+    
+    /**
+     * Tests the factory.
+     */
+    @Test
+    public void testFactory() {
+        Assert.assertTrue(AasFactory.getInstance().getName().length() > 0);
     }
     
 }
