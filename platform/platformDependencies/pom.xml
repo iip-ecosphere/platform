@@ -72,6 +72,16 @@
 
   <dependencyManagement>
     <dependencies>
+    
+      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx! -->
+      
+	  <dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		<version>1.7.25</version>
+	  </dependency>
+    
+      <!-- File stuff -->
 
       <dependency>
         <groupId>commons-io</groupId>
