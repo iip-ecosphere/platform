@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -20,17 +21,40 @@ import java.util.Map;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * Utility functions for representing types in AAS. The implemented format is initial and will change over time.
+ * Utility functions for representing types in AAS. A Java type is turned into
+ * 
+ * <ul>
+ *   <li>submodel: types
+ *     <ul>
+ *       <li>submodel elements collection: <i>Java type name, inner classes as "."</i>
+ *       <ul>
+ *         <li>Property: attribute1 name, value = type (for primitives, arrays and String)</li>
+ *         <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
+ *       </ul>
+ *     </ul>
+ *   </li>
+ * </ul>
+ * 
+ * Type usages, e.g., for input/output types are translated to
+ * <ul>
+ *   <li>Property: attribute1 name, value = type (for primitives, arrays and String)</li>
+ *   <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
+ * </ul>
+ * 
+ * The implemented format is initial and will change over time (array of ref type unclear, generics).
  * 
  * @author Holger Eichelberger, SSE
  */
 public class ClassUtility {
 
-    public static final String PREFIX = "type_";
+    public static final String NAME_TYPE_SUBMODEL = "types";
+    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
     private static Map<Class<?>, Reference> mapping = new HashMap<>();
 
     /**
@@ -41,20 +65,23 @@ public class ClassUtility {
      * @return the reference to the sub-model (<b>null</b> if nothing was created)
      */
     public static Reference addType(AasBuilder aasBuilder, Class<?> type) {
-        SubmodelBuilder smb = aasBuilder.createSubModelBuilder(getSubmodelName(type));
-        Reference result = addType(smb, type);
-        smb.build();
+        SubmodelBuilder smb = aasBuilder.createSubModelBuilder(NAME_TYPE_SUBMODEL); // create or re-open
+        SubmodelElementCollectionBuilder typeCollection = smb.createSubmodelElementCollectionBuilder(
+            getName(type), false, false);
+        Reference result = addType(typeCollection, type);
+        typeCollection.build();
+        smb.build(); // ok also in case of re-open
         return result;
     }
 
     /**
      * Adds a type to a sub-model. [static data]
      * 
-     * @param subModelBuilder the target sub-model
+     * @param builder the target sub-model
      * @param type the type to add
      * @return the reference to the type (<b>null</b> if nothing was created)
      */
-    private static Reference addType(SubmodelBuilder subModelBuilder, Class<?> type) {
+    private static Reference addType(SubmodelElementCollectionBuilder builder, Class<?> type) {
         Reference result;
         if (type.isPrimitive() || type.isArray()) {
             result = null;
@@ -64,13 +91,13 @@ public class ClassUtility {
             if (null == result) {
                 for (Field f: type.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
-                        addTypeSubModelElement(subModelBuilder, translateToAasName(f.getName()), f.getType());
+                        addTypeSubModelElement(builder, translateToAasName(f.getName()), f.getType());
                     }
                 }
                 if (Object.class != type.getSuperclass()) {
-                    addType(subModelBuilder, type.getSuperclass());
+                    addType(builder, type.getSuperclass());
                 }
-                result = subModelBuilder.createReference();
+                result = builder.createReference();
                 mapping.put(type, result);
             }
         }
@@ -85,8 +112,8 @@ public class ClassUtility {
      * @param type the type to represent in the element
      * @return the created sub-model element
      */
-    public static SubmodelElement addTypeSubModelElement(SubmodelBuilder subModelBuilder, String idShort, 
-        Class<?> type) {
+    public static SubmodelElement addTypeSubModelElement(SubmodelElementContainerBuilder subModelBuilder, 
+        String idShort, Class<?> type) {
         SubmodelElement result;
         // TODO not modifiable properties
         if (type.isPrimitive() || String.class == type) {
@@ -104,7 +131,7 @@ public class ClassUtility {
         } else {
             Reference aRef = mapping.get(type);
             if (null == aRef) {
-                aRef = addType(subModelBuilder.getParentBuilder(), type);
+                aRef = addType(subModelBuilder.getAasBuilder(), type);
             } 
             result = subModelBuilder
                 .createReferenceElementBuilder(idShort)
@@ -125,13 +152,24 @@ public class ClassUtility {
     }
     
     /**
-     * Returns the name of the associated sub-model.
+     * Returns the name of the associated model element.
      * 
      * @param type the type
      * @return the name
      */
-    public static String getSubmodelName(Class<?> type) {
-        return PREFIX + translateToAasName(type.getSimpleName());
+    public static String getName(Class<?> type) {
+        return translateToAasName(type.getName()).replace("$", ".");
+    }
+
+    /**
+     * Turns the {@code} object into a unique id with given (optional) prefix.
+     * 
+     * @param prefix an optional prefix, use an empty string for none; shall end with a separator, e.g., "_"
+     * @param object the object to be turned into a unique id
+     * @return the combined id
+     */
+    public static String getId(String prefix, Object object) {
+        return prefix + JVM_NAME + "_" + System.identityHashCode(object);
     }
 
 }

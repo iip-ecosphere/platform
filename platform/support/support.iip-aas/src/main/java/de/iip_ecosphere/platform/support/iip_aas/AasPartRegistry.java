@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,24 @@ public class AasPartRegistry {
      * The URN of the top-level AAS created by this registry in {@link #build()}.
      */
     public static final String URN_AAS = "urn:::AAS:::iipEcosphere#";
+    
+    // TODO local vs. global
+    private static String host = "localhost";
+    private static int port = 8080;
+    private static String endpoint = "registry";
+
+    /**
+     * Defines the AAS endpoint.
+     * 
+     * @param nHost the host name
+     * @param nPort the TCP port
+     * @param nEndpoint the registry endpoint 
+     */
+    public static void setAasEndpoint(String nHost, int nPort, String nEndpoint) {
+        host = nHost;
+        port = nPort;
+        endpoint = nEndpoint;
+    }
     
     /**
      * Returns the contributor loader.
@@ -93,17 +112,25 @@ public class AasPartRegistry {
     }
     
     /**
+     * Obtains the IIP-Ecosphere platform AAS. Be careful with the returned instance, as if
+     * the AAS is modified in the mean time, you may hold an outdated instance.
+     * 
+     * @return the platform AAS (may be <b>null</b> for none)
+     * @throws IOException if the AAS cannot be read due to connection errors
+     */
+    public static Aas retrieveIipAas() throws IOException {
+        return AasFactory.getInstance().retrieveAas(host, port, endpoint, URN_AAS);
+    }
+    
+    /**
      * Deploy the given AAS to a local server. [preliminary]
      * 
      * @param aas the list of aas, e.g., from {@link #build()}
-     * @param host the host to deploy to
-     * @param port the TCP port to deploy to 
-     * @param regPath the local registry path
      * @return the server instance
      */
-    public static Server deployTo(List<Aas> aas, String host, int port, String regPath) {
+    public static Server deploy(List<Aas> aas) {
         DeploymentBuilder dBuilder = AasFactory.getInstance().createDeploymentBuilder(host, port);
-        dBuilder.addInMemoryRegistry(regPath);
+        dBuilder.addInMemoryRegistry(endpoint);
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
