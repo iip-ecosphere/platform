@@ -258,6 +258,7 @@ public class ConnectorsAasTest {
         testDescriptorsSubmodel(aas);
         
         aas.accept(new AasPrintVisitor());
+        AasPartRegistry.setAasEndpoint("localhost", 4005, "registry");
         Server server = AasPartRegistry.deploy(aasList);
         server.start(2000);
 
