@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -54,6 +55,8 @@ public class PrintVisitorTest {
         System.out.println("------------");
         mySubmodel.accept(vis);
         // no asserts here... if you want to test the output
+        
+        myAas.accept(new BasicAasVisitor());
     }
 
 }

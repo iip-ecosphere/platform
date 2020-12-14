@@ -21,4 +21,9 @@ import de.iip_ecosphere.platform.support.aas.Reference;
  */
 public class FakeReference implements Reference {
 
+    @Override
+    public boolean hasReference() {
+        return true; // this is a fake
+    }
+
 }

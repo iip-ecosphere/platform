@@ -82,11 +82,25 @@ public interface SubmodelElementCollection extends SubmodelElement {
     public SubmodelElement getElement(String idShort);
 
     /**
-     * Returns a submodel element collection with the given name.
+     * Returns a sub-model element collection with the given name.
      * 
      * @param idShort the short id of the property
-     * @return the submodel collection element, <b>null</b> for none
+     * @return the sub-model collection element, <b>null</b> for none
      */
     public SubmodelElementCollection getSubmodelElementCollection(String idShort);
+    
+    /**
+     * Returns the number of elements.
+     * 
+     * @return the number of elements
+     */
+    public int getElementsCount();
 
+    /**
+     * Creates a reference to this collection.
+     * 
+     * @return the reference
+     */
+    public Reference createReference();
+    
 }

@@ -18,5 +18,12 @@ package de.iip_ecosphere.platform.support.aas;
  * @author Holger Eichelberger, SSE
  */
 public interface Reference {
+    
+    /**
+     * Returns whether this reference points to something.
+     * 
+     * @return {@code false} whether it does not point to some element, {@code true} if it points to some element
+     */
+    public boolean hasReference();
 
 }

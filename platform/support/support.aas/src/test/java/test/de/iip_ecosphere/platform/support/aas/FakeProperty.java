@@ -69,6 +69,13 @@ public class FakeProperty extends FakeElement implements Property {
             instance.value = value;
             return this;
         }
+        
+        @Override
+        public PropertyBuilder setValue(Type type, Object value) {
+            instance.type = type;
+            instance.value = value;
+            return this;
+        }
 
         @Override
         public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set) {

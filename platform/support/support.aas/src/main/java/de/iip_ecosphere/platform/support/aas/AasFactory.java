@@ -27,9 +27,47 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  */
 public abstract class AasFactory {
 
+    /**
+     * A dummy AAS factory instance that intentionally does nothing. This is the default implementation,
+     * but it will never be effective if there is an implementation available via the service loader.
+     */
+    public static final AasFactory DUMMY = new AasFactory() {
+
+        @Override
+        public String getName() {
+            return "Dummy";
+        }
+
+        @Override
+        public AasBuilder createAasBuilder(String idShort, String urn) {
+            return null;
+        }
+
+        @Override
+        public SubmodelBuilder createSubModelBuilder(String idShort) {
+            return null;
+        }
+
+        @Override
+        public Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException {
+            return null;
+        }
+
+        @Override
+        public DeploymentBuilder createDeploymentBuilder(String host, int port) {
+            return null;
+        }
+
+        @Override
+        public DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port) {
+            return null;
+        }
+        
+    };
+
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
-    private static AasFactory instance = null;
+    private static AasFactory instance = DUMMY;
     
     /**
      * Returns the actual instance.
@@ -37,7 +75,7 @@ public abstract class AasFactory {
      * @return the actual instance
      */
     public static AasFactory getInstance() {
-        if (null == instance) {
+        if (DUMMY == instance) {
             ServiceLoader<AasFactoryDescriptor> loader = ServiceLoader.load(AasFactoryDescriptor.class);
             Optional<AasFactoryDescriptor> first = loader.findFirst();
             if (first.isPresent()) {
@@ -53,14 +91,18 @@ public abstract class AasFactory {
     }
     
     /**
-     * Defines the actual instance.
+     * Defines the actual instance. This shall be used when there is intentionally no AAS implementation, e.g., 
+     * in test situations.
      * 
      * @param newInstance the new instance (may be <b>null</b> but then the call is without effect)
+     * @return AAS instance before setting, may be <b>null</b>
      */
-    public static void setInstance(AasFactory newInstance) {
+    public static AasFactory setInstance(AasFactory newInstance) {
+        AasFactory oldInstance = instance;
         if (null != newInstance) {
             instance = newInstance;
         }
+        return oldInstance;
     }
     
     /**
@@ -76,7 +118,7 @@ public abstract class AasFactory {
      * @param idShort the shortId of the AAS
      * @param urn the uniform resource name of the AAS
      * 
-     * @return the AAS builder instance
+     * @return the AAS builder instance (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty
      */
     public abstract AasBuilder createAasBuilder(String idShort, String urn);
@@ -85,7 +127,7 @@ public abstract class AasFactory {
      * Creates a standalone sub-model without parent AAS.
      * 
      * @param idShort the short id of the sub-model
-     * @return the sub-model builder
+     * @return the sub-model builder (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
      *   supported
      */
@@ -98,7 +140,7 @@ public abstract class AasFactory {
      * @param port the TCP port number of the AAS repository
      * @param endpointPath the registry endpoint path on host
      * @param urn the URN of the AAS
-     * @return the AAS
+     * @return the AAS (may be <b>null</b> if the AAS does not exist)
      * @throws IOException if accessing the AAS fails for some reason
      */
     public abstract Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException;
@@ -108,7 +150,7 @@ public abstract class AasFactory {
      * 
      * @param host the target host
      * @param port the target IP port
-     * @return the deployment builder instance
+     * @return the deployment builder instance (may be <b>null</b> if no AAS implementation is registered)
      */
     public abstract DeploymentBuilder createDeploymentBuilder(String host, int port);
 
@@ -118,7 +160,7 @@ public abstract class AasFactory {
      * @param contextPath the context base path (may be empty, otherwise shall start with a "/")
      * @param host the target host
      * @param port the target IP port
-     * @return the deployment builder instance
+     * @return the deployment builder instance (may be <b>null</b> if no AAS implementation is registered)
      */
     public abstract DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port);
     

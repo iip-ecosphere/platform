@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * A re-usable print visitor for AAS structures. Just prints the AAS to the console. Not applicable
  * within this component, but usable for on concrete implementations. Useful for debugging.
@@ -72,7 +74,13 @@ public class AasPrintVisitor implements AasVisitor {
     
     @Override
     public void visitProperty(Property property) {
-        log("PROPERTY " + property.getIdShort());
+        String value;
+        try {
+            value = String.valueOf(property.getValue());
+        } catch (ExecutionException e) {
+            value = "?";
+        }
+        log("PROPERTY " + property.getIdShort() + " = " + value);
     }
 
     @Override
@@ -82,7 +90,7 @@ public class AasPrintVisitor implements AasVisitor {
 
     @Override
     public void visitReferenceElement(ReferenceElement referenceElement) {
-        log("REFERENCE " + referenceElement.getIdShort());
+        log("REFERENCE " + referenceElement.getIdShort() + " = " + referenceElement.getValue());
     }
 
     @Override

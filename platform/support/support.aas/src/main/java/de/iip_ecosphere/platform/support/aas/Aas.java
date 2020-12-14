@@ -29,14 +29,23 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
     public interface AasBuilder {
 
         /**
-         * Creates a builder for a contained sub-model.
+         * Creates a builder for a contained sub-model. Calling this method again with the same name shall
+         * lead to a builder that allows for modifying the sub-model.
          * 
          * @param idShort the short id of the sub-model
          * @return the builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
+         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not 
+         *   possible
          */
         public SubmodelBuilder createSubModelBuilder(String idShort);
 
+        /**
+         * Returns the reference to the AAS.
+         * 
+         * @return the reference
+         */
+        public Reference createReference();
+        
         /**
          * Builds the instance.
          * 
@@ -67,5 +76,20 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      * @return the sub-model or <b>null</b> if there was none
      */
     public Submodel getSubModel(String idShort);
-    
+
+    /**
+     * Adds a sub-model through its builder (only if {@code build()} was called).
+     * 
+     * @param idShort the short id of the sub-model
+     * @return the sub-model builder
+     */
+    public SubmodelBuilder addSubmodel(String idShort);
+
+    /**
+     * Returns the reference to the AAS.
+     * 
+     * @return the reference
+     */
+    public Reference createReference();
+
 }

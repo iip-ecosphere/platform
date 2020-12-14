@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import test.de.iip_ecosphere.platform.support.aas.FakeAas.FakeAasBuilder;
 
 /**
@@ -37,6 +38,7 @@ import test.de.iip_ecosphere.platform.support.aas.FakeAas.FakeAasBuilder;
  */
 public class FakeSubmodel extends FakeElement implements Submodel {
 
+    private FakeAas parent;
     private Map<String, SubmodelElement> elements = new HashMap<>();
     
     /**
@@ -58,18 +60,25 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         FakeSubmodelBuilder(FakeAasBuilder parent, String idShort) {
             this.parent = parent;
             this.instance = new FakeSubmodel(idShort);
+            this.instance.parent = null != parent ? parent.getInstance() : null;
+        }
+
+        /**
+         * Creates a builder for an existing instance.
+         * 
+         * @param parent the parent
+         * @param instance the instance
+         */
+        FakeSubmodelBuilder(FakeAasBuilder parent, FakeSubmodel instance) {
+            this.parent = parent;
+            this.instance = instance;
         }
         
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
             boolean allowDuplicates) {
-            // fake, forget ordered, allowDuplicates
-            return new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort);
-        }
-
-        @Override
-        public AasBuilder getParentBuilder() {
-            return parent;
+            return new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort, ordered, 
+                allowDuplicates);
         }
 
         @Override
@@ -104,6 +113,16 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection) {
             instance.elements.put(collection.getIdShort(), collection);
             return collection;
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder getParentBuilder() {
+            return null;
+        }
+
+        @Override
+        public AasBuilder getAasBuilder() {
+            return parent;
         }
         
     }
@@ -241,6 +260,20 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return filter(idShort, SubmodelElementCollection.class);
+    }
+
+    @Override
+    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
+        boolean allowDuplicates) {
+        FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
+            new FakeAasBuilder(parent), this);
+        return new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(
+            secb, idShort, ordered, allowDuplicates);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new FakeReference();
     }
 
 }

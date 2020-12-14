@@ -52,6 +52,15 @@ public interface Property extends Element, DataElement {
          * @return <b>this</b>
          */
         public PropertyBuilder setValue(Object value);
+        
+        /**
+         * Sets the actual type and value. [convenience]
+         * 
+         * @param type the type
+         * @param value the value
+         * @return <b>this</b>
+         */
+        public PropertyBuilder setValue(Type type, Object value);
 
         /**
          * Binds the value of the property against functions, e.g., accessing an underlying object.

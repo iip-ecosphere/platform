@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 /**
  * Represents an AAS sub-model.
@@ -28,13 +28,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @author Holger Eichelberger, SSE
      */
     public interface SubmodelBuilder extends SubmodelElementContainerBuilder {
-        
-        /**
-         * Returns the parent builder.
-         * 
-         * @return the parent builder
-         */
-        public AasBuilder getParentBuilder();
         
         /**
          * Creates a reference on the sub-model under construction.
@@ -111,5 +104,23 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @return the submodel collection element, <b>null</b> for none
      */
     public SubmodelElementCollection getSubmodelElementCollection(String idShort);
+
+    /**
+     * Adds a sub-model through its builder (only if {@code build()} was called).
+     * 
+     * @param ordered whether the collection shall be ordered or not
+     * @param allowDuplicates whether the collection allows duplicates or not
+     * @param idShort the short id of the sub-model
+     * @return the sub-model builder
+     */
+    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered, 
+        boolean allowDuplicates);
+
+    /**
+     * Returns the reference to the AAS.
+     * 
+     * @return the reference
+     */
+    public Reference createReference();
 
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -42,7 +43,16 @@ public class FakeAas extends FakeElement implements Aas {
         FakeAasBuilder(String idShort, String urn) {
             instance = new FakeAas(idShort); // we do not return the URN so far, so we ignore it here
         }
-        
+
+        /**
+         * Creates an instance.
+         * 
+         * @param instance an axisting instance
+         */
+        FakeAasBuilder(FakeAas instance) {
+            this.instance = instance;
+        }
+
         @Override
         public SubmodelBuilder createSubModelBuilder(String idShort) {
             return new FakeSubmodel.FakeSubmodelBuilder(this, idShort);
@@ -62,6 +72,20 @@ public class FakeAas extends FakeElement implements Aas {
         @Override
         public Aas build() {
             return instance;
+        }
+        
+        /**
+         * Returns the instance.
+         * 
+         * @return the instance
+         */
+        FakeAas getInstance() {
+            return instance;
+        }
+        
+        @Override
+        public Reference createReference() {
+            return new FakeReference();
         }
         
     }
@@ -97,6 +121,16 @@ public class FakeAas extends FakeElement implements Aas {
     @Override
     public Submodel getSubModel(String idShort) {
         return submodels.get(idShort);
+    }
+
+    @Override
+    public SubmodelBuilder addSubmodel(String idShort) {
+        return new FakeSubmodel.FakeSubmodelBuilder(new FakeAasBuilder(this), idShort);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new FakeReference();
     }
 
 }
