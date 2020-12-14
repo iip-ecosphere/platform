@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -37,9 +38,13 @@ public class TransportAasTest {
      */
     @Test
     public void testAas() throws ExecutionException {
+        String serName = SerializerRegistry.setName("TestSer");
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(TransportAas.class));
+        // obtain the plattform AAS and go then on with the transport sub-model
         Aas aas = AasPartRegistry.getAas(AasPartRegistry.build(), AasPartRegistry.NAME_AAS);
         Assert.assertNotNull(aas);
+        
+        aas.accept(new AasPrintVisitor());
         
         Submodel tsm = aas.getSubModel(TransportAas.NAME_SUBMODEL);
         Assert.assertNotNull(tsm);
@@ -49,6 +54,7 @@ public class TransportAasTest {
         prop = tsm.getProperty(TransportAas.NAME_VAR_SERIALIZER);
         Assert.assertNotNull(prop);
         Assert.assertEquals(SerializerRegistry.getName(), prop.getValue());
+        SerializerRegistry.setName(serName);
     }
 
 }

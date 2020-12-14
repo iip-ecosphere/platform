@@ -41,12 +41,10 @@ public class TransportAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder) {
         SubmodelBuilder smB = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
         smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
-            .setType(Type.STRING)
-            .setValue(TransportFactory.getConnectorName())
+            .setValue(Type.STRING, TransportFactory.getConnectorName())
             .build();
         smB.createPropertyBuilder(NAME_VAR_SERIALIZER)
-            .setType(Type.STRING)
-            .setValue(SerializerRegistry.getName())
+            .setValue(Type.STRING, SerializerRegistry.getName())
             .build();
         smB.build();
         return null;
