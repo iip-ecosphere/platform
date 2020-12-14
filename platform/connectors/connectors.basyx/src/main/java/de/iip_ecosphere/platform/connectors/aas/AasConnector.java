@@ -100,6 +100,9 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         if (null == connectedAAS) {
             connectedAAS = factory.retrieveAas(params.getHost(), params.getPort(), 
                 params.getEndpointPath(), params.getApplicationId());
+            if (null == connectedAAS) {
+                throw new IOException("No AAS retrieved!");
+            }
         }
     }
     

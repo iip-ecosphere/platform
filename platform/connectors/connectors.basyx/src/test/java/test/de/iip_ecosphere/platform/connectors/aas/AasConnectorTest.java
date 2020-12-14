@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.connectors.ConnectorRegistry;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
@@ -43,6 +44,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -78,6 +80,7 @@ public class AasConnectorTest {
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
     private static final String REGISTRY_PATH = "registry";
     
+    private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
     
@@ -97,6 +100,12 @@ public class AasConnectorTest {
      */
     @BeforeClass
     public static void init() throws SocketException, UnknownHostException {
+        // multiple test runs may load the same descriptor multiple times
+        ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
+        platformAasServer = AasPartRegistry.deploy(AasPartRegistry.build());
+        platformAasServer.start(2000);
+        LOGGER.info("Platform AAS server started");
+        
         TestMachine machine = new TestMachine();
         ccServer = createControlComponent(machine);
         Aas aas = createAAS(machine);
@@ -119,7 +128,8 @@ public class AasConnectorTest {
     public static void shutdown() {
         httpServer.stop();
         ccServer.stop();
-        LOGGER.info("AAS server stopped");
+        LOGGER.info("Platform/AAS server stopped");
+        //platformAasServer.stop(); // seems to happen with httpServer
     }
     
     /** 
