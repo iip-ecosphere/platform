@@ -19,7 +19,8 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -50,23 +51,28 @@ public class FactoryTest {
             }
             
             @Override
-            public SubmodelBuilder createSubModelBuilder(String idShort) {
-                return DUMMY.createSubModelBuilder(idShort);
+            public SubmodelBuilder createSubmodelBuilder(String idShort) {
+                return DUMMY.createSubmodelBuilder(idShort);
             }
             
             @Override
-            public DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port) {
-                return DUMMY.createDeploymentBuilder(contextPath, host, port);
+            public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
+                return DUMMY.createDeploymentRecipe(contextPath, host, port);
             }
             
             @Override
-            public DeploymentBuilder createDeploymentBuilder(String host, int port) {
-                return DUMMY.createDeploymentBuilder(host, port);
+            public DeploymentRecipe createDeploymentRecipe(String host, int port) {
+                return DUMMY.createDeploymentRecipe(host, port);
             }
             
             @Override
             public AasBuilder createAasBuilder(String idShort, String urn) {
                 return DUMMY.createAasBuilder(idShort, urn);
+            }
+
+            @Override
+            public PersistenceRecipe createPersistenceRecipe() {
+                return DUMMY.createPersistenceRecipe();
             }
         };
         
@@ -85,11 +91,13 @@ public class FactoryTest {
         // it's just a fake
         Assert.assertEquals("fake", instance.getName());
         Assert.assertNotNull(instance.createAasBuilder("", ""));
-        Assert.assertNotNull(instance.createSubModelBuilder(""));
+        Assert.assertNotNull(instance.createSubmodelBuilder(""));
         Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
         
-        Assert.assertNull(instance.createDeploymentBuilder("localhost", 1234));
-        Assert.assertNull(instance.createDeploymentBuilder("/path", "localhost", 1234));
+        Assert.assertNull(instance.createDeploymentRecipe("localhost", 1234));
+        Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
+
+        Assert.assertNull(instance.createPersistenceRecipe());
     }
 
     /**
@@ -106,11 +114,11 @@ public class FactoryTest {
         Assert.assertEquals(AasFactory.DUMMY.getName(), instance.getName());
 
         Assert.assertNull(instance.createAasBuilder("", ""));
-        Assert.assertNull(instance.createSubModelBuilder(""));
+        Assert.assertNull(instance.createSubmodelBuilder(""));
         Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
         
-        Assert.assertNull(instance.createDeploymentBuilder("localhost", 1234));
-        Assert.assertNull(instance.createDeploymentBuilder("/path", "localhost", 1234));
+        Assert.assertNull(instance.createDeploymentRecipe("localhost", 1234));
+        Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
 
         AasFactory.setInstance(old);
     }

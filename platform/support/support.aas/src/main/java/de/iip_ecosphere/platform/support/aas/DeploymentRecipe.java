@@ -15,11 +15,11 @@ package de.iip_ecosphere.platform.support.aas;
 import de.iip_ecosphere.platform.support.Server;
 
 /**
- * Defines the interface of a builder that is able to deploy AAS at least to local servers for now.
+ * Defines the interface of a recipe that is able to deploy AAS at least to local servers for now.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface DeploymentBuilder {
+public interface DeploymentRecipe {
     
     /**
      * Adds an in-memory registry to the deployment.
@@ -27,7 +27,7 @@ public interface DeploymentBuilder {
      * @param regPath the registry URL path
      * @return <b>this</b>
      */
-    public DeploymentBuilder addInMemoryRegistry(String regPath);
+    public DeploymentRecipe addInMemoryRegistry(String regPath);
 
     /**
      * Deploys the ASS. Requires a valid registry to be created before.
@@ -37,7 +37,7 @@ public interface DeploymentBuilder {
      * @throws IllegalArgumentException if no registry was created before or {@code aas} was not created 
      *   by the corresponding {@link AasFactory}
      */
-    public DeploymentBuilder deploy(Aas aas);
+    public DeploymentRecipe deploy(Aas aas);
 
     /**
      * Deploys the given {@code subModel}.
@@ -48,7 +48,7 @@ public interface DeploymentBuilder {
      * @throws IllegalArgumentException if no registry was created before or {@code aas} was not created 
      *   by the corresponding {@link AasFactory}
      */
-    public DeploymentBuilder deploy(Submodel subModel, String path);
+    public DeploymentRecipe deploy(Submodel subModel, String path);
 
     /**
      * Starts the server.

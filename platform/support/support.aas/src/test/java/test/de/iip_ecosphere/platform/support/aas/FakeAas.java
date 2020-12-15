@@ -54,7 +54,7 @@ public class FakeAas extends FakeElement implements Aas {
         }
 
         @Override
-        public SubmodelBuilder createSubModelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort) {
             return new FakeSubmodel.FakeSubmodelBuilder(this, idShort);
         }
         
@@ -119,7 +119,7 @@ public class FakeAas extends FakeElement implements Aas {
     }
 
     @Override
-    public Submodel getSubModel(String idShort) {
+    public Submodel getSubmodel(String idShort) {
         return submodels.get(idShort);
     }
 

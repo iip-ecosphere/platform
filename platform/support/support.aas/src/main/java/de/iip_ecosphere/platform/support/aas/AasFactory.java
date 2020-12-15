@@ -44,7 +44,7 @@ public abstract class AasFactory {
         }
 
         @Override
-        public SubmodelBuilder createSubModelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort) {
             return null;
         }
 
@@ -54,12 +54,17 @@ public abstract class AasFactory {
         }
 
         @Override
-        public DeploymentBuilder createDeploymentBuilder(String host, int port) {
+        public DeploymentRecipe createDeploymentRecipe(String host, int port) {
             return null;
         }
 
         @Override
-        public DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port) {
+        public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
+            return null;
+        }
+
+        @Override
+        public PersistenceRecipe createPersistenceRecipe() {
             return null;
         }
         
@@ -131,7 +136,7 @@ public abstract class AasFactory {
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
      *   supported
      */
-    public abstract SubmodelBuilder createSubModelBuilder(String idShort);
+    public abstract SubmodelBuilder createSubmodelBuilder(String idShort);
     
     /**
      * Retrieves an AAS.
@@ -146,22 +151,29 @@ public abstract class AasFactory {
     public abstract Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException;
     
     /**
-     * Creates a deployment builder.
+     * Creates a deployment recipe.
      * 
      * @param host the target host
      * @param port the target IP port
-     * @return the deployment builder instance (may be <b>null</b> if no AAS implementation is registered)
+     * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentBuilder createDeploymentBuilder(String host, int port);
+    public abstract DeploymentRecipe createDeploymentRecipe(String host, int port);
 
     /**
-     * Creates a deployment builder.
+     * Creates a deployment recipe.
      * 
      * @param contextPath the context base path (may be empty, otherwise shall start with a "/")
      * @param host the target host
      * @param port the target IP port
-     * @return the deployment builder instance (may be <b>null</b> if no AAS implementation is registered)
+     * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port);
+    public abstract DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port);
+    
+    /**
+     * Creates a persistence recipe.
+     * 
+     * @return the recipe (may be <b>null</b> if no AAS implementation is registered)
+     */
+    public abstract PersistenceRecipe createPersistenceRecipe();
     
 }

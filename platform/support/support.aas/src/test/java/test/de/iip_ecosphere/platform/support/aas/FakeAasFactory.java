@@ -18,7 +18,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -54,7 +55,7 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
-    public SubmodelBuilder createSubModelBuilder(String idShort) {
+    public SubmodelBuilder createSubmodelBuilder(String idShort) {
         return new FakeSubmodel.FakeSubmodelBuilder(null, idShort);
     }
 
@@ -64,12 +65,17 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
-    public DeploymentBuilder createDeploymentBuilder(String host, int port) {
+    public DeploymentRecipe createDeploymentRecipe(String host, int port) {
         return null;
     }
 
     @Override
-    public DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port) {
+    public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
+        return null;
+    }
+
+    @Override
+    public PersistenceRecipe createPersistenceRecipe() {
         return null;
     }
 

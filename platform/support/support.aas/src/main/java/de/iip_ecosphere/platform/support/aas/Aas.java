@@ -37,7 +37,7 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not 
          *   possible
          */
-        public SubmodelBuilder createSubModelBuilder(String idShort);
+        public SubmodelBuilder createSubmodelBuilder(String idShort);
 
         /**
          * Returns the reference to the AAS.
@@ -75,7 +75,7 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      * @param idShort the short name to search for
      * @return the sub-model or <b>null</b> if there was none
      */
-    public Submodel getSubModel(String idShort);
+    public Submodel getSubmodel(String idShort);
 
     /**
      * Adds a sub-model through its builder (only if {@code build()} was called).
