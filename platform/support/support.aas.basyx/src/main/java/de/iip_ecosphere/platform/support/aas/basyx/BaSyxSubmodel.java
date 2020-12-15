@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.SubModel;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -118,13 +119,29 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
      * 
      * @param subModel the sub-model instance
      */
-    private BaSyxSubmodel(org.eclipse.basyx.submodel.metamodel.map.SubModel subModel) {
+    private BaSyxSubmodel(SubModel subModel) {
         super(subModel);
+    }
+    
+    /**
+     * Creates an instance based on a given instance.
+     * 
+     * @param parent the parent instance
+     * @param instance the BaSyx submodel instance
+     */
+    BaSyxSubmodel(BaSyxSubmodelParent parent, SubModel instance) {
+        super(instance);
+        this.parent = parent;
+        BaSyxElementTranslator.registerDataElements(instance.getDataElements(), this);
+        BaSyxElementTranslator.registerOperations(instance.getOperations(), this);
+        BaSyxElementTranslator.registerRemainingSubmodelElements(instance.getSubmodelElements(), this);
     }
     
     @Override
     public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
         boolean allowDuplicates) {
+        LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
+            + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
             new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), idShort, ordered, allowDuplicates);
     }

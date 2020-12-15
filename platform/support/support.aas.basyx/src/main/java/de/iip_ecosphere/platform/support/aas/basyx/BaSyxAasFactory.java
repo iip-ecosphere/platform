@@ -26,7 +26,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -69,7 +70,7 @@ public class BaSyxAasFactory extends AasFactory {
     }
 
     @Override
-    public SubmodelBuilder createSubModelBuilder(String idShort) {
+    public SubmodelBuilder createSubmodelBuilder(String idShort) {
         return new BaSyxSubmodel.BaSyxSubmodelBuilder(null, idShort);
     }
 
@@ -103,19 +104,24 @@ public class BaSyxAasFactory extends AasFactory {
     // checkstyle: resume exception type check
 
     @Override
-    public DeploymentBuilder createDeploymentBuilder(String host, int port) {
+    public DeploymentRecipe createDeploymentRecipe(String host, int port) {
         return new BaSyxDeploymentBuilder(host, port);
     }
 
 
     @Override
-    public DeploymentBuilder createDeploymentBuilder(String contextPath, String host, int port) {
+    public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
         return new BaSyxDeploymentBuilder(contextPath, host, port);
     }
 
     @Override
     public String getName() {
         return "AAS/BaSyx";
+    }
+
+    @Override
+    public PersistenceRecipe createPersistenceRecipe() {
+        return new BaSyxPersistenceRecipe();
     }
 
 }

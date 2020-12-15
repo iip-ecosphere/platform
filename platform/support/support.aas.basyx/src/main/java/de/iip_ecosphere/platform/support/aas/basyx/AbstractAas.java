@@ -37,7 +37,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
      * 
      * @author Holger Eichelberger, SSE
      */
-    interface BaSyxSubmodelParent {
+    public interface BaSyxSubmodelParent {
         /**
          * Creates an AAS builder on parent level.
          * 
@@ -120,7 +120,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     }
     
     @Override
-    public Submodel getSubModel(String idShort) {
+    public Submodel getSubmodel(String idShort) {
         return submodels.get(idShort);
     }
 

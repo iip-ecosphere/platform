@@ -37,7 +37,7 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
@@ -45,7 +45,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxDeploymentBuilder implements DeploymentBuilder {
+public class BaSyxDeploymentBuilder implements DeploymentRecipe {
 
     private String host;
     private int port;
@@ -88,7 +88,7 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
     }
 
     @Override
-    public DeploymentBuilder addInMemoryRegistry(String regPath) {
+    public DeploymentRecipe addInMemoryRegistry(String regPath) {
         registry = new InMemoryRegistry();
         IModelProvider registryProvider = new DirectoryModelProvider(registry);
         HttpServlet registryServlet = new VABHTTPInterface<IModelProvider>(registryProvider);
@@ -97,7 +97,7 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
     }
 
     @Override
-    public DeploymentBuilder deploy(Aas aas) {
+    public DeploymentRecipe deploy(Aas aas) {
         if (null == registry) {
             throw new IllegalArgumentException("No registry created before");
         }
@@ -132,7 +132,7 @@ public class BaSyxDeploymentBuilder implements DeploymentBuilder {
     }
     
     @Override
-    public DeploymentBuilder deploy(Submodel subModel, String path) {
+    public DeploymentRecipe deploy(Submodel subModel, String path) {
         if (!(subModel instanceof BaSyxSubmodel)) {
             throw new IllegalArgumentException("The subModel must be of instance BaSyxSubModel, i.e., created "
                 + "through the AasFactory.");

@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -96,7 +96,7 @@ public class BaSyxTest {
 
         Aas aas = createAas(machine);
         
-        DeploymentBuilder dBuilder = AasFactory.getInstance().createDeploymentBuilder(HOST_AAS, PORT_AAS);
+        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(HOST_AAS, PORT_AAS);
         dBuilder.addInMemoryRegistry(REGISTRY_PATH);
         dBuilder.deploy(aas);
         Server httpServer = dBuilder.createServer(3000);
@@ -120,7 +120,7 @@ public class BaSyxTest {
     private static Aas createAas(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(() -> {
@@ -146,7 +146,7 @@ public class BaSyxTest {
             .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
             .build();
         Reference subModelBuilderRef = subModelBuilder.createReference();
-        Assert.assertNotNull(aasBuilder.createSubModelBuilder(NAME_SUBMODEL)); // for modification
+        Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL)); // for modification
         
         SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_OUTER, false, true);
@@ -181,9 +181,9 @@ public class BaSyxTest {
         
         // adding on local models
         Submodel subAdd = aas.addSubmodel("sub-add").build();
-        Assert.assertNotNull(aas.getSubModel("sub-add"));
+        Assert.assertNotNull(aas.getSubmodel("sub-add"));
         subAdd.addSubmodelElementCollection("sub-coll", true, true).build();
-        Assert.assertNotNull(aas.getSubModel("sub-add").getSubmodelElementCollection("sub-coll"));
+        Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
         submodel.addSubmodelElementCollection("sub-coll2", false, false).build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
 
@@ -246,15 +246,15 @@ public class BaSyxTest {
         Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
 
         // the lately added sub-models/elements
-        Assert.assertNotNull(aas.getSubModel("sub-add"));
-        Assert.assertNotNull(aas.getSubModel("sub-add").getSubmodelElementCollection("sub-coll"));
+        Assert.assertNotNull(aas.getSubmodel("sub-add"));
+        Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
 
         // adding on connected models
         Submodel subAdd = aas.addSubmodel("conn-add").build();
-        Assert.assertNotNull(aas.getSubModel("conn-add"));
+        Assert.assertNotNull(aas.getSubmodel("conn-add"));
         subAdd.addSubmodelElementCollection("conn-coll", true, true).build();
-        Assert.assertNotNull(aas.getSubModel("conn-add").getSubmodelElementCollection("conn-coll"));
+        Assert.assertNotNull(aas.getSubmodel("conn-add").getSubmodelElementCollection("conn-coll"));
         submodel.addSubmodelElementCollection("conn-coll2", false, false).build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("conn-coll2"));
         

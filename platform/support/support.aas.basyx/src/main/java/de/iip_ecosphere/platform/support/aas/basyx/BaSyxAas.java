@@ -18,13 +18,14 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
 
 /**
  * Wraps a BaSyx AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
+public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements BaSyxSubmodelParent {
 
     /**
      * Builder for {@code BaSyxAas}.
@@ -71,10 +72,10 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
         }
 
         @Override
-        public SubmodelBuilder createSubModelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort) {
             SubmodelBuilder result;
-            Submodel sub =  instance.getSubModel(idShort);
-            if (null == instance.getSubModel(idShort)) {
+            Submodel sub =  instance.getSubmodel(idShort);
+            if (null == instance.getSubmodel(idShort)) {
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort);
             } else { // no connected here
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
@@ -84,7 +85,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
 
         @Override
         public Submodel register(BaSyxSubmodel submodel) {
-            if (null == instance.getSubModel(submodel.getIdShort())) {
+            if (null == instance.getSubmodel(submodel.getIdShort())) {
                 instance.getAas().addSubModel(submodel.getSubmodel());
                 instance.register(submodel);
             }
@@ -102,14 +103,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
 
         @Override
         public BaSyxSubmodelParent getSubmodelParent() {
-            return new BaSyxSubmodelParent() {
-
-                @Override
-                public BaSyxAbstractAasBuilder createAasBuilder() {
-                    return new BaSyxAasBuilder(instance);
-                }
-                
-            };
+            return instance;
         }
         
     }
@@ -119,13 +113,18 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> {
      * 
      * @param aas the BaSyx AAS instance
      */
-    private BaSyxAas(AssetAdministrationShell aas) {
+    BaSyxAas(AssetAdministrationShell aas) {
         super(aas);
     }
     
     @Override
     public SubmodelBuilder addSubmodel(String idShort) {
         return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort);
+    }
+
+    @Override
+    public BaSyxAbstractAasBuilder createAasBuilder() {
+        return new BaSyxAasBuilder(this);
     }
 
 }

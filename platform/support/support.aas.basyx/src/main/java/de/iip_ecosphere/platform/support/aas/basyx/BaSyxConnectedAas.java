@@ -50,10 +50,10 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         }
 
         @Override
-        public SubmodelBuilder createSubModelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort) {
             SubmodelBuilder result;
-            Submodel sub =  instance.getSubModel(idShort);
-            if (null == instance.getSubModel(idShort)) { // new here
+            Submodel sub =  instance.getSubmodel(idShort);
+            if (null == instance.getSubmodel(idShort)) { // new here
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort);
             } else if (sub instanceof BaSyxSubmodel) { // after add
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
@@ -65,7 +65,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
 
         @Override
         public Submodel register(BaSyxSubmodel submodel) {
-            if (null == instance.getSubModel(submodel.getIdShort())) {
+            if (null == instance.getSubmodel(submodel.getIdShort())) {
                 instance.getAas().addSubModel(submodel.getSubmodel());
                 instance.register(submodel);
             }
@@ -96,7 +96,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
      * 
      * @param aas the implementing AAS
      */
-    public BaSyxConnectedAas(ConnectedAssetAdministrationShell aas) {
+    BaSyxConnectedAas(ConnectedAssetAdministrationShell aas) {
         super(aas);
         for (ISubModel sm : aas.getSubModels().values()) {
             register(new BaSyxISubmodel(this, sm));
