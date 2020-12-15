@@ -85,13 +85,13 @@ public class ClassUtilityTest {
         AasBuilder aasBuilder = factory.createAasBuilder("test", "urn:::AAS:::types#");
         ClassUtility.addType(aasBuilder, Simple.class);
         ClassUtility.addType(aasBuilder, Complex.class);
-        SubmodelBuilder smBuilder = aasBuilder.createSubModelBuilder("test");
+        SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("test");
         ClassUtility.addTypeSubModelElement(smBuilder, "input", Simple.class);
         smBuilder.build();
         Aas aas = aasBuilder.build();
         aas.accept(new AasPrintVisitor());
         
-        Submodel smType = aas.getSubModel(ClassUtility.NAME_TYPE_SUBMODEL);
+        Submodel smType = aas.getSubmodel(ClassUtility.NAME_TYPE_SUBMODEL);
         SubmodelElementCollection typeC = smType.getSubmodelElementCollection(ClassUtility.getName(Simple.class));
         Assert.assertNotNull(typeC);
         Assert.assertNotNull(typeC.getProperty("value"));

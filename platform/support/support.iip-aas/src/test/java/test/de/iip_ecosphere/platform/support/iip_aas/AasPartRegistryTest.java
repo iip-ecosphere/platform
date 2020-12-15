@@ -46,7 +46,7 @@ public class AasPartRegistryTest {
         
         @Override
         public Aas contributeTo(AasBuilder aasBuilder) {
-            aasBuilder.createSubModelBuilder("c1").build();
+            aasBuilder.createSubmodelBuilder("c1").build();
             return null;
         }
         
@@ -62,7 +62,7 @@ public class AasPartRegistryTest {
         @Override
         public Aas contributeTo(AasBuilder aasBuilder) {
             AasBuilder builder = AasFactory.getInstance().createAasBuilder(NAME_MY_AAS, "urn:::AAS:::myAas#");
-            builder.createSubModelBuilder("c2").build();
+            builder.createSubmodelBuilder("c2").build();
             return builder.build();
         }
         
@@ -89,8 +89,8 @@ public class AasPartRegistryTest {
         Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS));
         Assert.assertNotNull(hashedAas.get(NAME_MY_AAS));
         
-        Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS).getSubModel("c1"));
-        Assert.assertNotNull(hashedAas.get(NAME_MY_AAS).getSubModel("c2"));
+        Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS).getSubmodel("c1"));
+        Assert.assertNotNull(hashedAas.get(NAME_MY_AAS).getSubmodel("c2"));
         
         // TODO test deploy
     }

@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.
@@ -129,7 +129,7 @@ public class AasPartRegistry {
      * @return the server instance
      */
     public static Server deploy(List<Aas> aas) {
-        DeploymentBuilder dBuilder = AasFactory.getInstance().createDeploymentBuilder(host, port);
+        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(host, port);
         dBuilder.addInMemoryRegistry(endpoint);
         for (Aas a: aas) {
             dBuilder.deploy(a);
