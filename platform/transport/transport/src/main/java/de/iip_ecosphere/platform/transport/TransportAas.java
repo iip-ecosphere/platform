@@ -39,7 +39,7 @@ public class TransportAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder) {
-        SubmodelBuilder smB = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
         smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
             .setValue(Type.STRING, TransportFactory.getConnectorName())
             .build();

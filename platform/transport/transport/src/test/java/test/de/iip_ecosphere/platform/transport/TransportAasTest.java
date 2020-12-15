@@ -46,7 +46,7 @@ public class TransportAasTest {
         
         aas.accept(new AasPrintVisitor());
         
-        Submodel tsm = aas.getSubModel(TransportAas.NAME_SUBMODEL);
+        Submodel tsm = aas.getSubmodel(TransportAas.NAME_SUBMODEL);
         Assert.assertNotNull(tsm);
         Property prop = tsm.getProperty(TransportAas.NAME_VAR_CONNECTOR);
         Assert.assertNotNull(prop);
