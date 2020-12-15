@@ -403,7 +403,7 @@ public class ConnectorsAasTest {
      * @param aas the AAS to inspect
      */
     private void testDescriptorsSubmodel(Aas aas) {
-        Submodel cdsm = aas.getSubModel(ConnectorsAas.NAME_DESCRIPTORS_SUBMODEL);
+        Submodel cdsm = aas.getSubmodel(ConnectorsAas.NAME_DESCRIPTORS_SUBMODEL);
         Assert.assertNotNull(cdsm);
         
         Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
@@ -493,7 +493,7 @@ public class ConnectorsAasTest {
         System.out.println();
         
         Assert.assertNotNull(aas);
-        Submodel cdsm = aas.getSubModel(ConnectorsAas.NAME_CONNECTORS_SUBMODEL);
+        Submodel cdsm = aas.getSubmodel(ConnectorsAas.NAME_CONNECTORS_SUBMODEL);
         Assert.assertNotNull(cdsm);
         Assert.assertEquals(expectedActive, cdsm.getSubmodelElementsCount());
         

@@ -101,10 +101,10 @@ public class ConnectorsAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
-        SubmodelBuilder tsmB = aasBuilder.createSubModelBuilder(ClassUtility.NAME_TYPE_SUBMODEL);
+        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL);
         tsmB.build();
         
-        SubmodelBuilder ismB = aasBuilder.createSubModelBuilder(NAME_DESCRIPTORS_SUBMODEL);
+        SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL);
         Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
         while (iter.hasNext()) {
             ConnectorDescriptor desc = iter.next();
@@ -119,7 +119,7 @@ public class ConnectorsAas implements AasContributor {
         }
         Submodel descriptors = ismB.build();
         
-        SubmodelBuilder csmB = aasBuilder.createSubModelBuilder(NAME_CONNECTORS_SUBMODEL);
+        SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL);
         Iterator<Connector<?, ?, ?, ?>> iterC = ConnectorRegistry.getRegisteredConnectorInstances();
         while (iterC.hasNext()) {
             Connector<?, ?, ?, ?> connector = iterC.next();
@@ -144,7 +144,7 @@ public class ConnectorsAas implements AasContributor {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             if (null != aas) {
-                Submodel submodel = aas.getSubModel(NAME_CONNECTORS_SUBMODEL);
+                Submodel submodel = aas.getSubmodel(NAME_CONNECTORS_SUBMODEL);
                 if (null != submodel) {
                     String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
                     SubmodelElementCollection coll = submodel.getSubmodelElementCollection(idShort);
@@ -198,8 +198,8 @@ public class ConnectorsAas implements AasContributor {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             if (null != aas) {
-                Submodel descriptors = aas.getSubModel(NAME_DESCRIPTORS_SUBMODEL);
-                Submodel submodel = aas.getSubModel(NAME_CONNECTORS_SUBMODEL);
+                Submodel descriptors = aas.getSubmodel(NAME_DESCRIPTORS_SUBMODEL);
+                Submodel submodel = aas.getSubmodel(NAME_CONNECTORS_SUBMODEL);
                 if (null != submodel && null != descriptors) {
                     String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
                     SubmodelElementCollectionBuilder smcb = submodel.addSubmodelElementCollection(

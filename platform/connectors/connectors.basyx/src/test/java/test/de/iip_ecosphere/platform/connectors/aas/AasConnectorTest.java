@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.DeploymentBuilder;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -110,7 +110,7 @@ public class AasConnectorTest {
         ccServer = createControlComponent(machine);
         Aas aas = createAAS(machine);
 
-        DeploymentBuilder dBuilder = AasFactory.getInstance().createDeploymentBuilder(AAS_IP, AAS_PORT);
+        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(AAS_IP, AAS_PORT);
         dBuilder.addInMemoryRegistry(REGISTRY_PATH);
         dBuilder.deploy(aas);
         httpServer = dBuilder.createServer(3000);
@@ -154,7 +154,7 @@ public class AasConnectorTest {
     public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubModelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(() -> {
