@@ -145,9 +145,14 @@
         <artifactId>basyx.components.sqlregistry</artifactId>
         <version>${basyx.version}</version>
       </dependency>      
-        <dependency>
+      <dependency>
         <groupId>org.eclipse.basyx</groupId>
         <artifactId>basyx.components.AASServer</artifactId>
+        <version>${basyx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.basyx</groupId>
+        <artifactId>basyx.components.AASX</artifactId>
         <version>${basyx.version}</version>
       </dependency>
       <dependency>
