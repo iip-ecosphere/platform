@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -31,10 +32,12 @@ import org.eclipse.basyx.aas.factory.xml.XMLToMetamodelConverter;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.components.aasx.AASXPackageManager;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.SubModel;
+import org.eclipse.basyx.support.bundle.AASBundle;
 import org.xml.sax.SAXException;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -42,8 +45,13 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
- * A persistence recipe for BaSyx AAS. This implementation is internally based on short ids. Might be this is
- * not enough for reading models uniquely back.
+ * A persistence recipe for BaSyx AAS. This implementation is internally based on short ids. 
+ * 
+ * Limitations:
+ * <ul>
+ *   <li>This class does not consider concept descriptions or assets when reading directly from XML.</li>
+ *   <li>Might be this is not enough for reading models uniquely back directly from XML.</li>
+ * </ul>
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -75,36 +83,89 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
     
     @Override
     public List<Aas> readFrom(File file) throws IOException {
-        // TODO ZIP
         List<Aas> result = new ArrayList<Aas>();
+        if (file.getName().toLowerCase().endsWith(".aasx")) {
+            readFromAasx(file, result);
+        } else {
+            readFromXml(file, result);
+        }
+        return result;
+    }
+
+    /**
+     * Reads AAS from an AAS ZIP package in {@code file}.
+     * 
+     * @param file the file to read
+     * @param result the resulting {@link Aas} instances (to be modified as a side effect)
+     * @throws IOException in case of I/O reading problems
+     */
+    private void readFromAasx(File file, List<Aas> result) throws IOException {
+        try {
+            AASXPackageManager apm = new AASXPackageManager(file.getAbsolutePath());
+            Set<AASBundle> bundles = apm.retrieveAASBundles();
+            List<IAssetAdministrationShell> aas = new ArrayList<>();
+            List<ISubModel> submodels = new ArrayList<>();
+            for (AASBundle b : bundles) {
+                aas.add(b.getAAS());
+                submodels.addAll(b.getSubmodels());
+                
+                aas.clear();
+                submodels.clear();
+            }
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * Reads AAS from XML in {@code file}.
+     * 
+     * @param file the file to read
+     * @param result the resulting {@link Aas} instances (to be modified as a side effect)
+     * @throws IOException in case of I/O reading problems
+     */
+    private void readFromXml(File file, List<Aas> result) throws IOException {
         try {
             String content = new String(Files.readAllBytes(file.toPath()));
             XMLToMetamodelConverter conv = new XMLToMetamodelConverter(content);
-            List<IAssetAdministrationShell> aas = conv.parseAAS();
-            List<ISubModel> submodels = conv.parseSubmodels();
-            Map<String, SubModel> subMapping = new HashMap<>();
-            for (ISubModel sm : submodels) {
-                if (sm instanceof SubModel) {
-                    subMapping.put(sm.getIdShort(), (SubModel) sm);
-                }
+            transform(conv.parseAAS(), conv.parseSubmodels(), result);
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new IOException(e);
+        }
+    }
+    
+    /**
+     * Transforms a list of related {@code aas} and {@code submodels} to a list of {@link Aas} instances of the
+     * abstraction.
+     * 
+     * @param aas the AAS to transform
+     * @param submodels the sub-models for {@code aas} to transform
+     * @param result the resulting {@link Aas} instances (to be modified as a side effect)
+     * @throws IOException in case that something goes wrong
+     */
+    private void transform(List<IAssetAdministrationShell> aas, List<ISubModel> submodels, List<Aas> result) 
+        throws IOException {
+        Map<String, SubModel> subMapping = new HashMap<>();
+        for (ISubModel sm : submodels) {
+            if (sm instanceof SubModel) {
+                subMapping.put(sm.getIdShort(), (SubModel) sm);
             }
-            for (IAssetAdministrationShell a : aas) {
-                if (a instanceof AssetAdministrationShell) {
-                    BaSyxAas bAas = new BaSyxAas((AssetAdministrationShell) a);
-                    for (IReference r : a.getSubmodelReferences()) {
-                        String name = r.getKeys().get(0).getValue();
+        }
+        for (IAssetAdministrationShell a : aas) {
+            if (a instanceof AssetAdministrationShell) {
+                BaSyxAas bAas = new BaSyxAas((AssetAdministrationShell) a);
+                for (IReference r : a.getSubmodelReferences()) {
+                    if (!r.getKeys().isEmpty()) {
+                        String name = r.getKeys().get(0).getValue(); // really the first??
                         SubModel submodel = subMapping.get(name);
                         if (null != submodel) {
                             bAas.register(new BaSyxSubmodel(bAas, submodel));
                         }
                     }
-                    result.add(bAas);
                 }
+                result.add(bAas);
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            throw new IOException(e);
         }
-        return result;
     }
 
 }

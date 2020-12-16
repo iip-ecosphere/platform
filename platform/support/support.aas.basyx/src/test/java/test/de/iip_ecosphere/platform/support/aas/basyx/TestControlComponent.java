@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 /**
  * Implements a simple test control component.
  * 
+ * @author Monika Staciwa, SSE
  * @author Holger Eichelberger, SSE
  */
 public class TestControlComponent extends SimpleControlComponent implements ControlComponentChangeListener {

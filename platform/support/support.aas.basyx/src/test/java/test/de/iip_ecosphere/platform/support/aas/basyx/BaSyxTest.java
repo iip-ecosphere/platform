@@ -39,13 +39,13 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 
 import org.junit.Assert;
 
 /**
  * Tests the BaSyx abstraction with server and client on the "same machine".
  * 
+ * @author Monika Staciwa, SSE
  * @author Holger Eichelberger, SSE
  */
 public class BaSyxTest {
@@ -92,8 +92,28 @@ public class BaSyxTest {
     @Test
     public void test() throws SocketException, UnknownHostException, ExecutionException, IOException {
         TestMachine machine = new TestMachine();
-        Server ccServer = BaSyxDeploymentBuilder.createControlComponent(new TestControlComponent(machine), PORT_VAB);
 
+        VABOperationsProvider ops = new VABOperationsProvider();
+        ops.defineProperty(NAME_VAR_LOTSIZE, () -> {
+            return machine.getLotSize(); 
+        }, (param) -> {
+                machine.setLotSize((int) param); 
+            });
+        ops.defineProperty(NAME_VAR_POWCONSUMPTION, () -> {
+            return machine.getPowerConsumption(); 
+        }, null);
+        ops.defineServiceFunction(TestControlComponent.OPMODE_STARTING, (params) -> {
+            machine.start();
+            return null;
+        });
+        ops.defineServiceFunction(TestControlComponent.OPMODE_CONFIGURING, (params) -> {
+            return machine.reconfigure((int) params[0]);
+        });
+        ops.defineServiceFunction(TestControlComponent.OPMODE_STOPPING, (params) -> {
+            machine.stop();
+            return null;
+        });
+        Server ccServer = BaSyxDeploymentBuilder.createControlComponent(ops.createModelProvider(), PORT_VAB);
         Aas aas = createAas(machine);
         
         DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(HOST_AAS, PORT_AAS);
@@ -123,27 +143,25 @@ public class BaSyxTest {
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
-            .bind(() -> {
-                return machine.getLotSize(); 
-            }, (param) -> {
-                    machine.setLotSize((int) param); 
-                })
+            .bind(VABOperationsProvider.createGetter(NAME_VAR_LOTSIZE, HOST_AAS, PORT_VAB), 
+                 VABOperationsProvider.createSetter(NAME_VAR_LOTSIZE, HOST_AAS, PORT_VAB))
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
             .setType(Type.DOUBLE)
-            .bind(() -> {
-                return machine.getPowerConsumption(); 
-            }, null)
+            .bind(VABOperationsProvider.createGetter(NAME_VAR_POWCONSUMPTION, HOST_AAS, PORT_VAB), null)
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STARTING, HOST_AAS, PORT_VAB))
+            .setInvocable(VABOperationsProvider
+                .createInvocable(TestControlComponent.OPMODE_STARTING, HOST_AAS, PORT_VAB))
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
             .addInputVariable()
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_CONFIGURING, HOST_AAS, PORT_VAB))
+            .setInvocable(VABOperationsProvider
+                .createInvocable(TestControlComponent.OPMODE_CONFIGURING, HOST_AAS, PORT_VAB))
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
+            .setInvocable(VABOperationsProvider
+                .createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
             .build();
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL)); // for modification
@@ -272,6 +290,7 @@ public class BaSyxTest {
         Assert.assertEquals(expectedSize, CollectionUtils.toList(iter.iterator()).size());
     }
     
+    
     /**
      * Tests the factory.
      */
@@ -279,5 +298,6 @@ public class BaSyxTest {
     public void testFactory() {
         Assert.assertTrue(AasFactory.getInstance().getName().length() > 0);
     }
+
     
 }

@@ -56,6 +56,18 @@ public class TestMachine {
     }
     
     /**
+     * Configures the lot size.
+     * 
+     * @param lotSize the new lot size
+     * @return if the new lot size is greater than the old one
+     */
+    public boolean reconfigure(int lotSize) {
+        int old = lotSize;
+        this.lotSize = lotSize;
+        return lotSize > old;
+    }
+    
+    /**
      * Returns the power consumption.
      *
      * @return the power consumption

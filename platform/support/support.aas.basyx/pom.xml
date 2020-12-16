@@ -26,6 +26,10 @@
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.components.sqlregistry</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.AASX</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>

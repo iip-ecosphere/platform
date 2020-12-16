@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServlet;
 
@@ -25,9 +26,9 @@ import org.eclipse.basyx.aas.registration.restapi.DirectoryModelProvider;
 import org.eclipse.basyx.aas.restapi.AASModelProvider;
 import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
 import org.eclipse.basyx.components.servlet.submodel.SubmodelServlet;
-import org.eclipse.basyx.models.controlcomponent.ControlComponent;
 import org.eclipse.basyx.submodel.restapi.SubModelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
@@ -206,14 +207,25 @@ public class BaSyxDeploymentBuilder implements DeploymentRecipe {
     /** 
      * This method creates a control component for the {@link TestMachine}.
      * 
-     * @param cc the control component
+     * @param cc the control component (usually hash-based model provider)
      * @param port the port to run on
      * @return the server instance
      */
-    public static Server createControlComponent(ControlComponent cc, int port) {
+    public static Server createControlComponent(HashMap<String, Object> cc, int port) {
         // Server where the control component is reachable.
-        VABMapProvider ccProvider = new VABMapProvider(cc);
-        BaSyxTCPServer<VABMapProvider> server = new BaSyxTCPServer<>(ccProvider, port);
+        return createControlComponent(new VABMapProvider(cc), port);
+    }
+
+    /** 
+     * This method creates a control component for the {@link TestMachine}.
+     * 
+     * @param provider the model provider
+     * @param port the port to run on
+     * @return the server instance
+     */
+    public static Server createControlComponent(VABModelProvider provider, int port) {
+        // Server where the control component is reachable.
+        BaSyxTCPServer<VABModelProvider> server = new BaSyxTCPServer<>(provider, port);
         Server result = new Server() {
 
             @Override
