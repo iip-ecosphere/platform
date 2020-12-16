@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     DirectMemoryTransportConnectorTest.class,
     SerializerRegistryTest.class,
-    TransportAasTest.class
+    TransportAasTest.class, 
+    OtherTests.class
 })
 public class AllTests {
 }
