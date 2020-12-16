@@ -55,22 +55,42 @@ public class BaSyxPersistenceTest {
         aasB = factory.createAasBuilder("MyAas1", "urn:::AAS:::myAAs#1");
         aas.add(aasB.build());
         
-        File f = new File(FileUtils.getTempDirectory(), "myAAS.xml");
-        f.delete();
-        PersistenceRecipe recipe = factory.createPersistenceRecipe();
-        recipe.writeTo(aas, f);
+        File xml = new File(FileUtils.getTempDirectory(), "myAAS.xml");
+        xml.delete();
+        File aasx = new File(FileUtils.getTempDirectory(), "myAAS.aasx");
+        aasx.delete();
         
-        List<Aas> aasIn = recipe.readFrom(f);
-        Assert.assertEquals(2, aasIn.size());
+        PersistenceRecipe recipe = factory.createPersistenceRecipe();
+        // Basyx just considers the first AAS and ignores the remaining
+        List<Aas> aasxList = new ArrayList<Aas>();
+        aasxList.add(aas.get(0));
+        recipe.writeTo(aasxList, aasx);
+        recipe.writeTo(aas, xml);
+        
+        assertAas(recipe.readFrom(aasx), true);
+        assertAas(recipe.readFrom(xml), false);
+
+        xml.delete();
+        aasx.delete();
+    }
+  
+    /**
+     * Asserts the expected contents in read AAS.
+     * 
+     * @param aasIn the input/read AAS
+     * @param justFirst consider only the first AAS
+     */
+    private static void assertAas(List<Aas> aasIn, boolean justFirst) {
+        Assert.assertEquals(justFirst ? 1 : 2, aasIn.size());
         
         Assert.assertEquals("MyAas", aasIn.get(0).getIdShort());
         Assert.assertEquals(1, aasIn.get(0).getSubmodelCount());
         Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel"));
         Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel").getProperty("MyP"));
 
-        Assert.assertEquals("MyAas1", aasIn.get(1).getIdShort());
-
-        f.delete();
+        if (!justFirst) {
+            Assert.assertEquals("MyAas1", aasIn.get(1).getIdShort());
+        }
     }
     
 }
