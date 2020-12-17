@@ -19,7 +19,9 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -76,6 +78,21 @@ public class FakeAasFactory extends AasFactory {
 
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
+        return null;
+    }
+
+    @Override
+    public String[] getProtocols() {
+        return new String[]{DEFAULT_PROTOCOL};
+    }
+
+    @Override
+    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+        return null;
+    }
+
+    @Override
+    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
         return null;
     }
 

@@ -29,8 +29,6 @@ update to a more recent state of BaSyx could resolve these problems.
 
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties and operations do exist; the others will be added incrementally on demand)
-- Deployment abstractions
-- Load/store abstractions
-- Implementation-level abstractions (VAB)
+- Further deployment abstractions (remote, sub-model)
 - Authentication/Security
 - AAS Events (currently occurring in BaSyx)

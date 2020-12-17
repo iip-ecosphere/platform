@@ -27,6 +27,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  */
 public abstract class AasFactory {
 
+    public static final String DEFAULT_PROTOCOL = "";
+    
     /**
      * A dummy AAS factory instance that intentionally does nothing. This is the default implementation,
      * but it will never be effective if there is an implementation available via the service loader.
@@ -65,6 +67,21 @@ public abstract class AasFactory {
 
         @Override
         public PersistenceRecipe createPersistenceRecipe() {
+            return null;
+        }
+
+        @Override
+        public String[] getProtocols() {
+            return new String[]{DEFAULT_PROTOCOL};
+        }
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+            return null;
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
             return null;
         }
         
@@ -175,5 +192,39 @@ public abstract class AasFactory {
      * @return the recipe (may be <b>null</b> if no AAS implementation is registered)
      */
     public abstract PersistenceRecipe createPersistenceRecipe();
+    
+    /**
+     * Returns the supported protocols.
+     * 
+     * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
+     * @see #createInvocablesCreator(String, String, int)
+     */
+    public abstract String[] getProtocols();
+    
+    /**
+     * Creates an invocables creator for a certain protocol.
+     * 
+     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
+     *   the default protocol}
+     * @param host the host name to communicate with
+     * @param port the port number to communicate on
+     * @return the invocables creator
+     * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
+     * @see #createProtocolBuilder(String, int)
+     */
+    public abstract InvocablesCreator createInvocablesCreator(String protocol, String host, int port);
+
+    /**
+     * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
+     * and to be accessible
+     * 
+     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
+     *   the default protocol}
+     * @param port the port number to communicate on
+     * @return the builder instance
+     * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
+     * @see #createInvocablesCreator(String, String, int)
+     */
+    public abstract ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port);
     
 }

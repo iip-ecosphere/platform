@@ -20,7 +20,9 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -74,6 +76,21 @@ public class FactoryTest {
             public PersistenceRecipe createPersistenceRecipe() {
                 return DUMMY.createPersistenceRecipe();
             }
+
+            @Override
+            public String[] getProtocols() {
+                return DUMMY.getProtocols();
+            }
+
+            @Override
+            public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+                return DUMMY.createInvocablesCreator(protocol, host, port);
+            }
+
+            @Override
+            public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
+                return DUMMY.createProtocolServerBuilder(protocol, port);
+            }
         };
         
     }
@@ -98,6 +115,11 @@ public class FactoryTest {
         Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
 
         Assert.assertNull(instance.createPersistenceRecipe());
+        
+        Assert.assertNotNull(instance.getProtocols());
+        Assert.assertTrue(instance.getProtocols().length > 0);
+        Assert.assertNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
+        Assert.assertNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
     }
 
     /**
@@ -119,6 +141,13 @@ public class FactoryTest {
         
         Assert.assertNull(instance.createDeploymentRecipe("localhost", 1234));
         Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
+
+        Assert.assertNull(instance.createPersistenceRecipe());
+
+        Assert.assertNotNull(instance.getProtocols());
+        Assert.assertTrue(instance.getProtocols().length > 0);
+        Assert.assertNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
+        Assert.assertNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
 
         AasFactory.setInstance(old);
     }
