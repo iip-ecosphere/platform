@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.processing.Generated;
 
-import org.eclipse.basyx.models.controlcomponent.ControlComponent;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -38,18 +37,15 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
-import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.Invocables;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
-import test.de.iip_ecosphere.platform.support.aas.basyx.TestControlComponent;
+import test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTest;
 import test.de.iip_ecosphere.platform.support.aas.basyx.TestMachine;
 
 /**
@@ -107,7 +103,7 @@ public class AasConnectorTest {
         LOGGER.info("Platform AAS server started");
         
         TestMachine machine = new TestMachine();
-        ccServer = createControlComponent(machine);
+        ccServer = BaSyxTest.createVabOperationsServer(VAB_PORT, machine);
         Aas aas = createAAS(machine);
 
         DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(AAS_IP, AAS_PORT);
@@ -132,17 +128,6 @@ public class AasConnectorTest {
         //platformAasServer.stop(); // seems to happen with httpServer
     }
     
-    /** 
-     * This method creates a control component for the {@link TestMachine}.
-     * 
-     * @param machine the machine instance
-     * @return the test control component
-     */
-    private static Server createControlComponent(TestMachine machine) {
-        ControlComponent cc = new TestControlComponent(machine);
-        return BaSyxDeploymentBuilder.createControlComponent(cc, VAB_PORT);        
-    }
-    
     /**
      * This method creates and starts the Asset Administration Shell.
      * 
@@ -155,30 +140,7 @@ public class AasConnectorTest {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
-        subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
-            .setType(Type.INTEGER)
-            .bind(() -> {
-                return machine.getLotSize(); 
-            }, (param) -> {
-                    machine.setLotSize((int) param); 
-                })
-            .build();
-        subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
-            .setType(Type.DOUBLE)
-            .bind(() -> {
-                return machine.getPowerConsumption(); 
-            }, null)
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STARTING, AAS_IP, VAB_PORT))
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
-            .addInputVariable()
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_CONFIGURING, AAS_IP, VAB_PORT))
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
-            .setInvocable(Invocables.createInvocable(TestControlComponent.OPMODE_STOPPING, AAS_IP, VAB_PORT))
-            .build();
+        BaSyxTest.createVabAasElements(subModelBuilder, AAS_IP, VAB_PORT);
         
         subModelBuilder.build();
         return aasBuilder.build();
@@ -188,7 +150,7 @@ public class AasConnectorTest {
      * Blocks until a certain number of (accumulated) receptions is reached or fails after 4s.
      * 
      * @param count the counter
-     * @param receptions the xecpected number of receptions 
+     * @param receptions the expected number of receptions 
      */
     private void block(AtomicInteger count, int receptions) {
         int max = 20; // longer than polling interval in params, 30 may be required depending on machine speed
