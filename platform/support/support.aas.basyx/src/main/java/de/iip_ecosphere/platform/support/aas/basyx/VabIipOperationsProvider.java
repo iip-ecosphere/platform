@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.aas.basyx;
+package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -19,13 +19,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
-import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
+
+import com.sun.xml.txw2.IllegalAnnotationException;
+
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
 /**
  * Implements a simple VAB operations provider following a simple status/operations/service structure 
@@ -48,7 +50,7 @@ import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class VABOperationsProvider extends HashMap<String, Object> {
+public class VabIipOperationsProvider extends HashMap<String, Object> {
 
     /**
      * The path separator.
@@ -167,9 +169,48 @@ public class VABOperationsProvider extends HashMap<String, Object> {
     }
     
     /**
+     * The protocol server builder for this provider.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class VabIipOperationsBuilder implements ProtocolServerBuilder {
+
+        private int port;
+        private VabIipOperationsProvider instance;
+        
+        /**
+         * Creates a builder instance.
+         * 
+         * @param port the target communication port
+         */
+        VabIipOperationsBuilder(int port) {
+            this.port = port;
+            this.instance = new VabIipOperationsProvider();
+        }
+        
+        @Override
+        public VabIipOperationsBuilder defineOperation(String name, Function<Object[], Object> function) {
+            instance.defineServiceFunction(name, function);
+            return this;
+        }
+
+        @Override
+        public VabIipOperationsBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+            instance.defineProperty(name, get, set);
+            return this;
+        }
+
+        @Override
+        public Server build() {
+            return BaSyxDeploymentBuilder.createControlComponent(instance.createModelProvider(), port);
+        }
+        
+    }
+    
+    /**
      * Creates a VAB operations provider instance.
      */
-    public VABOperationsProvider() {
+    public VabIipOperationsProvider() {
         super();
         put(STATUS, status);
         put(OPERATIONS, operations);
@@ -209,17 +250,21 @@ public class VABOperationsProvider extends HashMap<String, Object> {
      * @param name the name of the operation
      * @param function the implementing function
      * @return <b>this</b>
+     * @throws IllegalArgumentException if the operation is already registered
      */
-    public VABOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
+    public VabIipOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
         String uName = makeUnique(operationFunctions, category + "/" + name);
-        operationFunctions.put(uName, function);
-        
         Map<String, Entry> o = this.operations.get(category);
         if (null == o) {
             o = new HashMap<String, Entry>();
             this.operations.put(category, o);
         }
+        if (o.containsKey(name)) {
+            throw new IllegalArgumentException("Operation " + category + "/" + name + "is already known.");
+        }
         o.put(name, new Entry(Kind.OPERATION, uName));
+        operationFunctions.put(uName, function);
+        
         return this;
     }
 
@@ -230,8 +275,9 @@ public class VABOperationsProvider extends HashMap<String, Object> {
      * @param function the implementing function
      * @return <b>this</b>
      * @see #defineOperation(String, String, Function)
+     * @throws IllegalArgumentException if the operation is already registered
      */
-    public VABOperationsProvider defineServiceFunction(String name, Function<Object[], Object> function) {
+    public VabIipOperationsProvider defineServiceFunction(String name, Function<Object[], Object> function) {
         return defineOperation(SERVICE, name, function);
     }
     
@@ -244,8 +290,12 @@ public class VABOperationsProvider extends HashMap<String, Object> {
      * @param get the supplier providing read access to the property value (may be <b>null</b>)
      * @param set the consumer providing write access to the property value (may be <b>null</b>)
      * @return <b>this</b>
+     * @throws IllegalArgumentException if the property is already registered
      */
-    public VABOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+    public VabIipOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+        if (properties.containsKey(name)) {
+            throw new IllegalAnnotationException("Property " + name + " is already known");
+        }
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
         return this;
@@ -292,19 +342,13 @@ public class VABOperationsProvider extends HashMap<String, Object> {
     
         @Override
         public void setModelPropertyValue(Object element, String propertyName, Object newValue) {
-            if (STATUS.equals(element)) {
-                Property prop = properties.get(propertyName);
-                if (null == prop) {
-                    throw new ResourceNotFoundException("Property " + propertyName + " in element " + element 
-                        + " not found.");
-                }  else if (null == prop.set) {
-                    throw new ResourceNotFoundException("Property " + propertyName + " in element " + element 
-                        + " not found (for reading).");
-                } 
-                prop.set.accept(newValue);
-            } else {
-                throw new ResourceNotFoundException("Element " + element + " not found.");
-            }
+            Property prop = properties.get(propertyName);
+            if (null == prop) {
+                throw new ResourceNotFoundException("Property " + propertyName + " not found.");
+            }  else if (null == prop.set) {
+                throw new ResourceNotFoundException("Property " + propertyName + " not found (for reading).");
+            } 
+            prop.set.accept(newValue);
         }
     
         @Override
@@ -323,51 +367,6 @@ public class VABOperationsProvider extends HashMap<String, Object> {
             throw new ResourceNotFoundException("Element " + element + " not found.");
         }
         
-    }
-
-    /**
-     * Creates a VAB setter call for the given property {@code name} on {@code host} and {@code port}.
-     * 
-     * @param name the property name
-     * @param host the host name of the VAB server
-     * @param port the port number of the VAB server
-     * @return the consumer object to be attached to the AAS property
-     */
-    public static Consumer<Object> createSetter(String name, String host, int port) {
-        return (params) -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            proxy.setModelPropertyValue(VABOperationsProvider.PREFIX_STATUS + name, params);
-        };
-    }
-
-    /**
-     * Creates a VAB getter call for the given property {@code name} on {@code host} and {@code port}.
-     * 
-     * @param name the property name
-     * @param host the host name of the VAB server
-     * @param port the port number of the VAB server
-     * @return the supplier object to be attached to the AAS property
-     */
-    public static Supplier<Object> createGetter(String name, String host, int port) {
-        return () -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            return proxy.getModelPropertyValue(VABOperationsProvider.PREFIX_STATUS + name);
-        };
-    }
-
-    /**
-     * Creates a VAB function call for the given operation {@code name} on {@code host} and {@code port}.
-     * 
-     * @param name the operation name
-     * @param host the host name of the VAB server
-     * @param port the port number of the VAB server
-     * @return the function object to be attached to the AAS property
-     */
-    public static Function<Object[], Object> createInvocable(String name, String host, int port) {
-        return (params) -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            return proxy.invokeOperation(VABOperationsProvider.PREFIX_SERVICE + name, params);
-        };
     }
 
 }

@@ -27,7 +27,9 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -38,6 +40,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
  */
 public class BaSyxAasFactory extends AasFactory {
 
+    private static final String PROTOCOL_VAB_IIP = "VAB-IIP";
     private static Map<Type, PropertyValueTypeDef> types = new HashMap<>();
     
     static {
@@ -122,6 +125,29 @@ public class BaSyxAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return new BaSyxPersistenceRecipe();
+    }
+
+    @Override
+    public String[] getProtocols() {
+        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_IIP};
+    }
+
+    @Override
+    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
+            return new VabIipInvocablesCreator(host, port);
+        } else {
+            throw new IllegalArgumentException("Unknown protocol: " + protocol);
+        }
+    }
+
+    @Override
+    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
+        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
+            return new VabIipOperationsProvider.VabIipOperationsBuilder(port);
+        } else {
+            throw new IllegalArgumentException("Unknown protocol: " + protocol);
+        }
     }
 
 }

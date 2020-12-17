@@ -28,17 +28,19 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentBuilder;
 
 import org.junit.Assert;
 
@@ -49,7 +51,7 @@ import org.junit.Assert;
  * @author Holger Eichelberger, SSE
  */
 public class BaSyxTest {
-
+    
     public static final String QNAME_VAR_LOTSIZE;
     public static final String QNAME_VAR_POWCONSUMPTION;
     public static final String QNAME_OP_STARTMACHINE;
@@ -87,33 +89,76 @@ public class BaSyxTest {
     }
     
     /**
+     * Creates the VAB operations server for the given machine instance and for the operations in 
+     * {@link #createVabAasElements(SubmodelBuilder, String, int)}..
+     * 
+     * @param port the server communication port
+     * @param machine the machine
+     * @return the protocol server
+     */
+    public static Server createVabOperationsServer(int port, TestMachine machine) {
+        AasFactory factory = AasFactory.getInstance();
+        ProtocolServerBuilder builder = factory.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, port);
+        builder.defineProperty(NAME_VAR_LOTSIZE, () -> {
+            return machine.getLotSize(); 
+        }, (param) -> {
+                machine.setLotSize((int) param); 
+            });
+        builder.defineProperty(NAME_VAR_POWCONSUMPTION, () -> {
+            return machine.getPowerConsumption(); 
+        }, null);
+        builder.defineOperation(NAME_OP_STARTMACHINE, (params) -> {
+            machine.start();
+            return null;
+        });
+        builder.defineOperation(NAME_OP_RECONFIGURE, (params) -> {
+            return machine.reconfigure((int) params[0]);
+        });
+        builder.defineOperation(NAME_OP_STOPMACHINE, (params) -> {
+            machine.stop();
+            return null;
+        });
+        return builder.build();
+    }
+
+    /**
+     * Creates the corresponding AAS elements for {@link #createVabOperationsServer(int, TestMachine)}.
+     * 
+     * @param subModelBuilder the sub model container builder to add the elements to
+     * @param host the protocol host 
+     * @param port the protocol port
+     */
+    public static void createVabAasElements(SubmodelElementContainerBuilder subModelBuilder, String host, int port) {
+        AasFactory factory = AasFactory.getInstance();
+        InvocablesCreator invC = factory.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, host, port);
+        subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
+            .setType(Type.INTEGER)
+            .bind(invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
+            .build();
+        subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
+            .setType(Type.DOUBLE)
+            .bind(invC.createGetter(NAME_VAR_POWCONSUMPTION), null)
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
+            .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
+            .addInputVariable()
+            .setInvocable(invC.createInvocable(NAME_OP_RECONFIGURE))
+            .build();
+        subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
+            .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))
+            .build();
+    }
+    
+    /**
      * Tests creating/reading an AAS.
      */
     @Test
     public void test() throws SocketException, UnknownHostException, ExecutionException, IOException {
         TestMachine machine = new TestMachine();
 
-        VABOperationsProvider ops = new VABOperationsProvider();
-        ops.defineProperty(NAME_VAR_LOTSIZE, () -> {
-            return machine.getLotSize(); 
-        }, (param) -> {
-                machine.setLotSize((int) param); 
-            });
-        ops.defineProperty(NAME_VAR_POWCONSUMPTION, () -> {
-            return machine.getPowerConsumption(); 
-        }, null);
-        ops.defineServiceFunction(TestControlComponent.OPMODE_STARTING, (params) -> {
-            machine.start();
-            return null;
-        });
-        ops.defineServiceFunction(TestControlComponent.OPMODE_CONFIGURING, (params) -> {
-            return machine.reconfigure((int) params[0]);
-        });
-        ops.defineServiceFunction(TestControlComponent.OPMODE_STOPPING, (params) -> {
-            machine.stop();
-            return null;
-        });
-        Server ccServer = BaSyxDeploymentBuilder.createControlComponent(ops.createModelProvider(), PORT_VAB);
+        Server ccServer = createVabOperationsServer(PORT_VAB, machine);
         Aas aas = createAas(machine);
         
         DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(HOST_AAS, PORT_AAS);
@@ -141,28 +186,7 @@ public class BaSyxTest {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
-        subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
-            .setType(Type.INTEGER)
-            .bind(VABOperationsProvider.createGetter(NAME_VAR_LOTSIZE, HOST_AAS, PORT_VAB), 
-                 VABOperationsProvider.createSetter(NAME_VAR_LOTSIZE, HOST_AAS, PORT_VAB))
-            .build();
-        subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
-            .setType(Type.DOUBLE)
-            .bind(VABOperationsProvider.createGetter(NAME_VAR_POWCONSUMPTION, HOST_AAS, PORT_VAB), null)
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
-            .setInvocable(VABOperationsProvider
-                .createInvocable(TestControlComponent.OPMODE_STARTING, HOST_AAS, PORT_VAB))
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
-            .addInputVariable()
-            .setInvocable(VABOperationsProvider
-                .createInvocable(TestControlComponent.OPMODE_CONFIGURING, HOST_AAS, PORT_VAB))
-            .build();
-        subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
-            .setInvocable(VABOperationsProvider
-                .createInvocable(TestControlComponent.OPMODE_STOPPING, HOST_AAS, PORT_VAB))
-            .build();
+        createVabAasElements(subModelBuilder, HOST_AAS, PORT_VAB);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL)); // for modification
         
