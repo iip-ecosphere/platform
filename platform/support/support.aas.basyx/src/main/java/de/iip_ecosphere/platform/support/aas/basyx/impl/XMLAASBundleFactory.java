@@ -130,7 +130,7 @@ public class XMLAASBundleFactory {
     /**
      * Retrieves an identifiable from a list of identifiable by its reference
      * 
-     * @param submodelRef
+     * @param ref
      * @param submodels
      * @return
      * @throws ResourceNotFoundException

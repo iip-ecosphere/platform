@@ -278,11 +278,12 @@ public class BaSyxDeploymentBuilder implements DeploymentRecipe {
     }
     
     /** 
-     * This method creates a control component for the {@link TestMachine}.
+     * This method creates a control component.
      * 
      * @param cc the control component (usually hash-based model provider)
      * @param port the port to run on
      * @return the server instance
+     * @see #createControlComponent(VABModelProvider, int)
      */
     public static Server createControlComponent(HashMap<String, Object> cc, int port) {
         // Server where the control component is reachable.
@@ -290,7 +291,7 @@ public class BaSyxDeploymentBuilder implements DeploymentRecipe {
     }
 
     /** 
-     * This method creates a control component for the {@link TestMachine}.
+     * This method creates a control component for a model provider.
      * 
      * @param provider the model provider
      * @param port the port to run on

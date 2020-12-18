@@ -22,7 +22,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
-import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
 
@@ -52,7 +51,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
          * 
          * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
          * @param idShort the short id of the sub-model
-         * @throws IllegalArgumentException may be thrown if {@link #setType(Type)} was not called before
+         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
         BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort) {
             if (null == idShort || 0 == idShort.length()) {

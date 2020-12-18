@@ -107,12 +107,12 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
     private enum Kind {
         
         /**
-         * 'Refers' to {@link VABOperationsProvider#properties}.
+         * 'Refers' to {@link VabIipOperationsProvider#properties}.
          */
         PROPERTY,
 
         /**
-         * 'Refers' to {@link VABOperationsProvider#operations}.
+         * 'Refers' to {@link VabIipOperationsProvider#operations}.
          */
         OPERATION
     }

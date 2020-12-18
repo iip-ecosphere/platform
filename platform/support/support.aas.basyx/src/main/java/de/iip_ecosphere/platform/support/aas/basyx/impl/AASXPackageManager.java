@@ -245,7 +245,7 @@ public class AASXPackageManager {
     /**
      * Unzips all files referenced by the aasx file according to its relationships
      * 
-     * @param filePath - path the AASX
+     * @param aasxFilePath - path the AASX
      * 
      * @throws IOException
      * @throws SAXException
