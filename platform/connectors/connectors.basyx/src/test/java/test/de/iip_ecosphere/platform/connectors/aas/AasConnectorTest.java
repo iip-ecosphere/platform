@@ -109,9 +109,9 @@ public class AasConnectorTest {
         DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(AAS_IP, AAS_PORT);
         dBuilder.addInMemoryRegistry(REGISTRY_PATH);
         dBuilder.deploy(aas);
-        httpServer = dBuilder.createServer(3000);
+        httpServer = dBuilder.createServer();
         
-        ccServer.start();
+        ccServer.start(3000);
         httpServer.start();
 
         LOGGER.info("AAS server started");
