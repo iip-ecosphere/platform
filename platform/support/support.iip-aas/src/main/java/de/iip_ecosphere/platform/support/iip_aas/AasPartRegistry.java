@@ -134,7 +134,7 @@ public class AasPartRegistry {
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
-        return dBuilder.createServer(200);
+        return dBuilder.createServer();
     }
     
     /**
