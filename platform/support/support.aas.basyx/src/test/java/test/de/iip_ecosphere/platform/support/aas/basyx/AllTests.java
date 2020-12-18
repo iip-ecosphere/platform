@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     BaSyxTest.class,
-    BaSyxPersistenceTest.class
+    BaSyxPersistenceTest.class,
+    DeploymentTest.class
 })
 public class AllTests {
 }

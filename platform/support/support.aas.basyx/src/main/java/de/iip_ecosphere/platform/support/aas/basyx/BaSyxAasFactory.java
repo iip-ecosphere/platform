@@ -90,9 +90,9 @@ public class BaSyxAasFactory extends AasFactory {
     // checkstyle: stop exception type check
 
     @Override
-    public Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException {
+    public Aas retrieveAas(String host, int port, String registryPath, String urn) throws IOException {
         try {
-            String uri = "http://" + host + ":" + port + "/" + endpointPath;
+            String uri = "http://" + host + ":" + port + "/" + registryPath;
             AASRegistryProxy registry = new AASRegistryProxy(uri);
             HTTPConnectorProvider connectorProvider = new HTTPConnectorProvider();
             ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(

@@ -155,7 +155,7 @@ public class BaSyxTest {
      * Tests creating/reading an AAS.
      */
     @Test
-    public void test() throws SocketException, UnknownHostException, ExecutionException, IOException {
+    public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
         TestMachine machine = new TestMachine();
 
         Server ccServer = createVabOperationsServer(PORT_VAB, machine);
@@ -164,10 +164,10 @@ public class BaSyxTest {
         DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(HOST_AAS, PORT_AAS);
         dBuilder.addInMemoryRegistry(REGISTRY_PATH);
         dBuilder.deploy(aas);
-        Server httpServer = dBuilder.createServer(3000);
+        Server httpServer = dBuilder.createServer();
 
         ccServer.start();
-        httpServer.start();
+        httpServer.start(3000);
         
         queryAas(machine);
         httpServer.stop();
