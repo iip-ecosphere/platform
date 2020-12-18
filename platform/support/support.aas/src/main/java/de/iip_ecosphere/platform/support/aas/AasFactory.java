@@ -210,7 +210,7 @@ public abstract class AasFactory {
      * @param port the port number to communicate on
      * @return the invocables creator
      * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
-     * @see #createProtocolBuilder(String, int)
+     * @see #createProtocolServerBuilder(String, int)
      */
     public abstract InvocablesCreator createInvocablesCreator(String protocol, String host, int port);
 

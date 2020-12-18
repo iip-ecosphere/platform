@@ -26,7 +26,7 @@ import de.iip_ecosphere.platform.support.Server;
 public interface ProtocolServerBuilder {
 
     /**
-     * Defines a service function (i.e., in {@value #OPERATIONS}/{@value #SERVICE}).
+     * Defines a service function.
      * 
      * @param name the name of the operation
      * @param function the implementing function
@@ -36,7 +36,7 @@ public interface ProtocolServerBuilder {
     public ProtocolServerBuilder defineOperation(String name, Function<Object[], Object> function);
 
     /**
-     * Defines a property with getter/setter implementation within {@value #STATUS}. Theoretically, either getter/setter
+     * Defines a property with getter/setter implementation. Theoretically, either getter/setter
      * may be <b>null</b> for read-only/write-only properties, but this must be, however, reflected in the AAS so that 
      * no wrong can access happens.
      * 
