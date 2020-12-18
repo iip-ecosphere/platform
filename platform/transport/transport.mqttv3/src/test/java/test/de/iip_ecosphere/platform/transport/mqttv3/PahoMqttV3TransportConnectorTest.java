@@ -54,7 +54,7 @@ public class PahoMqttV3TransportConnectorTest {
         });
 
         Assert.assertEquals(PahoMqttV3TransportConnector.NAME, TransportFactory.getConnectorName());
-        final int port = 8883;
+        final int port = 8885;
         TestHiveMqServer server = new TestHiveMqServer();
         server.start("localhost", port);
         AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
