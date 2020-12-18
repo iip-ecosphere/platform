@@ -78,7 +78,11 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
     public Submodel getSubmodel(String idShort);
 
     /**
-     * Adds a sub-model through its builder (only if {@code build()} was called).
+     * Adds a sub-model through its builder (only if {@code build()} was called). However, added submodels are
+     * not automatically deployed as the AAS just maintains a reference to the sub-model (in contrast to initial
+     * deployment where we can consider sub-models). If a late sub-model shall be deployed/made available, keep
+     * the instance of the {@link AasServer} from {@link DeploymentRecipe#createServer()} and explicitly deploy
+     * the new sub-model via {@link AasServer#deploy(Aas, Submodel)}.
      * 
      * @param idShort the short id of the sub-model
      * @return the sub-model builder

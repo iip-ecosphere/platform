@@ -160,12 +160,12 @@ public abstract class AasFactory {
      * 
      * @param host the host name of the AAS repository
      * @param port the TCP port number of the AAS repository
-     * @param endpointPath the registry endpoint path on host
+     * @param registryPath the registry path on {@code host}
      * @param urn the URN of the AAS
      * @return the AAS (may be <b>null</b> if the AAS does not exist)
      * @throws IOException if accessing the AAS fails for some reason
      */
-    public abstract Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException;
+    public abstract Aas retrieveAas(String host, int port, String registryPath, String urn) throws IOException;
     
     /**
      * Creates a deployment recipe.

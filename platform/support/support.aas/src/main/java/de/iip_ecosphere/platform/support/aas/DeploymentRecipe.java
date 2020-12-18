@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.Server;
-
 /**
  * Defines the interface of a recipe that is able to deploy AAS at least to local servers for now.
  * 
@@ -30,7 +28,9 @@ public interface DeploymentRecipe {
     public DeploymentRecipe addInMemoryRegistry(String regPath);
 
     /**
-     * Deploys the ASS. Requires a valid registry to be created before.
+     * Deploys the ASS and its sub-models. Intended for initial deployment. Requires a valid registry to be created 
+     * before. For incremental deployment of sub-models for already deployed AAS please consult 
+     * {@link AasServer#deploy(Aas, Submodel)}.
      * 
      * @param aas the AAS to deploy
      * @return <b>this</b>
@@ -40,22 +40,10 @@ public interface DeploymentRecipe {
     public DeploymentRecipe deploy(Aas aas);
 
     /**
-     * Deploys the given {@code subModel}.
+     * Creates the server instance.
      * 
-     * @param subModel the subModel
-     * @param path the path at which to make the sub-model available (shall be a qualified URL prefix path)
-     * @return <b>this</b>
-     * @throws IllegalArgumentException if no registry was created before or {@code aas} was not created 
-     *   by the corresponding {@link AasFactory}
-     */
-    public DeploymentRecipe deploy(Submodel subModel, String path);
-
-    /**
-     * Starts the server.
-     * 
-     * @param minWaitingTime the minimum waiting time
      * @return the server
      */
-    public Server createServer(int minWaitingTime);
+    public AasServer createServer();
 
 }

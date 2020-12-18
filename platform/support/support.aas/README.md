@@ -15,20 +15,15 @@ We apply the following principles (with links also in the package description of
  - Implementation-specific parts like VAB-based remote method accesses are (so far) not represented by the abstraction rather than provided by the specific implementation. However, the output of these supporting/creation methods shall plugin into the builder mechanism explained above.
  
 ** Issues **
- 
-For now, there seem to be problems adding sub-models to an existing AAS at runtime. The created sub-model exists, but 
-it is not taken over into the deployed version while this works well for sub-model elements. If the name of the 
-sub-model is known at startup time, it is one workaround to create an empty sub-model upfront and to just insert the 
-elements later.
 
-Moreover, setting values of dynamically created properties seems to cause problems, as the server responds that the
+Setting values of dynamically created properties seems to cause problems, as the server responds that the
 respective element does not exist (while it can read it).
 
-We will investigate whether these issues arise from the abstraction or from the underlying implementation. May be, an
+We will investigate whether this issue arise from the abstraction or from the underlying implementation. May be, an
 update to a more recent state of BaSyx could resolve these problems.
 
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties and operations do exist; the others will be added incrementally on demand)
-- Further deployment abstractions (remote, sub-model)
+- Further deployment abstractions (remote)
 - Authentication/Security
 - AAS Events (currently occurring in BaSyx)
