@@ -1,4 +1,5 @@
-/********************************************************************************
+/**
+ * ******************************************************************************
  * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -8,26 +9,28 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.support;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.Assert;
+import org.junit.Test;
 
-import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
-import test.de.iip_ecosphere.platform.support.aas.PrintVisitorTest;
+import de.iip_ecosphere.platform.support.NetUtils;
 
 /**
- * Defines the tests to be executed.
+ * Tests {@link NetUtils}.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    TimeUtilsTest.class,
-    CollectionUtilsTest.class,
-    NetUtilsTest.class,
-    FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
-    PrintVisitorTest.class
-})
-public class AllTests {
+public class NetUtilsTest {
+
+    /**
+     * Tests {@link NetUtils#getEphemeralPort()}.
+     */
+    @Test
+    public void testEphemeralPort() {
+        // if there is no free port, it probably makes no sense to run the tests at all
+        Assert.assertTrue(NetUtils.getEphemeralPort() > 0);
+    }
+    
 }
