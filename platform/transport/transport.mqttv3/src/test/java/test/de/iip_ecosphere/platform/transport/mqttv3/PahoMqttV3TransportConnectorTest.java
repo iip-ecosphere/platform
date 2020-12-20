@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -54,7 +55,7 @@ public class PahoMqttV3TransportConnectorTest {
         });
 
         Assert.assertEquals(PahoMqttV3TransportConnector.NAME, TransportFactory.getConnectorName());
-        final int port = 8885;
+        final int port = NetUtils.getEphemeralPort();
         TestHiveMqServer server = new TestHiveMqServer();
         server.start("localhost", port);
         AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
