@@ -22,26 +22,26 @@ This is for all code realizing the IIP-Ecosphere platform. So far present:
 More to come soon with next focus on edge/stream performance, configuration integration and edge deployment. 
 
 #Guidelines
-* There is an overall architecture in the project ownCloud. Please consult the architecture first to understand 
+* There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
   how existing and new parts are related.
-* Java projects are created with Eclipse (2019-08). Use iipCodeFormatter.xml
-  from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters.
-* For now, we use JDK 8 in order to be compliant with Edge devices. To have exchangable projects across development 
+* **Java projects** are created with Eclipse (2019-08). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters. *We check for an upgrade to Eclipse 2020-12-R.+
+* For now, we use **JDK 8** in order to be compliant with Edge devices. To have exchangable projects across development 
   installations, use in Eclipse the execution environment JavaSE-1.8 as JRE system library. This may be relaxed in 
   future.
-* A related Java Checkstyle definition is based on Checkstyle 8.35. The style 
-  definition is in ``platformDependencies`` and shall be added as a project 
-  local definition named ``IIP Code Conventions``to Checkstyle before importing 
-  the other projects.
-* The Java package prefix shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 
-* Java files shall contain the license header. Existing files can be used as a template.
-* Building Java-parts happens with Maven (based on a parent POM). Groups are or start with ``de.iip-ecosphere.platform`` to comply with Maven central deployment. Use basic information from the parent 
+* A related Java **Checkstyle** definition is based on Checkstyle 8.35. Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects.
+* Please install **FindBugs** or **Spotbugs** to avoid obvious programming problems.
+* The **Java package prefix** shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 
+* Java files shall contain the **license header**. Existing files can be used as a template.
+* Building Java parts happens with **Maven** (based on a parent POM). Groups are or start with ``de.iip-ecosphere.platform`` to comply with Maven central deployment. Use basic information from the parent 
   POM as far as possible, e.g., valid URL, description, licenses, developers and SCM section. Redefine parts only if 
   needed except for dependencies - please define explicitly your minimum set of required dependencies (easing later
   deployment) Use existing test artifacts for reuse and, where possible, build your tests on existing functionality. 
-* For tests with network functionality, e.g., communication protocols or AAS servers, please do not rely always on the
-  same ports as subsequent tests may unexpectedly fail. Check the other tests for their port numbers or, better, 
-  use free ephemeral ports (see basic support component, ``NetUtils``) instead.
-* CI and SNAPSHOT deployment currently are done via SSE-CI/SSE-Maven-Repo. 
+* For **tests with network**, e.g., communication protocols or AAS servers, please do not rely always on the same ports as subsequent tests may unexpectedly fail. Check the other tests for their port numbers or, better, use free ephemeral ports (see basic support component, ``NetUtils``) instead. So far, the time between the spring tests allows using the same port.
+  
+     - ``transport.spring.amqp`` (port 8883) due to testing with (static, non-generated) Spring configuration file
+     - ``transport.spring.mqttv3`` (port 8883) due to testing with (static, non-generated) Spring configuration file
+     - ``transport.spring.mqttv5`` (port 8883) due to testing with (static, non-generated) Spring configuration file
+  
+* **CI and SNAPSHOT deployment** currently are done via SSE-CI/SSE-Maven-Repo. 
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
   file that executes Maven and deploys the artifacts.
