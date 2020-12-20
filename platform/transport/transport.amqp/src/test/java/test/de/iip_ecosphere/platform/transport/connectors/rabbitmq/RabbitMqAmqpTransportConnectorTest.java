@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.rabbitmq.client.ConnectionFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -71,7 +72,7 @@ public class RabbitMqAmqpTransportConnectorTest {
         });
 
         Assert.assertEquals(FakeAuthConnector.NAME, TransportFactory.getConnectorName());
-        final int port = 8883;
+        final int port = NetUtils.getEphemeralPort();
         TestQpidServer server = new TestQpidServer();
         server.start("localhost", port);
         AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
