@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -71,8 +72,8 @@ public class AasConnectorTest {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_IP = "localhost";
-    private static final int AAS_PORT = 4000;
-    private static final int VAB_PORT = 4001;
+    private static final int AAS_PORT = NetUtils.getEphemeralPort();
+    private static final int VAB_PORT = NetUtils.getEphemeralPort();
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
     private static final String REGISTRY_PATH = "registry";
     
@@ -98,6 +99,9 @@ public class AasConnectorTest {
     public static void init() throws SocketException, UnknownHostException {
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
+        
+        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_HOST, NetUtils.getEphemeralPort(), 
+            AasPartRegistry.DEFAULT_ENDPOINT);
         platformAasServer = AasPartRegistry.deploy(AasPartRegistry.build());
         platformAasServer.start(2000);
         LOGGER.info("Platform AAS server started");
@@ -126,6 +130,9 @@ public class AasConnectorTest {
         ccServer.stop();
         LOGGER.info("Platform/AAS server stopped");
         //platformAasServer.stop(); // seems to happen with httpServer
+
+        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_HOST, AasPartRegistry.DEFAULT_PORT, 
+            AasPartRegistry.DEFAULT_ENDPOINT);
     }
     
     /**

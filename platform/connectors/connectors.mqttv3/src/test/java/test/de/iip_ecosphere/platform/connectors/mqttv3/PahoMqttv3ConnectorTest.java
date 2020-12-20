@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -59,7 +60,7 @@ public class PahoMqttv3ConnectorTest {
      */
     @Test
     public void testPahoConnector() throws IOException {
-        final int port = 8883;
+        final int port = NetUtils.getEphemeralPort();
         TestHiveMqServer server = new TestHiveMqServer();
         server.start("localhost", port);
         doTest("localhost", port);

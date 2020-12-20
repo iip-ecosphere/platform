@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.Namespace;
 
 /**
@@ -41,7 +42,7 @@ public class OpcUaConnectorTest extends AbstractOpcUaConnectorTest {
      */
     @BeforeClass
     public static void init() throws ExecutionException, InterruptedException {
-        setSetup(new NoSecuritySetup("milo", 12686, 8443));
+        setSetup(new NoSecuritySetup("milo", NetUtils.getEphemeralPort(), NetUtils.getEphemeralPort()));
         testServer = new TestServer((server) -> new Namespace(server), getSetup());
         testServer.startup().get();
         LOGGER.info("OPC UA server started");
