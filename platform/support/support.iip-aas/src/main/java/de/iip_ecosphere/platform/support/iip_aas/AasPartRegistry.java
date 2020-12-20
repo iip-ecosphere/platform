@@ -43,10 +43,14 @@ public class AasPartRegistry {
      */
     public static final String URN_AAS = "urn:::AAS:::iipEcosphere#";
     
+    public static final String DEFAULT_HOST = "localhost";
+    public static final int DEFAULT_PORT = 8080;
+    public static final String DEFAULT_ENDPOINT = "registry";
+    
     // TODO local vs. global
-    private static String host = "localhost";
-    private static int port = 8080;
-    private static String endpoint = "registry";
+    private static String host = DEFAULT_HOST;
+    private static int port = DEFAULT_PORT;
+    private static String endpoint = DEFAULT_ENDPOINT;
 
     /**
      * Defines the AAS endpoint.
