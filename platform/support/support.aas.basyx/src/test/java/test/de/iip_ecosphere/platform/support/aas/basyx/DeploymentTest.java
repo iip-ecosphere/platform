@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -38,7 +39,7 @@ public class DeploymentTest {
     public void localSubmodelDynamicDeployment() throws IOException {
         final String urn = "urn:::AAS:::testMachines#";
         final String host = "localhost";
-        final int port = 4050;
+        final int port = NetUtils.getEphemeralPort();
         final String registryPath = "registry";
         
         AasFactory factory = AasFactory.getInstance();

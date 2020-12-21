@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -75,8 +76,8 @@ public class BaSyxTest {
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxTest.class);
     private static final String HOST_AAS = "localhost";
-    private static final int PORT_AAS = 4000;
-    private static final int PORT_VAB = 4001;
+    private static final int PORT_AAS = NetUtils.getEphemeralPort();
+    private static final int PORT_VAB = NetUtils.getEphemeralPort();
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
     private static final String REGISTRY_PATH = "registry";
     
