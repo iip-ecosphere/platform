@@ -58,7 +58,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
     public static final String SEPARATOR =  VABPathTools.SEPERATOR;
 
     /**
-     * The path prefix for properties.
+     * The path prefix for status/properties.
      */
     public static final String STATUS = "status";
 
@@ -86,7 +86,6 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * A convenient combination of {@link #OPERATIONS} + {@link #SEPARATOR} + {@link #SEPARATOR} + {@link #SERVICE} .
      */
     public static final String PREFIX_SERVICE = OPERATIONS + SEPARATOR + SERVICE + SEPARATOR;
-
 
     private static final long serialVersionUID = 6355197555283292724L;
 
@@ -212,9 +211,36 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      */
     public VabIipOperationsProvider() {
         super();
-        put(STATUS, status);
-        put(OPERATIONS, operations);
-        operations.put(SERVICE, service);
+        put(getStatusPath(), status);
+        put(getOperationsPath(), operations);
+        operations.put(getServicePath(), service);
+    }
+
+    /**
+     * Returns the base path name for status/properties. Allows for overriding the default settings.
+     * 
+     * @return the path name, by default {@link #STATUS}
+     */
+    protected String getStatusPath() {
+        return STATUS;
+    }
+
+    /**
+     * Returns the base path name for operations. Allows for overriding the default settings.
+     * 
+     * @return the path name, by default {@link #OPERATIONS}
+     */
+    protected String getOperationsPath() {
+        return OPERATIONS;
+    }
+
+    /**
+     * Returns the base (sub-)path name for services. Allows for overriding the default settings.
+     * 
+     * @return the path name, by default {@link #SERVICE} (interpreted as sub-path of {@link #getOperationsPath()}.
+     */
+    protected String getServicePath() {
+        return SERVICE;
     }
 
     /**
@@ -278,7 +304,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * @throws IllegalArgumentException if the operation is already registered
      */
     public VabIipOperationsProvider defineServiceFunction(String name, Function<Object[], Object> function) {
-        return defineOperation(SERVICE, name, function);
+        return defineOperation(getServicePath(), name, function);
     }
     
     /**
