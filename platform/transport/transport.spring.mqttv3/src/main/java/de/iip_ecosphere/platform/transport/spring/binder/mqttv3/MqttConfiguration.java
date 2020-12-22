@@ -28,7 +28,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
 public class MqttConfiguration {
     
     private String host;
-    private int port;
+    private int port; // in test, consider overriding initializer for ephemeral port
     private String schema = "tcp";
     private String clientId;
     private int keepAlive = 60000;

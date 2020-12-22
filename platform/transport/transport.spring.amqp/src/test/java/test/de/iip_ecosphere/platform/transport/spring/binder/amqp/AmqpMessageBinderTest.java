@@ -21,10 +21,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Processor;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
@@ -33,12 +36,14 @@ import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MimeType;
 
 import com.rabbitmq.client.ConnectionFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -57,14 +62,32 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
  */
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.properties")
+@ContextConfiguration(initializers = AmqpMessageBinderTest.Initializer.class)
 @RunWith(SpringRunner.class)
 public class AmqpMessageBinderTest {
 
+    private static final int PORT = NetUtils.getEphemeralPort();
     private static TestQpidServer server;
     private static String received;
 
     @Autowired
     private TransportParameter params;
+    
+    /**
+     * An initializer to override certain configuration values, in particular dynamic ports.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertyValues
+                .of("amqp.port=" + PORT)
+                .applyTo(applicationContext);
+        }
+        
+    }
     
     /**
      * Initializes the test by starting an embedded AMQP server and by sending back received results on the output
@@ -75,9 +98,8 @@ public class AmqpMessageBinderTest {
     public static void init() {
         server = new TestQpidServer();
         final String host = "localhost";
-        final int port = 8883;
         try {
-            server.start(host, port);
+            server.start(host, PORT);
         } catch (IOException e) {
             Assert.fail("BROKER PROBLEM " + e.getMessage());
         }
@@ -92,7 +114,7 @@ public class AmqpMessageBinderTest {
             
         };
         try {
-            infra.connect(TransportParameterBuilder.newBuilder(host, port).setApplicationId("infra").build());
+            infra.connect(TransportParameterBuilder.newBuilder(host, PORT).setApplicationId("infra").build());
             infra.setReceptionCallback("amqpBinder", new ReceptionCallback<String>() {
     
                 @Override
@@ -112,7 +134,7 @@ public class AmqpMessageBinderTest {
         } catch (IOException e) {
             Assert.fail("CONNECTOR PROBLEM " + e.getMessage());
         }
-        System.out.println("Started infra client on " + host + " " + port);
+        System.out.println("Started infra client on " + host + " " + PORT);
         TimeUtils.sleep(1000);
     }
     
@@ -138,7 +160,7 @@ public class AmqpMessageBinderTest {
         
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
-        Assert.assertEquals(8883, params.getPort());
+        Assert.assertEquals(PORT, params.getPort());
         Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
 

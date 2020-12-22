@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
 public class AmqpConfiguration {
     
     private String host;
-    private int port;
+    private int port; // in test, consider overriding initializer for ephemeral port
     private List<String> filteredTopics = new ArrayList<String>();
     private String user = "";
     private String password = "";
