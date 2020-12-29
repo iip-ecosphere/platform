@@ -50,11 +50,10 @@
     <apache.commons.version>2.6</apache.commons.version>    
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
-    <basyx.version>0.0.1-SNAPSHOT</basyx.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
-    
+
     <!-- for now due to edge deployment/initial experience -->
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -131,36 +130,6 @@
         <groupId>org.eclipse.milo</groupId>
         <artifactId>sdk-server</artifactId>
         <version>${eclipse.milo.version}</version>
-      </dependency>
-    
-      <!-- BaSyx (AAS) - SSE-version as long as BaSys does not deploy to Maven -->
-    
-      <dependency>
-        <groupId>org.eclipse.basyx</groupId>
-        <artifactId>basyx.components.lib</artifactId>
-        <version>${basyx.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.basyx</groupId>
-        <artifactId>basyx.components.sqlregistry</artifactId>
-        <version>${basyx.version}</version>
-      </dependency>      
-      <dependency>
-        <groupId>org.eclipse.basyx</groupId>
-        <artifactId>basyx.components.AASServer</artifactId>
-        <version>${basyx.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.basyx</groupId>
-        <artifactId>basyx.components.AASX</artifactId>
-        <version>${basyx.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.basyx</groupId>
-        <artifactId>basyx.sdk</artifactId>
-        <version>${basyx.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       
       <!-- Spring boot/cloud stream, individual dependencies for better packaging -->
