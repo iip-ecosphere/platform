@@ -10,25 +10,16 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support;
+package de.iip_ecosphere.platform.support.aas;
 
 /**
- * A generic server, something that can be started or stopped.
+ * Defines the (implementation-independent) Asset type.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Server {
+public enum AssetKind {
 
-    /**
-     * Start the server without waiting time/blocking.
-     * 
-     * @return <b>this</b>
-     */
-    public Server start();
+    TYPE,
+    INSTANCE
     
-    /**
-     * Stop the server.
-     */
-    public void stop();
-
 }

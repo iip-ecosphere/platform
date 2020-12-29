@@ -13,22 +13,20 @@
 package de.iip_ecosphere.platform.support;
 
 /**
- * A generic server, something that can be started or stopped.
+ * Defines the usual builder interface. Instance-specific configuring methods are supposed to return an instance of 
+ * the builder. {@link #build()} finally builds the instance and disposes the builder instance.
+ * 
+ * @param <I> The type of the instance to build.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Server {
-
-    /**
-     * Start the server without waiting time/blocking.
-     * 
-     * @return <b>this</b>
-     */
-    public Server start();
+public interface Builder<I> {
     
     /**
-     * Stop the server.
+     * Builds the instance under construction. The work of the builder instance shall be done by this call.
+     * 
+     * @return the instance.
      */
-    public void stop();
+    public I build();
 
 }

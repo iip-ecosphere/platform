@@ -17,6 +17,9 @@ import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -29,7 +32,13 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 public class FakeAas extends FakeElement implements Aas {
 
     private Map<String, Submodel> submodels = new HashMap<String, Submodel>();
+    private Asset asset;
     
+    /**
+     * The Fake AAS builder.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     static class FakeAasBuilder implements AasBuilder {
 
         private FakeAas instance;
@@ -54,10 +63,10 @@ public class FakeAas extends FakeElement implements Aas {
         }
 
         @Override
-        public SubmodelBuilder createSubmodelBuilder(String idShort) {
-            return new FakeSubmodel.FakeSubmodelBuilder(this, idShort);
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
+            return new FakeSubmodel.FakeSubmodelBuilder(this, idShort, identifier);
         }
-        
+
         /**
          * Registers a sub-model.
          * 
@@ -86,6 +95,11 @@ public class FakeAas extends FakeElement implements Aas {
         @Override
         public Reference createReference() {
             return new FakeReference();
+        }
+
+        @Override
+        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+            return new FakeAsset.FakeAssetBuilder(this, idShort, urn, kind);
         }
         
     }
@@ -124,13 +138,32 @@ public class FakeAas extends FakeElement implements Aas {
     }
 
     @Override
-    public SubmodelBuilder addSubmodel(String idShort) {
+    public SubmodelBuilder addSubmodel(String idShort, String urn) {
         return new FakeSubmodel.FakeSubmodelBuilder(new FakeAasBuilder(this), idShort);
     }
 
     @Override
     public Reference createReference() {
         return new FakeReference();
+    }
+    
+    /**
+     * Defines the asset.
+     * 
+     * @param asset the asset
+     */
+    void setAsset(FakeAsset asset) {
+        this.asset = asset;
+    }
+    
+    @Override
+    public Asset getAsset() {
+        return asset;
+    }
+
+    @Override
+    public void delete(Submodel submodel) {
+        submodels.remove(submodel.getIdShort());
     }
 
 }

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 /**
@@ -27,7 +28,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface SubmodelBuilder extends SubmodelElementContainerBuilder {
+    public interface SubmodelBuilder extends SubmodelElementContainerBuilder, Builder<Submodel> {
         
         /**
          * Creates a reference on the sub-model under construction.
@@ -35,13 +36,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          * @return the reference
          */
         public Reference createReference();
-
-        /**
-         * Builds the instance.
-         * 
-         * @return the sub-model instance
-         */
-        public Submodel build();
 
     }
 
@@ -90,23 +84,23 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     public Operation getOperation(String idShort, int inArgs, int outArgs, int inOutArgs);
 
     /**
-     * Returns a submodel element with the given name.
+     * Returns a sub-model element with the given name.
      * 
      * @param idShort the short id of the property
-     * @return the submodel element, <b>null</b> for none
+     * @return the sub-model element, <b>null</b> for none
      */
     public SubmodelElement getSubmodelElement(String idShort);
 
     /**
-     * Returns a submodel element collection with the given name.
+     * Returns a sub-model element collection with the given name.
      * 
      * @param idShort the short id of the property
-     * @return the submodel collection element, <b>null</b> for none
+     * @return the sub-model collection element, <b>null</b> for none
      */
     public SubmodelElementCollection getSubmodelElementCollection(String idShort);
 
     /**
-     * Adds a sub-model through its builder (only if {@code build()} was called).
+     * Adds a sub-model through its builder (only if {@link Builder#build()} was called).
      * 
      * @param ordered whether the collection shall be ordered or not
      * @param allowDuplicates whether the collection allows duplicates or not
@@ -122,5 +116,12 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @return the reference
      */
     public Reference createReference();
+
+    /**
+     * Deletes a sub-model element.
+     * 
+     * @param elt the element to delete
+     */
+    public void delete(SubmodelElement elt);
 
 }

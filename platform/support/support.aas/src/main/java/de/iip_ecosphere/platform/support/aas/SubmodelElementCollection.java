@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Builder;
+
 /**
  * Defines the interface of a sub-model element collection.
  * 
@@ -24,7 +26,8 @@ public interface SubmodelElementCollection extends SubmodelElement {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface SubmodelElementCollectionBuilder extends SubmodelElementContainerBuilder  {
+    public interface SubmodelElementCollectionBuilder extends SubmodelElementContainerBuilder, 
+        Builder<SubmodelElementCollection> {
         
         /**
          * Creates a reference to the sub-model element collection created by this builder.
@@ -33,13 +36,6 @@ public interface SubmodelElementCollection extends SubmodelElement {
          */
         public Reference createReference();
         
-        /**
-         * Builds the sub-model element collection instance.
-         * 
-         * @return the sub-model element collection instance
-         */
-        public SubmodelElementCollection build();
-
     }
 
     /**

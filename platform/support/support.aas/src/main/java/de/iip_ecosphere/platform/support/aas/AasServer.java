@@ -40,4 +40,11 @@ public interface AasServer extends Server {
      */
     public void deploy(Aas aas, Submodel submodel) throws IOException;
 
+    /**
+     * Start the server without waiting time/blocking.
+     * 
+     * @return <b>this</b>
+     */
+    public AasServer start();
+
 }

@@ -17,12 +17,15 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -43,28 +46,28 @@ public class FactoryTest {
         return new AasFactory() {
             
             @Override
-            public Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException {
-                return DUMMY.retrieveAas(host, port, endpointPath, urn);
-            }
-            
-            @Override
             public String getName() {
                 return DUMMY.getName();
             }
-            
+
             @Override
-            public SubmodelBuilder createSubmodelBuilder(String idShort) {
-                return DUMMY.createSubmodelBuilder(idShort);
+            public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
+                return DUMMY.createSubmodelBuilder(idShort, urn);
             }
             
             @Override
-            public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
-                return DUMMY.createDeploymentRecipe(contextPath, host, port);
+            public Server createRegistryServer(Endpoint endpoint, String... options) {
+                return DUMMY.createRegistryServer(endpoint, options);
+            }
+
+            @Override
+            public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
+                return DUMMY.obtainRegistry(regEndpoint);
             }
             
             @Override
-            public DeploymentRecipe createDeploymentRecipe(String host, int port) {
-                return DUMMY.createDeploymentRecipe(host, port);
+            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
+                return DUMMY.createDeploymentRecipe(endpoint);
             }
             
             @Override
@@ -91,6 +94,7 @@ public class FactoryTest {
             public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
                 return DUMMY.createProtocolServerBuilder(protocol, port);
             }
+
         };
         
     }
@@ -108,11 +112,12 @@ public class FactoryTest {
         // it's just a fake
         Assert.assertEquals("fake", instance.getName());
         Assert.assertNotNull(instance.createAasBuilder("", ""));
-        Assert.assertNotNull(instance.createSubmodelBuilder(""));
-        Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
-        
-        Assert.assertNull(instance.createDeploymentRecipe("localhost", 1234));
-        Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
+        Assert.assertNotNull(instance.createSubmodelBuilder("", ""));
+
+        Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
+        Assert.assertNull(instance.createRegistryServer(new Endpoint(ep, "/registry"), ""));
+        Assert.assertNull(instance.obtainRegistry(ep));
+        Assert.assertNull(instance.createDeploymentRecipe(ep));
 
         Assert.assertNull(instance.createPersistenceRecipe());
         
@@ -136,11 +141,12 @@ public class FactoryTest {
         Assert.assertEquals(AasFactory.DUMMY.getName(), instance.getName());
 
         Assert.assertNull(instance.createAasBuilder("", ""));
-        Assert.assertNull(instance.createSubmodelBuilder(""));
-        Assert.assertNull(instance.retrieveAas("", 1234, "", ""));
-        
-        Assert.assertNull(instance.createDeploymentRecipe("localhost", 1234));
-        Assert.assertNull(instance.createDeploymentRecipe("/path", "localhost", 1234));
+        Assert.assertNull(instance.createSubmodelBuilder("", ""));
+
+        Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
+        Assert.assertNull(instance.createRegistryServer(new Endpoint(ep, "/registry")));
+        Assert.assertNotNull(instance.obtainRegistry(ep));
+        Assert.assertNull(instance.createDeploymentRecipe(ep));
 
         Assert.assertNull(instance.createPersistenceRecipe());
 

@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.Server;
 
 /**
@@ -23,7 +24,7 @@ import de.iip_ecosphere.platform.support.Server;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ProtocolServerBuilder {
+public interface ProtocolServerBuilder extends Builder<Server> {
 
     /**
      * Defines a service function.
@@ -47,12 +48,5 @@ public interface ProtocolServerBuilder {
      * @throws IllegalArgumentException if the property is already registered
      */
     public ProtocolServerBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set);
-
-    /**
-     * Builds the protocol server instance.
-     * 
-     * @return the server instance
-     */
-    public Server build();
-    
+   
 }

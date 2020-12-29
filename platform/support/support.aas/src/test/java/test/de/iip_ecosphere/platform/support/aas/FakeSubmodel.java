@@ -50,7 +50,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
         private FakeAasBuilder parent;
         private FakeSubmodel instance;
-        
+
         /**
          * Creates an instance.
          * 
@@ -58,6 +58,18 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          * @param idShort the short id
          */
         FakeSubmodelBuilder(FakeAasBuilder parent, String idShort) {
+            this(parent, idShort, null);
+        }
+
+        /**
+         * Creates an instance.
+         * 
+         * @param parent the parent builder
+         * @param idShort the short id
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+         */
+        FakeSubmodelBuilder(FakeAasBuilder parent, String idShort, String identifier) {
             this.parent = parent;
             this.instance = new FakeSubmodel(idShort);
             this.instance.parent = null != parent ? parent.getInstance() : null;
@@ -196,6 +208,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
+    public Iterable<Property> properties() {
+        return filter(Property.class);
+    }
+
+    @Override
     public int getDataElementsCount() {
         return filter(DataElement.class).size();
     }
@@ -208,6 +225,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public int getOperationsCount() {
         return filter(Operation.class).size();
+    }
+
+
+    @Override
+    public int getPropertiesCount() {
+        return filter(Property.class).size();
     }
 
     @Override
@@ -274,6 +297,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public Reference createReference() {
         return new FakeReference();
+    }
+
+    @Override
+    public void delete(SubmodelElement elt) {
+        elements.remove(elt.getIdShort());
     }
 
 }

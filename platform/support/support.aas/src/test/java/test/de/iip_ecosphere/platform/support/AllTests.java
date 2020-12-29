@@ -26,6 +26,7 @@ import test.de.iip_ecosphere.platform.support.aas.PrintVisitorTest;
     TimeUtilsTest.class,
     CollectionUtilsTest.class,
     NetUtilsTest.class,
+    SchemaServerEndpointTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
     PrintVisitorTest.class
 })

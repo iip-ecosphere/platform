@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -46,22 +48,45 @@ public abstract class AasFactory {
         }
 
         @Override
-        public SubmodelBuilder createSubmodelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
             return null;
         }
 
         @Override
-        public Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException {
+        public Server createRegistryServer(Endpoint endpoint, String... options) {
             return null;
         }
 
         @Override
-        public DeploymentRecipe createDeploymentRecipe(String host, int port) {
-            return null;
+        public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
+            return new Registry() { // some tests rely on an instance here
+
+                @Override
+                public Aas retrieveAas(String aasUrn) throws IOException {
+                    return null;
+                }
+
+                @Override
+                public Submodel retrieveSubmodel(String aasUrn, String submodelUrn) throws IOException {
+                    return null;
+                }
+
+                @Override
+                public void createAas(Aas aas, String endpointURL) {
+                }
+
+                @Override
+                public void createSubmodel(Aas aas, Submodel submodel) {
+                }
+
+                @Override
+                public void register(Aas aas, Submodel submodel, String endpointUrl) {
+                }
+            };
         }
 
         @Override
-        public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
+        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
             return null;
         }
 
@@ -138,53 +163,52 @@ public abstract class AasFactory {
      * Creates an AAS builder instance.
      * 
      * @param idShort the shortId of the AAS
-     * @param urn the uniform resource name of the AAS
+     * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      * 
      * @return the AAS builder instance (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty
      */
-    public abstract AasBuilder createAasBuilder(String idShort, String urn);
+    public abstract AasBuilder createAasBuilder(String idShort, String identifier);
 
     /**
      * Creates a standalone sub-model without parent AAS.
      * 
      * @param idShort the short id of the sub-model
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      * @return the sub-model builder (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
      *   supported
      */
-    public abstract SubmodelBuilder createSubmodelBuilder(String idShort);
+    public abstract SubmodelBuilder createSubmodelBuilder(String idShort, String identifier);
+
+    /**
+     * Creates a registry server.
+     * 
+     * @param endpoint the endpoint path on the server for the registry (host is ignored, always on localhost)
+     * @param options for the server, names of implementation-specific options to be enabled, 
+     *   may be empty for none
+     * @return the registry server
+     */
+    public abstract Server createRegistryServer(Endpoint endpoint, String... options);
     
     /**
-     * Retrieves an AAS.
+     * Obtains access to a registry.
      * 
-     * @param host the host name of the AAS repository
-     * @param port the TCP port number of the AAS repository
-     * @param registryPath the registry path on {@code host}
-     * @param urn the URN of the AAS
-     * @return the AAS (may be <b>null</b> if the AAS does not exist)
-     * @throws IOException if accessing the AAS fails for some reason
+     * @param regEndpoint the registry endpoint
+     * @return the registry access for the given connection information
+     * @throws IOException in case that the recipe/connection cannot be created
      */
-    public abstract Aas retrieveAas(String host, int port, String registryPath, String urn) throws IOException;
-    
-    /**
-     * Creates a deployment recipe.
-     * 
-     * @param host the target host
-     * @param port the target IP port
-     * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
-     */
-    public abstract DeploymentRecipe createDeploymentRecipe(String host, int port);
+    public abstract Registry obtainRegistry(Endpoint regEndpoint) throws IOException;
 
     /**
      * Creates a deployment recipe.
      * 
-     * @param contextPath the context base path (may be empty, otherwise shall start with a "/")
-     * @param host the target host
-     * @param port the target IP port
+     * @param endpoint the target host (hostname in particular used for endpoint urls)
      * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port);
+    public abstract DeploymentRecipe createDeploymentRecipe(Endpoint endpoint);
     
     /**
      * Creates a persistence recipe.
@@ -216,7 +240,10 @@ public abstract class AasFactory {
 
     /**
      * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
-     * and to be accessible
+     * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
+     * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
+     * {@link #createDeploymentRecipe(String, int)} or 
+     * {@link #createDeploymentRecipe#createDeploymentRecipe(String, String, int)}.
      * 
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}

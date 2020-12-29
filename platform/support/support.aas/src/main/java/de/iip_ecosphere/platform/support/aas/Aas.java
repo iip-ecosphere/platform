@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -26,18 +28,20 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface AasBuilder {
+    public interface AasBuilder extends Builder<Aas> {
 
         /**
          * Creates a builder for a contained sub-model. Calling this method again with the same name shall
          * lead to a builder that allows for modifying the sub-model.
          * 
          * @param idShort the short id of the sub-model
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          * @return the builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not 
-         *   possible
+         * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty; or if 
+         *   modification is not possible
          */
-        public SubmodelBuilder createSubmodelBuilder(String idShort);
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier);
 
         /**
          * Returns the reference to the AAS.
@@ -47,12 +51,18 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
         public Reference createReference();
         
         /**
-         * Builds the instance.
+         * Creates an asset builder for this AAS.
          * 
-         * @return the Aas instance
+         * @param idShort the short id of the asset
+         * @param urn the URN of the asset
+         * @param kind the asset kind
+         * @return the asset builder
+         * @throws IllegalArgumentException if creating an asset builder is not possible, e.g., because {@code idShort} 
+         *     or {@code urn} are <b>null</b> or empty or because creating an asset on an already deployed AAS does not 
+         *     work
          */
-        public Aas build();
-
+        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind);
+        
     }
     
     /**
@@ -78,16 +88,18 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
     public Submodel getSubmodel(String idShort);
 
     /**
-     * Adds a sub-model through its builder (only if {@code build()} was called). However, added submodels are
+     * Adds a sub-model through its builder (only if {@link Builder#build()} was called). However, added submodels are
      * not automatically deployed as the AAS just maintains a reference to the sub-model (in contrast to initial
      * deployment where we can consider sub-models). If a late sub-model shall be deployed/made available, keep
      * the instance of the {@link AasServer} from {@link DeploymentRecipe#createServer()} and explicitly deploy
      * the new sub-model via {@link AasServer#deploy(Aas, Submodel)}.
      * 
      * @param idShort the short id of the sub-model
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      * @return the sub-model builder
      */
-    public SubmodelBuilder addSubmodel(String idShort);
+    public SubmodelBuilder addSubmodel(String idShort, String identifier);
 
     /**
      * Returns the reference to the AAS.
@@ -96,4 +108,18 @@ public interface Aas extends Element, Identifiable, HasDataSpecification {
      */
     public Reference createReference();
 
+    /**
+     * Returns the attached asset.
+     * 
+     * @return the asset (may be <b>null</b> for none)
+     */
+    public Asset getAsset();
+
+    /**
+     * Deletes the given sub-model.
+     * 
+     * @param submodel the sub-model to delete
+     */
+    public void delete(Submodel submodel);
+    
 }

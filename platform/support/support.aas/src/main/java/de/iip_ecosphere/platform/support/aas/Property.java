@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.Builder;
+
 /**
  * Represents an AAS.
  * 
@@ -28,7 +30,7 @@ public interface Property extends Element, DataElement {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface PropertyBuilder {
+    public interface PropertyBuilder extends Builder<Property> {
 
         /**
          * Returns the parent builder.
@@ -72,13 +74,6 @@ public interface Property extends Element, DataElement {
          * @throws IllegalArgumentException may be thrown if {@link #setType(Type)} was not called before
          */
         public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set);
-
-        /**
-         * Builds the instance.
-         * 
-         * @return the property instance
-         */
-        public Property build();
 
     }
 

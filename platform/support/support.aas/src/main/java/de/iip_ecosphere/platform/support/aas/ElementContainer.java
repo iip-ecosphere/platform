@@ -32,6 +32,20 @@ public interface ElementContainer {
      * @return the number of data elements
      */
     public int getDataElementsCount();
+
+    /**
+     * Returns all properties in the element container.
+     * 
+     * @return all properties
+     */
+    public Iterable<Property> properties();
+
+    /**
+     * Returns the number of properties in the element container.
+     * 
+     * @return the number of properties
+     */
+    public int getPropertiesCount();
     
     /**
      * Returns all operations in the element container.

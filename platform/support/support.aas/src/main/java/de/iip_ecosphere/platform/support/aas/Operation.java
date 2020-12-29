@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.aas;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import de.iip_ecosphere.platform.support.Builder;
+
 /**
  * Represents an AAS operation.
  * 
@@ -27,7 +29,7 @@ public interface Operation extends Element, SubmodelElement {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface OperationBuilder {
+    public interface OperationBuilder extends Builder<Operation> {
         
         /**
          * Returns the parent builder.
@@ -64,13 +66,6 @@ public interface Operation extends Element, SubmodelElement {
          * @return <b>this</b>
          */
         public OperationBuilder setInvocable(Function<Object[], Object> invocable);
-        
-        /**
-         * Finally builds the operation instance.
-         * 
-         * @return the operation instance
-         */
-        public Operation build();
         
     }
     

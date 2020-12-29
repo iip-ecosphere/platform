@@ -13,18 +13,50 @@
 package de.iip_ecosphere.platform.support.aas;
 
 /**
- * Represents an AAS (property/variable) type.
+ * Represents an (implementation-independent) AAS (property/variable/value) type.
  * 
  * @author Holger Eichelberger, SSE
  */
 public enum Type {
 
+    INTEGER, 
+    NON_POSITIVE_INTEGER,
+    NON_NEGATIVE_INTEGER,
+    POSITIVE_INTEGER,
+    NEGATIVE_INTEGER,
+    INT8,
+    INT16,
+    INT32,
+    INT64,
+    UINT8,
+    UINT16,
+    UINT32,
+    UINT64,
+    STRING, 
+    LANG_STRING,
+    ANY_URI,
+    BASE64_BINARY,
+    HEX_BINARY,
+    NOTATION,
+    ENTITY,
+    ID,
+    IDREF,
     DOUBLE,
     FLOAT, 
-    INTEGER, 
-    STRING, 
-    BOOLEAN, 
-    VOID, 
-    NULL
-
+    BOOLEAN,
+    DURATION, 
+    DAY_TIME_DURATION, 
+    YEAR_MONTH_DURATION,
+    DATE_TIME, 
+    DATE_TIME_STAMP, 
+    G_DAY, 
+    G_MONTH, 
+    G_MONTH_DAY, 
+    G_YEAR, 
+    G_YEAR_MONTH,
+    Q_NAME,
+    NONE, 
+    ANY_TYPE, 
+    ANY_SIMPLE_TYPE;
+    
 }

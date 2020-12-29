@@ -37,7 +37,7 @@ public class PrintVisitorTest {
     public void testVisitor() {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("aas", "");
-        SubmodelBuilder smB =  aasB.createSubmodelBuilder("sub");
+        SubmodelBuilder smB =  aasB.createSubmodelBuilder("sub", "");
         smB.createPropertyBuilder("prop").build();
         smB.createOperationBuilder("op").build();
         SubmodelElementCollectionBuilder nB = smB.createSubmodelElementCollectionBuilder("nested", false, false);

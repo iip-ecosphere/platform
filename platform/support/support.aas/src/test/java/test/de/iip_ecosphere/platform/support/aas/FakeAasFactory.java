@@ -12,16 +12,19 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+
 import java.io.IOException;
 
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -57,22 +60,22 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
-    public SubmodelBuilder createSubmodelBuilder(String idShort) {
-        return new FakeSubmodel.FakeSubmodelBuilder(null, idShort);
+    public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
+        return new FakeSubmodel.FakeSubmodelBuilder(null, idShort, urn);
     }
 
     @Override
-    public Aas retrieveAas(String host, int port, String endpointPath, String urn) throws IOException {
+    public Server createRegistryServer(Endpoint endpoint, String... options) {
         return null;
     }
 
     @Override
-    public DeploymentRecipe createDeploymentRecipe(String host, int port) {
+    public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
         return null;
     }
 
     @Override
-    public DeploymentRecipe createDeploymentRecipe(String contextPath, String host, int port) {
+    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
         return null;
     }
 
