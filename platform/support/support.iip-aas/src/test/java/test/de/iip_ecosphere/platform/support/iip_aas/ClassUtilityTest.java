@@ -85,7 +85,7 @@ public class ClassUtilityTest {
         AasBuilder aasBuilder = factory.createAasBuilder("test", "urn:::AAS:::types#");
         ClassUtility.addType(aasBuilder, Simple.class);
         ClassUtility.addType(aasBuilder, Complex.class);
-        SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("test");
+        SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("test", null);
         ClassUtility.addTypeSubModelElement(smBuilder, "input", Simple.class);
         smBuilder.build();
         Aas aas = aasBuilder.build();

@@ -65,7 +65,7 @@ public class ClassUtility {
      * @return the reference to the sub-model (<b>null</b> if nothing was created)
      */
     public static Reference addType(AasBuilder aasBuilder, Class<?> type) {
-        SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(NAME_TYPE_SUBMODEL); // create or re-open
+        SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(NAME_TYPE_SUBMODEL, null); // create or re-open
         SubmodelElementCollectionBuilder typeCollection = smb.createSubmodelElementCollectionBuilder(
             getName(type), false, false);
         Reference result = addType(typeCollection, type);

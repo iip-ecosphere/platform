@@ -46,7 +46,7 @@ public class AasPartRegistryTest {
         
         @Override
         public Aas contributeTo(AasBuilder aasBuilder) {
-            aasBuilder.createSubmodelBuilder("c1").build();
+            aasBuilder.createSubmodelBuilder("c1", null).build();
             return null;
         }
         
@@ -62,7 +62,7 @@ public class AasPartRegistryTest {
         @Override
         public Aas contributeTo(AasBuilder aasBuilder) {
             AasBuilder builder = AasFactory.getInstance().createAasBuilder(NAME_MY_AAS, "urn:::AAS:::myAas#");
-            builder.createSubmodelBuilder("c2").build();
+            builder.createSubmodelBuilder("c2", null).build();
             return builder.build();
         }
         

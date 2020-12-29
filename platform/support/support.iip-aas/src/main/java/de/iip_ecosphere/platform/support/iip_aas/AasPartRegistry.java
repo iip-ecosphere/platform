@@ -20,11 +20,13 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.
@@ -43,26 +45,23 @@ public class AasPartRegistry {
      */
     public static final String URN_AAS = "urn:::AAS:::iipEcosphere#";
     
+    public static final Schema DEFAULT_SCHEMA = Schema.HTTP;
     public static final String DEFAULT_HOST = "localhost";
     public static final int DEFAULT_PORT = 8080;
     public static final String DEFAULT_ENDPOINT = "registry";
     
     // TODO local vs. global
-    private static String host = DEFAULT_HOST;
-    private static int port = DEFAULT_PORT;
-    private static String endpoint = DEFAULT_ENDPOINT;
+    public static final Endpoint DEFAULT_EP = new Endpoint(DEFAULT_SCHEMA, DEFAULT_HOST, 
+        DEFAULT_PORT, DEFAULT_ENDPOINT);
+    private static Endpoint aasEndpoint = DEFAULT_EP;
 
     /**
      * Defines the AAS endpoint.
      * 
-     * @param nHost the host name
-     * @param nPort the TCP port
-     * @param nEndpoint the registry endpoint 
+     * @param endpoint the registry endpoint 
      */
-    public static void setAasEndpoint(String nHost, int nPort, String nEndpoint) {
-        host = nHost;
-        port = nPort;
-        endpoint = nEndpoint;
+    public static void setAasEndpoint(Endpoint endpoint) {
+        aasEndpoint = endpoint;
     }
     
     /**
@@ -123,7 +122,7 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveIipAas() throws IOException {
-        return AasFactory.getInstance().retrieveAas(host, port, endpoint, URN_AAS);
+        return AasFactory.getInstance().obtainRegistry(aasEndpoint).retrieveAas(URN_AAS);
     }
     
     /**
@@ -133,8 +132,9 @@ public class AasPartRegistry {
      * @return the server instance
      */
     public static Server deploy(List<Aas> aas) {
-        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(host, port);
-        dBuilder.addInMemoryRegistry(endpoint);
+        ImmediateDeploymentRecipe dBuilder = AasFactory.getInstance()
+            .createDeploymentRecipe(new Endpoint(aasEndpoint, ""))
+            .addInMemoryRegistry(aasEndpoint.getEndpoint());
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
