@@ -14,11 +14,11 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -88,10 +88,12 @@ public class AasPartRegistry {
      * @return the contributor classes
      */
     public static Set<Class<? extends AasContributor>> contributorClasses() {
-        return getContributorLoader()
-            .stream()
-            .map((p) -> p.get().getClass())
-            .collect(Collectors.toSet());        
+        Set<Class<? extends AasContributor>> result = new HashSet<Class<? extends AasContributor>>();
+        Iterator<AasContributor> iter = contributors();
+        while (iter.hasNext()) {
+            result.add(iter.next().getClass());
+        }
+        return result;
     }
     
     /**
