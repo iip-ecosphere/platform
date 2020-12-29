@@ -54,6 +54,11 @@
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
 
+    <!-- child properties overriding??? -->
+
+    <basyx.version>0.1.0-SNAPSHOT</basyx.version> 
+    <basyx.vab.version>0.0.1-SNAPSHOT</basyx.vab.version>
+
     <!-- for now due to edge deployment/initial experience -->
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
