@@ -33,7 +33,9 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -100,22 +102,23 @@ public class AasConnectorTest {
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         
-        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_HOST, NetUtils.getEphemeralPort(), 
-            AasPartRegistry.DEFAULT_ENDPOINT);
-        platformAasServer = AasPartRegistry.deploy(AasPartRegistry.build());
-        platformAasServer.start(2000);
+        AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_HOST, 
+            NetUtils.getEphemeralPort(), AasPartRegistry.DEFAULT_ENDPOINT));
+        platformAasServer = AasPartRegistry.deploy(AasPartRegistry.build()).start();
         LOGGER.info("Platform AAS server started");
         
         TestMachine machine = new TestMachine();
-        ccServer = BaSyxTest.createVabOperationsServer(VAB_PORT, machine);
+        // start required here by basyx-0.1.0-SNAPSHOT
+        ccServer = BaSyxTest.createVabOperationsServer(VAB_PORT, machine).start(); 
         Aas aas = createAAS(machine);
 
-        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(AAS_IP, AAS_PORT);
-        dBuilder.addInMemoryRegistry(REGISTRY_PATH);
-        dBuilder.deploy(aas);
-        httpServer = dBuilder.createServer();
+        DeploymentRecipe dBuilder = AasFactory.getInstance()
+            .createDeploymentRecipe(new Endpoint(Schema.HTTP, AAS_IP, AAS_PORT, ""));
+        httpServer = dBuilder
+            .addInMemoryRegistry(REGISTRY_PATH)
+            .deploy(aas)
+            .createServer();
         
-        ccServer.start(3000);
         httpServer.start();
 
         LOGGER.info("AAS server started");
@@ -129,10 +132,9 @@ public class AasConnectorTest {
         httpServer.stop();
         ccServer.stop();
         LOGGER.info("Platform/AAS server stopped");
-        //platformAasServer.stop(); // seems to happen with httpServer
+        platformAasServer.stop();
 
-        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_HOST, AasPartRegistry.DEFAULT_PORT, 
-            AasPartRegistry.DEFAULT_ENDPOINT);
+        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
     }
     
     /**
@@ -146,7 +148,7 @@ public class AasConnectorTest {
     public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         BaSyxTest.createVabAasElements(subModelBuilder, AAS_IP, VAB_PORT);
         
         subModelBuilder.build();

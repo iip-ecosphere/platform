@@ -23,6 +23,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -98,8 +100,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == connectedAAS) {
-            connectedAAS = factory.retrieveAas(params.getHost(), params.getPort(), 
-                params.getEndpointPath(), params.getApplicationId());
+            Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), params.getEndpointPath());
+            connectedAAS = factory.obtainRegistry(regEp).retrieveAas(params.getApplicationId());
             if (null == connectedAAS) {
                 throw new IOException("No AAS retrieved!");
             }
