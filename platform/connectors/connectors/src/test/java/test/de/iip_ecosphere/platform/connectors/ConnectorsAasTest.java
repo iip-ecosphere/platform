@@ -33,6 +33,8 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
@@ -258,9 +260,8 @@ public class ConnectorsAasTest {
         testDescriptorsSubmodel(aas);
         
         aas.accept(new AasPrintVisitor());
-        AasPartRegistry.setAasEndpoint("localhost", 4005, "registry");
-        Server server = AasPartRegistry.deploy(aasList);
-        server.start(2000);
+        AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "localhost", 4005, "registry"));
+        Server server = AasPartRegistry.deploy(aasList).start();
 
         // do not go on with "aas" here... that is the local, non-deployed AAS. Connectors will modify deployed AAS.
         Assert.assertNotNull(AasPartRegistry.retrieveIipAas());
@@ -273,17 +274,17 @@ public class ConnectorsAasTest {
         connector1.connect(null);
         
         System.out.println("Connected connector 1");
-        testActiveDescriptors(connectors, 1);
+        testActiveDescriptors(connectors, 1); 
 
         Connector2<DataOut2, DataIn2> connector2 = createConnector2Instance();
         connectors.add(connector2);
         connector2.connect(null);
         System.out.println("Connected connector 2");
-        testActiveDescriptors(connectors, 2);
+        testActiveDescriptors(connectors, 2); 
         
         connectors.remove(connector1);
         connector1.disconnect();
-        System.out.println("Disconnected connector 2");
+        System.out.println("Disconnected connector 1");
         testActiveDescriptors(connectors, 2);
         
         connectors.remove(connector2);
@@ -292,6 +293,7 @@ public class ConnectorsAasTest {
         testActiveDescriptors(connectors, 2);
         
         server.stop();
+        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
     }
     
     /**
@@ -488,6 +490,9 @@ public class ConnectorsAasTest {
      * @throws IOException shall not occur
      */
     private void testActiveDescriptors(List<Connector<?, ?, ?, ?>> connectors, int expectedActive) throws IOException {
+        if (!ConnectorsAas.ENABLE_ACTIVE_READING) {  // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+            return;
+        }
         Aas aas = AasPartRegistry.retrieveIipAas();
         aas.accept(new AasPrintVisitor());
         System.out.println();

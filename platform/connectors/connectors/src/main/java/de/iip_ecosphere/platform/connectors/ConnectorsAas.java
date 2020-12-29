@@ -89,22 +89,24 @@ public class ConnectorsAas implements AasContributor {
     public static final String NAME_SMC_VAR_ACTIVE = "active";
     public static final String NAME_SMC_VAR_DESCRIPTOR = "descriptor";
 
+    // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
     /**
      * Defines whether changing the {@link #NAME_SMC_VAR_ACTIVE} property is permitted. So far, this does not work, 
      * either due to a bug in the abstraction or in BaSyx. May be, the property is somehow not allowed for writing
      * and the error message is weird.
      */
-    public static final boolean ENABLE_ACTIVE_WRITING = false; // TODO check and fix, remove then
+    public static final boolean ENABLE_ACTIVE_WRITING = false;
+    public static final boolean ENABLE_ACTIVE_READING = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorsAas.class);
 
     @Override
     public Aas contributeTo(AasBuilder aasBuilder) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
-        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL);
+        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null);
         tsmB.build();
         
-        SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL);
+        SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null);
         Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
         while (iter.hasNext()) {
             ConnectorDescriptor desc = iter.next();
@@ -119,7 +121,7 @@ public class ConnectorsAas implements AasContributor {
         }
         Submodel descriptors = ismB.build();
         
-        SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL);
+        SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL, null);
         Iterator<Connector<?, ?, ?, ?>> iterC = ConnectorRegistry.getRegisteredConnectorInstances();
         while (iterC.hasNext()) {
             Connector<?, ?, ?, ?> connector = iterC.next();
@@ -183,8 +185,7 @@ public class ConnectorsAas implements AasContributor {
                 prop.getValue(); // useless, but works anyway
             }
         } else {
-            LOGGER.error("No property: " + NAME_CONNECTORS_SUBMODEL + "/" + coll.getIdShort() 
-                + "/" + NAME_SMC_VAR_ACTIVE);
+            LOGGER.error("No property: " + NAME_CONNECTORS_SUBMODEL + "/" + coll.getIdShort() + "/" + idShort);
         }
     }
 
