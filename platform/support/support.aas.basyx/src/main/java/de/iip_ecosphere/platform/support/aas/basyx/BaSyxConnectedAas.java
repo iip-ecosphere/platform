@@ -16,7 +16,9 @@ import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShe
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -50,11 +52,23 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         }
 
         @Override
-        public SubmodelBuilder createSubmodelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
+            return obtainSubmodelBuilder(idShort, urn);
+        }
+        
+        /**
+         * Obtains a sub-model builder.
+         * 
+         * @param idShort the short id
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+         * @return the created sub-model builder
+         */
+        public SubmodelBuilder obtainSubmodelBuilder(String idShort, String identifier) {
             SubmodelBuilder result;
             Submodel sub =  instance.getSubmodel(idShort);
             if (null == instance.getSubmodel(idShort)) { // new here
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort);
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
             } else if (sub instanceof BaSyxSubmodel) { // after add
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
             } else { // connected
@@ -89,6 +103,16 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
             return instance;
         }
 
+        @Override
+        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+            throw new IllegalArgumentException("Asset cannot be created on/assigned to deployed AAS.");
+        }
+
+        @Override
+        void setAsset(BaSyxAsset asset) {
+            // do nothing, not possible
+        }
+
     }
     
     /**
@@ -104,8 +128,8 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
     }
 
     @Override
-    public SubmodelBuilder addSubmodel(String idShort) {
-        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort);
+    public SubmodelBuilder addSubmodel(String idShort, String identifier) {
+        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort, identifier);
     }
 
 }

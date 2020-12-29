@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
@@ -63,15 +64,16 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * @param idShort the short name of the sub-model element
          * @param ordered whether the collection is ordered
          * @param allowDuplicates whether the collection allows duplicates
+         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
         BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
             String idShort, boolean ordered, boolean allowDuplicates) {
             this.parentBuilder = parentBuilder;
             this.instance = new BaSyxSubmodelElementCollection();
             this.collection = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
-            this.collection.setIdShort(idShort);
+            this.collection.setIdShort(Tools.checkId(idShort));
             this.collection.setOrdered(ordered);
-            this.collection.setOrdered(allowDuplicates);
+            this.collection.setAllowDuplicates(allowDuplicates);
         }
         
         /**
@@ -131,25 +133,25 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
         @Override
         BaSyxOperation register(BaSyxOperation operation) {
-            this.collection.addElement(operation.getSubmodelElement());
+            this.collection.addSubModelElement(operation.getSubmodelElement());
             return instance.register(operation);
         }
         
         @Override
         BaSyxProperty register(BaSyxProperty property) {
-            this.collection.addElement(property.getSubmodelElement());
+            this.collection.addSubModelElement(property.getSubmodelElement());
             return instance.register(property);
         }
 
         @Override
         BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-            this.collection.addElement(reference.getSubmodelElement());
+            this.collection.addSubModelElement(reference.getSubmodelElement());
             return instance.register(reference);
         }
 
         @Override
         BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
-            this.collection.addElement(collection.getSubmodelElement());
+            this.collection.addSubModelElement(collection.getSubmodelElement());
             return instance.register(collection);
         }
 
@@ -188,7 +190,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      */
     BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
         this.collection = collection;
-        BaSyxElementTranslator.registerDataElements(collection.getDataElements(), this);
+        BaSyxElementTranslator.registerProperties(collection.getProperties(), this);
         BaSyxElementTranslator.registerOperations(collection.getOperations(), this);
         BaSyxElementTranslator.registerRemainingSubmodelElements(collection.getSubmodelElements(), this);        
     }
@@ -232,11 +234,14 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public SubmodelElement getElement(String idShort) {
         // looping may not be efficient, let's see
         SubmodelElement found = null;
-        for (SubmodelElement se : elements) {
-            if (se.getIdShort().equals(idShort)) {
-                found = se;
-                break;
+        try {
+            for (SubmodelElement se : elements) {
+                if (se.getIdShort().equals(idShort)) {
+                    found = se;
+                    break;
+                }
             }
+        } catch (ResourceNotFoundException e) {
         }
         return found;
     }

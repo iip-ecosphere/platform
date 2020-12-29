@@ -22,13 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -160,15 +161,15 @@ public class BaSyxTest {
         TestMachine machine = new TestMachine();
 
         Server ccServer = createVabOperationsServer(PORT_VAB, machine);
+        ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         Aas aas = createAas(machine);
         
-        DeploymentRecipe dBuilder = AasFactory.getInstance().createDeploymentRecipe(HOST_AAS, PORT_AAS);
-        dBuilder.addInMemoryRegistry(REGISTRY_PATH);
-        dBuilder.deploy(aas);
-        Server httpServer = dBuilder.createServer();
-
-        ccServer.start();
-        httpServer.start(3000);
+        Server httpServer = AasFactory.getInstance()
+            .createDeploymentRecipe(new Endpoint(Schema.HTTP, HOST_AAS, PORT_AAS, ""))
+            .addInMemoryRegistry(REGISTRY_PATH)
+            .deploy(aas)
+            .createServer()
+            .start();
         
         queryAas(machine);
         httpServer.stop();
@@ -186,10 +187,10 @@ public class BaSyxTest {
     private static Aas createAas(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         createVabAasElements(subModelBuilder, HOST_AAS, PORT_VAB);
         Reference subModelBuilderRef = subModelBuilder.createReference();
-        Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL)); // for modification
+        Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
         
         SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_OUTER, false, true);
@@ -215,7 +216,8 @@ public class BaSyxTest {
         
         Submodel submodel = subModelBuilder.build();
         assertSize(3, submodel.operations());
-        assertSize(2, submodel.dataElements());
+        assertSize(0, submodel.dataElements());
+        assertSize(2, submodel.properties());
         assertSize(6, submodel.submodelElements());
         Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE, 1));
         Assert.assertEquals(6, submodel.getSubmodelElementsCount());
@@ -223,7 +225,7 @@ public class BaSyxTest {
         Aas aas = aasBuilder.build();
         
         // adding on local models
-        Submodel subAdd = aas.addSubmodel("sub-add").build();
+        Submodel subAdd = aas.addSubmodel("sub-add", null).build();
         Assert.assertNotNull(aas.getSubmodel("sub-add"));
         subAdd.addSubmodelElementCollection("sub-coll", true, true).build();
         Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
@@ -244,12 +246,13 @@ public class BaSyxTest {
      */
     private static void queryAas(TestMachine machine) throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
-        Aas aas = factory.retrieveAas(HOST_AAS, PORT_AAS, REGISTRY_PATH, URN_AAS);
+        Endpoint regEp = new Endpoint(Schema.HTTP, HOST_AAS, PORT_AAS, REGISTRY_PATH);
+        Aas aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(2, aas.getSubmodelCount());
         Submodel submodel = aas.submodels().iterator().next();
         Assert.assertNotNull(submodel);
-        Assert.assertEquals(2, submodel.getDataElementsCount());
+        Assert.assertEquals(2, submodel.getPropertiesCount());
         Property lotSize = submodel.getProperty(NAME_VAR_LOTSIZE);
         Assert.assertNotNull(lotSize);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
@@ -294,7 +297,7 @@ public class BaSyxTest {
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
 
         // adding on connected models
-        Submodel subAdd = aas.addSubmodel("conn-add").build();
+        Submodel subAdd = aas.addSubmodel("conn-add", null).build();
         Assert.assertNotNull(aas.getSubmodel("conn-add"));
         subAdd.addSubmodelElementCollection("conn-coll", true, true).build();
         Assert.assertNotNull(aas.getSubmodel("conn-add").getSubmodelElementCollection("conn-coll"));

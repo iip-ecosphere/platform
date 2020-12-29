@@ -16,7 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -74,7 +77,14 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
          * 
          * @return the instance
          */
-        abstract Aas getInstance(); 
+        abstract Aas getInstance();
+        
+        /**
+         * Defines the asset for the AAS being under construction.
+         * 
+         * @param asset the asset
+         */
+        abstract void setAsset(BaSyxAsset asset);
         
         @Override
         public Reference createReference() {
@@ -85,6 +95,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     
     private A aas;
     private Map<String, Submodel> submodels = new HashMap<>();
+    private BaSyxAsset asset;
 
     /**
      * Creates an instance. Prevents external creation.
@@ -93,6 +104,10 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
      */
     protected AbstractAas(A aas) {
         this.aas = aas;
+        IAsset asset = aas.getAsset();
+        if (null != asset) {
+            this.asset = new BaSyxAsset(asset);
+        }
     }
 
     /**
@@ -121,7 +136,11 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     
     @Override
     public Submodel getSubmodel(String idShort) {
-        return submodels.get(idShort);
+        try {
+            return submodels.get(idShort);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     /**
@@ -148,6 +167,37 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     @Override
     public Reference createReference() {
         return new BaSyxReference(getAas().getReference());
+    }
+
+    @Override
+    public de.iip_ecosphere.platform.support.aas.Asset getAsset() {
+        return asset;
+    }
+
+    /**
+     * Defines the asset.
+     * 
+     * @param asset the asset
+     */
+    protected void setAsset(BaSyxAsset asset) {
+        this.asset = asset;
+    }
+
+    @Override
+    public void delete(Submodel submodel) {
+        submodels.remove(submodel.getIdShort());
+        getAas().removeSubmodel(((AbstractSubmodel<?>) submodel).getSubmodel().getIdentification());
+    }
+
+    /**
+     * Returns an AAS endpoint URI according to the BaSyx naming schema.
+     * 
+     * @param server the server address
+     * @param aas the AAS
+     * @return the endpoint URI
+     */
+    static String getAasEndpoint(ServerAddress server, Aas aas) {
+        return server.toServerUri() + "/" + Tools.idToUrlPath(aas.getIdShort()) + "/aas";
     }
 
 }

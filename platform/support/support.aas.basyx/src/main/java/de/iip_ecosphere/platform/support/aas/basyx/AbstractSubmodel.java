@@ -18,7 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
+import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -40,8 +43,9 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     private S submodel;
     private List<Operation> operations = new ArrayList<>();
-    private Map<String, DataElement> dataElements = new HashMap<>();
-    private List<SubmodelElement> submodelElements = new ArrayList<>(); // TODO shall be redundant or just remaining?
+    private Map<String, DataElement> dataElements = new HashMap<>(); // TODO now partly values in BaSyx
+    private Map<String, Property> properties = new HashMap<>();
+    private List<SubmodelElement> submodelElements = new ArrayList<>();
 
     /**
      * Creates an instance. Prevents external creation.
@@ -80,7 +84,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
      * @return {@code property}
      */
     public BaSyxProperty register(BaSyxProperty property) {
-        dataElements.put(property.getIdShort(), property);
+        properties.put(property.getIdShort(), property);
         submodelElements.add(property);
         return property;
     }
@@ -118,6 +122,11 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     }
 
     @Override
+    public Iterable<Property> properties() {
+        return properties.values();
+    }
+
+    @Override
     public Iterable<DataElement> dataElements() {
         return dataElements.values();
     }
@@ -149,23 +158,26 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     @Override
     public Property getProperty(String idShort) {
-        Property result = null;
-        DataElement tmp = getDataElement(idShort);
-        if (tmp instanceof Property) {
-            result = (Property) tmp;
-        }
-        return result;
+        return properties.get(idShort);
+    }
+
+    @Override
+    public int getPropertiesCount() {
+        return properties.size();
     }
     
     @Override
     public ReferenceElement getReferenceElement(String idShort) {
         // looping may not be efficient, let's see
         ReferenceElement found = null;
-        for (SubmodelElement elt : submodelElements) {
-            if (elt instanceof ReferenceElement && elt.getIdShort().equals(idShort)) {
-                found = (ReferenceElement) elt;
-                break;
+        try {
+            for (SubmodelElement elt : submodelElements) {
+                if (elt instanceof ReferenceElement && elt.getIdShort().equals(idShort)) {
+                    found = (ReferenceElement) elt;
+                    break;
+                }
             }
+        } catch (ResourceNotFoundException e) {
         }
         return found;
     }
@@ -239,6 +251,35 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     @Override
     public Reference createReference() {
         return new BaSyxReference(getSubmodel().getReference());
+    }
+
+    @Override
+    public void delete(SubmodelElement elt) {
+        try {
+            if (elt instanceof Property) {
+                properties.remove(elt.getIdShort());
+            } else if (elt instanceof DataElement) {
+                dataElements.remove(elt.getIdShort());
+            } else {
+                operations.remove(elt);
+                submodelElements.remove(elt);
+            }
+            submodel.deleteSubmodelElement(elt.getIdShort());
+        } catch (ResourceNotFoundException e) {
+        }
+    }
+
+    /**
+     * Returns an AAS sub-model URI according to the BaSyx naming schema.
+     * 
+     * @param server the server address
+     * @param aas the AAS
+     * @param submodel the sub-model
+     * @return the endpoint URI
+     */
+    static String getSubmodelEndpoint(ServerAddress server, Aas aas, Submodel submodel) {
+        return AbstractAas.getAasEndpoint(server, aas) 
+            + "/submodels/" + Tools.idToUrlPath(submodel.getIdShort()) + "/submodel";
     }
 
 }

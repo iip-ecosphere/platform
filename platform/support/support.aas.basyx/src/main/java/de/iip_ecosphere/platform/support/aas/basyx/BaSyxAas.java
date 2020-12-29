@@ -12,10 +12,14 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
+import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
+import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
@@ -40,20 +44,14 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
          * Creates an instance. Prevents external creation.
          * 
          * @param idShort the shortId of the AAS
-         * @param urn the uniform resource name of the AAS
+         * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty
          */
-        BaSyxAasBuilder(String idShort, String urn) {
-            if (null == idShort || 0 == idShort.length()) {
-                throw new IllegalArgumentException("idShort must be given");
-            }
-            if (null == urn || 0 == urn.length()) {
-                throw new IllegalArgumentException("urn must be given");
-            }
+        BaSyxAasBuilder(String idShort, String identifier) {
             AssetAdministrationShell aas = new AssetAdministrationShell();
-            ModelUrn aasURN = new ModelUrn(urn);
-            aas.setIdentification(aasURN);
-            aas.setIdShort(idShort);
+            aas.setIdShort(Tools.checkId(idShort));
+            aas.setIdentification(Tools.translateIdentifier(identifier, idShort));
             instance = new BaSyxAas(aas);
         }
 
@@ -72,11 +70,11 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         }
 
         @Override
-        public SubmodelBuilder createSubmodelBuilder(String idShort) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
             SubmodelBuilder result;
             Submodel sub =  instance.getSubmodel(idShort);
             if (null == instance.getSubmodel(idShort)) {
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort);
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
             } else { // no connected here
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
             }
@@ -105,6 +103,20 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         public BaSyxSubmodelParent getSubmodelParent() {
             return instance;
         }
+
+        @Override
+        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+            return new BaSyxAsset.BaSyxAssetBuilder(this, idShort, urn, kind);
+        }
+
+        @Override
+        void setAsset(BaSyxAsset asset) {
+            instance.setAsset(asset);
+            IAsset a = asset.getAsset();
+            instance.getAas().setAsset((Asset) a);
+            // reference is needed for Reading back AASX; works also without setAsset; unclear wether both ar needed
+            instance.getAas().setAssetReference((Reference) a.getReference()); 
+        }
         
     }
 
@@ -116,10 +128,10 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
     BaSyxAas(AssetAdministrationShell aas) {
         super(aas);
     }
-    
+
     @Override
-    public SubmodelBuilder addSubmodel(String idShort) {
-        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort);
+    public SubmodelBuilder addSubmodel(String idShort, String identifier) {
+        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort, identifier);
     }
 
     @Override

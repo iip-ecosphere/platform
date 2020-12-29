@@ -43,11 +43,16 @@ import org.eclipse.basyx.aas.factory.xml.XMLToMetamodelConverter;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.map.SubModel;
 import org.eclipse.basyx.support.bundle.AASBundle;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,7 +61,6 @@ import org.xml.sax.SAXException;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.basyx.impl.AASXPackageManager;
 
 /**
  * A persistence recipe for BaSyx AAS. This implementation is internally based on short ids. 
@@ -78,6 +82,7 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
 
     // well, we could do better with plugins etc... sufficient for now and here
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxPersistenceRecipe.class);
     private static final Map<String, String> CONTENT_TYPES = new TreeMap<>();
     
     static {
@@ -160,7 +165,7 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
      */
     private void writeToAasx(List<Aas> aas, File file) throws IOException {
         if (aas.size() > 1) {
-            LoggerFactory.getLogger(getClass()).warn("Writing multiple AAS to a single file may not be read back as "
+            LOGGER.warn("Writing multiple AAS to a single file may not be read back as "
                 + "BaSyx currently just supports one AAS to be read from an AASX package.");
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -225,7 +230,15 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         List<ISubModel> basyxSubmodels = new ArrayList<ISubModel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
-        basyxAas.add(((BaSyxAas) aas).getAas());
+        AssetAdministrationShell origAas = ((BaSyxAas) aas).getAas();
+        if (null == origAas.getAsset()) {  // as of BaSyx 0.0.1
+            LOGGER.warn("AAS '" + aas.getIdShort() + "' may not be read back correctly as it does not have an Asset.");
+        }
+        if (null == origAas.getAssetReference()) { // as of BaSyx 0.1.0
+            LOGGER.warn("AAS '" + aas.getIdShort() + "' may not be read back correctly as it does not have "
+                + "an Asset Reference.");
+        }
+        basyxAas.add(origAas);
         for (Submodel s : aas.submodels()) {
             basyxSubmodels.add(((BaSyxSubmodel) s).getSubmodel());
         }
@@ -391,7 +404,8 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         Map<String, SubModel> subMapping = new HashMap<>();
         for (ISubModel sm : submodels) {
             if (sm instanceof SubModel) {
-                subMapping.put(sm.getIdShort(), (SubModel) sm);
+                IIdentifier id = sm.getIdentification();
+                subMapping.put(id.getIdType() + "/" + id.getId(), (SubModel) sm);
             }
         }
         for (IAssetAdministrationShell a : aas) {
@@ -399,10 +413,15 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
                 BaSyxAas bAas = new BaSyxAas((AssetAdministrationShell) a);
                 for (IReference r : a.getSubmodelReferences()) {
                     if (!r.getKeys().isEmpty()) {
-                        String name = r.getKeys().get(0).getValue(); // really the first??
-                        SubModel submodel = subMapping.get(name);
-                        if (null != submodel) {
-                            bAas.register(new BaSyxSubmodel(bAas, submodel));
+                        SubModel submodel = null;
+                        for (IKey k : r.getKeys()) {
+                            if (KeyElements.SUBMODEL == k.getType()) {
+                                submodel = subMapping.get(k.getIdType() + "/" + k.getValue());
+                            }
+                            if (null != submodel) {
+                                bAas.register(new BaSyxSubmodel(bAas, submodel));
+                                break;
+                            }
                         }
                     }
                 }

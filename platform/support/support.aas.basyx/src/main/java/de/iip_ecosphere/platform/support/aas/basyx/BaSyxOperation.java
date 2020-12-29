@@ -72,10 +72,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             this.parentBuilder = parentBuilder;
             instance = new BaSyxOperation();
             operation = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation();
-            operation.setIdShort(idShort);
-            if (null == idShort || 0 == idShort.length()) {
-                throw new IllegalArgumentException("idShort must be given");
-            }
+            operation.setIdShort(Tools.checkId(idShort));
         }
 
         @Override

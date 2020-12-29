@@ -1,13 +1,15 @@
 # AAS Component AAS/BaSxy extension in the Support Layer of the IIP-Ecosphere platform
 
-Asset Administration Shell (AAS) abstraction for on [Eclipse BaSyx](https://www.eclipse.org/basyx/).  
+Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx](https://www.eclipse.org/basyx/).  
 
-- Currently with implementations for AAS, sub-model, sub-model elements, properties and operations; the others will be 
-  added incrementally on demand.
+- Currently with implementations for AAS, asset, sub-model, sub-model elements, properties and operations; abilities 
+  and other concepts will be added incrementally on demand.
 - Load/store abstractions for XML and AASX (for only one AAS)
 - Implementation-level abstractions (direct VAB, not ControlComponent-based)
 
+May be, future versions need to switch to lazy loading of deployed AAS instances.
+
 **Missing**
-- Various AAS concepts (incremental addition as used)
+- Various AAS concepts (incremental addition as needed by the platform)
 - Authentication/Security
 - Events

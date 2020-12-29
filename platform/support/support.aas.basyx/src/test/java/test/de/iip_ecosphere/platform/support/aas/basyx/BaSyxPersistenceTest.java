@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -45,14 +46,19 @@ public class BaSyxPersistenceTest {
         AasFactory factory = AasFactory.getInstance();
         
         List<Aas> aas = new ArrayList<Aas>();
-        
+
+        // we create this here with assets as reading back AAS via BaSyx requires assets from 0.0.1 and asset 
+        // references from 0.1.0
         AasBuilder aasB = factory.createAasBuilder("MyAas", "urn:::AAS:::myAAs#");
-        SubmodelBuilder smB = aasB.createSubmodelBuilder("MySubModel");
+        aasB.createAssetBuilder("asset", "urn:::AAS:::myAAsasset#", AssetKind.INSTANCE).build();
+        SubmodelBuilder smB = aasB.createSubmodelBuilder("MySubModel", "urn:::AAS:::myAAsMySubModel#");
         smB.createPropertyBuilder("MyP").setValue(Type.BOOLEAN, true).build();
         smB.build();
+        aasB.createSubmodelBuilder("MySubModel1", null).build(); // no URN, custom here
         aas.add(aasB.build());
         
         aasB = factory.createAasBuilder("MyAas1", "urn:::AAS:::myAAs#1");
+        aasB.createAssetBuilder("asset1", "urn:::AAS:::myAAs#1asset#1", AssetKind.INSTANCE);
         aas.add(aasB.build());
         
         File xml = new File(FileUtils.getTempDirectory(), "myAAS.xml");
@@ -84,9 +90,10 @@ public class BaSyxPersistenceTest {
         Assert.assertEquals(justFirst ? 1 : 2, aasIn.size());
         
         Assert.assertEquals("MyAas", aasIn.get(0).getIdShort());
-        Assert.assertEquals(1, aasIn.get(0).getSubmodelCount());
+        Assert.assertEquals(2, aasIn.get(0).getSubmodelCount());
         Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel"));
         Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel").getProperty("MyP"));
+        Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel1"));
 
         if (!justFirst) {
             Assert.assertEquals("MyAas1", aasIn.get(1).getIdShort());

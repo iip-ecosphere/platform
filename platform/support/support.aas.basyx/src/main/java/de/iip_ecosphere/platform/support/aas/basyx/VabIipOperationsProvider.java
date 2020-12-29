@@ -201,7 +201,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
 
         @Override
         public Server build() {
-            return BaSyxDeploymentBuilder.createControlComponent(instance.createModelProvider(), port);
+            return BaSyxDeploymentRecipe.createControlComponent(instance.createModelProvider(), port);
         }
         
     }

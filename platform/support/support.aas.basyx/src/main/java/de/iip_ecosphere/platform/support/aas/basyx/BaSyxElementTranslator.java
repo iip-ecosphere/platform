@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IDataElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
@@ -54,12 +53,13 @@ class BaSyxElementTranslator {
      * @param elements the data elements to be processed (as declared by BaSyx)
      * @param reg the IIP-Ecosphere registrar
      */
-    static void registerDataElements(Map<String, IDataElement> elements, DataElementsRegistrar reg) {
-        for (IDataElement elt : elements.values()) {
+    static void registerValues(Map<String, Object> elements, DataElementsRegistrar reg) {
+        // unclear by now
+        /*for (Object elt : elements.values()) {
             if (elt instanceof IProperty) {
                 reg.register(new BaSyxProperty((IProperty) elt));
             } // TODO else
-        }
+        }*/
     }
 
     /**
@@ -77,6 +77,18 @@ class BaSyxElementTranslator {
          */
         BaSyxOperation register(BaSyxOperation operation);
         
+    }
+
+    /**
+     * Registers the operations.
+     * 
+     * @param properties the properties to be processed (as declared by BaSyx)
+     * @param reg the IIP-Ecosphere registrar
+     */
+    static void registerProperties(Map<String, IProperty> properties, DataElementsRegistrar reg) {
+        for (IProperty op : properties.values()) {
+            reg.register(new BaSyxProperty(op));
+        }
     }
 
     /**

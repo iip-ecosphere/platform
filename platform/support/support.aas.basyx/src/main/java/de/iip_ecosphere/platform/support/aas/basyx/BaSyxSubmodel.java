@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.SubModel;
 import org.slf4j.LoggerFactory;
 
@@ -45,26 +45,35 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         private BaSyxAbstractAasBuilder parentBuilder;
         private BaSyxSubmodel instance;
         private SubModel submodel;
+
+        /**
+         * Creates an instance. Prevents external creation.
+         * 
+         * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
+         * @param idShort the short id of the sub-model
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
+         */
+        BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort, String identifier) {
+            this(parentBuilder, idShort, Tools.translateIdentifier(identifier, idShort));
+        }
         
         /**
          * Creates an instance. Prevents external creation.
          * 
          * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
          * @param idShort the short id of the sub-model
+         * @param identifier the identifier of the model
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
-        BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort) {
-            if (null == idShort || 0 == idShort.length()) {
-                throw new IllegalArgumentException("idShort must be given");
-            }
+        BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort, IIdentifier identifier) {
             this.parentBuilder = parentBuilder;
-            submodel = new SubModel();
-            submodel.setIdShort(idShort);
-            submodel.setIdentification(IdentifierType.CUSTOM, idShort); // preliminary
+            submodel = new SubModel(Tools.checkId(idShort), identifier);
             instance = new BaSyxSubmodel(submodel);
-            instance.parent = parentBuilder.getSubmodelParent();
+            instance.parent = null == parentBuilder ? null : parentBuilder.getSubmodelParent();
         }
-
+        
         /**
          * Creates an instance from an existing BaSyx instance.
          * 
@@ -112,6 +121,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         }
 
     }
+    
 
     /**
      * Creates an instance. Prevents external creation.
@@ -131,7 +141,8 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
     BaSyxSubmodel(BaSyxSubmodelParent parent, SubModel instance) {
         super(instance);
         this.parent = parent;
-        BaSyxElementTranslator.registerDataElements(instance.getDataElements(), this);
+        BaSyxElementTranslator.registerValues(instance.getValues(), this);
+        BaSyxElementTranslator.registerProperties(instance.getProperties(), this);
         BaSyxElementTranslator.registerOperations(instance.getOperations(), this);
         BaSyxElementTranslator.registerRemainingSubmodelElements(instance.getSubmodelElements(), this);
     }

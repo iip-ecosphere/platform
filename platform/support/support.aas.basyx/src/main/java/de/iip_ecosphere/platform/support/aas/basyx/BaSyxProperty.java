@@ -12,12 +12,15 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
+import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProviderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,14 +60,15 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
          * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
          */
         BaSyxPropertyBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort) {
-            if (null == idShort || 0 == idShort.length()) {
-                throw new IllegalArgumentException("idShort must be given");
-            }
             this.parentBuilder = parentBuilder;
             instance = new BaSyxProperty();
             property = new org.eclipse.basyx.submodel.metamodel.map.submodelelement
                 .dataelement.property.Property();
-            property.setIdShort(idShort);
+            property.setIdShort(Tools.checkId(idShort));
+
+            // following not necessary, but leads to NPE when writing AAS to file
+            property.setDescription(new LangStrings()); 
+            property.setEmbeddedDataSpecifications(new ArrayList<>());
         }
         
         @Override
@@ -74,7 +78,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
         @Override
         public PropertyBuilder setType(Type type) {
-            typeDef = BaSyxAasFactory.translate(type);
+            typeDef = Tools.translate(type);
             property.setValueType(typeDef);
             return this;
         }
@@ -130,17 +134,23 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         this.property = property;
     }
 
-    @Override
-    public String getIdShort() {
-        return property.getIdShort();
-    }
-    
     // checkstyle: stop exception type check
 
     @Override
+    public String getIdShort() {
+        try {
+            return property.getIdShort();
+        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+            return "";
+        }
+    }
+    
+    @Override
     public Object getValue() throws ExecutionException {
         try {
-            return property.get();
+            return property.getValue();
+        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+            throw new ExecutionException(e);
         } catch (Exception e) {
             throw new ExecutionException(e);
         }

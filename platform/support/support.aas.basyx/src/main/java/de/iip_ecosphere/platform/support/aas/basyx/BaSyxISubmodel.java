@@ -94,14 +94,15 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
      * Creates sub-model instance.
      * 
      * @param parent the parent AAS
-     * @param subModel the instance
+     * @param submodel the instance
      */
-    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubModel subModel) {
-        super(subModel);
+    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubModel submodel) {
+        super(submodel);
         this.parent = parent;
-        BaSyxElementTranslator.registerDataElements(subModel.getDataElements(), this);
-        BaSyxElementTranslator.registerOperations(subModel.getOperations(), this);
-        BaSyxElementTranslator.registerRemainingSubmodelElements(subModel.getSubmodelElements(), this);
+        BaSyxElementTranslator.registerValues(submodel.getValues(), this);
+        BaSyxElementTranslator.registerProperties(submodel.getProperties(), this);
+        BaSyxElementTranslator.registerOperations(submodel.getOperations(), this);
+        BaSyxElementTranslator.registerRemainingSubmodelElements(submodel.getSubmodelElements(), this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -88,15 +89,27 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
         return reference;
     }
 
+    // checkstyle: stop exception type check
+
     @Override
     public String getIdShort() {
-        return reference.getIdShort();
+        try {
+            return reference.getIdShort();
+        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+            return "";
+        }
     }
 
     @Override
     public Reference getValue() {
-        return new BaSyxReference(reference.getValue());
+        try {
+            return new BaSyxReference(reference.getValue());
+        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+            return null;
+        }
     }
+
+    // checkstyle: resume exception type check
 
     @Override
     IReferenceElement getSubmodelElement() {

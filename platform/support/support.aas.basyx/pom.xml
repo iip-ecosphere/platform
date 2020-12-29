@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
- <artifactId>support.aas.basyx</artifactId>
+  <artifactId>support.aas.basyx</artifactId>
   <name>support AAS/BaSyx</name>
   <description>The IIP-Ecosphere AAS/BaSyx extension.</description>
 
@@ -11,6 +11,11 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <basyx.version>0.1.0-SNAPSHOT</basyx.version> 
+    <basyx.vab.version>0.0.1-SNAPSHOT</basyx.vab.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -21,14 +26,17 @@
     <dependency>
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.components.lib</artifactId>
+      <version>${basyx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.sqlregistry</artifactId>
+      <artifactId>basyx.components.registry</artifactId>
+      <version>${basyx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.AASX</artifactId>
+      <artifactId>basyx.components.AASServer</artifactId>
+      <version>${basyx.version}</version>
     </dependency>
 
     <dependency>
@@ -46,6 +54,7 @@
     <dependency>
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.sdk</artifactId>
+      <version>${basyx.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
