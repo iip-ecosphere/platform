@@ -145,7 +145,7 @@ public class BaSyxTest {
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
-            .addInputVariable()
+            .addInputVariable(NAME_VAR_LOTSIZE, Type.INTEGER)
             .setInvocable(invC.createInvocable(NAME_OP_RECONFIGURE))
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
@@ -219,7 +219,7 @@ public class BaSyxTest {
         assertSize(0, submodel.dataElements());
         assertSize(2, submodel.properties());
         assertSize(6, submodel.submodelElements());
-        //Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE, 1)); // TODO broken by BaSyx 0.1.0-SNAPSHOT
+        Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE, 1));
         Assert.assertEquals(6, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
@@ -266,9 +266,9 @@ public class BaSyxTest {
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
-        //op = submodel.getOperation(NAME_OP_RECONFIGURE, 1, 0, 0); // TODO broken by BaSyx-0.1.0-SNAPSHOT
-        //Assert.assertNotNull(op);
-        //op.invoke(5);
+        op = submodel.getOperation(NAME_OP_RECONFIGURE, 1, 0, 0);
+        Assert.assertNotNull(op);
+        op.invoke(5);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
         op = submodel.getOperation(NAME_OP_STOPMACHINE, 0, 0, 0);

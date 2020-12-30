@@ -12,6 +12,11 @@
      <version>0.0.1-SNAPSHOT</version>
   </parent>
   
+  <properties>
+    <basyx.version>0.1.0-SNAPSHOT</basyx.version> 
+    <basyx.vab.version>0.0.1-SNAPSHOT</basyx.vab.version>
+  </properties>
+  
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

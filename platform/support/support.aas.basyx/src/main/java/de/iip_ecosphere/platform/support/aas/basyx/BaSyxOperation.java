@@ -18,10 +18,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
  * Implements an AAS Operation wrapper for BaSyx.
@@ -83,36 +85,43 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         /**
          * Creates an operation variable. Just in case that we somewhen need name and type.
          * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return the operation variable
          */
-        private OperationVariable createOperationVariable() {
-            return new OperationVariable();
+        private OperationVariable createOperationVariable(String idShort, Type type) {
+            Property prop = new Property();
+            prop.setIdShort(idShort);
+            if (null != type) { // let's see whether this makes sense
+                prop.setValueType(Tools.translate(type));
+            }
+            return new OperationVariable(prop);
         }
         
         @Override
-        public OperationBuilder addInputVariable() {
+        public OperationBuilder addInputVariable(String idShort, Type type) {
             if (null == inputVariables) {
                 inputVariables = new ArrayList<>();                
             }
-            inputVariables.add(createOperationVariable());
+            inputVariables.add(createOperationVariable(idShort, type));
             return this;
         }
 
         @Override
-        public OperationBuilder addOutputVariable() {
+        public OperationBuilder addOutputVariable(String idShort, Type type) {
             if (null == outputVariables) {
                 outputVariables = new ArrayList<>();                
             }
-            outputVariables.add(createOperationVariable());
+            outputVariables.add(createOperationVariable(idShort, type));
             return this;
         }
 
         @Override
-        public OperationBuilder addInOutVariable() {
+        public OperationBuilder addInOutVariable(String idShort, Type type) {
             if (null == outputVariables) {
                 outputVariables = new ArrayList<>();                
             }
-            inOutVariables.add(createOperationVariable());
+            inOutVariables.add(createOperationVariable(idShort, type));
             return this;
         }
 
