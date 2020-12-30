@@ -41,23 +41,29 @@ public interface Operation extends Element, SubmodelElement {
         /**
          * Adds an input variable to the operation.
          * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addInputVariable();
+        public OperationBuilder addInputVariable(String idShort, Type type);
         
         /**
          * Adds an output variable to the operation.
          * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addOutputVariable();
+        public OperationBuilder addOutputVariable(String idShort, Type type);
 
         /**
          * Adds an input-output variable to the operation.
          * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addInOutVariable();
+        public OperationBuilder addInOutVariable(String idShort, Type type);
         
         /**
          * Sets the invocable of this operation.

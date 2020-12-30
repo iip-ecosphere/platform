@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
@@ -28,6 +29,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
  * Tests the factory/descriptor.
@@ -145,7 +147,7 @@ public class FactoryTest {
 
         Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
         Assert.assertNull(instance.createRegistryServer(new Endpoint(ep, "/registry")));
-        Assert.assertNotNull(instance.obtainRegistry(ep));
+        assertRegistry(instance.obtainRegistry(ep));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
 
         Assert.assertNull(instance.createPersistenceRecipe());
@@ -156,6 +158,34 @@ public class FactoryTest {
         Assert.assertNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
 
         AasFactory.setInstance(old);
+    }
+    
+    /**
+     * Asserts a default/dummy registry instance.
+     * 
+     * @param reg the registry instance
+     * @throws IOException shall not occur
+     */
+    private static void assertRegistry(Registry reg) throws IOException {
+        Assert.assertNotNull(reg);
+        Assert.assertNull(reg.retrieveAas(""));
+        reg.createAas(null, "");
+        reg.createSubmodel(null, null);
+        reg.register(null, null, "");
+        Assert.assertNull(reg.retrieveSubmodel("", ""));
+    }
+    
+    /**
+     * Asserting plain constants is ridiculous. Real function happens in implementation components.
+     */
+    @Test
+    public void assertConstants() {
+        for (Type t : Type.values()) {
+            Assert.assertNotNull(t);
+        }
+        for (AssetKind k : AssetKind.values()) {
+            Assert.assertNotNull(k);
+        }
     }
 
 }

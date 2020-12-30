@@ -38,6 +38,7 @@ public class SchemaServerEndpointTest {
     /**
      * Tests server address.
      */
+    @Test
     public void testServerAddress() {
         ServerAddress add = new ServerAddress(Schema.HTTP);
         Assert.assertEquals(Schema.HTTP, add.getSchema());
@@ -77,6 +78,7 @@ public class SchemaServerEndpointTest {
     /**
      * Tests server address.
      */
+    @Test
     public void testEndpoint() {
         Endpoint ep = new Endpoint(Schema.HTTP, "aa");
         Assert.assertEquals(Schema.HTTP, ep.getSchema());

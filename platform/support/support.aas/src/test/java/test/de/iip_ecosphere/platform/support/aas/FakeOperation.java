@@ -18,6 +18,7 @@ import java.util.function.Function;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
  * A simple fake operation. No real arguments/parameters, just fake.
@@ -57,19 +58,19 @@ public class FakeOperation extends FakeElement implements Operation {
         }
 
         @Override
-        public OperationBuilder addInputVariable() {
+        public OperationBuilder addInputVariable(String name, Type type) {
             instance.inArgs++;
             return this;
         }
 
         @Override
-        public OperationBuilder addOutputVariable() {
+        public OperationBuilder addOutputVariable(String name, Type type) {
             instance.outArgs++;
             return this;
         }
 
         @Override
-        public OperationBuilder addInOutVariable() {
+        public OperationBuilder addInOutVariable(String name, Type type) {
             instance.inOutArgs++;
             return this;
         }
