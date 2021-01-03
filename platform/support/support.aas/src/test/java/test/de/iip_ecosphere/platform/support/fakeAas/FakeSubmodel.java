@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.aas;
+package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +28,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
-import test.de.iip_ecosphere.platform.support.aas.FakeAas.FakeAasBuilder;
 
 /**
  * A fake (inefficient) submodel.

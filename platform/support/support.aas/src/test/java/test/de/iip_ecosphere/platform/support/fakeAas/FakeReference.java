@@ -10,28 +10,20 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support;
+package test.de.iip_ecosphere.platform.support.fakeAas;
+
+import de.iip_ecosphere.platform.support.aas.Reference;
 
 /**
- * A generic server, something that can be started or stopped and, finally, disposed.
+ * Implements a fake reference pointing to nothing. Just the reference.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Server {
+public class FakeReference implements Reference {
 
-    /**
-     * Start the server without waiting time/blocking.
-     * 
-     * @return <b>this</b>
-     */
-    public Server start();
-    
-    /**
-     * Stop the server. So far, we make no statement whether re-starting the server is possible, but it is safe to 
-     * assume that re-starting is not foreseen.
-     * 
-     * @param dispose shall also allocated resources of this server be disposed
-     */
-    public void stop(boolean dispose);
+    @Override
+    public boolean hasReference() {
+        return true; // this is a fake
+    }
 
 }

@@ -13,8 +13,8 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
-import test.de.iip_ecosphere.platform.support.aas.PrintVisitorTest;
+import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
+import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
 
 /**
  * Defines the tests to be executed.

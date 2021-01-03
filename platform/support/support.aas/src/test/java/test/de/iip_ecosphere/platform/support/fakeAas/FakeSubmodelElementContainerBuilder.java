@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.aas;
+package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;

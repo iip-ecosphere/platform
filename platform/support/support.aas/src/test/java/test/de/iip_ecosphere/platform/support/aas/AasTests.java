@@ -1,5 +1,4 @@
-/**
- * ******************************************************************************
+/********************************************************************************
  * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -9,21 +8,21 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-
 package test.de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.aas.Reference;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * Implements a fake reference pointing to nothing. Just the reference.
+ * Defines the tests to be executed.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FakeReference implements Reference {
-
-    @Override
-    public boolean hasReference() {
-        return true; // this is a fake
-    }
-
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    AasTest.class,
+    PersistenceTest.class,
+    DeploymentTest.class
+})
+public class AasTests {
 }

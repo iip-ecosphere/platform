@@ -10,11 +10,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.aas;
+package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
-import test.de.iip_ecosphere.platform.support.aas.FakeAas.FakeAasBuilder;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
 
 /**
  * Implements a fake asset.
