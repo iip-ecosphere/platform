@@ -48,8 +48,9 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParamete
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
+import test.de.iip_ecosphere.platform.support.aas.AasTest;
+import test.de.iip_ecosphere.platform.support.aas.TestMachine;
 import test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTest;
-import test.de.iip_ecosphere.platform.support.aas.basyx.TestMachine;
 
 /**
  * Tests {@link AasConnector} with polling and no security.
@@ -109,7 +110,7 @@ public class AasConnectorTest {
         
         TestMachine machine = new TestMachine();
         // start required here by basyx-0.1.0-SNAPSHOT
-        ccServer = BaSyxTest.createVabOperationsServer(VAB_PORT, machine).start(); 
+        ccServer = AasTest.createOperationsServer(VAB_PORT, machine).start(); 
         Aas aas = createAAS(machine);
 
         DeploymentRecipe dBuilder = AasFactory.getInstance()
@@ -129,10 +130,10 @@ public class AasConnectorTest {
      */
     @AfterClass
     public static void shutdown() {
-        httpServer.stop();
-        ccServer.stop();
+        httpServer.stop(true);
+        ccServer.stop(true);
         LOGGER.info("Platform/AAS server stopped");
-        platformAasServer.stop();
+        platformAasServer.stop(true);
 
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
     }
@@ -149,7 +150,7 @@ public class AasConnectorTest {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        BaSyxTest.createVabAasElements(subModelBuilder, AAS_IP, VAB_PORT);
+        BaSyxTest.createAasOperationsElements(subModelBuilder, AAS_IP, VAB_PORT);
         
         subModelBuilder.build();
         return aasBuilder.build();
@@ -213,7 +214,24 @@ public class AasConnectorTest {
         @Override
         public MachineData to(Object source) throws IOException {
             ModelAccess access = getModelAccess();
-            // as the connector accepts Objects, also directly casting would be ok
+            try {
+                access.get("abxy"); // no submodel
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.get("ab" + access.getQSeparator() + "abxy"); // submodel/property does not exist
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.get(NAME_SUBMODEL + access.getQSeparator() + "abxy"); // property does not exist
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
             return new MachineData(
                 (int) access.get(QNAME_VAR_LOTSIZE), 
                 (double) access.get(QNAME_VAR_POWCONSUMPTION));
@@ -246,16 +264,41 @@ public class AasConnectorTest {
 
         @Override
         public Object from(MachineCommand data) throws IOException {
+            ModelAccess access = getModelAccess();
             // generated code with "semantic" from configuration model
             if (data.start) {
-                getModelAccess().call(QNAME_OP_STARTMACHINE);
+                access.call(QNAME_OP_STARTMACHINE);
             }
             if (data.stop) {
-                getModelAccess().call(QNAME_OP_STOPMACHINE);
+                access.call(QNAME_OP_STOPMACHINE);
             }
             if (data.lotSize > 0) {
                 // as the connector accepts Objects, also data.lotSize would be ok
-                getModelAccess().set(QNAME_VAR_LOTSIZE, data.lotSize);
+                access.set(QNAME_VAR_LOTSIZE, data.lotSize);
+            }
+            try {
+                access.set(NAME_SUBMODEL + access.getQSeparator() + "abxy", ""); // property does not exist
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.call(NAME_SUBMODEL + access.getQSeparator() + "abxy"); // operation does not exist
+                Assert.fail("Operation shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.call("abc" + access.getQSeparator() + "abxy"); // submodel/operation do not exist
+                Assert.fail("Operation shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.call("abxy"); // no submodel
+                Assert.fail("Operation shall not exist");
+            } catch (IOException e) {
+                // expected
             }
             return null; // irrelevant
         }
