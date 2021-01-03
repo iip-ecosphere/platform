@@ -23,7 +23,7 @@ import org.junit.runners.Suite;
     ToolTests.class,
     BaSyxTest.class,
     BaSyxPersistenceTest.class,
-    DeploymentTest.class
+    BaSyxDeploymentTest.class
 })
 public class AllTests {
 }

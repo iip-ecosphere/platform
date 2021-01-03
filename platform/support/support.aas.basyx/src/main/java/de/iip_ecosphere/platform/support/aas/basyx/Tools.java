@@ -12,13 +12,17 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -231,6 +235,31 @@ public class Tools {
             }
         }
         return result;
+    }
+    
+    /**
+     * Tries to dispose a Tomcat working directory.
+     * 
+     * @param baseDir the basic directory where the working directory is located in, may be <b>null</b> for default,
+     *   i.e., program home directory
+     * @param port the port number of the disposed Tomcat instance
+     */
+    static void disposeTomcatWorkingDir(File baseDir, int port) {
+        if (null == baseDir) {
+            baseDir = new File(".");
+        }
+        File workDir = new File(baseDir, "tomcat." + port);
+        if (workDir.exists()) {
+            if (!FileUtils.deleteQuietly(workDir)) { // may fail if process is not terminated, see Tomcats workaround
+                try {
+                    FileUtils.forceDeleteOnExit(workDir);
+                } catch (IOException e) {
+                }
+            }
+        } else {
+            LoggerFactory.getLogger(Tools.class).warn("Tomcat working directory '" + workDir.getAbsolutePath() 
+                + "' not found for disposal.");
+        }
     }
 
 }

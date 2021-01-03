@@ -266,6 +266,13 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
             desc.aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(sm.getSubmodel(), 
                 AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.endpoint, aas, submodel)));
         }
+        
+        @Override
+        public void stop(boolean dispose) {
+            if (dispose) {
+                Tools.disposeTomcatWorkingDir(null, deploymentSpec.endpoint.getPort());
+            }
+        }
 
     }
 
@@ -296,10 +303,11 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         }
 
         @Override
-        public void stop() {
+        public void stop(boolean dispose) {
             if (Tomcats.guardStop(server)) {
                 server.shutdown();
             }
+            super.stop(dispose); // if not disposable, schedule for deletion at JVM end
         }
 
     }
@@ -335,10 +343,11 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         }
 
         @Override
-        public void stop() {
+        public void stop(boolean dispose) {
             if (Tomcats.guardStop(server)) {
                 server.stopComponent();
             }
+            super.stop(dispose); // if not disposable, schedule for deletion at JVM end
         }
 
     }
@@ -375,10 +384,10 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
             }
 
             @Override
-            public void stop() {
+            public void stop(boolean dispose) {
                 server.stop();
             }
-            
+
         };
         return result;
     }
