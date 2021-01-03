@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import test.de.iip_ecosphere.platform.support.aas.FactoryTest;
+import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.Product;

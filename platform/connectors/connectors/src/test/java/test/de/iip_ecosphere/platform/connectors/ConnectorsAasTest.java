@@ -292,7 +292,7 @@ public class ConnectorsAasTest {
         System.out.println("Disconnected connector 2");
         testActiveDescriptors(connectors, 2);
         
-        server.stop();
+        server.stop(true);
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
     }
     
