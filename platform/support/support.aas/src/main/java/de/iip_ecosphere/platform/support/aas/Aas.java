@@ -24,7 +24,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 public interface Aas extends Element, Identifiable, HasDataSpecification {
     
     /**
-     * Used to build an AAS.
+     * Used to build an AAS. For creating an instance/type AAS, use 
+     * {@link #createAssetBuilder(String, String, AssetKind)}. 
      * 
      * @author Holger Eichelberger, SSE
      */
