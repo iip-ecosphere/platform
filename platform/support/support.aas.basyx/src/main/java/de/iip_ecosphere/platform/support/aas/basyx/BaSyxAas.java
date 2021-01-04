@@ -16,6 +16,7 @@ import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
@@ -66,6 +67,11 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
 
         @Override
         public Aas build() {
+            if (null == instance.getAsset()) {
+                LoggerFactory.getLogger(getClass()).warn("AAS does not have an asset, i.e., the AAS does not indicate"
+                    + "whether it is an instance or a type. Further, the missing asset may prevent persisting the "
+                    + "AAS.");
+            }
             return instance;
         }
 
