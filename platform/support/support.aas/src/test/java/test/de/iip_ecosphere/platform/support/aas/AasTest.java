@@ -113,9 +113,8 @@ public class AasTest {
             machine.start();
             return null;
         });
-        builder.defineOperation(NAME_OP_RECONFIGURE, (params) -> {
-            return machine.reconfigure((int) params[0]);
-        });
+        builder.defineOperation(NAME_OP_RECONFIGURE, (params) 
+            -> machine.reconfigure((int) params[0]));
         builder.defineOperation(NAME_OP_STOPMACHINE, (params) -> {
             machine.stop();
             return null;
