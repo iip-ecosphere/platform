@@ -24,8 +24,6 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
 
-import com.sun.xml.txw2.IllegalAnnotationException;
-
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
@@ -320,7 +318,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      */
     public VabIipOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
         if (properties.containsKey(name)) {
-            throw new IllegalAnnotationException("Property " + name + " is already known");
+            throw new IllegalArgumentException("Property " + name + " is already known");
         }
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
