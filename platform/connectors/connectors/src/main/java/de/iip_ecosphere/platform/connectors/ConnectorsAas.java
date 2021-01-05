@@ -14,14 +14,12 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -59,7 +57,6 @@ import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
  *             (see {@link ClassUtility})</li>
  *           <li>property or referenceElement: outType = <i>string or ref to types submodel</i>
  *             (see {@link ClassUtility})</li>
- *           <li>property: active = <i>true or false</i></li>
  *           <li>referenceElement: descriptor = <i>ref to respective submodel element collection in 
  *             installedConnectors</i> (present only if the descriptor is in the target submodel)</li>
  *         </ul>
@@ -86,17 +83,7 @@ public class ConnectorsAas implements AasContributor {
     public static final String NAME_SMC_VAR_CONNECTOR = "name";
     public static final String NAME_SMC_VAR_OUT = "outType";
     public static final String NAME_SMC_VAR_IN = "inType";
-    public static final String NAME_SMC_VAR_ACTIVE = "active";
     public static final String NAME_SMC_VAR_DESCRIPTOR = "descriptor";
-
-    // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
-    /**
-     * Defines whether changing the {@link #NAME_SMC_VAR_ACTIVE} property is permitted. So far, this does not work, 
-     * either due to a bug in the abstraction or in BaSyx. May be, the property is somehow not allowed for writing
-     * and the error message is weird.
-     */
-    public static final boolean ENABLE_ACTIVE_WRITING = false;
-    public static final boolean ENABLE_ACTIVE_READING = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorsAas.class);
 
@@ -151,7 +138,7 @@ public class ConnectorsAas implements AasContributor {
                     String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
                     SubmodelElementCollection coll = submodel.getSubmodelElementCollection(idShort);
                     if (null != coll) {
-                        setPropertyValue(coll, NAME_SMC_VAR_ACTIVE, false);
+                        submodel.delete(coll);
                     } else {
                         LOGGER.error("No element collection for connector: " + NAME_CONNECTORS_SUBMODEL 
                             + "/" + idShort);
@@ -162,30 +149,6 @@ public class ConnectorsAas implements AasContributor {
             }
         } catch (IOException e) {
             LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Changes a property value on a (deployed) AAS.
-     * 
-     * @param coll the sub-model element collection
-     * @param idShort the short id
-     * @param value the new value
-     * @throws ExecutionException in case that writing fails for some reason
-     */
-    private static void setPropertyValue(SubmodelElementCollection coll, String idShort, Object value) 
-        throws ExecutionException {
-        Property prop = coll.getProperty(idShort);
-        if (null != prop) {
-            if (ENABLE_ACTIVE_WRITING) {
-                prop.setValue(value);  
-            } else {
-                prop.getValue(); // useless, but works anyway
-            }
-        } else {
-            LOGGER.error("No property: " + NAME_CONNECTORS_SUBMODEL + "/" + coll.getIdShort() + "/" + idShort);
         }
     }
 
@@ -231,9 +194,6 @@ public class ConnectorsAas implements AasContributor {
             .build();
         ClassUtility.addTypeSubModelElement(smcb, NAME_SMC_VAR_OUT, connector.getConnectorOutputType());
         ClassUtility.addTypeSubModelElement(smcb, NAME_SMC_VAR_IN, connector.getConnectorInputType());
-        smcb.createPropertyBuilder(NAME_SMC_VAR_ACTIVE)
-            .setValue(Type.BOOLEAN, true)
-            .build();
 
         String descName = ClassUtility.getName(connector.getClass());
         SubmodelElementCollection descC = descriptors.getSubmodelElementCollection(descName);

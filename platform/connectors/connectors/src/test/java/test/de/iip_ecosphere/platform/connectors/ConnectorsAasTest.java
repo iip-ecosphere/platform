@@ -37,8 +37,6 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -241,6 +239,14 @@ public class ConnectorsAasTest {
         private boolean value2;
     }
 
+    /**
+     * Print the AAS to the console.
+     * 
+     * @param aas the AAS to print
+     */
+    private void printOut(Aas aas) {
+        //aas.accept(new AasPrintVisitor()); currently disabled due to elements problems
+    }
 
     /**
      * Tests the connectors AAS.
@@ -256,10 +262,10 @@ public class ConnectorsAasTest {
         List<Aas> aasList = AasPartRegistry.build();
         Aas aas = AasPartRegistry.getAas(aasList, AasPartRegistry.NAME_AAS);
         Assert.assertNotNull(aas);
-        aas.accept(new AasPrintVisitor());
+        printOut(aas);
         testDescriptorsSubmodel(aas);
         
-        aas.accept(new AasPrintVisitor());
+        printOut(aas);
         AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "localhost", 4005, "registry"));
         Server server = AasPartRegistry.deploy(aasList).start();
 
@@ -285,12 +291,12 @@ public class ConnectorsAasTest {
         connectors.remove(connector1);
         connector1.disconnect();
         System.out.println("Disconnected connector 1");
-        testActiveDescriptors(connectors, 2);
+        testActiveDescriptors(connectors, 1);
         
         connectors.remove(connector2);
         connector2.disconnect();
         System.out.println("Disconnected connector 2");
-        testActiveDescriptors(connectors, 2);
+        testActiveDescriptors(connectors, 0);
         
         server.stop(true);
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
@@ -490,11 +496,8 @@ public class ConnectorsAasTest {
      * @throws IOException shall not occur
      */
     private void testActiveDescriptors(List<Connector<?, ?, ?, ?>> connectors, int expectedActive) throws IOException {
-        if (!ConnectorsAas.ENABLE_ACTIVE_READING) {  // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
-            return;
-        }
         Aas aas = AasPartRegistry.retrieveIipAas();
-        aas.accept(new AasPrintVisitor());
+        printOut(aas);
         System.out.println();
         
         Assert.assertNotNull(aas);
@@ -512,42 +515,9 @@ public class ConnectorsAasTest {
                 assertReferenceElement(true, connElt, ConnectorsAas.NAME_SMC_VAR_OUT);
                 assertStringProperty(c.getName(), connElt, ConnectorsAas.NAME_SMC_VAR_CONNECTOR);
                 assertReferenceElement(true, connElt, ConnectorsAas.NAME_SMC_VAR_DESCRIPTOR);
-                // these are only the active ones!
-                assertBooleanProperty(true, connElt, ConnectorsAas.NAME_SMC_VAR_ACTIVE);
             } catch (ExecutionException e) {
                 Assert.fail(e.getMessage());
             }
-        }
-        
-        if (ConnectorsAas.ENABLE_ACTIVE_WRITING) {
-            cdsm.accept(new BasicAasVisitor() {
-
-                private int activeCount = 0;
-                private int passiveCount = 0;
-
-                @Override
-                public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
-                    try {
-                        Property prop = collection.getProperty(ConnectorsAas.NAME_SMC_VAR_ACTIVE);
-                        Assert.assertNotNull(prop);
-                        Assert.assertTrue(prop.getValue() instanceof Boolean);
-                        if ((boolean) prop.getValue()) {
-                            activeCount++;
-                        } else {
-                            passiveCount++;
-                        }
-                    } catch (ExecutionException e) {
-                        Assert.fail(e.getMessage());
-                    }
-                }
-                
-                @Override
-                public void endSubmodel(Submodel submodel) {
-                    Assert.assertEquals(expectedActive, activeCount);
-                    Assert.assertEquals(connectors.size(), activeCount + passiveCount);
-                }
-                
-            });
         }
     }
 
