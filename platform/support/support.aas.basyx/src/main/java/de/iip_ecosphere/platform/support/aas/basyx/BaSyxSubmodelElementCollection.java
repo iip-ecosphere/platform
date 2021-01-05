@@ -55,6 +55,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxSubmodelElementCollection instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection collection;
+        private boolean isNew = true;
         
         /**
          * Creates a sub-model element collection builder. The parent builder must be set by the calling
@@ -86,6 +87,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             BaSyxSubmodelElementCollection instance) {
             this.parentBuilder = parentBuilder;
             this.instance = instance;
+            this.isNew = false;
             if (instance.collection 
                 instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) {
                 this.collection = (org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) 
@@ -174,6 +176,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         protected AbstractSubmodel<ISubModel> getInstance() {
             return null;
+        }
+
+        @Override
+        public boolean isNew() {
+            return isNew;
         }
         
     }

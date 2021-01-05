@@ -45,6 +45,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         private BaSyxAbstractAasBuilder parentBuilder;
         private BaSyxSubmodel instance;
         private SubModel submodel;
+        private boolean isNew = true;
 
         /**
          * Creates an instance. Prevents external creation.
@@ -83,6 +84,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, BaSyxSubmodel instance) {
             this.parentBuilder = parentBuilder;
             this.instance = instance;
+            this.isNew = false;
         }
 
         @Override
@@ -118,6 +120,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         @Override
         protected AbstractSubmodel<SubModel> getInstance() {
             return instance;
+        }
+
+        @Override
+        public boolean isNew() {
+            return isNew;
         }
 
     }

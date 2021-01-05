@@ -12,14 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
-import de.iip_ecosphere.platform.support.aas.basyx.Tomcats;
-
 /**
  * Tests deployment scenarios.
  * 
@@ -27,26 +19,4 @@ import de.iip_ecosphere.platform.support.aas.basyx.Tomcats;
  */
 public class BaSyxDeploymentTest extends test.de.iip_ecosphere.platform.support.aas.DeploymentTest {
     
-    /**
-     * Tests a changed attribute value on a dynamically deployed sub-model elements collection. Does not work,
-     * similarly when creating the connectors component AAS.
-     * 
-     * @throws IOException shall not occur
-     * @throws ExecutionException shall not occur
-     */
-    @Ignore("Fails setting value with ResourceNotFoundException -> tries to access ArrayList")
-    @Test
-    public void localDynamicSubmodelElementsCollectionPropertyDeployment() throws IOException, ExecutionException {
-        super.localDynamicSubmodelElementsCollectionPropertyDeployment();
-    }
-
-    /**
-     * Tests a remote AAS deployment.
-     */
-    @Test
-    public void remoteAasDeploymentTest() throws IOException {
-        super.remoteAasDeploymentTest();
-        Tomcats.clear(); // just that it is done once
-    }
-
 }

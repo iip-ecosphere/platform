@@ -78,15 +78,12 @@ public class BaSyxAasFactory extends AasFactory {
             @Override
             public Server start() {
                 component.startComponent();
-                Tomcats.registerStart(component);
                 return this;
             }
 
             @Override
             public void stop(boolean dispose) {
-                if (Tomcats.guardStop(component)) {
-                    component.stopComponent();
-                }
+                component.stopComponent();
                 if (dispose) { // if not disposable, schedule for deletion at JVM end
                     Tools.disposeTomcatWorkingDir(null, endpoint.getPort());
                 }

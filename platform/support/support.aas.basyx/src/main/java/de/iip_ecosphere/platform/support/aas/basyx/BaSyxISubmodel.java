@@ -88,6 +88,11 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
             return instance;
         }
 
+        @Override
+        public boolean isNew() {
+            return false; // see constructor
+        }
+
     }
     
     /**

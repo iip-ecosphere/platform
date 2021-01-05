@@ -12,13 +12,12 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -42,10 +41,10 @@ import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.Submod
 public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel, SubmodelElementsRegistrar {
 
     private S submodel;
-    private List<Operation> operations = new ArrayList<>();
+    private Map<String, Operation> operations = new HashMap<>();
     private Map<String, DataElement> dataElements = new HashMap<>(); // TODO now partly values in BaSyx
     private Map<String, Property> properties = new HashMap<>();
-    private List<SubmodelElement> submodelElements = new ArrayList<>();
+    private Map<String, SubmodelElement> submodelElements = new HashMap<>();
 
     /**
      * Creates an instance. Prevents external creation.
@@ -66,14 +65,28 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     }
     
     /**
+     * Emits a warning.
+     * 
+     * @param msg the message to be emitted
+     */
+    private void warn(String msg) {
+        LoggerFactory.getLogger(getClass()).warn(msg);
+    }
+    
+    /**
      * Registers an operation.
      * 
      * @param operation the operation
      * @return {@code operation}
      */
     public BaSyxOperation register(BaSyxOperation operation) {
-        operations.add(operation);
-        submodelElements.add(operation);
+        String id = operation.getIdShort();
+        if (operations.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already an operation/element with short id '" + id + "'. "
+                + "The property/element may be redefined.");
+        }
+        operations.put(id, operation);
+        submodelElements.put(id, operation);
         return operation;
     }
     
@@ -84,8 +97,13 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
      * @return {@code property}
      */
     public BaSyxProperty register(BaSyxProperty property) {
-        properties.put(property.getIdShort(), property);
-        submodelElements.add(property);
+        String id = property.getIdShort();
+        if (properties.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already a property/element with short id '" + id + "'. "
+                + "The property/element may be redefined.");
+        }
+        properties.put(id, property);
+        submodelElements.put(id, property);
         return property;
     }
     
@@ -96,7 +114,12 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
      * @return {@code reference}
      */
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-        submodelElements.add(reference);
+        String id = reference.getIdShort();
+        if (submodelElements.containsKey(id)) {
+            warn("There is already a reference/element with short id '" + id + "'. "
+                + "The reference/element may be redefined.");
+        }
+        submodelElements.put(id, reference);
         return reference;
     }
 
@@ -107,7 +130,12 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
      * @return {@code collection}
      */
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
-        submodelElements.add(collection);
+        String id = collection.getIdShort();
+        if (submodelElements.containsKey(id)) {
+            warn("There is already a collection/element with short id '" + id + "'. "
+                + "The collection/element may be redefined.");
+        }
+        submodelElements.put(id, collection);
         return collection;
     }
 
@@ -118,7 +146,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     @Override
     public Iterable<SubmodelElement> submodelElements() {
-        return submodelElements;
+        return submodelElements.values();
     }
 
     @Override
@@ -133,7 +161,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
 
     @Override
     public Iterable<Operation> operations() {
-        return operations;
+        return operations.values();
     }
 
     @Override
@@ -171,11 +199,9 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
         // looping may not be efficient, let's see
         ReferenceElement found = null;
         try {
-            for (SubmodelElement elt : submodelElements) {
-                if (elt instanceof ReferenceElement && elt.getIdShort().equals(idShort)) {
-                    found = (ReferenceElement) elt;
-                    break;
-                }
+            SubmodelElement elt = submodelElements.get(idShort);
+            if (elt instanceof ReferenceElement) {
+                found = (ReferenceElement) elt;
             }
         } catch (ResourceNotFoundException e) {
         }
@@ -183,41 +209,13 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     }
     
     @Override
-    public Operation getOperation(String idShort, int numArgs) {
-        Operation found = null;
-        for (Operation op : operations) {
-            if (op.getIdShort().equals(idShort) && numArgs == op.getArgsCount()) {
-                found = op;
-                break;
-            }
-        }
-        return found;
-    }
-
-    @Override
-    public Operation getOperation(String idShort, int inArgs, int outArgs, int inOutArgs) {
-        Operation found = null;
-        for (Operation op : operations) {
-            if (op.getIdShort().equals(idShort) && inArgs == op.getInArgsCount() && outArgs == op.getOutArgsCount() 
-                && inOutArgs == op.getInOutArgsCount()) {
-                found = op;
-                break;
-            }
-        }
-        return found;
+    public Operation getOperation(String idShort) {
+        return operations.get(idShort);
     }
 
     @Override
     public SubmodelElement getSubmodelElement(String idShort) {
-        // looping may not be efficient, let's see
-        SubmodelElement found = null;
-        for (SubmodelElement se : submodelElements) {
-            if (se.getIdShort().equals(idShort)) {
-                found = se;
-                break;
-            }
-        }
-        return found;
+        return submodelElements.get(idShort);
     }
     
     @Override
@@ -236,11 +234,11 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
         for (DataElement de : dataElements.values()) {
             de.accept(visitor);
         }
-        for (Operation op : operations) {
+        for (Operation op : operations.values()) {
             op.accept(visitor);
         }
-        for (SubmodelElement se : submodelElements) {
-            // remaining elements
+        for (SubmodelElement se : submodelElements.values()) {
+            // remaining elements, don't iterate over them again
             if (!(se instanceof DataElement && se instanceof Operation)) {
                 se.accept(visitor);
             }
@@ -260,10 +258,10 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
                 properties.remove(elt.getIdShort());
             } else if (elt instanceof DataElement) {
                 dataElements.remove(elt.getIdShort());
-            } else {
-                operations.remove(elt);
-                submodelElements.remove(elt);
+            } else if (elt instanceof Operation) {
+                operations.remove(elt.getIdShort());
             }
+            submodelElements.remove(elt.getIdShort());
             submodel.deleteSubmodelElement(elt.getIdShort());
         } catch (ResourceNotFoundException e) {
         }

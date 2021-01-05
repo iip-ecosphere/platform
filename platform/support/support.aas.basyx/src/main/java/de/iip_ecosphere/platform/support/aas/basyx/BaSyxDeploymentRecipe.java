@@ -298,15 +298,12 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         @Override
         public AasServer start() {
             server.start();
-            Tomcats.registerStart(server);
             return this;
         }
 
         @Override
         public void stop(boolean dispose) {
-            if (Tomcats.guardStop(server)) {
-                server.shutdown();
-            }
+            server.shutdown();
             super.stop(dispose); // if not disposable, schedule for deletion at JVM end
         }
 
@@ -338,15 +335,12 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         @Override
         public AasServer start() {
             server.startComponent();
-            Tomcats.registerStart(server);
             return this;
         }
 
         @Override
         public void stop(boolean dispose) {
-            if (Tomcats.guardStop(server)) {
-                server.stopComponent();
-            }
+            server.stopComponent();
             super.stop(dispose); // if not disposable, schedule for deletion at JVM end
         }
 
