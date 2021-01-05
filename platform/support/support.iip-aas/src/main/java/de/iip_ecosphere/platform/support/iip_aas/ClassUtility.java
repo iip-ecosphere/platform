@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -45,6 +47,8 @@ import de.iip_ecosphere.platform.support.aas.Type;
  *   <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
  * </ul>
  * 
+ * Attributes marked by {@link Skip} will not be listed.
+ * 
  * The implemented format is initial and will change over time (array of ref type unclear, generics).
  * 
  * @author Holger Eichelberger, SSE
@@ -53,6 +57,47 @@ public class ClassUtility {
 
     public static final String NAME_TYPE_SUBMODEL = "types";
     private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
+    private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
+    
+    /**
+     * Registers a {@code type} by its simple name.
+     * 
+     * @param type the type
+     */
+    private static void registerBySimpleName(Class<?> type) {
+        NAME_MAPPING.put(type, type.getSimpleName());
+    }
+
+    /**
+     * Registers a {@code type} by the simple name of {@code nameType}, e.g., to map wrappers to their primitive types.
+     * 
+     * @param type the type
+     * @param nameType the type providing the name
+     */
+    private static void registerBySimpleName(Class<?> type, Class<?> nameType) {
+        NAME_MAPPING.put(type, nameType.getSimpleName());
+    }
+
+    static {
+        // the primitive types
+        registerBySimpleName(Integer.TYPE);
+        registerBySimpleName(Long.TYPE);
+        registerBySimpleName(Double.TYPE);
+        registerBySimpleName(Float.TYPE);
+        registerBySimpleName(Boolean.TYPE);
+        registerBySimpleName(Short.TYPE);
+        registerBySimpleName(Character.TYPE);
+        // string as pseudo-primitive
+        registerBySimpleName(String.class);
+        // the wrappers via their primitive types (boxing/unboxing)
+        registerBySimpleName(Integer.class, Integer.TYPE);
+        registerBySimpleName(Long.class, Long.TYPE);
+        registerBySimpleName(Double.class, Double.TYPE);
+        registerBySimpleName(Float.class, Float.TYPE);
+        registerBySimpleName(Boolean.class, Boolean.TYPE);
+        registerBySimpleName(Short.class, Short.TYPE);
+        registerBySimpleName(Character.class, Character.TYPE);
+    }
 
     /**
      * Adds a type to an AAS as sub-model. If the type already exists in the AAS/submodel, no new element will be 
@@ -111,17 +156,25 @@ public class ClassUtility {
         String idShort, Class<?> type) {
         SubmodelElement result;
         // TODO not modifiable properties
-        if (type.isPrimitive() || String.class == type) {
+        if (NAME_MAPPING.containsKey(type)) {
             result = subModelBuilder
                 .createPropertyBuilder(idShort)
                 .setType(Type.STRING)
-                .setValue(type.getSimpleName())
+                .setValue(NAME_MAPPING.get(type))
                 .build();
         } else if (type.isArray()) {
+            String simpleName = type.getSimpleName();
+            String name = NAME_MAPPING.get(type.getComponentType());
+            if (null == name) {
+                name = simpleName; // TODO preliminary, reference, needed?
+            } else {
+                int pos = simpleName.indexOf('[');
+                name = name + simpleName.substring(pos);
+            }
             result = subModelBuilder
                 .createPropertyBuilder(idShort)
                 .setType(Type.STRING)
-                .setValue(type.getSimpleName())
+                .setValue(name)
                 .build();
         } else {
             Reference aRef = addType(subModelBuilder.getAasBuilder(), type);
