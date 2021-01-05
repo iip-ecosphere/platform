@@ -65,16 +65,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
          * @return the created sub-model builder
          */
         public SubmodelBuilder obtainSubmodelBuilder(String idShort, String identifier) {
-            SubmodelBuilder result;
-            Submodel sub =  instance.getSubmodel(idShort);
-            if (null == instance.getSubmodel(idShort)) { // new here
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
-            } else if (sub instanceof BaSyxSubmodel) { // after add
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
-            } else { // connected
-                result = new BaSyxISubmodel.BaSyxISubmodelBuilder(this, (BaSyxISubmodel) sub);
-            }
-            return result;
+            return instance.obtainSubmodelBuilder(this, idShort, identifier);
         }
 
         @Override
@@ -126,10 +117,32 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
             register(new BaSyxISubmodel(this, sm));
         }
     }
+    
+    /**
+     * Obtains a sub-model builder.
+     *
+     * @param builder the AAS builder
+     * @param idShort the short id
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+     * @return the created sub-model builder
+     */
+    private SubmodelBuilder obtainSubmodelBuilder(BaSyxConnectedAasBuilder builder, String idShort, String identifier) {
+        SubmodelBuilder result;
+        Submodel sub =  getSubmodel(idShort);
+        if (null == getSubmodel(idShort)) { // new here
+            result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, idShort, identifier);
+        } else if (sub instanceof BaSyxSubmodel) { // after add
+            result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, (BaSyxSubmodel) sub);
+        } else { // connected
+            result = new BaSyxISubmodel.BaSyxISubmodelBuilder(builder, (BaSyxISubmodel) sub);
+        }
+        return result;
+    }
 
     @Override
     public SubmodelBuilder addSubmodel(String idShort, String identifier) {
-        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort, identifier);
+        return obtainSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort, identifier);
     }
 
 }
