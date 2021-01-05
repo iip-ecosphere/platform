@@ -266,7 +266,7 @@ public class ConnectorsAasTest {
         testDescriptorsSubmodel(aas);
         
         printOut(aas);
-        AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "localhost", 4005, "registry"));
+        AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
         Server server = AasPartRegistry.deploy(aasList).start();
 
         // do not go on with "aas" here... that is the local, non-deployed AAS. Connectors will modify deployed AAS.
