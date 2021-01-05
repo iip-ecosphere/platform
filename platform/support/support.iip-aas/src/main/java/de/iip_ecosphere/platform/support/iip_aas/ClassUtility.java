@@ -15,8 +15,6 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -55,10 +53,10 @@ public class ClassUtility {
 
     public static final String NAME_TYPE_SUBMODEL = "types";
     private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
-    private static Map<Class<?>, Reference> mapping = new HashMap<>();
 
     /**
-     * Adds a type to an AAS as sub-model. [static data]
+     * Adds a type to an AAS as sub-model. If the type already exists in the AAS/submodel, no new element will be 
+     * created just a reference to it will be returned. [static data]
      * 
      * @param aasBuilder the AAS builder
      * @param type the type to add
@@ -86,9 +84,7 @@ public class ClassUtility {
         if (type.isPrimitive() || type.isArray()) {
             result = null;
         } else {
-            result = mapping.get(type);
-            // TODO resolve from global dictionary?
-            if (null == result) {
+            if (builder.isNew()) {
                 for (Field f: type.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
                         addTypeSubModelElement(builder, translateToAasName(f.getName()), f.getType());
@@ -97,9 +93,8 @@ public class ClassUtility {
                 if (Object.class != type.getSuperclass()) {
                     addType(builder, type.getSuperclass());
                 }
-                result = builder.createReference();
-                mapping.put(type, result);
             }
+            result = builder.createReference();
         }
         return result;
     }
@@ -129,15 +124,12 @@ public class ClassUtility {
                 .setValue(type.getSimpleName())
                 .build();
         } else {
-            Reference aRef = mapping.get(type);
-            if (null == aRef) {
-                aRef = addType(subModelBuilder.getAasBuilder(), type);
-            } 
+            Reference aRef = addType(subModelBuilder.getAasBuilder(), type);
             result = subModelBuilder
                 .createReferenceElementBuilder(idShort)
                 .setValue(aRef)
                 .build();
-        }
+        }        
         return result;
     }
     
