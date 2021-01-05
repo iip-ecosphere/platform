@@ -204,7 +204,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 String operationName = qName.substring(pos + 1);
                 Submodel subModel = connectedAAS.getSubmodel(subModelName);
                 if (null != subModel) {
-                    Operation operation = subModel.getOperation(operationName, args.length);
+                    Operation operation = subModel.getOperation(operationName);
                     if (null != operation) {
                         try {
                             result = operation.invoke(args);
