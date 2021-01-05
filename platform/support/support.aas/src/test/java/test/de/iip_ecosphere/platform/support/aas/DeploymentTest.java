@@ -156,6 +156,7 @@ public class DeploymentTest {
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
         SubmodelElementCollectionBuilder smcB = sub.addSubmodelElementCollection("coll", false, false);
+        Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         smcB.build();
 

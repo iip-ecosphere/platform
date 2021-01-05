@@ -44,6 +44,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
         private FakeSubmodelElementContainerBuilder parent;
         private FakeSubmodelElementCollection instance;
+        private boolean isNew = true;
         
         /**
          * Creates a builder instance.
@@ -69,6 +70,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             FakeSubmodelElementCollection instance) {
             this.parent = parent;
             this.instance = instance;
+            this.isNew = false;
         }
         
         @Override
@@ -120,6 +122,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         @Override
         public AasBuilder getAasBuilder() {
             return parent.getAasBuilder();
+        }
+
+        @Override
+        public boolean isNew() {
+            return isNew;
         }
         
     }

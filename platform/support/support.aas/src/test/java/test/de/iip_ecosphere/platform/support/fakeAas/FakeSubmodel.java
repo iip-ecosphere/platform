@@ -50,6 +50,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
         private FakeAasBuilder parent;
         private FakeSubmodel instance;
+        private boolean isNew = true;
 
         /**
          * Creates an instance.
@@ -84,6 +85,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         FakeSubmodelBuilder(FakeAasBuilder parent, FakeSubmodel instance) {
             this.parent = parent;
             this.instance = instance;
+            this.isNew = false;
         }
         
         @Override
@@ -135,6 +137,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         @Override
         public AasBuilder getAasBuilder() {
             return parent;
+        }
+
+        @Override
+        public boolean isNew() {
+            return isNew;
         }
         
     }
@@ -249,30 +256,8 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
-    public Operation getOperation(String idShort, int numArgs) {
-        Operation found = null;
-        List<Operation> ops = filter(Operation.class);
-        for (Operation o : ops) {
-            if (o.getIdShort().equals(idShort) && o.getArgsCount() == numArgs) {
-                found = o;
-                break;
-            }
-        }
-        return found;
-    }
-
-    @Override
-    public Operation getOperation(String idShort, int inArgs, int outArgs, int inOutArgs) {
-        Operation found = null;
-        List<Operation> ops = filter(Operation.class);
-        for (Operation o : ops) {
-            if (o.getIdShort().equals(idShort) && o.getInArgsCount() == inArgs && o.getOutArgsCount() == outArgs 
-                    && o.getInOutArgsCount() == inOutArgs) {
-                found = o;
-                break;
-            }
-        }
-        return found;
+    public Operation getOperation(String idShort) {
+        return filter(idShort, Operation.class);
     }
 
     @Override

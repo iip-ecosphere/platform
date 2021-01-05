@@ -64,24 +64,12 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     public ReferenceElement getReferenceElement(String idShort);
 
     /**
-     * Returns an operation with the given name and the given number of arguments.
+     * Returns an operation with the given short name.
      * 
      * @param idShort the short id of the property
-     * @param numArgs the number of arguments regardless whether they are in/out/inout
-     * @return the property, <b>null</b> for none
+     * @return the operation, <b>null</b> for none
      */
-    public Operation getOperation(String idShort, int numArgs);
-    
-    /**
-     * Returns an operation with the given name and the given number of arguments.
-     * 
-     * @param idShort the short id of the property
-     * @param inArgs the number of ingoing arguments/variables
-     * @param outArgs the number of outgoing arguments/variables
-     * @param inOutArgs the number of in/outgoing arguments/variables
-     * @return the property, <b>null</b> for none
-     */
-    public Operation getOperation(String idShort, int inArgs, int outArgs, int inOutArgs);
+    public Operation getOperation(String idShort);
 
     /**
      * Returns a sub-model element with the given name.

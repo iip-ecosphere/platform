@@ -189,6 +189,7 @@ public class AasTest {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        Assert.assertTrue(subModelBuilder.isNew());
         createAasOperationsElements(subModelBuilder, HOST_AAS, PORT_VAB);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
@@ -220,7 +221,7 @@ public class AasTest {
         assertSize(0, submodel.dataElements());
         assertSize(2, submodel.properties());
         assertSize(6, submodel.submodelElements());
-        Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE, 1));
+        Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE));
         Assert.assertEquals(6, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
@@ -262,17 +263,17 @@ public class AasTest {
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
 
         Assert.assertEquals(3, submodel.getOperationsCount());
-        Operation op = submodel.getOperation(NAME_OP_STARTMACHINE, 0, 0, 0);
+        Operation op = submodel.getOperation(NAME_OP_STARTMACHINE);
         Assert.assertNotNull(op);
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
-        op = submodel.getOperation(NAME_OP_RECONFIGURE, 1, 0, 0);
+        op = submodel.getOperation(NAME_OP_RECONFIGURE);
         Assert.assertNotNull(op);
         op.invoke(5);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
-        op = submodel.getOperation(NAME_OP_STOPMACHINE, 0, 0, 0);
+        op = submodel.getOperation(NAME_OP_STOPMACHINE);
         Assert.assertNotNull(op);
         op.invoke();
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());

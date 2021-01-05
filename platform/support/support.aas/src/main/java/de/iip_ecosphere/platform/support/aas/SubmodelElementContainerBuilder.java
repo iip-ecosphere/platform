@@ -66,5 +66,12 @@ public interface SubmodelElementContainerBuilder {
      * @return the AAS builder
      */
     public AasBuilder getAasBuilder();
+    
+    /**
+     * Returns whether a new element is being created or the builder refers to an existing element.
+     * 
+     * @return {@code true} for new, {@code false} for existing
+     */
+    public boolean isNew();
 
 }
