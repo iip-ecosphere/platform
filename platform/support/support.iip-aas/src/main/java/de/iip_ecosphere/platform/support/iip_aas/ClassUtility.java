@@ -30,13 +30,21 @@ import de.iip_ecosphere.platform.support.aas.Type;
  * Utility functions for representing types in AAS. A Java type is turned into
  * 
  * <ul>
- *   <li>submodel: types
+ *   <li>Submodel: types
  *     <ul>
- *       <li>submodel elements collection: <i>Java type name, inner classes as "."</i>
+ *       <li>Submodel elements collection: <i>Java type name, inner classes as "."</i>
  *       <ul>
- *         <li>Property: {@link #ATTRIBUTE_PREFIX} + attribute1 name, value = type (for primitives, arrays and 
+ *         <li>Property: {@link #ATTRIBUTE_PREFIX} + attribute name, value = type (for primitives or 
  *             String)</li>
- *         <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
+ *         <li>Submodel elements collection: {@link #ATTRIBUTE_PREFIX} + attribute name
+ *             <ul>
+ *                <li>Property/ReferenceElement: {@link #NAME_ARRAY_PROPERTY_TYPE} (property for primitives or String, 
+ *                    reference element for reference types)</li>
+ *                <li>Property {@link #NAME_ARRAY_PROPERTY_DIMENSIONS} numeric number of nested array dimensions</li>
+ *             </ul>
+ *         </li>
+ *         <li>ReferenceElement: {@link #ATTRIBUTE_PREFIX} + attribute name, 
+ *             value = ref-to collection (for reference types)</li>
  *       </ul>
  *     </ul>
  *   </li>
@@ -59,6 +67,8 @@ public class ClassUtility {
 
     public static final String NAME_TYPE_SUBMODEL = "types";
     public static final String ATTRIBUTE_PREFIX = "attr_"; //TODO BaSyx 0.1.0-SNAPSHOT fails with "value" etc
+    public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
+    public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
     private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
@@ -167,19 +177,15 @@ public class ClassUtility {
                 .setValue(NAME_MAPPING.get(type))
                 .build();
         } else if (type.isArray()) {
-            String simpleName = type.getSimpleName();
-            String name = NAME_MAPPING.get(type.getComponentType());
-            if (null == name) {
-                name = simpleName; // TODO preliminary, reference, needed?
-            } else {
-                int pos = simpleName.indexOf('[');
-                name = name + simpleName.substring(pos);
-            }
-            result = subModelBuilder
-                .createPropertyBuilder(idShort)
-                .setType(Type.STRING)
-                .setValue(name)
+            SubmodelElementCollectionBuilder cBuilder = subModelBuilder.createSubmodelElementCollectionBuilder(
+                idShort, false, false);
+            addTypeSubModelElement(cBuilder, NAME_ARRAY_PROPERTY_TYPE, type.getComponentType());
+            cBuilder
+                .createPropertyBuilder(NAME_ARRAY_PROPERTY_DIMENSIONS)
+                .setType(Type.INTEGER)
+                .setValue((int) type.getSimpleName().chars().filter(c -> c == '[').count())
                 .build();
+            result = cBuilder.build();
         } else {
             Reference aRef = addType(subModelBuilder.getAasBuilder(), type);
             result = subModelBuilder

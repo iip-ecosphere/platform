@@ -136,8 +136,10 @@ public class ClassUtilityTest {
         Assert.assertNotNull(typeC);
         Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "unknown"));
         Assert.assertEquals("String", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "unknown").getValue());
-        Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "values"));
-        Assert.assertEquals("int[]", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "values").getValue());
+        SubmodelElementCollection smc = typeC.getSubmodelElementCollection(ClassUtility.ATTRIBUTE_PREFIX + "values");
+        Assert.assertNotNull(smc);
+        Assert.assertEquals("int", smc.getProperty("type").getValue());
+        Assert.assertEquals(1, smc.getProperty("nesting").getValue());
         Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "otherValue"));
         Assert.assertEquals("int", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "otherValue").getValue());
         Assert.assertNotNull(typeC.getReferenceElement(ClassUtility.ATTRIBUTE_PREFIX + "simple"));
