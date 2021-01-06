@@ -40,8 +40,8 @@ public class SchemaServerEndpointTest {
      */
     @Test
     public void testServerAddress() {
-        ServerAddress add = new ServerAddress(Schema.HTTP);
-        Assert.assertEquals(Schema.HTTP, add.getSchema());
+        ServerAddress add = new ServerAddress(Schema.IGNORE);
+        Assert.assertEquals(Schema.IGNORE, add.getSchema());
         Assert.assertTrue(add.getPort() > 0);
         Assert.assertEquals(ServerAddress.LOCALHOST, add.getHost());
         Assert.assertTrue(add.toUri().length() > 0);

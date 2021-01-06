@@ -19,7 +19,15 @@ package de.iip_ecosphere.platform.support;
  */
 public enum Schema {
 
-    HTTP("http://", false);
+    /**
+     * HTTP unencrypted.
+     */
+    HTTP("http://", false), 
+    
+    /**
+     * Use whatever you like.
+     */
+    IGNORE("", false);
     
     private String uriSchema;
     private boolean isEncrypted;
