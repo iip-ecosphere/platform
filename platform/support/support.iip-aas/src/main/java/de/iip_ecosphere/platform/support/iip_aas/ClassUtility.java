@@ -69,7 +69,7 @@ public class ClassUtility {
     public static final String ATTRIBUTE_PREFIX = "attr_"; // AAS id name limitation
     public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
     public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
-    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName().replace("@", "_");
+    private static final String JVM_NAME = translateToAasName(ManagementFactory.getRuntimeMXBean().getName());
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
     /**
@@ -197,13 +197,23 @@ public class ClassUtility {
     }
     
     /**
-     * Translates a Java identifier name to an AAS short name.
+     * Translates a name to an AAS short name.
      * 
-     * @param javaIdentifier the Java identifier
+     * @param name the name
      * @return the AAS short name
      */
-    static String translateToAasName(String javaIdentifier) {
-        return javaIdentifier.replace(".", "_");
+    public static String translateToAasName(String name) {
+        StringBuilder b = new StringBuilder(name);
+        for (int i = 0; i < b.length(); i++) {
+            char c = b.charAt(i);
+            if (!(Character.isDigit(c) || Character.isLetter(c) || c == '_')) {
+                b.setCharAt(i, '_');
+            }
+        }
+        if (b.length() > 0 && !Character.isLetter(b.charAt(0))) {
+            b.insert(0, "x");
+        }
+        return b.toString();
     }
     
     /**
@@ -213,7 +223,7 @@ public class ClassUtility {
      * @return the name
      */
     public static String getName(Class<?> type) {
-        return translateToAasName(type.getName().replace("$", "."));
+        return translateToAasName(type.getName());
     }
 
     /**
