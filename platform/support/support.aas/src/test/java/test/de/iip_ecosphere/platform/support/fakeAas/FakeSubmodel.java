@@ -271,7 +271,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
-    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
         FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
             new FakeAasBuilder(parent), this);

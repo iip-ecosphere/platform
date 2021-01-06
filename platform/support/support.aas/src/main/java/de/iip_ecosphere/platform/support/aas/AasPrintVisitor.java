@@ -85,7 +85,7 @@ public class AasPrintVisitor implements AasVisitor {
 
     @Override
     public void visitOperation(Operation operation) {
-        log("OPERATION " + operation.getIdShort()); // TODO + " #args " + operation.getArgsCount() broken by BaSyx-0.1.0
+        log("OPERATION " + operation.getIdShort() + " #args " + operation.getArgsCount());
     }
 
     @Override

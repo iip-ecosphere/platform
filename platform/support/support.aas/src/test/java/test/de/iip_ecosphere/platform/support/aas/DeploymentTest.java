@@ -66,7 +66,7 @@ public class DeploymentTest {
         Endpoint regEp = new Endpoint(serverAdr, registryPath);
         Registry reg = factory.obtainRegistry(regEp);
         aas = reg.retrieveAas(urn);
-        Submodel sub = aas.addSubmodel("dynamic", null).build();
+        Submodel sub = aas.createSubmodelBuilder("dynamic", null).build();
 
         server.deploy(aas, sub);
 
@@ -104,7 +104,7 @@ public class DeploymentTest {
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
-        SubmodelElementCollectionBuilder smcB = sub.addSubmodelElementCollection("coll", false, true);
+        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         smcB.build();
 
@@ -155,7 +155,7 @@ public class DeploymentTest {
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
-        SubmodelElementCollectionBuilder smcB = sub.addSubmodelElementCollection("coll", false, false);
+        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
         Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         smcB.build();

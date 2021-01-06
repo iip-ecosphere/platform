@@ -226,11 +226,11 @@ public class AasTest {
         Aas aas = aasBuilder.build();
         
         // adding on local models
-        Submodel subAdd = aas.addSubmodel("sub-add", null).build();
+        Submodel subAdd = aas.createSubmodelBuilder("sub-add", null).build();
         Assert.assertNotNull(aas.getSubmodel("sub-add"));
-        subAdd.addSubmodelElementCollection("sub-coll", true, true).build();
+        subAdd.createSubmodelElementCollectionBuilder("sub-coll", true, true).build();
         Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
-        submodel.addSubmodelElementCollection("sub-coll2", false, false).build();
+        submodel.createSubmodelElementCollectionBuilder("sub-coll2", false, false).build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
 
         aas.accept(new AasPrintVisitor()); // assert the accepts
@@ -298,11 +298,11 @@ public class AasTest {
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
 
         // adding on connected models
-        Submodel subAdd = aas.addSubmodel("conn-add", null).build();
+        Submodel subAdd = aas.createSubmodelBuilder("conn-add", null).build();
         Assert.assertNotNull(aas.getSubmodel("conn-add"));
-        subAdd.addSubmodelElementCollection("conn-coll", true, true).build();
+        subAdd.createSubmodelElementCollectionBuilder("conn-coll", true, true).build();
         Assert.assertNotNull(aas.getSubmodel("conn-add").getSubmodelElementCollection("conn-coll"));
-        submodel.addSubmodelElementCollection("conn-coll2", false, false).build();
+        submodel.createSubmodelElementCollectionBuilder("conn-coll2", false, false).build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("conn-coll2"));
         
         aas.accept(new AasPrintVisitor()); // assert the accepts

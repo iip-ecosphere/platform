@@ -138,7 +138,7 @@ public class FakeAas extends FakeElement implements Aas {
     }
 
     @Override
-    public SubmodelBuilder addSubmodel(String idShort, String urn) {
+    public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
         return new FakeSubmodel.FakeSubmodelBuilder(new FakeAasBuilder(this), idShort);
     }
 
