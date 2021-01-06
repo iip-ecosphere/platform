@@ -43,7 +43,8 @@ import org.springframework.util.MimeType;
 
 import com.rabbitmq.client.ConnectionFactory;
 
-import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -66,7 +67,7 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 @RunWith(SpringRunner.class)
 public class AmqpMessageBinderTest {
 
-    private static final int PORT = NetUtils.getEphemeralPort();
+    private static final ServerAddress ADDR = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
     private static TestQpidServer server;
     private static String received;
 
@@ -83,7 +84,7 @@ public class AmqpMessageBinderTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues
-                .of("amqp.port=" + PORT)
+                .of("amqp.port=" + ADDR.getPort())
                 .applyTo(applicationContext);
         }
         
@@ -96,13 +97,8 @@ public class AmqpMessageBinderTest {
      */
     @BeforeClass
     public static void init() {
-        server = new TestQpidServer();
-        final String host = "localhost";
-        try {
-            server.start(host, PORT);
-        } catch (IOException e) {
-            Assert.fail("BROKER PROBLEM " + e.getMessage());
-        }
+        server = new TestQpidServer(ADDR);
+        server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final RabbitMqAmqpTransportConnector infra = new RabbitMqAmqpTransportConnector() {
@@ -114,7 +110,7 @@ public class AmqpMessageBinderTest {
             
         };
         try {
-            infra.connect(TransportParameterBuilder.newBuilder(host, PORT).setApplicationId("infra").build());
+            infra.connect(TransportParameterBuilder.newBuilder(ADDR).setApplicationId("infra").build());
             infra.setReceptionCallback("amqpBinder", new ReceptionCallback<String>() {
     
                 @Override
@@ -134,7 +130,7 @@ public class AmqpMessageBinderTest {
         } catch (IOException e) {
             Assert.fail("CONNECTOR PROBLEM " + e.getMessage());
         }
-        System.out.println("Started infra client on " + host + " " + PORT);
+        System.out.println("Started infra client on " + ADDR.getHost() + " " + ADDR.getPort());
         TimeUtils.sleep(1000);
     }
     
@@ -144,7 +140,7 @@ public class AmqpMessageBinderTest {
     @AfterClass
     public static void shutdown() {
         AmqpClient.stopClient();
-        server.stop();
+        server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
     }
     
@@ -160,7 +156,7 @@ public class AmqpMessageBinderTest {
         
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
-        Assert.assertEquals(PORT, params.getPort());
+        Assert.assertEquals(ADDR.getPort(), params.getPort());
         Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
 

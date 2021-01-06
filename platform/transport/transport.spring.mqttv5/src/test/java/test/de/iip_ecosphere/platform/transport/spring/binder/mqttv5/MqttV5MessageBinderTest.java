@@ -41,7 +41,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MimeType;
 
-import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -64,7 +65,7 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 @RunWith(SpringRunner.class)
 public class MqttV5MessageBinderTest {
 
-    private static final int PORT = NetUtils.getEphemeralPort();
+    private static final ServerAddress ADDR = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
     private static TestHiveMqServer server;
     private static String received;
     
@@ -81,7 +82,7 @@ public class MqttV5MessageBinderTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues
-                .of("mqtt.port=" + PORT)
+                .of("mqtt.port=" + ADDR.getPort())
                 .applyTo(applicationContext);
         }
         
@@ -95,14 +96,13 @@ public class MqttV5MessageBinderTest {
      */
     @BeforeClass
     public static void init() {
-        server = new TestHiveMqServer();
-        final String host = "localhost";
-        server.start(host, PORT);
+        server = new TestHiveMqServer(ADDR);
+        server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final PahoMqttV5TransportConnector infra = new PahoMqttV5TransportConnector();
         try {
-            infra.connect(TransportParameterBuilder.newBuilder(host, PORT).setApplicationId("infra").build());
+            infra.connect(TransportParameterBuilder.newBuilder(ADDR).setApplicationId("infra").build());
             infra.setReceptionCallback("mqttv5Binder", new ReceptionCallback<String>() {
     
                 @Override
@@ -122,7 +122,7 @@ public class MqttV5MessageBinderTest {
         } catch (IOException e) {
             System.out.println("CONNECTOR PROBLEM " + e.getMessage());
         }
-        System.out.println("Started infra client on " + host + " " + PORT);
+        System.out.println("Started infra client on " + ADDR.getHost() + " " + ADDR.getPort());
         TimeUtils.sleep(1000);
     }
     
@@ -132,7 +132,7 @@ public class MqttV5MessageBinderTest {
     @AfterClass
     public static void shutdown() {
         MqttClient.stopClient();
-        server.stop();
+        server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
     }
     
@@ -148,7 +148,7 @@ public class MqttV5MessageBinderTest {
 
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
-        Assert.assertEquals(PORT, params.getPort());
+        Assert.assertEquals(ADDR.getPort(), params.getPort());
         Assert.assertEquals("test", params.getApplicationId());
     }
 
