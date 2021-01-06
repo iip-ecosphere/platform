@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.aas;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -30,11 +31,12 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * Tests {@link BaSyxPersistenceRecipe}.
+ * Tests {@link BaSyxPersistenceRecipe}. This class only implements the basics and must be completed by the 
+ * respective AAS abstraction implementation.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PersistenceTest {
+public abstract class PersistenceTest {
 
     /**
      * Tests writing/reading.
@@ -61,23 +63,55 @@ public class PersistenceTest {
         aasB.createAssetBuilder("asset1", "urn:::AAS:::myAAs#1asset#1", AssetKind.INSTANCE);
         aas.add(aasB.build());
         
-        File xml = new File(FileUtils.getTempDirectory(), "myAAS.xml");
-        xml.delete();
-        File aasx = new File(FileUtils.getTempDirectory(), "myAAS.aasx");
-        aasx.delete();
-        
+        aas = Collections.unmodifiableList(aas);
         PersistenceRecipe recipe = factory.createPersistenceRecipe();
-        // Basyx just considers the first AAS and ignores the remaining
-        List<Aas> aasxList = new ArrayList<Aas>();
-        aasxList.add(aas.get(0));
-        recipe.writeTo(aasxList, aasx);
-        recipe.writeTo(aas, xml);
-        
-        assertAas(recipe.readFrom(aasx), true);
-        assertAas(recipe.readFrom(xml), false);
+        for (File f : filesToTest()) {
+            List<Aas> aasxList = selectedAas(f, aas);
+            recipe.writeTo(aasxList, f);
+            assertAas(recipe.readFrom(f), assertOnlyFirst(f));
+            f.delete();
+        }
+    }
 
-        xml.delete();
-        aasx.delete();
+    /**
+     * Returns the files to test.
+     * 
+     * @return the files to test
+     */
+    protected abstract File[] filesToTest();
+    
+    /**
+     * Returns the AAS to test, as a selection of {@code aas}. This may be required if a certain persistence recipe
+     * does not take multiple AAS.
+     * 
+     * @param file the file to write as an indicator of the current test process, one of the files 
+     *     from {@link #filesToTest()}
+     * @param aas the AAS to select from (unmodifiable)
+     * @return the selected AAS
+     */
+    protected abstract List<Aas> selectedAas(File file, List<Aas> aas);
+
+    /**
+     * Returns whether only the first AAS shall be asserted. This may be required if {@link #selectedAas(File, List)}
+     * selects AAS.
+     * 
+     * @param file the file to write as an indicator of the current test process, one of the files 
+     *     from {@link #filesToTest()}
+     * @return {@code true} for asserting only the first, {@code false} for asserting all
+     */
+    protected abstract boolean assertOnlyFirst(File file);
+
+    /**
+     * Obtains the name of a file in the temporary directory and tries to ensure that it does not exist.
+     * We go for file names so that debugging becomes possible (rather than for random names).
+     * 
+     * @param name the name of the file
+     * @return the file
+     */
+    protected static File obtainTmpFile(String name) {
+        File file = new File(FileUtils.getTempDirectory(), name );
+        file.delete();
+        return file;
     }
   
     /**
