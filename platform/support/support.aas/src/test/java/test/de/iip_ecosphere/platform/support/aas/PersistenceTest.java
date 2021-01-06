@@ -66,9 +66,10 @@ public abstract class PersistenceTest {
         aas = Collections.unmodifiableList(aas);
         PersistenceRecipe recipe = factory.createPersistenceRecipe();
         for (File f : filesToTest()) {
+            System.out.println("Testing " + f);
             List<Aas> aasxList = selectedAas(f, aas);
             recipe.writeTo(aasxList, f);
-            assertAas(recipe.readFrom(f), assertOnlyFirst(f));
+            assertAas(recipe.readFrom(f), assertOnlyFirst(f), assertAsset(f));
             f.delete();
         }
     }
@@ -102,6 +103,15 @@ public abstract class PersistenceTest {
     protected abstract boolean assertOnlyFirst(File file);
 
     /**
+     * Returns whether the asset/properties shall be asserted.
+     * 
+     * @param file the file to write as an indicator of the current test process, one of the files 
+     *     from {@link #filesToTest()}
+     * @return {@code true} for asserting the asset/properties, {@code false} for ignoring the asset
+     */
+    protected abstract boolean assertAsset(File file);
+    
+    /**
      * Obtains the name of a file in the temporary directory and tries to ensure that it does not exist.
      * We go for file names so that debugging becomes possible (rather than for random names).
      * 
@@ -119,15 +129,22 @@ public abstract class PersistenceTest {
      * 
      * @param aasIn the input/read AAS
      * @param justFirst consider only the first AAS
+     * @param testAsset consider the asset during testing
      */
-    private static void assertAas(List<Aas> aasIn, boolean justFirst) {
+    private static void assertAas(List<Aas> aasIn, boolean justFirst, boolean testAsset) {
         Assert.assertEquals(justFirst ? 1 : 2, aasIn.size());
         
-        Assert.assertEquals("MyAas", aasIn.get(0).getIdShort());
-        Assert.assertEquals(2, aasIn.get(0).getSubmodelCount());
-        Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel"));
-        Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel").getProperty("MyP"));
-        Assert.assertNotNull(aasIn.get(0).getSubmodel("MySubModel1"));
+        Aas aas = aasIn.get(0);
+        Assert.assertEquals("MyAas", aas.getIdShort());
+        Assert.assertEquals(2, aas.getSubmodelCount());
+        Assert.assertNotNull(aas.getSubmodel("MySubModel"));
+        Assert.assertNotNull(aas.getSubmodel("MySubModel").getProperty("MyP"));
+        Assert.assertNotNull(aas.getSubmodel("MySubModel1"));
+        if (testAsset) {
+            Assert.assertNotNull(aas.getAsset());
+            Assert.assertEquals("asset", aas.getAsset().getIdShort());
+            Assert.assertEquals(AssetKind.INSTANCE, aas.getAsset().getAssetKind());
+        }
 
         if (!justFirst) {
             Assert.assertEquals("MyAas1", aasIn.get(1).getIdShort());
