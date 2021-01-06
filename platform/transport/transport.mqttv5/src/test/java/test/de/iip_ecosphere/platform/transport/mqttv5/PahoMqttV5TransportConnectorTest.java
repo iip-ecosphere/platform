@@ -15,7 +15,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -55,12 +56,12 @@ public class PahoMqttV5TransportConnectorTest {
         });
 
         Assert.assertEquals(PahoMqttV5TransportConnector.NAME, TransportFactory.getConnectorName());
-        final int port = NetUtils.getEphemeralPort();
-        TestHiveMqServer server = new TestHiveMqServer();
-        server.start("localhost", port);
-        AbstractTransportConnectorTest.doTest("localhost", port, ProductJsonSerializer.class);
-        AbstractTransportConnectorTest.doTest("localhost", port, ProductProtobufSerializer.class);
-        server.stop();
+        ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
+        TestHiveMqServer server = new TestHiveMqServer(addr);
+        server.start();
+        AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
+        AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
+        server.stop(true);
         TransportFactory.setMainImplementation(old);
     }
 

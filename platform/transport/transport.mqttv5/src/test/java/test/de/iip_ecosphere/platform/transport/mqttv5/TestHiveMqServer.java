@@ -17,30 +17,38 @@ import org.apache.commons.io.FileUtils;
 import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
+
 /**
  * A simple embedded HiveMQ test server for MQTT.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TestHiveMqServer {
+public class TestHiveMqServer implements Server {
     
     private EmbeddedHiveMQ hiveMQ;
+    private ServerAddress addr;
 
     /**
-     * Starts the server.
+     * Creates the server instance.
      * 
-     * @param host the host name
-     * @param port the port number
+     * @param addr the server address (schema is ignored)
      */
-    public void start(String host, int port) {
+    public TestHiveMqServer(ServerAddress addr) {
+        this.addr = addr;
+    }
+    
+    @Override
+    public Server start() {
         if (null == hiveMQ) {
             String tmp = System.getProperty("java.io.tmpdir");
             File hiveTmp = new File(tmp, "hivemq");
             FileUtils.deleteQuietly(hiveTmp);
             hiveTmp.mkdir();
 
-            System.setProperty("HIVEMQ_PORT", Integer.toString(port));
-            System.setProperty("HIVEMQ_ADDRESS", host);
+            System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
+            System.setProperty("HIVEMQ_ADDRESS", addr.getHost());
             System.setProperty("hivemq.log.folder", hiveTmp.getAbsolutePath());
             
             File cfg = new File("./src/test");
@@ -52,12 +60,11 @@ public class TestHiveMqServer {
             hiveMQ = embeddedHiveMQBuilder.build();
             hiveMQ.start().join();
         }
+        return this;
     }
     
-    /**
-     * Stops the server.
-     */
-    public void stop() {
+    @Override
+    public void stop(boolean dispose) {
         hiveMQ.stop().join();
         hiveMQ = null;
     }
