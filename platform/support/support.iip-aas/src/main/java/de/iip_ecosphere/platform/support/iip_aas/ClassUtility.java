@@ -34,7 +34,8 @@ import de.iip_ecosphere.platform.support.aas.Type;
  *     <ul>
  *       <li>submodel elements collection: <i>Java type name, inner classes as "."</i>
  *       <ul>
- *         <li>Property: attribute1 name, value = type (for primitives, arrays and String)</li>
+ *         <li>Property: {@link #ATTRIBUTE_PREFIX} + attribute1 name, value = type (for primitives, arrays and 
+ *             String)</li>
  *         <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
  *       </ul>
  *     </ul>
@@ -47,7 +48,8 @@ import de.iip_ecosphere.platform.support.aas.Type;
  *   <li>ReferenceElement: attribute1 name, value = ref-to collection (for reference types)</li>
  * </ul>
  * 
- * Attributes marked by {@link Skip} will not be listed.
+ * Attributes marked by {@link Skip} will not be listed. So far, arrays over reference types are represented as 
+ * strings rather than references to the component type.
  * 
  * The implemented format is initial and will change over time (array of ref type unclear, generics).
  * 
@@ -56,6 +58,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 public class ClassUtility {
 
     public static final String NAME_TYPE_SUBMODEL = "types";
+    public static final String ATTRIBUTE_PREFIX = "attr_"; //TODO BaSyx 0.1.0-SNAPSHOT fails with "value" etc
     private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
@@ -132,7 +135,8 @@ public class ClassUtility {
             if (builder.isNew()) {
                 for (Field f: type.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
-                        addTypeSubModelElement(builder, translateToAasName(f.getName()), f.getType());
+                        addTypeSubModelElement(builder, ATTRIBUTE_PREFIX 
+                            + translateToAasName(f.getName()), f.getType());
                     }
                 }
                 if (Object.class != type.getSuperclass()) {
@@ -193,7 +197,7 @@ public class ClassUtility {
      * @return the AAS short name
      */
     static String translateToAasName(String javaIdentifier) {
-        return javaIdentifier;
+        return javaIdentifier.replace(".", "_");
     }
     
     /**
@@ -203,7 +207,7 @@ public class ClassUtility {
      * @return the name
      */
     public static String getName(Class<?> type) {
-        return translateToAasName(type.getName()).replace("$", ".");
+        return translateToAasName(type.getName().replace("$", "."));
     }
 
     /**

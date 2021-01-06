@@ -128,20 +128,20 @@ public class ClassUtilityTest {
         Submodel smType = aas.getSubmodel(ClassUtility.NAME_TYPE_SUBMODEL);
         SubmodelElementCollection typeC = smType.getSubmodelElementCollection(ClassUtility.getName(Simple.class));
         Assert.assertNotNull(typeC);
-        Assert.assertNotNull(typeC.getProperty("value"));
-        Assert.assertEquals("int", typeC.getProperty("value").getValue());
-        Assert.assertNull(typeC.getProperty("secret"));
+        Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "value"));
+        Assert.assertEquals("int", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "value").getValue());
+        Assert.assertNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "secret"));
 
         typeC = smType.getSubmodelElementCollection(ClassUtility.getName(Complex.class));
         Assert.assertNotNull(typeC);
-        Assert.assertNotNull(typeC.getProperty("unknown"));
-        Assert.assertEquals("String", typeC.getProperty("unknown").getValue());
-        Assert.assertNotNull(typeC.getProperty("values"));
-        Assert.assertEquals("int[]", typeC.getProperty("values").getValue());
-        Assert.assertNotNull(typeC.getProperty("otherValue"));
-        Assert.assertEquals("int", typeC.getProperty("otherValue").getValue());
-        Assert.assertNotNull(typeC.getReferenceElement("simple"));
-        Assert.assertNotNull(typeC.getReferenceElement("simple").getValue());
+        Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "unknown"));
+        Assert.assertEquals("String", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "unknown").getValue());
+        Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "values"));
+        Assert.assertEquals("int[]", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "values").getValue());
+        Assert.assertNotNull(typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "otherValue"));
+        Assert.assertEquals("int", typeC.getProperty(ClassUtility.ATTRIBUTE_PREFIX + "otherValue").getValue());
+        Assert.assertNotNull(typeC.getReferenceElement(ClassUtility.ATTRIBUTE_PREFIX + "simple"));
+        Assert.assertNotNull(typeC.getReferenceElement(ClassUtility.ATTRIBUTE_PREFIX + "simple").getValue());
         
         Submodel smTest = aas.getSubmodel(NAME_TEST_SUBMODEL);
         Property primitive = smTest.getProperty(NAME_TEST_VAR_PRIMITIVE);
@@ -198,7 +198,7 @@ public class ClassUtilityTest {
         // read back the AAS
         factory = AasFactory.getInstance();
         Aas aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
-        SubmodelBuilder smBuilder = aas.addSubmodel(NAME_TEST_SUBMODEL, null); // regardless whether it exists
+        SubmodelBuilder smBuilder = aas.createSubmodelBuilder(NAME_TEST_SUBMODEL, null); // regardless whether it exists
         populateModel(smBuilder);
         smBuilder.build();
         aas.accept(new AasPrintVisitor());
@@ -207,7 +207,8 @@ public class ClassUtilityTest {
         // and assert again, e.g., different process
         factory = AasFactory.getInstance();
         aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
-        //assertTypeSubmodel(aas); // TODO runs into a class cast problem :/
+        aas.accept(new AasPrintVisitor());
+        assertTypeSubmodel(aas);
 
         httpServer.stop(true);
     }
