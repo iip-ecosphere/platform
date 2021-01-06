@@ -14,7 +14,10 @@ package de.iip_ecosphere.platform.support.aas;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+
+import de.iip_ecosphere.platform.support.FileFormat;
 
 /**
  * A receipe to read/write AAS from/to files.
@@ -24,11 +27,19 @@ import java.util.List;
 public interface PersistenceRecipe {
 
     /**
-     * Writs the given AAS to {@code file}.
+     * Returns the supported file formats.
+     * 
+     * @return the supported file formats
+     */
+    public Collection<FileFormat> getSupportedFormats();
+    
+    /**
+     * Writes the given AAS to {@code file}.
      * 
      * @param aas the AAS to write
      * @param file the file to write to
      * @throws IOException in case of I/O problems
+     * @throws IllegalArgumentException if {@code file} represents an unknown format, see {@link #getSupportedFormats()}
      */
     public void writeTo(List<Aas> aas, File file) throws IOException;
     
@@ -38,6 +49,7 @@ public interface PersistenceRecipe {
      * @param file the file to read from
      * @return the read AAS
      * @throws IOException in case of I/O problems
+     * @throws IllegalArgumentException if {@code file} represents an unknown format, see {@link #getSupportedFormats()}
      */
     public List<Aas> readFrom(File file) throws IOException;
 

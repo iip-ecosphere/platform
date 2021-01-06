@@ -27,6 +27,7 @@ import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
     CollectionUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
+    FileFormatTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
     PrintVisitorTest.class
 })
