@@ -268,14 +268,14 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     }
 
     /**
-     * Returns an AAS sub-model URI according to the BaSyx naming schema.
+     * Returns an AAS sub-model URI according to the BaSyx naming schema. [public for testing, debugging]
      * 
      * @param server the server address
      * @param aas the AAS
      * @param submodel the sub-model
      * @return the endpoint URI
      */
-    static String getSubmodelEndpoint(ServerAddress server, Aas aas, Submodel submodel) {
+    public static String getSubmodelEndpoint(ServerAddress server, Aas aas, Submodel submodel) {
         return AbstractAas.getAasEndpoint(server, aas) 
             + "/submodels/" + Tools.idToUrlPath(submodel.getIdShort()) + "/submodel";
     }

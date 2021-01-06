@@ -52,22 +52,10 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         }
 
         @Override
-        public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
-            return obtainSubmodelBuilder(idShort, urn);
-        }
-        
-        /**
-         * Obtains a sub-model builder.
-         * 
-         * @param idShort the short id
-         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
-         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
-         * @return the created sub-model builder
-         */
-        public SubmodelBuilder obtainSubmodelBuilder(String idShort, String identifier) {
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
             return instance.obtainSubmodelBuilder(this, idShort, identifier);
         }
-
+        
         @Override
         public Submodel register(BaSyxSubmodel submodel) {
             if (null == instance.getSubmodel(submodel.getIdShort())) {
@@ -141,7 +129,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
     }
 
     @Override
-    public SubmodelBuilder addSubmodel(String idShort, String identifier) {
+    public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
         return obtainSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort, identifier);
     }
 

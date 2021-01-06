@@ -111,7 +111,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
     }
 
     @Override
-    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
         BaSyxSubmodelElementContainerBuilder<ISubModel> secb = new BaSyxISubmodelBuilder(
             new BaSyxConnectedAasBuilder(parent), this);

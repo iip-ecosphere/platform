@@ -190,13 +190,13 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     }
 
     /**
-     * Returns an AAS endpoint URI according to the BaSyx naming schema.
+     * Returns an AAS endpoint URI according to the BaSyx naming schema. [public for testing, debugging]
      * 
      * @param server the server address
      * @param aas the AAS
      * @return the endpoint URI
      */
-    static String getAasEndpoint(ServerAddress server, Aas aas) {
+    public static String getAasEndpoint(ServerAddress server, Aas aas) {
         return server.toServerUri() + "/" + Tools.idToUrlPath(aas.getIdShort()) + "/aas";
     }
 

@@ -140,9 +140,9 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
         for (Aas a : aas) {
-            basyxAas.add(((BaSyxAas) a).getAas());
+            basyxAas.add(((AbstractAas<?>) a).getAas());
             for (Submodel s : a.submodels()) {
-                basyxSubmodels.add(((BaSyxSubmodel) s).getSubmodel());
+                basyxSubmodels.add(((AbstractSubmodel<?>) s).getSubmodel());
             }
         }
         
@@ -230,7 +230,7 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         List<ISubModel> basyxSubmodels = new ArrayList<ISubModel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
-        AssetAdministrationShell origAas = ((BaSyxAas) aas).getAas();
+        IAssetAdministrationShell origAas = ((AbstractAas<?>) aas).getAas();
         if (null == origAas.getAsset()) {  // as of BaSyx 0.0.1
             LOGGER.warn("AAS '" + aas.getIdShort() + "' may not be read back correctly as it does not have an Asset.");
         }
@@ -240,7 +240,7 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         }
         basyxAas.add(origAas);
         for (Submodel s : aas.submodels()) {
-            basyxSubmodels.add(((BaSyxSubmodel) s).getSubmodel());
+            basyxSubmodels.add(((AbstractSubmodel<?>) s).getSubmodel());
         }
         
         MetamodelToXMLConverter.convertToXML(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 

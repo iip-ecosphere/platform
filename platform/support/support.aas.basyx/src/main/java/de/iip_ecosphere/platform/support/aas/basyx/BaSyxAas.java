@@ -136,7 +136,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
     }
 
     @Override
-    public SubmodelBuilder addSubmodel(String idShort, String identifier) {
+    public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
         return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort, identifier);
     }
 

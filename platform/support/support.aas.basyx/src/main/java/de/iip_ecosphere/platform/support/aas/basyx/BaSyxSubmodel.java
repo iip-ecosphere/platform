@@ -90,16 +90,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
             boolean allowDuplicates) {
-            SubmodelElementCollectionBuilder result;
-            SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
-            if (null == sub) {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
-                    ordered, allowDuplicates);
-            } else {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
-                   (BaSyxSubmodelElementCollection) sub);
-            }
-            return result;
+            return instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
         }
 
         @Override
@@ -154,13 +145,38 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         BaSyxElementTranslator.registerRemainingSubmodelElements(instance.getSubmodelElements(), this);
     }
     
+    /**
+     * Creates a builder for a contained sub-model element collection. Calling this method again with the same name 
+     * shall lead to a builder that allows for modifying the sub-model.
+     * 
+     * @param parent the parent builder
+     * @param idShort the short name of the reference element
+     * @param ordered whether the collection is ordered
+     * @param allowDuplicates whether the collection allows duplicates
+     * @return the builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
+     */
+    private SubmodelElementCollectionBuilder obtainSubmodelElementCollectionBuilder(
+        BaSyxSubmodelElementContainerBuilder<?> parent, String idShort, boolean ordered, boolean allowDuplicates) {
+        SubmodelElementCollectionBuilder result;
+        SubmodelElementCollection sub = getSubmodelElementCollection(idShort);
+        if (null == sub) {
+            result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, idShort, 
+                ordered, allowDuplicates);
+        } else {
+            result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, 
+               (BaSyxSubmodelElementCollection) sub);
+        }
+        return result;
+    }
+    
     @Override
-    public SubmodelElementCollectionBuilder addSubmodelElementCollection(String idShort, boolean ordered,
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
         LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
             + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
-        return new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
-            new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), idShort, ordered, allowDuplicates);
+        return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
+            idShort, ordered, allowDuplicates);
     }
 
 }
