@@ -335,7 +335,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     throw new IOException(e);
                 }
             } else {
-                callResult = null;
+                throw new IOException("Cannot access top level operation '" + qName + "'");
             }
             return callResult;
         }
