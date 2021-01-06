@@ -12,6 +12,11 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import de.iip_ecosphere.platform.support.aas.Aas;
 import test.de.iip_ecosphere.platform.support.aas.PersistenceTest;
 
 /**
@@ -21,4 +26,28 @@ import test.de.iip_ecosphere.platform.support.aas.PersistenceTest;
  */
 public class BaSyxPersistenceTest extends PersistenceTest {
     
+    private static final File XML = obtainTmpFile("myAAS.xml");
+    private static final File AASX = obtainTmpFile("myAAS.aasx");
+    private static final File JSON = obtainTmpFile("myAAS.json");
+    
+    @Override
+    protected File[] filesToTest() {
+        return new File[] {XML, AASX, JSON};
+    }
+
+    @Override
+    protected List<Aas> selectedAas(File file, List<Aas> aas) {
+        List<Aas> result = aas;
+        if (file == AASX) {
+            result = new ArrayList<Aas>();
+            result.add(aas.get(0));
+        }
+        return result;
+    }
+    
+    @Override
+    protected boolean assertOnlyFirst(File file) {
+        return file == AASX; // TODO Basyx just considers the first AAS and ignores the remaining
+    }
+
 }

@@ -69,8 +69,8 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
      * @param result the resulting {@link Aas} instances (to be modified as a side effect)
      * @throws IOException in case that something goes wrong
      */
-    protected void transform(List<IAssetAdministrationShell> aas, List<ISubModel> submodels, List<Aas> result) 
-        throws IOException {
+    protected void transform(List<? extends IAssetAdministrationShell> aas, List<? extends ISubModel> submodels, 
+        List<Aas> result) throws IOException {
         Map<String, SubModel> subMapping = new HashMap<>();
         for (ISubModel sm : submodels) {
             if (sm instanceof SubModel) {

@@ -50,7 +50,8 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
         // ASSUMPTION - no double registration here
         PersistenceRecipe[] rcps = new PersistenceRecipe[] {
             new XmlPersistenceRecipe(),
-            new AasxPersistenceRecipe()
+            new AasxPersistenceRecipe(),
+            new JsonPersistenceRecipe()
         };
         
         for (PersistenceRecipe r : rcps) {
