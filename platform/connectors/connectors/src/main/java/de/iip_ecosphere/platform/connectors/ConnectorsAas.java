@@ -166,7 +166,7 @@ public class ConnectorsAas implements AasContributor {
                 Submodel submodel = aas.getSubmodel(NAME_CONNECTORS_SUBMODEL);
                 if (null != submodel && null != descriptors) {
                     String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-                    SubmodelElementCollectionBuilder smcb = submodel.addSubmodelElementCollection(
+                    SubmodelElementCollectionBuilder smcb = submodel.createSubmodelElementCollectionBuilder(
                         idShort, false, false);
                     addConnector(smcb, connector, descriptors);
                     smcb.build();

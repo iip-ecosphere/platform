@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -245,7 +246,7 @@ public class ConnectorsAasTest {
      * @param aas the AAS to print
      */
     private void printOut(Aas aas) {
-        //aas.accept(new AasPrintVisitor()); currently disabled due to elements problems
+        aas.accept(new AasPrintVisitor()); 
     }
 
     /**
