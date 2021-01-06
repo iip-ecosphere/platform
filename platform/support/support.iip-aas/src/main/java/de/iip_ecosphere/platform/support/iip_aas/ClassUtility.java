@@ -66,10 +66,10 @@ import de.iip_ecosphere.platform.support.aas.Type;
 public class ClassUtility {
 
     public static final String NAME_TYPE_SUBMODEL = "types";
-    public static final String ATTRIBUTE_PREFIX = "attr_"; //TODO BaSyx 0.1.0-SNAPSHOT fails with "value" etc
+    public static final String ATTRIBUTE_PREFIX = "attr_"; // AAS id name limitation
     public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
     public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
-    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
+    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName().replace("@", "_");
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
     /**
@@ -224,7 +224,7 @@ public class ClassUtility {
      * @return the combined id
      */
     public static String getId(String prefix, Object object) {
-        return prefix + JVM_NAME + "_" + System.identityHashCode(object);
+        return translateToAasName(prefix + JVM_NAME + "_" + System.identityHashCode(object));
     }
 
 }

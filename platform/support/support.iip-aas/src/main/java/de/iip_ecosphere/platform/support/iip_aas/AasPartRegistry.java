@@ -38,7 +38,7 @@ public class AasPartRegistry {
     /**
      * The name of the top-level AAS created by this registry in {@link #build()}.
      */
-    public static final String NAME_AAS = "IIP-Ecosphere";
+    public static final String NAME_AAS = "IIP_Ecosphere";
     
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
