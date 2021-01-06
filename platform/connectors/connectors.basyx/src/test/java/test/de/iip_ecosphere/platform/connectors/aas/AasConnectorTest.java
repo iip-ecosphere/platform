@@ -60,20 +60,6 @@ import test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTest;
  * @author Holger Eichelberger, SSE
  */
 public class AasConnectorTest {
-
-    public static final String QNAME_VAR_LOTSIZE;
-    public static final String QNAME_VAR_POWCONSUMPTION;
-    public static final String QNAME_OP_STARTMACHINE;
-    public static final String QNAME_OP_RECONFIGURE;
-    public static final String QNAME_OP_STOPMACHINE;
-
-    private static final String NAME_AAS = "aasTest";
-    private static final String NAME_SUBMODEL = "machine";
-    private static final String NAME_VAR_LOTSIZE = "lotSize";
-    private static final String NAME_VAR_POWCONSUMPTION = "powerConsumption";
-    private static final String NAME_OP_STARTMACHINE = "startMachine";
-    private static final String NAME_OP_RECONFIGURE = "setLotSize";
-    private static final String NAME_OP_STOPMACHINE = "stopMachine";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_IP = "localhost";
@@ -85,14 +71,6 @@ public class AasConnectorTest {
     private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
-    
-    static {
-        QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
-        QNAME_VAR_POWCONSUMPTION = NAME_SUBMODEL + "/" + NAME_VAR_POWCONSUMPTION;
-        QNAME_OP_STARTMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STARTMACHINE;
-        QNAME_OP_RECONFIGURE = NAME_SUBMODEL + "/" + NAME_OP_RECONFIGURE;
-        QNAME_OP_STOPMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STOPMACHINE;
-    }
 
     /**
      * Sets the test up by starting an embedded OPC UA server.
@@ -150,8 +128,8 @@ public class AasConnectorTest {
      */
     public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
-        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, AAS_URN);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
         BaSyxTest.createAasOperationsElements(subModelBuilder, AAS_IP, VAB_PORT);
         
         subModelBuilder.build();
@@ -203,15 +181,15 @@ public class AasConnectorTest {
                 // expected
             }
             try {
-                access.get(NAME_SUBMODEL + access.getQSeparator() + "abxy"); // property does not exist
+                access.get(AasTest.NAME_SUBMODEL + access.getQSeparator() + "abxy"); // property does not exist
                 Assert.fail("Property shall not exist");
             } catch (IOException e) {
                 // expected
             }
             return new MachineData(
-                (int) access.get(QNAME_VAR_LOTSIZE), 
-                (double) access.get(QNAME_VAR_POWCONSUMPTION), 
-                "");
+                (int) access.get(AasTest.QNAME_VAR_LOTSIZE), 
+                (double) access.get(AasTest.QNAME_VAR_POWCONSUMPTION), 
+                (String) access.get(AasTest.QNAME_VAR_VENDOR));
         }
 
         @Override
@@ -244,23 +222,23 @@ public class AasConnectorTest {
             ModelAccess access = getModelAccess();
             // generated code with "semantic" from configuration model
             if (data.isStart()) {
-                access.call(QNAME_OP_STARTMACHINE);
+                access.call(AasTest.QNAME_OP_STARTMACHINE);
             }
             if (data.isStop()) {
-                access.call(QNAME_OP_STOPMACHINE);
+                access.call(AasTest.QNAME_OP_STOPMACHINE);
             }
             if (data.getLotSize() > 0) {
                 // as the connector accepts Objects, also data.lotSize would be ok
-                access.set(QNAME_VAR_LOTSIZE, data.getLotSize());
+                access.set(AasTest.QNAME_VAR_LOTSIZE, data.getLotSize());
             }
             try {
-                access.set(NAME_SUBMODEL + access.getQSeparator() + "abxy", ""); // property does not exist
+                access.set(AasTest.NAME_SUBMODEL + access.getQSeparator() + "abxy", ""); // property does not exist
                 Assert.fail("Property shall not exist");
             } catch (IOException e) {
                 // expected
             }
             try {
-                access.call(NAME_SUBMODEL + access.getQSeparator() + "abxy"); // operation does not exist
+                access.call(AasTest.NAME_SUBMODEL + access.getQSeparator() + "abxy"); // operation does not exist
                 Assert.fail("Operation shall not exist");
             } catch (IOException e) {
                 // expected
