@@ -142,6 +142,17 @@ public class Tools {
         if (null == idShort || 0 == idShort.length()) {
             throw new IllegalArgumentException("idShort must be given");
         }
+        
+        //https://wiki.eclipse.org/BaSyx_/_Documentation_/_AssetAdministrationShell
+        //Property idShort shall only feature letters, digits, underscore ("_"); starting mandatory with a letter. 
+        //Property idShort shall be matched case-insensitive. 
+        if (!idShort.matches("[a-zA-Z]\\w+")) {
+            throw new IllegalArgumentException("idShort '" + idShort + "' shall only feature letters, digits, "
+                + "underscore (\"_\"); starting mandatory with a letter.");
+        }
+        if (idShort.equals("value")) { // to be extended
+            throw new IllegalArgumentException("idShort shall not be \"value\"");
+        }
         return idShort;
     }
 

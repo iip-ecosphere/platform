@@ -15,10 +15,10 @@ package test.de.iip_ecosphere.platform.support.aas.basyx;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 
 /**
- * Tests the BaSyx abstraction with server and client on the "same machine".
+ * Tests the AAS abstraction implementation for BaSyx.
  * 
- * @author Monika Staciwa, SSE
+ * @author Holger Eichelberger, SSE
  */
 public class BaSyxTest extends AasTest {
-    
+        
 }

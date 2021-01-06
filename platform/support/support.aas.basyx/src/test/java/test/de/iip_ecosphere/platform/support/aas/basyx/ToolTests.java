@@ -123,6 +123,21 @@ public class ToolTests {
             Assert.fail("No exception");
         } catch (IllegalArgumentException e) {
         }
+        try {
+            Tools.checkId("012ds_");
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+        }
+        try {
+            Tools.checkId("java.lang.String");
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+        }
+        try {
+            Tools.checkId("value");
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+        }
     }
 
     /**
