@@ -55,13 +55,14 @@ import org.junit.Assert;
 public class AasTest {
     
     public static final String QNAME_VAR_LOTSIZE;
+    public static final String QNAME_VAR_VENDOR;
     public static final String QNAME_VAR_POWCONSUMPTION;
     public static final String QNAME_OP_STARTMACHINE;
     public static final String QNAME_OP_RECONFIGURE;
     public static final String QNAME_OP_STOPMACHINE;
 
-    private static final String NAME_AAS = "aasTest";
-    private static final String NAME_SUBMODEL = "machine";
+    public static final String NAME_AAS = "aasTest";
+    public static final String NAME_SUBMODEL = "machine";
     private static final String NAME_SUBMODELC_OUTER = "outer";
     private static final String NAME_VAR_SUBMODELC_OUTER_VAR = "outerVar";
     private static final String NAME_VAR_SUBMODELC_OUTER_REF = "outerRef";
@@ -69,6 +70,7 @@ public class AasTest {
     private static final String NAME_VAR_SUBMODELC_INNER_VAR = "innerVar";
     private static final String NAME_VAR_SUBMODELC_INNER_REF = "innerRef";
     private static final String NAME_VAR_LOTSIZE = "lotSize";
+    private static final String NAME_VAR_VENDOR = "vendor";
     private static final String NAME_VAR_POWCONSUMPTION = "powerConsumption";
     private static final String NAME_OP_STARTMACHINE = "startMachine";
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
@@ -84,6 +86,7 @@ public class AasTest {
     
     static {
         QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
+        QNAME_VAR_VENDOR = NAME_SUBMODEL + "/" + NAME_VAR_VENDOR;
         QNAME_VAR_POWCONSUMPTION = NAME_SUBMODEL + "/" + NAME_VAR_POWCONSUMPTION;
         QNAME_OP_STARTMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STARTMACHINE;
         QNAME_OP_RECONFIGURE = NAME_SUBMODEL + "/" + NAME_OP_RECONFIGURE;
@@ -105,6 +108,11 @@ public class AasTest {
             return machine.getLotSize(); 
         }, (param) -> {
                 machine.setLotSize((int) param); 
+            });
+        builder.defineProperty(NAME_VAR_VENDOR, () -> {
+            return machine.getVendor(); 
+        }, (param) -> { // whether meaningful or not
+                machine.setVendor((String) param); 
             });
         builder.defineProperty(NAME_VAR_POWCONSUMPTION, () -> {
             return machine.getPowerConsumption(); 
@@ -136,6 +144,10 @@ public class AasTest {
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
+            .build();
+        subModelBuilder.createPropertyBuilder(NAME_VAR_VENDOR)
+            .setType(Type.STRING)
+            .bind(invC.createGetter(NAME_VAR_VENDOR), invC.createSetter(NAME_VAR_VENDOR))
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
             .setType(Type.DOUBLE)
@@ -218,10 +230,10 @@ public class AasTest {
         Submodel submodel = subModelBuilder.build();
         assertSize(3, submodel.operations());
         assertSize(0, submodel.dataElements());
-        assertSize(2, submodel.properties());
-        assertSize(6, submodel.submodelElements());
+        assertSize(3, submodel.properties());
+        assertSize(7, submodel.submodelElements());
         Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE));
-        Assert.assertEquals(6, submodel.getSubmodelElementsCount());
+        Assert.assertEquals(7, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
         
@@ -253,7 +265,7 @@ public class AasTest {
         Assert.assertEquals(2, aas.getSubmodelCount());
         Submodel submodel = aas.submodels().iterator().next();
         Assert.assertNotNull(submodel);
-        Assert.assertEquals(2, submodel.getPropertiesCount());
+        Assert.assertEquals(3, submodel.getPropertiesCount());
         Property lotSize = submodel.getProperty(NAME_VAR_LOTSIZE);
         Assert.assertNotNull(lotSize);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());

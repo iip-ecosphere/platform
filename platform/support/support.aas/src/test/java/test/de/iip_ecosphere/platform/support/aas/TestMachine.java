@@ -21,6 +21,7 @@ public class TestMachine {
     
     private int lotSize = 1;
     private double powerConsumption = 0.1;
+    private String vendor;
     
     /**
      * Starts the machine.
@@ -74,6 +75,24 @@ public class TestMachine {
      */
     public double getPowerConsumption() {
         return powerConsumption;
+    }
+    
+    /**
+     * Returns the vendor.
+     * 
+     * @return the vendor
+     */
+    public String getVendor() {
+        return vendor;
+    }
+    
+    /**
+     * Changes the vendor.
+     * 
+     * @param vendor the new vendor
+     */
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
     }
 
 }
