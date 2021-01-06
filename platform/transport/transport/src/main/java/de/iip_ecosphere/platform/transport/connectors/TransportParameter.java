@@ -10,6 +10,8 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport.connectors;
 
+import de.iip_ecosphere.platform.support.ServerAddress;
+
 /**
  * Captures common transport parameter for all connector types. Connectors shall document which of the
  * optional settings are required.
@@ -54,6 +56,16 @@ public class TransportParameter {
             TransportParameterBuilder builder = new TransportParameterBuilder();
             builder.instance = new TransportParameter(host, port);
             return builder;
+        }
+
+        /**
+         * Creates a new builder.
+         * 
+         * @param addr the server address (schema ignored)
+         * @return the builder instance
+         */
+        public static TransportParameterBuilder newBuilder(ServerAddress addr) {
+            return newBuilder(addr.getHost(), addr.getPort());
         }
 
         /**

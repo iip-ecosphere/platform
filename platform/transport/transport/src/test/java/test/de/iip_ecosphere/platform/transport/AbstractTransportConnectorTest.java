@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import org.junit.Assert;
 
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
@@ -56,19 +57,19 @@ public class AbstractTransportConnectorTest {
     /**
      * Implements the test using the {@link TransportFactory}.
      * 
-     * @param host the host to use (usually "localhost")
-     * @param port the TCP port to use
+     * @param addr the server address
      * @param serializerType the serializer type to use
      * @throws IOException in case that connection/communication fails
      */
-    public static void doTest(String host, int port, Class<? extends Serializer<Product>> serializerType) 
+    public static void doTest(ServerAddress addr, Class<? extends Serializer<Product>> serializerType) 
         throws IOException {
         Product data1 = new Product("prod1", 10.2);
         Product data2 = new Product("prod2", 5.1);
 
         System.out.println("Using serializer: " + serializerType.getSimpleName());
         SerializerRegistry.registerSerializer(serializerType);
-        TransportParameter param1 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl1").build();
+        TransportParameter param1 = TransportParameterBuilder.newBuilder(addr.getHost(), addr.getPort())
+            .setApplicationId("cl1").build();
         TransportConnector cl1 = TransportFactory.createConnector();
         Assert.assertTrue(cl1.getName().length() > 0);
         System.out.println("Connecting connector 1");
@@ -78,7 +79,7 @@ public class AbstractTransportConnectorTest {
         final Callback cb1 = new Callback();
         cl1.setReceptionCallback(stream2, cb1);
 
-        TransportParameter param2 = TransportParameterBuilder.newBuilder(host, port).setApplicationId("cl2").build();
+        TransportParameter param2 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl2").build();
         TransportConnector cl2 = TransportFactory.createConnector();
         Assert.assertTrue(cl2.getName().length() > 0);
         System.out.println("Connecting connector 2");

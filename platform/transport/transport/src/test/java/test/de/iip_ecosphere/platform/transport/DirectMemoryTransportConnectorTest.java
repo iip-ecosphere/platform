@@ -14,6 +14,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -119,9 +121,10 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertTrue(TransportFactory.createIpcConnector() == MY_FAKE_CONNECTOR);
         Assert.assertEquals(DirectMemoryTransferTransportConnector.NAME, TransportFactory.getConnectorName());
 
-        AbstractTransportConnectorTest.doTest("", 0, ProductJsonSerializer.class);
+        ServerAddress addr = new ServerAddress(Schema.IGNORE, "", 0);
+        AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
         MY_DM_CONNECTOR.clear(); // just as we want to have constants
-        AbstractTransportConnectorTest.doTest("", 0, ProductProtobufSerializer.class);
+        AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
         
         TransportFactory.setMainImplementation(mainOld);
         TransportFactory.setMainImplementation(ipcOld);
