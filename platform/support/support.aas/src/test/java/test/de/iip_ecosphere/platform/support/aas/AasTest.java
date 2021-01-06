@@ -47,7 +47,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import org.junit.Assert;
 
 /**
- * Tests the BaSyx abstraction with server and client on the "same machine".
+ * Tests the AAS abstraction with server and client on the "same machine".
  * 
  * @author Monika Staciwa, SSE
  * @author Holger Eichelberger, SSE
@@ -226,12 +226,12 @@ public class AasTest {
         Aas aas = aasBuilder.build();
         
         // adding on local models
-        Submodel subAdd = aas.createSubmodelBuilder("sub-add", null).build();
-        Assert.assertNotNull(aas.getSubmodel("sub-add"));
-        subAdd.createSubmodelElementCollectionBuilder("sub-coll", true, true).build();
-        Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
-        submodel.createSubmodelElementCollectionBuilder("sub-coll2", false, false).build();
-        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
+        Submodel subAdd = aas.createSubmodelBuilder("sub_add", null).build();
+        Assert.assertNotNull(aas.getSubmodel("sub_add"));
+        subAdd.createSubmodelElementCollectionBuilder("sub_coll", true, true).build();
+        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementCollection("sub_coll"));
+        submodel.createSubmodelElementCollectionBuilder("sub_coll2", false, false).build();
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub_coll2"));
 
         aas.accept(new AasPrintVisitor()); // assert the accepts
 
@@ -293,17 +293,17 @@ public class AasTest {
         Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
 
         // the lately added sub-models/elements
-        Assert.assertNotNull(aas.getSubmodel("sub-add"));
-        Assert.assertNotNull(aas.getSubmodel("sub-add").getSubmodelElementCollection("sub-coll"));
-        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub-coll2"));
+        Assert.assertNotNull(aas.getSubmodel("sub_add"));
+        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementCollection("sub_coll"));
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("sub_coll2"));
 
         // adding on connected models
-        Submodel subAdd = aas.createSubmodelBuilder("conn-add", null).build();
-        Assert.assertNotNull(aas.getSubmodel("conn-add"));
-        subAdd.createSubmodelElementCollectionBuilder("conn-coll", true, true).build();
-        Assert.assertNotNull(aas.getSubmodel("conn-add").getSubmodelElementCollection("conn-coll"));
-        submodel.createSubmodelElementCollectionBuilder("conn-coll2", false, false).build();
-        Assert.assertNotNull(submodel.getSubmodelElementCollection("conn-coll2"));
+        Submodel subAdd = aas.createSubmodelBuilder("conn_add", null).build();
+        Assert.assertNotNull(aas.getSubmodel("conn_add"));
+        subAdd.createSubmodelElementCollectionBuilder("conn_coll", true, true).build();
+        Assert.assertNotNull(aas.getSubmodel("conn_add").getSubmodelElementCollection("conn_coll"));
+        submodel.createSubmodelElementCollectionBuilder("conn_coll2", false, false).build();
+        Assert.assertNotNull(submodel.getSubmodelElementCollection("conn_coll2"));
         
         aas.accept(new AasPrintVisitor()); // assert the accepts
     }
@@ -328,5 +328,29 @@ public class AasTest {
         Assert.assertTrue(AasFactory.getInstance().getName().length() > 0);
     }
 
+    /**
+     * Tests for illegal short ids. Seems to be valid for all AAs.
+     */
+    @Test
+    public void testIllegalShortId() {
+        AasFactory factory = AasFactory.getInstance();
+        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        try {
+            subModelBuilder.createPropertyBuilder("value").setValue(1).build();
+            Assert.fail("No exception due to illegal name");
+        } catch (IllegalArgumentException e) {
+        }
+        try {
+            subModelBuilder.createPropertyBuilder("1234").setValue(1).build();
+            Assert.fail("No exception due to illegal name");
+        } catch (IllegalArgumentException e) {
+        }
+        try {
+            subModelBuilder.createPropertyBuilder("java.lang.String").setValue(1).build();
+            Assert.fail("No exception due to illegal name");
+        } catch (IllegalArgumentException e) {
+        }
+    }
     
 }
