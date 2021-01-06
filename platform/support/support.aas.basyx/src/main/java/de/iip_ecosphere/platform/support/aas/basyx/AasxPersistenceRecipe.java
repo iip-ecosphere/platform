@@ -185,6 +185,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
             basyxSubmodels.add(((AbstractSubmodel<?>) s).getSubmodel());
         }
         
+        addAsset(aas, assetList, IAsset.class);
         MetamodelToXMLConverter.convertToXML(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 
             new StreamResult(out));
 
@@ -287,10 +288,12 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
             Set<AASBundle> bundles = apm.retrieveAASBundles();
             List<IAssetAdministrationShell> aas = new ArrayList<>();
             List<ISubModel> submodels = new ArrayList<>();
+            List<IAsset> assets = new ArrayList<>();
             for (AASBundle b : bundles) {
                 aas.add(b.getAAS());
                 submodels.addAll(b.getSubmodels());
-                transform(aas, submodels, result);
+                // TODO BaSyx, unclear how to get the assets here
+                transform(aas, submodels, assets, result);
                 aas.clear();
                 submodels.clear();
             }

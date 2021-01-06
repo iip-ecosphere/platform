@@ -64,6 +64,7 @@ class XmlPersistenceRecipe extends AbstractPersistenceRecipe {
             for (Submodel s : a.submodels()) {
                 basyxSubmodels.add(((AbstractSubmodel<?>) s).getSubmodel());
             }
+            addAsset(a, assetList, IAsset.class);
         }
         
         try (FileWriter result = new FileWriter(file)) {
@@ -82,7 +83,7 @@ class XmlPersistenceRecipe extends AbstractPersistenceRecipe {
         try {
             String content = new String(Files.readAllBytes(file.toPath()));
             XMLToMetamodelConverter conv = new XMLToMetamodelConverter(content);
-            transform(conv.parseAAS(), conv.parseSubmodels(), result);
+            transform(conv.parseAAS(), conv.parseSubmodels(), conv.parseAssets(), result);
         } catch (SAXException | ParserConfigurationException e) {
             throw new IOException(e);
         }

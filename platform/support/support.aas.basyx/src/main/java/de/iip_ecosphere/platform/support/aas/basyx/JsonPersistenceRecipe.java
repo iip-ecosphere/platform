@@ -66,6 +66,7 @@ public class JsonPersistenceRecipe extends AbstractPersistenceRecipe {
                             + a.getIdShort());
                     }
                 }
+                addAsset(a, assetList, Asset.class);
             } else {
                 throw new IllegalArgumentException("Can only write directly created AAS: " + a.getIdShort());
             }
@@ -82,7 +83,7 @@ public class JsonPersistenceRecipe extends AbstractPersistenceRecipe {
         List<Aas> result = new ArrayList<Aas>();
         String json = FileUtils.readFileToString(file, Charset.defaultCharset());
         JSONToMetamodelConverter conv = new JSONToMetamodelConverter(json);
-        transform(conv.parseAAS(), conv.parseSubmodels(), result);
+        transform(conv.parseAAS(), conv.parseSubmodels(), conv.parseAssets(), result);
         return result;
     }
 

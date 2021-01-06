@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
@@ -65,17 +67,25 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
      * abstraction.
      * 
      * @param aas the AAS to transform
-     * @param submodels the sub-models for {@code aas} to transform
+     * @param submodels the sub-models to transform/link to {@link aas}
+     * @param assets the assets to transform/link to {@link aas}
      * @param result the resulting {@link Aas} instances (to be modified as a side effect)
      * @throws IOException in case that something goes wrong
      */
     protected void transform(List<? extends IAssetAdministrationShell> aas, List<? extends ISubModel> submodels, 
-        List<Aas> result) throws IOException {
+        List<? extends IAsset> assets, List<Aas> result) throws IOException {
         Map<String, SubModel> subMapping = new HashMap<>();
-        for (ISubModel sm : submodels) {
+        Map<String, Asset> assetMapping = new HashMap<>();
+        for (ISubModel sm : submodels) { // we do not read back connected AAS 
             if (sm instanceof SubModel) {
                 IIdentifier id = sm.getIdentification();
                 subMapping.put(id.getIdType() + "/" + id.getId(), (SubModel) sm);
+            }
+        }
+        for (IAsset asset : assets) {
+            if (asset instanceof Asset) {
+                IIdentifier id = asset.getIdentification();
+                assetMapping.put(id.getIdType() + "/" + id.getId(), (Asset) asset);
             }
         }
         for (IAssetAdministrationShell a : aas) {
@@ -95,9 +105,54 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
                         }
                     }
                 }
+                IReference r = a.getAssetReference();
+                if (null != r && !r.getKeys().isEmpty()) {
+                    Asset asset = null;
+                    for (IKey k : r.getKeys()) {
+                        if (KeyElements.ASSET == k.getType()) {
+                            asset = assetMapping.get(k.getIdType() + "/" + k.getValue());
+                        }
+                    }
+                    if (null != asset) {
+                        bAas.registerAsset(new BaSyxAsset(asset));
+                    }
+                }
                 result.add(bAas);
             }
         }
+    }
+    
+    /**
+     * Adds the asset from {@code aas} to {@code assetList} if feasible.
+     * 
+     * @param <T> the type of the asset
+     * @param aas the AAS to take the asset from
+     * @param assetList the asset list to be modified as a side effect
+     * @param assetCls the asset class
+     * @see #isValidForWriting(IAsset)
+     * @throws IllegalArgumentException if the wrong asset instance comes in
+     */
+    protected static <T> void addAsset(Aas aas, Collection<T> assetList, Class<T> assetCls) {
+        if (aas.getAsset() instanceof BaSyxAsset) {
+            IAsset asset = ((BaSyxAsset) aas.getAsset()).getAsset();
+            if (asset instanceof Asset) {
+                if (isValidForWriting(asset)) { // default assets created by BaSyx, cause problems in reading 
+                    assetList.add(assetCls.cast(asset));
+                }
+            } else {
+                throw new IllegalArgumentException("Can only write real Asset instances");
+            }
+        }
+    }
+    
+    /**
+     * Returns whether the given {@code asset} is valid for writing.
+     * 
+     * @param asset the asset to check
+     * @return {@code true} if valid, {@code false} else
+     */
+    protected static boolean isValidForWriting(IAsset asset) {
+        return asset.getIdShort().length() > 0;
     }
 
 }

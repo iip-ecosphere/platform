@@ -117,11 +117,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
 
         @Override
         void setAsset(BaSyxAsset asset) {
-            instance.setAsset(asset);
-            IAsset a = asset.getAsset();
-            instance.getAas().setAsset((Asset) a);
-            // reference is needed for Reading back AASX; works also without setAsset; unclear wether both ar needed
-            instance.getAas().setAssetReference((Reference) a.getReference()); 
+            instance.registerAsset(asset);
         }
         
     }
@@ -143,6 +139,19 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
     @Override
     public BaSyxAbstractAasBuilder createAasBuilder() {
         return new BaSyxAasBuilder(this);
+    }
+
+    /**
+     * Registers an asset and sets the asset reference in this step. {@link #setAsset(BaSyxAsset)} is called in here.
+     * 
+     * @param asset the asset to set
+     */
+    void registerAsset(BaSyxAsset asset) {
+        setAsset(asset);
+        IAsset a = asset.getAsset();
+        getAas().setAsset((Asset) a);
+        // reference is needed for Reading back AASX; works also without setAsset; unclear wether both ar needed
+        getAas().setAssetReference((Reference) a.getReference()); 
     }
 
 }

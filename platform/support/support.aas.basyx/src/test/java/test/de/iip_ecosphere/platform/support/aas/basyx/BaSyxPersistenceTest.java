@@ -47,7 +47,12 @@ public class BaSyxPersistenceTest extends PersistenceTest {
     
     @Override
     protected boolean assertOnlyFirst(File file) {
-        return file == AASX; // TODO Basyx just considers the first AAS and ignores the remaining
+        return file == AASX; // TODO BaSyx just considers the first AAS and ignores the remaining
+    }
+
+    @Override
+    protected boolean assertAsset(File file) {
+        return file == AASX; // TODO it seems that BaSyx does not read back the assets from AASX
     }
 
 }
