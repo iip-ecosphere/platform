@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public class TransportAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "IIP-Ecosphere.transport";
+    public static final String NAME_SUBMODEL = "IIP_Ecosphere_transport";
     public static final String NAME_VAR_CONNECTOR = "protocol";
     public static final String NAME_VAR_SERIALIZER = "wireFormat";
     // TODO endpoints?
