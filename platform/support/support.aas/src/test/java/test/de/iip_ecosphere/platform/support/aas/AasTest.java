@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -128,6 +129,17 @@ public class AasTest {
             return null;
         });
         return builder.build();
+    }
+
+    /**
+     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine)}.
+     * 
+     * @param subModelBuilder the sub model container builder to add the elements to
+     * @param addr the server address (schema ignored)
+     */
+    public static void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
+        ServerAddress addr) {
+        createAasOperationsElements(subModelBuilder, addr.getHost(), addr.getPort());
     }
 
     /**

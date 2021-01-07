@@ -25,6 +25,11 @@ public enum Schema {
     HTTP("http://", false), 
     
     /**
+     * TCP unencrypted.
+     */
+    TCP("tcp://", false),
+    
+    /**
      * Use whatever you like.
      */
     IGNORE("", false);
