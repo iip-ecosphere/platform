@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * Tests {@link BaSyxPersistenceRecipe}. This class only implements the basics and must be completed by the 
+ * Tests {@link PersistenceRecipe}. This class only implements the basics and must be completed by the 
  * respective AAS abstraction implementation.
  * 
  * @author Holger Eichelberger, SSE

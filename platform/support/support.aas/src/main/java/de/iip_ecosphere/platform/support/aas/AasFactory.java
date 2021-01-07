@@ -242,8 +242,7 @@ public abstract class AasFactory {
      * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
      * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
      * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
-     * {@link #createDeploymentRecipe(String, int)} or 
-     * {@link #createDeploymentRecipe#createDeploymentRecipe(String, String, int)}.
+     * {@link #createDeploymentRecipe(Endpoint)}.
      * 
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}

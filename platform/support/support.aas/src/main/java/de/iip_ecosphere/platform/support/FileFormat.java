@@ -63,7 +63,7 @@ public abstract class FileFormat {
      * the file extension, etc.
      * 
      * @param file the file to check
-     * @return {@code true} if the given {@link file} matches this file format, {@code false} else
+     * @return {@code true} if the given {@code file} matches this file format, {@code false} else
      */
     public abstract boolean matches(File file);
 

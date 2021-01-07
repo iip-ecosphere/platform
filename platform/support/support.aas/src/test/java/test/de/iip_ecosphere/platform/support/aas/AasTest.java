@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -79,11 +78,11 @@ public class AasTest {
 
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(AasTest.class);
-    private static final String HOST_AAS = "localhost";
-    private static final int PORT_AAS = NetUtils.getEphemeralPort();
-    private static final int PORT_VAB = NetUtils.getEphemeralPort();
+    private static final ServerAddress AAS_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
+    private static final Endpoint AAS_SERVER_BASE = new Endpoint(AAS_SERVER, "");
+    private static final Endpoint AAS_SERVER_REGISTRY = new Endpoint(AAS_SERVER, "registry");
+    private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
-    private static final String REGISTRY_PATH = "registry";
     
     static {
         QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
@@ -96,7 +95,7 @@ public class AasTest {
     
     /**
      * Creates the operations server for the given machine instance and for the operations in 
-     * {@link #createAasOperationsElements(SubmodelBuilder, String, int)}..
+     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, String, int)}..
      * 
      * @param port the server communication port
      * @param machine the machine
@@ -184,13 +183,13 @@ public class AasTest {
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
         TestMachine machine = new TestMachine();
 
-        Server ccServer = createOperationsServer(PORT_VAB, machine);
+        Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine);
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         Aas aas = createAas(machine);
         
         Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(new Endpoint(Schema.HTTP, HOST_AAS, PORT_AAS, ""))
-            .addInMemoryRegistry(REGISTRY_PATH)
+            .createDeploymentRecipe(AAS_SERVER_BASE)
+            .addInMemoryRegistry(AAS_SERVER_REGISTRY.getEndpoint())
             .deploy(aas)
             .createServer()
             .start();
@@ -213,7 +212,7 @@ public class AasTest {
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         Assert.assertTrue(subModelBuilder.isNew());
-        createAasOperationsElements(subModelBuilder, HOST_AAS, PORT_VAB);
+        createAasOperationsElements(subModelBuilder, VAB_SERVER);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
         
@@ -271,8 +270,7 @@ public class AasTest {
      */
     private static void queryAas(TestMachine machine) throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
-        Endpoint regEp = new Endpoint(Schema.HTTP, HOST_AAS, PORT_AAS, REGISTRY_PATH);
-        Aas aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
+        Aas aas = factory.obtainRegistry(AAS_SERVER_REGISTRY).retrieveAas(URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(2, aas.getSubmodelCount());
         Submodel submodel = aas.submodels().iterator().next();

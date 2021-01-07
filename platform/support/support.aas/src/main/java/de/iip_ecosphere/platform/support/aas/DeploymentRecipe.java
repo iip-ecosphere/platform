@@ -61,10 +61,10 @@ public interface DeploymentRecipe {
     public interface RegistryDeploymentRecipe {
 
         /**
-         * Obtains access to the registry (via {@link AasFactory#obtainRegistry(String, int, String)}.
+         * Obtains access to the registry (via {@link AasFactory#obtainRegistry(Endpoint)}.
          * 
          * @return the registry instance
-     * @throws IOException in case that the recipe/connection cannot be created
+         * @throws IOException in case that the recipe/connection cannot be created
          */
         public Registry obtainRegistry() throws IOException;
         
