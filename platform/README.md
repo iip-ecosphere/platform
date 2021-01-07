@@ -24,10 +24,10 @@ More to come soon with next focus on edge/stream performance, configuration inte
 # Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
   how existing and new parts are related.
-* **Java projects** are created with Eclipse (2019-08). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters. *We check for an upgrade to Eclipse 2020-12-R.*
-* For now, we use **JDK 8** in order to be compliant with Edge devices. To have exchangable projects across development 
-  installations, use in Eclipse the execution environment JavaSE-1.8 as JRE system library. This may be relaxed in 
-  future.
+* **Java projects** are created with Eclipse (2020-12-R). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters.
+* For now, we use **JDK 8** in order to be compliant with Edge devices. To have exchangeable projects across development 
+  installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in 
+  future. Unfortunately, Eclipse 2020-12-R complains again about complier compliance. If a solution for this is known, please describe here.
 * A related Java **Checkstyle** definition is based on Checkstyle 8.35. Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects.
 * Please install **FindBugs** or **Spotbugs** to avoid obvious programming problems.
 * The **Java package prefix** shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 
