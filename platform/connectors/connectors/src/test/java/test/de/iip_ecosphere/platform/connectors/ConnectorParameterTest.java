@@ -37,6 +37,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.IdentityToken;
 import de.iip_ecosphere.platform.connectors.IdentityToken.IdentityTokenBuilder;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
  * Tests {@link ConnectorParameter} and the related builder. Data is irrelevant/fake as we test the implementation
@@ -219,7 +221,7 @@ public class ConnectorParameterTest {
         KeyPair pair = new KeyPair(null, null);
         
         ConnectorParameter params = ConnectorParameterBuilder
-            .newBuilder("aaa", 1234, "xyz")
+            .newBuilder("aaa", 1234, Schema.TCP)
             .setApplicationInformation("aI", "aD")
             .setEndpointPath("epp/")
             .setKeepAlive(2345)
@@ -231,7 +233,7 @@ public class ConnectorParameterTest {
 
         Assert.assertEquals("aaa", params.getHost());
         Assert.assertEquals(1234, params.getPort());
-        Assert.assertEquals("xyz", params.getSchema());
+        Assert.assertEquals(Schema.TCP, params.getSchema());
         Assert.assertEquals("aI", params.getApplicationId());
         Assert.assertEquals("aD", params.getApplicationDescription());
         Assert.assertEquals("epp/", params.getEndpointPath());
@@ -244,6 +246,14 @@ public class ConnectorParameterTest {
         Assert.assertTrue(tokens.get("x") == params.getIdentityToken("x"));
         Assert.assertTrue(cert == params.getClientCertificate());
         Assert.assertTrue(pair == params.getClientKeyPair());
+        
+        ServerAddress addr = new ServerAddress(Schema.TCP, "aaa", 1234);
+        params = ConnectorParameterBuilder
+            .newBuilder(addr)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(addr.getSchema(), params.getSchema());
     }
 
 }

@@ -16,6 +16,9 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
+
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.
  * 
@@ -24,7 +27,7 @@ import java.util.Map;
 public class ConnectorParameter {
 
     public static final String ANY_ENDPOINT = "";
-    public static final String DEFAULT_SCHEMA = "tcp";
+    public static final Schema DEFAULT_SCHEMA = Schema.TCP;
     public static final int DEFAULT_REQUEST_TIMEOUT = 5000;
     public static final int DEFAULT_NOTIFICATION_INTERVAL = 1000;
     public static final int DEFAULT_KEEP_ALIVE = 2000;
@@ -33,7 +36,7 @@ public class ConnectorParameter {
     private X509Certificate certificate;
     private KeyPair keyPair;
     private Map<String, IdentityToken> identityToken;
-    private String schema = DEFAULT_SCHEMA;
+    private Schema schema = DEFAULT_SCHEMA;
     private int port;
     private String host;
     private int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
@@ -79,7 +82,7 @@ public class ConnectorParameter {
          *     also if value is <b>null</b>)
          * @return the connector parameter builder
          */
-        public static ConnectorParameterBuilder newBuilder(String host, int port, String schema) {
+        public static ConnectorParameterBuilder newBuilder(String host, int port, Schema schema) {
             ConnectorParameterBuilder builder = new ConnectorParameterBuilder();
             builder.instance = new ConnectorParameter(host, port);
             if (null != schema) {
@@ -87,6 +90,16 @@ public class ConnectorParameter {
             }
             return builder;
         }        
+
+        /**
+         * Creates a new connector parameter builder with required basic information.
+         * 
+         * @param addr the server address
+         * @return the connector parameter builder
+         */
+        public static ConnectorParameterBuilder newBuilder(ServerAddress addr) {
+            return newBuilder(addr.getHost(), addr.getPort(), addr.getSchema());
+        }
         
         /**
          * Sets a connector-dependent endpoint path, a URL path. Optional, remains an empty string if not called.
@@ -258,14 +271,14 @@ public class ConnectorParameter {
     /**
      * The connection schema.
      * 
-     * @return the schema (default "tcp")
+     * @return the schema (default {@link #DEFAULT_SCHEMA})
      */
-    public String getSchema() {
+    public Schema getSchema() {
         return schema;
     }
     
     /**
-     * The connection port on {@link #getSchema() schema}.
+     * The connection port.
      * 
      * @return the connection port
      */
