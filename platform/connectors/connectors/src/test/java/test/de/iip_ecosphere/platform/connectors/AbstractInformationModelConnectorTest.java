@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -59,7 +58,7 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
     }
     
     /**
-     * Returns the connector descriptor for {@link #createConnector(ChannelProtocolAdapter)}.
+     * Returns the connector descriptor for {@link #createConnector(ProtocolAdapter)}.
      * 
      * @return the connector descriptor
      */

@@ -94,7 +94,7 @@ public abstract class AbstractSerializingConnectorTest {
 
     /**
      * Tests the connector through explicitly setting/resetting the factory
-     * implementation. Builds up a {@link TestHiveMqServer} so that the test is
+     * implementation. Builds up a {@link Server} based on {@link #createTestServer(ServerAddress)} that the test is
      * self-contained.
      * 
      * @throws IOException in case that connection/communication fails

@@ -491,9 +491,7 @@ public class ConnectorsAasTest {
      * important to retrieve a new one.
      * 
      * @param connectors all connectors instantiated for this test, active an non-active
-     * @param expectedActive the expected number of connectors in the active sub-model; please remember, that we 
-     *   cannot delete elements, i.e., the number can only increase and will diverge from the elements in 
-     *   {@link connectors}
+     * @param expectedActive the expected number of connectors in the active sub-model
      * @throws IOException shall not occur
      */
     private void testActiveDescriptors(List<Connector<?, ?, ?, ?>> connectors, int expectedActive) throws IOException {

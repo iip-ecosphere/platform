@@ -63,7 +63,7 @@ public class ConnectorParameter {
         
         /**
          * Creates a new connector parameter builder with required basic information. Schema is set to 
-         * "{@value ConnectorParameter#DEFAULT_SCHEMA}".
+         * {@link ConnectorParameter#DEFAULT_SCHEMA}.
          * 
          * @param host the host to connect to
          * @param port the port to connect to
@@ -78,8 +78,8 @@ public class ConnectorParameter {
          * 
          * @param host the host to connect to
          * @param port the port to connect to
-         * @param schema protocol schema, usually "{@value ConnectorParameter#DEFAULT_SCHEMA}" (
-         *     also if value is <b>null</b>)
+         * @param schema protocol schema, usually ({@link ConnectorParameter#DEFAULT_SCHEMA} 
+         *     if value is <b>null</b>)
          * @return the connector parameter builder
          */
         public static ConnectorParameterBuilder newBuilder(String host, int port, Schema schema) {

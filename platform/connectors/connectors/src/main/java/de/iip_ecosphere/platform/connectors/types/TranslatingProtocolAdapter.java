@@ -24,7 +24,6 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <I> the input type to the underlying machine/platform
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
- * @param <D> the model data type (see @link {@link ModelAccess})
  * 
  * @author Holger Eichelberger, SSE
  */
