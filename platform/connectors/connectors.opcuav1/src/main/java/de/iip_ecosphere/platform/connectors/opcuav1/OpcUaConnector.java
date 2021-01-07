@@ -135,7 +135,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == client) {
             this.params = params;
-            String endpointURL = "opc." + params.getSchema() + "://" + params.getHost() + ":" + params.getPort() 
+            String endpointURL = "opc." + params.getSchema().toUri() + params.getHost() + ":" + params.getPort() 
                 + "/" + params.getEndpointPath();
             try {
                 client = OpcUaClient.create(
