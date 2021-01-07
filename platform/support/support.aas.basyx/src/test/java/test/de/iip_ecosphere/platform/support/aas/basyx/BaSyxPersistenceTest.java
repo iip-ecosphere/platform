@@ -20,7 +20,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import test.de.iip_ecosphere.platform.support.aas.PersistenceTest;
 
 /**
- * Tests {@link BaSyxPersistenceRecipe}.
+ * Tests {@link PersistenceRecipe}.
  * 
  * @author Holger Eichelberger, SSE
  */

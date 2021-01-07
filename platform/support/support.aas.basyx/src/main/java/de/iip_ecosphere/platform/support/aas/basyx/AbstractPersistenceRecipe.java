@@ -67,8 +67,8 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
      * abstraction.
      * 
      * @param aas the AAS to transform
-     * @param submodels the sub-models to transform/link to {@link aas}
-     * @param assets the assets to transform/link to {@link aas}
+     * @param submodels the sub-models to transform/link to {@code aas}
+     * @param assets the assets to transform/link to {@code aas}
      * @param result the resulting {@link Aas} instances (to be modified as a side effect)
      * @throws IOException in case that something goes wrong
      */
