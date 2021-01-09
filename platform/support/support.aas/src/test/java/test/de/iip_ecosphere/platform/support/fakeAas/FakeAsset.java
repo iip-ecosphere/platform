@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
@@ -71,6 +72,11 @@ public class FakeAsset implements Asset {
     @Override
     public String getIdShort() {
         return shortId;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitAsset(this);
     }
 
 }

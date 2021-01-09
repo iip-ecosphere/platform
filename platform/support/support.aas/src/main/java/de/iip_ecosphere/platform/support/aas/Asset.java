@@ -48,4 +48,11 @@ public interface Asset {
      */
     public String getIdShort();
 
+    /**
+     * Accepts the given visitor.
+     * 
+     * @param visitor the visitor instance
+     */
+    public void accept(AasVisitor visitor);
+    
 }

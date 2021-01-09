@@ -57,4 +57,8 @@ public class BasicAasVisitor implements AasVisitor {
     public void endSubmodelElementCollection(SubmodelElementCollection collection) {
     }
 
+    @Override
+    public void visitAsset(Asset asset) {
+    }
+
 }

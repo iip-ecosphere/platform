@@ -116,6 +116,9 @@ public class FakeAas extends FakeElement implements Aas {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitAas(this);
+        if (null != asset) {
+            asset.accept(visitor);
+        }
         for (Submodel sm : submodels()) {
             sm.accept(visitor);
         }

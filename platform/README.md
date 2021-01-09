@@ -28,6 +28,7 @@ More to come soon with next focus on edge/stream performance, configuration inte
 * For now, we use **JDK 8** in order to be compliant with Edge devices. To have exchangeable projects across development 
   installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in 
   future. Unfortunately, Eclipse 2020-12-R complains again about complier compliance. If a solution for this is known, please describe here.
+* Use **Javadoc** to describe the parts and pieces as well as their contract and intention. We assume that parameters of reference types are passed in with instances unless the documentation indicates that null (in Javadoc in bold font) can be used.
 * A related Java **Checkstyle** definition is based on Checkstyle 8.35. Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects.
 * Please install **FindBugs** or **Spotbugs** to avoid obvious programming problems.
 * The **Java package prefix** shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 

@@ -61,6 +61,12 @@ public class AasPrintVisitor implements AasVisitor {
         decreaseIndentation();
     }
 
+
+    @Override
+    public void visitAsset(Asset asset) {
+        log("ASSET " + asset.getIdShort() + " " + asset.getAssetKind());
+    }
+
     @Override
     public void visitSubmodel(Submodel submodel) {
         log("SUBMODEL " + submodel.getIdShort());

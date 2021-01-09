@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -37,6 +38,7 @@ public class PrintVisitorTest {
     public void testVisitor() {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("aas", "");
+        aasB.createAssetBuilder("asset", null, AssetKind.INSTANCE).build();
         SubmodelBuilder smB =  aasB.createSubmodelBuilder("sub", "");
         smB.createPropertyBuilder("prop").build();
         smB.createOperationBuilder("op").build();

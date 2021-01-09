@@ -61,6 +61,13 @@ public interface AasVisitor {
     public void endAas(Aas aas);
 
     /**
+     * Visits an asset.
+     * 
+     * @param asset the asset
+     */
+    public void visitAsset(Asset asset);
+    
+    /**
      * Visits a sub-model.
      * 
      * @param submodel the sub-model
