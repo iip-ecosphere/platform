@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
@@ -93,6 +94,11 @@ public class BaSyxAsset implements Asset {
      */
     IAsset getAsset() {
         return asset;
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitAsset(this);
     }
 
 }

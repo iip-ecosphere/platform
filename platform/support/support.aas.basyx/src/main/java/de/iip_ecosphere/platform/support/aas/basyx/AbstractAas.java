@@ -158,6 +158,9 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitAas(this);
+        if (null != asset) {
+            asset.accept(visitor);
+        }
         for (Submodel sm : submodels.values()) {
             sm.accept(visitor);
         }
