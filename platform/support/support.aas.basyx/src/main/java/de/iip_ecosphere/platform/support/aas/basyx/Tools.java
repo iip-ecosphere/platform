@@ -151,7 +151,7 @@ public class Tools {
                 + "underscore (\"_\"); starting mandatory with a letter.");
         }
         if (idShort.equals("value") || idShort.equals("invocationList")) { 
-            throw new IllegalArgumentException("idShort shall not be \"value\"");
+            throw new IllegalArgumentException("idShort shall not be \"" + idShort + "\"");
         }
         return idShort;
     }
