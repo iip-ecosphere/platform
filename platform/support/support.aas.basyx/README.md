@@ -29,7 +29,7 @@ May be, future versions need to switch to lazy loading of deployed AAS instances
 - Notify all colleagues working on the platform that no commit is permitted until the BaSyx deploment and platform build is completed.
 - If successful, do the deployment to the SSE mvn repo via ``jenkins-2`` as user ``jenkins``. You may use the Jenkins tasks, however,
   on command line there is more control over the actual version to be used.
-  - Checkout BaSxy in ``workspaces/IIP_basyx`` and ``workspaces/IIP_basyx-components``. Verify that the same version from git is used in both folders (so far, separated folders due to two MVN tasks).
+- Checkout BaSxy in ``workspaces/IIP_basyx`` and ``workspaces/IIP_basyx-components``. Verify that the same version from git is used in both folders (so far, separated folders due to two MVN tasks).
     - Run ``mvn -DskipTests clean install`` as before, for the SDK in ``workspaces/IIP_basyx`` and for the components in 
   ``workspaces/IIP_basyx-components``
     - Execute the Jenkins BaSyx deployment task (also to record the time there).
