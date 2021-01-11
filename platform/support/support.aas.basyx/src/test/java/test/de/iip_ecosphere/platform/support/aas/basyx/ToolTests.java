@@ -138,6 +138,11 @@ public class ToolTests {
             Assert.fail("No exception");
         } catch (IllegalArgumentException e) {
         }
+        try {
+            Tools.checkId("invocationList");
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+        }
     }
 
     /**
