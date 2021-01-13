@@ -18,6 +18,11 @@ May be, future versions need to switch to lazy loading of deployed AAS instances
 - Events
 
 **Upgrading BaSyx (for SSE)**
+
+These steps are only needed if you are in charge of upgrading BaSyx and in the same step deploying an new version to the SSE Maven repository. These steps are not intended if you just want to develop for the platform. Then the reliable BaSyx versions in the SSE Maven repository shall be sufficient. 
+
+Why not simply relying on BaSyx in Maven Central? Because, so far BaSyx was not deployed there :/
+
 - Do a local check out of the respective/most recent BaSyx version
 - Build each project in ``sdks/java/*`` with ``mvn -DskipTests clean package``.
 - Build ``components/basys.components`` with ``mvn -DskipTests clean package``.
