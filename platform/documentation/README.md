@@ -3,7 +3,7 @@
 # Documents 
 * Setup documentation
 * Platform handbook (soon)
-* [Guideline to open the projects and setup the environment](../blob/master/Guideline.docx)
+* [Guideline to open the projects and setup the environment](../blob/master/Guideline)
 
 # Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
