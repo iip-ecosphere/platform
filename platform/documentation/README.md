@@ -1,7 +1,6 @@
 # IIP-Ecosphere platform documentation
 
 # Documents 
-* Setup documentation
 * Platform handbook (soon)
 * [Guideline to open the projects and setup the environment](../documentation/Guideline.pdf?raw=true)
 
@@ -25,3 +24,4 @@
 * **CI and SNAPSHOT deployment** currently are done via SSE-CI/SSE-Maven-Repo. 
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
   file that executes Maven and deploys the artifacts.
+* For new components, please write a **short documentation** in terms of a ``README.md`` and hook that component appropriately into the parent documentations.
