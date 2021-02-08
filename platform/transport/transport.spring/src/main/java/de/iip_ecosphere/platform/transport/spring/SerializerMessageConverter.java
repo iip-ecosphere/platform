@@ -25,7 +25,8 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
  * Generic Spring Cloud Stream message converter for {@link SerializerRegistry}. Register your (generated) serializers
- * at startup time of the application.
+ * at startup time of the application. Applied to streams with the correct mime type, e.g., via 
+ * {@code spring.cloud.stream.default.contentType=application/ser-string}.
  *  
  * @author Holger Eichelberger, SSE
  */

@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
  * Implements operations to be carried out at application start, e.g., setting up configured serializers or the
- * transport factory..
+ * transport factory.
  * 
  * @author Holger Eichelberger, SSE
  */
