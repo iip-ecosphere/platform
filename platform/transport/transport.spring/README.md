@@ -13,4 +13,5 @@ AAS Protocol-specific binders shall exhibit the (default) server connection info
 
 ## Spring hints:
 
-- Enable debugging: `logging.level.org.springframework.cloud=DEBUG` and/or `logging.level.org.springframework.integration=DEBUG` 
+- Enable Spring Cloud Streams debugging: `logging.level.org.springframework.cloud=DEBUG` and/or `logging.level.org.springframework.integration=DEBUG` 
+- Enable Spring debugging: `logging.level.root=DEBUG`
