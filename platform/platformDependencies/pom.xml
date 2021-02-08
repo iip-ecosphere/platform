@@ -80,11 +80,16 @@
 		<version>1.7.25</version>
 	  </dependency>
     
-      <!-- File stuff -->
+      <!-- Commons stuff -->
 
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
+        <version>${apache.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
         <version>${apache.commons.version}</version>
       </dependency>
     
