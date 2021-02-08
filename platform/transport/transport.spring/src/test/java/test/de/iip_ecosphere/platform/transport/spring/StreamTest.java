@@ -11,20 +11,19 @@
 
 package test.de.iip_ecosphere.platform.transport.spring;
 
+import java.util.function.Function;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
-import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.integration.annotation.Transformer;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -69,18 +68,16 @@ public class StreamTest {
      * @author Holger Eichelberger, SSE
      */
     @SpringBootApplication
-    @EnableBinding(Processor.class)
     public static class MyProcessor {
         
         /**
          * Transforms the received input.
          * 
-         * @param in the input
-         * @return the transformed input
+         * @return function transforming the input
          */
-        @Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-        public String transform(String in) {
-            return in + " world";
+        @Bean
+        public Function<String, String> transform() {
+            return in -> in + " world";
         }
         
         /**
