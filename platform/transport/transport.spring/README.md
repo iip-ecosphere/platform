@@ -10,3 +10,7 @@ This component is directly based on the transport components. This component pro
 conversion based on the serialization mechanism defined in the transport component. Protocol-specific binders are
 defined in further projects named `transport.streaming.<protocol>`. For uniform usage and a future transport 
 AAS Protocol-specific binders shall exhibit the (default) server connection information as TransportParameter bean.
+
+## Spring hints:
+
+- Enable debugging: `logging.level.org.springframework.cloud=DEBUG` and/or `logging.level.org.springframework.integration=DEBUG` 
