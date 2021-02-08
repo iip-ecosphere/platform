@@ -12,6 +12,9 @@
 package test.de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
 import java.io.IOException;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -22,20 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.InboundChannelAdapter;
-import org.springframework.integration.annotation.Poller;
-import org.springframework.integration.annotation.Transformer;
-import org.springframework.integration.core.MessageSource;
-import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -159,23 +152,6 @@ public class AmqpMessageBinderTest {
         Assert.assertEquals(ADDR.getPort(), params.getPort());
         Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
-
-    /**
-     * Defines a processor with additional input for receiving messages from the binder/test broker server.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    interface Proc extends Processor {
-
-        /**
-         * A second input.
-         * 
-         * @return the input channel
-         */
-        @Input
-        SubscribableChannel input2();
-
-    }
     
     /**
      * A simple test processor.
@@ -183,39 +159,36 @@ public class AmqpMessageBinderTest {
      * @author Holger Eichelberger, SSE
      */
     @SpringBootApplication
-    @EnableBinding(Proc.class)
     public static class MyProcessor {
 
         /**
          * Produces the inbound messages.
          * 
-         * @return the produced messages
+         * @return supplier for inbound messages
          */
         @Bean
-        @InboundChannelAdapter(value = Processor.INPUT, poller = @Poller(fixedDelay = "200", maxMessagesPerPoll = "1"))
-        public MessageSource<String> in() {
-            return () -> new GenericMessage<String>("DMG-1");
+        public Supplier<String> in() {
+            return () -> "DMG-1";
         }
         
         /**
          * Transforms the received input.
          * 
-         * @param in the input
-         * @return the transformed input
+         * @return function transforming the input
          */
-        @Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-        public String transform(String in) {
-            return in + " world";
+        @Bean
+        public Function<String, String> transform() {
+            return in -> in + " world";
         }
         
         /**
          * Receives the bounced message from the binder.
          * 
-         * @param value the value
+         * @return consumer instance
          */
-        @StreamListener("input2")
-        public void receiveInput(String value) {
-            received = value;
+        @Bean
+        public Consumer<String> receiveInput() {
+            return s -> received = s;
         }
         
         /**
