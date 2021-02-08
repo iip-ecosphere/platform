@@ -67,5 +67,26 @@ public class CollectionUtilsTest {
             Assert.assertTrue(result.contains(s));
         }
     }
+    
+    /**
+     * Tests {@link CollectionUtils#toList(Object...)}.
+     */
+    @Test
+    public void testToListVarArg() {
+        List<String> tmp = CollectionUtils.toList();
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(0, tmp.size());
+        
+        tmp = CollectionUtils.toList("a");
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(1, tmp.size());
+        Assert.assertEquals("a", tmp.get(0));
+
+        tmp = CollectionUtils.toList("a", "b");
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(2, tmp.size());
+        Assert.assertEquals("a", tmp.get(0));
+        Assert.assertEquals("b", tmp.get(1));
+    }
 
 }

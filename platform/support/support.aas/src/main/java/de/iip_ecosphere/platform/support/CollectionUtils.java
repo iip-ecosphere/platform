@@ -26,6 +26,22 @@ import java.util.Set;
 public class CollectionUtils {
 
     /**
+     * Turns given elements into a list.
+     * 
+     * @param <T> the element type
+     * @param elements the elements
+     * @return the list containing all {@code elements}
+     */
+    @SafeVarargs
+    public static <T> List<T> toList(T... elements) {
+        List<T> result = new ArrayList<T>();
+        for (T e : elements) {
+            result.add(e);
+        }
+        return result;
+    }
+    
+    /**
      * Turns the elements in the iterator into a list.
      * 
      * @param <T> the element type
