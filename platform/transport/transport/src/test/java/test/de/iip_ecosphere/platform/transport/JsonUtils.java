@@ -53,4 +53,22 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * Reads an integer field from a JSON object.
+     * 
+     * @param obj   the object to read from
+     * @param field the field to read from
+     * @param dflt  the default value
+     * @return the double value, if not accessible {@code dflt}
+     * @throws IOException if parsing the double value fails
+     */
+    public static int readInteger(JSONObject obj, String field, int dflt) throws IOException {
+        try {
+            Object tmp = obj.get(field);
+            return null == tmp ? dflt : Integer.parseInt(tmp.toString());
+        } catch (NumberFormatException e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+    
 }
