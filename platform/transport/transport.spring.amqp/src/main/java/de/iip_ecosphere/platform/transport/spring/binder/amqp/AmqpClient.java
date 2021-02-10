@@ -146,7 +146,7 @@ public class AmqpClient {
                 connection = factory.newConnection();
                 channel = connection.createChannel();
             } catch (IOException | TimeoutException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Creating AMQP client: " + e.getMessage(), e);
             }                
         }
     }
@@ -163,7 +163,7 @@ public class AmqpClient {
             connection.close();
             connection = null;
         } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Stopping AMQP client: " + e.getMessage(), e);
         }
     }
 
@@ -187,7 +187,7 @@ public class AmqpClient {
                 LOGGER.info("Subscribed to " + topic);
                 done = true;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Subscribing to AMQP broker: " + e.getMessage(), e);
             }
         }
         return done;
@@ -209,7 +209,7 @@ public class AmqpClient {
                 LOGGER.info("Unsubscribed from " + topic);
                 done = true;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Unsubscribing from AMQP broker: " + e.getMessage(), e);
             }
         }
         return done;

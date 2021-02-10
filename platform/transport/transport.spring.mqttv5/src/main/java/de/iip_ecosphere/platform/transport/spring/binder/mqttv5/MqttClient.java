@@ -174,7 +174,7 @@ public class MqttClient {
                     try {
                         waitForCompletion(client.publish(entry.topic, message));
                     } catch (MqttException e) {
-                        throw new RuntimeException(e);
+                        LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " + e.getMessage(), e);
                     }
                 }
                 TimeUtils.sleep(2);
@@ -205,7 +205,7 @@ public class MqttClient {
                 new Thread(sendConsumer).start();
                 client = cl;
             } catch (MqttException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Connecting MQTT client: " + e.getMessage(), e);
             }
         }
     }
@@ -221,7 +221,7 @@ public class MqttClient {
             callback = null;
             client = null;
         } catch (MqttException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Stopping MQTT client: " + e.getMessage(), e);
         }
     }
 
@@ -242,7 +242,7 @@ public class MqttClient {
                 LOGGER.info("Subscribed to " + topic);
                 done = true;
             } catch (MqttException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Subscribing to MQTT topic '" + topic + "': " + e.getMessage(), e);
             }
         }
         return done;
@@ -264,7 +264,7 @@ public class MqttClient {
                 LOGGER.info("Unsubscribed from " + topic);
                 done = true;
             } catch (MqttException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Unsubscribing from MQTT topic '" + topic + "': " + e.getMessage(), e);
             }
         }
         return done;
