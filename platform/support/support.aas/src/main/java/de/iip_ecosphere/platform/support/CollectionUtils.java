@@ -26,7 +26,7 @@ import java.util.Set;
 public class CollectionUtils {
 
     /**
-     * Turns given elements into a list.
+     * Turns given {@code elements} into a list.
      * 
      * @param <T> the element type
      * @param elements the elements
@@ -39,6 +39,22 @@ public class CollectionUtils {
             result.add(e);
         }
         return result;
+    }
+    
+    /**
+     * Turns given {@code elements} to {@code list}.
+     * 
+     * @param <T> the element type
+     * @param list the list to be modified as a side effect
+     * @param elements the elements
+     * @return the list with all {@code elements} added
+     */
+    @SafeVarargs
+    public static <T> List<T> addAll(List<T> list, T... elements) {
+        for (T e : elements) {
+            list.add(e);
+        }
+        return list;
     }
     
     /**

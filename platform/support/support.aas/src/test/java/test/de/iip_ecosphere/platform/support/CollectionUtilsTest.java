@@ -89,4 +89,30 @@ public class CollectionUtilsTest {
         Assert.assertEquals("b", tmp.get(1));
     }
 
+    /**
+     * Tests {@link CollectionUtils#addAll(List, Object...)}.
+     */
+    @Test
+    public void testAddAllVarArg() {
+        List<String> tmp = new ArrayList<String>();
+        List<String> res = CollectionUtils.addAll(tmp);
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(0, tmp.size());
+        
+        res = CollectionUtils.addAll(tmp, "a");
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(1, tmp.size());
+        Assert.assertEquals("a", tmp.get(0));
+
+        res = CollectionUtils.addAll(tmp, "a", "b");
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(3, tmp.size());
+        Assert.assertEquals("a", tmp.get(0));
+        Assert.assertEquals("a", tmp.get(1));
+        Assert.assertEquals("b", tmp.get(2));
+    }
+
 }
