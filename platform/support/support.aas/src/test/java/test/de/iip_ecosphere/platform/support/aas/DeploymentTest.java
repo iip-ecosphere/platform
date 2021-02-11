@@ -45,6 +45,8 @@ public class DeploymentTest {
     
     /**
      * Tests a local dynamic sub-model deployment.
+     * 
+     * @throws IOException shall not occur if the test works
      */
     @Test
     public void localSubmodelDynamicDeployment() throws IOException {
@@ -186,6 +188,8 @@ public class DeploymentTest {
 
     /**
      * Tests a remote AAS deployment.
+     * 
+     * @throws IOException shall not occur if the test works
      */
     @Test
     public void remoteAasDeploymentTest() throws IOException {

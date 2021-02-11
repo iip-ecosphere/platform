@@ -178,6 +178,11 @@ public class AasTest {
     
     /**
      * Tests creating/reading an AAS.
+     * 
+     * @throws SocketException shall not occur if the test works
+     * @throws UnknownHostException shall not occur if the test works
+     * @throws ExecutionException shall not occur if the test works
+     * @throws IOException shall not occur if the test works
      */
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
