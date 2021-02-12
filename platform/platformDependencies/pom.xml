@@ -47,12 +47,29 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <org.slf4j.version>1.7.25</org.slf4j.version>
+    <com.googlecode.json-simple>1.1.1</com.googlecode.json-simple>
     <apache.commons.version>2.6</apache.commons.version>    
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
+    <com.hivemq.version>2020.4</com.hivemq.version>
+    <org.springframework.boot.version>2.4.2</org.springframework.boot.version>
+    <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
+    <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
+
+    <!-- for overriding/fixing local build processes -->
+    <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
+    <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
+    <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
+    <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
+    <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
+    <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
+    <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
+    <org.jacoco.maven.jacoco.version>0.8.2</org.jacoco.maven.jacoco.version>
+    <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
 
     <!-- for now due to edge deployment/initial experience -->
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -77,7 +94,7 @@
 	  <dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
-		<version>1.7.25</version>
+		<version>${org.slf4j.version}</version>
 	  </dependency>
     
       <!-- Commons stuff -->
@@ -104,7 +121,7 @@
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
         <artifactId>json-simple</artifactId>
-        <version>1.1.1</version>
+        <version>${com.googlecode.json-simple}</version>
       </dependency>      
       
       <!-- MQTT -->
@@ -123,7 +140,7 @@
       <dependency>
         <groupId>com.hivemq</groupId>
         <artifactId>hivemq-community-edition-embedded</artifactId>
-        <version>2020.4</version>
+        <version>${com.hivemq.version}</version>
       </dependency>
       
       <!-- AMQP -->
@@ -153,39 +170,23 @@
       
       <dependency>
         <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-stream</artifactId>
-        <version>3.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-commons</artifactId>
-        <version>3.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter</artifactId>
-        <version>3.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>5.3.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-stream</artifactId>
-        <version>3.1.1</version>
-        <type>test-jar</type>
-        <scope>test</scope>
-        <classifier>test-binder</classifier>
+        <artifactId>spring-cloud-stream-dependencies</artifactId>
+        <version>${org.springframework.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.4.2</version>
+        <version>${org.springframework.boot.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${org.springframework.spring-test.version}</version>
+        <scope>test</scope>
       </dependency>
     
       <!-- basic testing dependencies -->
@@ -204,7 +205,7 @@
       <plugin>
         <groupId>kr.motd.maven</groupId>
         <artifactId>os-maven-plugin</artifactId>
-        <version>1.6.2</version>
+        <version>${kr.motd.maven.os.version}</version>
         <executions>
           <execution>
             <phase>initialize</phase>
@@ -218,7 +219,7 @@
       <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.6.1</version>
+        <version>${org.xolstice.maven.protobuf.version}</version>
         <configuration>
           <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
         </configuration>    
@@ -234,8 +235,9 @@
     
        <plugin>
          <artifactId>maven-compiler-plugin</artifactId>
-         <version>3.7.0</version>
+         <version>${org.apache.maven.compiler.version}</version>
          <configuration>
+           <!-- Somehow it does not work with properties, at least on my side -->
            <source>1.8</source>
            <target>1.8</target>
            <encoding>${java.encoding}</encoding>
@@ -245,7 +247,7 @@
        <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>${org.apache.maven.javadoc.version}</version>
         <configuration>
           <show>private</show>
           <encoding>${java.encoding}</encoding>
@@ -268,7 +270,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>${org.apache.maven.jar.version}</version>
         <executions>
           <execution>
             <goals>
@@ -281,7 +283,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>${org.apache.maven.surefire.version}</version>
         <configuration>
           <includes>
             <include>**/AllTests.class</include>
@@ -292,7 +294,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>${org.jacoco.maven.jacoco.version}</version>
         <executions>
             <execution>
                 <goals>
