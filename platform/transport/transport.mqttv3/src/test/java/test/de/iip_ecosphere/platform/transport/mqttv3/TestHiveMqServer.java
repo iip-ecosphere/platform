@@ -12,20 +12,19 @@ package test.de.iip_ecosphere.platform.transport.mqttv3;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
-
 import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
- * A simple embedded HiveMQ test server for MQTT.
+ * A simple embedded HiveMQ/MQTT test server for testing/experiments.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TestHiveMqServer implements Server {
+public class TestHiveMqServer extends AbstractTestServer {
     
     private EmbeddedHiveMQ hiveMQ;
     private ServerAddress addr;
@@ -42,16 +41,13 @@ public class TestHiveMqServer implements Server {
     @Override
     public Server start() {
         if (null == hiveMQ) {
-            String tmp = System.getProperty("java.io.tmpdir");
-            File hiveTmp = new File(tmp, "hivemq");
-            FileUtils.deleteQuietly(hiveTmp);
-            hiveTmp.mkdir();
+            File hiveTmp = createTmpFolder("hivemq_v3");
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());
             System.setProperty("hivemq.log.folder", hiveTmp.getAbsolutePath());
             
-            File cfg = new File("./src/test");
+            File cfg = getConfigDir("./src/test");
             final EmbeddedHiveMQBuilder embeddedHiveMQBuilder = EmbeddedHiveMQBuilder.builder()
                 .withConfigurationFolder(cfg.toPath())
                 .withDataFolder(hiveTmp.toPath())

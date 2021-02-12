@@ -20,13 +20,14 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
- * A simple AMQP server.
+ * A simple AMQP server for testing/experiments.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TestQpidServer implements Server {
+public class TestQpidServer extends AbstractTestServer {
     
     private SystemLauncher systemLauncher;
     private ServerAddress addr;
@@ -48,7 +49,7 @@ public class TestQpidServer implements Server {
             System.setProperty("qpid.amqp_port", Integer.toString(addr.getPort()));
             systemLauncher = new SystemLauncher();
             Map<String, Object> attributes = new HashMap<String, Object>();
-            File f = new File("./src/test/config.json");
+            File f = new File(getConfigDir("./src/test"), "config.json");
             URL initialConfig = f.toURI().toURL();
             // https://qpid.apache.org/releases/qpid-broker-j-8.0.0/book/
             // Java-Broker-Initial-Configuration-Configuration-Properties.html
