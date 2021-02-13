@@ -46,6 +46,7 @@ public class TestHiveMqServer extends AbstractTestServer {
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());
             System.setProperty("hivemq.log.folder", hiveTmp.getAbsolutePath());
+            System.setProperty("hivemq.data.folder", hiveTmp.getAbsolutePath()); // sometimes below fails
             
             File cfg = getConfigDir("./src/test");
             final EmbeddedHiveMQBuilder embeddedHiveMQBuilder = EmbeddedHiveMQBuilder.builder()
