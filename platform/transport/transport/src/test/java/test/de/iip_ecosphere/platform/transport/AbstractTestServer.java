@@ -150,7 +150,7 @@ public abstract class AbstractTestServer implements Server {
         try (ZipInputStream zis = new ZipInputStream(in)) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                boolean isDirectory = zipEntry.getName().endsWith(File.separator);
+                boolean isDirectory = zipEntry.isDirectory();
                 Path newPath = zipSlipProtect(zipEntry, target);
                 if (isDirectory) {
                     Files.createDirectories(newPath);
@@ -162,7 +162,6 @@ public abstract class AbstractTestServer implements Server {
                     }
                     Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
                 }
-
                 zipEntry = zis.getNextEntry();
             }
             zis.closeEntry();
@@ -181,16 +180,13 @@ public abstract class AbstractTestServer implements Server {
      */
     private static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir)
         throws IOException {
-
         Path targetDirResolved = targetDir.resolve(zipEntry.getName());
-
         // make sure normalized file still has targetDir as its prefix
         // else throws exception
         Path normalizePath = targetDirResolved.normalize();
         if (!normalizePath.startsWith(targetDir)) {
             throw new IOException("Bad zip entry: " + zipEntry.getName());
         }
-
         return normalizePath;
     }
     
