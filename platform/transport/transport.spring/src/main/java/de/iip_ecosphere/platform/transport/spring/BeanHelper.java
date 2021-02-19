@@ -33,10 +33,10 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
  * context, here with {@code "myProto"} as (optional) qualifying name.
  * 
  * <pre>
- *   @Bean
- *   @ConditionalOnMissingBean
+ *   &commat;Bean
+ *   &commat;ConditionalOnMissingBean
  *   public TransportParameter myTransportParameter(@Autowired ApplicationContext ctx, 
- *       @Autowired MyConfiguration config) {
+ *       &commat;Autowired MyConfiguration config) {
  *       return TransportParameterBeanHelper.registerInParentContext(ctx, config.toTransportParameter(), "myProto");
  *   }
  * </pre>
