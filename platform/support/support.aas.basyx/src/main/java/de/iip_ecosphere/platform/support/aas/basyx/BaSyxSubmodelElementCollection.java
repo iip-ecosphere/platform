@@ -193,7 +193,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
  
     /**
      * Creates an instance and sets the BaSyx instance directly.
-     * @param collection
+     * 
+     * @param collection the collection instance
      */
     BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
         this.collection = collection;
@@ -254,7 +255,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     /**
-     * {@link #getElement(String) combined with a type filter.
+     * {@link #getElement(String)} combined with a type filter.
      * 
      * @param <T> the type
      * @param idShort the short id to search for

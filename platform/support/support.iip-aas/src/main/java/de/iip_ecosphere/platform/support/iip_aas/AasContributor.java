@@ -27,7 +27,7 @@ public interface AasContributor {
      * Contribute to the given {@code aasBuilder}.
      * 
      * @param aasBuilder the AAS to contribute to
-     * @return the contributor may ignore {@link aasBuilder} and create an own AAS and return that. If this contributor 
+     * @return the contributor may ignore {@code aasBuilder} and create an own AAS and return that. If this contributor 
      *   just contributes to the {@code aasBuilder} the result shall be <b>null</b>
      */
     public Aas contributeTo(AasBuilder aasBuilder);

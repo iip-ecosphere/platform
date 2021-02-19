@@ -41,7 +41,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
     // TODO can we distinguish the three types; static, dynamic, ?
     /**
-     * Builder for {@lin BaSyxProperty}.
+     * Builder for {@link BaSyxProperty}.
      * 
      * @author Holger Eichelberger, SSE
      */

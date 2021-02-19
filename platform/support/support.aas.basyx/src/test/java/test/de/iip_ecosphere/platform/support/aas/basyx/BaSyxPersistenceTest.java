@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import test.de.iip_ecosphere.platform.support.aas.PersistenceTest;
 
 /**
