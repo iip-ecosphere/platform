@@ -65,7 +65,7 @@ public class MqttConfiguration {
     }
     
     /**
-     * Returns the broker connection string consisting of {@link #getSchema()}, {@link #getHost() 
+     * Returns the broker connection string consisting of {@link #getSchema()}, {@link #getHost()} 
      * and {@link #getPort()}.
      * 
      * @return the broker connection string
@@ -169,7 +169,7 @@ public class MqttConfiguration {
     /**
      * Changes the action timeout to wait for the broker to complete an action. [required by Spring]
      *
-     * @param actionTimeout the action timeout in ms ({@value #keepAlive} by default)
+     * @param actionTimeout the action timeout in ms (60000 by default)
      */
     public void setActionTimeout(int actionTimeout) {
         this.actionTimeout = actionTimeout;
