@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>connectors.basyx</artifactId>
+  <artifactId>connectors.aas</artifactId>
   <packaging>jar</packaging>
   <name>connectors AAS/BaSyx extension</name>
   <description>The AAS/BaSyx connectors extension component in the transport layer of the IIP-Ecosphere platform.</description>
