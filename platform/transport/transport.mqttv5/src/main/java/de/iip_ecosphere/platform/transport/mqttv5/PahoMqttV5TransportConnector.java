@@ -92,7 +92,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
             client = new MqttAsyncClient(broker, getApplicationId(), new MemoryPersistence());
             client.setCallback(new Callback());
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
-            connOpts.setCleanStart(true);
+            connOpts.setCleanStart(false);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
