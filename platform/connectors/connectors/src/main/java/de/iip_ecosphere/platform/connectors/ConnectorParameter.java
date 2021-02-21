@@ -42,6 +42,7 @@ public class ConnectorParameter {
     private int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private String endpointPath = "";
     private String applicationId = "";
+    private boolean autoApplicationId = true;
     private String applicationDescription = "";
     private int notificationInterval = DEFAULT_NOTIFICATION_INTERVAL;
     private int keepAlive = DEFAULT_KEEP_ALIVE;
@@ -162,6 +163,18 @@ public class ConnectorParameter {
             String applicationDescription) {
             instance.applicationId = applicationId;
             instance.applicationDescription = applicationDescription;
+            return this;
+        }
+        
+        /**
+         * Defines whether the application identification is expected to be unique or shall be made unique upon first 
+         * connect. May be ignored if not applicable.
+         * 
+         * @param autoApplicationId {@code true} (default) for make unique, {@code false} else
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setAutoApplicationId(boolean autoApplicationId) {
+            instance.autoApplicationId = autoApplicationId;
             return this;
         }
         
@@ -350,6 +363,16 @@ public class ConnectorParameter {
      */
     public int getKeepAlive() {
         return keepAlive;
+    }
+    
+    /**
+     * Returns whether the application identification is expected to be unique or shall be made unique upon first 
+     * connect. May be ignored if not applicable.
+     * 
+     * @return {@code true} (default) for make unique, {@code false} else
+     */
+    public boolean getAutoApplicationId() {
+        return autoApplicationId;
     }
 
 }

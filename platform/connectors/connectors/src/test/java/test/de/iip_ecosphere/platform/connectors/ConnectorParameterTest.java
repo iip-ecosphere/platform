@@ -223,6 +223,7 @@ public class ConnectorParameterTest {
         ConnectorParameter params = ConnectorParameterBuilder
             .newBuilder("aaa", 1234, Schema.TCP)
             .setApplicationInformation("aI", "aD")
+            .setAutoApplicationId(false)
             .setEndpointPath("epp/")
             .setKeepAlive(2345)
             .setNotificationInterval(9999)
@@ -236,6 +237,7 @@ public class ConnectorParameterTest {
         Assert.assertEquals(Schema.TCP, params.getSchema());
         Assert.assertEquals("aI", params.getApplicationId());
         Assert.assertEquals("aD", params.getApplicationDescription());
+        Assert.assertFalse(params.getAutoApplicationId());
         Assert.assertEquals("epp/", params.getEndpointPath());
         Assert.assertEquals(2345, params.getKeepAlive());
         Assert.assertEquals(9999, params.getNotificationInterval());

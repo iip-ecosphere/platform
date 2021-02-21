@@ -75,7 +75,7 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
     }
 
     @Override
-    protected void writeImpl(byte[] data) throws IOException {
+    protected void writeImpl(byte[] data, String channel) throws IOException {
         received.offer(data);
     }
 

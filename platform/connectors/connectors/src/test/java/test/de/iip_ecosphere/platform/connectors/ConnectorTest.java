@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
+import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -301,6 +302,35 @@ public class ConnectorTest {
         instance.disconnect();
         assertInstance(instance, false);
         instance.dispose();
+    }
+
+    /**
+     * Tests failing construction of connectors.
+     */
+    @Test
+    public void testConnectorParams() {
+        try {
+            new MyModelConnector<Product, Command>();
+            Assert.fail("No exception thrown");
+        } catch (IllegalArgumentException e) {
+            // this is ok
+        }
+        try {
+            new MyModelConnector<Product, Command>((ProtocolAdapter<Object, Object, Product, Command>[]) null);
+            Assert.fail("No exception thrown");
+        } catch (IllegalArgumentException e) {
+            // this is ok
+        }
+        try {
+            ConnectorInputTypeTranslator<Command, Object> in = new ModelInputTranslator(); 
+            ConnectorOutputTypeTranslator<Object, Product> out = new ModelOutputTranslator(false);
+            TranslatingProtocolAdapter<Object, Object, Product, Command> adapter 
+                = new TranslatingProtocolAdapter<>(out, in);
+            new MyModelConnector<Product, Command>(adapter, null);
+            Assert.fail("No exception thrown");
+        } catch (IllegalArgumentException e) {
+            // this is ok
+        }
     }
 
     /**

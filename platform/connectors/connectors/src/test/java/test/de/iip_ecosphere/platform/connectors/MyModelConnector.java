@@ -63,11 +63,12 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
     /**
      * Creates a model connector instance.
      * 
-     * @param adapter the protocol adapter
+     * @param adapter the protocol adapter(s)
      */
-    public MyModelConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
+    @SafeVarargs
+    public MyModelConnector(ProtocolAdapter<Object, Object, CO, CI>... adapter) {
         super(adapter);
-        adapter.setModelAccess(new MyModelAccess());
+        configureModelAccess(new MyModelAccess());
     }
 
     @Override

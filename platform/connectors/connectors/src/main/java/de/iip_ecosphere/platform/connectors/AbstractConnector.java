@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
+import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
@@ -35,21 +36,82 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I, CO, CI>, 
     NotificationChangedListener {
 
-    private ProtocolAdapter<O, I, CO, CI> adapter;
+    private ProtocolAdapter<O, I, CO, CI>[] adapter;
+    private AdapterSelector<O, I, CO, CI> selector;
     private ReceptionCallback<CO> callback;
     private Timer timer;
     private TimerTask pollTask;
     private ConnectorParameter params;
 
     /**
-     * Creates an instance and installs the protocol adapter.
+     * Creates an instance and installs the protocol adapter(s) with a default selector for the first adapter.
+     * For integration compatibility, connector constructors are supposed to accept a var-arg parameter for adapters.
      * 
-     * @param adapter the protocol adapter
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
      */
-    protected AbstractConnector(ProtocolAdapter<O, I, CO, CI> adapter) {
+    @SafeVarargs
+    protected AbstractConnector(ProtocolAdapter<O, I, CO, CI>... adapter) {
+        this(null, adapter);
+    }
+
+    /**
+     * Creates an instance and installs the protocol adapter(s).
+     * For integration compatibility, connector constructors are supposed to accept a var-arg parameter for adapters.
+     * 
+     * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
+     */
+    @SafeVarargs
+    protected AbstractConnector(AdapterSelector<O, I, CO, CI> selector, ProtocolAdapter<O, I, CO, CI>... adapter) {
+        if (null == adapter || adapter.length == 0) {
+            throw new IllegalArgumentException("adapter must be given (not null, not empty)");
+        }
+        for (int a = 0; a < adapter.length; a++) {
+            if (null == adapter[a]) {
+                throw new IllegalArgumentException("adapter must be given (not null, not empty)");
+            }
+        }
         this.adapter = adapter;
+        this.selector = selector;
+        if (null == this.selector) {
+            this.selector = new AdapterSelector<O, I, CO, CI>() {
+
+                @Override
+                public ProtocolAdapter<O, I, CO, CI> selectSouthOutput(O data) {
+                    return adapter[0];
+                }
+
+                @Override
+                public ProtocolAdapter<O, I, CO, CI> selectNorthInput(CI data) {
+                    return adapter[0];
+                }
+                
+            };
+        } 
     }
     
+    /**
+     * Configures the model access on all protocol adapters.
+     * 
+     * @param access the model access
+     */
+    protected void configureModelAccess(ModelAccess access) {
+        for (int a = 0; a < adapter.length; a++) {
+            adapter[a].setModelAccess(access);
+        }
+    }
+
+    /**
+     * Returns the adapter selector.
+     * 
+     * @return the selector
+     */
+    protected AdapterSelector<O, I, CO, CI> getSelector() {
+        return selector;
+    }
+
     /**
      * Connects the connector to the underlying machine/platform. Calls {@link #connectImpl(ConnectorParameter)} 
      * and if successful (no exception thrown) {@link #initializeModelAccess()}. Calls 
@@ -156,7 +218,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     
     @Override
     public void write(CI data) throws IOException {
-        writeImpl(adapter.adaptInput(data));
+        writeImpl(selector.selectNorthInput(data).adaptInput(data));
     }
 
     /**
@@ -176,7 +238,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      */
     protected void received(O data) throws IOException {
         if (null != callback) {
-            callback.received(adapter.adaptOutput(data));
+            callback.received(selector.selectSouthOutput(data).adaptOutput(data));
         }
     }
     
@@ -211,7 +273,9 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      * @throws IOException in case the initialization fails, e.g., monitors cannot be set up
      */
     protected void initializeModelAccess() throws IOException {
-        adapter.initializeModelAccess();
+        for (int a = 0; a < adapter.length; a++) {
+            adapter[a].initializeModelAccess();
+        }
     }
 
     /**
@@ -229,22 +293,22 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
 
     @Override
     public Class<? extends I> getProtocolInputType() {
-        return adapter.getProtocolInputType();
+        return adapter[0].getProtocolInputType();
     }
     
     @Override
     public Class<? extends CI> getConnectorInputType() {
-        return adapter.getConnectorInputType();
+        return adapter[0].getConnectorInputType();
     }
     
     @Override
     public Class<? extends O> getProtocolOutputType() {
-        return adapter.getProtocolOutputType();
+        return adapter[0].getProtocolOutputType();
     }
     
     @Override
     public Class<? extends CO> getConnectorOutputType() {
-        return adapter.getConnectorOutputType();
+        return adapter[0].getConnectorOutputType();
     }
 
 }
