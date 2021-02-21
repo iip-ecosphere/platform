@@ -235,6 +235,7 @@ public class MqttConfiguration {
         return TransportParameterBuilder
            .newBuilder(getHost(), getPort())
            .setApplicationId(getClientId())
+           .setAutoApplicationId(getAutoClientId())
            .setActionTimeout(getActionTimeout())
            .setKeepAlive(getKeepAlive()).build();
     }

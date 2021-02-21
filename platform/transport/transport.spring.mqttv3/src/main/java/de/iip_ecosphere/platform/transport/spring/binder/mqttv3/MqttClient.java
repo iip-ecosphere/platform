@@ -28,9 +28,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * A central MQTT client for all binders to reduce resource usage. Typically, different binders subscribe to different
@@ -187,10 +187,8 @@ public class MqttClient {
         if (null == client) {
             try {
                 configuration = config;
-                String clientId = config.getClientId();
-                if (config.getAutoClientId()) {
-                    clientId += "-" + NetUtils.getOwnIP() + "-" + System.currentTimeMillis(); 
-                }
+                String clientId = AbstractTransportConnector.getApplicationId(config.getClientId(), "stream", 
+                    config.getAutoClientId());
                 LOGGER.info("Connecting to " + config.getBrokerString() + " with client id " + clientId);
                 MqttAsyncClient cl = new MqttAsyncClient(config.getBrokerString(), 
                     config.getClientId(), new MemoryPersistence());
