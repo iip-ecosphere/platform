@@ -20,6 +20,7 @@
   POM as far as possible, e.g., valid URL, description, licenses, developers and SCM section. Redefine parts only if 
   needed except for dependencies - please define explicitly your minimum set of required dependencies (easing later
   deployment) Use existing test artifacts for reuse and, where possible, build your tests on existing functionality. 
+* For *logging*, we use SLF4J as specified in the overall platform dependencies.
 * For **tests with network**, e.g., communication protocols or AAS servers, please do not rely always on the same ports as subsequent tests may unexpectedly fail. Check the other tests for their port numbers or, better, use free ephemeral ports (see basic support component, ``NetUtils``) instead. Spring-based tests may require a specific initializer to override static configuration settings with dynamic information such as an ephemeral port. See tests in ``transport.spring.*`` for an example.
 * **CI and SNAPSHOT deployment** currently are done via SSE-CI/SSE-Maven-Repo. 
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
