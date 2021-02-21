@@ -33,4 +33,12 @@ public class NetUtilsTest {
         Assert.assertTrue(NetUtils.getEphemeralPort() > 0);
     }
     
+    /**
+     * Tests {@link NetUtils#getOwnIP()}.
+     */
+    @Test
+    public void testOwnIP() {
+        Assert.assertTrue(NetUtils.getOwnIP().length() > 0);
+    }
+    
 }

@@ -13,7 +13,11 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * Some network utilities.
@@ -37,6 +41,23 @@ public class NetUtils {
         } catch (IOException e) {
         }
         return result;
+    }
+    
+    /**
+     * Returns the preferred own network address.
+     * 
+     * @return the preferred own network address
+     */
+    public static String getOwnIP() {
+        //https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
+        String ip = "";
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+        } catch (UnknownHostException | SocketException e) {
+            ip = "127.0.0.1";
+        }
+        return ip;
     }
 
 }
