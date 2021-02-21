@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -59,12 +60,46 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     }
 
     /**
-     * The unique application/client identifier.
+     * The unique application/client identifier. Considers {@link TransportParameter#getApplicationId()} and
+     * {@link TransportParameter#getAutoApplicationId()}.
      * 
      * @return the client identifier
      */
     protected String getApplicationId() {
-        return params.getApplicationId();
+        return getApplicationId(params.getApplicationId(), "tp", params.getAutoApplicationId());
+    }
+
+    /**
+     * Creates a unique application/client identifier.
+     * 
+     * @param applicationId the basic application id (may be <b>null</b>, turned to an empty string then)
+     * @param infix an optional infix to be appended to {@code applicationId} (may be <b>null</b>, 
+     *   turned to an empty string then)
+     * @param makeUnique make unique or just compose given information
+     * @return the client identifier
+     */
+    public static String getApplicationId(String applicationId, String infix, boolean makeUnique) {
+        final String separator = "-";
+        String appId = applicationId;
+        if (null == appId) {
+            appId = "";
+        }
+        if (null == infix) {
+            infix = "";
+        }
+        if (infix.length() > 0) {
+            if (appId.length() > 0) {
+                appId += separator;
+            }
+            appId += infix;
+            if (!appId.endsWith(separator) && makeUnique) {
+                appId += separator;
+            }
+        }
+        if (makeUnique) {
+            appId += NetUtils.getOwnIP() + separator + System.currentTimeMillis(); 
+        } 
+        return appId;
     }
 
     /**

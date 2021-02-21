@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    TransportParameterTest.class,
     DirectMemoryTransportConnectorTest.class,
     SerializerRegistryTest.class,
     TransportAasTest.class, 

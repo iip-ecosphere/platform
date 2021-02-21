@@ -24,6 +24,7 @@ public class TransportParameter {
     private int port;
     private int actionTimeout = 1000;
     private String applicationId = "";
+    private boolean autoApplicationId = true;
     private int keepAlive = 2000; 
 
     // inspired by OPC UA, just an idea for UKL
@@ -76,6 +77,19 @@ public class TransportParameter {
          */
         public TransportParameterBuilder setApplicationId(String applicationId) {
             instance.applicationId = applicationId;
+            return this;
+        }
+        
+        
+        /**
+         * Defines whether the application identification is expected to be unique or shall be made unique upon first 
+         * connect. May be ignored if not applicable.
+         * 
+         * @param autoApplicationId {@code true} (default) for make unique, {@code false} else
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setAutoApplicationId(boolean autoApplicationId) {
+            instance.autoApplicationId = autoApplicationId;
             return this;
         }
 
@@ -166,6 +180,16 @@ public class TransportParameter {
      */
     public String getApplicationId() {
         return applicationId;
+    }
+    
+    /**
+     * Returns whether the application identification is expected to be unique or shall be made unique upon first 
+     * connect. May be ignored if not applicable.
+     * 
+     * @return {@code true} (default) for make unique, {@code false} else
+     */
+    public boolean getAutoApplicationId() {
+        return autoApplicationId;
     }
 
     // TODO per stream: authentication, TLS
