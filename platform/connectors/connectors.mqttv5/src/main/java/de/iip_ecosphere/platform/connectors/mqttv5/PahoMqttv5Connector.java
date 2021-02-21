@@ -27,11 +27,13 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * Implements the generic MQTT v5 connector. Requires {@link ConnectorParameter#getApplicationId()} 
@@ -73,10 +75,23 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
     /**
      * Creates a connector instance.
      * 
-     * @param adapter the protocol adapter
+     * @param adapter the protocol adapter(s)
      */
-    public PahoMqttv5Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI> adapter) {
-        super(adapter);
+    @SafeVarargs
+    public PahoMqttv5Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
+        this(null, adapter);
+    }
+
+    /**
+     * Creates a connector instance.
+     * 
+     * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
+     * @param adapter the protocol adapter(s)
+     */
+    @SafeVarargs
+    public PahoMqttv5Connector(ChannelAdapterSelector<byte[], byte[], CO, CI> selector, 
+        ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
+        super(selector, adapter);
     }
 
     /**
@@ -122,17 +137,21 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
     protected void connectImpl(ConnectorParameter params) throws IOException {
         try {
             String broker = "tcp://" + params.getHost() + ":" + params.getPort();
-            client = new MqttAsyncClient(broker, params.getApplicationId(), new MemoryPersistence());
+            String appId = AbstractTransportConnector.getApplicationId(params.getApplicationId(), "conn", 
+                    params.getAutoApplicationId());
+            client = new MqttAsyncClient(broker, appId, new MemoryPersistence());
             client.setCallback(new Callback());
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             connOpts.setCleanStart(true);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
-            try {
-                waitForCompletion(client.subscribe(getOutputChannel(), MqttQoS.AT_LEAST_ONCE.value()));
-            } catch (MqttException e) {
-                throw new IOException(e);
+            for (String out : getOutputChannels()) {
+                try {
+                    waitForCompletion(client.subscribe(out, MqttQoS.AT_LEAST_ONCE.value()));
+                } catch (MqttException e) {
+                    throw new IOException(e);
+                }
             }
         } catch (MqttException e) {
             throw new IOException(e);
@@ -169,11 +188,11 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
     }
 
     @Override
-    protected void writeImpl(byte[] data) throws IOException {
+    protected void writeImpl(byte[] data, String channel) throws IOException {
         MqttMessage message = new MqttMessage(data);
         message.setQos(MqttQoS.AT_LEAST_ONCE.value());
         try {
-            IMqttToken token = client.publish(getInputChannel(), message);
+            IMqttToken token = client.publish(channel, message);
             waitForCompletion(token); // for now
         } catch (MqttException e) {
             throw new IOException(e);

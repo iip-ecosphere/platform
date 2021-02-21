@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.IdentityToken;
@@ -120,15 +121,30 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
         
     }
-    
+
     /**
-     * Creates an instance and installs the protocol adapter.
+     * Creates an instance and installs the protocol adapter(s).
      * 
-     * @param adapter the protocol adapter
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
      */
-    public OpcUaConnector(ProtocolAdapter<DataItem, Object, CO, CI> adapter) {
-        super(adapter);
-        adapter.setModelAccess(new OpcUaModelAccess());
+    @SafeVarargs
+    public OpcUaConnector(ProtocolAdapter<DataItem, Object, CO, CI>... adapter) {
+        this(null, adapter);
+    }
+
+    /**
+     * Creates an instance and installs the protocol adapter(s).
+     * 
+     * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
+     */
+    @SafeVarargs
+    public OpcUaConnector(AdapterSelector<DataItem, Object, CO, CI> selector, 
+        ProtocolAdapter<DataItem, Object, CO, CI>... adapter) {
+        super(selector, adapter);
+        configureModelAccess(new OpcUaModelAccess());
     }
     
     @Override

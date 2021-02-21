@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
@@ -74,25 +75,43 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
      * Creates an instance and installs the protocol adapter.
      * 
      * @param adapter the protocol adapter
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
      */
-    public AasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter) {
-        this(adapter, null);
+    @SafeVarargs
+    public AasConnector(ProtocolAdapter<Object, Object, CO, CI>... adapter) {
+        this(null, null, adapter);
     }
     
     /**
      * Creates an instance and installs the protocol adapter.
      * 
-     * @param adapter the protocol adapter
      * @param factory define the AasFactory to use, if <b>null</b> use {@link AasFactory#getInstance()}
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
      */
-    public AasConnector(ProtocolAdapter<Object, Object, CO, CI> adapter, AasFactory factory) {
-        super(adapter);
+    @SafeVarargs
+    public AasConnector(AasFactory factory, ProtocolAdapter<Object, Object, CO, CI>... adapter) {
+        this(factory, null, adapter);
+    }
+    
+    /**
+     * Creates an instance and installs the protocol adapter.
+     * 
+     * @param factory define the AasFactory to use, if <b>null</b> use {@link AasFactory#getInstance()}
+     * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
+     */
+    @SafeVarargs
+    public AasConnector(AasFactory factory, AdapterSelector<Object, Object, CO, CI> selector, 
+        ProtocolAdapter<Object, Object, CO, CI>... adapter) {
+        super(selector, adapter);
         if (null == factory) {
             this.factory = AasFactory.getInstance();
         } else {
             this.factory = factory;
         }
-        adapter.setModelAccess(new AasModelAccess());
+        configureModelAccess(new AasModelAccess());
     }
 
     // checkstyle: stop exception type check

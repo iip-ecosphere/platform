@@ -26,11 +26,13 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * Implements the generic MQTT v3 connector. Requires {@link ConnectorParameter#getApplicationId()} 
@@ -72,10 +74,25 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     /**
      * Creates a connector instance.
      * 
-     * @param adapter the protocol adapter
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
      */
-    public PahoMqttv3Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI> adapter) {
-        super(adapter);
+    @SafeVarargs
+    public PahoMqttv3Connector(ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
+        this(null, adapter);
+    }
+
+    /**
+     * Creates a connector instance.
+     * 
+     * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
+     * @param adapter the protocol adapter(s)
+     * @throws IllegalArgumentException if {@code adapter} is <b>null</b> or empty or adapters are <b>null</b>
+     */
+    @SafeVarargs
+    public PahoMqttv3Connector(ChannelAdapterSelector<byte[], byte[], CO, CI> selector, 
+        ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
+        super(selector, adapter);
     }
 
     /**
@@ -106,17 +123,21 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     protected void connectImpl(ConnectorParameter params) throws IOException {
         try {
             String broker = "tcp://" + params.getHost() + ":" + params.getPort();
-            client = new MqttAsyncClient(broker, params.getApplicationId(), new MemoryPersistence());
+            String appId = AbstractTransportConnector.getApplicationId(params.getApplicationId(), "conn", 
+                params.getAutoApplicationId());
+            client = new MqttAsyncClient(broker, appId, new MemoryPersistence());
             client.setCallback(new Callback());
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             waitForCompletion(client.connect(connOpts));
-            try {
-                waitForCompletion(client.subscribe(getOutputChannel(), MqttQoS.AT_LEAST_ONCE.value()));
-            } catch (MqttException e) {
-                throw new IOException(e);
+            for (String out : getOutputChannels()) {
+                try {
+                    waitForCompletion(client.subscribe(out, MqttQoS.AT_LEAST_ONCE.value()));
+                } catch (MqttException e) {
+                    throw new IOException(e);
+                }
             }
         } catch (MqttException e) {
             throw new IOException(e);
@@ -153,11 +174,11 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     }
 
     @Override
-    protected void writeImpl(byte[] data) throws IOException {
+    protected void writeImpl(byte[] data, String channel) throws IOException {
         MqttMessage message = new MqttMessage(data);
         message.setQos(MqttQoS.AT_LEAST_ONCE.value());
         try {
-            IMqttDeliveryToken token = client.publish(getInputChannel(), message);
+            IMqttDeliveryToken token = client.publish(channel, message);
             waitForCompletion(token); // for now
         } catch (MqttException e) {
             throw new IOException(e);
