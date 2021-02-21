@@ -29,6 +29,7 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
@@ -48,6 +49,7 @@ public class MqttClient {
     private static Deque<SendEntry> queue = new LinkedBlockingDeque<MqttClient.SendEntry>();
     private static SendConsumer sendConsumer;
     private static Callback callback;
+    private static boolean resentFailed;
     
     /**
      * Called when a message for a topic arrives.
@@ -108,7 +110,7 @@ public class MqttClient {
 
         @Override
         public void disconnected(MqttDisconnectResponse disconnectResponse) {
-            // nothing, may be later
+            LOGGER.info("Disconnected: " + disconnectResponse.getReasonString());
         }
 
         @Override
@@ -123,6 +125,7 @@ public class MqttClient {
 
         @Override
         public void connectComplete(boolean reconnect, String serverURI) {
+            LOGGER.info("Connection complete reconnect: " + reconnect + " on " + serverURI);
             // nothing
         }
 
@@ -167,14 +170,23 @@ public class MqttClient {
         @Override
         public void run() {
             while (running) {
-                SendEntry entry = queue.pollFirst();
-                if (null != entry && null != client) {
-                    MqttMessage message = new MqttMessage(entry.payload);
-                    message.setQos(MqttQoS.AT_LEAST_ONCE.value());
-                    try {
-                        waitForCompletion(client.publish(entry.topic, message));
-                    } catch (MqttException e) {
-                        LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " + e.getMessage(), e);
+                if (client.isConnected()) { // it may suddenly disconnect
+                    SendEntry entry = queue.pollFirst();
+                    if (null != entry && null != client) {
+                        MqttMessage message = new MqttMessage(entry.payload);
+                        message.setQos(MqttQoS.AT_LEAST_ONCE.value());
+                        try {
+                            waitForCompletion(client.publish(entry.topic, message));
+                        } catch (MqttException e) {
+                            if (resentFailed) {
+                                LOGGER.warn("Sending MQTT message with topic " + entry.topic + ": " + e.getMessage() 
+                                    + " Requeueing.", e);
+                                queue.addFirst(entry);
+                            } else {
+                                LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " 
+                                    + e.getMessage(), e);
+                            }
+                        }
                     }
                 }
                 TimeUtils.sleep(2);
@@ -192,12 +204,18 @@ public class MqttClient {
         if (null == client) {
             try {
                 configuration = config;
+                String clientId = config.getClientId();
+                if (config.getAutoClientId()) {
+                    clientId += "-" + NetUtils.getOwnIP() + "-" + System.currentTimeMillis(); 
+                }
+                LOGGER.info("Connecting to " + config.getBrokerString() + " with client id " + clientId);
                 MqttAsyncClient cl = new MqttAsyncClient(config.getBrokerString(), 
-                    config.getClientId(), new MemoryPersistence());
+                    clientId, new MemoryPersistence());
+                resentFailed = config.getResentFailed();
                 callback = new Callback();
                 cl.setCallback(callback);
                 MqttConnectionOptions connOpts = new MqttConnectionOptions();
-                connOpts.setCleanStart(true);
+                connOpts.setCleanStart(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
                 waitForCompletion(cl.connect(connOpts));

@@ -28,6 +28,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
@@ -47,6 +48,7 @@ public class MqttClient {
     private static Deque<SendEntry> queue = new LinkedBlockingDeque<MqttClient.SendEntry>();
     private static SendConsumer sendConsumer;
     private static Callback callback;
+    private static boolean resentFailed;
     
     /**
      * Called when a message for a topic arrives.
@@ -99,7 +101,7 @@ public class MqttClient {
         
         @Override
         public void connectionLost(Throwable cause) {
-            // if reconnect allowed, do nothing else close client
+            LOGGER.info("Connection lost: " + cause.getMessage());
         }
 
         @Override
@@ -151,17 +153,26 @@ public class MqttClient {
         @Override
         public void run() {
             while (running) {
-                SendEntry entry = queue.pollFirst();
-                if (null != entry && null != client) {
-                    MqttMessage message = new MqttMessage(entry.payload);
-                    message.setQos(MqttQoS.AT_LEAST_ONCE.value());
-                    try {
-                        waitForCompletion(client.publish(entry.topic, message));
-                    } catch (MqttException e) {
-                        LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " + e.getMessage(), e);
+                if (client.isConnected()) { // it may suddenly disconnect
+                    SendEntry entry = queue.pollFirst();
+                    if (null != entry && null != client) {
+                        MqttMessage message = new MqttMessage(entry.payload);
+                        message.setQos(MqttQoS.AT_LEAST_ONCE.value());
+                        try {
+                            waitForCompletion(client.publish(entry.topic, message));
+                        } catch (MqttException e) {
+                            if (resentFailed) {
+                                LOGGER.warn("Sending MQTT message with topic " + entry.topic + ": " + e.getMessage() 
+                                    + " Requeueing.", e);
+                                queue.addFirst(entry);
+                            } else {
+                                LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " 
+                                    + e.getMessage(), e);
+                            }
+                        }
                     }
+                    TimeUtils.sleep(2);
                 }
-                TimeUtils.sleep(2);
             }
         }
         
@@ -176,12 +187,18 @@ public class MqttClient {
         if (null == client) {
             try {
                 configuration = config;
+                String clientId = config.getClientId();
+                if (config.getAutoClientId()) {
+                    clientId += "-" + NetUtils.getOwnIP() + "-" + System.currentTimeMillis(); 
+                }
+                LOGGER.info("Connecting to " + config.getBrokerString() + " with client id " + clientId);
                 MqttAsyncClient cl = new MqttAsyncClient(config.getBrokerString(), 
                     config.getClientId(), new MemoryPersistence());
+                resentFailed = config.getResentFailed();
                 callback = new Callback();
                 cl.setCallback(callback);
                 MqttConnectOptions connOpts = new MqttConnectOptions();
-                connOpts.setCleanSession(true);
+                connOpts.setCleanSession(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
                 waitForCompletion(cl.connect(connOpts));

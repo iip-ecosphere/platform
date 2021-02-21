@@ -31,8 +31,10 @@ public class MqttConfiguration {
     private int port; // in test, consider overriding initializer for ephemeral port
     private String schema = "tcp";
     private String clientId;
+    private boolean autoClientId = true;
     private int keepAlive = 60000;
     private int actionTimeout = 1000;
+    private boolean resentFailed = true;
     private List<String> filteredTopics = new ArrayList<String>();
     
     /**
@@ -100,7 +102,16 @@ public class MqttConfiguration {
     public String getClientId() {
         return clientId;
     }
-    
+
+    /**
+     * Returns whether making the client ID unique is enabled.
+     * 
+     * @return {@code true} for enabled (default), {@code false} else
+     */
+    public boolean getAutoClientId() {
+        return autoClientId;
+    }
+
     /**
      * Returns the keep-alive time between heartbeats.
      * 
@@ -117,6 +128,15 @@ public class MqttConfiguration {
      */
     public int getActionTimeout() {
         return actionTimeout;
+    }
+
+    /**
+     * Returns if failed messages shall be queued and resent or thrown away.
+     * 
+     * @return {@code true} for resent (default), {@code false} for throw away
+     */
+    public boolean getResentFailed() {
+        return resentFailed;
     }
 
     // setters required for @ConfigurationProperties
@@ -158,6 +178,16 @@ public class MqttConfiguration {
     }
 
     /**
+     * Changes whether the client identification is expected to be unique or shall be made unique upon first connect.
+     * [required by Spring]
+     * 
+     * @param autoClientId {@code true} (default) for make unique, {@code false} else
+     */
+    public void setAutoClientId(boolean autoClientId) {
+        this.autoClientId = autoClientId;
+    }
+
+    /**
      * Changes the keep-alive time between heartbeats. [required by Spring]
      * 
      * @param keepAlive the keep-alive time in ms
@@ -183,6 +213,15 @@ public class MqttConfiguration {
      */
     public void setFilteredTopics(List<String> filteredTopics) {
         this.filteredTopics = filteredTopics;
+    }
+    
+    /**
+     * Returns if failed messages shall be queued and resent or thrown away. [required by Spring]
+     * 
+     * @param resentFailed {@code true} (default) for resent, {@code false} for throw away
+     */
+    public void setResentFailed(boolean resentFailed) {
+        this.resentFailed = resentFailed;
     }
     
     // converter
