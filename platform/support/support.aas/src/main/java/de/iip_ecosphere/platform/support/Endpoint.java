@@ -98,5 +98,21 @@ public class Endpoint extends ServerAddress {
         }
         return endpoint;
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        boolean result = false;
+        if (other instanceof Endpoint) {
+            Endpoint o = (Endpoint) other;
+            result = super.equals(other) && endpoint.equals(o.endpoint); 
+        }
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        return super.hashCode() ^ endpoint.hashCode();
+    }
+
 
 }

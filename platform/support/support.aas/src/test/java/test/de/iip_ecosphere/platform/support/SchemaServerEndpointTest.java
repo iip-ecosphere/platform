@@ -60,12 +60,15 @@ public class SchemaServerEndpointTest {
         Assert.assertEquals("http://localhost:1235", add.toUri());
         Assert.assertEquals("http://localhost:1235", add.toServerUri());
         
-        add = new ServerAddress(Schema.HTTP, "", 1235);
-        Assert.assertEquals(Schema.HTTP, add.getSchema());
-        Assert.assertEquals(1235, add.getPort());
-        Assert.assertEquals(ServerAddress.LOCALHOST, add.getHost());
-        Assert.assertEquals("http://localhost:1235", add.toUri());
-        Assert.assertEquals("http://localhost:1235", add.toServerUri());
+        ServerAddress add1 = new ServerAddress(Schema.HTTP, "", 1235);
+        Assert.assertEquals(Schema.HTTP, add1.getSchema());
+        Assert.assertEquals(1235, add1.getPort());
+        Assert.assertEquals(ServerAddress.LOCALHOST, add1.getHost());
+        Assert.assertEquals("http://localhost:1235", add1.toUri());
+        Assert.assertEquals("http://localhost:1235", add1.toServerUri());
+        
+        Assert.assertEquals(add, add1);
+        Assert.assertEquals(add.hashCode(), add1.hashCode());
         
         add = new ServerAddress(Schema.HTTP, "xxx", 1235);
         Assert.assertEquals(Schema.HTTP, add.getSchema());
@@ -103,13 +106,16 @@ public class SchemaServerEndpointTest {
         Assert.assertEquals("http://localhost:1235/rep", ep.toUri());
         Assert.assertEquals("http://localhost:1235", ep.toServerUri());
 
-        ep = new Endpoint(Schema.HTTP, "", 1235, "/rep");
-        Assert.assertEquals(Schema.HTTP, ep.getSchema());
-        Assert.assertEquals(1235, ep.getPort());
-        Assert.assertEquals(ServerAddress.LOCALHOST, ep.getHost());
-        Assert.assertEquals("/rep", ep.getEndpoint());
-        Assert.assertEquals("http://localhost:1235/rep", ep.toUri());
-        Assert.assertEquals("http://localhost:1235", ep.toServerUri());
+        Endpoint ep1 = new Endpoint(Schema.HTTP, "", 1235, "/rep");
+        Assert.assertEquals(Schema.HTTP, ep1.getSchema());
+        Assert.assertEquals(1235, ep1.getPort());
+        Assert.assertEquals(ServerAddress.LOCALHOST, ep1.getHost());
+        Assert.assertEquals("/rep", ep1.getEndpoint());
+        Assert.assertEquals("http://localhost:1235/rep", ep1.toUri());
+        Assert.assertEquals("http://localhost:1235", ep1.toServerUri());
+        
+        Assert.assertEquals(ep, ep1);
+        Assert.assertEquals(ep.hashCode(), ep1.hashCode());
 
         ServerAddress server = new ServerAddress(Schema.HTTP, "xxx", 1235);
         ep = new Endpoint(server, "rep");

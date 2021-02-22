@@ -15,6 +15,7 @@ import org.junit.runners.Suite;
 
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
+import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
 
 /**
  * Defines the tests to be executed.
@@ -28,8 +29,9 @@ import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
     FileFormatTest.class,
-    FactoryTest.class, // we do not go for a sub-suite for now as Maven would execute both
-    PrintVisitorTest.class
+    FactoryTest.class, // we do not go for a sub-suite for now as Maven may execute both
+    PrintVisitorTest.class,
+    NetworkManagerTest.class
 })
 public class AllTests {
 }

@@ -104,4 +104,19 @@ public class ServerAddress {
         return schema.toUri() + host + ":" + port;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        boolean result = false;
+        if (other instanceof ServerAddress) {
+            ServerAddress o = (ServerAddress) other;
+            result = schema == o.schema && host.equals(o.host) && port == o.port; 
+        }
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        return schema.ordinal() ^ host.hashCode() ^ port;
+    }
+    
 }
