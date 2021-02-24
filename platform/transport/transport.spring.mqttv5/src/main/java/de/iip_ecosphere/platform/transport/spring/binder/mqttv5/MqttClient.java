@@ -209,7 +209,7 @@ public class MqttClient {
                 LOGGER.info("Connecting to " + config.getBrokerString() + " with client id " + clientId);
                 MqttAsyncClient cl = new MqttAsyncClient(config.getBrokerString(), 
                     clientId, new MemoryPersistence());
-                resentFailed = config.getResentFailed();
+                resentFailed = config.getResendFailed();
                 callback = new Callback();
                 cl.setCallback(callback);
                 MqttConnectionOptions connOpts = new MqttConnectionOptions();

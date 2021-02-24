@@ -8,9 +8,12 @@ The implementation is initial and could be optimized. The following configuratio
  * `mqtt.port`: TCP port number of the MQTT broker
  * `mqtt.schema`: Transport schema (default: `tcp`)
  * `mqtt.clientId`: Client identification of this device
+ * `mqtt.autoClientId`: Adjust the client id to make it unique (default: `true`)
+ * `mqtt.resendFailed`: Do not throw away packages when sending fails, keep them in the queue and try 
+   to re-send them  (default: `true`)
  * `mqtt.keepAlive`: Time in milliseconds between two MQTT heartbeats (default: `60000`)
  * `mqtt.actionTimeout`: Time in milliseconds to wait for an operation to complete (default: `1000`)
- * `mqtt.filteredTopics`: List of topic names not to subscribe to.
+ * `mqtt.filteredTopics`: List of topic names not to subscribe to (as list, via suffix [0], [1], ...).
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification
