@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl;
+import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import org.junit.Assert;
 
@@ -50,6 +51,7 @@ public class NetworkManagerTest {
             port = NetUtils.getEphemeralPort();
         }
         ServerAddress adr = new ServerAddress(Schema.IGNORE, ServerAddress.LOCALHOST, port);
+        Assert.assertFalse(manager.isInUse(port)); // new manager
         Assert.assertFalse(manager.isInUse(adr)); // new manager
         try {
             manager.obtainPort(null);
@@ -61,22 +63,48 @@ public class NetworkManagerTest {
             Assert.fail("No exception");
         } catch (IllegalArgumentException e) {
         }
+        
         final String key1 = "key1";
         final String key2 = "key2";
-        ServerAddress adr1 = manager.obtainPort(key1);
+        // obtain an address, shall be new
+        ManagedServerAddress adr1 = manager.obtainPort(key1);
+        Assert.assertTrue(adr1.isNew());
         Assert.assertTrue(adr1.getPort() > 0);
         Assert.assertTrue(adr1.getHost().length() > 0);
+        Assert.assertTrue(manager.isInUse(adr1.getPort()));
         Assert.assertTrue(manager.isInUse(adr1));
-        ServerAddress adr2 = manager.obtainPort(key2);
+
+        // re-obtain the first address, shall be the same but not new
+        ManagedServerAddress re1 = manager.obtainPort(key1);
+        Assert.assertFalse(re1.isNew());
+        Assert.assertEquals(adr1.getPort(), re1.getPort());
+        Assert.assertEquals(adr1.getHost(), re1.getHost());
+        Assert.assertTrue(manager.isInUse(re1.getPort()));
+        Assert.assertTrue(manager.isInUse(re1));
+
+        // obtain a second address, shall be new
+        ManagedServerAddress adr2 = manager.obtainPort(key2);
+        Assert.assertTrue(adr1.isNew());
         Assert.assertTrue(adr2.getPort() > 0);
         Assert.assertTrue(adr2.getHost().length() > 0);
         Assert.assertTrue(adr1.getPort() != adr2.getPort());
+        Assert.assertTrue(manager.isInUse(adr2.getPort()));
         Assert.assertTrue(manager.isInUse(adr2));
-        
-        Assert.assertTrue(manager.isInUse(adr2));
+
+        // re-obtain the second address, shall be the same but not new
+        ManagedServerAddress re2 = manager.obtainPort(key2);
+        Assert.assertFalse(re2.isNew());
+        Assert.assertEquals(adr2.getPort(), re2.getPort());
+        Assert.assertEquals(adr2.getHost(), re2.getHost());
+        Assert.assertTrue(manager.isInUse(re2.getPort()));
+        Assert.assertTrue(manager.isInUse(re2));
+
+        // release address 1
         manager.releasePort(key1);
         Assert.assertFalse(manager.isInUse(adr1));
         Assert.assertTrue(manager.isInUse(adr2));
+
+        // release address 2
         manager.releasePort(key2);
         Assert.assertFalse(manager.isInUse(adr1));
         Assert.assertFalse(manager.isInUse(adr2));

@@ -114,5 +114,4 @@ public class Endpoint extends ServerAddress {
         return super.hashCode() ^ endpoint.hashCode();
     }
 
-
 }

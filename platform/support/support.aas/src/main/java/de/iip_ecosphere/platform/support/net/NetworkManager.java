@@ -34,10 +34,11 @@ public interface NetworkManager {
      * @return the server address including the port number (including the server IP), not used by other processes
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
      */
-    public ServerAddress obtainPort(String key);
+    public ManagedServerAddress obtainPort(String key);
     
     /**
-     * Releases the port. When all requesting parties released the port, the port will be ultimately freed.
+     * Releases the port. When all requesting parties released the port, the port will be ultimately freed. Usuall,
+     * only clients with a {@link ManagedServerAddress#isNew() new} address shall call this method.
      * 
      * @param key a key indicating the use
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
@@ -45,12 +46,20 @@ public interface NetworkManager {
     public void releasePort(String key);
     
     /**
-     * Returns whether the given port is in use/allocated.
+     * Returns whether the given address is in use/allocated by this manager.
+     * 
+     * @param address the address
+     * @return {@code true} if the address is allocated within this manager, {@code false} else
+     */
+    public boolean isInUse(ServerAddress address);
+
+    /**
+     * Returns whether the given port is in use/allocated by this manager.
      * 
      * @param port the port 
      * @return {@code true} if the port is allocated within this manager, {@code false} else
      */
-    public boolean isInUse(ServerAddress port);
+    public boolean isInUse(int port);
     
     /**
      * The minimum port handled by this manager.

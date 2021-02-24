@@ -26,24 +26,26 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class LocalNetworkManagerImpl implements NetworkManager {
 
-    private Map<String, ServerAddress> keyToPorts = new HashMap<>();
-    private Map<ServerAddress, String> portsToKeys = new HashMap<>();
+    private Map<String, Integer> keyToPorts = new HashMap<>();
+    private Map<Integer, String> portsToKeys = new HashMap<>();
+    private String host = NetUtils.getOwnIP();
     
     @Override
-    public ServerAddress obtainPort(String key) {
+    public synchronized ManagedServerAddress obtainPort(String key) {
         if (null == key) {
             throw new IllegalArgumentException("Key must be given");
         }
-        ServerAddress result = null;
-        ServerAddress ex = keyToPorts.get(key);
+        ManagedServerAddress result = null;
+        Integer ex = keyToPorts.get(key);
         if (null != ex) {
-            result = ex;
+            result = new ManagedServerAddress(Schema.IGNORE, host, ex, false);
         } else {
             do {
-                result = new ServerAddress(Schema.IGNORE, NetUtils.getOwnIP(), NetUtils.getEphemeralPort());
-                if (!portsToKeys.containsKey(result)) {
-                    portsToKeys.put(result, key);
-                    keyToPorts.put(key, result);
+                int port = NetUtils.getEphemeralPort();
+                if (!portsToKeys.containsKey(port)) {
+                    keyToPorts.put(key, port);
+                    portsToKeys.put(port, key);
+                    result = new ManagedServerAddress(Schema.IGNORE, host, port, true);
                 } else {
                     result = null;
                 }
@@ -53,19 +55,24 @@ public class LocalNetworkManagerImpl implements NetworkManager {
     }
 
     @Override
-    public void releasePort(String key) {
+    public synchronized void releasePort(String key) {
         if (null == key) {
             throw new IllegalArgumentException("Key must be given");
         }
-        ServerAddress adr = keyToPorts.remove(key);
-        if (null != adr) {
-            portsToKeys.remove(adr);
+        Integer port = keyToPorts.remove(key);
+        if (null != port) {
+            portsToKeys.remove(port);
         }
     }
 
     @Override
+    public synchronized boolean isInUse(int port) {
+        return portsToKeys.containsKey(port);
+    }
+
+    @Override
     public boolean isInUse(ServerAddress adr) {
-        return portsToKeys.containsKey(adr);
+        return host.equals(adr.getHost()) && isInUse(adr.getPort());
     }
 
     @Override

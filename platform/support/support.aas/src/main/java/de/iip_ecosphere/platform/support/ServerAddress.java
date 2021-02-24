@@ -25,7 +25,7 @@ public class ServerAddress {
     private int port;
 
     /**
-     * Creates a new localhost server address instance on an ephemerial port.
+     * Creates a new {@link #LOCALHOST} server address instance on an ephemerial port.
      * 
      * @param schema the schema
      */
@@ -34,7 +34,7 @@ public class ServerAddress {
     }
 
     /**
-     * Creates a new localhost server address instance.
+     * Creates a new {@link #LOCALHOST} server address instance.
      * 
      * @param schema the schema
      * @param port the port number (ignored if negative)
@@ -47,7 +47,7 @@ public class ServerAddress {
      * Creates a new server address instance.
      * 
      * @param schema the schema
-     * @param host the hostname (turned to "localhost" if <b>null</b> or empty)
+     * @param host the hostname (turned to {@link #LOCALHOST} if <b>null</b> or empty)
      * @param port the port number
      */
     public ServerAddress(Schema schema, String host, int port) {
