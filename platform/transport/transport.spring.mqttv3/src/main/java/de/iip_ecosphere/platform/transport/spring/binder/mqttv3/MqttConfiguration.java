@@ -34,7 +34,7 @@ public class MqttConfiguration {
     private boolean autoClientId = true;
     private int keepAlive = 60000;
     private int actionTimeout = 1000;
-    private boolean resentFailed = true;
+    private boolean resendFailed = true;
     private List<String> filteredTopics = new ArrayList<String>();
     
     /**
@@ -131,12 +131,12 @@ public class MqttConfiguration {
     }
 
     /**
-     * Returns if failed messages shall be queued and resent or thrown away.
+     * Returns if failed messages shall be queued and re-send or thrown away.
      * 
-     * @return {@code true} for resent (default), {@code false} for throw away
+     * @return {@code true} for re-send (default), {@code false} for throw away
      */
-    public boolean getResentFailed() {
-        return resentFailed;
+    public boolean getResendFailed() {
+        return resendFailed;
     }
 
     // setters required for @ConfigurationProperties
@@ -216,12 +216,12 @@ public class MqttConfiguration {
     }
     
     /**
-     * Returns if failed messages shall be queued and resent or thrown away. [required by Spring]
+     * Returns if failed messages shall be queued and re-send or thrown away. [required by Spring]
      * 
-     * @param resentFailed {@code true} (default) for resent, {@code false} for throw away
+     * @param resendFailed {@code true} (default) for re-send, {@code false} for throw away
      */
-    public void setResentFailed(boolean resentFailed) {
-        this.resentFailed = resentFailed;
+    public void setResendFailed(boolean resendFailed) {
+        this.resendFailed = resendFailed;
     }
     
     // converter
