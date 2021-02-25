@@ -37,7 +37,7 @@ public class MqttV5MessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public MqttV5MessageBinderProvisioner mqttMessageBinderProvisioner() {
+    public MqttV5MessageBinderProvisioner mqttv5BinderProvisioner() {
         return new MqttV5MessageBinderProvisioner();
     }
 
@@ -48,8 +48,8 @@ public class MqttV5MessageBinderConfiguration {
      * @return the message binder
      */
     @Bean
-    @ConditionalOnMissingBean
-    public MqttV5MessageBinder mqttMessageBinder(MqttV5MessageBinderProvisioner messageBinderProvisioner) {
+    @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
+    public MqttV5MessageBinder mqttv5Binder(MqttV5MessageBinderProvisioner messageBinderProvisioner) {
         return new MqttV5MessageBinder(null, messageBinderProvisioner);
     }
 
@@ -61,7 +61,7 @@ public class MqttV5MessageBinderConfiguration {
      * @return the transport parameter instance
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean // method is optional, only if needed in testing
     public TransportParameter mqttTransportParameter(@Autowired ApplicationContext ctx, 
         @Autowired MqttConfiguration config) {
         return BeanHelper.registerInParentContext(ctx, config.toTransportParameter(), "mqtt v5");
