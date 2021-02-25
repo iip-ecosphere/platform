@@ -37,7 +37,7 @@ public class MqttV3MessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public MqttV3MessageBinderProvisioner mqttMessageBinderProvisioner() {
+    public MqttV3MessageBinderProvisioner mqttv3BinderProvisioner() {
         return new MqttV3MessageBinderProvisioner();
     }
 
@@ -48,8 +48,8 @@ public class MqttV3MessageBinderConfiguration {
      * @return the message binder
      */
     @Bean
-    @ConditionalOnMissingBean
-    public MqttV3MessageBinder mqttMessageBinder(MqttV3MessageBinderProvisioner messageBinderProvisioner) {
+    @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
+    public MqttV3MessageBinder mqttv3Binder(MqttV3MessageBinderProvisioner messageBinderProvisioner) {
         return new MqttV3MessageBinder(null, messageBinderProvisioner);
     }
     
@@ -61,7 +61,7 @@ public class MqttV3MessageBinderConfiguration {
      * @return the transport parameter instance
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean // method is optional, only if needed in testing
     public TransportParameter mqttTransportParameter(@Autowired ApplicationContext ctx, 
         @Autowired MqttConfiguration config) {
         return BeanHelper.registerInParentContext(ctx, config.toTransportParameter(), "mqtt v3");
