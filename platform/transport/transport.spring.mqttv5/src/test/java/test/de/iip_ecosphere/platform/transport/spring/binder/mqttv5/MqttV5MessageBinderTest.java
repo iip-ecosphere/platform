@@ -49,6 +49,8 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 
 /**
  * Test class for the message binder. This class uses the application configuration from transport.spring!
+ * Binder name is explicitly configured in {@code test.properties} as {@code spring.cloud.stream.defaultBinder} in 
+ * order to test for a correct binder name.
  * 
  * @author Holger Eichelberger, SSE
  */

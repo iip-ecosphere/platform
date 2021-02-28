@@ -18,6 +18,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
  * Represents the configuration options of a MQTT v5 client.
@@ -36,6 +37,7 @@ public class MqttConfiguration {
     private int actionTimeout = 1000;
     private boolean resendFailed = true;
     private List<String> filteredTopics = new ArrayList<String>();
+    private String qos = MqttQoS.AT_LEAST_ONCE.name();
     
     /**
      * Returns whether {@code topic} is a filtered topic, i.e., we shall not subscribe to this topic.
@@ -138,6 +140,15 @@ public class MqttConfiguration {
     public boolean getResendFailed() {
         return resendFailed;
     }
+    
+    /**
+     * Returns the QoS level for sending.
+     * 
+     * @return the QoS level
+     */
+    public MqttQoS getQos() {
+        return MqttQoS.valueOf(qos);
+    }
 
     // setters required for @ConfigurationProperties
 
@@ -222,6 +233,20 @@ public class MqttConfiguration {
      */
     public void setResendFailed(boolean resendFailed) {
         this.resendFailed = resendFailed;
+    }
+
+    /**
+     * Defines the QoS level.
+     * 
+     * @param qos the QoS level, ignored if invalid, see {@link MqttQoS}
+     */
+    public void setQos(String qos) {
+        try {
+            MqttQoS.valueOf(qos.toUpperCase());
+            this.qos = qos.toUpperCase();
+        } catch (IllegalArgumentException e) {
+            // ignore for now, leave as is
+        }
     }
 
     // converter
