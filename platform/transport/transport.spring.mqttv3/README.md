@@ -14,6 +14,7 @@ The implementation is initial and could be optimized. The following configuratio
  * `mqtt.keepAlive`: Time in milliseconds between two MQTT heartbeats (default: `60000`)
  * `mqtt.actionTimeout`: Time in milliseconds to wait for an operation to complete (default: `1000`)
  * `mqtt.filteredTopics`: List of topic names not to subscribe to  (as list, via suffix [0], [1], ...).
+ * `mqtt.qos`: Quality of service level, one from `AT_MOST_ONCE`, `AT_LEAST_ONCE` (default), `EXACTLY_ONCE`
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification
