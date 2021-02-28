@@ -37,7 +37,7 @@ public class AmqpMessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public AmqpMessageBinderProvisioner amqpMessageBinderProvisioner() {
+    public AmqpMessageBinderProvisioner amqpBinderProvisioner() {
         return new AmqpMessageBinderProvisioner();
     }
 
@@ -49,7 +49,7 @@ public class AmqpMessageBinderConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public AmqpMessageBinder amqpMessageBinder(AmqpMessageBinderProvisioner messageBinderProvisioner) {
+    public AmqpMessageBinder amqpBinder(AmqpMessageBinderProvisioner messageBinderProvisioner) {
         return new AmqpMessageBinder(null, messageBinderProvisioner);
     }
 
