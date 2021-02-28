@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>transport.spring.hivemqv5</artifactId>
+  <packaging>jar</packaging>
+  <name>IIP-Ecosphere Hivemq MQTT v5 transport spring binder</name>
+  <description>The Hivemq MQTT v5 transport binder for connecting Spring cloud stream devices via MQTT.</description>
+  
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>  
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+      <!-- conflicts with el-api from BaSyx! -->
+      <exclusions>
+        <exclusion>
+          <groupId>javax.el</groupId>
+          <artifactId>el-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.spring</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-stream</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.hivemq</groupId>
+        <artifactId>hivemq-mqtt-client</artifactId>
+        <version>1.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.hivemq</groupId>
+      <artifactId>hivemq-community-edition-embedded</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.spring</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.mqttv5</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.mqttv5</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

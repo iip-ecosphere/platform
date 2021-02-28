@@ -1,0 +1,2 @@
+hivemqv3Binder:\
+de.iip_ecosphere.platform.transport.spring.binder.hivemqv3.HivemqV3MessageBinderConfiguration
