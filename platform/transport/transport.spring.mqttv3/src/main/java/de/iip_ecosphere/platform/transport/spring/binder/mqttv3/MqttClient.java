@@ -12,12 +12,8 @@
 package de.iip_ecosphere.platform.transport.spring.binder.mqttv3;
 
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -30,13 +26,12 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * A central MQTT client for all binders to reduce resource usage. Typically, different binders subscribe to different
- * topics. The implementation uses queuing/a consumer pattern as the Paho MQTT client is not thread-safe.
+ * topics. 
  * 
  * Partially public for testing. Initial implementation, not optimized.
  * 
@@ -47,14 +42,8 @@ public class MqttClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttV3MessageBinder.class); // map all to binder
     private static MqttAsyncClient client;
     private static MqttConfiguration configuration;
-    private static Deque<SendEntry> queue = new LinkedBlockingDeque<MqttClient.SendEntry>();
-    private static SendConsumer sendConsumer;
     private static Callback callback;
-    private static boolean resendFailed;
     private static MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
-    private static ReentrantLock mutex = new ReentrantLock();
-    private static Semaphore consumerSemaphore = new Semaphore(0);
-    private static Semaphore producerSemaphore = new Semaphore(100);
     
     /**
      * Called when a message for a topic arrives.
@@ -126,76 +115,6 @@ public class MqttClient {
     }
     
     /**
-     * Represents a message to be send while queuing for sending.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class SendEntry {
-        private String topic;
-        private byte[] payload;
-        
-        /**
-         * Creates a send entry.
-         * 
-         * @param topic the topic name
-         * @param payload the payload
-         */
-        private SendEntry(String topic, byte[] payload) {
-            this.topic = topic;
-            this.payload = payload;
-        }
-    }
-    
-    /**
-     * The send consumer running in parallel taking {@link SendEntry send entries} from {@link MqttClient#queue} to
-     * pass them on to the MQTT client for sending.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class SendConsumer implements Runnable {
-
-        private boolean running = true;
-        
-        @Override
-        public void run() {
-            while (running) {
-                if (client.isConnected()) { // it may suddenly disconnect
-                    try {
-                        consumerSemaphore.acquire();
-                        mutex.lock();
-                        SendEntry entry = queue.pollFirst();
-                        mutex.unlock();
-                        if (null != entry && null != client) {
-                            MqttMessage message = new MqttMessage(entry.payload);
-                            message.setQos(qos.value());
-                            try {
-                                waitForCompletion(client.publish(entry.topic, message));
-                            } catch (MqttException e) {
-                                if (resendFailed) {
-                                    LOGGER.warn("Sending MQTT message with topic " + entry.topic + ": " 
-                                        + e.getMessage() + " Requeueing.", e);
-                                    mutex.lock();
-                                    queue.addFirst(entry);
-                                    mutex.unlock();
-                                } else {
-                                    LOGGER.error("Sending MQTT message with topic " + entry.topic + ": " 
-                                        + e.getMessage(), e);
-                                }
-                            }
-                        }
-                        producerSemaphore.release();
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Acquiring send lock: " + e.getMessage(), e);
-                    }
-                } else {
-                    TimeUtils.sleep(2);
-                }
-            }
-        }
-        
-    }
-    
-    /**
      * Creates the client based on a given MQTT client configuration.
      * 
      * @param config the MQTT configuration to take the connection information from
@@ -210,7 +129,6 @@ public class MqttClient {
                 LOGGER.info("Connecting to " + config.getBrokerString() + " with client id " + clientId);
                 MqttAsyncClient cl = new MqttAsyncClient(config.getBrokerString(), 
                     config.getClientId(), new MemoryPersistence());
-                resendFailed = config.getResendFailed();
                 callback = new Callback();
                 cl.setCallback(callback);
                 MqttConnectOptions connOpts = new MqttConnectOptions();
@@ -218,8 +136,6 @@ public class MqttClient {
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
                 waitForCompletion(cl.connect(connOpts));
-                sendConsumer = new SendConsumer();
-                new Thread(sendConsumer).start();
                 client = cl;
             } catch (MqttException e) {
                 LOGGER.error("Connecting MQTT client: " + e.getMessage(), e);
@@ -232,7 +148,6 @@ public class MqttClient {
      */
     public static void stopClient() {
         try {
-            sendConsumer.running = false;
             waitForCompletion(client.disconnect());
             client.close();
             callback = null;
@@ -294,15 +209,14 @@ public class MqttClient {
      * @param payload the payload to send
      */
     static void send(String topic, byte[] payload) {
-        // sending also works in here, but the queue is more stable, even more performant
-        try {
-            producerSemaphore.acquire();
-            mutex.lock();
-            queue.offer(new SendEntry(topic, payload));
-            mutex.unlock();
-            consumerSemaphore.release();
-        } catch (InterruptedException e) {
-            LOGGER.error("Acquiring send lock: " + e.getMessage(), e);
+        if (null != client) {
+            MqttMessage message = new MqttMessage(payload);
+            message.setQos(qos.value());
+            try {
+                client.publish(topic, message);
+            } catch (MqttException e) {
+                LOGGER.error("Sending MQTT message with topic " + topic + ": " + e.getMessage(), e);
+            }
         }
     }
     

@@ -35,7 +35,6 @@ public class MqttConfiguration {
     private boolean autoClientId = true;
     private int keepAlive = 60000;
     private int actionTimeout = 1000;
-    private boolean resendFailed = true;
     private List<String> filteredTopics = new ArrayList<String>();
     private String qos = MqttQoS.AT_LEAST_ONCE.name();
     
@@ -131,15 +130,6 @@ public class MqttConfiguration {
     public int getActionTimeout() {
         return actionTimeout;
     }
-
-    /**
-     * Returns if failed messages shall be queued and re-send or thrown away.
-     * 
-     * @return {@code true} for re-send (default), {@code false} for throw away
-     */
-    public boolean getResendFailed() {
-        return resendFailed;
-    }
     
     /**
      * Returns the QoS level for sending.
@@ -224,15 +214,6 @@ public class MqttConfiguration {
      */
     public void setFilteredTopics(List<String> filteredTopics) {
         this.filteredTopics = filteredTopics;
-    }
-    
-    /**
-     * Returns if failed messages shall be queued and re-send or thrown away. [required by Spring]
-     * 
-     * @param resendFailed {@code true} (default) for re-send, {@code false} for throw away
-     */
-    public void setResendFailed(boolean resendFailed) {
-        this.resendFailed = resendFailed;
     }
 
     /**
