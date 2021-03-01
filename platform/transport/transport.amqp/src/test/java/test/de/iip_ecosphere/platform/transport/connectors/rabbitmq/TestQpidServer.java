@@ -56,6 +56,7 @@ public class TestQpidServer extends AbstractTestServer {
             attributes.put("type", "Memory");
             attributes.put("initialConfigurationLocation", initialConfig.toExternalForm());
             attributes.put("startupLoggedToSystemOut", true);
+            attributes.put("initialSystemPropertiesLocation", ""); // breaks otherwise in (Spring-)packaged jars
             systemLauncher.startup(attributes);
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
