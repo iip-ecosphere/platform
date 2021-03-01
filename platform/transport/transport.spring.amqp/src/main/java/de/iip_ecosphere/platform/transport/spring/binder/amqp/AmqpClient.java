@@ -13,10 +13,8 @@ package de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -26,8 +24,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
-
-import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * A central AMQP client for all binders to reduce resource usage. Typically, different binders subscribe to different
@@ -43,8 +39,6 @@ public class AmqpClient {
     private static Connection connection;
     private static Channel channel;
     private static AmqpConfiguration configuration;
-    private static Deque<SendEntry> queue = new LinkedBlockingDeque<AmqpClient.SendEntry>();
-    private static SendConsumer sendConsumer;
     private static Set<String> topics = Collections.synchronizedSet(new HashSet<>());
     
     /**
@@ -62,55 +56,6 @@ public class AmqpClient {
          */
         public void messageArrived(String topic, byte[] payload);
 
-    }
-    
-    /**
-     * Represents a message to be send while queuing for sending.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class SendEntry {
-        private String topic;
-        private byte[] payload;
-        
-        /**
-         * Creates a send entry.
-         * 
-         * @param topic the topic name
-         * @param payload the payload
-         */
-        private SendEntry(String topic, byte[] payload) {
-            this.topic = topic;
-            this.payload = payload;
-        }
-    }
-    
-    /**
-     * The send consumer running in parallel taking {@link SendEntry send entries} from {@link AmqpClient#queue} to
-     * pass them on to the AMQP client for sending.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class SendConsumer implements Runnable {
-
-        private boolean running = true;
-        
-        @Override
-        public void run() {
-            while (running) {
-                SendEntry entry = queue.pollFirst();
-                if (null != entry && null != channel) {
-                    try {
-                        ensureTopicQueue(entry.topic);
-                        channel.basicPublish("", entry.topic, null, entry.payload);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                TimeUtils.sleep(2);
-            }
-        }
-        
     }
     
     /**
@@ -141,8 +86,6 @@ public class AmqpClient {
                 factory.setAutomaticRecoveryEnabled(true);
                 factory.setUsername(config.getUser());
                 factory.setPassword(config.getPassword());
-                sendConsumer = new SendConsumer();
-                new Thread(sendConsumer).start();
                 connection = factory.newConnection();
                 channel = connection.createChannel();
             } catch (IOException | TimeoutException e) {
@@ -156,7 +99,6 @@ public class AmqpClient {
      */
     public static void stopClient() {
         try {
-            sendConsumer.running = false;
             channel.close();
             topics.clear();
             channel = null;
@@ -203,13 +145,15 @@ public class AmqpClient {
     static boolean unsubscribeFrom(String topic) {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != channel) {
-            try {
-                topics.remove(topic);
-                channel.basicCancel(topic);
-                LOGGER.info("Unsubscribed from " + topic);
-                done = true;
-            } catch (IOException e) {
-                LOGGER.error("Unsubscribing from AMQP broker: " + e.getMessage(), e);
+            if (!topics.contains(topic)) {
+                try {
+                    topics.remove(topic);
+                    channel.basicCancel(topic);
+                    LOGGER.info("Unsubscribed from " + topic);
+                    done = true;
+                } catch (IOException e) {
+                    LOGGER.error("Unsubscribing from AMQP broker: " + e.getMessage(), e);
+                }
             }
         }
         return done;
@@ -222,7 +166,14 @@ public class AmqpClient {
      * @param payload the payload to send
      */
     static void send(String topic, byte[] payload) {
-        queue.offer(new SendEntry(topic, payload));
+        if (null != channel) {
+            try {
+                ensureTopicQueue(topic);
+                channel.basicPublish("", topic, null, payload);
+            } catch (IOException e) {
+                LOGGER.error("Sending AMQP broker: " + e.getMessage(), e);
+            }
+        }
     }
     
 }
