@@ -1,8 +1,9 @@
 # IIP-Ecosphere platform documentation
 
-# Documents 
+# Further documents 
 * Platform handbook (soon)
 * [Guideline to open the projects and setup the environment](../documentation/Guideline.pdf?raw=true)
+* [Release guideline] (../documentation/RELEASE.md)
 
 # Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
