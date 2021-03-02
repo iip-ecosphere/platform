@@ -3,7 +3,7 @@
 For performing a release...
 * Get gnupgp and obtain a public/private keypair.
 * Prepare your maven `settings.xml` so that a server entry for `ossrh-iip` with credentials from the project administration and a profile for `ossrh-iip` pointing to your GPG installation are defined.
-* Download the `MavenCentral` deployment project from the tools folder in the IIP-Ecosphere github repository.
+* Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the IIP-Ecosphere github repository.
     * Check the `pom.xml` so that all relevant top-level components are mentioned.
     * Check the `deploy.bat`.
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
