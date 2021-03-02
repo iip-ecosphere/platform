@@ -1,12 +1,11 @@
 @echo off
 
-REM install wget into PATH
 REM install maven into PATH
 REM install GnuPGP
 REM add your account settings for ossrh into maven setup (use authentication token)
 REM copy this script into an empty directory
 REM run this script
-REM goto https://oss.sonatype.org/#welcome, staging repositories, deuni-hildesheim...*, close for check/deploy
+REM goto https://oss.sonatype.org/#welcome, staging repositories, deiip-ecosphere...*, close for check/deploy
 
 setlocal ENABLEDELAYEDEXPANSION
 SET VERSION=0.1.0
@@ -15,7 +14,6 @@ SET REPO=ossrh-iip
 SET DEPLOYCMD=mvn gpg:sign-and-deploy-file -Durl=%TARGET% -DrepositoryId=%REPO%
 SET FOLDER=target\jars
 
-REM call %DEPLOYCMD% -DpomFile=%FOLDER%\platformDependencies-%VERSION%.pom -Dfile=%FOLDER%\platformDependencies-%VERSION%.pom
 for /r %%f in (%FOLDER%\*%VERSION%.jar) do (
   SET fn=%%~nf
   SET an=!fn:%VERSION%=!
