@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.transport.spring;
 import java.util.function.Supplier;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.lang.Nullable;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -68,10 +68,10 @@ public class BeanHelper {
      */
     public static <T> T registerInParentContext(ApplicationContext ctx, T bean, 
         @Nullable String beanName) {
-        if (ctx instanceof AnnotationConfigApplicationContext && ctx.getParent() != null) {
+        if (ctx.getParent() instanceof GenericApplicationContext) {
             @SuppressWarnings("unchecked")
             Class<T> cls = (Class<T>) bean.getClass(); // otherwise wrong method binding
-            ((AnnotationConfigApplicationContext) ctx.getParent()).registerBean(beanName, cls, new Supplier<T>() {
+            ((GenericApplicationContext) ctx.getParent()).registerBean(beanName, cls, new Supplier<T>() {
 
                     @Override
                     public T get() {

@@ -16,4 +16,4 @@ For performing a release...
 * Log into Maven Central Sonatype nexus and close the current staging repository. If no validation errors occur, deploy that repository.
 * Go through all projects and change to the next SNAPSHOT version number, i.e., except for the platform dependencies only changes to the POM parent entry are required. Maven may help you here.
 * Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
-* Inform all developing parties that the release is done, everybody shall update their workspaces and development can continue.
+* Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
