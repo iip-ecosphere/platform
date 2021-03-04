@@ -9,5 +9,9 @@
  * 
  * Application may require link to one class in here via 
  * {@link org.springframework.boot.autoconfigure.SpringBootApplication#scanBasePackageClasses()}.
+ * In some contexts, we experienced that {@code scanBasePackageClasses} on this package disturbs the spring 
+ * initialization, in particular spring cloud multi-binder settings. Then the underlying functionality can be utilized 
+ * directly through {@link RegistrationHelper} or this class can be subclassed in the application and marked as 
+ * component.
  */
 package de.iip_ecosphere.platform.transport.spring;
