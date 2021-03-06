@@ -90,8 +90,8 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             }
             if (null != get && null == set) {
                 LOGGER.warn("Creating AAS operation " + property.getIdShort() + " with only a bound getter "
-                    + "can lead to runtime inconsistencies as setting will change the value in the property rather "
-                    + "than the value in the underlying representation object.");
+                    + "can lead to runtime inconsistencies as setting the value will change the value in the "
+                    + "property rather than the value in the underlying representation object.");
             }
             property.set(VABLambdaProviderHelper.createSimple(get, set), typeDef);
             return this;
