@@ -29,7 +29,18 @@ import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 public interface InvocablesCreator {
 
     /**
+     * A getter implementation that does nothing. [convenience]
+     */
+    public static final Supplier<Object> WRITE_ONLY = Property.PropertyBuilder.WRITE_ONLY;
+
+    /**
+     * A setter implementation that does nothing. [convenience]
+     */
+    public static final Consumer<Object> READ_ONLY = Property.PropertyBuilder.READ_ONLY;
+
+    /**
      * Creates a getter implementation for a property, i.e., for {@link PropertyBuilder#bind(Supplier, Consumer)}.
+     * Use {@link #WRITE_ONLY} if no getter is intended but also the value shall not be held locally in the property.
      * 
      * @param name the unique name of the property
      * @return the getter implementation
@@ -38,6 +49,7 @@ public interface InvocablesCreator {
 
     /**
      * Creates a setter implementation for a property, i.e., for {@link PropertyBuilder#bind(Supplier, Consumer)}.
+     * Use {@link #READY_ONLY} if no setter is intended but also the value shall not be held locally in the property.
      * 
      * @param name the unique name of the property
      * @return the setter implementation

@@ -162,7 +162,7 @@ public class AasTest {
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
             .setType(Type.DOUBLE)
-            .bind(invC.createGetter(NAME_VAR_POWCONSUMPTION), null)
+            .bind(invC.createGetter(NAME_VAR_POWCONSUMPTION), InvocablesCreator.READ_ONLY)
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))

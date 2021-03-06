@@ -33,6 +33,16 @@ public interface Property extends Element, DataElement {
     public interface PropertyBuilder extends Builder<Property> {
 
         /**
+         * A getter implementation that does nothing.
+         */
+        public static final Supplier<Object> WRITE_ONLY = () -> null;
+
+        /**
+         * A setter implementation that does nothing.
+         */
+        public static final Consumer<Object> READ_ONLY = (o) -> { };
+        
+        /**
          * Returns the parent builder.
          * 
          * @return the parent builder
@@ -67,9 +77,9 @@ public interface Property extends Element, DataElement {
         /**
          * Binds the value of the property against functions, e.g., accessing an underlying object.
          * 
-         * @param get the getter function
+         * @param get the getter function (use {@link #WRITE_ONLY} for write-only)
          * @param set the setter function called when the setter of the property is called (may be <b>bull</b>,
-         *   then a new value may override the getter and hold the value locally)
+         *   then a new value may override the getter and hold the value locally, use {@link #READ_ONLY} for read-only))
          * @return <b>this</b>
          * @throws IllegalArgumentException may be thrown if {@link #setType(Type)} was not called before
          */
