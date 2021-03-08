@@ -13,7 +13,7 @@
   installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in 
   future. Unfortunately, Eclipse 2020-12-R complains again about complier compliance. If a solution for this is known, please describe here.
 * Use **Javadoc** to describe the parts and pieces as well as their contract and intention. We assume that parameters of reference types are passed in with instances unless the documentation indicates that null (in Javadoc in bold font) can be used.
-* A related Java **Checkstyle** definition is based on Checkstyle 8.35. Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects.
+* A related Java **Checkstyle** definition is based on Checkstyle 8.35. Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects. Please use empty lines as paragraph breaks in text, i.e., whenever a unit of code has been completed that is not an own method. An empty line after each line of code is not recommended in this project. However, empty lines in this sense are not part of the Checkstyle rules.
 * Please install **FindBugs** or **Spotbugs** to avoid obvious programming problems.
 * The **Java package prefix** shall be ``de.iip-ecosphere.platform``. Test packages shall start with ``test.de.iip-ecosphere.platform`` 
 * Java files shall contain the **license header**. Existing files can be used as a template.
