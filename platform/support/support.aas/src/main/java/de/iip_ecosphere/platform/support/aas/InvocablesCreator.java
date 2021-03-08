@@ -49,7 +49,7 @@ public interface InvocablesCreator {
 
     /**
      * Creates a setter implementation for a property, i.e., for {@link PropertyBuilder#bind(Supplier, Consumer)}.
-     * Use {@link #READY_ONLY} if no setter is intended but also the value shall not be held locally in the property.
+     * Use {@link #READ_ONLY} if no setter is intended but also the value shall not be held locally in the property.
      * 
      * @param name the unique name of the property
      * @return the setter implementation
