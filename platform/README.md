@@ -18,8 +18,8 @@ This is for all code realizing the IIP-Ecosphere platform. So far present:
        * Platform connector for AAS based on the abstraction in the support layer
        * Platform connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
  * Services (in progress)
-    * Service management interface
-    * ECS management interface
+    * [Service management](https://github.com/iip-ecosphere/platform/tree/main/platform/services/README.md)
+    * [Resource services](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md)
 
 More to come soon with next focus on configuration integration and edge deployment. 
 
