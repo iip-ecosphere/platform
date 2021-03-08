@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ClassUtilityTest.class,
-    AasPartRegistryTest.class
+    AasPartRegistryTest.class,
+    PlatformAasTest.class
 })
 public class AllTests {
 }

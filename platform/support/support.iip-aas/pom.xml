@@ -11,6 +11,20 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.2.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+  </properties>
+  
+  <build>
+    <resources>
+       <resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+       </resource>
+    </resources>  
+  </build>
 
   <dependencies>
     <dependency>
