@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -65,6 +66,10 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
 
     @Override
     public void activate() throws ExecutionException {
+    }
+    
+    @Override
+    public void reconfigure(Map<String, Object> values) throws ExecutionException {
     }
 
 }

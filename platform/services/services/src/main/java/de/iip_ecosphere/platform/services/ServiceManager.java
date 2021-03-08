@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -114,6 +115,15 @@ public interface ServiceManager  {
      * @throws ExecutionException in case that passivating fails, e.g., because the service is already passive 
      */
     public void passivate(String id) throws ExecutionException;
+    
+    /**
+     * Reconfigures the underlying service. [adaptation]
+     * 
+     * @param id the id of the running service
+     * @param values the (service-specific) values that shall lead to a reconfiguration of the service
+     * @throws ExecutionException if reconfiguration fails
+     */
+    public void reconfigure(String id, Map<String, Object> values) throws ExecutionException;
 
     /**
      * Sets the state of the service. [adaptation]

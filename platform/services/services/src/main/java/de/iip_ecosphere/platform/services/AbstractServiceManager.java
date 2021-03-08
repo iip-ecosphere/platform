@@ -152,4 +152,9 @@ public abstract class AbstractServiceManager<D extends ServiceDescriptor> implem
         getServiceDescriptor(id, "id", "setState").setState(state);
     }
     
+    @Override
+    public void reconfigure(String id, Map<String, Object> values) throws ExecutionException {
+        getServiceDescriptor(id, "id", "setState").reconfigure(values);
+    }
+    
 }

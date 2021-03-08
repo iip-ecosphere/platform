@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -85,6 +86,13 @@ public interface ServiceDescriptor {
      */
     public void activate() throws ExecutionException;
 
-    // TODO reconfigure
+    /**
+     * Reconfigures the underlying service.
+     * 
+     * @param values the (service-specific) values that shall lead to a reconfiguration of the service
+     * @throws ExecutionException if reconfiguration fails
+     */
+    public void reconfigure(Map<String, Object> values) throws ExecutionException;
+    
     // TODO endpoints
 }
