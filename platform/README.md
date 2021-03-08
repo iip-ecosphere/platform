@@ -17,8 +17,12 @@ This is for all code realizing the IIP-Ecosphere platform. So far present:
        * Platform connector for OPC UA v1 based on [Eclipse Milo](https://projects.eclipse.org/projects/iot.milo)
        * Platform connector for AAS based on the abstraction in the support layer
        * Platform connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
- * Services (starting)
+ * Services (in progress)
+    * Service management interface
+    * ECS management interface
 
-More to come soon with next focus on edge/stream performance, configuration integration and edge deployment. 
+More to come soon with next focus on configuration integration and edge deployment. 
 
 For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md).
+
+For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md).
