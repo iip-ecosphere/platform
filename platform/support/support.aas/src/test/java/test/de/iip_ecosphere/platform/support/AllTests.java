@@ -31,7 +31,8 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
     FileFormatTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven may execute both
     PrintVisitorTest.class,
-    NetworkManagerTest.class
+    NetworkManagerTest.class,
+    LifecycleHandlerTest.class
 })
 public class AllTests {
 }
