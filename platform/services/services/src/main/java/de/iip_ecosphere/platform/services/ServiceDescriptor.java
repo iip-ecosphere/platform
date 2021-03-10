@@ -23,6 +23,13 @@ import java.util.concurrent.ExecutionException;
 public interface ServiceDescriptor {
     
     /**
+     * Returns the unique id of the service.
+     * 
+     * @return the unique id
+     */
+    public String getId();
+    
+    /**
      * The name of the service.
      * 
      * @return the name
@@ -59,7 +66,7 @@ public interface ServiceDescriptor {
     public void setState(ServiceState state) throws ExecutionException;
     
     /**
-     * Returns whether the service is deployable or fixed in deployment location.
+     * Returns whether the service is deployable in distributable manner or fixed in deployment location.
      * 
      * @return {@code true} for deployable, {@code false} for fixed
      */
@@ -71,6 +78,13 @@ public interface ServiceDescriptor {
      * @return the service kind
      */
     public ServiceKind getKind();
+    
+    /**
+     * Returns the containing artifact.
+     * 
+     * @return the containing artifact (descriptor)
+     */
+    public ArtifactDescriptor getArtifact();
     
     /**
      * Passivates the service.
@@ -94,5 +108,5 @@ public interface ServiceDescriptor {
      */
     public void reconfigure(Map<String, Object> values) throws ExecutionException;
     
-    // TODO endpoints
+    // TODO endpoints, data connectors
 }

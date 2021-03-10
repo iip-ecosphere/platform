@@ -12,64 +12,106 @@
 
 package de.iip_ecosphere.platform.services;
 
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Abstract {@link ServiceDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 
- * statemachine.
+ * statemachine. We do not protect the setters here explicitly, e.g., through a builder pattern as we assume that 
+ * the respective messages will only be called within the package of the implementing manager.
  * 
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
     
-    // TODO state transition checks
-    // TODO basic implementation
+    private String id;
+    private String name;
+    private String description;
+    private Version version;
+    private ArtifactDescriptor artifact;
+    private ServiceState state;
+    private ServiceKind kind = ServiceKind.TRANSFORMATION_SERVICE;
+    private boolean isDeployable = true;
+    
+    /**
+     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
+     * 
+     * @param id the service id
+     * @param name the name of this service
+     * @param description the description of the service
+     * @param version the version
+     */
+    protected AbstractServiceDescriptor(String id, String name, String description, Version version) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.version = version;
+        this.state = ServiceState.AVAILABLE;
+    }
+
+    /**
+     * Defines an artifact.
+     * 
+     * @param artifact the containing artifact descriptor
+     */
+    protected void setArtifact(ArtifactDescriptor artifact) {
+        this.artifact = artifact;
+    }
+    
+    /**
+     * Sets the classification of this service. If not called, default values will be used. 
+     * 
+     * @param kind the service kind
+     * @param isDeployable whether the service can be deployed in distributed manner or not (fixed, centralized)
+     */
+    protected void setClassification(ServiceKind kind, boolean isDeployable) {
+        this.kind = kind;
+        this.isDeployable = isDeployable;
+    }
+    
+    @Override
+    public String getId() {
+        return id;
+    }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public Version getVersion() {
-        return new Version();
+        return version;
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return description;
     }
 
     @Override
     public ServiceState getState() {
-        return ServiceState.UNKOWN;
+        return state;
     }
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
+        // TODO statemachine?
+        this.state = state;
     }
 
     @Override
     public boolean isDeployable() {
-        return false;
+        return isDeployable;
     }
 
     @Override
     public ServiceKind getKind() {
-        return null;
-    }
-
-    @Override
-    public void passivate() throws ExecutionException {
-    }
-
-    @Override
-    public void activate() throws ExecutionException {
+        return kind;
     }
     
     @Override
-    public void reconfigure(Map<String, Object> values) throws ExecutionException {
+    public ArtifactDescriptor getArtifact() {
+        return artifact;
     }
 
 }

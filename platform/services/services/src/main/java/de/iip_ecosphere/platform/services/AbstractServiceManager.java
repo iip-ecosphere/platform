@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -24,62 +25,95 @@ import java.util.concurrent.ExecutionException;
  * {@link #removeService(String)}, {@link #switchToService(String, String)}, {@link #migrateService(String, String)}
  * and call the implementation of this class to perform the changes.
  *
- * @param <D> the actual type of service descriptor
+ * @param <A> the actual type of the artifact descriptor
+ * @param <S> the actual type of the service descriptor
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractServiceManager<D extends ServiceDescriptor> implements ServiceManager {
+public abstract class AbstractServiceManager<A extends AbstractArtifactDescriptor<S>, 
+    S extends AbstractServiceDescriptor> implements ServiceManager {
 
-    private Map<String, D> services = Collections.synchronizedMap(new HashMap<>());
-
-    @Override
-    public Set<String> getIds() {
-        return services.keySet();
-    }
+    private Map<String, A> artifacts = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public Collection<D> getServices() {
-        return services.values();
-    }
-
-    @Override
-    public D getService(String id) {
-        return services.get(id);
+    public Set<String> getArtifactIds() {
+        return artifacts.keySet();
     }
     
     @Override
-    public ServiceState getState(String id) {
-        ServiceState result = ServiceState.UNKOWN;
-        if (null != id) {
-            ServiceDescriptor d = services.get(id);
-            if (null != d) {
-                result = d.getState();
+    public Collection<A> getArtifacts() {
+        return artifacts.values();
+    }
+    
+    @Override
+    public Set<String> getServiceIds() {
+        Set<String> result = new HashSet<>();
+        for (A a : getArtifacts()) {
+            result.addAll(a.getServiceIds());
+        }
+        return result;
+    }
+
+    @Override
+    public Collection<S> getServices() {
+        Set<S> result = new HashSet<>();
+        for (A a : getArtifacts()) {
+            result.addAll(a.getServices());
+        }
+        return result;
+    }
+
+    @Override
+    public A getArtifact(String artifactId) {
+        return null == artifactId ? null : artifacts.get(artifactId);
+    }
+    
+    @Override
+    public S getService(String serviceId) {
+        S result = null;
+        for (A a : getArtifacts()) {
+            result = a.getService(serviceId);
+            if (null != result) {
+                break;
             }
         }
         return result;
     }
     
+    @Override
+    public ServiceState getState(String serviceId) {
+        ServiceState result = ServiceState.UNKOWN;
+        S service = getService(serviceId);
+        if (null != service) {
+            result = service.getState();
+        }
+        return result;
+    }
+    
     /**
-     * Adds a service.
+     * Adds an artifact.
      * 
-     * @param id the service id
+     * @param artifactId the artifact id
      * @param descriptor the service descriptor
+     * @return {@code artifactId}
      * @throws ExecutionException in case that the id is invalid or already known
      */
-    protected void addService(String id, D descriptor) throws ExecutionException {
-        checkId(id, "id");
-        if (services.containsKey(id)) {
-            throw new ExecutionException("Service id '" + id + "' is already known", null);
+    protected String addArtifact(String artifactId, A descriptor) throws ExecutionException {
+        checkId(artifactId, "artifactId");
+        if (artifacts.containsKey(artifactId)) {
+            throw new ExecutionException("Artifact id '" + artifactId + "' is already known", null);
         }
-        services.put(id, descriptor);
+        artifacts.put(artifactId, descriptor);
+        return artifactId;
     }
 
     @Override
-    public void removeService(String id) throws ExecutionException {
-        checkId(id, "id");
-        if (!services.containsKey(id)) {
-            throw new ExecutionException("Service id '" + id + "' is not known. Cannot remove service.", null);
+    public void removeArtifact(String artifactId) throws ExecutionException {
+        checkId(artifactId, "artifactId");
+        if (!artifacts.containsKey(artifactId)) {
+            throw new ExecutionException("Artifact id '" + artifactId 
+                + "' is not known. Cannot remove artifact.", null);
         }
-        services.remove(id);
+        artifacts.remove(artifactId);
     }
     
     /**
@@ -89,72 +123,92 @@ public abstract class AbstractServiceManager<D extends ServiceDescriptor> implem
      * @param text the text to include into the exception
      * @throws ExecutionException if {@code id} is not considered valid
      */
-    protected void checkId(String id, String text) throws ExecutionException {
+    protected static void checkId(String id, String text) throws ExecutionException {
         if (null == id || id.length() == 0) {
-            throw new ExecutionException("Service " + text + "must be given (not null or empty)", null);
+            throw new ExecutionException(text + "must be given (not null or empty)", null);
         }
     }
     
     @Override
-    public void switchToService(String id, String targetId) throws ExecutionException {
-        checkId(id, "id");
-        checkId(id, "targetId");
-        if (!id.equals(targetId)) {
-            if (services.containsKey(targetId)) {
-                throw new ExecutionException("Target service id '" + id + "' is already known. Cannot switch service.", 
-                    null);
-            }
-            if (!services.containsKey(id)) {
-                throw new ExecutionException("Service id '" + id + "' is not known. Cannot switch service.", null);
-            }
-            services.put(targetId, services.remove(id));
+    public void switchToService(String serviceId, String targetId) throws ExecutionException {
+        checkId(serviceId, "id");
+        checkId(serviceId, "targetId");
+        if (!serviceId.equals(targetId)) {
+            stopService(serviceId);
+            startService(targetId);
         }
     }
 
     @Override
-    public void migrateService(String id, String location) throws ExecutionException {
-        removeService(id);
+    public void migrateService(String serviceId, String location) throws ExecutionException {
+        checkId(serviceId, "serviceId");
+        S cnt = getServiceDescriptor(serviceId, "serviceId", "migrate");
+        if (ServiceState.RUNNING == cnt.getState()) {
+            stopService(serviceId);
+        } else {
+            throw new ExecutionException("Service " + serviceId + " is in state " + cnt.getState() 
+                + ". Cannot migrate service.", null);
+        }
     }
 
     /**
      * Returns a service descriptor.
      * 
-     * @param id the service id
+     * @param artifactId the artifact id
      * @param idText the id text to be passed to {@link #checkId(String, String)}
      * @param activityText a description of the activity the service is requested for to construct an exception if 
      *   the service does not exist
      * @return the service (not <b>null</b>)
-     * @throws ExecutionException if id is invalid or the service is unkown
+     * @throws ExecutionException if id is invalid or the service is unknown
      */
-    protected ServiceDescriptor getServiceDescriptor(String id, String idText, String activityText) 
-        throws ExecutionException {
-        checkId(id, idText);
-        ServiceDescriptor result = services.get(id);
+    protected A getArtifactDescriptor(String artifactId, String idText, String activityText) throws ExecutionException {
+        checkId(artifactId, idText);
+        A result = artifacts.get(artifactId);
         if (null == result) {
-            throw new ExecutionException("Service id '" + id + "' is not known. Cannot " + activityText 
+            throw new ExecutionException("Artifact id '" + artifactId + "' is not known. Cannot " + activityText 
+                + " service.", null);
+        }
+        return result;
+    }
+
+    /**
+     * Returns a service descriptor.
+     * 
+     * @param serviceId the service id
+     * @param idText the id text to be passed to {@link #checkId(String, String)}
+     * @param activityText a description of the activity the service is requested for to construct an exception if 
+     *   the service does not exist
+     * @return the service (not <b>null</b>)
+     * @throws ExecutionException if id is invalid or the service is unknown
+     */
+    protected S getServiceDescriptor(String serviceId, String idText, String activityText) throws ExecutionException {
+        checkId(serviceId, idText);
+        S result = getService(serviceId);
+        if (null == result) {
+            throw new ExecutionException("Service id '" + serviceId + "' is not known. Cannot " + activityText 
                 + " service.", null);
         }
         return result;
     }
 
     @Override
-    public void activate(String id) throws ExecutionException {
-        getServiceDescriptor(id, "id", "activate").passivate();
+    public void activate(String serviceId) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "activate").activate();
     }
 
     @Override
-    public void passivate(String id) throws ExecutionException {
-        getServiceDescriptor(id, "id", "passivate").passivate();
+    public void passivate(String serviceId) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "passivate").passivate();
     }
 
     @Override
-    public void setState(String id, ServiceState state) throws ExecutionException {
-        getServiceDescriptor(id, "id", "setState").setState(state);
+    public void setState(String serviceId, ServiceState state) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "setState").setState(state);
     }
     
     @Override
-    public void reconfigure(String id, Map<String, Object> values) throws ExecutionException {
-        getServiceDescriptor(id, "id", "setState").reconfigure(values);
+    public void reconfigure(String serviceId, Map<String, Object> values) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "setState").reconfigure(values);
     }
     
 }

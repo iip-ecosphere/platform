@@ -12,28 +12,69 @@
 
 package test.de.iip_ecosphere.platform.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
+import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.Version;
 
 /**
  * A test service manager.
  * 
  * @author Holger Eichelberger, SSE
  */
-class MyServiceManager extends AbstractServiceManager<MyServiceDesciptor> {
+class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MyServiceDesciptor> {
 
+    private int artifactId;
+    private int serviceId;
+    
+    /**
+     * Prevents external creation.
+     */
+    MyServiceManager() {
+    }
+    
+    /**
+     * Creates an artifact id.
+     * 
+     * @return the artifact id
+     */
+    private String createArtifactId() {
+        return "art_" + artifactId++;
+    }
+    
+    /**
+     * Creates a service id.
+     * 
+     * @return the service id
+     */
+    private String createServiceId() {
+        return "service_" + serviceId++;
+    }
+    
     @Override
-    public void addService(String id, String location) throws ExecutionException {
-        super.addService(id, new MyServiceDesciptor());
+    public String addArtifact(String location) throws ExecutionException {
+        if (null == location) {
+            throw new ExecutionException("location must not be null", null);
+        }
+        String aId = createArtifactId();
+        List<MyServiceDesciptor> services = new ArrayList<>();
+        services.add(new MyServiceDesciptor(createServiceId(), location, location, new Version(1, 0)));
+        services.add(new MyServiceDesciptor(createServiceId(), location, location, new Version(1, 1)));
+        super.addArtifact(aId, new MyArtifactDescriptor(aId, location, services));
+        return aId;
     }
 
     @Override
-    public void startService(String id) throws ExecutionException {
+    public void startService(String serviceId) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "start").setState(ServiceState.RUNNING);
     }
 
     @Override
-    public void stopService(String id) throws ExecutionException {
+    public void stopService(String serviceId) throws ExecutionException {
+        getServiceDescriptor(serviceId, "serviceId", "stop").setState(ServiceState.STOPPED);
     }
 
     @Override
@@ -41,8 +82,8 @@ class MyServiceManager extends AbstractServiceManager<MyServiceDesciptor> {
     }
     
     @Override
-    public void removeService(String id) throws ExecutionException {
-        super.removeService(id);
+    public void removeArtifact(String id) throws ExecutionException {
+        super.removeArtifact(id);
     }
     
     @Override
@@ -53,6 +94,11 @@ class MyServiceManager extends AbstractServiceManager<MyServiceDesciptor> {
     @Override
     public void migrateService(String id, String location) throws ExecutionException {
         super.migrateService(id, location);
+    }
+
+    @Override
+    public void cloneArtifact(String artifactId, String location) throws ExecutionException {
+        // TODO Auto-generated method stub
     }
     
 }
