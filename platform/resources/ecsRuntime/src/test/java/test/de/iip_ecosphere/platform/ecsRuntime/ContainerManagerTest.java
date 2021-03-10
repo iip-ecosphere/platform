@@ -12,9 +12,14 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
+import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 
 /**
@@ -26,11 +31,76 @@ public class ContainerManagerTest {
     
     /**
      * Template test.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void testApp() {
-        Assert.assertNotNull(EcsFactory.getContainerManager());
-        // TODO more
+    public void testApp() throws ExecutionException {
+        ContainerManager mgr = EcsFactory.getContainerManager();
+        Assert.assertNotNull(mgr);
+        String id = mgr.addContainer("bla");
+        Assert.assertNotNull(id);
+        Assert.assertTrue(id.length() > 0);
+        
+        ContainerDescriptor cnt = mgr.getContainer("");
+        Assert.assertNull(cnt); // does not exist
+        cnt = mgr.getContainer(id);
+        Assert.assertNotNull(cnt);
+        Assert.assertEquals(id, cnt.getId());
+        Assert.assertNotNull(cnt.getName());
+        Assert.assertEquals(ContainerState.AVAILABLE, cnt.getState());
+        Assert.assertEquals(ContainerState.AVAILABLE, mgr.getState(id));
+        Assert.assertNotNull(cnt.getVersion());
+        
+        Assert.assertTrue(mgr.getContainers().contains(cnt));
+        Assert.assertTrue(mgr.getIds().contains(id));
+        try {
+            mgr.startContainer("");
+            Assert.fail("No exception");
+        } catch (ExecutionException e) {
+            // this is ok
+        }
+        mgr.startContainer(id);
+        Assert.assertEquals(ContainerState.DEPLOYED, cnt.getState());
+        Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
+        mgr.updateContainer(id, "bla");
+        mgr.stopContainer(id);
+        Assert.assertEquals(ContainerState.STOPPED, cnt.getState());
+        Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
+
+        mgr.startContainer(id);
+        Assert.assertEquals(ContainerState.DEPLOYED, cnt.getState());
+        Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
+
+        try {
+            mgr.undeployContainer(id);
+            Assert.fail("No exception");
+        } catch (ExecutionException e) {
+            // this is ok
+        }
+
+        mgr.stopContainer(id);
+        Assert.assertEquals(ContainerState.STOPPED, cnt.getState());
+        Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
+        mgr.undeployContainer(id);
+        Assert.assertEquals(ContainerState.UNKOWN, cnt.getState());
+        Assert.assertEquals(ContainerState.UNKOWN, mgr.getState(id));
+        
+        id = mgr.addContainer("bla");
+        cnt = mgr.getContainer(id);
+        mgr.startContainer(id);
+        mgr.migrateContainer(id, "bla");
+        if (ContainerState.STOPPED == cnt.getState()) {
+            mgr.undeployContainer(id);
+        }
+        Assert.assertEquals(ContainerState.UNKOWN, cnt.getState());
+        Assert.assertEquals(ContainerState.UNKOWN, mgr.getState(id));
+
+        // cnt is gone, but there is a new instance on "bla"
+        Assert.assertFalse(mgr.getContainers().contains(cnt));
+        Assert.assertTrue(mgr.getContainers().size() > 0);
+        Assert.assertFalse(mgr.getIds().contains(id));
+        Assert.assertTrue(mgr.getIds().size() > 0);
     }
     
 }

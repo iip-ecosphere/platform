@@ -22,7 +22,7 @@ public enum ContainerState {
     /**
      * The container is on the device and ready to be deployed. Next state shall be {@link #DEPLYOING}.
      */
-    AVAILABE,
+    AVAILABLE,
     
     /**
      * The container is brought to life. Next state shall be {@link #DEPLOYED}.

@@ -22,26 +22,64 @@ import de.iip_ecosphere.platform.services.Version;
  */
 public abstract class AbstractContainerDescriptor implements ContainerDescriptor {
     
-    // TODO basic implementation
+    private String id;
+    private String name;
+    private Version version;
+    private ContainerState state;
+    
+    /**
+     * Creates a container descriptor instance.
+     * 
+     * @param id the container id
+     * @param name the (file) name of the container
+     * @param version the version of the container
+     * @throws IllegalArgumentException if id, name or version is invalid, i.e., null or empty
+     */
+    protected AbstractContainerDescriptor(String id, String name, Version version) {
+        if (null == id || id.length() == 0) {
+            throw new IllegalArgumentException("id must not be null or empty");
+        }
+        if (null == name || name.length() == 0) {
+            throw new IllegalArgumentException("name must not be null or empty");
+        }
+        if (null == version) {
+            throw new IllegalArgumentException("version must not be null");
+        }
+        this.id = id;
+        this.name = name;
+        this.version = version;
+        this.state = ContainerState.AVAILABLE;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public Version getVersion() {
-        return new Version();
+        return version;
     }
-
-    @Override
-    public String getDescription() {
-        return null;
+    
+    /**
+     * Changes the container state.
+     * 
+     * @param state the new container state
+     */
+    protected void setState(ContainerState state) {
+        if (null != state) {
+            this.state = state;
+        }
     }
 
     @Override
     public ContainerState getState() {
-        return ContainerState.UNKOWN;
+        return state;
     }
     
 }

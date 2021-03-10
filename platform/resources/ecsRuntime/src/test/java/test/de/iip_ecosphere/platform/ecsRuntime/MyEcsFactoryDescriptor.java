@@ -12,7 +12,6 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 
 /**
@@ -25,7 +24,7 @@ public class MyEcsFactoryDescriptor implements EcsFactoryDescriptor {
     // do not rename this class! Java Service Loader
     
     @Override
-    public ContainerManager createContainerManagerInstance() {
+    public MyContainerManager createContainerManagerInstance() {
         return new MyContainerManager();
     }
 

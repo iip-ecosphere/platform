@@ -20,16 +20,16 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
- * A basic re-usable implementation of the containermanager. Implementations shall override at least 
+ * A basic re-usable implementation of the container manager. Implementations shall override at least 
  * {@link #undeployContainer(String)}, {@link #migrateContainer(String, String)}
  * and call the implementation of this class to perform the changes.
  *
- * @param <D> the actual type of container descriptor
+ * @param <C> the actual type of container descriptor
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractContainerManager<D extends ContainerDescriptor> implements ContainerManager {
+public abstract class AbstractContainerManager<C extends ContainerDescriptor> implements ContainerManager {
 
-    private Map<String, D> containers = Collections.synchronizedMap(new HashMap<>());
+    private Map<String, C> containers = Collections.synchronizedMap(new HashMap<>());
 
     @Override
     public Set<String> getIds() {
@@ -37,12 +37,12 @@ public abstract class AbstractContainerManager<D extends ContainerDescriptor> im
     }
 
     @Override
-    public Collection<D> getContainers() {
+    public Collection<C> getContainers() {
         return containers.values();
     }
 
     @Override
-    public D getContainer(String id) {
+    public C getContainer(String id) {
         return containers.get(id);
     }
     
@@ -63,14 +63,16 @@ public abstract class AbstractContainerManager<D extends ContainerDescriptor> im
      * 
      * @param id the container id
      * @param descriptor the container descriptor
+     * @return {@code id}
      * @throws ExecutionException in case that the id is invalid or already known
      */
-    protected void addContainer(String id, D descriptor) throws ExecutionException {
+    protected String addContainer(String id, C descriptor) throws ExecutionException {
         checkId(id, "id");
         if (containers.containsKey(id)) {
             throw new ExecutionException("Container id '" + id + "' is already known", null);
         }
         containers.put(id, descriptor);
+        return id;
     }
 
     @Override
@@ -79,7 +81,34 @@ public abstract class AbstractContainerManager<D extends ContainerDescriptor> im
         if (!containers.containsKey(id)) {
             throw new ExecutionException("Container id '" + id + "' is not known. Cannot undeploy container.", null);
         }
-        containers.remove(id);
+        ContainerDescriptor desc = containers.get(id);
+        if (ContainerState.AVAILABLE == desc.getState() || ContainerState.STOPPED == desc.getState()) {
+            containers.remove(id);
+        } else {
+            throw new ExecutionException("Container is in state " + desc.getState() 
+                + ". Cannot undeploy container.", null);
+        }
+    }
+    
+    /**
+     * Returns a service descriptor.
+     * 
+     * @param id the service id
+     * @param idText the id text to be passed to {@link #checkId(String, String)}
+     * @param activityText a description of the activity the service is requested for to construct an exception if 
+     *   the service does not exist
+     * @return the service (not <b>null</b>)
+     * @throws ExecutionException if id is invalid or the service is unkown
+     */
+    protected C getContainer(String id, String idText, String activityText) 
+        throws ExecutionException {
+        checkId(id, idText);
+        C result = containers.get(id);
+        if (null == result) {
+            throw new ExecutionException("Container id '" + id + "' is not known. Cannot " + activityText 
+                + " container.", null);
+        }
+        return result;
     }
     
     /**
@@ -91,13 +120,23 @@ public abstract class AbstractContainerManager<D extends ContainerDescriptor> im
      */
     protected void checkId(String id, String text) throws ExecutionException {
         if (null == id || id.length() == 0) {
-            throw new ExecutionException("Service " + text + "must be given (not null or empty)", null);
+            throw new ExecutionException("Container " + text + "must be given (not null or empty)", null);
         }
     }
     
     @Override
     public void migrateContainer(String id, String location) throws ExecutionException {
-        undeployContainer(id);
+        checkId(id, "id");
+        if (!containers.containsKey(id)) {
+            throw new ExecutionException("Container id '" + id + "' is not known. Cannot migrate container.", null);
+        }
+        ContainerDescriptor desc = containers.get(id);
+        if (ContainerState.DEPLOYED == desc.getState()) {
+            stopContainer(id);
+        } else {
+            throw new ExecutionException("Container " + id + " is in state " + desc.getState() 
+                + ". Cannot undeploy container.", null);
+        }
     }
 
 }

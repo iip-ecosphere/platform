@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
+import de.iip_ecosphere.platform.services.Version;
 
 /**
  * A test container descriptor.
@@ -20,5 +22,22 @@ import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
  * @author Holger Eichelberger, SSE
  */
 class MyContainerDesciptor extends AbstractContainerDescriptor {
+
+    /**
+     * Creates a container descriptor instance.
+     * 
+     * @param id the container id
+     * @param name the (file) name of the container
+     * @param version the version of the container
+     * @throws IllegalArgumentException if id, name or version is invalid, i.e., null or empty
+     */
+    MyContainerDesciptor(String id, String name, Version version) {
+        super(id, name, version);
+    }
+    
+    @Override
+    protected void setState(ContainerState state) {
+        super.setState(state);
+    }
     
 }

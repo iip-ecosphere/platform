@@ -23,19 +23,19 @@ import java.util.concurrent.ExecutionException;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ContainerManager  {
+public interface ContainerManager {
 
     /**
      * Adds a container to the management domain of this instance, e.g., by downloading it from a container registry.
      * This defines the {@code id} of the container within the management domain of this instance. After a successful
-     * execution, the container {@code id} shall be available and the container shall be in state 
+     * execution, the container {@code id} is returned and shall be available and the container shall be in state 
      * {@link ContainerState#AVAILABLE}.
      * 
-     * @param id the id of the container
      * @param location the location from where to download the container, e.g., an URL
+     * @return the id of the container
      * @throws ExecutionException in case that adding the container fails for some reason
      */
-    public void addContainer(String id, String location) throws ExecutionException;
+    public String addContainer(String location) throws ExecutionException;
 
     /**
      * Starts a container. The container must be already within the management domain of this instance by
@@ -110,7 +110,7 @@ public interface ContainerManager  {
     /**
      * Returns a container descriptor.
      * 
-     * @param id the id of the container
+     * @param id the id of the container (may be <b>null</b> or invalid)
      * @return the related container descriptor or <b>null</b> if the container is not known at all
      */
     public ContainerDescriptor getContainer(String id); 

@@ -22,6 +22,13 @@ import de.iip_ecosphere.platform.services.Version;
 public interface ContainerDescriptor {
     
     /**
+     * Returns the container id.
+     * 
+     * @return the container id
+     */
+    public String getId();
+    
+    /**
      * The name of the container.
      * 
      * @return the name
@@ -34,13 +41,6 @@ public interface ContainerDescriptor {
      * @return the version
      */
     public Version getVersion();
-    
-    /**
-     * The description of the container.
-     * 
-     * @return the description, may be empty
-     */
-    public String getDescription();
     
     /**
      * Returns the state the container is currently in.
