@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +36,7 @@ public interface ContainerManager {
      * @return the id of the container
      * @throws ExecutionException in case that adding the container fails for some reason
      */
-    public String addContainer(String location) throws ExecutionException;
+    public String addContainer(URI location) throws ExecutionException;
 
     /**
      * Starts a container. The container must be already within the management domain of this instance by
@@ -59,10 +60,10 @@ public interface ContainerManager {
      * Migrates the container.
      * 
      * @param id the id of the container
-     * @param location the target location, e.g., a device name
+     * @param location the target location, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void migrateContainer(String id, String location) throws ExecutionException;
+    public void migrateContainer(String id, URI location) throws ExecutionException;
     
     /**
      * Removes the container from the management domain of this instance. This operation shall only remove the 
@@ -83,7 +84,7 @@ public interface ContainerManager {
      * @param location the location of the new container, e.g., an URL
      * @throws ExecutionException if the given container cannot be updated for some reason
      */
-    public void updateContainer(String id, String location) throws ExecutionException;
+    public void updateContainer(String id, URI location) throws ExecutionException;
     
     /**
      * Returns the state of the container.

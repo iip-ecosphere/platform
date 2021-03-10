@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -83,14 +84,15 @@ public class SpringCloudServiceManager
     }
     
     @Override
-    public String addArtifact(String location) throws ExecutionException {
+    public String addArtifact(URI location) throws ExecutionException {
         String aId = createArtifactId();
+        
         // DOWNLOAD, Folder dependent on location
         // read in deployment descriptor
         List<SpringCloudServiceDescriptor> services = new ArrayList<>();
         // parse in services
         File jarFile = new File("");
-        SpringCloudArtifactDescriptor artifact = new SpringCloudArtifactDescriptor(aId, location, jarFile, services);
+        SpringCloudArtifactDescriptor artifact = new SpringCloudArtifactDescriptor(aId, "", jarFile, services);
         return super.addArtifact(aId, artifact);
     }
 
@@ -105,7 +107,7 @@ public class SpringCloudServiceManager
     }
 
     @Override
-    public void migrateService(String name, String location) throws ExecutionException {
+    public void migrateService(String name, URI location) throws ExecutionException {
         super.migrateService(name, location);
         throw new ExecutionException("not implemented", null);  // TODO
     }
@@ -117,7 +119,7 @@ public class SpringCloudServiceManager
     }
 
     @Override
-    public void updateService(String name, String location) throws ExecutionException {
+    public void updateService(String name, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
     }
 
@@ -128,7 +130,7 @@ public class SpringCloudServiceManager
     }
 
     @Override
-    public void cloneArtifact(String artifactId, String location) throws ExecutionException {
+    public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
     }
 

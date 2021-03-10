@@ -12,25 +12,38 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactory;
+import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 
 /**
- * Template test.
+ * Tests {@ink SpringCloudServiceManager}.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class TestServiceManager {
     
     /**
-     * Template test.
+     * Tests {@ink SpringCloudServiceManager}.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void testApp() {
-        Assert.assertTrue(ServiceFactory.getServiceManager() instanceof SpringCloudServiceManager); 
+    public void testApp() throws ExecutionException {
+        ServiceManager mgr = ServiceFactory.getServiceManager();
+        Assert.assertTrue(mgr instanceof SpringCloudServiceManager);
+        File f = new File("./target/jars/simpleStream.spring.jar");
+        Assert.assertTrue("Test cannot be executed as " + f 
+            + " does not exist. Was it downloaded by Maven?", f.exists());
+        String aId = mgr.addArtifact(f.toURI());
+        ArtifactDescriptor aDesc = mgr.getArtifact(aId);
         // TODO
     }
     

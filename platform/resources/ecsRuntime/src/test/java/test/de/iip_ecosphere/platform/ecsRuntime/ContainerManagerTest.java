@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
@@ -33,12 +35,14 @@ public class ContainerManagerTest {
      * Template test.
      * 
      * @throws ExecutionException shall not occur
+     * @throws URISyntaxException shall not occur
      */
     @Test
-    public void testApp() throws ExecutionException {
+    public void testApp() throws ExecutionException, URISyntaxException {
+        URI dummy = new URI("file:///dummy");
         ContainerManager mgr = EcsFactory.getContainerManager();
         Assert.assertNotNull(mgr);
-        String id = mgr.addContainer("bla");
+        String id = mgr.addContainer(dummy);
         Assert.assertNotNull(id);
         Assert.assertTrue(id.length() > 0);
         
@@ -63,7 +67,7 @@ public class ContainerManagerTest {
         mgr.startContainer(id);
         Assert.assertEquals(ContainerState.DEPLOYED, cnt.getState());
         Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
-        mgr.updateContainer(id, "bla");
+        mgr.updateContainer(id, dummy);
         mgr.stopContainer(id);
         Assert.assertEquals(ContainerState.STOPPED, cnt.getState());
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
@@ -86,10 +90,10 @@ public class ContainerManagerTest {
         Assert.assertEquals(ContainerState.UNKOWN, cnt.getState());
         Assert.assertEquals(ContainerState.UNKOWN, mgr.getState(id));
         
-        id = mgr.addContainer("bla");
+        id = mgr.addContainer(dummy);
         cnt = mgr.getContainer(id);
         mgr.startContainer(id);
-        mgr.migrateContainer(id, "bla");
+        mgr.migrateContainer(id, dummy);
         if (ContainerState.STOPPED == cnt.getState()) {
             mgr.undeployContainer(id);
         }

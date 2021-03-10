@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
@@ -37,7 +38,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     }
     
     @Override
-    public String addContainer(String location) throws ExecutionException {
+    public String addContainer(URI location) throws ExecutionException {
         String sId = createId();
         return super.addContainer(sId, new MyContainerDesciptor(sId, "cName", new Version(0, 1)));
     }
@@ -55,7 +56,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     }
 
     @Override
-    public void updateContainer(String id, String location) throws ExecutionException {
+    public void updateContainer(String id, URI location) throws ExecutionException {
         checkId(id, id);
         // we may do some parallel change here, but for testing without functionality?
     }
@@ -68,7 +69,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     }
 
     @Override
-    public void migrateContainer(String containerId, String location) throws ExecutionException {
+    public void migrateContainer(String containerId, URI location) throws ExecutionException {
         // we may do some parallel change here, but for testing without functionality?
         MyContainerDesciptor cnt = getContainer(containerId, "containerId", "migrate");
         // on "target machine"
