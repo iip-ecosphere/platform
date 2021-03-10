@@ -12,7 +12,12 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.Version;
 
 /**
  * Specific descriptor implementation for spring cloud streams.
@@ -20,5 +25,32 @@ import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
  * @author Holger Eichelberger, SSE
  */
 public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor {
+
+    /**
+     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
+     * 
+     * @param id the service id
+     * @param name the name of this service
+     * @param description the description of the service
+     * @param version the version
+     */
+    SpringCloudServiceDescriptor(String id, String name, String description, Version version) {
+        super(id, name, description, version);
+    }
+    
+    @Override
+    public void passivate() throws ExecutionException {
+        // TODO
+    }
+
+    @Override
+    public void activate() throws ExecutionException {
+        // TODO
+    }
+    
+    @Override
+    public void reconfigure(Map<String, Object> values) throws ExecutionException {
+        // TODO
+    }
 
 }

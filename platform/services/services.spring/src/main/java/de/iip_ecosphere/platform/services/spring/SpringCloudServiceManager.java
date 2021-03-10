@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
@@ -23,8 +26,12 @@ import de.iip_ecosphere.platform.services.ServiceManager;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SpringCloudServiceManager extends AbstractServiceManager<SpringCloudServiceDescriptor> {
+public class SpringCloudServiceManager 
+    extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
+    private int artifactId;
+    private int serviceId;
+    
     // do not rename this class or the following descriptor class! Java Service Loader
     
     /**
@@ -41,10 +48,50 @@ public class SpringCloudServiceManager extends AbstractServiceManager<SpringClou
         
     }
     
+    /**
+     * Prevents external creation.
+     */
+    private SpringCloudServiceManager() {
+    }
+    
+    /**
+     * Returns the id of the own resource.
+     * 
+     * @return the id
+     */
+    private String getResourceId() {
+        return "<resource-id>_"; // TODO preliminary, security!
+    }
+
+    /**
+     * Creates an artifact id.
+     * 
+     * @return the artifact id
+     */
+    private String createArtifactId() {
+        return getResourceId() + artifactId++; // TODO preliminary, security!
+    }
+    
+    /**
+     * Creates a service id.
+     * 
+     * @return the service id
+     */
+    @SuppressWarnings("unused")
+    private String createServiceId() {
+        return getResourceId() + serviceId++; // TODO preliminary, security!
+    }
+    
     @Override
-    public void addService(String name, String location) throws ExecutionException {
-        super.addService(location, new SpringCloudServiceDescriptor());  // TODO fill with data
-        throw new ExecutionException("not implemented", null);  // TODO
+    public String addArtifact(String location) throws ExecutionException {
+        String aId = createArtifactId();
+        // DOWNLOAD, Folder dependent on location
+        // read in deployment descriptor
+        List<SpringCloudServiceDescriptor> services = new ArrayList<>();
+        // parse in services
+        File jarFile = new File("");
+        SpringCloudArtifactDescriptor artifact = new SpringCloudArtifactDescriptor(aId, location, jarFile, services);
+        return super.addArtifact(aId, artifact);
     }
 
     @Override
@@ -64,8 +111,8 @@ public class SpringCloudServiceManager extends AbstractServiceManager<SpringClou
     }
 
     @Override
-    public void removeService(String name) throws ExecutionException {
-        super.removeService(name);
+    public void removeArtifact(String name) throws ExecutionException {
+        super.removeArtifact(name);
         throw new ExecutionException("not implemented", null);  // TODO
     }
 
@@ -78,6 +125,11 @@ public class SpringCloudServiceManager extends AbstractServiceManager<SpringClou
     public void switchToService(String name, String target) throws ExecutionException {
         super.switchToService(name, target);
         throw new ExecutionException("not implemented", null); // TODO
+    }
+
+    @Override
+    public void cloneArtifact(String artifactId, String location) throws ExecutionException {
+        throw new ExecutionException("not implemented", null);  // TODO
     }
 
 }

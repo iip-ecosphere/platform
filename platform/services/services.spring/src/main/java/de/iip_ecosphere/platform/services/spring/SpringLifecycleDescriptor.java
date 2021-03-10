@@ -12,10 +12,28 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+
 /**
- * Template.
+ * The lifecycle descriptor for the spring cloud service manager.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class App {
+public class SpringLifecycleDescriptor implements LifecycleDescriptor {
+
+    @Override
+    public void startup(String[] args) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void shutdown() {
+    }
+
+    @Override
+    public Thread getShutdownHook() {
+        return null; // not needed
+    }
+
 }
