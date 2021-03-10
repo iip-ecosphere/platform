@@ -1,0 +1,33 @@
+test:
+    debug: true
+    ingestCount: 150
+mqtt:
+    port: 8883
+    actionTimeout: 2000
+    mqtt.qos: AT_MOST_ONCE
+    host: localhost
+    clientId: test
+logging:
+    level:
+        root: INFO
+management:
+    health:
+        binders:
+            enabled: true
+spring:
+    main:
+        banner-mode: off
+    cloud:
+        function:
+            definition: create;log
+        stream:
+            poller:
+                fixedDelay: 8
+                maxMessagesPerPoll: 1
+            bindings:
+                create-out-0:
+                    destination: ingest
+                log-in-0:
+                    destination: ingest
+            defaultBinder: hivemqv5Binder
+                    
