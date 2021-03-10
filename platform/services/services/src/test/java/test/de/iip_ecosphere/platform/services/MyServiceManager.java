@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -55,15 +56,16 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     }
     
     @Override
-    public String addArtifact(String location) throws ExecutionException {
+    public String addArtifact(URI location) throws ExecutionException {
         if (null == location) {
             throw new ExecutionException("location must not be null", null);
         }
         String aId = createArtifactId();
         List<MyServiceDesciptor> services = new ArrayList<>();
-        services.add(new MyServiceDesciptor(createServiceId(), location, location, new Version(1, 0)));
-        services.add(new MyServiceDesciptor(createServiceId(), location, location, new Version(1, 1)));
-        super.addArtifact(aId, new MyArtifactDescriptor(aId, location, services));
+        String text = location.toString();
+        services.add(new MyServiceDesciptor(createServiceId(), text, text, new Version(1, 0)));
+        services.add(new MyServiceDesciptor(createServiceId(), text, text, new Version(1, 1)));
+        super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
         return aId;
     }
 
@@ -78,7 +80,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     }
 
     @Override
-    public void updateService(String id, String location) throws ExecutionException {
+    public void updateService(String id, URI location) throws ExecutionException {
     }
     
     @Override
@@ -92,12 +94,12 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     }
 
     @Override
-    public void migrateService(String id, String location) throws ExecutionException {
+    public void migrateService(String id, URI location) throws ExecutionException {
         super.migrateService(id, location);
     }
 
     @Override
-    public void cloneArtifact(String artifactId, String location) throws ExecutionException {
+    public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         // TODO Auto-generated method stub
     }
     

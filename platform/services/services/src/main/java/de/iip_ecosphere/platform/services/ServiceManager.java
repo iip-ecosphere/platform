@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -35,11 +36,11 @@ public interface ServiceManager {
      * management domain of this instance. After a successful execution, the artifact {@code id} is returned, artifact 
      * and service(s) shall be available and the service(s) shall be in state {@link ServiceState#AVAILABLE}.
      * 
-     * @param location the location from where to download the service, e.g., an URL
      * @return the id of the service
+     * @param location the location from where to download the service, e.g., an URL
      * @throws ExecutionException in case that adding the service fails for some reason
      */
-    public String addArtifact(String location) throws ExecutionException;
+    public String addArtifact(URI location) throws ExecutionException;
 
     /**
      * Starts a service. The service implementation must be already within the management domain of this instance by
@@ -63,20 +64,20 @@ public interface ServiceManager {
      * Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]
      * 
      * @param serviceId the id of the service
-     * @param location the target location, e.g., a device name
+     * @param location the target location, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void migrateService(String serviceId, String location) throws ExecutionException;
+    public void migrateService(String serviceId, URI location) throws ExecutionException;
     
     /**
      * Clones the artifact. As services belong to artifacts, it is not possible to migrate a single service (except
      * for if the artifact consists of a single service). [adaptation]
      * 
      * @param artifactId the id of the service
-     * @param location the target location, e.g., a device name
+     * @param location the target location, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void cloneArtifact(String artifactId, String location) throws ExecutionException;
+    public void cloneArtifact(String artifactId, URI location) throws ExecutionException;
 
     /**
      * Removes the artifact (and transitively its services) from the management domain of this instance. This operation 
@@ -98,7 +99,7 @@ public interface ServiceManager {
      * @throws ExecutionException if the given service cannot be updated for some reason, e.g., because the replacement
      *   service is not an evolved version of the running service
      */
-    public void updateService(String serviceId, String location) throws ExecutionException;
+    public void updateService(String serviceId, URI location) throws ExecutionException;
     
     /**
      * Switches to an interface-compatible service. This method cares for stopping the old service, performing

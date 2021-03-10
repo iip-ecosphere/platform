@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.services;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -37,9 +39,11 @@ public class ServiceManagerTest {
      * Tests {@link ServiceManager}.
      * 
      * @throws ExecutionException shall not occur
+     * @throws URISyntaxException shall not occur
      */
     @Test
-    public void testApp() throws ExecutionException {
+    public void testApp() throws ExecutionException, URISyntaxException {
+        URI dummy = new URI("file:///dummy");
         ServiceManager mgr = ServiceFactory.getServiceManager();
         Assert.assertNotNull(mgr);
         
@@ -49,7 +53,7 @@ public class ServiceManagerTest {
         } catch (ExecutionException e) {
             // ok
         }
-        String aId = mgr.addArtifact("bla");
+        String aId = mgr.addArtifact(dummy);
         Assert.assertNotNull(aId);
         ArtifactDescriptor aDesc = mgr.getArtifact(aId);
         Assert.assertNotNull(aId);
