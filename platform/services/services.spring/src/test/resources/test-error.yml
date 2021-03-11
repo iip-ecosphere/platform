@@ -1,0 +1,4 @@
+id1: art
+name: art-name
+service:
+  - id: id-0
