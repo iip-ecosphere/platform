@@ -9,11 +9,13 @@ services:
       - arg-0-1
       - arg-0-2
     relations:
-      - portArg: --port=${port}
-        hostArg: --host=${host}
+      - endpoint:
+          portArg: --port=${port}
+          hostArg: --host=${host}
       - channel: input
-        portArg: --input.port=${port}
-        hostArg: --input.host=${host}
+        endpoint:
+          portArg: --input.port=${port}
+          hostArg: --input.host=${host}
   - id: id-1
     name: name-1
     version: 1.0.3
@@ -22,8 +24,20 @@ services:
       - id: id-0
     relations:
       - channel: output
-        portArg: --input.port=${port}
-        hostArg: --input.host=${host}
+        endpoint:
+          portArg: --input.port=${port}
+          hostArg: --input.host=${host}
+    process:
+      path: impl/python
+      cmdArg:
+        - python
+        - MyServiceWrapper.py
+      streamEndpoint:
+        portArg: streamPort=${port}
+        hostArg: streamHost=${host}
+      aasEndpoint:
+        portArg: aasPort=${port}
+        hostArg: aasHost=${host}
   - name: name-1
     version: 1.0.3
     description: desc desc-1

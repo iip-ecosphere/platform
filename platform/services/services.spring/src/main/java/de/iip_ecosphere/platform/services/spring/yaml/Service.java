@@ -29,6 +29,7 @@ public class Service {
     private List<String> cmdArg = new ArrayList<>();
     private List<ServiceDependency> dependencies = new ArrayList<>();
     private List<Relation> relations = new ArrayList<>();
+    private Process process;
 
     /**
      * Returns the name of the service.
@@ -92,6 +93,15 @@ public class Service {
     public List<Relation> getRelations() {
         return relations;
     }
+    
+    /**
+     * Returns an optional attached process realizing the service.
+     * 
+     * @return the process information, may be <b>null</b>
+     */
+    public Process getProcess() {
+        return process;
+    }
 
     /**
      * Defines the id of the service. [required by Spring]
@@ -154,6 +164,15 @@ public class Service {
      */
     public void setRelations(List<Relation> relations) {
         this.relations = relations;
+    }
+
+    /**
+     * Defines an optional attached process realizing the service. [required by Spring]
+     * 
+     * @param process the process information, may be <b>null</b>
+     */
+    public void setProcess(Process process) {
+        this.process = process;
     }
 
 }

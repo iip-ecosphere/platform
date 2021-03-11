@@ -22,12 +22,9 @@ import de.iip_ecosphere.platform.support.net.NetworkManager;
 public class Relation {
 
     public static final String LOCAL_CHANNEL = "";
-    public static final String PORT_PLACEHOLDER = "${port}";
-    public static final String HOST_PLACEHOLDER = "${host}";
     
     private String channel = "";
-    private String portArg = "";
-    private String hostArg = "";
+    private Endpoint endpoint;
     
     /**
      * Returns the name of the communication channel this relation is realized by. Channel names may be used
@@ -40,46 +37,12 @@ public class Relation {
     }
     
     /**
-     * Returns the specified command line argument to set the communication port for this relation upon service 
-     * deployment/execution. 
+     * Returns communication endpoint (port/host) the service shall communicate with. 
      * 
-     * @return the generic port argument, {@value #PORT_PLACEHOLDER} is substituted by the port number
+     * @return the communication endpoint
      */
-    public String getPortArg() {
-        return portArg;
-    }
-
-    /**
-     * Returns the ready-to-use command line argument to set the communication port for this relation upon service 
-     * deployment/execution. 
-     * 
-     * @param port the actual port number
-     * @return the port argument
-     */
-    public String getPortArg(int port) {
-        return portArg.replace(PORT_PLACEHOLDER, String.valueOf(port));
-    }
-
-    /**
-     * Returns the specified command line argument to set the host to communicate with for this relation upon service 
-     * deployment/execution. 
-     * 
-     * @return the generic port argument, {@value #HOST_PLACEHOLDER} is substituted by the host name, may be empty 
-     *   for localhost
-     */
-    public String getHostArg() {
-        return hostArg;
-    }
-
-    /**
-     * Returns the ready-to.use command line argument to set the host to communicate with for this relation upon 
-     * service deployment/execution. 
-     * 
-     * @param hostname the actual hostname
-     * @return the port argument
-     */
-    public String getHostArg(String hostname) {
-        return hostArg.replace(HOST_PLACEHOLDER, hostname);
+    public Endpoint getEndpoint() {
+        return endpoint;
     }
     
     /**
@@ -93,23 +56,12 @@ public class Relation {
     }
 
     /**
-     * Defines the command line argument to set the communication port for this relation upon service 
-     * deployment/execution. [Required by Spring]
+     * Defines communication endpoint (port/host) the service shall communicate with. 
      * 
-     * @param portArg the generic port argument, may contain {@value #PORT_PLACEHOLDER}
+     * @param endpoint the communication endpoint
      */
-    public void setPortArg(String portArg) {
-        this.portArg = portArg;
-    }
-
-    /**
-     * Defines the command line argument to set the host to communicate with for this relation upon service 
-     * deployment/execution. [Required by Spring]
-     * 
-     * @param hostArg the host argument, may contain {@value #HOST_PLACEHOLDER}
-     */
-    public void setHostArg(String hostArg) {
-        this.hostArg = hostArg;
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
     }
     
 }
