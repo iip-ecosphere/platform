@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServiceInfo {
+public class Service {
     
     private String id;
     private String name;
@@ -28,6 +28,7 @@ public class ServiceInfo {
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
     private List<ServiceDependency> dependencies = new ArrayList<>();
+    private List<Relation> relations = new ArrayList<>();
 
     /**
      * Returns the name of the service.
@@ -84,6 +85,15 @@ public class ServiceInfo {
     }
 
     /**
+     * Returns the service-specific relations and command line arguments.
+     * 
+     * @return the relations, may be empty
+     */
+    public List<Relation> getRelations() {
+        return relations;
+    }
+
+    /**
      * Defines the id of the service. [required by Spring]
      * 
      * @param id the id
@@ -135,6 +145,15 @@ public class ServiceInfo {
      */
     public void setDependencies(List<ServiceDependency> dependencies) {
         this.dependencies = dependencies;
+    }
+
+    /**
+     * Defines the service-specific relations and command line arguments. [required by Spring]
+     * 
+     * @param relations the relations, may be empty
+     */
+    public void setRelations(List<Relation> relations) {
+        this.relations = relations;
     }
 
 }

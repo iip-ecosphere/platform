@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.spring.yaml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +21,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 /**
- * Information about an artifact containing services. The artifact is to be deployed.
+ * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
+ * yaml file is generated, i.e., repeated information such as relations can be consistently specified.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ArtifactInfo {
+public class Artifact {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactInfo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Artifact.class);
     private String id;
     private String name;
-    private List<ServiceInfo> services;
+    private List<Service> services;
 
     /**
      * Returns the name of the service.
@@ -56,7 +59,7 @@ public class ArtifactInfo {
      * 
      * @return the services
      */
-    public List<ServiceInfo> getServices() {
+    public List<Service> getServices() {
         return services;
     }
 
@@ -83,30 +86,34 @@ public class ArtifactInfo {
      * 
      * @param services the services
      */
-    public void setServices(List<ServiceInfo> services) {
+    public void setServices(List<Service> services) {
         this.services = services;
     }
 
 
     /**
-     * Tries reading {@link ArtifactInfo} from a yaml input stream.
+     * Tries reading {@link Artifact} from a yaml input stream.
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
      */
-    public static ArtifactInfo readFromYaml(InputStream in) {
-        ArtifactInfo result;
+    public static Artifact readFromYaml(InputStream in) throws IOException {
+        Artifact result;
         if (null == in) {
-            result = new ArtifactInfo();
+            result = new Artifact();
         } else {
-            Yaml yaml = new Yaml(new Constructor(ArtifactInfo.class));
-            result = yaml.load(in);
+            try {        
+                Yaml yaml = new Yaml(new Constructor(Artifact.class));
+                result = yaml.load(in);
+            } catch (YAMLException e) {
+                throw new IOException(e);
+            }
         }
         if (null == result.services) {
             result.services = new ArrayList<>();
         }
         for (int s = result.services.size() - 1; s >= 0; s--) {
-            ServiceInfo info = result.services.get(s);
+            Service info = result.services.get(s);
             boolean isValid = (null != info.getId() && info.getId().length() > 0);
             if (!isValid) {
                 result.services.remove(s);

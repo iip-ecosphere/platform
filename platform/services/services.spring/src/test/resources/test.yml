@@ -8,12 +8,22 @@ services:
     cmdArg: 
       - arg-0-1
       - arg-0-2
+    relations:
+      - portArg: --port=${port}
+        hostArg: --host=${host}
+      - channel: input
+        portArg: --input.port=${port}
+        hostArg: --input.host=${host}
   - id: id-1
     name: name-1
     version: 1.0.3
     description: desc desc-1
     dependencies:
       - id: id-0
+    relations:
+      - channel: output
+        portArg: --input.port=${port}
+        hostArg: --input.host=${host}
   - name: name-1
     version: 1.0.3
     description: desc desc-1
