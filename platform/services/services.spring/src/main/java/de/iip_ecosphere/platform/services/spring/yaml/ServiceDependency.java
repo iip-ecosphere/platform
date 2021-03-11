@@ -32,7 +32,7 @@ public class ServiceDependency {
     }
     
     /**
-     * Defines the id of the service. [required by Spring]
+     * Defines the id of the service. [required by SnakeYaml]
      * 
      * @param id the id
      */

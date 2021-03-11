@@ -70,7 +70,7 @@ public class Process {
     
     
     /**
-     * Returns the path within the artifact to be extracted. [required by Spring]
+     * Returns the path within the artifact to be extracted. [required by SnakeYaml]
      * 
      * @param path the relative path
      */
@@ -79,7 +79,7 @@ public class Process {
     }
     
     /**
-     * Defines the command line arguments. [required by Spring]
+     * Defines the command line arguments. [required by SnakeYaml]
      * 
      * @param cmdArg the command line arguments (may be empty for none)
      */
@@ -88,7 +88,7 @@ public class Process {
     }
     
     /**
-     * Defines communication endpoint (port/host) the service shall communicate with. [required by Spring] 
+     * Defines communication endpoint (port/host) the service shall communicate with. [required by SnakeYaml] 
      * 
      * @param streamEndpoint the communication endpoint
      */
@@ -97,7 +97,7 @@ public class Process {
     }
     
     /**
-     * Defines communication endpoint (port/host) the service shall communicate with. [required by Spring] 
+     * Defines communication endpoint (port/host) the service shall communicate with. [required by SnakeYaml] 
      * 
      * @param aasEndpoint the communication endpoint
      */

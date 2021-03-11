@@ -5,6 +5,8 @@ services:
     name: name-0
     version: 1.0.2
     description: desc desc-0
+    deployable: true
+    kind: SOURCE_SERVICE
     cmdArg: 
       - arg-0-1
       - arg-0-2
@@ -20,6 +22,8 @@ services:
     name: name-1
     version: 1.0.3
     description: desc desc-1
+    deployable: true
+    kind: SINK_SERVICE
     dependencies:
       - id: id-0
     relations:

@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.spring.yaml.Artifact;
 import de.iip_ecosphere.platform.services.spring.yaml.Endpoint;
 import de.iip_ecosphere.platform.services.spring.yaml.Process;
@@ -58,6 +59,7 @@ public class ArtifactInfoTest {
         
         Service service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
+        assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
         assertCmdArgs(service.getCmdArg(), "arg-0-1", "arg-0-2");
         Assert.assertEquals(0, service.getDependencies().size());
         Assert.assertEquals(2, service.getRelations().size());
@@ -68,6 +70,7 @@ public class ArtifactInfoTest {
         
         service = info.getServices().get(1);
         assertServiceBasics(service, "id-1", "name-1", "1.0.3", "desc desc-1");
+        assertServiceCharacteristics(service, true, ServiceKind.SINK_SERVICE);
         assertCmdArgs(service.getCmdArg());
         Assert.assertEquals(1, service.getDependencies().size());
         assertDependency(service.getDependencies().get(0), "id-0");
@@ -91,7 +94,6 @@ public class ArtifactInfoTest {
             Assert.assertEquals(e, args.get(a));
             a++;
         }
-        
     }
     
     /**
@@ -109,6 +111,19 @@ public class ArtifactInfoTest {
         Assert.assertEquals(name, service.getName());
         Assert.assertEquals(version, service.getVersion());
         Assert.assertEquals(descr, service.getDescription());
+    }
+
+    /**
+     * Asserts additional characteristics of a {@link Service}.
+     * 
+     * @param service the service instance to be asserted
+     * @param deployable whether it is expected that the service is deployable
+     * @param kind the expected service kind
+     */
+    private static void assertServiceCharacteristics(Service service, boolean deployable, ServiceKind kind) {
+        Assert.assertNotNull(service);
+        Assert.assertEquals(deployable, service.isDeployable());
+        Assert.assertEquals(kind, service.getKind());
     }
 
     /**

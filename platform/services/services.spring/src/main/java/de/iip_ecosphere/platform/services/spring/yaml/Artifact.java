@@ -62,9 +62,9 @@ public class Artifact {
     public List<Service> getServices() {
         return services;
     }
-
+    
     /**
-     * Defines the id of the service. [required by Spring]
+     * Defines the id of the service. [required by SnakeYaml]
      * 
      * @param id the id
      */
@@ -73,7 +73,7 @@ public class Artifact {
     }
 
     /**
-     * Defines the name of the service. [required by Spring]
+     * Defines the name of the service. [required by SnakeYaml]
      * 
      * @param name the name
      */
@@ -82,14 +82,13 @@ public class Artifact {
     }
     
     /**
-     * Sets the service instances. [required by Spring]
+     * Sets the service instances. [required by SnakeYaml]
      * 
      * @param services the services
      */
     public void setServices(List<Service> services) {
         this.services = services;
     }
-
 
     /**
      * Tries reading {@link Artifact} from a yaml input stream.

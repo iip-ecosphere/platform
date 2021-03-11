@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.ServiceKind;
+
 /**
  * Information about a single service.
  * 
@@ -30,6 +32,8 @@ public class Service {
     private List<ServiceDependency> dependencies = new ArrayList<>();
     private List<Relation> relations = new ArrayList<>();
     private Process process;
+    private ServiceKind kind;
+    private boolean deployable = false;
 
     /**
      * Returns the name of the service.
@@ -77,7 +81,7 @@ public class Service {
     }
     
     /**
-     * Defines the command line arguments. [required by Spring]
+     * Defines the command line arguments. [required by SnakeYaml]
      * 
      * @return the service dependences(may be empty for none)
      */
@@ -102,9 +106,27 @@ public class Service {
     public Process getProcess() {
         return process;
     }
+    
+    /**
+     * Sets the service kind. [required by SnakeYaml]
+     * 
+     * @return the service kind
+     */
+    public ServiceKind getKind() {
+        return kind;
+    }
+    
+    /**
+     * Sets whether this service is decentrally deployable.
+     * 
+     * @return {@code true} for deployable, {@code false} for not deployable 
+     */
+    public boolean isDeployable() {
+        return deployable;
+    }
 
     /**
-     * Defines the id of the service. [required by Spring]
+     * Defines the id of the service. [required by SnakeYaml]
      * 
      * @param id the id
      */
@@ -113,7 +135,7 @@ public class Service {
     }
 
     /**
-     * Defines the name of the service. [required by Spring]
+     * Defines the name of the service. [required by SnakeYaml]
      * 
      * @param name the name
      */
@@ -122,7 +144,7 @@ public class Service {
     }
 
     /**
-     * Defines the version of the service. [required by Spring]
+     * Defines the version of the service. [required by SnakeYaml]
      * 
      * @param version the version
      */
@@ -131,7 +153,7 @@ public class Service {
     }
 
     /**
-     * Defines the description of the service. [required by Spring]
+     * Defines the description of the service. [required by SnakeYaml]
      * 
      * @param description the description
      */
@@ -140,7 +162,7 @@ public class Service {
     }
 
     /**
-     * Defines the command line arguments. [required by Spring]
+     * Defines the command line arguments. [required by SnakeYaml]
      * 
      * @param cmdArg the command line arguments (may be empty for none)
      */
@@ -149,7 +171,7 @@ public class Service {
     }
     
     /**
-     * Defines the command line arguments. [required by Spring]
+     * Defines the command line arguments. [required by SnakeYaml]
      * 
      * @param dependencies the service dependences(may be empty for none)
      */
@@ -158,7 +180,7 @@ public class Service {
     }
 
     /**
-     * Defines the service-specific relations and command line arguments. [required by Spring]
+     * Defines the service-specific relations and command line arguments. [required by SnakeYaml]
      * 
      * @param relations the relations, may be empty
      */
@@ -167,12 +189,30 @@ public class Service {
     }
 
     /**
-     * Defines an optional attached process realizing the service. [required by Spring]
+     * Defines an optional attached process realizing the service. [required by SnakeYaml]
      * 
      * @param process the process information, may be <b>null</b>
      */
     public void setProcess(Process process) {
         this.process = process;
+    }
+    
+    /**
+     * Sets the service kind. [required by SnakeYaml]
+     * 
+     * @param kind the service kind
+     */
+    public void setKind(ServiceKind kind) {
+        this.kind = kind;
+    }
+    
+    /**
+     * Sets whether this service is decentrally deployable.
+     * 
+     * @param deployable {@code true} for deployable, {@code false} for not deployable 
+     */
+    public void setDeployable(boolean deployable) {
+        this.deployable = deployable;
     }
 
 }

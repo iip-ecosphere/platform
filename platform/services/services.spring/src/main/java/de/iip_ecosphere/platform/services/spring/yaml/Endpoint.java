@@ -70,7 +70,7 @@ public class Endpoint {
     
     /**
      * Defines the command line argument to set the communication port for this relation upon service 
-     * deployment/execution. [Required by Spring]
+     * deployment/execution. [Required by SnakeYaml]
      * 
      * @param portArg the generic port argument, may contain {@value #PORT_PLACEHOLDER}
      */
@@ -80,7 +80,7 @@ public class Endpoint {
 
     /**
      * Defines the command line argument to set the host to communicate with for this relation upon service 
-     * deployment/execution. [Required by Spring]
+     * deployment/execution. [Required by SnakeYaml]
      * 
      * @param hostArg the host argument, may contain {@value #HOST_PLACEHOLDER}
      */

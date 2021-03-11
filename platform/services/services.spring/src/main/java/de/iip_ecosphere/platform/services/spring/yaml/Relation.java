@@ -46,7 +46,7 @@ public class Relation {
     }
     
     /**
-     * Defines the name of the communication channel this relation is realized by. [Required by Spring]
+     * Defines the name of the communication channel this relation is realized by. [Required by SnakeYaml]
      * 
      * @param channel the channel name, may be {@link #LOCAL_CHANNEL} referring to all channels used for 
      *   local communication
