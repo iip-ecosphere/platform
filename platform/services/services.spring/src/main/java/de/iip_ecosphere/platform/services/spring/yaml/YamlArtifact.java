@@ -17,14 +17,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
-import de.iip_ecosphere.platform.services.spring.descriptor.Service;
+import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -34,7 +32,6 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
  */
 public class YamlArtifact implements Artifact {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(YamlArtifact.class);
     private String id;
     private String name;
     private List<YamlService> services;
@@ -82,7 +79,8 @@ public class YamlArtifact implements Artifact {
     }
 
     /**
-     * Tries reading {@link YamlArtifact} from a yaml input stream.
+     * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
+     * Use {@link Validator} to test the returned instance for validity.
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
@@ -101,14 +99,6 @@ public class YamlArtifact implements Artifact {
         }
         if (null == result.services) {
             result.services = new ArrayList<>();
-        }
-        for (int s = result.services.size() - 1; s >= 0; s--) {
-            Service info = result.services.get(s);
-            boolean isValid = (null != info.getId() && info.getId().length() > 0);
-            if (!isValid) {
-                result.services.remove(s);
-                LOGGER.error("Service #" + (s + 1) + " is invalid and not considered further.");
-            }
         }
         return result;
     }

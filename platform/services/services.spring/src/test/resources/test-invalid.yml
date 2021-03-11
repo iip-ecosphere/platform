@@ -1,0 +1,25 @@
+id:
+name:
+services:
+  - name: name-1
+    version: 1.0.3
+    description: desc desc-1
+    cmdArg:
+      - arg-1-1
+      - arg-1-2
+  - id:
+    name:
+    dependencies:
+      - id:
+    cmdArg:
+      - 
+    relations:
+      - channel:
+        endpoint:
+          portArg:
+      - endpoint:
+    process:
+      path:
+      streamEndpoint:
+      aasEndpoint:
+  - version: 1.a.b

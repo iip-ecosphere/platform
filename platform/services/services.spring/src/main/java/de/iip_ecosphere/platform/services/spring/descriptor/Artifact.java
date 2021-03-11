@@ -15,7 +15,9 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import java.util.List;
 
 /**
- * Information about an artifact containing services. The artifact is to be deployed. 
+ * Information about an artifact containing services. The artifact is to be deployed. {@link #getId()} and 
+ * {@link #getName()} must be given, both not empty. {@link #getServices()} may be empty, but if not the services
+ * must be valid. 
  * 
  * @author Holger Eichelberger, SSE
  */

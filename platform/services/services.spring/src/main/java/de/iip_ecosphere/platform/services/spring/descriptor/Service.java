@@ -15,9 +15,14 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.Version;
 
 /**
- * Information about a single service.
+ * Information about a single service. {@link #getId()} and {@link #getName()} must be given, both not empty, 
+ * {@code #getKind()} and {@link #getVersion()} must be given, with version in format of {@link Version}. 
+ * {@code #getCmdArg()} may be empty. {@code #getDependencies()} and {@code #getRelations()} must be given but may 
+ * be empty. If elements are given, the elements must be valid. {@code #getProcess()} may be absent, i.e. <b>null</b>, 
+ * but if given it must be valid.
  * 
  * @author Holger Eichelberger, SSE
  */

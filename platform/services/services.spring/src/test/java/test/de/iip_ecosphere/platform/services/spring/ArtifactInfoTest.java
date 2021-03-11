@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
@@ -27,14 +28,14 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlServiceDependency;
 
 /**
- * Tests {@link YamlArtifact} and {@link YamlService}.
+ * Tests the YAML descriptor implementation and the {@link Validator}.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class ArtifactInfoTest {
 
     /**
-     * Tests the yaml reader.
+     * Tests the YAML reader.
      * 
      * @throws IOException shall not occur
      */
@@ -78,6 +79,25 @@ public class ArtifactInfoTest {
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
         assertProcess(service.getProcess(), "impl/python", "python", "MyServiceWrapper.py");
+        
+        Validator val = new Validator();
+        val.validate(info);
+        Assert.assertFalse(val.hasMessages());
+    }
+    
+    /**
+     * Tests a structurally correct but invalid YAML file.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testInvalidYaml() throws IOException {
+        YamlArtifact info = YamlArtifact.readFromYaml(getClass().getClassLoader()
+            .getResourceAsStream("test-invalid.yml"));
+        Validator val = new Validator();
+        val.validate(info);
+        Assert.assertTrue(val.hasMessages());
+        System.out.println(val.getMessages());
     }
     
     /**

@@ -18,7 +18,8 @@ import java.util.List;
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service. The process implementation (whatever it is) will be extracted 
  * from {@link #getPath()}. For the execution in a shell, the home directory will be set to the folder where the files 
- * in {@link #getPath()} are located.
+ * in {@link #getPath()} are located. {@link #getPath()} must not be empty, {@link #getCmdArg()} may be empty, 
+ * {@link #getStreamEndpoint()} and {@link #getAasEndpoint()} must be given.
  *  
  * @author Holger Eichelberger, SSE
  */

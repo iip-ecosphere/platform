@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
 /**
- * Represents a communication endpoint.
+ * Represents a communication endpoint. The port must be given, the host may be empty.
  * 
  * @author Holger Eichelberger, SSE
  */

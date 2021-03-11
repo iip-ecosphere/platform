@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 
 /**
- * Represents a relation/connection between services. Relations are [Name taken from usage view]
+ * Represents a relation/connection between services. [Name taken from usage view]
  * 
  * @author Holger Eichelberger, SSE
  */
