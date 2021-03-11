@@ -1,0 +1,29 @@
+id: art
+name: simpleStream.spring
+services:
+  - id: simpleStream-create
+    name: create
+    version: 0.2.0
+    description: Creates text tokens.
+    deployable: true
+    kind: SOURCE_SERVICE
+    dependencies:
+      - id: simpleStream-log
+    cmdArg: 
+      - create
+    relations:
+      - endpoint:
+          portArg: --mqtt.port=${port}
+          hostArg: --mqtt.host=${host}
+  - id: simpleStream-log
+    name: log
+    version: 0.2.0
+    description: Receives text tokens.
+    deployable: true
+    kind: SINK_SERVICE
+    cmdArg: 
+      - log
+    relations:
+      - endpoint:
+          portArg: --mqtt.port=${port}
+          hostArg: --mqtt.host=${host}
