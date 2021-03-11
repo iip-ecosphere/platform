@@ -16,111 +16,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 
 /**
  * Information about a single service.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Service {
+public class YamlService implements Service {
     
     private String id;
     private String name;
     private String version;
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
-    private List<ServiceDependency> dependencies = new ArrayList<>();
-    private List<Relation> relations = new ArrayList<>();
-    private Process process;
+    private List<YamlServiceDependency> dependencies = new ArrayList<>();
+    private List<YamlRelation> relations = new ArrayList<>();
+    private YamlProcess process;
     private ServiceKind kind;
     private boolean deployable = false;
 
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
+    @Override
     public String getId() {
         return id;
     }
 
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     * Returns the version of the service.
-     * 
-     * @return the version
-     */
+    @Override
     public String getVersion() {
         return version;
     }
 
-    /**
-     * Returns the description of the service.
-     * 
-     * @return the description
-     */
+    @Override
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Returns the command line arguments.
-     * 
-     * @return the command line arguments (may be empty for none)
-     */
+    @Override
     public List<String> getCmdArg() {
         return cmdArg;
     }
     
-    /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @return the service dependences(may be empty for none)
-     */
-    public List<ServiceDependency> getDependencies() {
+    @Override
+    public List<YamlServiceDependency> getDependencies() {
         return dependencies;
     }
 
-    /**
-     * Returns the service-specific relations and command line arguments.
-     * 
-     * @return the relations, may be empty
-     */
-    public List<Relation> getRelations() {
+    @Override
+    public List<YamlRelation> getRelations() {
         return relations;
     }
     
-    /**
-     * Returns an optional attached process realizing the service.
-     * 
-     * @return the process information, may be <b>null</b>
-     */
-    public Process getProcess() {
+    @Override
+    public YamlProcess getProcess() {
         return process;
     }
     
-    /**
-     * Sets the service kind. [required by SnakeYaml]
-     * 
-     * @return the service kind
-     */
+    @Override
     public ServiceKind getKind() {
         return kind;
     }
     
-    /**
-     * Sets whether this service is decentrally deployable.
-     * 
-     * @return {@code true} for deployable, {@code false} for not deployable 
-     */
+    @Override
     public boolean isDeployable() {
         return deployable;
     }
@@ -175,7 +136,7 @@ public class Service {
      * 
      * @param dependencies the service dependences(may be empty for none)
      */
-    public void setDependencies(List<ServiceDependency> dependencies) {
+    public void setDependencies(List<YamlServiceDependency> dependencies) {
         this.dependencies = dependencies;
     }
 
@@ -184,7 +145,7 @@ public class Service {
      * 
      * @param relations the relations, may be empty
      */
-    public void setRelations(List<Relation> relations) {
+    public void setRelations(List<YamlRelation> relations) {
         this.relations = relations;
     }
 
@@ -193,7 +154,7 @@ public class Service {
      * 
      * @param process the process information, may be <b>null</b>
      */
-    public void setProcess(Process process) {
+    public void setProcess(YamlProcess process) {
         this.process = process;
     }
     

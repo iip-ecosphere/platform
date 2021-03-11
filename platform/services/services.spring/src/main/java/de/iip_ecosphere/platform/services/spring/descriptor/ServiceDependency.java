@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring.yaml;
+package de.iip_ecosphere.platform.services.spring.descriptor;
 
 /**
  * Represents a service dependency. This class is currently rather simple, but further aspects like timeout conditions
@@ -18,26 +18,13 @@ package de.iip_ecosphere.platform.services.spring.yaml;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServiceDependency {
-    
-    private String id;
+public interface ServiceDependency {
     
     /**
      * Returns the name of the service.
      * 
      * @return the name
      */
-    public String getId() {
-        return id;
-    }
+    public String getId();
     
-    /**
-     * Defines the id of the service. [required by SnakeYaml]
-     * 
-     * @param id the id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
 }

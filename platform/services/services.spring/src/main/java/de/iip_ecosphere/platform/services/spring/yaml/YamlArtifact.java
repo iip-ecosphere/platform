@@ -23,43 +23,34 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
+import de.iip_ecosphere.platform.services.spring.descriptor.Service;
+
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
  * yaml file is generated, i.e., repeated information such as relations can be consistently specified.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Artifact {
+public class YamlArtifact implements Artifact {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Artifact.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(YamlArtifact.class);
     private String id;
     private String name;
-    private List<Service> services;
+    private List<YamlService> services;
 
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
+    @Override
     public String getId() {
         return id;
     }
 
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
+    @Override
     public String getName() {
         return name;
     }
     
-    /**
-     * Returns the services.
-     * 
-     * @return the services
-     */
-    public List<Service> getServices() {
+    @Override
+    public List<YamlService> getServices() {
         return services;
     }
     
@@ -86,23 +77,23 @@ public class Artifact {
      * 
      * @param services the services
      */
-    public void setServices(List<Service> services) {
+    public void setServices(List<YamlService> services) {
         this.services = services;
     }
 
     /**
-     * Tries reading {@link Artifact} from a yaml input stream.
+     * Tries reading {@link YamlArtifact} from a yaml input stream.
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
      */
-    public static Artifact readFromYaml(InputStream in) throws IOException {
-        Artifact result;
+    public static YamlArtifact readFromYaml(InputStream in) throws IOException {
+        YamlArtifact result;
         if (null == in) {
-            result = new Artifact();
+            result = new YamlArtifact();
         } else {
             try {        
-                Yaml yaml = new Yaml(new Constructor(Artifact.class));
+                Yaml yaml = new Yaml(new Constructor(YamlArtifact.class));
                 result = yaml.load(in);
             } catch (YAMLException e) {
                 throw new IOException(e);

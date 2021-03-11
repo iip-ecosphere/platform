@@ -12,36 +12,25 @@
 
 package de.iip_ecosphere.platform.services.spring.yaml;
 
-import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 
 /**
  * Represents a relation/connection between services. Relations are [Name taken from usage view]
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Relation {
+public class YamlRelation implements Relation {
 
-    public static final String LOCAL_CHANNEL = "";
-    
     private String channel = "";
-    private Endpoint endpoint;
+    private YamlEndpoint endpoint;
     
-    /**
-     * Returns the name of the communication channel this relation is realized by. Channel names may be used
-     * to query host and port via {@link NetworkManager}.
-     * 
-     * @return the channel name, may be {@link #LOCAL_CHANNEL} referring to all channels used for local communication
-     */
+    @Override
     public String getChannel() {
         return channel;
     }
     
-    /**
-     * Returns communication endpoint (port/host) the service shall communicate with. 
-     * 
-     * @return the communication endpoint
-     */
-    public Endpoint getEndpoint() {
+    @Override
+    public YamlEndpoint getEndpoint() {
         return endpoint;
     }
     
@@ -60,7 +49,7 @@ public class Relation {
      * 
      * @param endpoint the communication endpoint
      */
-    public void setEndpoint(Endpoint endpoint) {
+    public void setEndpoint(YamlEndpoint endpoint) {
         this.endpoint = endpoint;
     }
     

@@ -12,58 +12,34 @@
 
 package de.iip_ecosphere.platform.services.spring.yaml;
 
+import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
+
 /**
  * Represents a communication endpoint.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Endpoint {
+public class YamlEndpoint implements Endpoint {
 
-    public static final String PORT_PLACEHOLDER = "${port}";
-    public static final String HOST_PLACEHOLDER = "${host}";
-    
     private String portArg = "";
     private String hostArg = "";
     
-    /**
-     * Returns the specified command line argument to set the communication port for this relation upon service 
-     * deployment/execution. 
-     * 
-     * @return the generic port argument, {@value #PORT_PLACEHOLDER} is substituted by the port number
-     */
+    @Override
     public String getPortArg() {
         return portArg;
     }
 
-    /**
-     * Returns the ready-to-use command line argument to set the communication port for this relation upon service 
-     * deployment/execution. 
-     * 
-     * @param port the actual port number
-     * @return the port argument
-     */
+    @Override
     public String getPortArg(int port) {
         return portArg.replace(PORT_PLACEHOLDER, String.valueOf(port));
     }
 
-    /**
-     * Returns the specified command line argument to set the host to communicate with for this relation upon service 
-     * deployment/execution. 
-     * 
-     * @return the generic host argument, {@value #HOST_PLACEHOLDER} is substituted by the host name, may be empty 
-     *   for localhost
-     */
+    @Override
     public String getHostArg() {
         return hostArg;
     }
 
-    /**
-     * Returns the ready-to.use command line argument to set the host to communicate with for this relation upon 
-     * service deployment/execution. 
-     * 
-     * @param hostname the actual hostname
-     * @return the host argument
-     */
+    @Override
     public String getHostArg(String hostname) {
         return hostArg.replace(HOST_PLACEHOLDER, hostname);
     }

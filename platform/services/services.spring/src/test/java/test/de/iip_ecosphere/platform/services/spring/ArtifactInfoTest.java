@@ -19,15 +19,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
-import de.iip_ecosphere.platform.services.spring.yaml.Artifact;
-import de.iip_ecosphere.platform.services.spring.yaml.Endpoint;
-import de.iip_ecosphere.platform.services.spring.yaml.Process;
-import de.iip_ecosphere.platform.services.spring.yaml.Relation;
-import de.iip_ecosphere.platform.services.spring.yaml.Service;
-import de.iip_ecosphere.platform.services.spring.yaml.ServiceDependency;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlRelation;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlServiceDependency;
 
 /**
- * Tests {@link Artifact} and {@link Service}.
+ * Tests {@link YamlArtifact} and {@link YamlService}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -40,24 +40,24 @@ public class ArtifactInfoTest {
      */
     @Test
     public void testYaml() throws IOException {
-        Artifact info = Artifact.readFromYaml(null);
+        YamlArtifact info = YamlArtifact.readFromYaml(null);
         Assert.assertTrue(info.getServices().isEmpty());
         
         try {
-            info = Artifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test-error.yml"));
+            info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test-error.yml"));
             Assert.fail("No exception");
         } catch (IOException e) {
             // ok here, desired
         }
         
         // failing test.yml
-        info = Artifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test.yml"));
+        info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test.yml"));
         Assert.assertEquals("art", info.getId());
         Assert.assertEquals("art-name", info.getName());
         Assert.assertFalse(info.getServices().isEmpty());
         Assert.assertEquals(2, info.getServices().size());
         
-        Service service = info.getServices().get(0);
+        YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
         assertCmdArgs(service.getCmdArg(), "arg-0-1", "arg-0-2");
@@ -97,7 +97,7 @@ public class ArtifactInfoTest {
     }
     
     /**
-     * Asserts basic properties of a {@link Service}.
+     * Asserts basic properties of a {@link YamlService}.
      * 
      * @param service the service instance to be asserted
      * @param id the expected service id
@@ -105,7 +105,7 @@ public class ArtifactInfoTest {
      * @param version the expected service version
      * @param descr the expected description
      */
-    private static void assertServiceBasics(Service service, String id, String name, String version, String descr) {
+    private static void assertServiceBasics(YamlService service, String id, String name, String version, String descr) {
         Assert.assertNotNull(service);
         Assert.assertEquals(id, service.getId());
         Assert.assertEquals(name, service.getName());
@@ -114,66 +114,66 @@ public class ArtifactInfoTest {
     }
 
     /**
-     * Asserts additional characteristics of a {@link Service}.
+     * Asserts additional characteristics of a {@link YamlService}.
      * 
      * @param service the service instance to be asserted
      * @param deployable whether it is expected that the service is deployable
      * @param kind the expected service kind
      */
-    private static void assertServiceCharacteristics(Service service, boolean deployable, ServiceKind kind) {
+    private static void assertServiceCharacteristics(YamlService service, boolean deployable, ServiceKind kind) {
         Assert.assertNotNull(service);
         Assert.assertEquals(deployable, service.isDeployable());
         Assert.assertEquals(kind, service.getKind());
     }
 
     /**
-     * Asserts properties of a {@link Relation}.
+     * Asserts properties of a {@link YamlRelation}.
      * 
      * @param relation the relation to be asserted
      * @param channel the expected channel name/id
      * @param port the port number to be used/substituted
      * @param host the host name to be used/substituted
      */
-    private static void assertRelation(Relation relation, String channel, int port, String host) {
+    private static void assertRelation(YamlRelation relation, String channel, int port, String host) {
         Assert.assertNotNull(relation);
         Assert.assertEquals(channel, relation.getChannel());
         assertEndpoint(relation.getEndpoint(), port, host);
     }
 
     /**
-     * Asserts properties of an {@link Endpoint}.
+     * Asserts properties of an {@link YamlEndpoint}.
      * 
      * @param port the port number to be used/substituted
      * @param host the host name to be used/substituted
      * @param endpoint the endpoint to be asserted
      */
-    private static void assertEndpoint(Endpoint endpoint, int port, String host) {
+    private static void assertEndpoint(YamlEndpoint endpoint, int port, String host) {
         Assert.assertNotNull(endpoint);
-        Assert.assertEquals(endpoint.getPortArg().replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port)), 
+        Assert.assertEquals(endpoint.getPortArg().replace(YamlEndpoint.PORT_PLACEHOLDER, String.valueOf(port)), 
             endpoint.getPortArg(port));
-        Assert.assertEquals(endpoint.getHostArg().replace(Endpoint.HOST_PLACEHOLDER, host), 
+        Assert.assertEquals(endpoint.getHostArg().replace(YamlEndpoint.HOST_PLACEHOLDER, host), 
             endpoint.getHostArg(host));
     }
     
     /**
-     * Asserts properties of a {@link ServiceDependency} (to be extended).
+     * Asserts properties of a {@link YamlServiceDependency} (to be extended).
      * 
      * @param id the expected service id
      * @param dependency the dependency to be asserted
      */
-    private static void assertDependency(ServiceDependency dependency, String id) {
+    private static void assertDependency(YamlServiceDependency dependency, String id) {
         Assert.assertNotNull(dependency);
         Assert.assertEquals(id, dependency.getId());
     }
     
     /**
-     * Asserts {@link Process} information.
+     * Asserts {@link YamlProcess} information.
      * 
      * @param process the process to assert
      * @param path the expected path
      * @param cmdArgs the expected command line arguments
      */
-    private static void assertProcess(Process process, String path, 
+    private static void assertProcess(YamlProcess process, String path, 
         String... cmdArgs) {
         Assert.assertEquals(path, process.getPath());
         assertEndpoint(process.getStreamEndpoint(), 1234, "localhost");

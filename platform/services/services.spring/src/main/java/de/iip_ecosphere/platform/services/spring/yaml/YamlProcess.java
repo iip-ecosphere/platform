@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.spring.descriptor.Process;
+
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service. The process implementation (whatever it is) will be extracted 
@@ -23,51 +25,32 @@ import java.util.List;
  *  
  * @author Holger Eichelberger, SSE
  */
-public class Process {
+public class YamlProcess implements Process {
     
     private String path;
     private List<String> cmdArg = new ArrayList<>();
-    private Endpoint streamEndpoint;
-    private Endpoint aasEndpoint;
+    private YamlEndpoint streamEndpoint;
+    private YamlEndpoint aasEndpoint;
 
-    /**
-     * Returns the path within the artifact to be extracted.
-     * 
-     * @return the relative path
-     */
+    @Override
     public String getPath() {
         return path;
     }
     
-    /**
-     * Returns the command line arguments to start the process. The shell will be executed within the folder where
-     * the files from {@link #getPath()} are extracted.
-     * 
-     * @return the command line arguments (may be empty for none), {@link #getStreamEndpoint() streaming endpoint} and 
-     *     {@link #getAASEndpoint() AAS endpoint} will be added anyway
-     */
+    @Override
     public List<String> getCmdArg() {
         return cmdArg;
     }
     
-    /**
-     * Returns streaming endpoint (port/host) the service shall communicate with. 
-     * 
-     * @return the streaming endpoint
-     */
-    public Endpoint getStreamEndpoint() {
+    @Override
+    public YamlEndpoint getStreamEndpoint() {
         return streamEndpoint;
     }
     
-    /**
-     * Returns AAS endpoint (port/host) the service shall communicate with for commands. 
-     * 
-     * @return the AAS endpoint
-     */
-    public Endpoint getAasEndpoint() {
+    @Override
+    public YamlEndpoint getAasEndpoint() {
         return aasEndpoint;
     }
-    
     
     /**
      * Returns the path within the artifact to be extracted. [required by SnakeYaml]
@@ -92,7 +75,7 @@ public class Process {
      * 
      * @param streamEndpoint the communication endpoint
      */
-    public void setStreamEndpoint(Endpoint streamEndpoint) {
+    public void setStreamEndpoint(YamlEndpoint streamEndpoint) {
         this.streamEndpoint = streamEndpoint;
     }
     
@@ -101,7 +84,7 @@ public class Process {
      * 
      * @param aasEndpoint the communication endpoint
      */
-    public void setAasEndpoint(Endpoint aasEndpoint) {
+    public void setAasEndpoint(YamlEndpoint aasEndpoint) {
         this.aasEndpoint = aasEndpoint;
     }
     
