@@ -97,7 +97,9 @@ public class ArtifactInfoTest {
         Validator val = new Validator();
         val.validate(info);
         Assert.assertTrue(val.hasMessages());
+        System.out.println("> Validation output for test-invalid.yml:");
         System.out.println(val.getMessages());
+        System.out.println("< Validation output for test-invalid.yml:");
     }
     
     /**

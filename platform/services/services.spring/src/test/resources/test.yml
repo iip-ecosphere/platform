@@ -42,9 +42,3 @@ services:
       aasEndpoint:
         portArg: aasPort=${port}
         hostArg: aasHost=${host}
-  - name: name-1
-    version: 1.0.3
-    description: desc desc-1
-    cmdArg:
-      - arg-1-1
-      - arg-1-2
