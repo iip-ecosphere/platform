@@ -10,30 +10,34 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring;
-
-import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+package de.iip_ecosphere.platform.services.spring.yaml;
 
 /**
- * The lifecycle descriptor for the spring cloud service manager.
+ * Represents a service dependency. This class is currently rather simple, but further aspects like timeout conditions
+ * may follow.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SpringLifecycleDescriptor implements LifecycleDescriptor {
-
-    @Override
-    public void startup(String[] args) {
-        // TODO Auto-generated method stub
-        
+public class ServiceDependency {
+    
+    private String id;
+    
+    /**
+     * Returns the name of the service.
+     * 
+     * @return the name
+     */
+    public String getId() {
+        return id;
     }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @Override
-    public Thread getShutdownHook() {
-        return null; // not needed
+    
+    /**
+     * Defines the id of the service. [required by Spring]
+     * 
+     * @param id the id
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

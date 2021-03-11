@@ -1,0 +1,22 @@
+id: art
+name: art-name
+services:
+  - id: id-0
+    name: name-0
+    version: 1.0.2
+    description: desc desc-0
+    cmdArg: 
+      - arg-0-1
+      - arg-0-2
+  - id: id-1
+    name: name-1
+    version: 1.0.3
+    description: desc desc-1
+    dependencies:
+      - id: id-0
+  - name: name-1
+    version: 1.0.3
+    description: desc desc-1
+    cmdArg:
+      - arg-1-1
+      - arg-1-2

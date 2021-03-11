@@ -15,6 +15,15 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>services</artifactId>
      <version>${project.version}</version>

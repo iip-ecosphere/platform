@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TestServiceManager.class,
+    ArtifactInfoTest.class
 })
 public class AllTests {
 }
