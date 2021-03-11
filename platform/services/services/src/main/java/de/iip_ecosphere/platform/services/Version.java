@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
- * Artifact or service version.
+ * Artifact or service version. The format in terms of a pseudo "regular expression" number is {@code ("." number)*}.
  * 
  * @author Holger Eichelberger, SSE
  */
