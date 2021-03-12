@@ -80,5 +80,15 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
         super.migrateContainer(containerId, location);
         tCnt.setState(ContainerState.DEPLOYED);
     }
+
+    @Override
+    public String getContainerSystemName() {
+        return "Fake Container System";
+    }
+
+    @Override
+    public String getContainerSystemVersion() {
+        return "Fake Version";
+    }
     
 }

@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.Version;
+
 /**
  * A service provider interface for managing containers in the IIP-Ecosphere platform. The interface is rather simple 
  * as it shall be usable through an AAS. The id of a container used here must not be identical to some 
@@ -115,5 +117,20 @@ public interface ContainerManager {
      * @return the related container descriptor or <b>null</b> if the container is not known at all
      */
     public ContainerDescriptor getContainer(String id); 
+    
+    /**
+     * Returns the name of the underlying container system, e.g. Docker.
+     * 
+     * @return the name
+     */
+    public String getContainerSystemName();
+
+    /**
+     * Returns the version of the underlying container system. As this version may differ from the syntax conventions
+     * of {@link Version}, we just return here a string.
+     * 
+     * @return the version
+     */
+    public String getContainerSystemVersion();
     
 }
