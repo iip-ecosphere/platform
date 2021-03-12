@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.iip_ecosphere.platform.services.Version;
 
@@ -25,6 +27,7 @@ import de.iip_ecosphere.platform.services.Version;
 public class Validator {
 
     private List<String> messages = new ArrayList<>();
+    private Set<String> serviceIds = new HashSet<>();
     
     /**
      * Returns whether there are validation (error) messages.
@@ -65,6 +68,7 @@ public class Validator {
      */
     public void clear() {
         messages.clear();
+        serviceIds.clear();
     }
     
     /**
@@ -76,7 +80,21 @@ public class Validator {
         String msgContext = "";
         assertStringNotEmpty(artifact.getId(), "id", msgContext);
         assertStringNotEmpty(artifact.getName(), "name", msgContext);
-        assertList(artifact.getServices(), true, "services", msgContext, (s, m) -> validate(s, m));
+        
+        if (assertList(artifact.getServices(), true, "services", msgContext, (s, m) -> validate(s, m))) {
+            int sCount = 0;
+            for (Service s : artifact.getServices()) {
+                if (null != s.getEnsembleWith()) {
+                    for (String e : s.getEnsembleWith()) {
+                        if (null != e && e.length() > 0 && !serviceIds.contains(e)) {
+                            messages.add("Ensemble entry '" + e + "' in service #" + sCount + " is not declared as "
+                                + "service .");
+                        }
+                    }
+                }
+                sCount++;
+            }
+        }
     }
 
     /**
@@ -95,14 +113,17 @@ public class Validator {
      * @param msgContext nested context information for location of unnamed elements in validation messages
      */
     private void validate(Service service, String msgContext) {
-        assertStringNotEmpty(service.getId(), "id", msgContext);
+        if (assertStringNotEmpty(service.getId(), "id", msgContext)) {
+            serviceIds.add(service.getId());
+        }
         assertStringNotEmpty(service.getName(), "name", msgContext);
         assertStringNotEmpty(service.getVersion(), "version", msgContext);
         assertCondition(Version.isVersion(service.getVersion()), 
             "Field 'version' must be formatted as a version string", msgContext);
         assertFieldNotNull(service.getDescription(), "description", msgContext); // optional
         assertFieldNotNull(service.getKind(), "kind", msgContext);
-        assertCmdArg(service.getCmdArg(), "cmdArg", msgContext);
+        assertStringList(service.getCmdArg(), "cmdArg", "arg", msgContext);
+        assertStringList(service.getEnsembleWith(), "ensembleWith", "id", msgContext);
         assertList(service.getDependencies(), true, "dependencies", msgContext, (d, m) -> validate(d, m));
         assertList(service.getRelations(), true, "relations", msgContext, (r, m) -> validate(r, m));
         if (null != service.getProcess()) {
@@ -168,7 +189,7 @@ public class Validator {
      */
     private void validate(Process process, String msgContext) {
         assertStringNotEmpty(process.getPath(), "path", msgContext);
-        assertFieldNotNull(process.getCmdArg(), "cmdArg", msgContext);
+        assertStringList(process.getCmdArg(), "cmdArg", "arg", msgContext);
         if (assertFieldNotNull(process.getAasEndpoint(), "aasEndpoint", msgContext)) {
             validate(process.getAasEndpoint(), appendToContext(msgContext, "aasEndpoint"));
         }
@@ -272,19 +293,20 @@ public class Validator {
     }
 
     /**
-     * Asserts that command line arguments are either empty or strings are not empty.
+     * Asserts that the given string list is either empty or strings are not empty.
      * 
-     * @param cmdArg the command line argument list
+     * @param list the command line argument list
      * @param field the field the string is taken from for composing an error message
+     * @param entry the symbolic name of an entry for composing an error message
      * @param msgContext the context of the message/validate element for better location by the caller, ignored if 
      *   empty or <b>null</b>
      * @return {@code true} if successful, {@code false} if failed
      */
-    private boolean assertCmdArg(List<String> cmdArg, String field, String msgContext) {
-        boolean ok = assertFieldNotNull(cmdArg, field, msgContext);
+    private boolean assertStringList(List<String> list, String field, String entry, String msgContext) {
+        boolean ok = assertFieldNotNull(list, field, msgContext);
         if (ok) {
-            for (int c = 0; c < cmdArg.size(); c++) {
-                ok &= assertStringNotEmpty(cmdArg.get(c), field, appendToContext(msgContext, "arg #" + c));
+            for (int c = 0; c < list.size(); c++) {
+                ok &= assertStringNotEmpty(list.get(c), field, appendToContext(msgContext, entry + " #" + c));
             }
         }
         return ok;   

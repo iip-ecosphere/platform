@@ -10,6 +10,8 @@ services:
     cmdArg: 
       - arg-0-1
       - arg-0-2
+    ensembleWith: 
+      - id-1
     relations:
       - endpoint:
           portArg: --port=${port}
@@ -42,3 +44,7 @@ services:
       aasEndpoint:
         portArg: aasPort=${port}
         hostArg: aasHost=${host}
+    instances: 2
+    memory: 1024
+    disk: 500
+    cpus: 2

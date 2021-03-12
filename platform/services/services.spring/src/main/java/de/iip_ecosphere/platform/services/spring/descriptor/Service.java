@@ -20,9 +20,10 @@ import de.iip_ecosphere.platform.services.Version;
 /**
  * Information about a single service. {@link #getId()} and {@link #getName()} must be given, both not empty, 
  * {@code #getKind()} and {@link #getVersion()} must be given, with version in format of {@link Version}. 
- * {@code #getCmdArg()} may be empty. {@code #getDependencies()} and {@code #getRelations()} must be given but may 
- * be empty. If elements are given, the elements must be valid. {@code #getProcess()} may be absent, i.e. <b>null</b>, 
- * but if given it must be valid.
+ * {@code #getCmdArg()} or {@link #getEnsembleWith()} be empty. {@code #getDependencies()} and {@code #getRelations()} 
+ * must be given but may be empty. If elements are given, the elements must be valid. {@code #getProcess()} may be 
+ * absent, i.e. <b>null</b>, but if given it must be valid. {@link #getInstances()}, {@link #getMemory()}, 
+ * {@link #getDisk()}, {@link #getCpus()} are replaced by default values if invalid.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -62,7 +63,15 @@ public interface Service {
      * @return the command line arguments (may be empty for none)
      */
     public List<String> getCmdArg();
-    
+
+    /**
+     * Returns the service ids this service is starting as an ensemble with itself.
+     * The ensemble services shall not be started on their own.
+     * 
+     * @return the service ids (may be empty for none)
+     */
+    public List<String> getEnsembleWith();
+
     /**
      * Defines the command line arguments. [required by SnakeYaml]
      * 
@@ -98,4 +107,36 @@ public interface Service {
      */
     public boolean isDeployable();
 
+    /**
+     * Returns the desired number of instances of this service to be started in the same process. This property is 
+     * considered during deployment only if the deployer supports it.
+     * 
+     * @return the number of instances, ignored if not positive
+     */
+    public int getInstances();
+
+    /**
+     * Returns the desired memory for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @return the desired memory in bytes, ignored if not positive
+     */
+    public int getMemory();
+
+    /**
+     * Returns the desired disk space for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @return the desired disk space in bytes, ignored if not positive
+     */
+    public int getDisk();
+
+    /**
+     * Returns the desired number of CPUs for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @return the desired number of CPUs , ignored if not positive
+     */
+    public int getCpus();
+    
 }

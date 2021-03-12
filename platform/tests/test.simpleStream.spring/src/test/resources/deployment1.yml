@@ -9,8 +9,6 @@ services:
     kind: SOURCE_SERVICE
     dependencies:
       - id: simpleStream-log
-    ensembleWith:
-      - simpleStream-log
     cmdArg: 
       - create
     relations:

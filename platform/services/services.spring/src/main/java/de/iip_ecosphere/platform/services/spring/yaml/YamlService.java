@@ -30,11 +30,16 @@ public class YamlService implements Service {
     private String version;
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
+    private List<String> ensembleWith = new ArrayList<>();
     private List<YamlServiceDependency> dependencies = new ArrayList<>();
     private List<YamlRelation> relations = new ArrayList<>();
     private YamlProcess process;
     private ServiceKind kind;
     private boolean deployable = false;
+    private int instances = 1;
+    private int memory = -1;
+    private int disk = -1;
+    private int cpus = 1;
 
     @Override
     public String getId() {
@@ -62,6 +67,11 @@ public class YamlService implements Service {
     }
     
     @Override
+    public List<String> getEnsembleWith() {
+        return ensembleWith;
+    }
+    
+    @Override
     public List<YamlServiceDependency> getDependencies() {
         return dependencies;
     }
@@ -84,6 +94,26 @@ public class YamlService implements Service {
     @Override
     public boolean isDeployable() {
         return deployable;
+    }
+    
+    @Override
+    public int getInstances() {
+        return instances;
+    }
+
+    @Override
+    public int getMemory() {
+        return memory;
+    }
+
+    @Override
+    public int getDisk() {
+        return disk;
+    }
+
+    @Override
+    public int getCpus() {
+        return cpus;
     }
 
     /**
@@ -130,7 +160,16 @@ public class YamlService implements Service {
     public void setCmdArg(List<String> cmdArg) {
         this.cmdArg = cmdArg;
     }
-    
+
+    /**
+     * Defines the service ids to be started with this service. [required by SnakeYaml]
+     * 
+     * @param ensembleWith the service ids (may be empty for none)
+     */
+    public void setEnsembleWith(List<String> ensembleWith) {
+        this.ensembleWith = ensembleWith;
+    }
+
     /**
      * Defines the command line arguments. [required by SnakeYaml]
      * 
@@ -174,6 +213,46 @@ public class YamlService implements Service {
      */
     public void setDeployable(boolean deployable) {
         this.deployable = deployable;
+    }
+
+    /**
+     * Defines the desired number of instances of this service to be started in the same process. This property is 
+     * considered during deployment only if the deployer supports it.
+     * 
+     * @param instances the number of instances, ignored if not positive
+     */
+    public void setInstances(int instances) {
+        this.instances = instances;
+    }
+
+    /**
+     * Defines the desired memory for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @param memory the desired memory in bytes, ignored if not positive
+     */
+    public void setMemory(int memory) {
+        this.memory = memory;
+    }
+
+    /**
+     * Defines the desired disk space for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @param disk the desired disk space in bytes, ignored if not positive
+     */
+    public void setDisk(int disk) {
+        this.disk = disk;
+    }
+
+    /**
+     * Defines the desired number of CPUs for instances of this service. This property is considered during deployment
+     * only if the deployer supports it.
+     * 
+     * @param cpus the desired number of CPUs , ignored if not positive
+     */
+    public void setCpus(int cpus) {
+        this.cpus = cpus;
     }
 
 }

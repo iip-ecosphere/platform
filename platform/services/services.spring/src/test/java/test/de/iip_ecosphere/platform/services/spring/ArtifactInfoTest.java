@@ -61,7 +61,8 @@ public class ArtifactInfoTest {
         YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
-        assertCmdArgs(service.getCmdArg(), "arg-0-1", "arg-0-2");
+        assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
+        assertStringList(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(0, service.getDependencies().size());
         Assert.assertEquals(2, service.getRelations().size());
         service.getRelations().get(0);
@@ -72,17 +73,23 @@ public class ArtifactInfoTest {
         service = info.getServices().get(1);
         assertServiceBasics(service, "id-1", "name-1", "1.0.3", "desc desc-1");
         assertServiceCharacteristics(service, true, ServiceKind.SINK_SERVICE);
-        assertCmdArgs(service.getCmdArg());
+        assertStringList(service.getCmdArg());
+        assertStringList(service.getEnsembleWith());
         Assert.assertEquals(1, service.getDependencies().size());
         assertDependency(service.getDependencies().get(0), "id-0");
         Assert.assertEquals(1, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
         assertProcess(service.getProcess(), "impl/python", "python", "MyServiceWrapper.py");
+        Assert.assertEquals(2, service.getInstances());
+        Assert.assertEquals(1024, service.getMemory());
+        Assert.assertEquals(500, service.getDisk());
+        Assert.assertEquals(2, service.getCpus());
         
         Validator val = new Validator();
         val.validate(info);
         Assert.assertFalse(val.hasMessages());
+        val.clear();
     }
     
     /**
@@ -100,20 +107,21 @@ public class ArtifactInfoTest {
         System.out.println("> Validation output for test-invalid.yml:");
         System.out.println(val.getMessages());
         System.out.println("< Validation output for test-invalid.yml:");
+        val.clear();
     }
     
     /**
-     * Asserts a list of command line arguments w.r.t. the {@code expected} arguments.
+     * Asserts a list of strings w.r.t. the {@code expected} values.
      * 
-     * @param args the arguments
+     * @param list the list
      * @param expected the expected values
      */
-    private static void assertCmdArgs(List<String> args, String... expected) {
-        Assert.assertNotNull(args);
-        Assert.assertEquals(expected.length, args.size());
+    private static void assertStringList(List<String> list, String... expected) {
+        Assert.assertNotNull(list);
+        Assert.assertEquals(expected.length, list.size());
         int a = 0;
         for (String e: expected) {
-            Assert.assertEquals(e, args.get(a));
+            Assert.assertEquals(e, list.get(a));
             a++;
         }
     }
@@ -200,7 +208,7 @@ public class ArtifactInfoTest {
         Assert.assertEquals(path, process.getPath());
         assertEndpoint(process.getStreamEndpoint(), 1234, "localhost");
         assertEndpoint(process.getAasEndpoint(), 1235, "aas.de");
-        assertCmdArgs(process.getCmdArg(), cmdArgs);
+        assertStringList(process.getCmdArg(), cmdArgs);
     }
     
 }
