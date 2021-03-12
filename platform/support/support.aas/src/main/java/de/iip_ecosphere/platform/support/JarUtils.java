@@ -29,9 +29,9 @@ import java.util.zip.ZipInputStream;
 public class JarUtils {
     
     /**
-     * Finds a file within the ZIP file given by {@code in}.
+     * Finds a file within the ZIP/JAR file given by {@code in}.
      * 
-     * @param in the input stream containing ZIP data
+     * @param in the input stream containing ZIP/JAR data
      * @param name the name of the file within {@code in} to be returned
      * @return the input stream to {@code name} (must be closed explicitly) or <b>null</b> for none
      * @throws IOException if something I/O related fails
@@ -59,9 +59,9 @@ public class JarUtils {
     }
 
     /**
-     * Extracts a ZIP file.
+     * Extracts a ZIP/JAR file.
      * 
-     * @param in the input stream containing the ZIP file
+     * @param in the input stream containing the ZIP/JAR file
      * @param target the target path
      * @throws IOException if something I/O related fails
      */
@@ -81,11 +81,13 @@ public class JarUtils {
             return z.getName().equals(folder) || z.getName().startsWith(folder + "/");
         };
     }
+
+    // adapted from https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
     
     /**
-     * Extracts a ZIP file.
+     * Extracts a ZIP/JAR file.
      * 
-     * @param in the input stream containing the ZIP file
+     * @param in the input stream containing the ZIP/JAR file
      * @param target the target path
      * @param pred a predicate selecting ZIP entries for creation/extraction (may be <b>null</b> for all contents) 
      * @throws IOException if something I/O related fails
