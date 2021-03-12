@@ -74,11 +74,11 @@ public class ServiceManagerTest {
         
         mgr.startService(sId);
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
-        mgr.passivate(sId);
+        mgr.passivateService(sId);
         Assert.assertEquals(ServiceState.PASSIVATED, sDesc.getState());
-        mgr.activate(sId);
+        mgr.activateService(sId);
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
-        mgr.reconfigure(sId, new HashMap<String, Object>());
+        mgr.reconfigureService(sId, new HashMap<String, Object>());
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
         mgr.stopService(sId);
         Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());

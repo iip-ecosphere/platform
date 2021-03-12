@@ -81,7 +81,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
     
     @Override
-    public ServiceState getState(String serviceId) {
+    public ServiceState getServiceState(String serviceId) {
         ServiceState result = ServiceState.UNKOWN;
         S service = getService(serviceId);
         if (null != service) {
@@ -193,22 +193,22 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
 
     @Override
-    public void activate(String serviceId) throws ExecutionException {
+    public void activateService(String serviceId) throws ExecutionException {
         getServiceDescriptor(serviceId, "serviceId", "activate").activate();
     }
 
     @Override
-    public void passivate(String serviceId) throws ExecutionException {
+    public void passivateService(String serviceId) throws ExecutionException {
         getServiceDescriptor(serviceId, "serviceId", "passivate").passivate();
     }
 
     @Override
-    public void setState(String serviceId, ServiceState state) throws ExecutionException {
+    public void setServiceState(String serviceId, ServiceState state) throws ExecutionException {
         getServiceDescriptor(serviceId, "serviceId", "setState").setState(state);
     }
     
     @Override
-    public void reconfigure(String serviceId, Map<String, Object> values) throws ExecutionException {
+    public void reconfigureService(String serviceId, Map<String, Object> values) throws ExecutionException {
         getServiceDescriptor(serviceId, "serviceId", "setState").reconfigure(values);
     }
     

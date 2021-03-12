@@ -114,18 +114,18 @@ public interface ServiceManager {
     /**
      * Activates the service. [adaptation]
      * 
-     * @param id the id of the running service
+     * @param serviceId the id of the running service
      * @throws ExecutionException in case that activating fails, e.g., because the service is already active 
      */
-    public void activate(String id) throws ExecutionException;
+    public void activateService(String serviceId) throws ExecutionException;
 
     /**
      * Passivates the service. [adaptation]
      * 
-     * @param id the id of the running service
+     * @param serviceId the id of the running service
      * @throws ExecutionException in case that passivating fails, e.g., because the service is already passive 
      */
-    public void passivate(String id) throws ExecutionException;
+    public void passivateService(String serviceId) throws ExecutionException;
     
     /**
      * Reconfigures the underlying service. [adaptation]
@@ -134,7 +134,7 @@ public interface ServiceManager {
      * @param values the (service-specific) values that shall lead to a reconfiguration of the service
      * @throws ExecutionException if reconfiguration fails
      */
-    public void reconfigure(String serviceId, Map<String, Object> values) throws ExecutionException;
+    public void reconfigureService(String serviceId, Map<String, Object> values) throws ExecutionException;
 
     /**
      * Sets the state of the service. [adaptation]
@@ -143,7 +143,7 @@ public interface ServiceManager {
      * @param state the new state of the service
      * @throws ExecutionException if changing to the target state is not possible 
      */
-    public void setState(String serviceId, ServiceState state) throws ExecutionException;
+    public void setServiceState(String serviceId, ServiceState state) throws ExecutionException;
 
     /**
      * Returns the state of the service.
@@ -151,7 +151,7 @@ public interface ServiceManager {
      * @param serviceId the id of the running service
      * @return the state of the service
      */
-    public ServiceState getState(String serviceId);
+    public ServiceState getServiceState(String serviceId);
 
     /**
      * Returns the ids of all available artifacts.
