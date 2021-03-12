@@ -24,6 +24,8 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    FileUtilsTest.class,
+    JarUtilsTest.class,
     TimeUtilsTest.class,
     CollectionUtilsTest.class,
     NetUtilsTest.class,
