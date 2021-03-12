@@ -15,6 +15,7 @@ import java.io.File;
 import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
@@ -41,7 +42,7 @@ public class TestHiveMqServer extends AbstractTestServer {
     @Override
     public Server start() {
         if (null == hiveMQ) {
-            File hiveTmp = createTmpFolder("hivemq_v5");
+            File hiveTmp = FileUtils.createTmpFolder("hivemq_v5");
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());

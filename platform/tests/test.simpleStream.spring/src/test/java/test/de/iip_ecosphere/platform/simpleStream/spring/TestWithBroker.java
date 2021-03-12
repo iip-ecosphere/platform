@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -28,7 +29,7 @@ public class TestWithBroker {
             String loc = "hivemqv5cfg.zip"; // Maven turns file names to small caps                
             if (AbstractTestServer.runsFromJar() && null != loc && loc.length() > 0) {
                 System.out.println("Extracting server configuration from " + loc);
-                AbstractTestServer.setConfigDir(AbstractTestServer.createTmpFolder("brokerConfig"));
+                AbstractTestServer.setConfigDir(FileUtils.createTmpFolder("brokerConfig"));
                 AbstractTestServer.extractConfiguration(loc, "");
             } else { // dev execution, unpacked
                 AbstractTestServer.setConfigDir(new File("./src/test/hiveMqv5Cfg")); // null is ok
