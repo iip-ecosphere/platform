@@ -23,6 +23,16 @@ public class ManagedServerAddress extends ServerAddress {
         super(schema, host, port);
         this.isNew = isNew;
     }
+
+    /**
+     * Creates a new managed server address instance.
+     * 
+     * @param address the address to take port, host and schema from
+     * @param isNew {@code true} for is new, {@code false} for already known
+     */
+    public ManagedServerAddress(ServerAddress address, boolean isNew) {
+        this(address.getSchema(), address.getHost(), address.getPort(), isNew);
+    }
     
     /**
      * Returns whether this server address is new or already known.

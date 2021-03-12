@@ -38,9 +38,10 @@ public class NetworkManagerTest {
     }
     
     /**
-     * Tests the given network manager.
+     * Tests the given network manager for self-managed addresses.
      * 
      * @param manager the manager instance, assumes a fresh/unallocated instance
+     * @see #testPortReservation(NetworkManager)
      */
     public static void testNetworkManager(NetworkManager manager) {
         Assert.assertTrue(manager.getLowPort() > 0);
@@ -108,6 +109,68 @@ public class NetworkManagerTest {
         manager.releasePort(key2);
         Assert.assertFalse(manager.isInUse(adr1));
         Assert.assertFalse(manager.isInUse(adr2));
+        testPortReservation(manager);
+    }
+    
+    /**
+     * Tests the port reservation vs. self-managed ports.
+     * 
+     * @param manager the manager instance
+     */
+    private static void testPortReservation(NetworkManager manager) {
+        final String httpKey = "external-http";
+        ServerAddress addr = new ServerAddress(Schema.HTTP, "external.de", 80);
+        
+        try {
+            manager.reservePort(null, null);
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+        try {
+            manager.reservePort(null, addr);
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+        try {
+            manager.reservePort(httpKey, null);
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+        
+        // reserve it
+        ManagedServerAddress tmp = manager.reservePort(httpKey, addr);
+        Assert.assertNotNull(tmp);
+        Assert.assertTrue(tmp.isNew());
+        Assert.assertEquals(addr.getSchema(), tmp.getSchema());
+        Assert.assertEquals(addr.getHost(), tmp.getHost());
+        Assert.assertEquals(addr.getPort(), tmp.getPort());
+        
+        // override does not work
+        tmp = manager.reservePort(httpKey, new ServerAddress(Schema.TCP, "here.local", 90));
+        Assert.assertNotNull(tmp);
+        Assert.assertFalse(tmp.isNew());
+        Assert.assertEquals(addr.getSchema(), tmp.getSchema());
+        Assert.assertEquals(addr.getHost(), tmp.getHost());
+        Assert.assertEquals(addr.getPort(), tmp.getPort());
+        
+        // reserved remains there, no new address
+        tmp = manager.obtainPort(httpKey);
+        Assert.assertNotNull(tmp);
+        Assert.assertFalse(tmp.isNew());
+        Assert.assertEquals(addr.getSchema(), tmp.getSchema());
+        Assert.assertEquals(addr.getHost(), tmp.getHost());
+        Assert.assertEquals(addr.getPort(), tmp.getPort());
+
+        manager.releasePort(httpKey);
+        
+        // self-managed, shall now be the local address, nothing from above
+        tmp = manager.obtainPort(httpKey);
+        Assert.assertNotNull(tmp);
+        Assert.assertTrue(tmp.isNew());
+        Assert.assertNotEquals(addr.getSchema(), tmp.getSchema()); 
     }
     
 }

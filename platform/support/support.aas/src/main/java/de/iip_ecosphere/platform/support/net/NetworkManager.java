@@ -37,6 +37,21 @@ public interface NetworkManager {
     public ManagedServerAddress obtainPort(String key);
     
     /**
+     * Explicitly reserves a certain address for a given key. If reserved before {@link #obtainPort(String)}, this takes
+     * precedence. Reserved addresses shall also be {@link #releasePort(String) released} if not used anymore.
+     * Reserved addresses must not be within {@link #getLowPort()} and {@link #getHighPort()}, they must not even
+     * be associated with the machine running this manager.
+     * 
+     * @param key a key indicating the use
+     * @param address the address to use
+     * @return the server address including the port number (including the server IP), 
+     *   {@link ManagedServerAddress#isNew()} is {@code true} if the key/address was not obtained/reserved before, 
+     *   {@code false} if the key/address is also known. If {@code false} also {@link ManagedServerAddress#getHost()}
+     *   or {@link ManagedServerAddress#getSchema()} may differ from {@code address}.
+     */
+    public ManagedServerAddress reservePort(String key, ServerAddress address);
+    
+    /**
      * Releases the port. When all requesting parties released the port, the port will be ultimately freed. Usuall,
      * only clients with a {@link ManagedServerAddress#isNew() new} address shall call this method.
      * 

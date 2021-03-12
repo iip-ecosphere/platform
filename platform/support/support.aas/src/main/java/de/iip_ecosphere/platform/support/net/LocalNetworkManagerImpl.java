@@ -26,26 +26,21 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class LocalNetworkManagerImpl implements NetworkManager {
 
-    private Map<String, Integer> keyToPorts = new HashMap<>();
-    private Map<Integer, String> portsToKeys = new HashMap<>();
+    private Map<String, ServerAddress> keyToAddress = new HashMap<>();
+    private Map<Integer, String> portToKey = new HashMap<>();
     private String host = NetUtils.getOwnIP();
     
     @Override
     public synchronized ManagedServerAddress obtainPort(String key) {
-        if (null == key) {
-            throw new IllegalArgumentException("Key must be given");
-        }
-        ManagedServerAddress result = null;
-        Integer ex = keyToPorts.get(key);
-        if (null != ex) {
-            result = new ManagedServerAddress(Schema.IGNORE, host, ex, false);
-        } else {
+        ManagedServerAddress result = getManagedAddress(key); // calls checkKey(key)
+        if (null == result) {
             do {
                 int port = NetUtils.getEphemeralPort();
-                if (!portsToKeys.containsKey(port)) {
-                    keyToPorts.put(key, port);
-                    portsToKeys.put(port, key);
-                    result = new ManagedServerAddress(Schema.IGNORE, host, port, true);
+                if (!portToKey.containsKey(port)) {
+                    ServerAddress address = new ServerAddress(Schema.IGNORE, host, port);
+                    keyToAddress.put(key, address);
+                    portToKey.put(port, key);
+                    result = new ManagedServerAddress(address, true);
                 } else {
                     result = null;
                 }
@@ -53,21 +48,71 @@ public class LocalNetworkManagerImpl implements NetworkManager {
         }
         return result;
     }
-
-    @Override
-    public synchronized void releasePort(String key) {
+    
+    /**
+     * Checks the key for structural validity.
+     * 
+     * @param key the key
+     * @throws IllegalArgumentException if {@code key} is not structurally valid
+     */
+    private void checkKey(String key) {
         if (null == key) {
             throw new IllegalArgumentException("Key must be given");
         }
-        Integer port = keyToPorts.remove(key);
-        if (null != port) {
-            portsToKeys.remove(port);
+    }
+
+    /**
+     * Checks the address for structural validity.
+     * 
+     * @param address the address
+     * @throws IllegalArgumentException if {@code address} is not structurally valid
+     */
+    private void checkAddress(ServerAddress address) {
+        if (null == address) {
+            throw new IllegalArgumentException("Address must be given");
+        }
+    }
+
+    /**
+     * Returns a managed address if {@code key} is already known. Calls {@link #checkKey(String)}.
+     * 
+     * @param key the key
+     * @return the address if known, <b>null</b> else
+     */
+    private ManagedServerAddress getManagedAddress(String key) {
+        checkKey(key);
+        ServerAddress ex = keyToAddress.get(key);
+        ManagedServerAddress result = null;
+        if (null != ex) {
+            result = new ManagedServerAddress(ex, false);
+        }
+        return result;
+    }
+    
+    @Override
+    public ManagedServerAddress reservePort(String key, ServerAddress address) {
+        checkAddress(address);
+        ManagedServerAddress result = getManagedAddress(key); // calls checkKey(key)
+        if (null == result) {
+            keyToAddress.put(key, address);
+            portToKey.put(address.getPort(), key);
+            result = new ManagedServerAddress(address, true);
+        } 
+        return result;
+    }
+
+    @Override
+    public synchronized void releasePort(String key) {
+        checkKey(key);
+        ServerAddress ex = keyToAddress.remove(key);
+        if (null != ex) {
+            portToKey.remove(ex.getPort());
         }
     }
 
     @Override
     public synchronized boolean isInUse(int port) {
-        return portsToKeys.containsKey(port);
+        return portToKey.containsKey(port);
     }
 
     @Override
