@@ -9,8 +9,8 @@ services:
     kind: SOURCE_SERVICE
     dependencies:
       - id: simpleStream-log
-    cmdArg: 
-      - create
+    ensembleWith:
+      - simpleStream-log
     relations:
       - endpoint:
           portArg: --mqtt.port=${port}
@@ -21,8 +21,6 @@ services:
     description: Receives text tokens.
     deployable: true
     kind: SINK_SERVICE
-    cmdArg: 
-      - log
     relations:
       - endpoint:
           portArg: --mqtt.port=${port}

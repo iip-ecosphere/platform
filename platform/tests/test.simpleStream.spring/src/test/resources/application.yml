@@ -30,4 +30,24 @@ spring:
                 log-in-0:
                     destination: ingest
             defaultBinder: hivemqv5Binder
-                    
+
+---
+
+spring:
+    config:
+        activate:
+            on-profile: source
+    cloud:
+        function:
+            definition: create
+
+---
+
+spring:
+    config:
+        activate:
+            on-profile: sink
+    cloud:
+        function:
+            definition: log
+            

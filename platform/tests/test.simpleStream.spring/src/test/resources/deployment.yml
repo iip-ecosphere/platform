@@ -9,10 +9,8 @@ services:
     kind: SOURCE_SERVICE
     dependencies:
       - id: simpleStream-log
-    ensembleWith:
-      - simpleStream-log
     cmdArg: 
-      - create
+      - --spring.profiles.active=source
     relations:
       - endpoint:
           portArg: --mqtt.port=${port}
@@ -24,7 +22,7 @@ services:
     deployable: true
     kind: SINK_SERVICE
     cmdArg: 
-      - log
+      - --spring.profiles.active=sink
     relations:
       - endpoint:
           portArg: --mqtt.port=${port}
