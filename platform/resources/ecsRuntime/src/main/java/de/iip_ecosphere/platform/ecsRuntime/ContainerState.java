@@ -20,14 +20,14 @@ package de.iip_ecosphere.platform.ecsRuntime;
 public enum ContainerState {
 
     /**
-     * The container is on the device and ready to be deployed. Next state shall be {@link #DEPLYOING}.
+     * The container is on the device and ready to be deployed. Next state shall be {@link #DEPLOYING}.
      */
     AVAILABLE,
     
     /**
      * The container is brought to life. Next state shall be {@link #DEPLOYED}.
      */
-    DEPLYOING,
+    DEPLOYING,
 
     /**
      * The container is running. Next state may be {@link #FAILED}, {@link #MIGRATING}, {@link #UPDATING} 
