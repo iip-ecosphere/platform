@@ -17,6 +17,13 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
+
 import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
@@ -49,15 +56,36 @@ public class DockerContainerManager implements ContainerManager {
     public String addContainer(URI location) throws ExecutionException {
         return null; // TODO implement
     }
-
+    
+    // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
+    public static String DOCKER_HOST = "unix:///var/run/docker.sock";
+    /**
+     * This method configures a Docker Client.
+     * 
+     * @param dockerHost
+     * @return DockerClient
+     */
+    public DockerClient getDockerClient() {
+    	DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
+        		.withDockerHost(DOCKER_HOST).build(); 
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+        	    .dockerHost(standardConfig.getDockerHost())
+        	    .sslConfig(standardConfig.getSSLConfig())
+        	    .build();
+        DockerClient dockerClient = DockerClientImpl.getInstance(standardConfig, httpClient);
+        return dockerClient;
+    }
+    
     @Override
     public void startContainer(String id) throws ExecutionException {
-        // TODO implement        
+        DockerClient dockerClient = getDockerClient();     
+        dockerClient.startContainerCmd(id).exec();
     }
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
-        // TODO implement        
+    	DockerClient dockerClient = getDockerClient();     
+        dockerClient.stopContainerCmd(id).exec();     
     }
 
     @Override
@@ -67,7 +95,8 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
-        // TODO implement        
+    	DockerClient dockerClient = getDockerClient();     
+        dockerClient.removeContainerCmd(id).exec();          
     }
 
     @Override
@@ -110,5 +139,4 @@ public class DockerContainerManager implements ContainerManager {
         // TODO implement
         return null;
     }
-
 }
