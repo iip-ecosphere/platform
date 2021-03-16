@@ -24,6 +24,24 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Docker API Client -->
+    <dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-core</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
+	<!-- Docker API Client -->
+	<dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-transport</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
+	<!-- Docker API Client -->
+	<dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-transport-httpclient5</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
   </dependencies>
 
 </project>
