@@ -77,7 +77,7 @@ public class FakeOperation extends FakeElement implements Operation {
 
         @Override
         public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
-            return null; // we ignore this for now until we go even for dynamic AAS here
+            return this; // we ignore this for now until we go even for dynamic AAS here
         }
 
         @Override
