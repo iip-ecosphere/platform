@@ -41,14 +41,16 @@ public interface NetworkManager {
      * may have to wait/block/queue until the server is available.
      * 
      * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
-     * @return the server address including the port number (including the server IP), not used by other processes
+     * @return the server address including the port number (including the server IP), not used by other processes;  
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
      */
     public ManagedServerAddress obtainPort(String key);
 
     /**
      * Returns a network port number for a given key. Returns <b>null</b> if no key was registered, directly via
-     * {@link #reservePort(String, ServerAddress)} or indirectly via {@link #obtainPort(String)}.
+     * {@link #reservePort(String, ServerAddress)} or indirectly via {@link #obtainPort(String)}. If the managed
+     * applies delegation to parent managers, the result may be provided by the parent manager (in contrast to 
+     * {@link #isInUse(int)} and {@link #isInUse(ServerAddress)} which are supposed to be local only).
      * 
      * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
      * @return the server address including the port number (including the server IP), may be <code>bull</code> if
@@ -85,7 +87,7 @@ public interface NetworkManager {
      * Returns whether the given address is in use/allocated by this manager.
      * 
      * @param address the address
-     * @return {@code true} if the address is allocated within this manager, {@code false} else
+     * @return {@code true} if the address is allocated within this manager, {@code false} else (also in failure case)
      */
     public boolean isInUse(ServerAddress address);
 
@@ -93,21 +95,23 @@ public interface NetworkManager {
      * Returns whether the given port is in use/allocated by this manager.
      * 
      * @param port the port 
-     * @return {@code true} if the port is allocated within this manager, {@code false} else
+     * @return {@code true} if the port is allocated within this manager, {@code false} else (also in failure case)
      */
     public boolean isInUse(int port);
     
     /**
      * The minimum port handled by this manager.
      * 
-     * @return the minimum port [1;65535], inclusive, lower/equal than {@link #getHighPort()}
+     * @return the minimum port [1;65535], inclusive, lower/equal than {@link #getHighPort()}; may be negative to 
+     *   indicate invisible problems, e.g., during remote access
      */
     public int getLowPort();
 
     /**
      * The maximum port handled by this manager.
      * 
-     * @return the minimum port [1;65535], inclusive, higher/equal than {@link #getLowPort()}
+     * @return the minimum port [1;65535], inclusive, higher/equal than {@link #getLowPort()}; may be negative to 
+     *   indicate invisible problems, e.g., during remote access
      */
     public int getHighPort();
 
