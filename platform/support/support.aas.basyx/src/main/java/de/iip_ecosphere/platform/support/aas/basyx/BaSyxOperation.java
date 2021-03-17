@@ -137,7 +137,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 operation.setInputVariables(inputVariables);
             }
             if (null != outputVariables) {
-                operation.setInputVariables(outputVariables);
+                operation.setOutputVariables(outputVariables);
             }
             if (null != inOutVariables) {
                 operation.setInOutputVariables(inOutVariables);
