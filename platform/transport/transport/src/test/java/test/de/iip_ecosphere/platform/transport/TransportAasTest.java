@@ -41,7 +41,7 @@ public class TransportAasTest {
         String serName = SerializerRegistry.setName("TestSer");
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(TransportAas.class));
         // obtain the plattform AAS and go then on with the transport sub-model
-        Aas aas = AasPartRegistry.getAas(AasPartRegistry.build(), AasPartRegistry.NAME_AAS);
+        Aas aas = AasPartRegistry.getAas(AasPartRegistry.build().getAas(), AasPartRegistry.NAME_AAS);
         Assert.assertNotNull(aas);
         
         aas.accept(new AasPrintVisitor());
