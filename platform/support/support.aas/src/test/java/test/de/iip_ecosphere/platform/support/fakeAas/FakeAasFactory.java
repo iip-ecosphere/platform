@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
  * A faked factory that does nothing - just for testing. Do not rename, this class is referenced in 
@@ -40,6 +41,7 @@ public class FakeAasFactory extends AasFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
+    @ExcludeFirst
     public static class Descriptor implements AasFactoryDescriptor {
 
         @Override
@@ -91,12 +93,12 @@ public class FakeAasFactory extends AasFactory {
 
     @Override
     public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        return null;
+        return new FakeInvocablesCreator();
     }
 
     @Override
     public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        return null;
+        return new FakeProtocolServerBuilder();
     }
 
 }

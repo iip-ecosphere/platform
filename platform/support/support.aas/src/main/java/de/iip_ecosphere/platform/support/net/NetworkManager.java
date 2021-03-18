@@ -40,7 +40,7 @@ public interface NetworkManager {
      * obtain an address/port, but in a distributed setting this sequence may not be guaranteed so that the client
      * may have to wait/block/queue until the server is available.
      * 
-     * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
+     * @param key a key indicating the use (may be a prefix, see {@link #PREFIX_SEPARATOR})
      * @return the server address including the port number (including the server IP), not used by other processes;  
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
      */
@@ -52,7 +52,7 @@ public interface NetworkManager {
      * applies delegation to parent managers, the result may be provided by the parent manager (in contrast to 
      * {@link #isInUse(int)} and {@link #isInUse(ServerAddress)} which are supposed to be local only).
      * 
-     * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
+     * @param key a key indicating the use (may be a prefix, see {@link #PREFIX_SEPARATOR})
      * @return the server address including the port number (including the server IP), may be <code>bull</code> if
      *     no address/port was registered for {@code key}
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
@@ -65,12 +65,14 @@ public interface NetworkManager {
      * Reserved addresses must not be within {@link #getLowPort()} and {@link #getHighPort()}, they must not even
      * be associated with the machine running this manager.
      * 
-     * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
+     * @param key a key indicating the use (may be a prefix, see {@link #PREFIX_SEPARATOR})
      * @param address the address to use
      * @return the server address including the port number (including the server IP), 
      *   {@link ManagedServerAddress#isNew()} is {@code true} if the key/address was not obtained/reserved before, 
      *   {@code false} if the key/address is also known. If {@code false} also {@link ManagedServerAddress#getHost()}
      *   or {@link ManagedServerAddress#getSchema()} may differ from {@code address}.
+     * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b> or 
+     *   if {@code address} is <b>null</b>
      */
     public ManagedServerAddress reservePort(String key, ServerAddress address);
     
@@ -78,7 +80,7 @@ public interface NetworkManager {
      * Releases the port. When all requesting parties released the port, the port will be ultimately freed. Usuall,
      * only clients with a {@link ManagedServerAddress#isNew() new} address shall call this method.
      * 
-     * @param key a key indicating the use (may be a prefix, {@see #PREFIX_SEPARATOR})
+     * @param key a key indicating the use (may be a prefix, see {@link #PREFIX_SEPARATOR})
      * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b>
      */
     public void releasePort(String key);
@@ -88,6 +90,7 @@ public interface NetworkManager {
      * 
      * @param address the address
      * @return {@code true} if the address is allocated within this manager, {@code false} else (also in failure case)
+     * @throws IllegalArgumentException if {@code address} is <b>null</b>
      */
     public boolean isInUse(ServerAddress address);
 

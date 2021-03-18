@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class LocalNetworkManagerImpl implements NetworkManager {
+public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
 
     /**
      * The descriptor for hooking the manager into the {@link NetworkManagerFactory} via Java Service Loading.
@@ -79,30 +79,6 @@ public class LocalNetworkManagerImpl implements NetworkManager {
         }
         return result;
     }
-    
-    /**
-     * Checks the key for structural validity.
-     * 
-     * @param key the key
-     * @throws IllegalArgumentException if {@code key} is not structurally valid
-     */
-    private void checkKey(String key) {
-        if (null == key) {
-            throw new IllegalArgumentException("Key must be given");
-        }
-    }
-
-    /**
-     * Checks the address for structural validity.
-     * 
-     * @param address the address
-     * @throws IllegalArgumentException if {@code address} is not structurally valid
-     */
-    private void checkAddress(ServerAddress address) {
-        if (null == address) {
-            throw new IllegalArgumentException("Address must be given");
-        }
-    }
 
     /**
      * Returns a managed address if {@code key} is already known. Calls {@link #checkKey(String)}.
@@ -133,6 +109,7 @@ public class LocalNetworkManagerImpl implements NetworkManager {
             // is there a direct match?
             ex = keyToAddress.get(key);
         }
+
         ManagedServerAddress result = null;
         if (null != ex) {
             result = new ManagedServerAddress(ex, false);
@@ -168,6 +145,7 @@ public class LocalNetworkManagerImpl implements NetworkManager {
 
     @Override
     public boolean isInUse(ServerAddress adr) {
+        checkAddress(adr);
         return host.equals(adr.getHost()) && isInUse(adr.getPort());
     }
 

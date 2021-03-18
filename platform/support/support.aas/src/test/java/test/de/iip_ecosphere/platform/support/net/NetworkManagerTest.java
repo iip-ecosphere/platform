@@ -38,7 +38,7 @@ public class NetworkManagerTest {
     public void testNetworkManagers() {
         NetworkManager nm = NetworkManagerFactory.getInstance();
         Assert.assertTrue(nm instanceof LocalNetworkManagerImpl);
-        testNetworkManager(nm);
+        testNetworkManager(nm, "");
         
         LocalNetworkManagerImpl parent = new LocalNetworkManagerImpl();
         ServerAddress resAdr = new ServerAddress(Schema.IGNORE, "me.here", 1223);
@@ -49,16 +49,17 @@ public class NetworkManagerTest {
         Assert.assertEquals(resAdr.getSchema(), adr.getSchema());
         Assert.assertEquals(resAdr.getHost(), adr.getHost());
         Assert.assertEquals(resAdr.getPort(), adr.getPort());
-        testNetworkManager(mgr);
+        testNetworkManager(mgr, "");
     }
     
     /**
      * Tests the given network manager for self-managed addresses.
      * 
      * @param manager the manager instance, assumes a fresh/unallocated instance
-     * @see #testPortReservation(NetworkManager)
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
+     * @see #testPortReservation(NetworkManager, String)
      */
-    public static void testNetworkManager(NetworkManager manager) {
+    public static void testNetworkManager(NetworkManager manager, String suffix) {
         Assert.assertTrue(manager.getLowPort() > 0);
         Assert.assertTrue(manager.getHighPort() > 0);
         Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
@@ -135,17 +136,18 @@ public class NetworkManagerTest {
         manager.releasePort(key2);
         Assert.assertFalse(manager.isInUse(adr1));
         Assert.assertFalse(manager.isInUse(adr2));
-        testPortReservation(manager);
-        testPrefixes(manager);
+        testPortReservation(manager, suffix);
+        testPrefixes(manager, suffix);
     }
     
     /**
      * Tests the port reservation vs. self-managed ports.
      * 
      * @param manager the manager instance
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
      */
-    private static void testPortReservation(NetworkManager manager) {
-        final String httpKey = "external-http";
+    private static void testPortReservation(NetworkManager manager, String suffix) {
+        final String httpKey = "external-http" + suffix;
         ServerAddress addr = new ServerAddress(Schema.HTTP, "external.de", 80);
         
         try {
@@ -204,8 +206,9 @@ public class NetworkManagerTest {
      * Tests prefixes.
      * 
      * @param manager the manager instance
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
      */
-    private static void testPrefixes(NetworkManager manager) {
+    private static void testPrefixes(NetworkManager manager, String suffix) {
         ServerAddress addr = new ServerAddress(Schema.TCP, "here.local", 90);
 
         // usual

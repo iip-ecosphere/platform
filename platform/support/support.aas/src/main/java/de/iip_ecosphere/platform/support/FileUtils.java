@@ -54,7 +54,7 @@ public class FileUtils {
      * [convenience]
      *
      * @param file file or directory to delete, may be {@code null}
-     * @return {@code true} if {@code file] was deleted, otherwise {@code false}
+     * @return {@code true} if {@code file} was deleted, otherwise {@code false}
      */
     public static boolean deleteQuietly(File file) {
         return org.apache.commons.io.FileUtils.deleteQuietly(file);        
