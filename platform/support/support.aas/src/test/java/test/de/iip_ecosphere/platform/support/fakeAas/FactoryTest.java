@@ -125,8 +125,8 @@ public class FactoryTest {
         
         Assert.assertNotNull(instance.getProtocols());
         Assert.assertTrue(instance.getProtocols().length > 0);
-        Assert.assertNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
-        Assert.assertNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
+        Assert.assertNotNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
+        Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
     }
 
     /**

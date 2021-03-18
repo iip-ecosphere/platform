@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.transport;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
@@ -38,7 +40,7 @@ public class TransportAas implements AasContributor {
     // TODO endpoints?
     
     @Override
-    public Aas contributeTo(AasBuilder aasBuilder) {
+    public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
             .setValue(Type.STRING, TransportFactory.getConnectorName())
@@ -48,6 +50,16 @@ public class TransportAas implements AasContributor {
             .build();
         smB.build();
         return null;
+    }
+
+    @Override
+    public void contributeTo(ProtocolServerBuilder sBuilder) {
+        // no active AAS
+    }
+    
+    @Override
+    public Kind getKind() {
+        return Kind.PASSIVE;
     }
 
 }

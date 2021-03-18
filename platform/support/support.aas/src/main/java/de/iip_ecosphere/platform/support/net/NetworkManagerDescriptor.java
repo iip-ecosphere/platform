@@ -1,5 +1,6 @@
-/********************************************************************************
- * Copyright (c) {2020} The original author or authors
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -8,22 +9,21 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.support.iip_aas;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package de.iip_ecosphere.platform.support.net;
 
 /**
- * Defines the tests to be executed.
+ * Java Service Loader interface for the network manager.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ClassUtilityTest.class,
-    AasPartRegistryTest.class,
-    PlatformAasTest.class,
-    NetworkManagerAasTest.class
-})
-public class AllTests {
+public interface NetworkManagerDescriptor {
+    
+    /**
+     * Returns the network manager instance.
+     * 
+     * @return the network manager instance
+     */
+    public NetworkManager createInstance();
+
 }

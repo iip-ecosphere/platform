@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
@@ -260,12 +261,15 @@ public class ConnectorsAasTest {
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ConnectorsAas.class));
         // obtain the plattform AAS and go then on with the connectors sub-models
-        List<Aas> aasList = AasPartRegistry.build();
+        AasBuildResult bResult = AasPartRegistry.build();
+        List<Aas> aasList = bResult.getAas();
+        Server implServer = bResult.getProtocolServerBuilder().build();
+        implServer.start();
         Aas aas = AasPartRegistry.getAas(aasList, AasPartRegistry.NAME_AAS);
         Assert.assertNotNull(aas);
         printOut(aas);
         testDescriptorsSubmodel(aas);
-        
+
         printOut(aas);
         AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
         Server server = AasPartRegistry.deploy(aasList).start();
@@ -300,6 +304,7 @@ public class ConnectorsAasTest {
         testActiveDescriptors(connectors, 0);
         
         server.stop(true);
+        implServer.stop(true);
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
     }
     

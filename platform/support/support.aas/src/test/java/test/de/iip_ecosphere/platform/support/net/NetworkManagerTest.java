@@ -20,6 +20,8 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+
 import org.junit.Assert;
 
 /**
@@ -34,16 +36,30 @@ public class NetworkManagerTest {
      */
     @Test
     public void testNetworkManagers() {
-        testNetworkManager(new LocalNetworkManagerImpl());
+        NetworkManager nm = NetworkManagerFactory.getInstance();
+        Assert.assertTrue(nm instanceof LocalNetworkManagerImpl);
+        testNetworkManager(nm, "");
+        
+        LocalNetworkManagerImpl parent = new LocalNetworkManagerImpl();
+        ServerAddress resAdr = new ServerAddress(Schema.IGNORE, "me.here", 1223);
+        parent.reservePort("reserved", resAdr);
+        LocalNetworkManagerImpl mgr = new LocalNetworkManagerImpl(parent);
+        ManagedServerAddress adr = mgr.getPort("reserved");
+        Assert.assertNotNull(adr);
+        Assert.assertEquals(resAdr.getSchema(), adr.getSchema());
+        Assert.assertEquals(resAdr.getHost(), adr.getHost());
+        Assert.assertEquals(resAdr.getPort(), adr.getPort());
+        testNetworkManager(mgr, "");
     }
     
     /**
      * Tests the given network manager for self-managed addresses.
      * 
      * @param manager the manager instance, assumes a fresh/unallocated instance
-     * @see #testPortReservation(NetworkManager)
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
+     * @see #testPortReservation(NetworkManager, String)
      */
-    public static void testNetworkManager(NetworkManager manager) {
+    public static void testNetworkManager(NetworkManager manager, String suffix) {
         Assert.assertTrue(manager.getLowPort() > 0);
         Assert.assertTrue(manager.getHighPort() > 0);
         Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
@@ -60,6 +76,11 @@ public class NetworkManagerTest {
         } catch (IllegalArgumentException e) {
         }
         try {
+            manager.getPort(null);
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+        }
+        try {
             manager.releasePort(null);
             Assert.fail("No exception");
         } catch (IllegalArgumentException e) {
@@ -67,6 +88,7 @@ public class NetworkManagerTest {
         
         final String key1 = "key1";
         final String key2 = "key2";
+        Assert.assertNull(manager.getPort(key1));
         // obtain an address, shall be new
         ManagedServerAddress adr1 = manager.obtainPort(key1);
         Assert.assertTrue(adr1.isNew());
@@ -74,6 +96,11 @@ public class NetworkManagerTest {
         Assert.assertTrue(adr1.getHost().length() > 0);
         Assert.assertTrue(manager.isInUse(adr1.getPort()));
         Assert.assertTrue(manager.isInUse(adr1));
+        ManagedServerAddress g1 = manager.getPort(key1);
+        Assert.assertNotNull(g1);
+        Assert.assertEquals(adr1.getPort(), g1.getPort());
+        Assert.assertEquals(adr1.getHost(), g1.getHost());
+        Assert.assertFalse(g1.isNew());
 
         // re-obtain the first address, shall be the same but not new
         ManagedServerAddress re1 = manager.obtainPort(key1);
@@ -109,16 +136,18 @@ public class NetworkManagerTest {
         manager.releasePort(key2);
         Assert.assertFalse(manager.isInUse(adr1));
         Assert.assertFalse(manager.isInUse(adr2));
-        testPortReservation(manager);
+        testPortReservation(manager, suffix);
+        testPrefixes(manager, suffix);
     }
     
     /**
      * Tests the port reservation vs. self-managed ports.
      * 
      * @param manager the manager instance
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
      */
-    private static void testPortReservation(NetworkManager manager) {
-        final String httpKey = "external-http";
+    private static void testPortReservation(NetworkManager manager, String suffix) {
+        final String httpKey = "external-http" + suffix;
         ServerAddress addr = new ServerAddress(Schema.HTTP, "external.de", 80);
         
         try {
@@ -171,6 +200,40 @@ public class NetworkManagerTest {
         Assert.assertNotNull(tmp);
         Assert.assertTrue(tmp.isNew());
         Assert.assertNotEquals(addr.getSchema(), tmp.getSchema()); 
+    }
+    
+    /**
+     * Tests prefixes.
+     * 
+     * @param manager the manager instance
+     * @param suffix additional information to make keys unique for repeated tests, usually empty
+     */
+    private static void testPrefixes(NetworkManager manager, String suffix) {
+        ServerAddress addr = new ServerAddress(Schema.TCP, "here.local", 90);
+
+        // usual
+        manager.reservePort("a.b.", addr);
+        ManagedServerAddress res = manager.getPort("a.b.c");
+        Assert.assertNotNull(res);
+        Assert.assertEquals(addr.getSchema(), res.getSchema());
+        Assert.assertEquals(addr.getHost(), res.getHost());
+        Assert.assertEquals(addr.getPort(), res.getPort());
+        manager.releasePort("a.b.");
+        Assert.assertNull(manager.getPort("a.b.c"));
+        Assert.assertNull(manager.getPort("a.b.c.d"));
+        
+        // unusual
+        ManagedServerAddress addr1 = manager.obtainPort("a.");
+        Assert.assertNotNull(addr1);
+        Assert.assertTrue(addr1.isNew());
+        res = manager.getPort("a.b.c");
+        Assert.assertNotNull(res);
+        Assert.assertEquals(addr1.getSchema(), res.getSchema());
+        Assert.assertEquals(addr1.getHost(), res.getHost());
+        Assert.assertEquals(addr1.getPort(), res.getPort());
+        manager.releasePort("a.");
+        Assert.assertNull(manager.getPort("a.b.c"));
+        Assert.assertNull(manager.getPort("a.b.c.d"));
     }
     
 }

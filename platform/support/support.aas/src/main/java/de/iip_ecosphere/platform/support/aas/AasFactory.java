@@ -14,13 +14,13 @@ package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * A customizable factory for creating AAS instances independent of the underlying implementation.
@@ -123,8 +123,7 @@ public abstract class AasFactory {
      */
     public static AasFactory getInstance() {
         if (DUMMY == instance) {
-            ServiceLoader<AasFactoryDescriptor> loader = ServiceLoader.load(AasFactoryDescriptor.class);
-            Optional<AasFactoryDescriptor> first = loader.findFirst();
+            Optional<AasFactoryDescriptor> first = ServiceLoaderUtils.filterExcluded(AasFactoryDescriptor.class);
             if (first.isPresent()) {
                 instance = first.get().createInstance();
                 if (null != instance) {

@@ -19,6 +19,8 @@ import java.util.Properties;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -36,7 +38,7 @@ public class PlatformAas implements AasContributor {
     private static final String MAVEN_SNAPSHOT_POSTFIX = "-SNAPSHOT";
 
     @Override
-    public Aas contributeTo(AasBuilder aasBuilder) {
+    public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         String ver = "??";
         String buildId = "??";
@@ -71,6 +73,16 @@ public class PlatformAas implements AasContributor {
             .build();
         smB.build();
         return null;
+    }
+
+    @Override
+    public void contributeTo(ProtocolServerBuilder sBuilder) {
+        // no active AAS
+    }
+
+    @Override
+    public Kind getKind() {
+        return Kind.PASSIVE;
     }
 
 }

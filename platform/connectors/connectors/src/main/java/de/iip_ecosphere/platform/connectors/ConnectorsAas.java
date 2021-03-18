@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -88,7 +90,7 @@ public class ConnectorsAas implements AasContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorsAas.class);
 
     @Override
-    public Aas contributeTo(AasBuilder aasBuilder) {
+    public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
         SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null);
         tsmB.build();
@@ -256,6 +258,16 @@ public class ConnectorsAas implements AasContributor {
         smcb.createPropertyBuilder(NAME_DESC_VAR_SUPPORTS_STRUCTS)
             .setValue(Type.BOOLEAN, conn.supportsModelStructs())
             .build();
+    }
+
+    @Override
+    public void contributeTo(ProtocolServerBuilder sBuilder) {
+        // No active AAS
+    }
+    
+    @Override
+    public Kind getKind() {
+        return Kind.DYNAMIC;
     }
 
 }
