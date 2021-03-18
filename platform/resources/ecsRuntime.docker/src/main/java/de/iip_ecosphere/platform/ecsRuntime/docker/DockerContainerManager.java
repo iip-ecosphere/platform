@@ -36,10 +36,14 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
  */
 public class DockerContainerManager implements ContainerManager {
 
+    // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
+    private static String dockerhost = "unix:///var/run/docker.sock";
+
     // don't change name of outer/inner class
     
     /**
-     * Implements the factory descriptor for hooking the Docker container manager into the ECS factory.
+     * Implements the factory descriptor for hooking the Docker container manager 
+     * into the ECS factory.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -57,21 +61,19 @@ public class DockerContainerManager implements ContainerManager {
         return null; // TODO implement
     }
     
-    // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
-    public static String DOCKER_HOST = "unix:///var/run/docker.sock";
+    
     /**
      * This method configures a Docker Client.
      * 
-     * @param dockerHost
      * @return DockerClient
      */
     public DockerClient getDockerClient() {
-    	DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
-        		.withDockerHost(DOCKER_HOST).build(); 
+        DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .withDockerHost(dockerhost).build(); 
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
-        	    .dockerHost(standardConfig.getDockerHost())
-        	    .sslConfig(standardConfig.getSSLConfig())
-        	    .build();
+                .dockerHost(standardConfig.getDockerHost())
+                .sslConfig(standardConfig.getSSLConfig())
+                .build();
         DockerClient dockerClient = DockerClientImpl.getInstance(standardConfig, httpClient);
         return dockerClient;
     }
@@ -84,7 +86,7 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
-    	DockerClient dockerClient = getDockerClient();     
+        DockerClient dockerClient = getDockerClient();     
         dockerClient.stopContainerCmd(id).exec();     
     }
 
@@ -95,7 +97,7 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
-    	DockerClient dockerClient = getDockerClient();     
+        DockerClient dockerClient = getDockerClient();     
         dockerClient.removeContainerCmd(id).exec();          
     }
 
