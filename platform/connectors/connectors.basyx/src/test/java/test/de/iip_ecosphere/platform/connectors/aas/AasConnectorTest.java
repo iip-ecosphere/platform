@@ -39,6 +39,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
@@ -86,7 +88,10 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         
         AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_HOST, 
             NetUtils.getEphemeralPort(), AasPartRegistry.DEFAULT_ENDPOINT));
-        platformAasServer = AasPartRegistry.deploy(AasPartRegistry.build()).start();
+        // we don't start all active AAS here as we do not need them for this test
+        AasBuildResult bResult = AasPartRegistry.build(d -> d.getKind() != Kind.ACTIVE);
+        Server implServer = bResult.getProtocolServerBuilder().build();
+        platformAasServer = AasPartRegistry.deploy(bResult.getAas()).start();
         LOGGER.info("Platform AAS server started");
         
         TestMachine machine = new TestMachine();
@@ -101,6 +106,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
             .deploy(aas)
             .createServer();
         
+        implServer.start();
         httpServer.start();
 
         LOGGER.info("AAS server started");
