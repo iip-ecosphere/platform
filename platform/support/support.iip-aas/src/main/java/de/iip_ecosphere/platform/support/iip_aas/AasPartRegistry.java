@@ -60,25 +60,32 @@ public class AasPartRegistry {
     public static final Endpoint DEFAULT_EP = new Endpoint(DEFAULT_SCHEMA, DEFAULT_HOST, 
         DEFAULT_PORT, DEFAULT_ENDPOINT);
     private static Endpoint aasEndpoint = DEFAULT_EP;
-    private static ServerAddress protocolAddress = new ServerAddress(Schema.IGNORE, 
-        aasEndpoint.getHost(), DEFAULT_PROTOCOL_PORT);
+    public static final ServerAddress DEFAULT_IMPL = new ServerAddress(Schema.IGNORE, 
+            aasEndpoint.getHost(), DEFAULT_PROTOCOL_PORT);
+    private static ServerAddress protocolAddress = DEFAULT_IMPL;
 
     /**
      * Defines the AAS endpoint.
      * 
      * @param endpoint the registry endpoint 
+     * @return the endpoint before this call
      */
-    public static void setAasEndpoint(Endpoint endpoint) {
+    public static Endpoint setAasEndpoint(Endpoint endpoint) {
+        Endpoint old = aasEndpoint;
         aasEndpoint = endpoint;
+        return old;
     }
 
     /**
      * Defines the operation/property implementation protocol address.
      * 
      * @param address the address
+     * @return the address before this call
      */
-    public static void setProtocolAddress(ServerAddress address) {
+    public static ServerAddress setProtocolAddress(ServerAddress address) {
+        ServerAddress old = protocolAddress;
         protocolAddress = address;
+        return old;
     }
     
     /**

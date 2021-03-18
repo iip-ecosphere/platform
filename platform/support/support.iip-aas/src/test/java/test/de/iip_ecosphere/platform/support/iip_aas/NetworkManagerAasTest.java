@@ -18,7 +18,10 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -45,6 +48,8 @@ public class NetworkManagerAasTest {
     @Test
     public void testAas() throws ExecutionException, IOException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(NetworkManagerAas.class));
+        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        ServerAddress oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
         // active AAS require two server instances and a deployment
         Server implServer = res.getProtocolServerBuilder().build();
@@ -66,5 +71,7 @@ public class NetworkManagerAasTest {
         
         aasServer.stop(true);
         implServer.stop(true);
+        AasPartRegistry.setAasEndpoint(oldEp);
+        AasPartRegistry.setProtocolAddress(oldImpl);
     }
 }
