@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     ClassUtilityTest.class,
     AasPartRegistryTest.class,
-    PlatformAasTest.class
+    PlatformAasTest.class,
+    NetworkManagerAasTest.class
 })
 public class AllTests {
 }

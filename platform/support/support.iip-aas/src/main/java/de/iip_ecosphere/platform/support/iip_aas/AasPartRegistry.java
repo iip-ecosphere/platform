@@ -19,14 +19,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.
@@ -48,12 +52,16 @@ public class AasPartRegistry {
     public static final Schema DEFAULT_SCHEMA = Schema.HTTP;
     public static final String DEFAULT_HOST = "localhost";
     public static final int DEFAULT_PORT = 8080;
+    public static final int DEFAULT_PROTOCOL_PORT = 9000;
     public static final String DEFAULT_ENDPOINT = "registry";
+    public static final String DEFAULT_PROTOCOL = AasFactory.DEFAULT_PROTOCOL;
     
     // TODO local vs. global
     public static final Endpoint DEFAULT_EP = new Endpoint(DEFAULT_SCHEMA, DEFAULT_HOST, 
         DEFAULT_PORT, DEFAULT_ENDPOINT);
     private static Endpoint aasEndpoint = DEFAULT_EP;
+    private static ServerAddress protocolAddress = new ServerAddress(Schema.IGNORE, 
+        aasEndpoint.getHost(), DEFAULT_PROTOCOL_PORT);
 
     /**
      * Defines the AAS endpoint.
@@ -62,6 +70,15 @@ public class AasPartRegistry {
      */
     public static void setAasEndpoint(Endpoint endpoint) {
         aasEndpoint = endpoint;
+    }
+
+    /**
+     * Defines the operation/property implementation protocol address.
+     * 
+     * @param address the address
+     */
+    public static void setProtocolAddress(ServerAddress address) {
+        protocolAddress = address;
     }
     
     /**
@@ -95,25 +112,85 @@ public class AasPartRegistry {
         }
         return result;
     }
+
+    /**
+     * Represents the result of building the platform AAS.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class AasBuildResult {
+        
+        private List<Aas> aas;
+        private ProtocolServerBuilder sBuilder;
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param aas the created AAS
+         * @param sBuilder the server builder
+         */
+        private AasBuildResult(List<Aas> aas, ProtocolServerBuilder sBuilder) {
+            this.aas = aas;
+            this.sBuilder = sBuilder;
+        }
+        
+        /**
+         * Returns the list of created AAS.
+         * 
+         * @return the created AAS
+         */
+        public List<Aas> getAas() {
+            return aas;
+        }
+        
+        /**
+         * Returns the protocol server builder instance.
+         * 
+         * @return the server builder instance
+         */
+        public ProtocolServerBuilder getProtocolServerBuilder() {
+            return sBuilder;
+        }
+    }
+
+    /**
+     * Build up all AAS of the currently running platform part including all contributors. [public for testing]
+     * 
+     * @return the list of AAS
+     */
+    public static AasBuildResult build() {
+        return build(c -> true);
+    }
     
     /**
      * Build up all AAS of the currently running platform part. [public for testing]
      * 
+     * @param filter filter out contributors, in particular for testing, e.g., active AAS that require an 
+     * implementation server
+     * 
      * @return the list of AAS
      */
-    public static List<Aas> build() {
+    public static AasBuildResult build(Predicate<AasContributor> filter) {
         List<Aas> aas = new ArrayList<>();
-        AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder(NAME_AAS, URN_AAS);
+        AasFactory factory = AasFactory.getInstance();
+        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
+        InvocablesCreator iCreator = factory.createInvocablesCreator(DEFAULT_PROTOCOL, 
+            protocolAddress.getHost(), protocolAddress.getPort());
+        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(DEFAULT_PROTOCOL, 
+            protocolAddress.getPort());
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();
-            Aas partAas = contributor.contributeTo(aasBuilder);
-            if (null != partAas) {
-                aas.add(partAas);
+            if (filter.test(contributor)) {
+                Aas partAas = contributor.contributeTo(aasBuilder, iCreator);
+                contributor.contributeTo(sBuilder);
+                if (null != partAas) {
+                    aas.add(partAas);
+                }
             }
         }
         aas.add(0, aasBuilder.build());
-        return aas;
+        return new AasBuildResult(aas, sBuilder);
     }
     
     /**

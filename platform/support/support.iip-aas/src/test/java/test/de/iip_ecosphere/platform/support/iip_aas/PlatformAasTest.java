@@ -38,7 +38,8 @@ public class PlatformAasTest {
     public void testAas() throws ExecutionException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(PlatformAas.class));
         // obtain the plattform AAS and go then on with the transport sub-model
-        Aas aas = AasPartRegistry.getAas(AasPartRegistry.build(), AasPartRegistry.NAME_AAS);
+        // shortcut test as AAS is not dynamic/active
+        Aas aas = AasPartRegistry.getAas(AasPartRegistry.build().getAas(), AasPartRegistry.NAME_AAS);
         Assert.assertNotNull(aas);
         
         aas.accept(new AasPrintVisitor());

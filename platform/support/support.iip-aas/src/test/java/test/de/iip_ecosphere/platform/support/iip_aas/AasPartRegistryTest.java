@@ -24,6 +24,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -45,9 +47,18 @@ public class AasPartRegistryTest {
     public static class Contributor1 implements AasContributor {
         
         @Override
-        public Aas contributeTo(AasBuilder aasBuilder) {
+        public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
             aasBuilder.createSubmodelBuilder("c1", null).build();
             return null;
+        }
+
+        @Override
+        public void contributeTo(ProtocolServerBuilder sBuilder) {
+        }
+        
+        @Override
+        public Kind getKind() {
+            return Kind.PASSIVE;
         }
         
     }
@@ -60,12 +71,21 @@ public class AasPartRegistryTest {
     public static class Contributor2 implements AasContributor {
         
         @Override
-        public Aas contributeTo(AasBuilder aasBuilder) {
+        public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
             AasBuilder builder = AasFactory.getInstance().createAasBuilder(NAME_MY_AAS, "urn:::AAS:::myAas#");
             builder.createSubmodelBuilder("c2", null).build();
             return builder.build();
         }
-        
+
+        @Override
+        public void contributeTo(ProtocolServerBuilder sBuilder) {
+        }
+
+        @Override
+        public Kind getKind() {
+            return Kind.PASSIVE;
+        }
+
     }
 
     /**
@@ -78,12 +98,13 @@ public class AasPartRegistryTest {
         Assert.assertTrue(cClasses.contains(Contributor1.class));
         Assert.assertTrue(cClasses.contains(Contributor2.class));
         
-        List<Aas> aas = AasPartRegistry.build();
-        Assert.assertNotNull(aas);
-        Assert.assertEquals(2, aas.size());
+        AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
+        Assert.assertNotNull(res.getAas());
+        Assert.assertEquals(2, res.getAas().size());
+        Assert.assertNotNull(res.getProtocolServerBuilder());
         
         Map<String, Aas> hashedAas = new HashMap<>();
-        for (Aas a : aas) {
+        for (Aas a : res.getAas()) {
             hashedAas.put(a.getIdShort(), a);
         }
         Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS));
