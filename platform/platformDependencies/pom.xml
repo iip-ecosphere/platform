@@ -99,13 +99,22 @@
   <dependencyManagement>
     <dependencies>
     
-      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx! -->
+      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx/Spring! -->
       
 	  <dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 		<version>${org.slf4j.version}</version>
 	  </dependency>
+	  <!-- Also tests must be able to use the logging. However, this is optional as bindings may come through 
+	       BaSyx/Spring and may then require specific configuration! -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org.slf4j.version}</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
     
       <!-- Commons stuff -->
 
