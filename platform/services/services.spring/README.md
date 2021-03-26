@@ -71,3 +71,7 @@ Currently, the following properties can be configured:
           workingDirectoriesRoot: <Folder>
           deleteFilesOnExit: <Boolean>
       
+## Missing
+* Handling of dependent services
+* Handling of implementation processes
+* Advanced service operations: update, migrate, switch, clone
