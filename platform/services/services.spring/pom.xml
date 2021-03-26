@@ -105,6 +105,28 @@
           <overWriteSnapshots>true</overWriteSnapshots>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${org.apache.maven.surefire.version}</version>
+        <configuration>
+          <includes>
+            <include>**/AllTests.class</include>
+          </includes>
+        </configuration>
+  	    <dependencies>
+	      <!-- Force using the latest JUnit 47 provider -->
+	      <dependency>
+	        <groupId>org.apache.maven.surefire</groupId>
+	        <artifactId>surefire-junit47</artifactId>
+	        <version>${org.apache.maven.surefire.version}</version>
+	      </dependency>
+	    </dependencies>        
+      </plugin>
+      
+      
+      
     </plugins>
     <pluginManagement>
     	<plugins>
