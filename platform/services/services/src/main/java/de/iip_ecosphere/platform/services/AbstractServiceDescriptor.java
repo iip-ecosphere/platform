@@ -19,15 +19,16 @@ import java.util.concurrent.ExecutionException;
  * statemachine. We do not protect the setters here explicitly, e.g., through a builder pattern as we assume that 
  * the respective messages will only be called within the package of the implementing manager.
  * 
+ * @param <A> the type of artifact descriptor
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
+public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> implements ServiceDescriptor {
     
     private String id;
     private String name;
     private String description;
     private Version version;
-    private ArtifactDescriptor artifact;
+    private A artifact;
     private ServiceState state;
     private ServiceKind kind = ServiceKind.TRANSFORMATION_SERVICE;
     private boolean isDeployable = true;
@@ -53,7 +54,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
      * 
      * @param artifact the containing artifact descriptor
      */
-    protected void setArtifact(ArtifactDescriptor artifact) {
+    protected void setArtifact(A artifact) {
         this.artifact = artifact;
     }
     
@@ -110,7 +111,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
     }
     
     @Override
-    public ArtifactDescriptor getArtifact() {
+    public A getArtifact() {
         return artifact;
     }
 

@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.services.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-class MyServiceDesciptor extends AbstractServiceDescriptor {
+class MyServiceDesciptor extends AbstractServiceDescriptor<MyArtifactDescriptor> {
 
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.

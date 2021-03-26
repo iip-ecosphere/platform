@@ -43,22 +43,22 @@ public interface ServiceManager {
     public String addArtifact(URI location) throws ExecutionException;
 
     /**
-     * Starts a service. The service implementation must be already within the management domain of this instance by
-     * {@link #addService(String, String)}. The service shall after some time be in state 
+     * Starts one or multiple service. The service implementation must be already within the management domain of this 
+     * instance by {@link #addService(String, String)}. The service(s) shall after some time be in state 
      * {@link ServiceState#STARTING}, {@link ServiceState#RUNNING} or {@link ServiceState#FAILED}.
      * 
-     * @param serviceId the id of the service
+     * @param serviceId the id(s) of the service(s)
      * @throws ExecutionException in case that starting the service fails for some reason
      */
-    public void startService(String serviceId) throws ExecutionException;
+    public void startService(String... serviceId) throws ExecutionException;
     
     /**
-     * Stops the service. The service shall afterwards be in state {@link ServiceState#STOPPED}.
+     * Stops one or multiple services. The service shall afterwards be in state {@link ServiceState#STOPPED}.
      * 
-     * @param serviceId the id of the service to stop
+     * @param serviceId the id(s) of the service(s) to stop
      * @throws ExecutionException if stopping the service fails
      */
-    public void stopService(String serviceId) throws ExecutionException;
+    public void stopService(String... serviceId) throws ExecutionException;
     
     /**
      * Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]

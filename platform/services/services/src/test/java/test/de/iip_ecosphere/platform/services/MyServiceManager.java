@@ -70,13 +70,17 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     }
 
     @Override
-    public void startService(String serviceId) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "start").setState(ServiceState.RUNNING);
+    public void startService(String... serviceIds) throws ExecutionException {
+        for (String s: serviceIds) {
+            getServiceDescriptor(s, "serviceId", "start").setState(ServiceState.RUNNING);
+        }
     }
 
     @Override
-    public void stopService(String serviceId) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "stop").setState(ServiceState.STOPPED);
+    public void stopService(String... serviceIds) throws ExecutionException {
+        for (String s: serviceIds) {
+            getServiceDescriptor(s, "serviceId", "stop").setState(ServiceState.STOPPED);
+        }
     }
 
     @Override
