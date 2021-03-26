@@ -28,6 +28,11 @@ public class YamlEndpoint implements Endpoint {
     public String getPortArg() {
         return portArg;
     }
+    
+    @Override
+    public boolean isPortArgGeneric() {
+        return portArg.contains(PORT_PLACEHOLDER);
+    }
 
     @Override
     public String getPortArg(int port) {
@@ -37,6 +42,11 @@ public class YamlEndpoint implements Endpoint {
     @Override
     public String getHostArg() {
         return hostArg;
+    }
+
+    @Override
+    public boolean isHostArgGeneric() {
+        return portArg.contains(HOST_PLACEHOLDER);
     }
 
     @Override

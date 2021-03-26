@@ -15,36 +15,232 @@ package test.de.iip_ecosphere.platform.services.spring;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.cloud.deployer.spi.app.AppDeployer;
+import org.springframework.cloud.deployer.spi.local.LocalAppDeployer;
+import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactory;
 import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
+import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
+import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
 
 /**
  * Tests {@ink SpringCloudServiceManager}.
  * 
  * @author Holger Eichelberger, SSE
  */
+@SpringBootTest(classes = TestServiceManager.Config.class)
+@TestPropertySource(locations = "classpath:application.yml")
+@ContextConfiguration(initializers = TestServiceManager.Initializer.class)
+@Import(SpringCloudServiceConfiguration.class)
+@RunWith(SpringRunner.class)
 public class TestServiceManager {
+
+    private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
+
+    private static TestHiveMqServer server;
+    @Autowired
+    private SpringCloudServiceConfiguration config;
+
+    /**
+     * Initializes the test by starting an embedded MQTT server. Requires the HiveMq configuration xml/extensions 
+     * folder in src/test.
+     */
+    @BeforeClass
+    public static void init() {
+        server = new TestHiveMqServer(BROKER);
+        server.start();
+    }
     
     /**
-     * Tests {@ink SpringCloudServiceManager}.
+     * Shuts down client and test server.
+     */
+    @AfterClass
+    public static void shutdown() {
+        server.stop(false);
+    }
+    
+    /**
+     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager}. This test requires an actual version
+     * of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact in the compile phase.
      * 
      * @throws ExecutionException shall not occur
      */
     @Test
-    public void testApp() throws ExecutionException {
+    public void testSimpleStartStop() throws ExecutionException {
+        doTestStartStop("deployment.yml", new ArtifactAsserter() {
+
+            /*@Override
+            public void testDescriptor(ArtifactDescriptor aDesc) {
+                SpringCloudServiceDescriptor inputService = 
+                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-create");
+                SpringCloudServiceDescriptor outputService = 
+                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-log");
+                
+                inputService.get
+                
+            }*/
+
+        });
+    }
+    
+    /**
+     * Artifact asserter interface.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class ArtifactAsserter {
+
+        /**
+         * Performs specific tests for the given descriptor.
+         * 
+         * @param desc the descriptor
+         */
+        public void testDescriptor(ArtifactDescriptor desc) {
+        }
+
+        /**
+         * Specific tests for the given deployment, i.e., the running services.
+         * 
+         * @param desc the descriptor
+         */
+        public void testDeployment(ArtifactDescriptor desc) {
+        }
+
+    }
+    
+    /**
+     * Implements the tests for a start-stop scenario with different descriptors/related asserters.
+     * 
+     * @param descriptorName the descriptor name
+     * @param asserter the asserter related to descriptor-specific properties
+     * @throws ExecutionException
+     */
+    private void doTestStartStop(String descriptorName, ArtifactAsserter asserter) throws ExecutionException {
+        config.setDescriptorName(descriptorName);
         ServiceManager mgr = ServiceFactory.getServiceManager();
         Assert.assertTrue(mgr instanceof SpringCloudServiceManager);
+        
         File f = new File("./target/jars/simpleStream.spring.jar");
         Assert.assertTrue("Test cannot be executed as " + f 
             + " does not exist. Was it downloaded by Maven?", f.exists());
+        
         String aId = mgr.addArtifact(f.toURI());
+        Assert.assertNotNull(aId);
+        Assert.assertTrue(aId.length() > 0);
         ArtifactDescriptor aDesc = mgr.getArtifact(aId);
-        // TODO
+        Assert.assertNotNull(aDesc);
+        Assert.assertTrue(mgr.getArtifactIds().contains(aId));
+        Assert.assertTrue(mgr.getArtifacts().contains(aDesc));
+
+        // commonalities for both descriptors
+        Assert.assertTrue(aDesc.getServiceIds().size() == 2);
+        Assert.assertTrue(aDesc.getServiceIds().contains("simpleStream-create"));
+        Assert.assertTrue(aDesc.getServiceIds().contains("simpleStream-log"));
+        Assert.assertTrue(aDesc.getServices().size() == 2);
+        ServiceDescriptor inputService = aDesc.getService("simpleStream-create");
+        ServiceDescriptor outputService = aDesc.getService("simpleStream-log");
+        Assert.assertTrue(aDesc.getServices().contains(inputService));
+        Assert.assertTrue(aDesc.getServices().contains(outputService));
+        
+        asserter.testDescriptor(aDesc);
+        for (ServiceDescriptor sDesc : aDesc.getServices()) {
+            Assert.assertNotNull(sDesc.getId());
+            Assert.assertTrue(sDesc.getId().length() > 0);
+            Assert.assertNotNull(sDesc.getVersion());
+            Assert.assertNotNull(sDesc.getName());
+            Assert.assertTrue(sDesc.getName().length() > 0);
+            Assert.assertEquals(ServiceState.AVAILABLE, sDesc.getState());
+        }
+
+        String[] ids = new String[aDesc.getServices().size()];
+        aDesc.getServiceIds().toArray(ids);
+        mgr.startService(ids);
+
+        for (ServiceDescriptor sDesc : aDesc.getServices()) {
+            Assert.assertEquals("Service " + sDesc.getId() + " " + sDesc.getName() + " not running: "
+                + sDesc.getState(), ServiceState.RUNNING, sDesc.getState());
+        }
+        
+        TimeUtils.sleep(2000);
+
+        mgr.stopService(ids);
+
+        for (ServiceDescriptor sDesc : aDesc.getServices()) {
+            Assert.assertEquals("Service " + sDesc.getId() + " " + sDesc.getName() + " not stopped: " 
+                + sDesc.getState(), ServiceState.STOPPED, sDesc.getState());
+        }
+
+        asserter.testDeployment(aDesc);
+        
+        mgr.removeArtifact(aId);
+        Assert.assertFalse(mgr.getArtifactIds().contains(aId));
+        Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
+        Assert.assertNull(mgr.getArtifact(aId));
+    }
+    
+    @Import(SpringCloudServiceConfiguration.class)
+    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertyValues
+                .of("service-mgr.brokerPort=" + BROKER.getPort())
+                .applyTo(applicationContext);
+        }
+        
+    }
+    
+    /**
+     * Configures the context, in particular through instances that are not loaded automatically by Spring in tests.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    @Configuration
+    @EnableConfigurationProperties(LocalDeployerProperties.class)
+    public static class Config {
+
+        /**
+         * In tests, forces the {@link AppDeployer} to have an implementation.
+         * 
+         * @param properties the deployer properties needed to initialize the deployer instance
+         * @return the deployer instance to use
+         */
+        @Bean
+        public AppDeployer appDeployer(LocalDeployerProperties properties) {
+            return new LocalAppDeployer(properties);
+        }
+        
+        @Component
+        class Startup extends StartupApplicationListener {
+        }
+        
     }
     
 }

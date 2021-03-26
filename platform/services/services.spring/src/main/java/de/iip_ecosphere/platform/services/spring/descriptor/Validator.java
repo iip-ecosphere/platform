@@ -196,6 +196,9 @@ public class Validator {
         if (assertFieldNotNull(process.getStreamEndpoint(), "streamEndpoint", msgContext)) {
             validate(process.getStreamEndpoint(), appendToContext(msgContext, "streamEndpoint"));
         }
+        if (assertFieldNotNull(process.getServiceStreamEndpoint(), "serviceStreamEndpoint", msgContext)) {
+            validate(process.getServiceStreamEndpoint(), appendToContext(msgContext, "serviceStreamEndpoint"));
+        }
     }
 
     /**

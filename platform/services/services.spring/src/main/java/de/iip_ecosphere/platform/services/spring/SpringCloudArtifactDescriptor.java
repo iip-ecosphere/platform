@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.services.AbstractArtifactDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<SpringCloudServiceDescriptor> {
+class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<SpringCloudServiceDescriptor> {
 
     private File jar;
     
@@ -48,5 +48,5 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
     public File getJar() {
         return jar;
     }
-
+    
 }

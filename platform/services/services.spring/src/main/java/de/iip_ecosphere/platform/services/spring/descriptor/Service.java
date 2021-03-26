@@ -119,17 +119,19 @@ public interface Service {
      * Returns the desired memory for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @return the desired memory in bytes, ignored if not positive
+     * @return the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), ignored
+     *   if not positive
      */
-    public int getMemory();
+    public long getMemory();
 
     /**
      * Returns the desired disk space for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @return the desired disk space in bytes, ignored if not positive
+     * @return the desired disk space in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), 
+     *   ignored if not positive
      */
-    public int getDisk();
+    public long getDisk();
 
     /**
      * Returns the desired number of CPUs for instances of this service. This property is considered during deployment

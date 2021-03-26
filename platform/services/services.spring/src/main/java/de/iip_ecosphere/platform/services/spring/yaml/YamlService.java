@@ -37,8 +37,8 @@ public class YamlService implements Service {
     private ServiceKind kind;
     private boolean deployable = false;
     private int instances = 1;
-    private int memory = -1;
-    private int disk = -1;
+    private long memory = -1;
+    private long disk = -1;
     private int cpus = 1;
 
     @Override
@@ -102,12 +102,12 @@ public class YamlService implements Service {
     }
 
     @Override
-    public int getMemory() {
+    public long getMemory() {
         return memory;
     }
 
     @Override
-    public int getDisk() {
+    public long getDisk() {
         return disk;
     }
 
@@ -229,9 +229,10 @@ public class YamlService implements Service {
      * Defines the desired memory for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @param memory the desired memory in bytes, ignored if not positive
+     * @param memory the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), 
+     *   ignored if not positive
      */
-    public void setMemory(int memory) {
+    public void setMemory(long memory) {
         this.memory = memory;
     }
 
@@ -239,9 +240,10 @@ public class YamlService implements Service {
      * Defines the desired disk space for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @param disk the desired disk space in bytes, ignored if not positive
+     * @param disk the desired disk space in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"),
+     *   ignored if not positive
      */
-    public void setDisk(int disk) {
+    public void setDisk(long disk) {
         this.disk = disk;
     }
 

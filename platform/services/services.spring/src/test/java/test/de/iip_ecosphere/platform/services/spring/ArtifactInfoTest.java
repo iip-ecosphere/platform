@@ -12,13 +12,17 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.spring.DescriptorTest;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
@@ -80,7 +84,7 @@ public class ArtifactInfoTest {
         Assert.assertEquals(1, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
-        assertProcess(service.getProcess(), "impl/python", "python", "MyServiceWrapper.py");
+        assertProcess(service.getProcess(), "impl/python", false, "python", "MyServiceWrapper.py");
         Assert.assertEquals(2, service.getInstances());
         Assert.assertEquals(1024, service.getMemory());
         Assert.assertEquals(500, service.getDisk());
@@ -201,14 +205,34 @@ public class ArtifactInfoTest {
      * 
      * @param process the process to assert
      * @param path the expected path
+     * @param started whether the process is marked as aready started
      * @param cmdArgs the expected command line arguments
      */
-    private static void assertProcess(YamlProcess process, String path, 
+    private static void assertProcess(YamlProcess process, String path, boolean started,
         String... cmdArgs) {
         Assert.assertEquals(path, process.getPath());
         assertEndpoint(process.getStreamEndpoint(), 1234, "localhost");
         assertEndpoint(process.getAasEndpoint(), 1235, "aas.de");
         assertStringList(process.getCmdArg(), cmdArgs);
+        Assert.assertEquals(started, process.isStarted());
+    }
+
+    /**
+     * Tests {@link DescriptorTest}.
+     * 
+     * @throws IOException in case that descriptors/files cannot be read
+     */
+    @Test
+    public void testFileDescriptorTest() throws IOException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream("test.yml");
+        Assert.assertNotNull(in);
+        File f = File.createTempFile("services.spring", ".xml");
+        java.nio.file.Files.copy(in, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        
+        DescriptorTest.main(f.getAbsolutePath());
+        
+        f = new File("./target/jars/simpleStream.spring.jar");
+        DescriptorTest.main(f.getAbsolutePath());
     }
     
 }

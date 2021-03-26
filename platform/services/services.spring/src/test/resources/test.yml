@@ -38,6 +38,9 @@ services:
       cmdArg:
         - python
         - MyServiceWrapper.py
+      serviceStreamEndpoint:
+        portArg: --id1.streamPort=${port}
+        hostArg: --id1.streamHost=${host}
       streamEndpoint:
         portArg: streamPort=${port}
         hostArg: streamHost=${host}

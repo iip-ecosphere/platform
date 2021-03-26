@@ -29,8 +29,10 @@ public class YamlProcess implements Process {
     
     private String path;
     private List<String> cmdArg = new ArrayList<>();
+    private YamlEndpoint serviceStreamEndpoint;
     private YamlEndpoint streamEndpoint;
     private YamlEndpoint aasEndpoint;
+    private boolean started = false;
 
     @Override
     public String getPath() {
@@ -41,7 +43,12 @@ public class YamlProcess implements Process {
     public List<String> getCmdArg() {
         return cmdArg;
     }
-    
+
+    @Override
+    public YamlEndpoint getServiceStreamEndpoint() {
+        return serviceStreamEndpoint;
+    }
+
     @Override
     public YamlEndpoint getStreamEndpoint() {
         return streamEndpoint;
@@ -50,6 +57,11 @@ public class YamlProcess implements Process {
     @Override
     public YamlEndpoint getAasEndpoint() {
         return aasEndpoint;
+    }
+    
+    @Override
+    public boolean isStarted() {
+        return started;
     }
     
     /**
@@ -69,9 +81,20 @@ public class YamlProcess implements Process {
     public void setCmdArg(List<String> cmdArg) {
         this.cmdArg = cmdArg;
     }
-    
+
     /**
-     * Defines communication endpoint (port/host) the service shall communicate with. [required by SnakeYaml] 
+     * Defines communication endpoint (port/host) for streaming on the service side (to communicate with the 
+     * process side). [required by SnakeYaml] 
+     * 
+     * @param serviceStreamEndpoint the communication endpoint
+     */
+    public void setServiceStreamEndpoint(YamlEndpoint serviceStreamEndpoint) {
+        this.serviceStreamEndpoint = serviceStreamEndpoint;
+    }
+
+    /**
+     * Defines communication endpoint (port/host) on the process side the service shall communicate with. 
+     * [required by SnakeYaml] 
      * 
      * @param streamEndpoint the communication endpoint
      */
@@ -87,5 +110,14 @@ public class YamlProcess implements Process {
     public void setAasEndpoint(YamlEndpoint aasEndpoint) {
         this.aasEndpoint = aasEndpoint;
     }
-    
+
+    /**
+     * Changes whether the underlying process is already started when firing up the service. [required by SnakeYaml] 
+     * 
+     * @param started {@code true} for started (default), {@code false} else
+     */
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
 }

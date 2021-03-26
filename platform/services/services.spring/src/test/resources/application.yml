@@ -1,0 +1,17 @@
+logging:
+    level:
+        root: INFO
+spring:
+    main:
+        banner-mode: off
+    cloud:
+        deployer:
+            local:
+                deleteFilesOnExit: true
+                0workingDirectoriesRoot: FOLDER
+service-mgr:
+  deleteArtifacts: false
+  waitingTime: 30000
+  brokerHost: localhost
+  brokerPort: 8883
+  

@@ -26,16 +26,23 @@ public interface Endpoint {
      * Returns the specified command line argument to set the communication port for this relation upon service 
      * deployment/execution. 
      * 
-     * @return the generic port argument, {@value #PORT_PLACEHOLDER} is substituted by the port number
+     * @return the generic port argument
      */
     public String getPortArg();
 
+    /**
+     * Returns the whether {@link #getPortArg()} is generic through {@link #PORT_PLACEHOLDER}.
+     * 
+     * @return {@code true} for generic, {@code false} else
+     */
+    public boolean isPortArgGeneric();
+    
     /**
      * Returns the ready-to-use command line argument to set the communication port for this relation upon service 
      * deployment/execution. 
      * 
      * @param port the actual port number
-     * @return the port argument
+     * @return the port argument, {@value #PORT_PLACEHOLDER} is substituted by {@code port}
      */
     public String getPortArg(int port);
 
@@ -43,16 +50,23 @@ public interface Endpoint {
      * Returns the specified command line argument to set the host to communicate with for this relation upon service 
      * deployment/execution. 
      * 
-     * @return the generic host argument, {@value #HOST_PLACEHOLDER} is substituted by the host name, may be empty 
-     *   for localhost
+     * @return the generic host argument
      */
     public String getHostArg();
 
     /**
+     * Returns the whether {@link #getHostArg()} is generic through {@link #HOST_PLACEHOLDER}.
+     * 
+     * @return {@code true} for generic, {@code false} else
+     */
+    public boolean isHostArgGeneric();
+    
+    /**
      * Returns the ready-to.use command line argument to set the host to communicate with for this relation upon 
      * service deployment/execution. 
      * 
-     * @param hostname the actual hostname
+     * @param hostname the actual hostname, {@value #HOST_PLACEHOLDER} is substituted by {@code hostname}, may be empty 
+     *   for localhost
      * @return the host argument
      */
     public String getHostArg(String hostname);
