@@ -1,0 +1,180 @@
+package de.iip_ecosphere.platform.support.iip_aas.json;
+
+import java.util.function.Function;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+public class JsonResultWrapper implements Function<Object[], Object> {
+
+    private ExceptionFunction func;
+    
+    /**
+     * Creates a wrapper object.
+     * 
+     * @param func a function that may throw an exception.
+     */
+    public JsonResultWrapper(ExceptionFunction func) {
+        this.func = func;
+    }
+
+    /**
+     * Represents the result w/o exception.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Result {
+        
+        @JsonInclude(Include.NON_NULL)
+        private String result;
+
+        @JsonInclude(Include.NON_NULL)
+        private String exception;
+
+        /**
+         * Creates a result object (for JSON).
+         */
+        private Result() {
+        }
+        
+        /**
+         * Creates a result object for a result value.
+         * 
+         * @param result the result value
+         */
+        private Result(String result) {
+            this.result = result;
+        }
+
+        /**
+         * Creates a result object for an exceptional situation.
+         * 
+         * @param ex the exception
+         */
+        private Result(Exception ex) {
+            exception = ex.getMessage();
+        }
+
+        /**
+         * Returns the result.
+         * 
+         * @return the result
+         */
+        public String getResult() {
+            return result;
+        }
+
+        /**
+         * Returns the exception text.
+         * 
+         * @return the exception text
+         */
+        public String getException() {
+            return exception;
+        }
+        
+        /**
+         * Returns whether this object represents an exception.
+         * 
+         * @return {@code true} for exception, {@code false} for normal execution
+         */
+        public boolean isException() {
+            return null != exception;
+        }
+        
+        /**
+         * Defines the result.
+         * 
+         * @param result the result
+         */
+        public void setResult(String result) {
+            this.result = result;
+        }
+
+        /**
+         * Defines the exception text.
+         * 
+         * @param exception the exception text
+         */
+        public void setException(String exception) {
+            this.exception = exception;
+        }
+
+    }
+    
+    // checkstyle: stop exception type check
+    
+    /**
+     * A function that may throw an exception.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ExceptionFunction {
+        
+        /**
+         * Applies the function.
+         * 
+         * @param params function parameter
+         * @return function result
+         * @throws Exception potentially thrown exception
+         */
+        public Object apply(Object[] params) throws Exception;
+        
+    }
+
+    @Override
+    public Object apply(Object[] param) {
+        Result result;
+        try {
+            result = new Result(func.apply(param).toString());
+        } catch (Exception e) {
+            result = new Result(e);
+        }
+        return toJson(result);
+    }
+
+    // checkstyle resume exception type check
+    
+    /**
+     * Turns a {@link Result} into JSON.
+     * 
+     * @param res the result instance (may be <b>null</b>)
+     * @return the JSON string or an empty string in case of problems/no address
+     */
+    public static String toJson(Result res) {
+        String result = "";
+        if (null != res) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                result = objectMapper.writeValueAsString(res);
+            } catch (JsonProcessingException e) {
+                // handled by default value
+            }
+        } 
+        return result;
+    }
+    
+    
+    /**
+     * Turns something in JSON into a {@code Result}.
+     * 
+     * @param json the JSON value, usually a String
+     * @return the result instance
+     */
+    public static Result resultFromJson(Object json) {
+        Result result = null;
+        if (null != json) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                result = objectMapper.readValue(json.toString(), Result.class);
+            } catch (JsonProcessingException e) {
+                result = new Result(e);
+            }
+        }
+        return result; 
+    }
+
+}

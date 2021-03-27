@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.AbstractNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 
@@ -65,7 +66,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         try {
             checkKey(key);
             String tmp = checkString(getOperation(NetworkManagerAas.OP_OBTAIN_PORT).invoke(key));
-            return checkNotNull(NetworkManagerAas.readManagedServerAddress(tmp));
+            return checkNotNull(NetworkManagerAas.managedServerAddressFromJson(tmp));
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -77,7 +78,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
             checkKey(key);
             Object tmp = getOperation(NetworkManagerAas.OP_GET_PORT).invoke(key);
             // result may be null here!!
-            return NetworkManagerAas.readManagedServerAddress(null == tmp ? null : tmp.toString());
+            return NetworkManagerAas.managedServerAddressFromJson(tmp);
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -89,8 +90,8 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
             checkKey(key);
             checkAddress(address);
             String tmp = checkString(getOperation(NetworkManagerAas.OP_RESERVE_PORT).invoke(key, 
-                NetworkManagerAas.toJson(checkNotNull(address))));
-            return checkNotNull(NetworkManagerAas.readManagedServerAddress(tmp));
+                JsonUtils.toJson(checkNotNull(address))));
+            return checkNotNull(NetworkManagerAas.managedServerAddressFromJson(tmp));
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -171,7 +172,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         checkAddress(address);
         boolean result = false;
         try {
-            Object tmp = getOperation(NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(NetworkManagerAas.toJson(address));
+            Object tmp = getOperation(NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(JsonUtils.toJson(address));
             if (tmp instanceof Boolean) {
                 result = ((Boolean) tmp).booleanValue();
             }
