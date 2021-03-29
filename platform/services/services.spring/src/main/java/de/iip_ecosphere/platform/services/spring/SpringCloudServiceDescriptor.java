@@ -173,9 +173,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @param host the host name (for substitution in results delivered by {@code endpoint})
      */
     private void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, int port, String host) {
-        cmdLine.add(endpoint.getPortArg(port));
-        if (endpoint.getHostArg().length() > 0) {
-            cmdLine.add(endpoint.getHostArg(host));
+        if (null != endpoint) { // endpoints may be optional
+            cmdLine.add(endpoint.getPortArg(port));
+            if (endpoint.getHostArg().length() > 0) {
+                cmdLine.add(endpoint.getHostArg(host));
+            }
         }
     }
     
