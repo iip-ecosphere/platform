@@ -1,5 +1,6 @@
-/********************************************************************************
- * Copyright (c) {2020} The original author or authors
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -8,20 +9,25 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.Test;
+
+import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 
 /**
- * Defines the tests to be executed.
+ * Tests the {@link EcsAas}.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ContainerManagerTest.class,
-    EcsAasTest.class
-})
-public class AllTests {
+public class EcsAasTest {
+    
+    /**
+     * Tests the AAS.
+     */
+    @Test
+    public void testAas() {
+    }
+
 }
