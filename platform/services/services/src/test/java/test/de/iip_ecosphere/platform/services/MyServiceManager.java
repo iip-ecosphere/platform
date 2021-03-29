@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.services;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
@@ -26,7 +27,7 @@ import de.iip_ecosphere.platform.services.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MyServiceDesciptor> {
+class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MyServiceDescriptor> {
 
     private int artifactId;
     private int serviceId;
@@ -61,10 +62,10 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
             throw new ExecutionException("location must not be null", null);
         }
         String aId = createArtifactId();
-        List<MyServiceDesciptor> services = new ArrayList<>();
+        List<MyServiceDescriptor> services = new ArrayList<>();
         String text = location.toString();
-        services.add(new MyServiceDesciptor(createServiceId(), text, text, new Version(1, 0)));
-        services.add(new MyServiceDesciptor(createServiceId(), text, text, new Version(1, 1)));
+        services.add(new MyServiceDescriptor(createServiceId(), text, text, new Version(1, 0)));
+        services.add(new MyServiceDescriptor(createServiceId(), text, text, new Version(1, 1)));
         super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
         return aId;
     }
@@ -104,7 +105,36 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
 
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
-        // TODO Auto-generated method stub
     }
     
+    @Override
+    public void activateService(String serviceId) throws ExecutionException {
+        MyServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "activate");
+        if (ServiceState.PASSIVATED == service.getState()) {
+            setState(service, ServiceState.RUNNING);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void passivateService(String serviceId) throws ExecutionException {
+        MyServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "passivate");
+        if (ServiceState.RUNNING == service.getState()) {
+            setState(service, ServiceState.PASSIVATING);
+            setState(service, ServiceState.PASSIVATED);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
+        MyServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "reconfigure");
+        ServiceState state = service.getState();
+        setState(service, ServiceState.RECONFIGURING);
+        // reconfigure
+        setState(service, state);
+    }
+
 }

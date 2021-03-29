@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -32,6 +35,9 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private ServiceState state;
     private ServiceKind kind = ServiceKind.TRANSFORMATION_SERVICE;
     private boolean isDeployable = true;
+    private List<TypedDataDescriptor> parameters = new ArrayList<>(); 
+    private List<TypedDataConnectorDescriptor> input = new ArrayList<>(); 
+    private List<TypedDataConnectorDescriptor> output = new ArrayList<>(); 
     
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
@@ -96,7 +102,6 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        // TODO statemachine?
         this.state = state;
     }
 
@@ -113,6 +118,48 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     @Override
     public A getArtifact() {
         return artifact;
+    }
+
+    @Override
+    public List<TypedDataDescriptor> getParameters() {
+        return Collections.unmodifiableList(parameters); 
+    }
+    
+    @Override
+    public List<TypedDataConnectorDescriptor> getInputDataConnectors() {
+        return Collections.unmodifiableList(input); 
+    }
+
+    @Override
+    public List<TypedDataConnectorDescriptor> getOutputDataConnectors() {
+        return Collections.unmodifiableList(output); 
+    }
+    
+    /**
+     * Adds a parameter descriptor.
+     * 
+     * @param parameter the descriptor
+     */
+    protected void addParameter(TypedDataDescriptor parameter) {
+        parameters.add(parameter);
+    }
+
+    /**
+     * Adds an input descriptor.
+     * 
+     * @param input the descriptor
+     */
+    protected void addInputDataConnector(TypedDataConnectorDescriptor input) {
+        this.input.add(input);
+    }
+
+    /**
+     * Adds an output descriptor.
+     * 
+     * @param output the descriptor
+     */
+    protected void addOutputDataConnector(TypedDataConnectorDescriptor output) {
+        this.output.add(output);
     }
 
 }

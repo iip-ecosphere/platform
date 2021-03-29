@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +25,8 @@ import java.util.concurrent.ExecutionException;
  * Spring Cloud Streams. The management of such services happens via this interface, which shall utilize the respective
  * management capabilites of the underlying service computing approach. The interface is rather simple as it shall
  * be usable through an AAS. The id of a service used here must not be identical to the name in 
- * {@link ServiceDescriptor#getName()}, e.g., it may contain the version.
+ * {@link ServiceDescriptor#getName()}, e.g., it may contain the version. Implementations shall call the notify methods 
+ * in {@link ServicesAas}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -131,10 +133,37 @@ public interface ServiceManager {
      * Reconfigures the underlying service. [adaptation]
      * 
      * @param serviceId the serviceId of the running service
-     * @param values the (service-specific) values that shall lead to a reconfiguration of the service
+     * @param values the (service-specific) name-value mapping that shall lead to a reconfiguration of the service; 
+     *   values come either as primitive values or as JSON structures complying with the parameter descriptor. The 
+     *   service is responsible for correct JSON de-serialization according to the respective 
+     *   {@link TypedDataDescriptor descriptor}
      * @throws ExecutionException if reconfiguration fails
      */
-    public void reconfigureService(String serviceId, Map<String, Object> values) throws ExecutionException;
+    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException;
+
+    /**
+     * Returns all information about parameter for the given {@code serviceId}. [adaptation]
+     * 
+     * @param serviceId the serviceId of the service
+     * @return the descriptors for all supported parameters
+     */
+    public List<TypedDataDescriptor> getParameters(String serviceId);
+
+    /**
+     * Returns all input connector information for the given {@code serviceId}.
+     * 
+     * @param serviceId the serviceId of the service
+     * @return the descriptors for all input data connectors
+     */
+    public List<TypedDataConnectorDescriptor> getInputDataConnectors(String serviceId);
+
+    /**
+     * Returns all output connector information for the given {@code serviceId}.
+     * 
+     * @param serviceId the serviceId of the service
+     * @return the descriptors for all output data connectors
+     */
+    public List<TypedDataConnectorDescriptor> getOutputDataConnectors(String serviceId);
 
     /**
      * Sets the state of the service. [adaptation]
@@ -185,7 +214,7 @@ public interface ServiceManager {
      * Returns an artifact descriptor.
      * 
      * @param artifactId the id of the service (may be <b>null</b> or invalid)
-     * @return the related artifavt descriptor or <b>null</b> if the artifact does not exist
+     * @return the related artifact descriptor or <b>null</b> if the artifact does not exist
      */
     public ArtifactDescriptor getArtifact(String artifactId); 
     

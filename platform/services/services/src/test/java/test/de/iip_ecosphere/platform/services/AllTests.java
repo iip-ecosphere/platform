@@ -22,6 +22,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     VersionTest.class,
     ServiceManagerTest.class,
+    ServicesAasTest.class
 })
 public class AllTests {
 

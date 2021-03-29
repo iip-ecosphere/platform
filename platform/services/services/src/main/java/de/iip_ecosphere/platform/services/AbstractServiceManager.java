@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +25,8 @@ import java.util.concurrent.ExecutionException;
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
  * {@link #removeService(String)}, {@link #switchToService(String, String)}, {@link #migrateService(String, String)}
- * and call the implementation of this class to perform the changes.
+ * and call the implementation of this class to perform the changes. Implementations shall call the notify methods 
+ * in {@link ServicesAas}.
  *
  * @param <A> the actual type of the artifact descriptor
  * @param <S> the actual type of the service descriptor
@@ -104,6 +106,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             throw new ExecutionException("Artifact id '" + artifactId + "' is already known", null);
         }
         artifacts.put(artifactId, descriptor);
+        ServicesAas.notifyArtifactAdded(descriptor);
         return artifactId;
     }
 
@@ -114,7 +117,8 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             throw new ExecutionException("Artifact id '" + artifactId 
                 + "' is not known. Cannot remove artifact.", null);
         }
-        artifacts.remove(artifactId);
+        A aDesc = artifacts.remove(artifactId);
+        ServicesAas.notifyArtifactRemoved(aDesc);
     }
     
     /**
@@ -193,23 +197,53 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
 
     @Override
-    public void activateService(String serviceId) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "activate").activate();
-    }
-
-    @Override
-    public void passivateService(String serviceId) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "passivate").passivate();
-    }
-
-    @Override
     public void setServiceState(String serviceId, ServiceState state) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "setState").setState(state);
+        setState(getServiceDescriptor(serviceId, "serviceId", "setState"), state);
     }
     
+    /**
+     * Changes the service state and notifies {@link ServicesAas}.
+     * 
+     * @param service the service
+     * @param state the new state
+     * @throws ExecutionException if changing the state fails
+     */
+    protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
+        service.setState(state);
+        ServicesAas.notifyServiceStateChanged(service);
+    }
+    
+    @SuppressWarnings("unchecked")
     @Override
-    public void reconfigureService(String serviceId, Map<String, Object> values) throws ExecutionException {
-        getServiceDescriptor(serviceId, "serviceId", "setState").reconfigure(values);
+    public List<TypedDataDescriptor> getParameters(String serviceId) {
+        List<TypedDataDescriptor> result = null;
+        S service = getService(serviceId);
+        if (null != service) {
+            result = service.getParameters();
+        }
+        return result;
     }
-    
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<TypedDataConnectorDescriptor> getInputDataConnectors(String serviceId) {
+        List<TypedDataConnectorDescriptor> result = null;
+        S service = getService(serviceId);
+        if (null != service) {
+            result = service.getInputDataConnectors();
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<TypedDataConnectorDescriptor> getOutputDataConnectors(String serviceId) {
+        List<TypedDataConnectorDescriptor> result = null;
+        S service = getService(serviceId);
+        if (null != service) {
+            result = service.getOutputDataConnectors();
+        }
+        return result;
+    }
+
 }

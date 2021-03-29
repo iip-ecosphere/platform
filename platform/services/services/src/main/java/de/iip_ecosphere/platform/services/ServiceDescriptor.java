@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -87,26 +88,24 @@ public interface ServiceDescriptor {
     public ArtifactDescriptor getArtifact();
     
     /**
-     * Passivates the service.
+     * Returns all information about parameter for {@link #reconfigure(Map)}.
      * 
-     * @throws ExecutionException if passivating fails for some reason
+     * @return the name-descriptor mapping for all supported parameters
      */
-    public void passivate() throws ExecutionException;
+    public List<TypedDataDescriptor> getParameters();
     
     /**
-     * Activates the service.
+     * Returns all (asynchronous) input connectors into this service.
      * 
-     * @throws ExecutionException if activating fails for some reason
+     * @return all input channels
      */
-    public void activate() throws ExecutionException;
+    public List<TypedDataConnectorDescriptor> getInputDataConnectors();
 
     /**
-     * Reconfigures the underlying service.
+     * Returns all (asynchronous) output connectors from this service.
      * 
-     * @param values the (service-specific) values that shall lead to a reconfiguration of the service
-     * @throws ExecutionException if reconfiguration fails
+     * @return all input channels
      */
-    public void reconfigure(Map<String, Object> values) throws ExecutionException;
-    
-    // TODO endpoints, data connectors
+    public List<TypedDataConnectorDescriptor> getOutputDataConnectors();
+
 }

@@ -78,7 +78,8 @@ public class ServiceManagerTest {
         Assert.assertEquals(ServiceState.PASSIVATED, sDesc.getState());
         mgr.activateService(sId);
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
-        mgr.reconfigureService(sId, new HashMap<String, Object>());
+        mgr.reconfigureService(sId, new HashMap<String, String>());
+        // TODO test parameterDescriptors
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
         mgr.stopService(sId);
         Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
