@@ -1,5 +1,18 @@
 id: art
 name: art-name
+types:
+  - name: myType
+    fields:
+      - name: a
+        type: String
+      - name: b
+        type: int
+  - name: myType1
+    fields:
+      - name: a
+        type: java.lang.String
+      - name: b
+        type: myType
 services:
   - id: id-0
     name: name-0
@@ -7,6 +20,11 @@ services:
     description: desc desc-0
     deployable: true
     kind: SOURCE_SERVICE
+    parameters:
+      - name: param1
+        type: String
+      - name: param2
+        type: myType1
     cmdArg: 
       - arg-0-1
       - arg-0-2
@@ -20,6 +38,8 @@ services:
         endpoint:
           portArg: --input.port=${port}
           hostArg: --input.host=${host}
+        direction: IN
+        type: myType
   - id: id-1
     name: name-1
     version: 1.0.3
@@ -33,6 +53,8 @@ services:
         endpoint:
           portArg: --input.port=${port}
           hostArg: --input.host=${host}
+        direction: OUT
+        type: String
     process:
       path: impl/python
       cmdArg:

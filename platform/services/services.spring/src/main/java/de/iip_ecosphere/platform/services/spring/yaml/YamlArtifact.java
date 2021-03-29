@@ -35,6 +35,7 @@ public class YamlArtifact implements Artifact {
     private String id;
     private String name;
     private List<YamlService> services;
+    private List<YamlType> types = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -50,7 +51,12 @@ public class YamlArtifact implements Artifact {
     public List<YamlService> getServices() {
         return services;
     }
-    
+
+    @Override
+    public List<YamlType> getTypes() {
+        return types;
+    }
+
     /**
      * Defines the id of the service. [required by SnakeYaml]
      * 
@@ -76,6 +82,15 @@ public class YamlArtifact implements Artifact {
      */
     public void setServices(List<YamlService> services) {
         this.services = services;
+    }
+
+    /**
+     * Sets the declared types. [required by SnakeYaml]
+     * 
+     * @param types the types
+     */
+    public void setTypes(List<YamlType> types) {
+        this.types = types;
     }
 
     /**

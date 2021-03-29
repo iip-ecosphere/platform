@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.iip_ecosphere.platform.services.Version;
@@ -26,8 +28,21 @@ import de.iip_ecosphere.platform.services.Version;
  */
 public class Validator {
 
+    private static Set<String> primitives = new HashSet<>();
     private List<String> messages = new ArrayList<>();
     private Set<String> serviceIds = new HashSet<>();
+    
+    static {
+        primitives.add("String"); // to be translated to qualified name later
+        primitives.add("int");
+        primitives.add("boolean");
+        primitives.add("byte");
+        primitives.add("double");
+        primitives.add("float");
+        primitives.add("char");
+        primitives.add("short");
+        primitives.add("long");
+    }
     
     /**
      * Returns whether there are validation (error) messages.
@@ -80,8 +95,37 @@ public class Validator {
         String msgContext = "";
         assertStringNotEmpty(artifact.getId(), "id", msgContext);
         assertStringNotEmpty(artifact.getName(), "name", msgContext);
-        
-        if (assertList(artifact.getServices(), true, "services", msgContext, (s, m) -> validate(s, m))) {
+
+        Map<String, Type> typeMap = new HashMap<>();
+        for (Type t : artifact.getTypes()) {
+            if (assertJavaIdentifier(t.getName(), "name", msgContext)) {
+                if (typeMap.containsKey(t.getName())) {
+                    messages.add("Declared type `" + t.getName() + "` is not unique.");
+                }
+                try {
+                    Class.forName(t.getName());
+                    messages.add("Declared type `" + t.getName() + "` shall not be known as Java class here.");
+                } catch (ClassNotFoundException e) {
+                    // this is ok
+                }
+                typeMap.put(t.getName(), t);
+            }
+        }
+        Set<String> fieldNames = new HashSet<String>();
+        for (Type t : artifact.getTypes()) {
+            for (Field f: t.getFields()) {
+                assertStringNotEmpty(f.getName(), "name", msgContext);
+                if (fieldNames.contains(t.getName())) {
+                    messages.add("Declared field `" + f.getName() + "`in declared type `" + t.getName() 
+                        + "` is not unique.");
+                }
+                assertType(f.getType(), typeMap, "type", f.getName() + " in " + t.getName());
+                fieldNames.add(f.getName());
+            }
+            fieldNames.clear();
+        }
+
+        if (assertList(artifact.getServices(), true, "services", msgContext, (s, m) -> validate(s, typeMap, m))) {
             int sCount = 0;
             for (Service s : artifact.getServices()) {
                 if (null != s.getEnsembleWith()) {
@@ -101,18 +145,20 @@ public class Validator {
      * Validates the given service (and contained descriptor elements).
      * 
      * @param service the service to validate
+     * @param types the declared types
      */
-    public void validate(Service service) {
-        validate(service, "");
+    public void validate(Service service, List<? extends Type> types) {
+        validate(service, toMap(types), "");
     }
 
     /**
      * Validates the given service (and contained descriptor elements).
      * 
      * @param service the service to validate
+     * @param types the declared types
      * @param msgContext nested context information for location of unnamed elements in validation messages
      */
-    private void validate(Service service, String msgContext) {
+    private void validate(Service service, Map<String, Type> types, String msgContext) {
         if (assertStringNotEmpty(service.getId(), "id", msgContext)) {
             serviceIds.add(service.getId());
         }
@@ -125,10 +171,25 @@ public class Validator {
         assertStringList(service.getCmdArg(), "cmdArg", "arg", msgContext);
         assertStringList(service.getEnsembleWith(), "ensembleWith", "id", msgContext);
         assertList(service.getDependencies(), true, "dependencies", msgContext, (d, m) -> validate(d, m));
-        assertList(service.getRelations(), true, "relations", msgContext, (r, m) -> validate(r, m));
+        assertList(service.getParameters(), true, "parameters", msgContext, (p, m) -> validate(p, types, m));
+        assertList(service.getRelations(), true, "relations", msgContext, (r, m) -> validate(r, types, m));
         if (null != service.getProcess()) {
             validate(service.getProcess(), appendToContext(msgContext, "process"));
         }
+    }
+
+    /**
+     * Turns the given {@code types} into a map, mapping the type name to its type descriptor.
+     * 
+     * @param types the types to map
+     * @return the mapped types
+     */
+    public static Map<String, Type> toMap(List<? extends Type> types) {
+        Map<String, Type> typeMap = new HashMap<>();
+        for (Type t : types) {
+            typeMap.put(t.getName(), t);
+        }
+        return typeMap;
     }
 
     /**
@@ -154,21 +215,41 @@ public class Validator {
      * Validates the given relation (and contained descriptor elements).
      * 
      * @param relation the relation to validate
+     * @param types the declared types
      */
-    public void validate(Relation relation) {
-        validate(relation, "");
+    public void validate(Relation relation, Map<String, Type> types) {
+        validate(relation, types, "");
     }
 
+    /**
+     * Validates the given typed data (and contained descriptor elements).
+     * 
+     * @param typed the typed data to validate
+     * @param msgContext nested context information for location of unnamed elements in validation messages
+     * @param types the declared types
+     */
+    private void validate(TypedData typed, Map<String, Type> types, String msgContext) {
+        assertFieldNotNull(typed.getName(), "channel", msgContext);
+        assertFieldNotNull(typed.getDescription(), "description", msgContext); // optional
+        assertType(typed.getType(), types, "type", msgContext);
+    }
+    
     /**
      * Validates the given relation (and contained descriptor elements).
      * 
      * @param relation the relation to validate
      * @param msgContext nested context information for location of unnamed elements in validation messages
+     * @param types the declared types
      */
-    private void validate(Relation relation, String msgContext) {
-        assertFieldNotNull(relation.getChannel(), "channel", msgContext);
+    private void validate(Relation relation, Map<String, Type> types, String msgContext) {
+        boolean chOk = assertFieldNotNull(relation.getChannel(), "channel", msgContext);
         if (assertFieldNotNull(relation.getEndpoint(), "endpoint", msgContext)) {
             validate(relation.getEndpoint(), appendToContext(msgContext, "endpoint"));
+        }
+        assertFieldNotNull(relation.getDescription(), "description", msgContext); // optional
+        if (chOk && relation.getChannel().length() > 0) {
+            assertFieldNotNull(relation.getDirection(), "direction", msgContext);
+            assertType(relation.getType(), types, "type", msgContext);
         }
     }
 
@@ -236,6 +317,49 @@ public class Validator {
     private void validate(Endpoint endpoint, String msgContext) {
         assertStringNotEmpty(endpoint.getPortArg(), "portArg", msgContext); // port shall be given
         assertFieldNotNull(endpoint.getHostArg(), "hostArg", msgContext); // host is optional
+    }
+
+    /**
+     * Asserts that {@code type} is a known type, either in {@link #primitives}, {@code types} or as a Java type.
+     * 
+     * @param type the type name to check
+     * @param types the declared types
+     * @param field the field the string is taken from for composing an error message
+     * @param msgContext the context of the message/validate element for better location by the caller, ignored if 
+     *   empty or <b>null</b>
+     * @return {@code true} if successful, {@code false} if failed
+     */
+    private boolean assertType(String type, Map<String, Type> types, String field, String msgContext) {
+        boolean ok = assertJavaIdentifier(type, field, msgContext);
+        if (ok && !types.containsKey(type) && !primitives.contains(type)) {
+            try {
+                Class.forName(type);
+            } catch (ClassNotFoundException e) {
+                messages.add(appendContext("Type `" + type + "` is not known", msgContext));
+                ok = false;
+            }
+        }
+        return ok; 
+    }
+
+    /**
+     * Asserts that {@code name} in a field is not <b>null</b>, not empty and a Java identifier.
+     * 
+     * @param name the name to check
+     * @param field the field the string is taken from for composing an error message
+     * @param msgContext the context of the message/validate element for better location by the caller, ignored if 
+     *   empty or <b>null</b>
+     * @return {@code true} if successful, {@code false} if failed
+     */
+    private boolean assertJavaIdentifier(String name, String field, String msgContext) {
+        boolean ok = assertStringNotEmpty(name, "Field '" + field + "' must not be null", msgContext); 
+        if (ok) {
+            ok &= Character.isJavaIdentifierStart(name.charAt(0));
+            for (int c = 1; ok && c < name.length(); c++) {
+                ok &= Character.isJavaIdentifierPart(name.charAt(c));
+            }
+        }
+        return ok;
     }
     
     /**
@@ -340,15 +464,26 @@ public class Validator {
      */
     private boolean assertCondition(boolean condition, String msg, String msgContext) {
         if (!condition) {
-            if (null != msgContext && msgContext.length() > 0) {
-                msg += " (in " + msgContext + ")"; 
-            }
-            if (!msg.endsWith(".")) {
-                msg += ".";
-            }
-            messages.add(msg);
+            messages.add(appendContext(msg, msgContext));
         }
         return condition;
+    }
+
+    /**
+     * Appends the {@code msgContext} to {@code msg} for output.
+     * 
+     * @param msg the message
+     * @param msgContext the message context
+     * @return msg with appende context
+     */
+    private String appendContext(String msg, String msgContext) {
+        if (null != msgContext && msgContext.length() > 0) {
+            msg += " (in " + msgContext + ")"; 
+        }
+        if (!msg.endsWith(".")) {
+            msg += ".";
+        }
+        return msg;
     }
 
 }

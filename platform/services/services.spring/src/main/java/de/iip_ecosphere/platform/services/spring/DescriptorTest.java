@@ -29,22 +29,28 @@ public class DescriptorTest {
     /**
      * Tests the descriptor.
      * 
-     * @param args first argument is file name of Spring Service Jar artifact to test
+     * @param args file names of Spring Service Jar artifact to test
      */
     public static void main(String... args) {
         if (args.length > 0) {
-            File f = new File(args[0]);
-            System.out.println("Testing service descriptor in " + f);
-            try {
-                if (f.getName().endsWith(".jar")) {
-                    SpringCloudServiceManager.readFromFile(f);
-                } else if (f.getName().endsWith(".xml")) {
-                    try (FileInputStream fis = new FileInputStream(f)) {
-                        YamlArtifact.readFromYaml(fis);
+            for (String arg : args) {
+                File f = new File(arg);
+                if (!f.exists()) {
+                    System.out.println("File " + f + " does not exist");    
+                } else {
+                    System.out.println("Testing service descriptor in " + f);
+                    try {
+                        if (f.getName().endsWith(".jar")) {
+                            SpringCloudServiceManager.readFromFile(f);
+                        } else if (f.getName().endsWith(".xml")) {
+                            try (FileInputStream fis = new FileInputStream(f)) {
+                                YamlArtifact.readFromYaml(fis);
+                            }
+                        }
+                    } catch (ExecutionException | IOException e) {
+                        System.out.println("Error:\n" + e.getMessage());
                     }
                 }
-            } catch (ExecutionException | IOException e) {
-                System.out.println("Error:\n" + e.getMessage());
             }
         } else {
             System.out.println("No file given.");

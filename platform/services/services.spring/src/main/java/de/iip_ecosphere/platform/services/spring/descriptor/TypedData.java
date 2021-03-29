@@ -12,43 +12,32 @@
 
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
-import java.util.List;
-
 /**
- * Information about an artifact containing services. The artifact is to be deployed. {@link #getId()} and 
- * {@link #getName()} must be given, both not empty. {@link #getServices()} may be empty, but if not the services
- * must be valid. 
+ * Represents typed data, e.g., a parameter.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Artifact {
+public interface TypedData {
 
     /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
-    public String getId();
-
-    /**
-     * Returns the name of the service.
+     * Returns the name of the data.
      * 
      * @return the name
      */
     public String getName();
-    
-    /**
-     * Returns the services.
-     * 
-     * @return the services
-     */
-    public List<? extends Service> getServices();
 
     /**
-     * Returns the declared types.
+     * Returns the description of the data.
      * 
-     * @return the types
+     * @return the description
      */
-    public List<? extends Type> getTypes();
+    public String getDescription();
+
+    /**
+     * Returns the type of the data.
+     * 
+     * @return the type as qualified Java name
+     */
+    public String getType();
 
 }

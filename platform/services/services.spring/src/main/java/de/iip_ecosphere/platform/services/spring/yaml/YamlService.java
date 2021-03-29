@@ -33,6 +33,7 @@ public class YamlService implements Service {
     private List<String> ensembleWith = new ArrayList<>();
     private List<YamlServiceDependency> dependencies = new ArrayList<>();
     private List<YamlRelation> relations = new ArrayList<>();
+    private List<YamlTypedData> parameters = new ArrayList<>();
     private YamlProcess process;
     private ServiceKind kind;
     private boolean deployable = false;
@@ -80,7 +81,12 @@ public class YamlService implements Service {
     public List<YamlRelation> getRelations() {
         return relations;
     }
-    
+
+    @Override
+    public List<YamlTypedData> getParameters() {
+        return parameters;
+    }
+
     @Override
     public YamlProcess getProcess() {
         return process;
@@ -186,6 +192,15 @@ public class YamlService implements Service {
      */
     public void setRelations(List<YamlRelation> relations) {
         this.relations = relations;
+    }
+
+    /**
+     * Defines the service-specific configurable parameter. [required by SnakeYaml]
+     * 
+     * @param parameters the parameters, may be empty
+     */
+    public void setParameters(List<YamlTypedData> parameters) {
+        this.parameters = parameters;
     }
 
     /**

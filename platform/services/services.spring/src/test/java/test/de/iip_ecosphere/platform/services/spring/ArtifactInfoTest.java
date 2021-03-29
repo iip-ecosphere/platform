@@ -61,6 +61,13 @@ public class ArtifactInfoTest {
         Assert.assertEquals("art-name", info.getName());
         Assert.assertFalse(info.getServices().isEmpty());
         Assert.assertEquals(2, info.getServices().size());
+        Assert.assertEquals(2, info.getTypes().size());
+        Assert.assertEquals("myType", info.getTypes().get(0).getName());
+        Assert.assertEquals(2, info.getTypes().get(0).getFields().size());
+        Assert.assertEquals("a", info.getTypes().get(0).getFields().get(0).getName());
+        Assert.assertEquals("String", info.getTypes().get(0).getFields().get(0).getType());
+        Assert.assertEquals("myType1", info.getTypes().get(1).getName());
+        Assert.assertEquals(2, info.getTypes().get(1).getFields().size());
         
         YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
@@ -69,7 +76,6 @@ public class ArtifactInfoTest {
         assertStringList(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(0, service.getDependencies().size());
         Assert.assertEquals(2, service.getRelations().size());
-        service.getRelations().get(0);
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
         assertRelation(service.getRelations().get(1), "input", 9872, "me.here.de");
         Assert.assertNull(service.getProcess());

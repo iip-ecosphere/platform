@@ -219,7 +219,7 @@ public class SpringCloudServiceManager
                 // TODO check/wait for dependencies
                 AppDeploymentRequest req = service.createDeploymentRequest(getConfig());
                 if (null != req) {
-                    service.setState(ServiceState.DEPLOYING);
+                    setState(service, ServiceState.DEPLOYING);
                     LOGGER.info("Starting ... ");
                     String id = deployer.deploy(req);
                     waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
@@ -227,9 +227,9 @@ public class SpringCloudServiceManager
                     AppStatus status = deployer.status(id); 
                     service.setDeploymentId(id);
                     if (DeploymentState.deployed == status.getState()) {
-                        service.setState(ServiceState.RUNNING); // preliminary, done by/via service???
+                        setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
                     } else {
-                        service.setState(ServiceState.FAILED);
+                        setState(service, ServiceState.FAILED);
                         errors.add("Starting service id '" + ids + "' failed:\n" + getDeployer().getLog(id));
                     }
                 } // else, this is an ensemble service
@@ -295,18 +295,18 @@ public class SpringCloudServiceManager
                 if (null != status) {
                     DeploymentState state = status.getState();
                     if (state == DeploymentState.deployed) {
-                        service.setState(ServiceState.STOPPING);
+                        setState(service, ServiceState.STOPPING);
                         LOGGER.info("Stopping " + id + "... ");
                         deployer.undeploy(id);
                         state = waitFor(id, state, s -> DeploymentState.deployed == s);
                         LOGGER.info("Stopping " + id + "... " + state);
                         if (null == state || state == DeploymentState.undeployed) {
-                            service.setState(ServiceState.STOPPED);
+                            setState(service, ServiceState.STOPPED);
                         } else if (state == DeploymentState.error || state == DeploymentState.failed) {
-                            service.setState(ServiceState.FAILED);
+                            setState(service, ServiceState.FAILED);
                         }
                     } else {
-                        service.setState(ServiceState.STOPPED); // already gone with another service?
+                        setState(service, ServiceState.STOPPED); // already gone with another service?
                     }
                 }
             } 
@@ -350,6 +350,38 @@ public class SpringCloudServiceManager
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
+    }
+
+    @Override
+    public void activateService(String serviceId) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "activate");
+        if (ServiceState.PASSIVATED == service.getState()) {
+            // TODO activate
+            setState(service, ServiceState.RUNNING);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void passivateService(String serviceId) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "passivate");
+        if (ServiceState.RUNNING == service.getState()) {
+            setState(service, ServiceState.PASSIVATING);
+            // TODO passivate
+            setState(service, ServiceState.PASSIVATED);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "reconfigure");
+        ServiceState state = service.getState();
+        setState(service, ServiceState.RECONFIGURING);
+        // TODO reconfigure
+        setState(service, state);
     }
 
 }

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
@@ -67,21 +66,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     public String getGroup() {
         return getArtifact().getId(); // for now, just the artifact ID
-    }
-    
-    @Override
-    public void passivate() throws ExecutionException {
-        // TODO
-    }
-
-    @Override
-    public void activate() throws ExecutionException {
-        // TODO
-    }
-    
-    @Override
-    public void reconfigure(Map<String, Object> values) throws ExecutionException {
-        // TODO
     }
 
     /**
