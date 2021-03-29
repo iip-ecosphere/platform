@@ -243,7 +243,7 @@ public class Validator {
      */
     private void validate(Relation relation, Map<String, Type> types, String msgContext) {
         boolean chOk = assertFieldNotNull(relation.getChannel(), "channel", msgContext);
-        if (assertFieldNotNull(relation.getEndpoint(), "endpoint", msgContext)) {
+        if (null != relation.getEndpoint()) { // endpoints optional depending on the relation
             validate(relation.getEndpoint(), appendToContext(msgContext, "endpoint"));
         }
         assertFieldNotNull(relation.getDescription(), "description", msgContext); // optional
