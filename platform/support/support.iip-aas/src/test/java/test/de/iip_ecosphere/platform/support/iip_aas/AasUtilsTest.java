@@ -12,6 +12,9 @@
 
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +31,7 @@ public class AasUtilsTest {
      * Tests {@link AasUtils}.
      */
     @Test
-    public void testAasUtils() {
+    public void testString() {
         Object[] noArgs = new Object[0];
         Object[] args = new Object[2];
         args[0] = "abba";
@@ -37,8 +40,53 @@ public class AasUtilsTest {
         Assert.assertEquals("", AasUtils.readString(noArgs, 0, ""));
         Assert.assertEquals("abba", AasUtils.readString(args, 0, null));
 
+        // default ""
+        Assert.assertEquals("", AasUtils.readString(noArgs, 0));
+        // default "", index 0
+        Assert.assertEquals("", AasUtils.readString(noArgs));
+    }
+
+    /**
+     * Tests {@link AasUtils}.
+     */
+    @Test
+    public void testInt() {
+        Object[] noArgs = new Object[0];
+        Object[] args = new Object[2];
+        args[0] = "abba";
+        args[1] = 5;
+        
         Assert.assertEquals(-1, AasUtils.readInt(noArgs, 1, -1));
         Assert.assertEquals(5, AasUtils.readInt(args, 1, 0));
+    }
+
+    /**
+     * Tests {@link AasUtils}.
+     */
+    @Test
+    public void testUri() {
+        Object[] noArgs = new Object[0];
+        Object[] args = new Object[1];
+
+        // URI is ok
+        args[0] = "http://me.here/my/file.txt";
+        URI uri = AasUtils.readUri(noArgs, 0, null);
+        Assert.assertNull(uri);
+        uri = AasUtils.readUri(args, 0, null);
+        Assert.assertNotNull(uri);
+        Assert.assertEquals(args[0], uri.toString());
+
+        // erroneous URI
+        args[0] = "<x>";
+        uri = AasUtils.readUri(args, 0, null);
+        Assert.assertNull(uri);
+
+        try {
+            AasUtils.readUriEx(args, 0, null);
+            Assert.fail("no exception");
+        } catch (URISyntaxException e) {
+            // this is intended
+        }
     }
 
 }
