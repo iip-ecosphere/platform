@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.connectors;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 
 /**
@@ -131,27 +130,16 @@ public class ConnectorsAas implements AasContributor {
      * @param connector the connector instance
      */
     static void notifyRemoveConnector(Connector<?, ?, ?, ?> connector) {
-        // TODO run threaded locked on this model
-        try {
-            Aas aas = AasPartRegistry.retrieveIipAas();
-            if (null != aas) {
-                Submodel submodel = aas.getSubmodel(NAME_CONNECTORS_SUBMODEL);
-                if (null != submodel) {
-                    String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-                    SubmodelElementCollection coll = submodel.getSubmodelElementCollection(idShort);
-                    if (null != coll) {
-                        submodel.delete(coll);
-                    } else {
-                        LOGGER.error("No element collection for connector: " + NAME_CONNECTORS_SUBMODEL 
-                            + "/" + idShort);
-                    }
-                } else {
-                    LOGGER.error("No submodel: " + NAME_CONNECTORS_SUBMODEL);
-                }
+        ActiveAasBase.processNotification(NAME_CONNECTORS_SUBMODEL, (submodel, aas) -> {
+            String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
+            SubmodelElementCollection coll = submodel.getSubmodelElementCollection(idShort);
+            if (null != coll) {
+                submodel.delete(coll);
+            } else {
+                LOGGER.error("No element collection for connector: " + NAME_CONNECTORS_SUBMODEL 
+                    + "/" + idShort);
             }
-        } catch (IOException e) {
-            LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
-        }
+        });
     }
 
     /**
@@ -160,25 +148,18 @@ public class ConnectorsAas implements AasContributor {
      * @param connector the connector instance
      */
     static void notifyAddConnector(Connector<?, ?, ?, ?> connector) {
-        // TODO run threaded locked on this model
-        try {
-            Aas aas = AasPartRegistry.retrieveIipAas();
-            if (null != aas) {
-                Submodel descriptors = aas.getSubmodel(NAME_DESCRIPTORS_SUBMODEL);
-                Submodel submodel = aas.getSubmodel(NAME_CONNECTORS_SUBMODEL);
-                if (null != submodel && null != descriptors) {
-                    String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-                    SubmodelElementCollectionBuilder smcb = submodel.createSubmodelElementCollectionBuilder(
-                        idShort, false, false);
-                    addConnector(smcb, connector, descriptors);
-                    smcb.build();
-                } else {
-                    LOGGER.error("No submodel: " + NAME_CONNECTORS_SUBMODEL);
-                }
+        ActiveAasBase.processNotification(NAME_CONNECTORS_SUBMODEL, (submodel, aas) -> {
+            Submodel descriptors = aas.getSubmodel(NAME_DESCRIPTORS_SUBMODEL);
+            if (null != submodel && null != descriptors) {
+                String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
+                SubmodelElementCollectionBuilder smcb = submodel.createSubmodelElementCollectionBuilder(
+                    idShort, false, false);
+                addConnector(smcb, connector, descriptors);
+                smcb.build();
+            } else {
+                LOGGER.error("No submodel: " + NAME_CONNECTORS_SUBMODEL);
             }
-        } catch (IOException e) {
-            LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage());
-        }
+        });
     }
     
     /**
