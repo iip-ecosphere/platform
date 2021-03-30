@@ -29,8 +29,21 @@ public interface Relation {
      * @author Holger Eichelberger, SSE
      */
     public enum Direction {
+        
+        /**
+         * Input direction.
+         */
         IN,
-        OUT
+
+        /**
+         * Output direction.
+         */
+        OUT,
+        
+        /**
+         * If an explicit direction for other relations such as the empty channel for local connections shall be stated.
+         */
+        OTHER
     }
     
     /**

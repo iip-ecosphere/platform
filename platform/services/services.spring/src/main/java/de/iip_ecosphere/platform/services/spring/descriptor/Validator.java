@@ -28,21 +28,8 @@ import de.iip_ecosphere.platform.services.Version;
  */
 public class Validator {
 
-    private static Set<String> primitives = new HashSet<>();
     private List<String> messages = new ArrayList<>();
     private Set<String> serviceIds = new HashSet<>();
-    
-    static {
-        primitives.add("String"); // to be translated to qualified name later
-        primitives.add("int");
-        primitives.add("boolean");
-        primitives.add("byte");
-        primitives.add("double");
-        primitives.add("float");
-        primitives.add("char");
-        primitives.add("short");
-        primitives.add("long");
-    }
     
     /**
      * Returns whether there are validation (error) messages.
@@ -331,7 +318,7 @@ public class Validator {
      */
     private boolean assertType(String type, Map<String, Type> types, String field, String msgContext) {
         boolean ok = assertJavaIdentifier(type, field, msgContext);
-        if (ok && !types.containsKey(type) && !primitives.contains(type)) {
+        if (ok && !types.containsKey(type) && !TypeResolver.isPrimitive(type)) {
             try {
                 Class.forName(type);
             } catch (ClassNotFoundException e) {

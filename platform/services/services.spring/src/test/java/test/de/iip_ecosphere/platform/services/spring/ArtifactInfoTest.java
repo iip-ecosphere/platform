@@ -21,8 +21,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.spring.DescriptorTest;
+import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
@@ -100,6 +103,57 @@ public class ArtifactInfoTest {
         val.validate(info);
         Assert.assertFalse(val.hasMessages());
         val.clear();
+    }
+    
+    /**
+     * Tests the class resolution.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testResolution() throws IOException {
+        YamlArtifact info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test.yml"));
+
+        Validator val = new Validator();
+        val.validate(info);
+        SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(info, null);
+        Assert.assertNotNull(aDesc);
+        ServiceDescriptor sDesc = aDesc.getService("id-0");
+        TypedDataDescriptor param = sDesc.getParameters().get(0);
+        assertTypedData(param, "param1", "", String.class.getName());
+        param = sDesc.getParameters().get(1);
+        Class<?> paramType = assertTypedData(param, "param2", "", "myType1");
+        try {
+            Assert.assertEquals(String.class, paramType.getDeclaredField("a").getType());
+            Assert.assertEquals("myType", paramType.getDeclaredField("b").getType().getName());
+        } catch (NoSuchFieldException e) {
+            Assert.fail(e.getMessage());
+        }
+        Assert.assertEquals(1, sDesc.getInputDataConnectors().size());
+        assertTypedData(sDesc.getInputDataConnectors().get(0), "input", "", "myType");
+        
+        sDesc = aDesc.getService("id-1");
+        Assert.assertEquals(1, sDesc.getOutputDataConnectors().size());
+        assertTypedData(sDesc.getOutputDataConnectors().get(0), "output", "", "int");
+    }
+    
+    /**
+     * Asserts properties of a typed data descriptor.
+     * 
+     * @param desc the parameter descriptor
+     * @param name the name of the parameter
+     * @param description the description
+     * @param type the type (not tested if <b>null</b>)
+     * @return the type of the typed data as class (may be <b>null</b>, but not if {@code type} was given and asserted)
+     */
+    private static Class<?> assertTypedData(TypedDataDescriptor desc, String name, String description, String type) {
+        Assert.assertEquals(name, desc.getName());
+        Assert.assertEquals(description, desc.getDescription());
+        if (null != type) {
+            Assert.assertNotNull(desc.getType());
+            Assert.assertEquals(type, desc.getType().getName());
+        }
+        return desc.getType();
     }
     
     /**

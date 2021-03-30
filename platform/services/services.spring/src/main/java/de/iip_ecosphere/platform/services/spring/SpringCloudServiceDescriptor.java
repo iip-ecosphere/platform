@@ -28,7 +28,10 @@ import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.Version;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
+import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
+import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
+import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
@@ -50,13 +53,29 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * 
      * @param service the service deployment specification object
      * @param ensembleLeader optional ensemble leader some information shall be taken from/synchronized with
+     * @param resolver the (artifact) type resolver
      * @see #setClassification(ServiceKind, boolean)
      */
-    public SpringCloudServiceDescriptor(Service service, SpringCloudServiceDescriptor ensembleLeader) {
+    public SpringCloudServiceDescriptor(Service service, SpringCloudServiceDescriptor ensembleLeader, 
+        TypeResolver resolver) {
         super(service.getId(), service.getName(), service.getDescription(), new Version(service.getVersion()));
         setClassification(service.getKind(), service.isDeployable());
         this.service = service;
         this.ensembleLeader = ensembleLeader;
+        
+        for (TypedData p : service.getParameters()) {
+            addParameter(new SpringCloudServiceTypedData(p.getName(), p.getDescription(), 
+                resolver.resolve(p.getType())));
+        }
+        for (Relation r : service.getRelations()) {
+            if (Direction.IN == r.getDirection()) {
+                addInputDataConnector(new SpringCloudServiceTypedConnectorData(r.getChannel(), 
+                    r.getDescription(), resolver.resolve(r.getType())));
+            } else if (Direction.OUT == r.getDirection()) {
+                addOutputDataConnector(new SpringCloudServiceTypedConnectorData(r.getChannel(), 
+                    r.getDescription(), resolver.resolve(r.getType())));
+            }
+        }
     }
     
     /**

@@ -16,7 +16,6 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.Version;
-import de.iip_ecosphere.platform.services.spring.yaml.YamlTypedData;
 
 /**
  * Information about a single service. {@link #getId()} and {@link #getName()} must be given, both not empty, 
@@ -92,7 +91,7 @@ public interface Service {
      * 
      * @return the parameter, may be empty
      */
-    public List<YamlTypedData> getParameters();
+    public List<? extends TypedData> getParameters();
     
     /**
      * Returns an optional attached process realizing the service.

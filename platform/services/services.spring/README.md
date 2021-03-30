@@ -85,6 +85,8 @@ Currently, the following properties can be configured:
           deleteFilesOnExit: <Boolean>
       
 ## Missing
+* Services AAS (on the way)
 * Handling of dependent services
-* Handling of implementation processes
+* Handling of implementation processes, i.e., external implementations of services running as processes
 * Advanced service operations: update, migrate, switch, clone
+* Service monitoring

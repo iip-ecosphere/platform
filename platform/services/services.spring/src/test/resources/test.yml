@@ -54,7 +54,7 @@ services:
           portArg: --input.port=${port}
           hostArg: --input.host=${host}
         direction: OUT
-        type: String
+        type: int
     process:
       path: impl/python
       cmdArg:

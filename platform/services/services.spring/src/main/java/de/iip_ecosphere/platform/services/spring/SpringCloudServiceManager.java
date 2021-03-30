@@ -21,7 +21,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -42,7 +41,6 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
-import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -99,29 +97,7 @@ public class SpringCloudServiceManager
         if (val.hasMessages()) {
             throw new ExecutionException("Problems in descriptor:\n" + val.getMessages(), null);
         }
-        List<SpringCloudServiceDescriptor> services = new ArrayList<>();
-        Map<String, String> ensembleLeaderIds = new HashMap<>();
-        for (YamlService s : yamlArtifact.getServices()) {
-            for (String id : s.getEnsembleWith()) {
-                ensembleLeaderIds.put(id, s.getId());
-            }
-        }
-        
-        Map<String, SpringCloudServiceDescriptor> descriptors = new HashMap<String, SpringCloudServiceDescriptor>();
-        for (YamlService s : yamlArtifact.getServices()) {
-            SpringCloudServiceDescriptor ensembleLeader = null;
-            for (String ens: s.getEnsembleWith()) {
-                ensembleLeader = descriptors.get(ens);
-                if (null != ensembleLeader) {
-                    break;
-                }
-            }
-            SpringCloudServiceDescriptor desc = new SpringCloudServiceDescriptor(s, ensembleLeader);
-            descriptors.put(desc.getId(), desc);
-            services.add(desc);
-        }
-        SpringCloudArtifactDescriptor artifact = new SpringCloudArtifactDescriptor(yamlArtifact.getId(), 
-            yamlArtifact.getName(), jarFile, services);
+        SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(yamlArtifact, jarFile);
         return super.addArtifact(artifact.getId(), artifact);
     }
     

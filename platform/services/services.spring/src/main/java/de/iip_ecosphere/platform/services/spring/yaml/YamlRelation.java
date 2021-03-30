@@ -25,7 +25,7 @@ public class YamlRelation implements Relation {
     private YamlEndpoint endpoint;
     private String description = "";
     private String type;
-    private Direction direction;
+    private Direction direction = Direction.OTHER;
     
     @Override
     public String getChannel() {
