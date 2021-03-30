@@ -132,10 +132,12 @@ public class AasPartRegistryTest {
         Assert.assertNotNull(deployedAas.getSubmodel("c1"));
         
         boolean oldP = ActiveAasBase.setParallelNotification(false);
-        ActiveAasBase.processNotification("c1", s -> Assert.assertEquals("c1", s.getIdShort()));
+        ActiveAasBase.processNotification("c1", (s, a) -> Assert.assertEquals("c1", s.getIdShort()));
         ActiveAasBase.setParallelNotification(true);
         AtomicBoolean done = new AtomicBoolean(false);
-        ActiveAasBase.processNotification("c1", s -> { Assert.assertEquals("c1", s.getIdShort()); done.set(true); });
+        ActiveAasBase.processNotification("c1", (s, a) -> { 
+            Assert.assertEquals("c1", s.getIdShort()); done.set(true); 
+        });
         while (!done.get()) {
             TimeUtils.sleep(200);
         }

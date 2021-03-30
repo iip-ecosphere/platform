@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,21 +34,49 @@ public class ActiveAasBase {
     private static ExecutorService exec = Executors.newFixedThreadPool(5);
     
     /**
+     * ******************************************************************************
+     * Copyright (c) {2021} The original author or authors
+     *
+     * All rights reserved. This program and the accompanying materials are made 
+     * available under the terms of the Eclipse Public License 2.0 which is available 
+     * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+     * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+     *
+     * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+     ********************************************************************************/
+    
+    /**
+     * Defines the interface for a notification processor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface NotificationProcessor {
+        
+        /**
+         * Processes the notification.
+         * 
+         * @param submodel the primary submodel to be processed
+         * @param aas the parent AAS (as the submodel does not have a link to it)
+         */
+        public void process(Submodel submodel, Aas aas);
+    }
+    
+    /**
      * Processes a notification on a submodel of {@link AasPartRegistry#retrieveIipAas()}.
      * 
      * @param subId the short id of the submodel
-     * @param function the function to execute
+     * @param processor the processor to execute
      */
-    public static void processNotification(String subId, Consumer<Submodel> function) {
+    public static void processNotification(String subId, NotificationProcessor processor) {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             if (null != aas) {
                 Submodel submodel = aas.getSubmodel(subId);
                 if (null != submodel) {
                     if (parallelNotification) {
-                        exec.execute(() -> function.accept(submodel));
+                        exec.execute(() -> processor.process(submodel, aas));
                     } else {
-                        function.accept(submodel);
+                        processor.process(submodel, aas);
                     }
                 }
             } else {
