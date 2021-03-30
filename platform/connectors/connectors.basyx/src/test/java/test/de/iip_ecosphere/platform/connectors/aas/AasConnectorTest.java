@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
@@ -67,6 +68,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
+    private static boolean oldP;
     
     /**
      * Creates an instance of this test.
@@ -83,6 +85,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
      */
     @BeforeClass
     public static void init() throws SocketException, UnknownHostException {
+        oldP = ActiveAasBase.setParallelNotification(false); // more deterministic testing
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         
@@ -123,6 +126,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         platformAasServer.stop(true);
 
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
+        ActiveAasBase.setParallelNotification(oldP);
     }
     
     /**
