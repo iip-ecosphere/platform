@@ -54,7 +54,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxSubmodelElementCollection instance;
-        private org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection collection;
+        private ISubmodelElementCollection collection;
         private boolean isNew = true;
         
         /**
@@ -71,10 +71,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             String idShort, boolean ordered, boolean allowDuplicates) {
             this.parentBuilder = parentBuilder;
             this.instance = new BaSyxSubmodelElementCollection();
-            this.collection = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
-            this.collection.setIdShort(Tools.checkId(idShort));
-            this.collection.setOrdered(ordered);
-            this.collection.setAllowDuplicates(allowDuplicates);
+            org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll = 
+                new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
+            coll.setIdShort(Tools.checkId(idShort));
+            coll.setOrdered(ordered);
+            coll.setAllowDuplicates(allowDuplicates);
+            this.collection = coll;
         }
         
         /**
@@ -88,10 +90,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             this.parentBuilder = parentBuilder;
             this.instance = instance;
             this.isNew = false;
-            if (instance.collection 
-                instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) {
-                this.collection = (org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) 
-                    instance.collection;
+            if (instance.collection instanceof ISubmodelElementCollection) {
+                this.collection = (ISubmodelElementCollection) instance.collection;
             } else {
                 throw new IllegalArgumentException("Cannot create a " + getClass().getSimpleName() + " on a " 
                     + instance.collection.getClass().getSimpleName());
@@ -312,6 +312,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public Reference createReference() {
         return new BaSyxReference(collection.getReference());
+    }
+
+    @Override
+    public void deleteElement(String idShort) {
+        elements.remove(getElement(idShort));
+        collection.deleteSubmodelElement(idShort);
     }
 
 }

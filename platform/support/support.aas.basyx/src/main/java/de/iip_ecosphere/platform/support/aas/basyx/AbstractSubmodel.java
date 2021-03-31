@@ -239,7 +239,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
         }
         for (SubmodelElement se : submodelElements.values()) {
             // remaining elements, don't iterate over them again
-            if (!(se instanceof DataElement && se instanceof Operation)) {
+            if (!(se instanceof DataElement || se instanceof Operation)) {
                 se.accept(visitor);
             }
         }
