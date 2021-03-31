@@ -30,20 +30,31 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 public class ActiveAasBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveAasBase.class);
-    private static boolean parallelNotification = true;
+    private static NotificationMode mode = NotificationMode.ASYNCHRONOUS;
     private static ExecutorService exec = Executors.newFixedThreadPool(5);
-    
+
     /**
-     * ******************************************************************************
-     * Copyright (c) {2021} The original author or authors
-     *
-     * All rights reserved. This program and the accompanying materials are made 
-     * available under the terms of the Eclipse Public License 2.0 which is available 
-     * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
-     * which is available at https://www.apache.org/licenses/LICENSE-2.0.
-     *
-     * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
-     ********************************************************************************/
+     * Supported notification modes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum NotificationMode {
+        
+        /**
+         * Parallel asynchronous notifications.
+         */
+        ASYNCHRONOUS,
+        
+        /**
+         * Sequential, synchronous notifications, e.g., for testing.
+         */
+        SYNCHRONOUS,
+        
+        /**
+         * No notifications, e.g., for testing.
+         */
+        NONE;
+    }
     
     /**
      * Defines the interface for a notification processor.
@@ -68,35 +79,56 @@ public class ActiveAasBase {
      * @param processor the processor to execute
      */
     public static void processNotification(String subId, NotificationProcessor processor) {
-        try {
-            Aas aas = AasPartRegistry.retrieveIipAas();
-            if (null != aas) {
-                Submodel submodel = aas.getSubmodel(subId);
-                if (null != submodel) {
-                    if (parallelNotification) {
-                        exec.execute(() -> processor.process(submodel, aas));
-                    } else {
-                        processor.process(submodel, aas);
+        if (mode != NotificationMode.NONE) {
+            try {
+                Aas aas = AasPartRegistry.retrieveIipAas();
+                if (null != aas) {
+                    Submodel submodel = aas.getSubmodel(subId);
+                    if (null != submodel) {
+                        if (NotificationMode.SYNCHRONOUS == mode) {
+                            exec.execute(() -> processor.process(submodel, aas));
+                        } else {
+                            processor.process(submodel, aas);
+                        }
                     }
+                } else {
+                    LOGGER.error("Cannot find submodel: " + subId);
                 }
-            } else {
-                LOGGER.error("Cannot find submodel: " + subId);
+            } catch (IOException e) {
+                LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
         }
     }
 
     /**
      * Changes the notification execution mode. [for testing]
      * 
-     * @param parallel {@code true} for parallel executions, {@code false} for sequential
-     * @return the last execution mode
+     * @param mo the new mode
+     * @return the last notification mode
      */
-    public static boolean setParallelNotification(boolean parallel) {
-        boolean old = parallelNotification;
-        parallelNotification = parallel;
+    public static NotificationMode setNotificationMode(NotificationMode mo) {
+        NotificationMode old = mode;
+        mode = mo;
         return old;
+    }
+    
+    /**
+     * Obtains a submodel of {@link AasPartRegistry#retrieveIipAas()}.
+     * 
+     * @param name the name of the submodel
+     * @return the submodel
+     * @throws IOException if the submodel cannot be found
+     */
+    public static Submodel getSubmodel(String name) throws IOException {
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        if (null == aas) {
+            throw new IOException("No IIP-AAS found");
+        }
+        Submodel submodel = aas.getSubmodel(name);
+        if (null == submodel) {
+            throw new IOException("No submodel '" + name + "' found");
+        }
+        return submodel;
     }
     
 }

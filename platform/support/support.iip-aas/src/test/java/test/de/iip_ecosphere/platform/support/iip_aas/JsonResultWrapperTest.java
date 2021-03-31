@@ -45,9 +45,11 @@ public class JsonResultWrapperTest {
     
     /**
      * Tests {@link JsonResultWrapper}.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void testWrapper() {
+    public void testWrapper() throws ExecutionException {
         JsonResultWrapper wr = new JsonResultWrapper(p -> testFunc(readString(p, 0, "")));
         
         // this is a normal execution of testFunc
@@ -56,6 +58,7 @@ public class JsonResultWrapperTest {
         Assert.assertFalse(res.isException());
         Assert.assertNull(res.getException());
         Assert.assertEquals("1234", res.getResult());
+        Assert.assertEquals("1234", JsonResultWrapper.fromJson(wr.apply(new Object[]{"1234"})));
 
         // this causes an exception in testFunc
         res = JsonResultWrapper.resultFromJson(wr.apply(new Object[]{null}));
@@ -64,6 +67,13 @@ public class JsonResultWrapperTest {
         Assert.assertNotNull(res.getException());
         Assert.assertNull(res.getResult());
         System.out.println("EXC: " + res.getException());
+        
+        try {
+            JsonResultWrapper.fromJson(wr.apply(new Object[]{null}));
+            Assert.fail("No exception");
+        } catch (ExecutionException e) {
+            // this is ok
+        }
     }
     
 }

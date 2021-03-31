@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.support.iip_aas.json;
 
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -175,6 +176,27 @@ public class JsonResultWrapper implements Function<Object[], Object> {
             }
         }
         return result; 
+    }
+
+    /**
+     * Turns something in JSON into a result via an instance of {@code Result}.
+     * 
+     * @param json the JSON value, usually a String
+     * @return the result value, may be <b>null</b>, e.g., if {@code json} is <b>null</b>
+     * @throws ExecutionException if the parsed {@link Result} represents an exception
+     */
+    public static String fromJson(Object json) throws ExecutionException {
+        String result; 
+        Result res = resultFromJson(json);
+        if (null != res) {
+            if (res.isException()) {
+                throw new ExecutionException(res.getException(), null);
+            }
+            result = res.getResult();
+        } else {
+            result = null;
+        }
+        return result;
     }
 
 }

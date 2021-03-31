@@ -13,16 +13,16 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
+
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.Operation;
-import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.AbstractNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
+
+import static de.iip_ecosphere.platform.support.iip_aas.SubmodelClient.*;
 
 /**
  * Implementing a network manager acting as client for an AAS-based network manager. The AAS shall be provided by
@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
 
     private Submodel submodel;
-
+    
     /**
      * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
      * {@link NetworkManagerAas#NAME_SUBMODEL name}.
@@ -41,14 +41,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
      * @throws IOException if retrieving the IIP-AAS or the respective submodel fails
      */
     public NetworkManagerAasClient() throws IOException {
-        Aas aas = AasPartRegistry.retrieveIipAas();
-        if (null == aas) {
-            throw new IOException("No IIP-AAS found");
-        }
-        this.submodel = aas.getSubmodel(NetworkManagerAas.NAME_SUBMODEL);
-        if (null == this.submodel) {
-            throw new IOException("No submodel '" + NetworkManagerAas.NAME_SUBMODEL + "' found");
-        }
+        this(ActiveAasBase.getSubmodel(NetworkManagerAas.NAME_SUBMODEL));
     }
     
     /**
@@ -65,7 +58,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public ManagedServerAddress obtainPort(String key) {
         try {
             checkKey(key);
-            String tmp = checkString(getOperation(NetworkManagerAas.OP_OBTAIN_PORT).invoke(key));
+            String tmp = checkString(getOperation(submodel, NetworkManagerAas.OP_OBTAIN_PORT).invoke(key));
             return checkNotNull(NetworkManagerAas.managedServerAddressFromJson(tmp));
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
@@ -76,7 +69,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public ManagedServerAddress getPort(String key) {
         try {
             checkKey(key);
-            Object tmp = getOperation(NetworkManagerAas.OP_GET_PORT).invoke(key);
+            Object tmp = getOperation(submodel, NetworkManagerAas.OP_GET_PORT).invoke(key);
             // result may be null here!!
             return NetworkManagerAas.managedServerAddressFromJson(tmp);
         } catch (ExecutionException e) {
@@ -89,7 +82,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         try {
             checkKey(key);
             checkAddress(address);
-            String tmp = checkString(getOperation(NetworkManagerAas.OP_RESERVE_PORT).invoke(key, 
+            String tmp = checkString(getOperation(submodel, NetworkManagerAas.OP_RESERVE_PORT).invoke(key, 
                 JsonUtils.toJson(checkNotNull(address))));
             return checkNotNull(NetworkManagerAas.managedServerAddressFromJson(tmp));
         } catch (ExecutionException e) {
@@ -101,70 +94,10 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public void releasePort(String key) {
         try {
             checkKey(key);
-            getOperation(NetworkManagerAas.OP_RELEASE_PORT).invoke(key);
+            getOperation(submodel, NetworkManagerAas.OP_RELEASE_PORT).invoke(key);
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-    }
-    
-    /**
-     * Checks for that {@code obj} is a non-empty string.
-     * 
-     * @param obj the object representing the string
-     * @return the string
-     * @throws IllegalArgumentException if there is no valid string
-     */
-    private static String checkString(Object obj) {
-        String result = null == obj ? null : obj.toString();
-        if (null == result || result.length() == 0) {
-            throw new IllegalArgumentException("Not valid string/response");
-        }
-        return result;
-    }
-
-    /**
-     * Checks for that {@code result} is not null.
-     * 
-     * @param <T> the type of object
-     * @param obj the object to check
-     * @return {@code obj}
-     * @throws IllegalArgumentException if {@code obj} is <b>null</b>
-     */
-    private static <T> T checkNotNull(T obj) {
-        if (null == obj) {
-            throw new IllegalArgumentException("No valid object");
-        }
-        return obj;
-    }
-
-    /**
-     * Returns the operation for the given {@code idShort} defined on {@link #submodel}.
-     * 
-     * @param idShort the short id
-     * @return the operation
-     * @throws ExecutionException if the operation was not found
-     */
-    private Operation getOperation(String idShort) throws ExecutionException {
-        Operation result = submodel.getOperation(idShort);
-        if (null == result) {
-            throw new ExecutionException("Operation '" + idShort + "' not found", null);
-        }
-        return result;
-    }
-    
-    /**
-     * Returns the property for the given {@code idShort} defined on {@link #submodel}.
-     * 
-     * @param idShort the short id
-     * @return the property
-     * @throws ExecutionException if the property was not found
-     */
-    private Property getProperty(String idShort) throws ExecutionException {
-        Property result = submodel.getProperty(idShort);
-        if (null == result) {
-            throw new ExecutionException("Property '" + idShort + "' not found", null);
-        }
-        return result;
     }
 
     @Override
@@ -172,7 +105,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         checkAddress(address);
         boolean result = false;
         try {
-            Object tmp = getOperation(NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(JsonUtils.toJson(address));
+            Object tmp = getOperation(submodel, NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(JsonUtils.toJson(address));
             if (tmp instanceof Boolean) {
                 result = ((Boolean) tmp).booleanValue();
             }
@@ -185,7 +118,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public boolean isInUse(int port) {
         boolean result = false;
         try {
-            Object tmp = getOperation(NetworkManagerAas.OP_IS_IN_USE_PORT).invoke(port);
+            Object tmp = getOperation(submodel, NetworkManagerAas.OP_IS_IN_USE_PORT).invoke(port);
             if (tmp instanceof Boolean) {
                 result = ((Boolean) tmp).booleanValue();
             }
@@ -198,7 +131,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public int getLowPort() {
         int result = -1;
         try {
-            Object tmp = getProperty(NetworkManagerAas.PROP_LOW_PORT).getValue();
+            Object tmp = getProperty(submodel, NetworkManagerAas.PROP_LOW_PORT).getValue();
             if (tmp instanceof Integer) {
                 result = ((Integer) tmp).intValue();
             }
@@ -211,7 +144,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
     public int getHighPort() {
         int result = -1;
         try {
-            Object tmp = getProperty(NetworkManagerAas.PROP_HIGH_PORT).getValue();
+            Object tmp = getProperty(submodel, NetworkManagerAas.PROP_HIGH_PORT).getValue();
             if (tmp instanceof Integer) {
                 result = ((Integer) tmp).intValue();
             }
