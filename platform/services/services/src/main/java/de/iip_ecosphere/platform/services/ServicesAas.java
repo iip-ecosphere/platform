@@ -15,12 +15,15 @@ package de.iip_ecosphere.platform.services;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
@@ -29,6 +32,10 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the AAS for the services.
@@ -58,13 +65,22 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_SWITCH = "switchToService";
     public static final String NAME_OP_SERVICE_RECONF = "reconfigureService";
     public static final String NAME_OP_SERVICE_STOP = "stopService";
+    public static final String NAME_OP_SERVICE_GET_STATE = "getServiceSate";
+    public static final String NAME_OP_SERVICE_SET_STATE = "setServiceSate";
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
+
+    private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServicesAas.class);
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ServiceManager mgr = ServiceFactory.getServiceManager();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+        // ensure that these two do exist
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false).build();
+
         for (ArtifactDescriptor a : mgr.getArtifacts()) {
             addArtifact(smB, a);
         }
@@ -81,7 +97,9 @@ public class ServicesAas implements AasContributor {
         createIdOp(smB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
         createIdOp(smB, NAME_OP_SERVICE_RECONF, iCreator, "values");
         createIdOp(smB, NAME_OP_SERVICE_STOP, iCreator);
-
+        createIdOp(smB, NAME_OP_SERVICE_GET_STATE, iCreator);
+        createIdOp(smB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
+        
         // probably relevant ops only
         smB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
@@ -123,13 +141,26 @@ public class ServicesAas implements AasContributor {
     public static String getQName(String elementName) {
         return NAME_SUBMODEL + "_" + elementName;
     }
-    
+
+    /**
+     * Reads all params as string array.
+     * 
+     * @param params the params
+     * @return the string array
+     */
+    private static String[] readStringArray(Object[] params) {
+        String[] args = new String[params.length];
+        for (int a = 0; a < args.length; a++) {
+            args[a] = readString(params, a, "");
+        }
+        return args;
+    }
     
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START), 
-            new JsonResultWrapper(p -> { 
-                ServiceFactory.getServiceManager().startService(readString(p)); 
+            new JsonResultWrapper(p -> {
+                ServiceFactory.getServiceManager().startService(readStringArray(p)); 
                 return null;
             }
         ));
@@ -171,7 +202,19 @@ public class ServicesAas implements AasContributor {
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_STOP), 
             new JsonResultWrapper(p -> { 
-                ServiceFactory.getServiceManager().stopService(readString(p)); 
+                ServiceFactory.getServiceManager().stopService(readStringArray(p)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_GET_STATE), 
+            new JsonResultWrapper(p -> { 
+                return ServiceFactory.getServiceManager().getServiceState(readString(p)); 
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_SET_STATE), 
+            new JsonResultWrapper(p -> { 
+                ServiceState state = ServiceState.valueOf(readString(p, 1, "")); // exception shall be caught by wrapper
+                ServiceFactory.getServiceManager().setServiceState(readString(p), state); 
                 return null;
             }
         ));
@@ -316,6 +359,14 @@ public class ServicesAas implements AasContributor {
      * @param desc the artifact descriptor 
      */
     public static void notifyArtifactAdded(ArtifactDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            addArtifact(builder, desc);
+            for (ServiceDescriptor s : desc.getServices()) {
+                addService(builder, s);
+            }
+            builder.build();
+        });
     }
 
     /**
@@ -324,6 +375,14 @@ public class ServicesAas implements AasContributor {
      * @param desc the artifact descriptor 
      */
     public static void notifyArtifactRemoved(ArtifactDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+            for (String sId : desc.getServiceIds()) {
+                coll.deleteElement(sId);
+            }
+            coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
+            coll.deleteElement(desc.getId());
+        });
     }
     
     /**
@@ -332,6 +391,27 @@ public class ServicesAas implements AasContributor {
      * @param desc the service descriptor 
      */
     public static void notifyServiceStateChanged(ServiceDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            // other approach... link property against service descriptor while creation and reflect state
+            // let's try this one for now
+            SubmodelElementCollection elt = sub.getSubmodelElementCollection(NAME_COLL_SERVICES)
+                .getSubmodelElementCollection(desc.getId());
+            if (null != elt) {
+                Property prop = elt.getProperty(NAME_PROP_STATE);
+                if (null != prop) {
+                    try {
+                        prop.setValue(desc.getState().toString());
+                    } catch (ExecutionException e) {
+                        LOGGER.error("Cannot write state for service `" + desc.getId() + "`: " + e.getMessage());
+                    }
+                } else {
+                    LOGGER.error("Service state change - cannot find property " + NAME_PROP_STATE 
+                        + "for service `" + desc.getId());
+                }
+            } else {
+                LOGGER.error("Service state change - cannot find service `" + desc.getId() + "`");
+            }
+        });
     }
 
 }

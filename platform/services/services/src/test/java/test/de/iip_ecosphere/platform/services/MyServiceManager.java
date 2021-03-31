@@ -64,8 +64,8 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
         String aId = createArtifactId();
         List<MyServiceDescriptor> services = new ArrayList<>();
         String text = location.toString();
-        services.add(new MyServiceDescriptor(createServiceId(), text, text, new Version(1, 0)));
-        services.add(new MyServiceDescriptor(createServiceId(), text, text, new Version(1, 1)));
+        services.add(new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 0)));
+        services.add(new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 1)));
         super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
         return aId;
     }
@@ -105,6 +105,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
 
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
+        throw new ExecutionException("Not implemented", null);
     }
     
     @Override

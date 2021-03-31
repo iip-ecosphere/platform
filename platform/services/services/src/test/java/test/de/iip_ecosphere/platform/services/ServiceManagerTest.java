@@ -27,6 +27,8 @@ import de.iip_ecosphere.platform.services.ServiceFactory;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
  * Tests {@link ServiceManager}.
@@ -42,8 +44,9 @@ public class ServiceManagerTest {
      * @throws URISyntaxException shall not occur
      */
     @Test
-    public void testApp() throws ExecutionException, URISyntaxException {
-        URI dummy = new URI("file:///dummy");
+    public void testMgr() throws ExecutionException, URISyntaxException {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        final URI dummy = new URI("file:///dummy");
         ServiceManager mgr = ServiceFactory.getServiceManager();
         Assert.assertNotNull(mgr);
         
@@ -81,17 +84,49 @@ public class ServiceManagerTest {
         mgr.reconfigureService(sId, new HashMap<String, String>());
         // TODO test parameterDescriptors
         Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
+        mgr.setServiceState(sId, ServiceState.RUNNING); // no effect, just call
         mgr.stopService(sId);
         Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
 
-        //mgr.cloneArtifact(aId, sId);
-        //mgr.migrateService(aId, sId);
-        //mgr.switchToService(aId, sId);
-        //mgr.updateService(aId, sId);
+        assertException(() -> mgr.cloneArtifact(aId, dummy));
+        assertException(() -> mgr.migrateService(aId, dummy));
+        assertException(() -> mgr.switchToService(aId, sId));
+        mgr.updateService(aId, dummy);
         
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
+        ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * A method execution without parameters potentially causing an exception.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    interface WithExecutionException {
+        
+        /**
+         * A method execution without parameters potentially causing an exception.
+         * 
+         * @throws ExecutionException may occur if something fails
+         */
+        public void run() throws ExecutionException;
+        
+    }
+    
+    /**
+     * Asserts that an exception occurred, e.g., as {@code func} is currently not implemented.
+     * 
+     * @param func the function to execute
+     */
+    static void assertException(WithExecutionException func) {
+        try {
+            func.run();
+            Assert.fail("No Exception");
+        } catch (ExecutionException e) {
+            // ok, not implemented
+        }
     }
     
 }
