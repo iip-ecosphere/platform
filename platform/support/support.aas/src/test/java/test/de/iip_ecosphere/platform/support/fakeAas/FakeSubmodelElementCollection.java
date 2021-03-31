@@ -207,4 +207,9 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         return new FakeReference();
     }
 
+    @Override
+    public void deleteElement(String idShort) {
+        elements.remove(idShort);
+    }
+
 }
