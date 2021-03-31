@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
@@ -258,7 +259,7 @@ public class ConnectorsAasTest {
      */
     @Test
     public void testAas() throws IOException {
-        boolean oldP = ActiveAasBase.setParallelNotification(false); // more deterministic testing
+        NotificationMode oldP = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS); // deterministic tests
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ConnectorsAas.class));
@@ -308,7 +309,7 @@ public class ConnectorsAasTest {
         server.stop(true);
         implServer.stop(true);
         AasPartRegistry.setAasEndpoint(oldEp);
-        ActiveAasBase.setParallelNotification(oldP);
+        ActiveAasBase.setNotificationMode(oldP);
     }
     
     /**

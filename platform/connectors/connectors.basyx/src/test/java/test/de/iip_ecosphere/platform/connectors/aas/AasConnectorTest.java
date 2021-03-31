@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
@@ -68,7 +69,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
-    private static boolean oldP;
+    private static NotificationMode oldNotificationMode;
     
     /**
      * Creates an instance of this test.
@@ -85,7 +86,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
      */
     @BeforeClass
     public static void init() throws SocketException, UnknownHostException {
-        oldP = ActiveAasBase.setParallelNotification(false); // more deterministic testing
+        oldNotificationMode = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS); // deterministic testing
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         
@@ -126,7 +127,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         platformAasServer.stop(true);
 
         AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
-        ActiveAasBase.setParallelNotification(oldP);
+        ActiveAasBase.setNotificationMode(oldNotificationMode);
     }
     
     /**
