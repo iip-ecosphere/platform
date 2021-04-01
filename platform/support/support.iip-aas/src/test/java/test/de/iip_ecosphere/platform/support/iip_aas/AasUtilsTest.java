@@ -28,7 +28,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 public class AasUtilsTest {
     
     /**
-     * Tests {@link AasUtils}.
+     * Tests {@link AasUtils#readString(Object[], int, String)} and variants.
      */
     @Test
     public void testString() {
@@ -47,7 +47,7 @@ public class AasUtilsTest {
     }
 
     /**
-     * Tests {@link AasUtils}.
+     * Tests {@link AasUtils#readInt(Object[], int, int)}.
      */
     @Test
     public void testInt() {
@@ -61,7 +61,7 @@ public class AasUtilsTest {
     }
 
     /**
-     * Tests {@link AasUtils}.
+     * Tests {@link AasUtils#readUri(Object[], int, URI)}.
      */
     @Test
     public void testUri() {
@@ -87,6 +87,14 @@ public class AasUtilsTest {
         } catch (URISyntaxException e) {
             // this is intended
         }
+    }
+    
+    /**
+     * Tests {@link AasUtils#fixId(String)}.
+     */
+    @Test
+    public void testFixId() {
+        Assert.assertEquals("id", AasUtils.fixId("id"));
     }
 
 }

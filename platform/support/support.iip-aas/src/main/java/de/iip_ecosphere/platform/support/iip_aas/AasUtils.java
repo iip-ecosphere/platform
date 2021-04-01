@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+
 /**
  * Helper functions for active AAS.
  * 
@@ -127,6 +129,17 @@ public class AasUtils {
             result = dflt;
         }
         return result;
+    }
+    
+    /**
+     * Modifies a given {@code id} so that it fits the needs of the implementation. Uses 
+     * {@link AasFactory#fixId(String)}.
+     * 
+     * @param id the id
+     * @return the fixed id
+     */
+    public static String fixId(String id) {
+        return AasFactory.getInstance().fixId(id);
     }
 
 }
