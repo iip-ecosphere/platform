@@ -90,7 +90,7 @@ public class AasPartRegistryTest {
         public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
             AasBuilder builder = AasFactory.getInstance().createAasBuilder(NAME_MY_AAS, "urn:::AAS:::myAas#");
             SubmodelBuilder smb = builder.createSubmodelBuilder("c2", null);
-            smb.createPropertyBuilder("c2prop").setType(Type.STRING).build();
+            smb.createPropertyBuilder("c2prop").setType(Type.STRING).setValue("a").build();
             smb.createOperationBuilder("c2op").build();
             smb.build();
             return builder.build();
@@ -121,6 +121,7 @@ public class AasPartRegistryTest {
          */
         MyAasClient(Submodel submodel) {
             super(submodel);
+            Assert.assertEquals(submodel, getSubmodel());
         }
         
         /**
@@ -137,6 +138,7 @@ public class AasPartRegistryTest {
                 // ok
             }
             Assert.assertNotNull(getProperty("c2prop"));
+            Assert.assertNotNull(getPropertyStringValue("c2prop", null));
         }
 
         /**

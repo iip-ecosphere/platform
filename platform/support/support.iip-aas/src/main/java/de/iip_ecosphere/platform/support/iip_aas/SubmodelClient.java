@@ -100,6 +100,23 @@ public class SubmodelClient {
         }
         return result;
     }
+    
+    /**
+     * Returns the value of the property {@code name} from {@link #submodel} as String.
+     * 
+     * @param name the name 
+     * @param dflt the default value to be used if reading the value fails
+     * @return the string value, <b></b>
+     */
+    protected String getPropertyStringValue(String name, String dflt) {
+        String result = dflt;
+        try {
+            result = getProperty(name).getValue().toString();
+        } catch (ExecutionException e) {
+            // dflt
+        }
+        return result;
+    }
 
     /**
      * Checks for that {@code obj} is a non-empty string.
