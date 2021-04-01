@@ -74,7 +74,9 @@ public class SpringCloudServiceManager
         }
         
     }
-    
+
+    // TODO upon start, scan file-system for containers and add them automatically if applicable
+
     /**
      * Prevents external creation.
      */

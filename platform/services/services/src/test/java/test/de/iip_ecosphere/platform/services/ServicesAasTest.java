@@ -50,7 +50,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 public class ServicesAasTest {
 
     /**
-     * Tests the AAS.
+     * Tests {@link ServicesAas}.
      * 
      * @throws IOException shall not occur
      * @throws ExecutionException shall not occur 

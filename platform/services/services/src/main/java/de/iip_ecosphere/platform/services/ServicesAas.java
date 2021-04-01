@@ -38,7 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements the AAS for the services.
+ * Implements the AAS for the services. Container ids used as short AAS ids may be translated into ids that are
+ * valid from the perspective of the AAS implementation. All nested elements also carry their original id in 
+ * {@link #NAME_PROP_ID}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -71,7 +73,6 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
 
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServicesAas.class);
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -248,7 +249,7 @@ public class ServicesAas implements AasContributor {
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false);
 
         SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(desc.getId(), false, false);
+            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
         dBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -271,7 +272,7 @@ public class ServicesAas implements AasContributor {
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
 // Ref to artifact
         SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(desc.getId(), false, false);
+            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
         dBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -310,7 +311,7 @@ public class ServicesAas implements AasContributor {
     private static void addTypedData(SubmodelElementCollectionBuilder builder, String name, 
         List<? extends TypedDataDescriptor> descriptors) {
         SubmodelElementCollectionBuilder pBuilder 
-            = builder.createSubmodelElementCollectionBuilder(name, false, false);
+            = builder.createSubmodelElementCollectionBuilder(fixId(name), false, false);
         for (TypedDataDescriptor d : descriptors) {
             pBuilder.createPropertyBuilder(NAME_PROP_NAME)
                 .setValue(Type.STRING, d.getName())
@@ -378,10 +379,10 @@ public class ServicesAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
             for (String sId : desc.getServiceIds()) {
-                coll.deleteElement(sId);
+                coll.deleteElement(fixId(sId));
             }
             coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
-            coll.deleteElement(desc.getId());
+            coll.deleteElement(fixId(desc.getId()));
         });
     }
     
@@ -395,23 +396,32 @@ public class ServicesAas implements AasContributor {
             // other approach... link property against service descriptor while creation and reflect state
             // let's try this one for now
             SubmodelElementCollection elt = sub.getSubmodelElementCollection(NAME_COLL_SERVICES)
-                .getSubmodelElementCollection(desc.getId());
+                .getSubmodelElementCollection(fixId(desc.getId()));
             if (null != elt) {
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
                     try {
                         prop.setValue(desc.getState().toString());
                     } catch (ExecutionException e) {
-                        LOGGER.error("Cannot write state for service `" + desc.getId() + "`: " + e.getMessage());
+                        getLogger().error("Cannot write state for service `" + desc.getId() + "`: " + e.getMessage());
                     }
                 } else {
-                    LOGGER.error("Service state change - cannot find property " + NAME_PROP_STATE 
+                    getLogger().error("Service state change - cannot find property " + NAME_PROP_STATE 
                         + "for service `" + desc.getId());
                 }
             } else {
-                LOGGER.error("Service state change - cannot find service `" + desc.getId() + "`");
+                getLogger().error("Service state change - cannot find service `" + desc.getId() + "`");
             }
         });
+    }
+
+    /**
+     * Returns the logger instance.
+     * 
+     * @return the logger instance
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(ServicesAas.class);
     }
 
 }

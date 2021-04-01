@@ -97,7 +97,7 @@ public class ServicesAasClient extends SubmodelClient implements ServiceOperatio
     
     @Override
     public void migrateService(String serviceId, URI location) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_MIGRATE).invoke(serviceId, location));
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_MIGRATE).invoke(serviceId, location.toString()));
     }
 
     @Override

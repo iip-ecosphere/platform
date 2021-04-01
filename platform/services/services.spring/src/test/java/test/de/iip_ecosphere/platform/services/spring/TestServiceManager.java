@@ -42,12 +42,18 @@ import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactory;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
 
 /**
@@ -65,6 +71,11 @@ public class TestServiceManager {
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
 
     private static TestHiveMqServer server;
+    private static NotificationMode oldM;
+    private static Endpoint oldEp;
+    private static ServerAddress oldImpl;
+    private static Server implServer;
+    private static Server aasServer;
     @Autowired
     private SpringCloudServiceConfiguration config;
 
@@ -76,6 +87,17 @@ public class TestServiceManager {
     public static void init() {
         server = new TestHiveMqServer(BROKER);
         server.start();
+        
+        oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
+        oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
+        AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof ServicesAas);
+        
+        implServer = res.getProtocolServerBuilder().build();
+        implServer.start();
+        aasServer = AasPartRegistry.deploy(res.getAas()); 
+        aasServer.start();
     }
     
     /**
@@ -84,6 +106,11 @@ public class TestServiceManager {
     @AfterClass
     public static void shutdown() {
         server.stop(false);
+        aasServer.stop(true);
+        implServer.stop(true);
+        AasPartRegistry.setAasEndpoint(oldEp);
+        AasPartRegistry.setProtocolAddress(oldImpl);
+        ActiveAasBase.setNotificationMode(oldM);
     }
     
     /**
