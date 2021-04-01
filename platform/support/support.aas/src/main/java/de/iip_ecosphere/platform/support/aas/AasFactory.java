@@ -109,6 +109,11 @@ public abstract class AasFactory {
         public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
             return null;
         }
+
+        @Override
+        public String fixId(String id) {
+            return id; // we do not care here
+        }
         
     };
 
@@ -251,5 +256,13 @@ public abstract class AasFactory {
      * @see #createInvocablesCreator(String, String, int)
      */
     public abstract ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port);
+    
+    /**
+     * Modifies a given {@code id} so that it fits the needs of the implementation.
+     * 
+     * @param id the id
+     * @return the fixed id
+     */
+    public abstract String fixId(String id);
     
 }

@@ -101,4 +101,9 @@ public class FakeAasFactory extends AasFactory {
         return new FakeProtocolServerBuilder();
     }
 
+    @Override
+    public String fixId(String id) {
+        return id; // we don't care here
+    }
+
 }

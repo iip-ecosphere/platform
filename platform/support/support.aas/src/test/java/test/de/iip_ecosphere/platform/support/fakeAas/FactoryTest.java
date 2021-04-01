@@ -96,6 +96,11 @@ public class FactoryTest {
             public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
                 return DUMMY.createProtocolServerBuilder(protocol, port);
             }
+            
+            @Override
+            public String fixId(String id) {
+                return DUMMY.fixId(id);
+            }
 
         };
         
@@ -127,6 +132,8 @@ public class FactoryTest {
         Assert.assertTrue(instance.getProtocols().length > 0);
         Assert.assertNotNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
         Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
+        
+        Assert.assertEquals("id", instance.fixId("id"));
     }
 
     /**
