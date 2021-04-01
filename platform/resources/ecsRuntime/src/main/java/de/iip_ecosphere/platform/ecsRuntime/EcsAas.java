@@ -12,18 +12,31 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.services.ServiceDescriptor;
+import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
+
+import java.util.concurrent.ExecutionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
- * Implements the AAS for the ECS runtime.
+ * Implements the AAS for the ECS runtime. Container ids used as short AAS ids may be translated into ids that are
+ * valid from the perspective of the AAS implementation. All nested elements also carry their original id in 
+ * {@link #NAME_PROP_ID}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -37,6 +50,16 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_STATE = "state";
+    
+    public static final String NAME_OP_GET_STATE = "getState";
+    public static final String NAME_OP_CONTAINER_ADD = "addContainer";
+    public static final String NAME_OP_CONTAINER_UNDEPLOY = "undeployContainer";
+    public static final String NAME_OP_CONTAINER_UPDATE = "updateContainer";
+    public static final String NAME_OP_CONTAINER_MIGRATE = "migrateContainer";
+    public static final String NAME_OP_CONTAINER_STOP = "stopContainer";
+    public static final String NAME_OP_CONTAINER_START = "startContainer";
+
+    private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
 
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -52,17 +75,101 @@ public class EcsAas implements AasContributor {
         for (ContainerDescriptor desc : mgr.getContainers()) {
             addContainer(smB, desc);
         }
+
+        createIdOp(smB, NAME_OP_CONTAINER_START, iCreator);
+        createIdOp(smB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
+        createIdOp(smB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
+        createIdOp(smB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
+        createIdOp(smB, NAME_OP_CONTAINER_STOP, iCreator);
+        createIdOp(smB, NAME_OP_GET_STATE, iCreator);
+        smB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
+            .addInputVariable("url", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+
         smB.build();
         return null;
     }
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_START), 
+            new JsonResultWrapper(p -> {
+                EcsFactory.getContainerManager().startContainer(readString(p)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_MIGRATE), 
+            new JsonResultWrapper(p -> { 
+                EcsFactory.getContainerManager().migrateContainer(readString(p), readUri(p, 1, EMPTY_URI)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_UPDATE), 
+            new JsonResultWrapper(p -> { 
+                EcsFactory.getContainerManager().updateContainer(readString(p), readUri(p, 1, EMPTY_URI)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_UNDEPLOY), 
+            new JsonResultWrapper(p -> { 
+                EcsFactory.getContainerManager().undeployContainer(readString(p)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_STOP), 
+            new JsonResultWrapper(p -> { 
+                EcsFactory.getContainerManager().stopContainer(readString(p)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_GET_STATE), 
+            new JsonResultWrapper(p -> { 
+                return EcsFactory.getContainerManager().getState(readString(p)); 
+            }
+        ));
+
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_ADD), 
+            new JsonResultWrapper(p -> { 
+                return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
+            }
+        ));
     }
 
     @Override
     public Kind getKind() {
         return Kind.ACTIVE;
+    }
+
+    /**
+     * Creates an operation with a String parameter "id" and optional string parameters and a result of type string. 
+     * The operation name is derived from {@code name} applied to {@link #getQName(String)}.
+     * 
+     * @param smB the submodel builder
+     * @param name the operation name
+     * @param iCreator the invocables creator
+     * @param otherParams other String parameters
+     */
+    private void createIdOp(SubmodelBuilder smB, String name, InvocablesCreator iCreator, String... otherParams) {
+        OperationBuilder oBuilder = smB.createOperationBuilder(name)
+            .setInvocable(iCreator.createInvocable(getQName(name)))
+            .addInputVariable(NAME_PROP_ID, Type.STRING);
+        for (String p : otherParams) {
+            oBuilder.addInputVariable(p, Type.STRING);
+        }
+        oBuilder.addOutputVariable("result", Type.STRING);
+        oBuilder.build();
+    }
+
+    /**
+     * Returns the qualified name for an operation/property implementation.
+     * 
+     * @param elementName the element name
+     * @return the qualified name
+     */
+    public static String getQName(String elementName) {
+        return NAME_SUBMODEL + "_" + elementName;
     }
 
     /**
@@ -76,7 +183,7 @@ public class EcsAas implements AasContributor {
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false); 
         
         SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(desc.getId(), false, false);
+            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
         dBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -99,7 +206,12 @@ public class EcsAas implements AasContributor {
      * 
      * @param desc the container descriptor 
      */
-    public static void notifyContainerStarted(ContainerDescriptor desc) {
+    public static void notifyContainerAdded(ContainerDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            addContainer(builder, desc);
+            builder.build();
+        });
     }
 
     /**
@@ -107,7 +219,11 @@ public class EcsAas implements AasContributor {
      * 
      * @param desc the container descriptor 
      */
-    public static void notifyContainerStopped(ContainerDescriptor desc) {
+    public static void notifyContainerRemoved(ContainerDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
+            coll.deleteElement(fixId(desc.getId()));
+        });
     }
 
     /**
@@ -115,7 +231,37 @@ public class EcsAas implements AasContributor {
      * 
      * @param desc the container descriptor 
      */
-    public static void notifyContainerStateChanged(ServiceDescriptor desc) {
+    public static void notifyContainerStateChanged(ContainerDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            // other approach... link property against container descriptor while creation and reflect state
+            // let's try this one for now
+            SubmodelElementCollection elt = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS)
+                .getSubmodelElementCollection(fixId(desc.getId()));
+            if (null != elt) {
+                Property prop = elt.getProperty(NAME_PROP_STATE);
+                if (null != prop) {
+                    try {
+                        prop.setValue(desc.getState().toString());
+                    } catch (ExecutionException e) {
+                        getLogger().error("Cannot write state for container `" + desc.getId() + "`: " + e.getMessage());
+                    }
+                } else {
+                    getLogger().error("Container state change - cannot find property " + NAME_PROP_STATE 
+                        + "for container `" + desc.getId());
+                }
+            } else {
+                getLogger().error("Container state change - cannot find container `" + desc.getId() + "`");
+            }
+        });
+    }
+
+    /**
+     * Returns the logger instance.
+     * 
+     * @return the logger instance
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(EcsAas.class);
     }
 
 }

@@ -46,13 +46,13 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     @Override
     public void startContainer(String id) throws ExecutionException {
         checkId(id, id);
-        getContainer(id, "id", "start").setState(ContainerState.DEPLOYED);
+        setState(getContainer(id, "id", "start"), ContainerState.DEPLOYED);
     }
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
         checkId(id, id);
-        getContainer(id, "id", "stop").setState(ContainerState.STOPPED);
+        setState(getContainer(id, "id", "start"), ContainerState.STOPPED);
     }
 
     @Override
@@ -65,7 +65,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     public void undeployContainer(String id) throws ExecutionException {
         MyContainerDesciptor cnt = getContainer(id, "id", "undeploy");
         super.undeployContainer(id);
-        cnt.setState(ContainerState.UNKOWN); // do afterwards as super may throw exception
+        setState(cnt, ContainerState.UNKNOWN); // do afterwards as super may throw exception
     }
 
     @Override
@@ -78,7 +78,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
         super.addContainer(targetId, tCnt);
         // get rid of container here
         super.migrateContainer(containerId, location);
-        tCnt.setState(ContainerState.DEPLOYED);
+        setState(tCnt, ContainerState.DEPLOYED);
     }
 
     @Override

@@ -23,6 +23,8 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
  * Template test.
@@ -38,7 +40,8 @@ public class ContainerManagerTest {
      * @throws URISyntaxException shall not occur
      */
     @Test
-    public void testApp() throws ExecutionException, URISyntaxException {
+    public void testContainerManager() throws ExecutionException, URISyntaxException {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         URI dummy = new URI("file:///dummy");
         ContainerManager mgr = EcsFactory.getContainerManager();
         Assert.assertNotNull(mgr);
@@ -87,8 +90,8 @@ public class ContainerManagerTest {
         Assert.assertEquals(ContainerState.STOPPED, cnt.getState());
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
         mgr.undeployContainer(id);
-        Assert.assertEquals(ContainerState.UNKOWN, cnt.getState());
-        Assert.assertEquals(ContainerState.UNKOWN, mgr.getState(id));
+        Assert.assertEquals(ContainerState.UNKNOWN, cnt.getState());
+        Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
         
         id = mgr.addContainer(dummy);
         cnt = mgr.getContainer(id);
@@ -97,14 +100,16 @@ public class ContainerManagerTest {
         if (ContainerState.STOPPED == cnt.getState()) {
             mgr.undeployContainer(id);
         }
-        Assert.assertEquals(ContainerState.UNKOWN, cnt.getState());
-        Assert.assertEquals(ContainerState.UNKOWN, mgr.getState(id));
+        Assert.assertEquals(ContainerState.UNKNOWN, cnt.getState());
+        Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
 
         // cnt is gone, but there is a new instance on "bla"
         Assert.assertFalse(mgr.getContainers().contains(cnt));
         Assert.assertTrue(mgr.getContainers().size() > 0);
         Assert.assertFalse(mgr.getIds().contains(id));
         Assert.assertTrue(mgr.getIds().size() > 0);
+        
+        ActiveAasBase.setNotificationMode(oldM);
     }
     
 }

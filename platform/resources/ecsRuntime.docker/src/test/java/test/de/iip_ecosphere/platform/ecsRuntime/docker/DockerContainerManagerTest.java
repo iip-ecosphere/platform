@@ -18,6 +18,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerManager;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
  * Template test.
@@ -31,9 +33,13 @@ public class DockerContainerManagerTest {
      */
     @Test
     public void testContainerManager() {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
+        // TODO test against full AAS setup, see EcsAasTest
         ContainerManager cm = EcsFactory.getContainerManager();
         Assert.assertTrue(cm instanceof DockerContainerManager);
         // TODO go on testing with cm
+        
+        ActiveAasBase.setNotificationMode(oldM);
     }
     
 }
