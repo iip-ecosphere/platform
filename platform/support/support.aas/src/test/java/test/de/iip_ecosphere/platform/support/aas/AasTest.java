@@ -388,4 +388,24 @@ public class AasTest {
         }
     }
     
+    /**
+     * Tests {@link AasFactory#fixId(String)} for BaSyX.
+     */
+    @Test
+    public void testFixId() {
+        AasFactory instance = AasFactory.getInstance();
+        Assert.assertNull(instance.fixId(null));
+        Assert.assertEquals("", instance.fixId(""));
+        Assert.assertEquals("id", instance.fixId("id"));
+        Assert.assertEquals("a1id", instance.fixId("1id"));
+        Assert.assertEquals("a_id", instance.fixId("a_id"));
+        Assert.assertEquals("a_id", instance.fixId("a id"));
+        Assert.assertEquals("test_log", instance.fixId("test-log"));
+
+        Assert.assertEquals("de_uni_hildesheim_sse_Test_TEst", instance.fixId("de.uni-hildesheim.sse.Test$TEst"));
+        Assert.assertEquals("a1de_uni_hildesheim_sse_Test", instance.fixId("1de.uni-hildesheim.sse.Test"));
+        Assert.assertEquals("a1de_uni_hildesheim_sse_Test_TEst", instance.fixId("1de.uni-hildesheim.sse.Test$TEst"));
+        Assert.assertEquals("jenkins_2_localhost", instance.fixId("jenkins-2@localhost"));
+    }
+
 }

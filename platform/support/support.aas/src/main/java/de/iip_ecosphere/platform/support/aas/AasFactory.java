@@ -109,11 +109,6 @@ public abstract class AasFactory {
         public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
             return null;
         }
-
-        @Override
-        public String fixId(String id) {
-            return id; // we do not care here
-        }
         
     };
 
@@ -263,6 +258,23 @@ public abstract class AasFactory {
      * @param id the id
      * @return the fixed id
      */
-    public abstract String fixId(String id);
+    public String fixId(String id) { // generic code for AAS Spec, may be overridden
+        String result = id;
+        if (id != null && id.length() > 0) {
+            if (!Character.isAlphabetic(id.charAt(0))) {
+                id = "a" + id;
+            }
+            result = "";
+            for (int i = 0; i < id.length(); i++) {
+                char c = id.charAt(i);
+                if (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
+                    result += c;
+                } else {
+                    result += "_";
+                }
+            }
+        }
+        return result;
+    }
     
 }

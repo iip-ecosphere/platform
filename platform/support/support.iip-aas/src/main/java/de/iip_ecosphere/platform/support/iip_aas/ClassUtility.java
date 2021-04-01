@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.lang.management.ManagementFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+
+import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 /**
  * Utility functions for representing types in AAS. A Java type is turned into
@@ -69,7 +72,7 @@ public class ClassUtility {
     public static final String ATTRIBUTE_PREFIX = "attr_"; // AAS id name limitation
     public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
     public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
-    private static final String JVM_NAME = translateToAasName(ManagementFactory.getRuntimeMXBean().getName());
+    public static final String JVM_NAME = fixId(ManagementFactory.getRuntimeMXBean().getName());
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
     /**
@@ -145,8 +148,7 @@ public class ClassUtility {
             if (builder.isNew()) {
                 for (Field f: type.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
-                        addTypeSubModelElement(builder, ATTRIBUTE_PREFIX 
-                            + translateToAasName(f.getName()), f.getType());
+                        addTypeSubModelElement(builder, ATTRIBUTE_PREFIX + fixId(f.getName()), f.getType());
                     }
                 }
                 if (Object.class != type.getSuperclass()) {
@@ -197,33 +199,13 @@ public class ClassUtility {
     }
     
     /**
-     * Translates a name to an AAS short name.
-     * 
-     * @param name the name
-     * @return the AAS short name
-     */
-    public static String translateToAasName(String name) {
-        StringBuilder b = new StringBuilder(name);
-        for (int i = 0; i < b.length(); i++) {
-            char c = b.charAt(i);
-            if (!(Character.isDigit(c) || Character.isLetter(c) || c == '_')) {
-                b.setCharAt(i, '_');
-            }
-        }
-        if (b.length() > 0 && !Character.isLetter(b.charAt(0))) {
-            b.insert(0, "x");
-        }
-        return b.toString();
-    }
-    
-    /**
      * Returns the name of the associated model element.
      * 
      * @param type the type
      * @return the name
      */
     public static String getName(Class<?> type) {
-        return translateToAasName(type.getName());
+        return fixId(type.getName());
     }
 
     /**
@@ -234,7 +216,7 @@ public class ClassUtility {
      * @return the combined id
      */
     public static String getId(String prefix, Object object) {
-        return translateToAasName(prefix + JVM_NAME + "_" + System.identityHashCode(object));
+        return fixId(prefix + JVM_NAME + "_" + System.identityHashCode(object));
     }
 
 }

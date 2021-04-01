@@ -135,24 +135,4 @@ public class BaSyxAasFactory extends AasFactory {
         }
     }
 
-    @Override
-    public String fixId(String id) {
-        String result = id;
-        if (id != null && id.length() > 0) {
-            if (!Character.isAlphabetic(id.charAt(0))) {
-                id = "a" + id;
-            }
-            result = "";
-            for (int i = 0; i < id.length(); i++) {
-                char c = id.charAt(i);
-                if (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
-                    result += c;
-                } else {
-                    result += "_";
-                }
-            }
-        }
-        return result;
-    }
-
 }
