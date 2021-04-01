@@ -49,9 +49,10 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_SUBMODEL = "services";
     public static final String NAME_COLL_ARTIFACTS = "artifacts";
     public static final String NAME_COLL_SERVICES = "services";
-    public static final String NAME_COLL_PARAMETERS = "parameters";
-    public static final String NAME_COLL_INPUT_DATA_CONN = "inputDataConnectors";
-    public static final String NAME_COLL_OUTPUT_DATA_CONN = "outputDataConnectors";
+    public static final String NAME_COLL_RELATIONS = "relations";
+    public static final String NAME_SUBCOLL_PARAMETERS = "parameters";
+    public static final String NAME_SUBCOLL_INPUT_DATA_CONN = "inputDataConnectors";
+    public static final String NAME_SUBCOLL_OUTPUT_DATA_CONN = "outputDataConnectors";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_STATE = "state";
@@ -268,37 +269,41 @@ public class ServicesAas implements AasContributor {
      * @param desc the descriptor to be added
      */
     private static void addService(SubmodelBuilder smB, ServiceDescriptor desc) {
-        SubmodelElementCollectionBuilder cBuilder 
+        SubmodelElementCollectionBuilder serviceBuilder 
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
+        SubmodelElementCollectionBuilder connectionBuilder 
+            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
+
 // Ref to artifact
-        SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
-        dBuilder.createPropertyBuilder(NAME_PROP_ID)
+        SubmodelElementCollectionBuilder descrioptorBuilder 
+            = serviceBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
-        dBuilder.createPropertyBuilder(NAME_PROP_NAME)
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
             .build();
-        dBuilder.createPropertyBuilder(NAME_PROP_STATE)
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_STATE)
             .setValue(Type.STRING, desc.getState().toString())
             .build();
-        dBuilder.createPropertyBuilder(NAME_PROP_KIND)
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
             .setValue(Type.STRING, desc.getKind().toString())
             .build();
-        dBuilder.createPropertyBuilder(NAME_PROP_VERSION)
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_VERSION)
             .setValue(Type.STRING, desc.getVersion().toString())
             .build();
-        dBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
+        descrioptorBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
             .setValue(Type.STRING, desc.getDescription())
             .build();
         
-        addTypedData(dBuilder, NAME_COLL_PARAMETERS, desc.getParameters());
-        addTypedData(dBuilder, NAME_COLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
-        addTypedData(dBuilder, NAME_COLL_OUTPUT_DATA_CONN, desc.getInputDataConnectors());
+        addTypedData(descrioptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
+        addTypedData(descrioptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
+        addTypedData(descrioptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getInputDataConnectors());
         
-        dBuilder.build();
+        descrioptorBuilder.build();
         
-        cBuilder.build();
+        connectionBuilder.build();
+        serviceBuilder.build();
     }
 
     /**
@@ -313,15 +318,18 @@ public class ServicesAas implements AasContributor {
         SubmodelElementCollectionBuilder pBuilder 
             = builder.createSubmodelElementCollectionBuilder(fixId(name), false, false);
         for (TypedDataDescriptor d : descriptors) {
-            pBuilder.createPropertyBuilder(NAME_PROP_NAME)
+            SubmodelElementCollectionBuilder dBuilder 
+                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()), false, false);
+            dBuilder.createPropertyBuilder(NAME_PROP_NAME)
                 .setValue(Type.STRING, d.getName())
                 .build();
-            pBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
+            dBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
                 .setValue(Type.STRING, d.getDescription())
                 .build();
             if (null != d.getType()) {
-                ClassUtility.addTypeSubModelElement(pBuilder, NAME_PROP_TYPE, d.getType());
+                ClassUtility.addTypeSubModelElement(dBuilder, NAME_PROP_TYPE, d.getType());
             }
+            dBuilder.build();
         }
         pBuilder.build();
     }
