@@ -293,9 +293,9 @@ public class SpringCloudServiceManager
     }
 
     @Override
-    public void migrateService(String serviceId, URI location) throws ExecutionException {
-        super.migrateService(serviceId, location);
-        throw new ExecutionException("not implemented", null);  // TODO
+    public void migrateService(String serviceId, String resourceId) throws ExecutionException {
+        super.migrateService(serviceId, resourceId);
+        throw new ExecutionException("not implemented", null);  // TODO must change host value in AAS!
     }
 
     @Override

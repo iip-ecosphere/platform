@@ -17,42 +17,28 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAas;
-import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
 
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*;
 
 /**
- * A client for {@link ServicesAas}.
+ * A client for {@link ServicesAas} for accessing the operations provided by a certain resource.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServicesAasClient extends SubmodelClient implements ServiceOperations {
+public class ServicesAasClient extends SubmodelElementsCollectionClient implements ServiceOperations {
 
-    /**
-     * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
-     * {@link NetworkManagerAas#NAME_SUBMODEL name}.
-     * 
-     * @throws IOException if retrieving the IIP-AAS or the respective submodel fails
-     */
-    public ServicesAasClient() throws IOException {
-        this(ActiveAasBase.getSubmodel(ServicesAas.NAME_SUBMODEL));
-    }
     
     /**
-     * Creates a client instance based on the submodel. The submodel shall conform to {@link ServicesAas} with 
-     * respect to the operations, signatures, but also the {@link ServicesAas#NAME_SUBMODEL name},
+     * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
+     * {@link ServicesAas#NAME_SUBMODEL_RESOURCES resources}.
      * 
-     * @param submodel the submodel to use
+     * @param resourceId the id used as key in {@link ServicesAas#NAME_SUBMODEL_RESOURCES} to denote the resource 
+     *   to operate on
+     * @throws IOException if retrieving the IIP-AAS or the respective submodel fails
      */
-    public ServicesAasClient(Submodel submodel) {
-        super(submodel);
+    public ServicesAasClient(String resourceId) throws IOException {
+        super(ServicesAas.NAME_SUBMODEL_RESOURCES, resourceId);
     }
 
     @Override
@@ -96,8 +82,8 @@ public class ServicesAasClient extends SubmodelClient implements ServiceOperatio
     }
     
     @Override
-    public void migrateService(String serviceId, URI location) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_MIGRATE).invoke(serviceId, location.toString()));
+    public void migrateService(String serviceId, String resourceId) throws ExecutionException {
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_MIGRATE).invoke(serviceId, resourceId));
     }
 
     @Override
@@ -124,15 +110,6 @@ public class ServicesAasClient extends SubmodelClient implements ServiceOperatio
             getLogger().error("Requesting service state, illegal response value: " + e.getMessage());
         }
         return result;
-    }
-    
-    /**
-     * Returns the logger instance.
-     * 
-     * @return the logger
-     */
-    private Logger getLogger() {
-        return LoggerFactory.getLogger(getClass());
     }
     
     // getService -> own service descriptor, clone?

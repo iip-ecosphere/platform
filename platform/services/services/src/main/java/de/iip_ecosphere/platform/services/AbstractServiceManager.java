@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.services;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -145,7 +144,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
 
     @Override
-    public void migrateService(String serviceId, URI location) throws ExecutionException {
+    public void migrateService(String serviceId, String resourceId) throws ExecutionException {
         checkId(serviceId, "serviceId");
         S cnt = getServiceDescriptor(serviceId, "serviceId", "migrate");
         if (ServiceState.RUNNING == cnt.getState()) {

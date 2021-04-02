@@ -96,7 +96,7 @@ public class ContainerManagerTest {
         id = mgr.addContainer(dummy);
         cnt = mgr.getContainer(id);
         mgr.startContainer(id);
-        mgr.migrateContainer(id, dummy);
+        mgr.migrateContainer(id, "other");
         if (ContainerState.STOPPED == cnt.getState()) {
             mgr.undeployContainer(id);
         }

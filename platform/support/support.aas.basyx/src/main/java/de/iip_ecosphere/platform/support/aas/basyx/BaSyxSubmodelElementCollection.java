@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.Submod
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -231,6 +232,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public Property getProperty(String idShort) {
         return getElement(idShort, Property.class);
+    }
+
+    @Override
+    public Operation getOperation(String idShort) {
+        return getElement(idShort, Operation.class);
     }
 
     @Override

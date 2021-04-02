@@ -91,8 +91,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
 
     @Override
-    public void migrateContainer(String id, URI location) throws ExecutionException {
+    public void migrateContainer(String id, String resourceId) throws ExecutionException {
         // TODO implement, use super.migrateContainer
+        // TODO must change host value in AAS!
     }
 
     @Override

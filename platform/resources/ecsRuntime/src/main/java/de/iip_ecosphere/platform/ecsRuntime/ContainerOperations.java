@@ -58,10 +58,10 @@ public interface ContainerOperations {
      * Migrates the container.
      * 
      * @param id the id of the container
-     * @param location the target location, e.g., a device
+     * @param resourceId the target resource id, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void migrateContainer(String id, URI location) throws ExecutionException;
+    public void migrateContainer(String id, String resourceId) throws ExecutionException;
     
     /**
      * Removes the container from the management domain of this instance. This operation shall only remove the 

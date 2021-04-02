@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -31,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
@@ -42,7 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
  */
 public class EcsAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "resource"; // TODO ECS id
+    public static final String NAME_SUBMODEL = ServicesAas.NAME_SUBMODEL_RESOURCES; 
     public static final String NAME_PROP_CSYS_NAME = "containerSystemName";
     public static final String NAME_PROP_CSYS_VERSION = "containerSystemVersion";
     public static final String NAME_COLL_CONTAINERS = "containers";
@@ -50,6 +52,7 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_STATE = "state";
+    public static final String NAME_PROP_RESOURCE = "resource";
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
@@ -65,28 +68,36 @@ public class EcsAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ContainerManager mgr = EcsFactory.getContainerManager();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        // TODO resource information
-        smB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
+
+        SubmodelElementCollectionBuilder jB 
+            = smB.createSubmodelElementCollectionBuilder(ClassUtility.JVM_NAME, false, false);
+
+        // TODO resource/monitoring information
+
+        jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, mgr.getContainerSystemName())
             .build();
-        smB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
+        jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
             .setValue(Type.STRING, mgr.getContainerSystemVersion())
             .build();
-        for (ContainerDescriptor desc : mgr.getContainers()) {
-            addContainer(smB, desc);
-        }
 
-        createIdOp(smB, NAME_OP_CONTAINER_START, iCreator);
-        createIdOp(smB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
-        createIdOp(smB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
-        createIdOp(smB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
-        createIdOp(smB, NAME_OP_CONTAINER_STOP, iCreator);
-        createIdOp(smB, NAME_OP_GET_STATE, iCreator);
-        smB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
+        createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
+        createIdOp(jB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
+        createIdOp(jB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
+        createIdOp(jB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
+        createIdOp(jB, NAME_OP_CONTAINER_STOP, iCreator);
+        createIdOp(jB, NAME_OP_GET_STATE, iCreator);
+        jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
             .addInputVariable("url", Type.STRING)
             .addOutputVariable("result", Type.STRING)
             .build();
+
+        jB.build();
+
+        for (ContainerDescriptor desc : mgr.getContainers()) {
+            addContainer(smB, desc);
+        }
 
         smB.build();
         return null;
@@ -102,7 +113,7 @@ public class EcsAas implements AasContributor {
         ));
         sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_MIGRATE), 
             new JsonResultWrapper(p -> { 
-                EcsFactory.getContainerManager().migrateContainer(readString(p), readUri(p, 1, EMPTY_URI)); 
+                EcsFactory.getContainerManager().migrateContainer(readString(p), readString(p, 1)); 
                 return null;
             }
         ));
@@ -146,12 +157,13 @@ public class EcsAas implements AasContributor {
      * Creates an operation with a String parameter "id" and optional string parameters and a result of type string. 
      * The operation name is derived from {@code name} applied to {@link #getQName(String)}.
      * 
-     * @param smB the submodel builder
+     * @param smB the submodel element collection builder
      * @param name the operation name
      * @param iCreator the invocables creator
      * @param otherParams other String parameters
      */
-    private void createIdOp(SubmodelBuilder smB, String name, InvocablesCreator iCreator, String... otherParams) {
+    private void createIdOp(SubmodelElementCollectionBuilder smB, String name, InvocablesCreator iCreator, 
+        String... otherParams) {
         OperationBuilder oBuilder = smB.createOperationBuilder(name)
             .setInvocable(iCreator.createInvocable(getQName(name)))
             .addInputVariable(NAME_PROP_ID, Type.STRING);
@@ -195,6 +207,9 @@ public class EcsAas implements AasContributor {
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_STATE)
             .setValue(Type.STRING, desc.getState().toString())
+            .build();
+        dBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
+            .setValue(Type.STRING, ClassUtility.JVM_NAME)
             .build();
         dBuilder.build();
         

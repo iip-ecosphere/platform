@@ -99,8 +99,8 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     }
 
     @Override
-    public void migrateService(String id, URI location) throws ExecutionException {
-        super.migrateService(id, location);
+    public void migrateService(String id, String resourceId) throws ExecutionException {
+        super.migrateService(id, resourceId);
     }
 
     @Override

@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
@@ -40,13 +41,32 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements the AAS for the services. Container ids used as short AAS ids may be translated into ids that are
  * valid from the perspective of the AAS implementation. All nested elements also carry their original id in 
- * {@link #NAME_PROP_ID}.
+ * {@link #NAME_PROP_ID}. 
+ * 
+ * The created submodels may be used standalone or deployed to a common server. In the second case, parts of the 
+ * submodels will be complemented incrementally, e.g., the relations by the services started or the resources
+ * by the ECS runtime.
+ * 
+ * This class builds the submodel services ({@link #NAME_SUBMODEL}):
+ * <ul>
+ *  <li>A submodel elements collection "services" {@link #NAME_COLL_SERVICES} containing all declared services with 
+ *    their input and output types using the service id as ID.</li>
+ *  <li>A submodel elements collection "artifacts" {@link #NAME_COLL_ARTIFACTS} with all artifacts implementing the 
+ *    services using the artifact id as ID.</li>
+ *  <li>A submodel elements collection "relations" {@link #NAME_COLL_RELATIONS} with all relations connecting the 
+ *    services with the channel name as ID. This part is aimed at a quick lookup whether a related service is already 
+ *    there.</li>
+ * </ul>
+ * Moreover, this class builds the parts of the submodel resources ({@link #NAME_SUBMODEL_RESOURCES}), containing 
+ * submodel elements named according to the Unique JVM identifier of this process containing the provided operations. 
+ * This submodel is complemented by the ECSruntime with more resource specific information.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class ServicesAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "services";
+    public static final String NAME_SUBMODEL_RESOURCES = "resources";
     public static final String NAME_COLL_ARTIFACTS = "artifacts";
     public static final String NAME_COLL_SERVICES = "services";
     public static final String NAME_COLL_RELATIONS = "relations";
@@ -60,6 +80,9 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_DESCRIPTION = "description";
     public static final String NAME_PROP_TYPE = "type";
+    public static final String NAME_PROP_RESOURCE = "resource";
+    public static final String NAME_PROP_FROM = "from";
+    public static final String NAME_PROP_TO = "to";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
@@ -77,11 +100,42 @@ public class ServicesAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
+
+        // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
+        SubmodelElementCollectionBuilder jB 
+            = smB.createSubmodelElementCollectionBuilder(ClassUtility.JVM_NAME, false, false);
+    
+        // probably relevant ops only
+        createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
+        createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
+        createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
+        createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
+        createIdOp(jB, NAME_OP_SERVICE_UPDATE, iCreator, "location");
+        createIdOp(jB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
+        createIdOp(jB, NAME_OP_SERVICE_RECONF, iCreator, "values");
+        createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
+        createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
+        createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
+        
+        // probably relevant ops only
+        jB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
+            .addInputVariable("url", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
+        jB.build();
+
+        smB.build();
+
+        // service structures go into own part
         ServiceManager mgr = ServiceFactory.getServiceManager();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
-        // ensure that these two do exist
+        smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+        // ensure that these collections do exist
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false).build();
 
         for (ArtifactDescriptor a : mgr.getArtifacts()) {
             addArtifact(smB, a);
@@ -89,26 +143,6 @@ public class ServicesAas implements AasContributor {
         for (ServiceDescriptor s : mgr.getServices()) {
             addService(smB, s);
         }
-
-        // probably relevant ops only
-        createIdOp(smB, NAME_OP_SERVICE_START, iCreator);
-        createIdOp(smB, NAME_OP_SERVICE_ACTIVATE, iCreator);
-        createIdOp(smB, NAME_OP_SERVICE_PASSIVATE, iCreator);
-        createIdOp(smB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
-        createIdOp(smB, NAME_OP_SERVICE_UPDATE, iCreator, "location");
-        createIdOp(smB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
-        createIdOp(smB, NAME_OP_SERVICE_RECONF, iCreator, "values");
-        createIdOp(smB, NAME_OP_SERVICE_STOP, iCreator);
-        createIdOp(smB, NAME_OP_SERVICE_GET_STATE, iCreator);
-        createIdOp(smB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
-        
-        // probably relevant ops only
-        smB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
-            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
-            .addInputVariable("url", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .build();
-        createIdOp(smB, NAME_OP_ARTIFACT_REMOVE, iCreator);
 
         smB.build();
         return null;
@@ -118,12 +152,13 @@ public class ServicesAas implements AasContributor {
      * Creates an operation with a String parameter "id" and optional string parameters and a result of type string. 
      * The operation name is derived from {@code name} applied to {@link #getQName(String)}.
      * 
-     * @param smB the submodel builder
+     * @param smB the submodel elements collection builder
      * @param name the operation name
      * @param iCreator the invocables creator
      * @param otherParams other String parameters
      */
-    private void createIdOp(SubmodelBuilder smB, String name, InvocablesCreator iCreator, String... otherParams) {
+    private void createIdOp(SubmodelElementCollectionBuilder smB, String name, InvocablesCreator iCreator, 
+        String... otherParams) {
         OperationBuilder oBuilder = smB.createOperationBuilder(name)
             .setInvocable(iCreator.createInvocable(getQName(name)))
             .addInputVariable(NAME_PROP_ID, Type.STRING);
@@ -180,7 +215,7 @@ public class ServicesAas implements AasContributor {
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_MIGRATE), 
             new JsonResultWrapper(p -> { 
-                ServiceFactory.getServiceManager().migrateService(readString(p), readUri(p, 1, EMPTY_URI)); 
+                ServiceFactory.getServiceManager().migrateService(readString(p), readString(p, 1)); 
                 return null;
             }
         ));
@@ -257,6 +292,9 @@ public class ServicesAas implements AasContributor {
         dBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
             .build();
+        dBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
+            .setValue(Type.STRING, ClassUtility.JVM_NAME)
+            .build();
         dBuilder.build();
 
         cBuilder.build();
@@ -274,33 +312,39 @@ public class ServicesAas implements AasContributor {
         SubmodelElementCollectionBuilder connectionBuilder 
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
 
-// Ref to artifact
-        SubmodelElementCollectionBuilder descrioptorBuilder 
+        // Ref to artifact
+        SubmodelElementCollectionBuilder descriptorBuilder 
             = serviceBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_ID)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_NAME)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
             .build();
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_STATE)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_STATE)
             .setValue(Type.STRING, desc.getState().toString())
             .build();
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
             .setValue(Type.STRING, desc.getKind().toString())
             .build();
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_VERSION)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_VERSION)
             .setValue(Type.STRING, desc.getVersion().toString())
             .build();
-        descrioptorBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
             .setValue(Type.STRING, desc.getDescription())
             .build();
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
+            .setValue(Type.STRING, ClassUtility.JVM_NAME)
+            .build();
+        Reference serviceRef = descriptorBuilder.createReference();
         
-        addTypedData(descrioptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
-        addTypedData(descrioptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
-        addTypedData(descrioptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getInputDataConnectors());
+        addTypedData(descriptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
+        addTypedData(descriptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
+        addTypedData(descriptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getOutputDataConnectors());
+        addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
+        addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
         
-        descrioptorBuilder.build();
+        descriptorBuilder.build();
         
         connectionBuilder.build();
         serviceBuilder.build();
@@ -311,7 +355,7 @@ public class ServicesAas implements AasContributor {
      * 
      * @param builder the builder to use as parent
      * @param name the name of the collection
-     * @param descriptors the descriptors to add to the collection
+     * @param descriptors the descriptors to add to the parent collection
      */
     private static void addTypedData(SubmodelElementCollectionBuilder builder, String name, 
         List<? extends TypedDataDescriptor> descriptors) {
@@ -334,6 +378,27 @@ public class ServicesAas implements AasContributor {
         pBuilder.build();
     }
 
+    /**
+     * Adds data to {@link #NAME_COLL_RELATIONS}.
+     * 
+     * @param builder the builder to use as parent
+     * @param descriptors the descriptors to add to the parent collection
+     * @param input whether we are processing input or output descriptors
+     * @param serviceRef the reference to the using service
+     */
+    private static void addRelationData(SubmodelElementCollectionBuilder builder, 
+        List<? extends TypedDataConnectorDescriptor> descriptors, boolean input, Reference serviceRef) {
+        /*for (TypedDataConnectorDescriptor d : descriptors) {
+            SubmodelElementCollectionBuilder dBuilder 
+                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()), false, false);
+            String name = input ? NAME_PROP_TO : NAME_PROP_FROM;
+            dBuilder.createReferenceElementBuilder(name)
+                .setValue(serviceRef)
+                .build();
+            dBuilder.build();
+        }*/ // incrementally adding elements fails for now
+    }
+    
     /**
      * Reads the {@code index} argument from {@code} args as map of strings.
      * 
@@ -391,7 +456,30 @@ public class ServicesAas implements AasContributor {
             }
             coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
             coll.deleteElement(fixId(desc.getId()));
+            coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
+            for (ServiceDescriptor s : desc.getServices()) {
+                for (TypedDataConnectorDescriptor c : s.getInputDataConnectors()) {
+                    deleteSubmodelElement(coll, c.getName(), NAME_PROP_TO);
+                }
+                for (TypedDataConnectorDescriptor c : s.getOutputDataConnectors()) {
+                    deleteSubmodelElement(coll, c.getName(), NAME_PROP_FROM);
+                }
+            }
         });
+    }
+
+    /**
+     * Safely deletes a submodel element in a nested collection.
+     * 
+     * @param coll the parent collection
+     * @param name name the child collection
+     * @param elt element the element to delete
+     */
+    private static void deleteSubmodelElement(SubmodelElementCollection coll, String name, String elt) {
+        SubmodelElementCollection c = coll.getSubmodelElementCollection(fixId(name));
+        if (null != c) {
+            c.deleteElement(elt);
+        }
     }
     
     /**

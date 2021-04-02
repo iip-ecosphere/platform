@@ -62,6 +62,14 @@ public interface SubmodelElementCollection extends SubmodelElement {
     public Property getProperty(String idShort);
 
     /**
+     * Returns an operation with the given name.
+     * 
+     * @param idShort the short id of the operation
+     * @return the operation, <b>null</b> for none
+     */
+    public Operation getOperation(String idShort);
+
+    /**
      * Returns a reference element with the given name.
      * 
      * @param idShort the short id of the reference element

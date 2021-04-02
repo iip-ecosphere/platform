@@ -69,7 +69,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     }
 
     @Override
-    public void migrateContainer(String containerId, URI location) throws ExecutionException {
+    public void migrateContainer(String containerId, String resourceId) throws ExecutionException {
         // we may do some parallel change here, but for testing without functionality?
         MyContainerDesciptor cnt = getContainer(containerId, "containerId", "migrate");
         // on "target machine"
@@ -77,7 +77,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
         MyContainerDesciptor tCnt = new MyContainerDesciptor(targetId, cnt.getName(), cnt.getVersion());
         super.addContainer(targetId, tCnt);
         // get rid of container here
-        super.migrateContainer(containerId, location);
+        super.migrateContainer(containerId, resourceId);
         setState(tCnt, ContainerState.DEPLOYED);
     }
 

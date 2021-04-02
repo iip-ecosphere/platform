@@ -30,11 +30,11 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
@@ -64,14 +64,9 @@ public class EcsAasTest {
         implServer.start();
         Server aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
-        Aas aas = AasPartRegistry.retrieveIipAas();
-        Assert.assertNotNull(aas);
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
-        aas.accept(new AasPrintVisitor());
-        
-        Submodel sub = aas.getSubmodel(EcsAas.NAME_SUBMODEL);
-        Assert.assertNotNull(sub);
-        EcsAasClient client = new EcsAasClient(sub);
+        EcsAasClient client = new EcsAasClient(ClassUtility.JVM_NAME);
         test(client);
         
         aasServer.stop(true);
@@ -87,8 +82,9 @@ public class EcsAasTest {
      * @param client the client to test
      * @throws ExecutionException shall not occur 
      * @throws URISyntaxException shall not occur
+     * @throws IOException shall not occur
      */
-    private void test(EcsAasClient client) throws ExecutionException, URISyntaxException {
+    private void test(EcsAasClient client) throws ExecutionException, URISyntaxException, IOException {
         ContainerManager mgr = EcsFactory.getContainerManager(); // for x-checking
         final URI dummy = new URI("file:///dummy");
         String id = client.addContainer(dummy);
@@ -107,16 +103,22 @@ public class EcsAasTest {
             // this is ok
         }
         client.startContainer(id);
+        TimeUtils.sleep(300);
         Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
         Assert.assertEquals(ContainerState.DEPLOYED, client.getState(id));
         client.updateContainer(id, dummy);
+        TimeUtils.sleep(300);
         client.stopContainer(id);
+        TimeUtils.sleep(300);
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
         Assert.assertEquals(ContainerState.STOPPED, client.getState(id));
 
         client.startContainer(id);
+        TimeUtils.sleep(300);
         Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
         Assert.assertEquals(ContainerState.DEPLOYED, client.getState(id));
+
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
 
         try {
             client.undeployContainer(id);
@@ -126,18 +128,24 @@ public class EcsAasTest {
         }
 
         client.stopContainer(id);
+        TimeUtils.sleep(300);
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
         Assert.assertEquals(ContainerState.STOPPED, client.getState(id));
         client.undeployContainer(id);
+        TimeUtils.sleep(300);
         Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
         Assert.assertEquals(ContainerState.UNKNOWN, client.getState(id));
         
         id = client.addContainer(dummy);
+        TimeUtils.sleep(300);
         cnt = mgr.getContainer(id);
         client.startContainer(id);
-        client.migrateContainer(id, dummy);
+        TimeUtils.sleep(300);
+        client.migrateContainer(id, "other");
+        TimeUtils.sleep(300);
         if (ContainerState.STOPPED == cnt.getState()) {
             client.undeployContainer(id);
+            TimeUtils.sleep(300);
         }
         Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
         Assert.assertEquals(ContainerState.UNKNOWN, client.getState(id));

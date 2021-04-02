@@ -89,7 +89,7 @@ public class ServiceManagerTest {
         Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
 
         assertException(() -> mgr.cloneArtifact(aId, dummy));
-        assertException(() -> mgr.migrateService(aId, dummy));
+        assertException(() -> mgr.migrateService(aId, "other"));
         assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         

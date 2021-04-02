@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -140,7 +139,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     }
     
     @Override
-    public void migrateContainer(String id, URI location) throws ExecutionException {
+    public void migrateContainer(String id, String resourceId) throws ExecutionException {
         checkId(id, "id");
         if (!containers.containsKey(id)) {
             throw new ExecutionException("Container id '" + id + "' is not known. Cannot migrate container.", null);

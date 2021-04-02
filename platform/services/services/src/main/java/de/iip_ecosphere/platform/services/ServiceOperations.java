@@ -57,10 +57,10 @@ public interface ServiceOperations {
      * Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]
      * 
      * @param serviceId the id of the service
-     * @param location the target location, e.g., a device
+     * @param resourceId the target resource id, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void migrateService(String serviceId, URI location) throws ExecutionException;
+    public void migrateService(String serviceId, String resourceId) throws ExecutionException;
 
     /**
      * Removes the artifact (and transitively its services) from the management domain of this instance. This operation 

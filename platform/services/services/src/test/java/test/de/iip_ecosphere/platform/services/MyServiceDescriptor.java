@@ -14,6 +14,8 @@ package test.de.iip_ecosphere.platform.services;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.Version;
 
 /**
@@ -24,6 +26,69 @@ import de.iip_ecosphere.platform.services.Version;
 class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor> {
 
     /**
+     * A simple data descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class DataDesc implements TypedDataDescriptor {
+
+        private String name;
+        private String description;
+        private Class<?> type;
+
+        /**
+         * Creates a data descriptor.
+         * 
+         * @param name the name
+         * @param description the description
+         * @param type the type
+         */
+        private DataDesc(String name, String description, Class<?> type) {
+            this.name = name;
+            this.description = description;
+            this.type = type;
+        }
+        
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return type;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+        
+    }
+
+    /**
+     * A simple connector descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ConnectorDesc extends DataDesc implements TypedDataConnectorDescriptor {
+
+        /**
+         * Creates a data descriptor.
+         * 
+         * @param name the name
+         * @param description the description
+         * @param type the type
+         */
+        private ConnectorDesc(String name, String description, Class<?> type) {
+            super(name, description, type);
+        }
+
+    }
+    
+    private static int count = 0;
+    
+    /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
      * 
      * @param id the service id
@@ -33,6 +98,10 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
      */
     protected MyServiceDescriptor(String id, String name, String description, Version version) {
         super(id, name, description, version);
+        addParameter(new DataDesc("NAME", "reconfigures the name", String.class));
+        addInputDataConnector(new ConnectorDesc("conn-" + count, "", Integer.TYPE));
+        count++;
+        addOutputDataConnector(new ConnectorDesc("conn-" + count, "", Integer.TYPE));
     }
     
 }

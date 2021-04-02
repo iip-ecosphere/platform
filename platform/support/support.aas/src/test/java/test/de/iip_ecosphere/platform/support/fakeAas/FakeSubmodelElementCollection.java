@@ -18,6 +18,7 @@ import java.util.Map;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
@@ -210,6 +211,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
     @Override
     public void deleteElement(String idShort) {
         elements.remove(idShort);
+    }
+
+    @Override
+    public Operation getOperation(String idShort) {
+        return filter(idShort, Operation.class);
     }
 
 }

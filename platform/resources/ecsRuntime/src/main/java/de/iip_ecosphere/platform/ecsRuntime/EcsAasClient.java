@@ -18,40 +18,26 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.services.SubmodelElementsCollectionClient;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAas;
-import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
 
 /**
- * A client for {@link EcsAas}.
+ * A client for {@link EcsAas} for accessing the operations provided by a certain resource.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsAasClient extends SubmodelClient implements ContainerOperations {
+public class EcsAasClient extends SubmodelElementsCollectionClient implements ContainerOperations {
 
     /**
      * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
-     * {@link NetworkManagerAas#NAME_SUBMODEL name}.
+     * {@link EcsAas#NAME_SUBMODEL resources}.
      * 
+     * @param resourceId the id used as key in {@link EcsAas#NAME_SUBMODEL} to denote the resource 
+     *   to operate on
      * @throws IOException if retrieving the IIP-AAS or the respective submodel fails
      */
-    public EcsAasClient() throws IOException {
-        this(ActiveAasBase.getSubmodel(EcsAas.NAME_SUBMODEL));
-    }
-    
-    /**
-     * Creates a client instance based on the submodel. The submodel shall conform to {@link EcsAas} with 
-     * respect to the operations, signatures, but also the {@link EcsAas#NAME_SUBMODEL name},
-     * 
-     * @param submodel the submodel to use
-     */
-    public EcsAasClient(Submodel submodel) {
-        super(submodel);
+    public EcsAasClient(String resourceId) throws IOException {
+        super(EcsAas.NAME_SUBMODEL, resourceId);
     }
 
     @Override
@@ -70,8 +56,8 @@ public class EcsAasClient extends SubmodelClient implements ContainerOperations 
     }
 
     @Override
-    public void migrateContainer(String id, URI location) throws ExecutionException {
-        fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_MIGRATE).invoke(id, location.toString()));
+    public void migrateContainer(String id, String resourceId) throws ExecutionException {
+        fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_MIGRATE).invoke(id, resourceId));
     }
 
     @Override
@@ -98,15 +84,6 @@ public class EcsAasClient extends SubmodelClient implements ContainerOperations 
             getLogger().error("Requesting service state, illegal response value: " + e.getMessage());
         }
         return result;
-    }
-
-    /**
-     * Returns the logger instance.
-     * 
-     * @return the logger
-     */
-    private Logger getLogger() {
-        return LoggerFactory.getLogger(getClass());
     }
 
     @Override

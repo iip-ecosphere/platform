@@ -35,11 +35,10 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
@@ -69,14 +68,9 @@ public class ServicesAasTest {
         implServer.start();
         Server aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
-        Aas aas = AasPartRegistry.retrieveIipAas();
-        Assert.assertNotNull(aas);
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
-        aas.accept(new AasPrintVisitor());
-        
-        Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
-        Assert.assertNotNull(sub);
-        ServicesAasClient client = new ServicesAasClient(sub);
+        ServicesAasClient client = new ServicesAasClient(ClassUtility.JVM_NAME);
         ServiceManager mgr = ServiceFactory.getServiceManager(); // for x-checking
 
         final URI dummy = new URI("file:///dummy");
@@ -101,6 +95,8 @@ public class ServicesAasTest {
         
         client.startService(sId);
         Assert.assertEquals(ServiceState.RUNNING, client.getServiceState(sId));
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
+        
         client.passivateService(sId);
         Assert.assertEquals(ServiceState.PASSIVATED, client.getServiceState(sId));
         client.activateService(sId);
@@ -115,7 +111,7 @@ public class ServicesAasTest {
         Assert.assertEquals(ServiceState.STOPPED, client.getServiceState(sId));
 
         ServiceManagerTest.assertException(() -> mgr.cloneArtifact(aId, dummy));
-        ServiceManagerTest.assertException(() -> mgr.migrateService(aId, dummy));
+        ServiceManagerTest.assertException(() -> mgr.migrateService(aId, "other"));
         ServiceManagerTest.assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         
