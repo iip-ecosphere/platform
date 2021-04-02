@@ -34,7 +34,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
@@ -66,7 +66,7 @@ public class EcsAasTest {
         aasServer.start();
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
-        EcsAasClient client = new EcsAasClient(ClassUtility.JVM_NAME);
+        EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
         test(client);
         
         aasServer.stop(true);

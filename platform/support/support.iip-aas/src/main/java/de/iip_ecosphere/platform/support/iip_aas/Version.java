@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services;
+package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*;
 

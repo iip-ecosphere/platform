@@ -161,7 +161,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         public BaSyxSubmodelElementCollection build() {
             instance.collection = collection;
-            return parentBuilder.register(instance);
+            if (isNew) {
+                parentBuilder.register(instance);
+            }
+            return instance;
         }
 
         @Override

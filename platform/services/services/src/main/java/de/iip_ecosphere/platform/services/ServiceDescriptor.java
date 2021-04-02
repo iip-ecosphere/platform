@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.iip_aas.Version;
+
 /**
  * Describes a service.
  * 

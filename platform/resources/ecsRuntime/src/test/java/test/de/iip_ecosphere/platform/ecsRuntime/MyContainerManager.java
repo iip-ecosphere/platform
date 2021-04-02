@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * A test container manager.

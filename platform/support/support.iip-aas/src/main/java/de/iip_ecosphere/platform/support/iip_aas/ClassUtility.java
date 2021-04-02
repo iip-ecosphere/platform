@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
-import java.lang.management.ManagementFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -72,7 +70,7 @@ public class ClassUtility {
     public static final String ATTRIBUTE_PREFIX = "attr_"; // AAS id name limitation
     public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
     public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
-    public static final String JVM_NAME = fixId(ManagementFactory.getRuntimeMXBean().getName());
+    //private static final String JVM_NAME = fixId(ManagementFactory.getRuntimeMXBean().getName());
     private static final Map<Class<?>, String> NAME_MAPPING = new HashMap<>();
     
     /**
@@ -216,7 +214,7 @@ public class ClassUtility {
      * @return the combined id
      */
     public static String getId(String prefix, Object object) {
-        return fixId(prefix + JVM_NAME + "_" + System.identityHashCode(object));
+        return fixId(prefix + Id.getEnvId() + "_" + System.identityHashCode(object));
     }
 
 }

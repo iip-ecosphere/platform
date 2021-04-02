@@ -24,8 +24,10 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
@@ -66,7 +68,7 @@ import org.slf4j.LoggerFactory;
 public class ServicesAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "services";
-    public static final String NAME_SUBMODEL_RESOURCES = "resources";
+    public static final String NAME_SUBMODEL_RESOURCES = AasPartRegistry.NAME_SUBMODEL_RESOURCES;
     public static final String NAME_COLL_ARTIFACTS = "artifacts";
     public static final String NAME_COLL_SERVICES = "services";
     public static final String NAME_COLL_RELATIONS = "relations";
@@ -104,7 +106,7 @@ public class ServicesAas implements AasContributor {
         // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
         SubmodelElementCollectionBuilder jB 
-            = smB.createSubmodelElementCollectionBuilder(ClassUtility.JVM_NAME, false, false);
+            = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
     
         // probably relevant ops only
         createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
@@ -293,7 +295,7 @@ public class ServicesAas implements AasContributor {
             .setValue(Type.STRING, desc.getName())
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
-            .setValue(Type.STRING, ClassUtility.JVM_NAME)
+            .setValue(Type.STRING, Id.getDeviceIdAas())
             .build();
         dBuilder.build();
 
@@ -334,7 +336,7 @@ public class ServicesAas implements AasContributor {
             .setValue(Type.STRING, desc.getDescription())
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
-            .setValue(Type.STRING, ClassUtility.JVM_NAME)
+            .setValue(Type.STRING, Id.getDeviceIdAas())
             .build();
         Reference serviceRef = descriptorBuilder.createReference();
         
@@ -388,7 +390,7 @@ public class ServicesAas implements AasContributor {
      */
     private static void addRelationData(SubmodelElementCollectionBuilder builder, 
         List<? extends TypedDataConnectorDescriptor> descriptors, boolean input, Reference serviceRef) {
-        /*for (TypedDataConnectorDescriptor d : descriptors) {
+        for (TypedDataConnectorDescriptor d : descriptors) {
             SubmodelElementCollectionBuilder dBuilder 
                 = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()), false, false);
             String name = input ? NAME_PROP_TO : NAME_PROP_FROM;
@@ -396,7 +398,7 @@ public class ServicesAas implements AasContributor {
                 .setValue(serviceRef)
                 .build();
             dBuilder.build();
-        }*/ // incrementally adding elements fails for now
+        }
     }
     
     /**

@@ -38,7 +38,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
@@ -70,7 +70,7 @@ public class ServicesAasTest {
         aasServer.start();
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
-        ServicesAasClient client = new ServicesAasClient(ClassUtility.JVM_NAME);
+        ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
         ServiceManager mgr = ServiceFactory.getServiceManager(); // for x-checking
 
         final URI dummy = new URI("file:///dummy");

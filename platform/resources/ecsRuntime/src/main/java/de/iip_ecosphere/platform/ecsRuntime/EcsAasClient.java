@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.services.SubmodelElementsCollectionClient;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
 /**
  * A client for {@link EcsAas} for accessing the operations provided by a certain resource.

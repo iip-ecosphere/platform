@@ -20,6 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    IdTest.class,
+    VersionTest.class,
     ClassUtilityTest.class,
     AasPartRegistryTest.class,
     JsonUtilsTest.class,

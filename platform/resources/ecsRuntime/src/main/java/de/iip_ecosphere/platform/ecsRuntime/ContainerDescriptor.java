@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Describes a container.

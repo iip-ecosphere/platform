@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.iip_aas.Version;
+
 /**
  * Abstract {@link ServiceDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 
  * statemachine. We do not protect the setters here explicitly, e.g., through a builder pattern as we assume that 

@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Basic container operations that a container manager as well as an AAS client shall provide.

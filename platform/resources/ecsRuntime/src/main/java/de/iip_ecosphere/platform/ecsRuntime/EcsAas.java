@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -31,8 +30,9 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
  */
 public class EcsAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = ServicesAas.NAME_SUBMODEL_RESOURCES; 
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_RESOURCES; 
     public static final String NAME_PROP_CSYS_NAME = "containerSystemName";
     public static final String NAME_PROP_CSYS_VERSION = "containerSystemVersion";
     public static final String NAME_COLL_CONTAINERS = "containers";
@@ -70,7 +70,7 @@ public class EcsAas implements AasContributor {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
 
         SubmodelElementCollectionBuilder jB 
-            = smB.createSubmodelElementCollectionBuilder(ClassUtility.JVM_NAME, false, false);
+            = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
 
         // TODO resource/monitoring information
 
@@ -209,7 +209,7 @@ public class EcsAas implements AasContributor {
             .setValue(Type.STRING, desc.getState().toString())
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
-            .setValue(Type.STRING, ClassUtility.JVM_NAME)
+            .setValue(Type.STRING, Id.getDeviceIdAas())
             .build();
         dBuilder.build();
         

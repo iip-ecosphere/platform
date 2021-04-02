@@ -44,6 +44,9 @@ public class AasPartRegistry {
      */
     public static final String NAME_AAS = "IIP_Ecosphere";
     
+    // common submodel names are declared already here to relax dependencies
+    public static final String NAME_SUBMODEL_RESOURCES = "resources"; 
+    
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
      */
