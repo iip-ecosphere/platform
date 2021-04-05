@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -40,6 +42,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
     private FakeAas parent;
     private Map<String, SubmodelElement> elements = new HashMap<>();
+    private Map<String, Builder<?>> deferred;
     
     /**
      * A fake sub-model builder.
@@ -91,13 +94,28 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
             boolean allowDuplicates) {
-            return new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort, ordered, 
-                allowDuplicates);
+            SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class);
+            if (null == result) {
+                result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort, ordered, 
+                    allowDuplicates);
+            }
+            return result;
         }
 
         @Override
         public Reference createReference() {
             return new FakeReference();
+        }
+
+        @Override
+        public void defer() {
+            parent.defer(instance.getIdShort(), this);
+        }
+
+        @Override
+        public void buildDeferred() {
+            parent.buildMyDeferred();
         }
 
         @Override
@@ -143,7 +161,17 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         public boolean isNew() {
             return isNew;
         }
-        
+
+        @Override
+        void defer(String shortId, Builder<?> builder) {
+            instance.defer(shortId, builder);
+        }
+
+        @Override
+        void buildMyDeferred() {
+            instance.buildDeferred();
+        }
+
     }
     
     /**
@@ -273,10 +301,15 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
-        FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
-            new FakeAasBuilder(parent), this);
-        return new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(
-            secb, idShort, ordered, allowDuplicates);
+        SubmodelElementCollectionBuilder result = getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class);
+        if (null == result) {
+            FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
+                new FakeAasBuilder(parent), this);
+            result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(
+                secb, idShort, ordered, allowDuplicates);
+        }
+        return result;
     }
 
     @Override
@@ -287,6 +320,34 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public void delete(SubmodelElement elt) {
         elements.remove(elt.getIdShort());
+    }
+
+    /**
+     * Registers a sub-build as deferred.
+     * 
+     * @param shortId the shortId of the element
+     * @param builder the sub-builder to be registered
+     * @see #buildDeferred()
+     */
+    void defer(String shortId, Builder<?> builder) {
+        deferred = DeferredBuilder.defer(shortId, builder, deferred);
+    }
+
+    @Override
+    public void buildDeferred() {
+        DeferredBuilder.buildDeferred(deferred);
+    }
+
+    /**
+     * Returns a deferred builder.
+     * 
+     * @param <B> the builder type
+     * @param shortId the short id
+     * @param cls the builder type
+     * @return the builder or <b>null</b> if no builder for {@code shortId} with the respective type is registered
+     */
+    <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
+        return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 
 }

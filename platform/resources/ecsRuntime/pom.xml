@@ -19,6 +19,7 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <!-- NO dependency to de.iip-ecosphere.platform.services!! -->
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas.basyx</artifactId>

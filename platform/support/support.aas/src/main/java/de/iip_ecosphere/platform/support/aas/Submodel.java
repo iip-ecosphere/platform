@@ -21,14 +21,14 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
  * @author Holger Eichelberger, SSE
 */
 public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiable, HasDataSpecification, HasKind, 
-    ElementContainer {
+    ElementContainer, DeferredParent {
 
     /**
      * Encapsulated logic to build a sub-model.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface SubmodelBuilder extends SubmodelElementContainerBuilder, Builder<Submodel> {
+    public interface SubmodelBuilder extends SubmodelElementContainerBuilder, DeferredBuilder<Submodel> {
         
         /**
          * Creates a reference on the sub-model under construction.

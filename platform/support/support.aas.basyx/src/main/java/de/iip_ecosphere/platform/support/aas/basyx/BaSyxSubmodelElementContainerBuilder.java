@@ -12,17 +12,21 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
+import org.apache.ibatis.binding.MapperMethod.MethodSignature;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 
 /**
- * Basic implementation for a container-based model element.
+ * Basic implementation for a container-based model element. Subclasses must call {@link #buildMyDeferred()} in an 
+ * appropriate {@link MethodSignature} and use {@link #getDeferred(String, Class)} when potentially creating a 
+ * builder that could be deferred.
  * 
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE
@@ -105,6 +109,26 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> impleme
             getInstance().register(collection);
         }
         return collection;
+    }
+
+    /**
+     * Registers a sub-build as deferred.
+     * 
+     * @param shortId the shortId of the element
+     * @param builder the sub-builder to be registered
+     * @see #buildMyDeferred()
+     */
+    void defer(String shortId, Builder<?> builder) {
+        getInstance().defer(shortId, builder);
+    }
+
+    /**
+     * Calls {@link Builder#build()} on all deferred builders.
+     * 
+     * @see #defer(String, Builder)
+     */
+    void buildMyDeferred() {
+        getInstance().buildDeferred();
     }
 
 }

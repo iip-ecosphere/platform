@@ -129,7 +129,7 @@ public class ServicesAas implements AasContributor {
         createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
         jB.build();
 
-        smB.build();
+        smB.defer(); // join with ecsRuntime if present, build done by AAS
 
         // service structures go into own part
         ServiceManager mgr = ServiceFactory.getServiceManager();
@@ -348,7 +348,7 @@ public class ServicesAas implements AasContributor {
         
         descriptorBuilder.build();
         
-        connectionBuilder.build();
+        connectionBuilder.defer();
         serviceBuilder.build();
     }
 
@@ -397,7 +397,7 @@ public class ServicesAas implements AasContributor {
             dBuilder.createReferenceElementBuilder(name)
                 .setValue(serviceRef)
                 .build();
-            dBuilder.build();
+            dBuilder.defer();
         }
     }
     

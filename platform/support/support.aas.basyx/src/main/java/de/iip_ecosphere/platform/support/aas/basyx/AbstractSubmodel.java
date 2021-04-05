@@ -19,10 +19,12 @@ import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -45,6 +47,7 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     private Map<String, DataElement> dataElements = new HashMap<>(); // TODO now partly values in BaSyx
     private Map<String, Property> properties = new HashMap<>();
     private Map<String, SubmodelElement> submodelElements = new HashMap<>();
+    private Map<String, Builder<?>> deferred;
 
     /**
      * Creates an instance. Prevents external creation.
@@ -278,6 +281,38 @@ public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel,
     public static String getSubmodelEndpoint(ServerAddress server, Aas aas, Submodel submodel) {
         return AbstractAas.getAasEndpoint(server, aas) 
             + "/submodels/" + Tools.idToUrlPath(submodel.getIdShort()) + "/submodel";
+    }
+
+    /**
+     * Registers a sub-build as deferred.
+     * 
+     * @param shortId the shortId of the element
+     * @param builder the sub-builder to be registered
+     * @see #buildDeferred()
+     */
+    void defer(String shortId, Builder<?> builder) {
+        deferred = DeferredBuilder.defer(shortId, builder, deferred);
+    }
+
+    /**
+     * Calls {@link Builder#build()} on all deferred builders.
+     * 
+     * @see #defer(String, Builder)
+     */
+    public void buildDeferred() {
+        DeferredBuilder.buildDeferred(deferred);
+    }
+
+    /**
+     * Returns a deferred builder.
+     * 
+     * @param <B> the builder type
+     * @param shortId the short id
+     * @param cls the builder type
+     * @return the builder or <b>null</b> if no builder for {@code shortId} with the respective type is registered
+     */
+    <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
+        return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 
 }

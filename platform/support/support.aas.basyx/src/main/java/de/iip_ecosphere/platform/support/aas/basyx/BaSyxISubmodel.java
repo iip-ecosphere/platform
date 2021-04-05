@@ -55,14 +55,17 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
             boolean allowDuplicates) {
-            SubmodelElementCollectionBuilder result;
-            SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
-            if (null == sub) {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
-                    ordered, allowDuplicates);
-            } else {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
-                   (BaSyxSubmodelElementCollection) sub);                
+            SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class);
+            if (null == result) {
+                SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
+                if (null == sub) {
+                    result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
+                        ordered, allowDuplicates);
+                } else {
+                    result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
+                       (BaSyxSubmodelElementCollection) sub);                
+                }
             }
             return result;
         }
@@ -78,7 +81,18 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
         }
 
         @Override
+        public void defer() {
+            parentBuilder.defer(instance.getIdShort(), this);
+        }
+
+        @Override
+        public void buildDeferred() {
+            parentBuilder.buildMyDeferred();
+        }
+
+        @Override
         public Submodel build() {
+            buildMyDeferred();
             // do not register, this already exists/is registered
             return instance;
         }
@@ -113,10 +127,21 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
-        BaSyxSubmodelElementContainerBuilder<ISubModel> secb = new BaSyxISubmodelBuilder(
-            new BaSyxConnectedAasBuilder(parent), this);
-        return new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
-            secb, idShort, ordered, allowDuplicates);
+        SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
+        if (null == result) {
+            BaSyxSubmodelElementContainerBuilder<ISubModel> secb = new BaSyxISubmodelBuilder(
+                new BaSyxConnectedAasBuilder(parent), this);
+    
+            SubmodelElementCollection sub = getSubmodelElementCollection(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
+                    secb, idShort, ordered, allowDuplicates);
+            } else {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(secb, 
+                   (BaSyxSubmodelElementCollection) sub);
+            }
+        }
+        return result;
     }
 
 }

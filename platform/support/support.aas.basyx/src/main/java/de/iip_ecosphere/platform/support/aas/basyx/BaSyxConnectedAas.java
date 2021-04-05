@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -48,6 +49,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
 
         @Override
         public Aas build() {
+            buildMyDeferred();
             return instance;
         }
 
@@ -91,6 +93,16 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         void setAsset(BaSyxAsset asset) {
             // do nothing, not possible
         }
+        
+        @Override
+        void defer(String shortId, Builder<?> builder) {
+            getInstance().defer(shortId, builder);
+        }
+
+        @Override
+        void buildMyDeferred() {
+            getInstance().buildDeferred();
+        }
 
     }
     
@@ -116,14 +128,16 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
      * @return the created sub-model builder
      */
     private SubmodelBuilder obtainSubmodelBuilder(BaSyxConnectedAasBuilder builder, String idShort, String identifier) {
-        SubmodelBuilder result;
-        Submodel sub =  getSubmodel(idShort);
-        if (null == getSubmodel(idShort)) { // new here
-            result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, idShort, identifier);
-        } else if (sub instanceof BaSyxSubmodel) { // after add
-            result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, (BaSyxSubmodel) sub);
-        } else { // connected
-            result = new BaSyxISubmodel.BaSyxISubmodelBuilder(builder, (BaSyxISubmodel) sub);
+        SubmodelBuilder result = getDeferred(idShort, SubmodelBuilder.class);
+        if (null == result) {
+            Submodel sub =  getSubmodel(idShort);
+            if (null == getSubmodel(idShort)) { // new here
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, idShort, identifier);
+            } else if (sub instanceof BaSyxSubmodel) { // after add
+                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, (BaSyxSubmodel) sub);
+            } else { // connected
+                result = new BaSyxISubmodel.BaSyxISubmodelBuilder(builder, (BaSyxISubmodel) sub);
+            }
         }
         return result;
     }

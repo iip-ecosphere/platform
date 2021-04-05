@@ -95,7 +95,7 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
     public String getIdShort() {
         try {
             return reference.getIdShort();
-        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+        } catch (ResourceNotFoundException e) {
             return "";
         }
     }
@@ -104,7 +104,7 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
     public Reference getValue() {
         try {
             return new BaSyxReference(reference.getValue());
-        } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
+        } catch (ResourceNotFoundException e) { 
             return null;
         }
     }

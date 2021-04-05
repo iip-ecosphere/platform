@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -70,5 +71,21 @@ abstract class FakeSubmodelElementContainerBuilder implements SubmodelElementCon
      * @return {@code collection}
      */
     abstract FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection);
+
+    /**
+     * Registers a sub-build as deferred.
+     * 
+     * @param shortId the shortId of the element
+     * @param builder the sub-builder to be registered
+     * @see #buildMyDeferred()
+     */
+    abstract void defer(String shortId, Builder<?> builder);
+
+    /**
+     * Calls {@link Builder#build()} on all deferred builders.
+     * 
+     * @see #defer(String, Builder)
+     */
+    abstract void buildMyDeferred();
 
 }

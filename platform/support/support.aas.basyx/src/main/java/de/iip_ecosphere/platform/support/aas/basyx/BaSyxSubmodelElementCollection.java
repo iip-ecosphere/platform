@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
@@ -26,8 +27,10 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -44,6 +47,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     
     private ISubmodelElementCollection collection;
     private List<SubmodelElement> elements = new ArrayList<SubmodelElement>();
+    private Map<String, Builder<?>> deferred;
     
     /**
      * The sub-model element collection builder.
@@ -117,14 +121,17 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
             boolean allowDuplicates) {
-            SubmodelElementCollectionBuilder result;
-            SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
-            if (null == sub) {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
-                    ordered, allowDuplicates);
-            } else {
-                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
-                   (BaSyxSubmodelElementCollection) sub);
+            SubmodelElementCollectionBuilder result = DeferredBuilder.getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class, instance.deferred);
+            if (null == result) {
+                SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
+                if (null == sub) {
+                    result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
+                        ordered, allowDuplicates);
+                } else {
+                    result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
+                       (BaSyxSubmodelElementCollection) sub);
+                }
             }
             return result;
         }
@@ -143,7 +150,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         BaSyxProperty register(BaSyxProperty property) {
             this.collection.addSubModelElement(property.getSubmodelElement());
-            return instance.register(property);
+            BaSyxProperty p = instance.register(property);
+            return p;
         }
 
         @Override
@@ -157,13 +165,32 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             this.collection.addSubModelElement(collection.getSubmodelElement());
             return instance.register(collection);
         }
+        
+        @Override
+        public void defer() {
+            parentBuilder.defer(collection.getIdShort(), this);
+        }
+        
+        @Override
+        void defer(String shortId, Builder<?> builder) {
+            instance.deferred = DeferredBuilder.defer(shortId, builder, instance.deferred);
+        }
+
+        @Override
+        void buildMyDeferred() {
+            DeferredBuilder.buildDeferred(instance.deferred);            
+        }
+        
+        @Override
+        public void buildDeferred() {
+            parentBuilder.buildMyDeferred();
+        }
 
         @Override
         public BaSyxSubmodelElementCollection build() {
+            buildMyDeferred();
             instance.collection = collection;
-            if (isNew) {
-                parentBuilder.register(instance);
-            }
+            parentBuilder.register(instance);
             return instance;
         }
 

@@ -99,7 +99,7 @@ public class EcsAas implements AasContributor {
             addContainer(smB, desc);
         }
 
-        smB.build();
+        smB.defer(); // join with services if present, build done by AAS
         return null;
     }
 
