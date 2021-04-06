@@ -170,7 +170,7 @@ public class ClassUtilityTest {
         String id2 = ClassUtility.getId(prefix, o);
         Assert.assertNotNull(id2);
         Assert.assertTrue(id2.length() > 0);
-        Assert.assertTrue(id2.indexOf(id1) == prefix.length());
+        Assert.assertTrue(id2.startsWith(prefix));
     }
     
     /**
