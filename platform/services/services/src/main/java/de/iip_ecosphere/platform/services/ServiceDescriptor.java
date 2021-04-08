@@ -59,6 +59,14 @@ public interface ServiceDescriptor {
      * @return the state
      */
     public ServiceState getState();
+    
+    /**
+     * Returns the ensemble leader service, i.e., if multiple services are packaged together and shall be executed
+     * in the same process, it is important to synchronize aspects (via the ensemble leader service).
+     * 
+     * @return the ensemble leader, may be <b>null</b> if there is none
+     */
+    public ServiceDescriptor getEnsembleLeader();
 
     /**
      * Changes the state. [R133c]

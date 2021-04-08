@@ -78,6 +78,11 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     }
     
     @Override
+    public ServiceDescriptor getEnsembleLeader() {
+        return null; // we assume that this is not implemented by default
+    }
+    
+    @Override
     public String getId() {
         return id;
     }
@@ -99,12 +104,16 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
 
     @Override
     public ServiceState getState() {
-        return state;
+        return null != getEnsembleLeader() ? getEnsembleLeader().getState() : state;
     }
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        this.state = state;
+        if (null != getEnsembleLeader()) {
+            getEnsembleLeader().setState(state);
+        } else {
+            this.state = state;
+        }        
     }
 
     @Override
