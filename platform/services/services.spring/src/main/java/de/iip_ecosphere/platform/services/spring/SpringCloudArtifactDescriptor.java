@@ -64,28 +64,25 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
      */
     public static SpringCloudArtifactDescriptor createInstance(YamlArtifact artifact, File jarFile) {
         List<SpringCloudServiceDescriptor> services = new ArrayList<>();
-        Map<String, String> ensembleLeaderIds = new HashMap<>();
-        for (YamlService s : artifact.getServices()) {
-            for (String id : s.getEnsembleWith()) {
-                ensembleLeaderIds.put(id, s.getId());
-            }
-        }
         
         TypeResolver resolver = new TypeResolver(artifact.getTypes());
         Map<String, SpringCloudServiceDescriptor> descriptors = new HashMap<String, SpringCloudServiceDescriptor>();
         for (YamlService s : artifact.getServices()) {
-            SpringCloudServiceDescriptor ensembleLeader = null;
-            for (String ens: s.getEnsembleWith()) {
-                ensembleLeader = descriptors.get(ens);
-                if (null != ensembleLeader) {
-                    break;
-                }
-            }
-            
-            SpringCloudServiceDescriptor desc = new SpringCloudServiceDescriptor(s, ensembleLeader, resolver);
+            SpringCloudServiceDescriptor desc = new SpringCloudServiceDescriptor(s, resolver);
             descriptors.put(desc.getId(), desc);
             services.add(desc);
         }
+        
+        for (YamlService s : artifact.getServices()) {
+            if (null != s.getEnsembleWith()) {
+                SpringCloudServiceDescriptor service = descriptors.get(s.getId());
+                SpringCloudServiceDescriptor ensembleLeader = descriptors.get(s.getEnsembleWith());
+                if (null != ensembleLeader && null != service) { // must be local and defined
+                    service.setEnsembleLeader(ensembleLeader);
+                }
+            }
+        }
+        
         return new SpringCloudArtifactDescriptor(artifact.getId(), artifact.getName(), jarFile, services);        
     }
     

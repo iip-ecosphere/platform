@@ -52,16 +52,13 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * Creates an instance.
      * 
      * @param service the service deployment specification object
-     * @param ensembleLeader optional ensemble leader some information shall be taken from/synchronized with
      * @param resolver the (artifact) type resolver
      * @see #setClassification(ServiceKind, boolean)
      */
-    public SpringCloudServiceDescriptor(Service service, SpringCloudServiceDescriptor ensembleLeader, 
-        TypeResolver resolver) {
+    public SpringCloudServiceDescriptor(Service service, TypeResolver resolver) {
         super(service.getId(), service.getName(), service.getDescription(), new Version(service.getVersion()));
         setClassification(service.getKind(), service.isDeployable());
         this.service = service;
-        this.ensembleLeader = ensembleLeader;
         
         for (TypedData p : service.getParameters()) {
             addParameter(new SpringCloudServiceTypedData(p.getName(), p.getDescription(), 
@@ -79,6 +76,15 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     }
     
     /**
+     * Defines the ensemble leader.
+     * 
+     * @param ensembleLeader optional ensemble leader some information shall be taken from/synchronized with
+     */
+    void setEnsembleLeader(SpringCloudServiceDescriptor ensembleLeader) {
+        this.ensembleLeader = ensembleLeader;
+    }
+    
+    /**
      * Returns the deployment group.
      * 
      * @return the deployment group
@@ -87,13 +93,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         return getArtifact().getId(); // for now, just the artifact ID
     }
 
-    /**
-     * Returns the ensemble leader service, i.e., if multiple services are packaged together and shall be executed
-     * in the same process, it is important to synchronize aspects (via the ensemble leader service).
-     * 
-     * @return the ensemble leader, may be <b>null</b> if there is none
-     */
-    SpringCloudServiceDescriptor getEnsembleLeader() {
+    @Override
+    public SpringCloudServiceDescriptor getEnsembleLeader() {
         return ensembleLeader;
     }
     
@@ -217,5 +218,5 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     String getDeploymentId() {
         return deploymentId;
     }
-
+    
 }

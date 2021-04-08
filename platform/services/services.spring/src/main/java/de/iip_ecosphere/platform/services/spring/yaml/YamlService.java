@@ -30,7 +30,7 @@ public class YamlService implements Service {
     private String version;
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
-    private List<String> ensembleWith = new ArrayList<>();
+    private String ensembleWith;
     private List<YamlServiceDependency> dependencies = new ArrayList<>();
     private List<YamlRelation> relations = new ArrayList<>();
     private List<YamlTypedData> parameters = new ArrayList<>();
@@ -68,7 +68,7 @@ public class YamlService implements Service {
     }
     
     @Override
-    public List<String> getEnsembleWith() {
+    public String getEnsembleWith() {
         return ensembleWith;
     }
     
@@ -168,11 +168,11 @@ public class YamlService implements Service {
     }
 
     /**
-     * Defines the service ids to be started with this service. [required by SnakeYaml]
+     * Defines the service id of the ensemble leader starting this service. [required by SnakeYaml]
      * 
-     * @param ensembleWith the service ids (may be empty for none)
+     * @param ensembleWith the service id of the ensemble leader (may be <b>null</b> for none)
      */
-    public void setEnsembleWith(List<String> ensembleWith) {
+    public void setEnsembleWith(String ensembleWith) {
         this.ensembleWith = ensembleWith;
     }
 

@@ -116,11 +116,10 @@ public class Validator {
             int sCount = 0;
             for (Service s : artifact.getServices()) {
                 if (null != s.getEnsembleWith()) {
-                    for (String e : s.getEnsembleWith()) {
-                        if (null != e && e.length() > 0 && !serviceIds.contains(e)) {
-                            messages.add("Ensemble entry '" + e + "' in service #" + sCount + " is not declared as "
-                                + "service .");
-                        }
+                    String ensemble = s.getEnsembleWith(); 
+                    if (null != ensemble && ensemble.length() > 0 && !serviceIds.contains(ensemble)) {
+                        messages.add("Ensemble entry '" + ensemble + "' in service #" + sCount + " is not declared as "
+                            + "service .");
                     }
                 }
                 sCount++;
@@ -156,7 +155,6 @@ public class Validator {
         assertFieldNotNull(service.getDescription(), "description", msgContext); // optional
         assertFieldNotNull(service.getKind(), "kind", msgContext);
         assertStringList(service.getCmdArg(), "cmdArg", "arg", msgContext);
-        assertStringList(service.getEnsembleWith(), "ensembleWith", "id", msgContext);
         assertList(service.getDependencies(), true, "dependencies", msgContext, (d, m) -> validate(d, m));
         assertList(service.getParameters(), true, "parameters", msgContext, (p, m) -> validate(p, types, m));
         assertList(service.getRelations(), true, "relations", msgContext, (r, m) -> validate(r, types, m));

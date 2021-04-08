@@ -65,12 +65,11 @@ public interface Service {
     public List<String> getCmdArg();
 
     /**
-     * Returns the service ids this service is starting as an ensemble with itself.
-     * The ensemble services shall not be started on their own.
+     * Returns the service id of the ensemble leader. The ensemble services shall then be started on its own.
      * 
-     * @return the service ids (may be empty for none)
+     * @return the service id of the ensemble leader (may be <b>null</b> for none)
      */
-    public List<String> getEnsembleWith();
+    public String getEnsembleWith();
 
     /**
      * Defines the command line arguments. [required by SnakeYaml]

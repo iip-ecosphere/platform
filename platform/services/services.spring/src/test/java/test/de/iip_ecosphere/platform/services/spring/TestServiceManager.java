@@ -114,8 +114,9 @@ public class TestServiceManager {
     }
     
     /**
-     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager}. This test requires an actual version
-     * of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact in the compile phase.
+     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager} with two processes. This test requires 
+     * an actual version of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact 
+     * in the compile phase.
      * 
      * @throws ExecutionException shall not occur
      */
@@ -135,9 +136,32 @@ public class TestServiceManager {
             }*/
 
         });
-        // TODO with deployment1.yml
     }
-    
+
+    /**
+     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager} in one process as an ensemble. As 
+     * {@link #testSimpleStartStop()}, this test requires an actual version of {@code test.simpleStream.spring}.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testEnsembleStartStop() throws ExecutionException {
+        doTestStartStop("deployment1.yml", new ArtifactAsserter() {
+
+            /*@Override
+            public void testDescriptor(ArtifactDescriptor aDesc) {
+                SpringCloudServiceDescriptor inputService = 
+                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-create");
+                SpringCloudServiceDescriptor outputService = 
+                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-log");
+                
+                inputService.get
+                
+            }*/
+
+        });
+    }
+
     /**
      * Artifact asserter interface.
      * 

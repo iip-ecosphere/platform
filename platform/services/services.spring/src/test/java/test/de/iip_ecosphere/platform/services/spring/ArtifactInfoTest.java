@@ -76,7 +76,7 @@ public class ArtifactInfoTest {
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
         assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
-        assertStringList(service.getEnsembleWith(), "id-1");
+        Assert.assertEquals(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(0, service.getDependencies().size());
         Assert.assertEquals(2, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
@@ -87,7 +87,7 @@ public class ArtifactInfoTest {
         assertServiceBasics(service, "id-1", "name-1", "1.0.3", "desc desc-1");
         assertServiceCharacteristics(service, true, ServiceKind.SINK_SERVICE);
         assertStringList(service.getCmdArg());
-        assertStringList(service.getEnsembleWith());
+        Assert.assertNull(service.getEnsembleWith());
         Assert.assertEquals(1, service.getDependencies().size());
         assertDependency(service.getDependencies().get(0), "id-0");
         Assert.assertEquals(1, service.getRelations().size());
