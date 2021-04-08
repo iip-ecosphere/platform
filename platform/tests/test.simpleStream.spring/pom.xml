@@ -58,7 +58,7 @@
             <directory>src/test/resources</directory>
             <includes>
                 <include>application.yml</include>
-                <include>deployment.yml</include>
+                <include>deployment*.yml</include>
             </includes>
         </testResource> 
         <testResource> 
