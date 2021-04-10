@@ -29,9 +29,11 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MyServiceDescriptor> {
 
+    private static int connectorCount = 0;
+    
     private int artifactId;
     private int serviceId;
-    
+
     /**
      * Prevents external creation.
      */
@@ -64,10 +66,27 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
         String aId = createArtifactId();
         List<MyServiceDescriptor> services = new ArrayList<>();
         String text = location.toString();
-        services.add(new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 0)));
-        services.add(new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 1)));
+        MyServiceDescriptor sd = 
+             new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 0));
+        services.add(setupData(sd));
+        sd = new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 1));
+        services.add(setupData(sd));
         super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
         return aId;
+    }
+    
+    /**
+     * Adds some data to test against.
+     * 
+     * @param sd the descriptor instance
+     * @return {@code sd}
+     */
+    private MyServiceDescriptor setupData(MyServiceDescriptor sd) {
+        sd.addParameter(new MyTypedDataDescriptor("NAME", "reconfigures the name", String.class));
+        sd.addInputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "", Integer.TYPE));
+        connectorCount++;
+        sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "", Integer.TYPE));
+        return sd;
     }
 
     @Override

@@ -13,9 +13,13 @@
 package de.iip_ecosphere.platform.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
@@ -171,6 +175,69 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
      */
     protected void addOutputDataConnector(TypedDataConnectorDescriptor output) {
         this.output.add(output);
+    }
+
+    /**
+     * Returns all services in the same ensemble. [public, static for testing]
+     * 
+     * @param service the service to return the ensemble (in the same artifact) for
+     * @return all services in the same ensemble
+     */
+    public static Set<ServiceDescriptor> ensemble(ServiceDescriptor service) {
+        Set<ServiceDescriptor> result = new HashSet<ServiceDescriptor>();
+        result.add(service);
+        ServiceDescriptor leader = service.getEnsembleLeader();
+        if (null != leader) {
+            result.add(leader);
+        } else {
+            leader = service;
+        }
+        for (ServiceDescriptor s : service.getArtifact().getServices()) {
+            if (leader == s.getEnsembleLeader()) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the names of all channel names of connectors within the ensemble of {@code service}.
+     * 
+     * @param service the service to return the channel names for
+     * @return all channel names of connectors within the ensemble of {@code service}
+     */
+    public static Set<String> ensembleConnectorNames(ServiceDescriptor service) {
+        return internalConnectorNames(ensemble(service));
+    }
+
+    /**
+     * Returns the names of all channel names of connectors within {@code services}.
+     * 
+     * @param services the services to return the internal channel names for
+     * @return all channel names of connectors within the ensemble of {@code service}
+     */
+    public static Set<String> internalConnectorNames(Collection<? extends ServiceDescriptor> services) {
+        Set<String> in = new HashSet<String>();
+        Set<String> out = new HashSet<String>();
+        for (ServiceDescriptor s : services) {
+            in.addAll(connectorNames(s.getInputDataConnectors()));
+            out.addAll(connectorNames(s.getOutputDataConnectors()));
+        }
+        in.retainAll(out);
+        return in;
+    }
+
+    /**
+     * Returns all connector names for the connectors in {@code cons}.
+     * 
+     * @param cons the connectors
+     * @return the connector names
+     */
+    public static Set<String> connectorNames(Collection<TypedDataConnectorDescriptor> cons) {
+        return cons
+            .stream()
+            .map(c -> c.getName())
+            .collect(Collectors.toSet());
     }
 
 }

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -34,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 public abstract class AbstractServiceManager<A extends AbstractArtifactDescriptor<S>, 
     S extends AbstractServiceDescriptor> implements ServiceManager {
 
+    private Predicate<TypedDataConnectorDescriptor> available = c -> true; // TODO implement test against AAS
     private Map<String, A> artifacts = Collections.synchronizedMap(new HashMap<>());
 
     @Override
@@ -241,6 +245,100 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         S service = getService(serviceId);
         if (null != service) {
             result = service.getOutputDataConnectors();
+        }
+        return result;
+    }
+
+    /**
+     * Sorts the given list by the dependencies specified in the deployment descriptor.
+     * 
+     * @param serviceIds the service ids to sort
+     * @return the sorted service ids
+     */
+    protected String[] sortByDependency(String[] serviceIds) {
+        List<ServiceDescriptor> services = new ArrayList<ServiceDescriptor>();
+        for (String s : serviceIds) {
+            services.add(getService(s));
+        }
+        return sortByDependency(services, getServices(), available)
+            .stream()
+            .map(s -> s.getId())
+            .toArray(size -> new String[size]);
+    }
+    
+    /**
+     * Sorts a list of services by their dependencies, considering prerequisite input nodes outside the own ensemble.
+     * Ensemble nodes are simply listed after their ensemble leader. [public, static for testing]
+     * 
+     * @param <S> the service type
+     * @param services the services to sort
+     * @param localServices all known local services incuding {@code services}
+     * @param available the available predicate
+     * @return the list of sorted services
+     */
+    public static <S extends ServiceDescriptor> List<S> sortByDependency(List<S> services, 
+        Collection<? extends ServiceDescriptor> localServices, Predicate<TypedDataConnectorDescriptor> available) {
+        List<S> result = new ArrayList<S>();
+
+        // idea... sort services by their output connections/dependencies adding first those that have no dependencies.
+        // for all other, add them only if 1) ensemble leader has already been added (for ensemble members) or 2) all
+        // non ensemble-connections (assuming that they will be available after ensemble start) are available
+        // collect all ensemble-internal connectors
+        Set<String> ensembleConnections = new HashSet<>();
+        for (ServiceDescriptor s : services) {
+            // empty for non-ensemble leaders, connections for ensemble leaders, ensemble-members just repeat the 
+            // information; might be ok to use only non ensemble-members, but no guarantee that services also contains
+            // all ensemble leaders
+            ensembleConnections.addAll(AbstractServiceDescriptor.ensembleConnectorNames(s));
+        }
+        Set<String> internalConnections = AbstractServiceDescriptor.internalConnectorNames(localServices);
+        internalConnections.removeAll(ensembleConnections);
+
+        // process the services, exclude the ensemble connections
+        Set<ServiceDescriptor> processed = new HashSet<ServiceDescriptor>();
+        Set<String> avail = new HashSet<>();
+        int before;
+        boolean externalPrio = true;
+        do {
+            before = result.size();
+            for (S sd : services) {
+                boolean ok = true;
+                if (processed.contains(sd)) {
+                    continue;
+                }
+                if (null != sd.getEnsembleLeader()) { 
+                    // ensemble leader must be started before, hull dependencies are "mapped" to ensemble leader
+                    ok = processed.contains(sd.getEnsembleLeader());
+                } else {
+                    for (TypedDataConnectorDescriptor out : sd.getOutputDataConnectors()) {
+                        String outName = out.getName();
+                        if (externalPrio && internalConnections.contains(outName)) {
+                            ok = false;
+                            break; // defer to later stage
+                        }
+                        // ensemble-internal and already known available connections must not be tested
+                        if (!ensembleConnections.contains(outName) && !avail.contains(outName)) {
+                            ok = available.test(out);
+                            if (ok) {
+                                avail.add(outName);
+                            } else {
+                                break;
+                            }
+                        }             
+                    }
+                }
+                if (ok) {
+                    result.add(sd);
+                    processed.add(sd);
+                }
+            }
+            externalPrio = false;
+        } while (before != result.size() && result.size() != services.size());
+        // just add the remaining which may be parts of cycles
+        for (S sd : services) {
+            if (!processed.contains(sd)) {
+                result.add(sd);
+            }
         }
         return result;
     }
