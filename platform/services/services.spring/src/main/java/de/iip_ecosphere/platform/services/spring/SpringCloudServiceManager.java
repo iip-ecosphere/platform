@@ -173,17 +173,6 @@ public class SpringCloudServiceManager
         }
         return result;
     }
-    
-    /**
-     * Sorts the given list by the dependencies specified in the deployment descriptor.
-     * 
-     * @param serviceIds the service ids to sort
-     * @return the sorted service ids
-     */
-    private String[] sortByDependency(String[] serviceIds) {
-        // TODO sort serviceIds for dependencies
-        return serviceIds;
-    }
 
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
