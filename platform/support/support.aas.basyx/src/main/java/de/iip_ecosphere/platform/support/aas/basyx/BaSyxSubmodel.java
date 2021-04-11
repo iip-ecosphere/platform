@@ -196,4 +196,8 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
             idShort, ordered, allowDuplicates);
     }
 
+    @Override
+    public void update() {
+    }
+
 }

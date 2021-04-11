@@ -143,5 +143,9 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
         }
         return result;
     }
+    
+    @Override
+    public void update() {
+    }
 
 }

@@ -172,4 +172,8 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         getAas().setAssetReference((Reference) a.getReference()); 
     }
 
+    @Override
+    public void update() {
+    }
+
 }

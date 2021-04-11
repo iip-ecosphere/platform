@@ -10,7 +10,7 @@ Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx](https://ww
 - AAS Visitor
 - shortID validation for recommended/forbidden names. As in BaSyx, shortId must neither be ``value`` nor ``invocationList``. In addition, and more strict than BaSyx, we require that shortIds comply to the RegEx ``[a-zA-Z][a-zA-Z0-9_]+``.
 
-May be, future versions need to switch to lazy loading of deployed AAS instances.
+May be, future versions need to switch to lazy loading of deployed AAS instances (supported now by submodel elements collection, but no submodel or AAS).
 
 **Missing**
 - Various AAS concepts (incremental addition as needed by the platform)

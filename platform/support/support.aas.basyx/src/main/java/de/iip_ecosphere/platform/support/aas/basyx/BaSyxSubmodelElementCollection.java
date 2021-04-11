@@ -46,7 +46,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     SubmodelElementsRegistrar {
     
     private ISubmodelElementCollection collection;
-    private List<SubmodelElement> elements = new ArrayList<SubmodelElement>();
+    private List<SubmodelElement> elements;
     private Map<String, Builder<?>> deferred;
     
     /**
@@ -76,6 +76,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             String idShort, boolean ordered, boolean allowDuplicates) {
             this.parentBuilder = parentBuilder;
             this.instance = new BaSyxSubmodelElementCollection();
+            this.instance.elements = new ArrayList<SubmodelElement>();
             org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll = 
                 new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
             coll.setIdShort(Tools.checkId(idShort));
@@ -101,6 +102,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
                 throw new IllegalArgumentException("Cannot create a " + getClass().getSimpleName() + " on a " 
                     + instance.collection.getClass().getSimpleName());
             }
+            this.instance.initialize();
         }
 
         @Override
@@ -229,18 +231,29 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      */
     BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
         this.collection = collection;
-        BaSyxElementTranslator.registerProperties(collection.getProperties(), this);
-        BaSyxElementTranslator.registerOperations(collection.getOperations(), this);
-        BaSyxElementTranslator.registerRemainingSubmodelElements(collection.getSubmodelElements(), this);        
+    }
+
+    /**
+     * Dynamically intializes the elements structure.
+     */
+    private void initialize() {
+        if (null == elements) {
+            elements = new ArrayList<SubmodelElement>();
+            BaSyxElementTranslator.registerProperties(collection.getProperties(), this);
+            BaSyxElementTranslator.registerOperations(collection.getOperations(), this);
+            BaSyxElementTranslator.registerRemainingSubmodelElements(collection.getSubmodelElements(), this);        
+        }
     }
 
     @Override
     public int getElementsCount() {
+        initialize();
         return elements.size();
     }
     
     @Override
     public Iterable<SubmodelElement> elements() {
+        initialize();
         return elements;
     }
 
@@ -277,6 +290,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public SubmodelElement getElement(String idShort) {
         // looping may not be efficient, let's see
+        initialize();
         SubmodelElement found = null;
         try {
             for (SubmodelElement se : elements) {
@@ -338,6 +352,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
     @Override
     public void accept(AasVisitor visitor) {
+        initialize();
         visitor.visitSubmodelElementCollection(this);
         for (SubmodelElement se : elements) {
             se.accept(visitor);
@@ -352,8 +367,14 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
     @Override
     public void deleteElement(String idShort) {
+        initialize();
         elements.remove(getElement(idShort));
         collection.deleteSubmodelElement(idShort);
+    }
+
+    @Override
+    public void update() {
+        elements = null;
     }
 
 }

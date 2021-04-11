@@ -118,6 +118,10 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         }
     }
     
+    @Override
+    public void update() {
+    }
+    
     /**
      * Obtains a sub-model builder.
      *
