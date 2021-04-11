@@ -218,20 +218,20 @@ public class ServiceManagerTest {
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
 
         MyServiceDescriptor s11 = new MyServiceDescriptor("s1.1", "s1.2", "", null);
-        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "", Integer.class));
+        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
         MyServiceDescriptor s12 = new MyServiceDescriptor("s1.2", "s1.2", "", null);
-        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "", Integer.class));
+        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
         localServices.add(s11);
         localServices.add(s12);
         new MyArtifactDescriptor("a1", "a1", localServices);
 
         // s1.1 -> s2.1 -> s2.2 -> s1.2 
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.2", "", null);
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
         MyServiceDescriptor s22 = new MyServiceDescriptor("s2.2", "s2.2", "", null);
-        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "", Integer.class));
-        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "", Integer.class));
+        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
+        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
         services.add(s21);
         services.add(s22);
         new MyArtifactDescriptor("a2", "a2", services);
@@ -247,6 +247,10 @@ public class ServiceManagerTest {
         result = AbstractServiceManager.sortByDependency(services, localServices, av);
         assertList(result, s22, s21);
         av.assertTested("output", "im1"); // all outgoing connections
+
+        // pretend that "im1" does not exist
+        result = AbstractServiceManager.sortByDependency(services, localServices, c -> !c.getId().equals("im1"));
+        assertList(result, s22, s21); // same result, but forcibly added to end
     }
 
     /**
@@ -260,24 +264,24 @@ public class ServiceManagerTest {
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
 
         MyServiceDescriptor s11 = new MyServiceDescriptor("s1.1", "s1.2", "", null);
-        s11.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "", Integer.class));
-        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "", Integer.class));
+        s11.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
+        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class));
         MyServiceDescriptor s12 = new MyServiceDescriptor("s1.2", "s1.2", "", null);
-        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "", Integer.class));
-        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "", Integer.class));
+        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class));
         s11.setEnsembleLeader(s12);
         services.add(s11);
         services.add(s12);
 
         // ensemble members after ensemble leaders, no further sequence
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.1", "", null);
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "", Integer.class));
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("im2", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class));
         MyServiceDescriptor s22 = new MyServiceDescriptor("s2.2", "s2.2", "", null);
-        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "", Integer.class));
-        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im2", "", Integer.class));
+        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
+        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class));
         s22.setEnsembleLeader(s21);
         services.add(s21);
         services.add(s22);

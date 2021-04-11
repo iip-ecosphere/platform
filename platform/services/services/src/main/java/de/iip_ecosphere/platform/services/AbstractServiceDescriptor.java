@@ -211,32 +211,33 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     }
 
     /**
-     * Returns the names of all channel names of connectors within {@code services}.
+     * Returns the ids of all connectors within {@code services}.
      * 
      * @param services the services to return the internal channel names for
-     * @return all channel names of connectors within the ensemble of {@code service}
+     * @return all ids of connectors within the ensemble of {@code service}
      */
     public static Set<String> internalConnectorNames(Collection<? extends ServiceDescriptor> services) {
         Set<String> in = new HashSet<String>();
         Set<String> out = new HashSet<String>();
         for (ServiceDescriptor s : services) {
-            in.addAll(connectorNames(s.getInputDataConnectors()));
-            out.addAll(connectorNames(s.getOutputDataConnectors()));
+            in.addAll(connectorIds(s.getInputDataConnectors()));
+            out.addAll(connectorIds(s.getOutputDataConnectors()));
         }
         in.retainAll(out);
         return in;
     }
 
     /**
-     * Returns all connector names for the connectors in {@code cons}.
+     * Returns all connector ids for the connectors in {@code cons}.
      * 
      * @param cons the connectors
-     * @return the connector names
+     * @return the connector ids
      */
-    public static Set<String> connectorNames(Collection<TypedDataConnectorDescriptor> cons) {
+    public static Set<String> connectorIds(Collection<TypedDataConnectorDescriptor> cons) {
         return cons
             .stream()
-            .map(c -> c.getName())
+            .filter(c -> c.getId() != null && c.getId().length() > 0)
+            .map(c -> c.getId())
             .collect(Collectors.toSet());
     }
 

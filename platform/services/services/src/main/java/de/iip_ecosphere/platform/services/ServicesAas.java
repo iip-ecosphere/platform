@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -23,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -33,9 +35,11 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -311,8 +315,6 @@ public class ServicesAas implements AasContributor {
     private static void addService(SubmodelBuilder smB, ServiceDescriptor desc) {
         SubmodelElementCollectionBuilder serviceBuilder 
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
-        SubmodelElementCollectionBuilder connectionBuilder 
-            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
 
         // Ref to artifact
         SubmodelElementCollectionBuilder descriptorBuilder 
@@ -338,17 +340,13 @@ public class ServicesAas implements AasContributor {
         descriptorBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
             .setValue(Type.STRING, Id.getDeviceIdAas())
             .build();
-        Reference serviceRef = descriptorBuilder.createReference();
         
         addTypedData(descriptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getOutputDataConnectors());
-        addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
-        addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
         
         descriptorBuilder.build();
         
-        connectionBuilder.defer();
         serviceBuilder.build();
     }
 
@@ -399,6 +397,50 @@ public class ServicesAas implements AasContributor {
                 .build();
             dBuilder.defer();
         }
+    }
+    
+    /**
+     * Returns an availability predicate functor to determine whether typed data connector descriptors do exist in 
+     * the AAS.
+     * 
+     * @param timeout the timeout in ms within the request shall be repeated without directly failing
+     * @param retryDelay time delay in ms after which a failed request shall be re-tried
+     * @param input whether input or output side of the relation shall be queried
+     * @return the predictate for testing
+     */
+    public static Predicate<TypedDataConnectorDescriptor> createAvailabilityPredicate(int timeout, int retryDelay, 
+        boolean input) {
+        return new Predicate<TypedDataConnectorDescriptor>() {
+
+            private SubmodelElementCollection rels;
+            
+            @Override
+            public boolean test(TypedDataConnectorDescriptor conn) {
+                boolean found = false;
+                long start = System.currentTimeMillis();
+                do {
+                    if (null == rels) {
+                        try {
+                            Submodel submodel = ActiveAasBase.getSubmodel(ServicesAas.NAME_SUBMODEL);
+                            rels = submodel.getSubmodelElementCollection(ServicesAas.NAME_COLL_RELATIONS);
+                        } catch (IOException e) {
+                        }
+                    }
+                    if (null != rels) {
+                        rels.update(); // entries in collection may change, force update
+                        SubmodelElementCollection rel = rels.getSubmodelElementCollection(fixId(conn.getName()));
+                        if (null != rel) {
+                            String name = input ? NAME_PROP_TO : NAME_PROP_FROM;
+                            found = (null != rel.getReferenceElement(name));
+                        }
+                    }
+                    if (!found && timeout > 0) {
+                        TimeUtils.sleep(retryDelay);
+                    }
+                } while (!found && System.currentTimeMillis() - start < timeout);
+                return found;
+            }
+        };
     }
     
     /**
@@ -460,14 +502,32 @@ public class ServicesAas implements AasContributor {
             coll.deleteElement(fixId(desc.getId()));
             coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
             for (ServiceDescriptor s : desc.getServices()) {
-                for (TypedDataConnectorDescriptor c : s.getInputDataConnectors()) {
-                    deleteSubmodelElement(coll, c.getName(), NAME_PROP_TO);
-                }
-                for (TypedDataConnectorDescriptor c : s.getOutputDataConnectors()) {
-                    deleteSubmodelElement(coll, c.getName(), NAME_PROP_FROM);
-                }
+                removeRelations(s, sub, coll);
             }
         });
+    }
+
+    /**
+     * Remove the relations for {@code service}.
+     * 
+     * @param service the service
+     * @param sub the submodel for {@link #NAME_SUBMODEL}.
+     * @param coll the {@link #NAME_COLL_RELATIONS relations} submodel elements collection, may be <b>null</b> then
+     *   {@code sub} is queried for the collection
+     * @return {@code coll} or the queried collection
+     */
+    private static SubmodelElementCollection removeRelations(ServiceDescriptor service, Submodel sub, 
+        SubmodelElementCollection coll) {
+        if (null == coll) {
+            coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
+        }
+        for (TypedDataConnectorDescriptor c : service.getInputDataConnectors()) {
+            deleteSubmodelElement(coll, c.getName(), NAME_PROP_TO);
+        }
+        for (TypedDataConnectorDescriptor c : service.getOutputDataConnectors()) {
+            deleteSubmodelElement(coll, c.getName(), NAME_PROP_FROM);
+        }
+        return coll;
     }
 
     /**
@@ -479,17 +539,19 @@ public class ServicesAas implements AasContributor {
      */
     private static void deleteSubmodelElement(SubmodelElementCollection coll, String name, String elt) {
         SubmodelElementCollection c = coll.getSubmodelElementCollection(fixId(name));
-        if (null != c) {
-            c.deleteElement(elt);
+        String eltId = fixId(elt);
+        if (null != c && c.getElement(eltId) != null) {
+            c.deleteElement(eltId);
         }
     }
     
     /**
      * Is called when a service state changed.
      * 
-     * @param desc the service descriptor 
+     * @param old the previous state before the change
+     * @param desc the service descriptor with the new state
      */
-    public static void notifyServiceStateChanged(ServiceDescriptor desc) {
+    public static void notifyServiceStateChanged(ServiceState old, ServiceDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             // other approach... link property against service descriptor while creation and reflect state
             // let's try this one for now
@@ -510,6 +572,20 @@ public class ServicesAas implements AasContributor {
             } else {
                 getLogger().error("Service state change - cannot find service `" + desc.getId() + "`");
             }
+            
+            // synchronous execution needed??
+            if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == desc.getState()) {
+                Reference serviceRef = elt.createReference();
+                SubmodelElementCollectionBuilder connectionBuilder 
+                    = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
+                addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
+                addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
+                connectionBuilder.build();
+            } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
+                && ServiceState.STOPPED == desc.getState()) {
+                removeRelations(desc, sub, null);
+            }
+            
         });
     }
 

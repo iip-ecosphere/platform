@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -83,9 +85,11 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
      */
     private MyServiceDescriptor setupData(MyServiceDescriptor sd) {
         sd.addParameter(new MyTypedDataDescriptor("NAME", "reconfigures the name", String.class));
-        sd.addInputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "", Integer.TYPE));
+        sd.addInputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "conn-" + connectorCount, 
+            "", Integer.TYPE));
         connectorCount++;
-        sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "", Integer.TYPE));
+        sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "conn-" + connectorCount,
+            "", Integer.TYPE));
         return sd;
     }
 
@@ -155,6 +159,11 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
         setState(service, ServiceState.RECONFIGURING);
         // reconfigure
         setState(service, state);
+    }
+    
+    @Override
+    protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
+        return c-> true;
     }
 
 }

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -37,9 +36,15 @@ import java.util.stream.Collectors;
 public abstract class AbstractServiceManager<A extends AbstractArtifactDescriptor<S>, 
     S extends AbstractServiceDescriptor> implements ServiceManager {
 
-    private Predicate<TypedDataConnectorDescriptor> available = c -> true; // TODO implement test against AAS
     private Map<String, A> artifacts = Collections.synchronizedMap(new HashMap<>());
 
+    /**
+     * Returns the available connector testing predicate.
+     * 
+     * @return the predicate
+     */
+    protected abstract Predicate<TypedDataConnectorDescriptor> getAvailablePredicate();
+    
     @Override
     public Set<String> getArtifactIds() {
         return artifacts.keySet();
@@ -212,8 +217,9 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      * @throws ExecutionException if changing the state fails
      */
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
+        ServiceState old = service.getState();
         service.setState(state);
-        ServicesAas.notifyServiceStateChanged(service);
+        ServicesAas.notifyServiceStateChanged(old, service);
     }
     
     @SuppressWarnings("unchecked")
@@ -260,7 +266,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         for (String s : serviceIds) {
             services.add(getService(s));
         }
-        return sortByDependency(services, getServices(), available)
+        return sortByDependency(services, getServices(), getAvailablePredicate())
             .stream()
             .map(s -> s.getId())
             .toArray(size -> new String[size]);

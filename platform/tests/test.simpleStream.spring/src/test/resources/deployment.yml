@@ -7,8 +7,6 @@ services:
     description: Creates text tokens.
     deployable: true
     kind: SOURCE_SERVICE
-    dependencies:
-      - id: simpleStream-log
     cmdArg: 
       - --spring.profiles.active=source
     relations:
@@ -16,6 +14,7 @@ services:
           portArg: --mqtt.port=${port}
           hostArg: --mqtt.host=${host}
       - channel: create-out-0
+        id: intern
         type: String
         direction: OUT
   - id: simpleStream-log
@@ -31,5 +30,6 @@ services:
           portArg: --mqtt.port=${port}
           hostArg: --mqtt.host=${host}
       - channel: log-in-0
+        id: intern
         type: String
         direction: IN

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.ServicesAasClient;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -93,6 +95,9 @@ public class ServicesAasTest {
         Assert.assertTrue(aDesc.getServices().contains(sDesc));
         Assert.assertEquals(ServiceState.AVAILABLE, client.getServiceState(sId));
         
+        Predicate<TypedDataConnectorDescriptor> av = ServicesAas.createAvailabilityPredicate(1000, 200, false);
+        Assert.assertFalse(av.test(sDesc.getOutputDataConnectors().get(0))); // not running/connected
+        
         client.startService(sId);
         Assert.assertEquals(ServiceState.RUNNING, client.getServiceState(sId));
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
@@ -107,6 +112,7 @@ public class ServicesAasTest {
         client.reconfigureService(sId, vals);
         Assert.assertEquals(ServiceState.RUNNING, client.getServiceState(sId));
         client.setServiceState(sId, ServiceState.RUNNING); // no effect, just call
+        Assert.assertTrue(av.test(sDesc.getOutputDataConnectors().get(0)));
         client.stopService(sId);
         Assert.assertEquals(ServiceState.STOPPED, client.getServiceState(sId));
 

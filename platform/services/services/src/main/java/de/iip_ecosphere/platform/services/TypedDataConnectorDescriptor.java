@@ -19,5 +19,13 @@ package de.iip_ecosphere.platform.services;
  * @author Holger Eichelberger, SSE
  */
 public interface TypedDataConnectorDescriptor extends TypedDataDescriptor {
+    
+    /**
+     * Returns the id of the connector. Depending on the implementation, id may be the same as {@link #getName()} or
+     * differ, e.g, if {@link #getName()} points to a technical channel name.
+     * 
+     * @return the id
+     */
+    public String getId();
 
 }
