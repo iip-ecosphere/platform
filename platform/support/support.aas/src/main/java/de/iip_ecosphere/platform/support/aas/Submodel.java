@@ -88,13 +88,13 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     public SubmodelElementCollection getSubmodelElementCollection(String idShort);
 
     /**
-     * Returns a sub-model collection builder either by providing access to an existing collection or through a builder 
-     * to add a new sub-model through (ultimately only if {@link Builder#build()} was called).
+     * Returns a sub-model elements collection builder either by providing access to an existing collection or through 
+     * a builder to add a new sub-model elements collection (ultimately only if {@link Builder#build()} was called).
      * 
      * @param ordered whether the collection shall be ordered or not
      * @param allowDuplicates whether the collection allows duplicates or not
      * @param idShort the short id of the sub-model
-     * @return the sub-model builder
+     * @return the sub-model collection builder
      */
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
         boolean allowDuplicates);

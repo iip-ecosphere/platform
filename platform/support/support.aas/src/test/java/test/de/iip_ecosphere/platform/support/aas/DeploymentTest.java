@@ -125,11 +125,21 @@ public class DeploymentTest {
         smcB.build();
 
         aas = reg.retrieveAas(urn);
+        Aas aas1 = reg.retrieveAas(urn); // snapshot
+        
         sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
         SubmodelElementCollection coll = sub.getSubmodelElementCollection("coll");
         Assert.assertNotNull(coll);
-        // do not access prop, fails in BaSyx-0.1.0
+
+        SubmodelElementCollection coll1 = aas1.getSubmodel("sub").getSubmodelElementCollection("coll");
+        Assert.assertNull(coll1.getProperty("prop1")); // does not exist, not yet created (here, forces init)
+        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
+        smcB.createPropertyBuilder("prop1").setValue(Type.BOOLEAN, true).build();
+        smcB.build();
+        Assert.assertNull(coll1.getProperty("prop1")); // exists in other instance, e.g., other process
+        coll1.update(); // force update
+        Assert.assertNotNull(coll1.getProperty("prop1")); // there it is
 
         sub.delete(coll);
 
