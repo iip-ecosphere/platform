@@ -155,7 +155,6 @@ public class Validator {
         assertFieldNotNull(service.getDescription(), "description", msgContext); // optional
         assertFieldNotNull(service.getKind(), "kind", msgContext);
         assertStringList(service.getCmdArg(), "cmdArg", "arg", msgContext);
-        assertList(service.getDependencies(), true, "dependencies", msgContext, (d, m) -> validate(d, m));
         assertList(service.getParameters(), true, "parameters", msgContext, (p, m) -> validate(p, types, m));
         assertList(service.getRelations(), true, "relations", msgContext, (r, m) -> validate(r, types, m));
         if (null != service.getProcess()) {
@@ -175,25 +174,6 @@ public class Validator {
             typeMap.put(t.getName(), t);
         }
         return typeMap;
-    }
-
-    /**
-     * Validates the given dependency (and contained descriptor elements).
-     * 
-     * @param dependency the dependency to validate
-     */
-    public void validate(ServiceDependency dependency) {
-        validate(dependency, "");
-    }
-
-    /**
-     * Validates the given dependency (and contained descriptor elements).
-     * 
-     * @param dependency the dependency to validate
-     * @param msgContext nested context information for location of unnamed elements in validation messages
-     */
-    private void validate(ServiceDependency dependency, String msgContext) {
-        assertStringNotEmpty(dependency.getId(), "id", msgContext);
     }
 
     /**

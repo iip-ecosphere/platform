@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.spring.DescriptorTest;
 import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
@@ -32,7 +33,6 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlRelation;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
-import de.iip_ecosphere.platform.services.spring.yaml.YamlServiceDependency;
 
 /**
  * Tests the YAML descriptor implementation and the {@link Validator}.
@@ -77,7 +77,6 @@ public class ArtifactInfoTest {
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
         assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
         Assert.assertEquals(service.getEnsembleWith(), "id-1");
-        Assert.assertEquals(0, service.getDependencies().size());
         Assert.assertEquals(2, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
         assertRelation(service.getRelations().get(1), "input", 9872, "me.here.de");
@@ -88,8 +87,6 @@ public class ArtifactInfoTest {
         assertServiceCharacteristics(service, true, ServiceKind.SINK_SERVICE);
         assertStringList(service.getCmdArg());
         Assert.assertNull(service.getEnsembleWith());
-        Assert.assertEquals(1, service.getDependencies().size());
-        assertDependency(service.getDependencies().get(0), "id-0");
         Assert.assertEquals(1, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
@@ -129,18 +126,36 @@ public class ArtifactInfoTest {
         } catch (NoSuchFieldException e) {
             Assert.fail(e.getMessage());
         }
-        Assert.assertEquals(1, sDesc.getInputDataConnectors().size());
-        assertTypedData(sDesc.getInputDataConnectors().get(0), "input", "", "myType");
+        Assert.assertEquals(1, sDesc.getOutputDataConnectors().size());
+        assertTypedData(sDesc.getOutputDataConnectors().get(0), "intern", "input", "", "myType");
         
         sDesc = aDesc.getService("id-1");
-        Assert.assertEquals(1, sDesc.getOutputDataConnectors().size());
-        assertTypedData(sDesc.getOutputDataConnectors().get(0), "output", "", "int");
+        Assert.assertEquals(1, sDesc.getInputDataConnectors().size());
+        assertTypedData(sDesc.getInputDataConnectors().get(0), "intern", "output", "", "int");
     }
-    
+
+    /**
+     * Asserts properties of a typed connector descriptor.
+     * 
+     * @param desc the connector descriptor
+     * @param id the identifier of the descriptor (not tested if <b>null</b>)
+     * @param name the name of the parameter
+     * @param description the description
+     * @param type the type (not tested if <b>null</b>)
+     * @return the type of the typed data as class (may be <b>null</b>, but not if {@code type} was given and asserted)
+     */
+    private static Class<?> assertTypedData(TypedDataConnectorDescriptor desc, String id, String name, 
+        String description, String type) {
+        if (null != id) {
+            Assert.assertEquals(id, desc.getId());
+        }
+        return assertTypedData(desc, name, description, type);
+    }
+
     /**
      * Asserts properties of a typed data descriptor.
      * 
-     * @param desc the parameter descriptor
+     * @param desc the data descriptor
      * @param name the name of the parameter
      * @param description the description
      * @param type the type (not tested if <b>null</b>)
@@ -247,17 +262,6 @@ public class ArtifactInfoTest {
             endpoint.getPortArg(port));
         Assert.assertEquals(endpoint.getHostArg().replace(YamlEndpoint.HOST_PLACEHOLDER, host), 
             endpoint.getHostArg(host));
-    }
-    
-    /**
-     * Asserts properties of a {@link YamlServiceDependency} (to be extended).
-     * 
-     * @param id the expected service id
-     * @param dependency the dependency to be asserted
-     */
-    private static void assertDependency(YamlServiceDependency dependency, String id) {
-        Assert.assertNotNull(dependency);
-        Assert.assertEquals(id, dependency.getId());
     }
     
     /**

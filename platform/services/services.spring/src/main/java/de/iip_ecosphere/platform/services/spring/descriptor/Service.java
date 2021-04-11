@@ -72,13 +72,6 @@ public interface Service {
     public String getEnsembleWith();
 
     /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @return the service dependences(may be empty for none)
-     */
-    public List<? extends ServiceDependency> getDependencies();
-
-    /**
      * Returns the service-specific relations and command line arguments.
      * 
      * @return the relations, may be empty

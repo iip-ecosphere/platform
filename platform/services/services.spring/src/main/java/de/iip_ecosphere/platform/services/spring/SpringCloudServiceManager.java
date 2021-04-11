@@ -39,6 +39,8 @@ import de.iip_ecosphere.platform.services.AbstractServiceManager;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.ServicesAas;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -58,6 +60,7 @@ public class SpringCloudServiceManager
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
+    private Predicate<TypedDataConnectorDescriptor> available = c -> true;
     
     // do not rename this class or the following descriptor class! Java Service Loader
     
@@ -81,6 +84,15 @@ public class SpringCloudServiceManager
      * Prevents external creation.
      */
     private SpringCloudServiceManager() {
+    }
+
+    @Override
+    protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
+        if (null == available) {
+            available = ServicesAas.createAvailabilityPredicate(SpringInstances.getConfig().getWaitingTime(), 500, 
+                false); // TODO 500 -> config
+        }
+        return available;
     }
     
     @Override
@@ -177,6 +189,7 @@ public class SpringCloudServiceManager
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
         AppDeployer deployer = getDeployer();
+        // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
         for (String ids : sortByDependency(serviceIds)) {
             SpringCloudServiceDescriptor service = getService(ids);
@@ -254,6 +267,7 @@ public class SpringCloudServiceManager
     public void stopService(String... serviceIds) throws ExecutionException {
         List<String> errors = new ArrayList<>();
         AppDeployer deployer = getDeployer();
+        // TODO add/check causes for failing
         for (String ids : serviceIds) {
             SpringCloudServiceDescriptor service = getService(ids);
             String id = service.getDeploymentId();
@@ -273,7 +287,7 @@ public class SpringCloudServiceManager
                             setState(service, ServiceState.FAILED);
                         }
                     } else {
-                        setState(service, ServiceState.STOPPED); // already gone with another service?
+                        setState(service, ServiceState.STOPPED);
                     }
                 }
             } 

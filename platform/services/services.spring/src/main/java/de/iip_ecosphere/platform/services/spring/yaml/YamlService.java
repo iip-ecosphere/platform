@@ -31,7 +31,6 @@ public class YamlService implements Service {
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
     private String ensembleWith;
-    private List<YamlServiceDependency> dependencies = new ArrayList<>();
     private List<YamlRelation> relations = new ArrayList<>();
     private List<YamlTypedData> parameters = new ArrayList<>();
     private YamlProcess process;
@@ -72,11 +71,6 @@ public class YamlService implements Service {
         return ensembleWith;
     }
     
-    @Override
-    public List<YamlServiceDependency> getDependencies() {
-        return dependencies;
-    }
-
     @Override
     public List<YamlRelation> getRelations() {
         return relations;
@@ -174,15 +168,6 @@ public class YamlService implements Service {
      */
     public void setEnsembleWith(String ensembleWith) {
         this.ensembleWith = ensembleWith;
-    }
-
-    /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @param dependencies the service dependences(may be empty for none)
-     */
-    public void setDependencies(List<YamlServiceDependency> dependencies) {
-        this.dependencies = dependencies;
     }
 
     /**

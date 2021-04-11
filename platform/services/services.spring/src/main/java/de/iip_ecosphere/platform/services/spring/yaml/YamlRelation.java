@@ -21,12 +21,18 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
  */
 public class YamlRelation implements Relation {
 
+    private String id;
     private String channel = "";
     private YamlEndpoint endpoint;
     private String description = "";
     private String type;
     private Direction direction = Direction.OTHER;
-    
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String getChannel() {
         return channel;
@@ -50,6 +56,15 @@ public class YamlRelation implements Relation {
     @Override
     public Direction getDirection() {
         return direction;
+    }
+
+    /**
+     * Defines the id of this relation. [Required by SnakeYaml]
+     * 
+     * @param id the id of this relation
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

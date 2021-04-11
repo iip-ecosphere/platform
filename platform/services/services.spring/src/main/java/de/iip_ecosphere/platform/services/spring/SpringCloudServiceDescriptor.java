@@ -66,10 +66,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         }
         for (Relation r : service.getRelations()) {
             if (Direction.IN == r.getDirection()) {
-                addInputDataConnector(new SpringCloudServiceTypedConnectorData(r.getChannel(), 
+                addInputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
                     r.getDescription(), resolver.resolve(r.getType())));
             } else if (Direction.OUT == r.getDirection()) {
-                addOutputDataConnector(new SpringCloudServiceTypedConnectorData(r.getChannel(), 
+                addOutputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
                     r.getDescription(), resolver.resolve(r.getType())));
             }
         }

@@ -20,8 +20,6 @@ services:
     ensembleWith:
   - id:
     name:
-    dependencies:
-      - id:
     cmdArg:
       -
     ensembleWith: id5 

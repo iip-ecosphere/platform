@@ -34,10 +34,11 @@ services:
           portArg: --port=${port}
           hostArg: --host=${host}
       - channel: input
+        id: intern
         endpoint:
           portArg: --input.port=${port}
           hostArg: --input.host=${host}
-        direction: IN
+        direction: OUT
         type: myType
   - id: id-1
     name: name-1
@@ -45,14 +46,13 @@ services:
     description: desc desc-1
     deployable: true
     kind: SINK_SERVICE
-    dependencies:
-      - id: id-0
     relations:
       - channel: output
+        id: intern
         endpoint:
           portArg: --input.port=${port}
           hostArg: --input.host=${host}
-        direction: OUT
+        direction: IN
         type: int
     process:
       path: impl/python

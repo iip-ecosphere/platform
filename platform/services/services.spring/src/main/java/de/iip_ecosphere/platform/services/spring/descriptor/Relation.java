@@ -47,6 +47,14 @@ public interface Relation {
     }
     
     /**
+     * The id of the relation. Depending on the underlying implementation, id may be the same as {@link #getChannel()}
+     * or differ, e.g, if {@link #getChannel()} points to a technical channel name.
+     * 
+     * @return the id of the channel
+     */
+    public String getId();
+    
+    /**
      * Returns the name of the communication channel this relation is realized by. Channel names may be used
      * to query host and port via {@link NetworkManager}.
      * 

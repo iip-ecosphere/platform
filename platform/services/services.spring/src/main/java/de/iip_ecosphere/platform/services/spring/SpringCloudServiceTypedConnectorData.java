@@ -22,16 +22,25 @@ import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceTypedData 
     implements TypedDataConnectorDescriptor {
 
+    private String id;
+    
     /**
      * Creates an instance.
      * 
-     * @param name the name of the data
+     * @param id the id of the connection.
+     * @param name the name of the data, e.g., the channel 
      * @param description an optional description of the data (may be empty)
      * @param type the type, either a standard java class or a dynamic proxy for types declared by the services that are
      *   not available in this (execution/platform) environment
      */
-    SpringCloudServiceTypedConnectorData(String name, String description, Class<?> type) {
+    SpringCloudServiceTypedConnectorData(String id, String name, String description, Class<?> type) {
         super(name, description, type);
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
     
 }
