@@ -34,6 +34,7 @@ public class DockerContainerManagerTest {
         ContainerManager cm = EcsFactory.getContainerManager();
         Assert.assertTrue(cm instanceof DockerContainerManager);
         // TODO go on testing with cm
+        
     }
     
 }
