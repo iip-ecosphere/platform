@@ -1,0 +1,107 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package test.de.iip_ecosphere.platform.support.iip_aas;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+
+import org.apache.catalina.LifecycleException;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+
+/**
+ * Tests {@link UriResolver}.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+@SuppressWarnings("restriction")
+public class UriResolverTest {
+
+    private static final String TEST_TEXT = "TEST!";
+    
+    static class MyHandler implements HttpHandler {
+
+        @Override
+        public void handle(HttpExchange ex) throws IOException {
+            String reqUri = ex.getRequestURI().toString();
+            if (reqUri.endsWith("/resolutionTest.txt")) {
+                byte [] response = TEST_TEXT.getBytes();
+                ex.sendResponseHeaders(200, response.length);
+                OutputStream os = ex.getResponseBody();
+                os.write(response);
+                os.close();
+            } else {
+                ex.sendResponseHeaders(404, 0);
+            }
+        }
+    }
+    
+    /**
+     * Tests {@link UriResolver}.
+     */
+    @Test
+    public void testUriResolution() throws IOException, LifecycleException, URISyntaxException {
+        File f = new File("src/test/resolutionTest.txt");
+        File resolved = UriResolver.resolveToFile(f.toURI(), null);
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(resolved.exists());
+        Assert.assertTrue(resolved.isFile());
+        Assert.assertEquals(f.length(), resolved.length());
+
+        ServerAddress addr = new ServerAddress(Schema.HTTP, "localhost", 8080); // localhost, ephemeral
+        HttpServer server = HttpServer.create(new InetSocketAddress(addr.getPort()), 0);
+        server.createContext("/test", new MyHandler());
+        server.setExecutor(null); // creates a default executor
+        server.start();
+
+        URI uri = new URI("http://localhost:" + addr.getPort() + "/test/resolutionTest1.txt");
+        try {
+            resolved = UriResolver.resolveToFile(uri, null);
+            Assert.fail("no exception");
+        } catch (IOException e) {
+            // this is ok
+        }
+
+        File dir = Files.createTempDirectory("iip").toFile();
+        uri = new URI("http://localhost:" + addr.getPort() + "/test/resolutionTest.txt");
+        resolved = UriResolver.resolveToFile(uri, dir);
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(resolved.exists());
+        Assert.assertTrue(resolved.isFile());
+        Assert.assertEquals(TEST_TEXT.length(), resolved.length());
+        FileUtils.deleteQuietly(dir);
+
+        resolved = UriResolver.resolveToFile(uri, null);
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(resolved.exists());
+        Assert.assertTrue(resolved.isFile());
+        Assert.assertEquals(TEST_TEXT.length(), resolved.length());
+        
+        server.stop(0);
+    }
+
+}
