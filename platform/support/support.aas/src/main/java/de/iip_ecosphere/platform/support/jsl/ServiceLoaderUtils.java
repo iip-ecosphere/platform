@@ -35,12 +35,22 @@ public class ServiceLoaderUtils {
         // in test settings, the fake descriptor may also be there - filter it out
         Optional<D> first = loader.stream()
             .map(p -> p.get())
-            .filter(d -> !d.getClass().isAnnotationPresent(ExcludeFirst.class))
+            .filter(d -> !hasExcludeFirst(d))
             .findFirst();
         if (first.isEmpty()) {
             first = loader.findFirst();
         }
         return first;
+    }
+    
+    /**
+     * Returns whether an {@link instance} is tagged with the {@link ExcludeFirst} annotation.
+     * 
+     * @param instance the instance to check (may be <b>null</b>)
+     * @return {@code true} if the annotation is present, {@code false} else
+     */
+    public static boolean hasExcludeFirst(Object instance) {
+        return null != instance && instance.getClass().isAnnotationPresent(ExcludeFirst.class);
     }
 
 }

@@ -135,6 +135,25 @@ public abstract class AasFactory {
         }
         return instance;
     }
+
+    /**
+     * Returns whether {@link #getInstance()} is a full factory instance.
+     * 
+     * @return {@code true} if {@link #getInstance()} is a full factory instance, {@code false} else
+     */
+    public static boolean isFullInstance() {
+        return isFullInstance(getInstance());
+    }
+    
+    /**
+     * Returns whether {@code factory} is a full factory instance.
+     * 
+     * @param factory the factory instance
+     * @return {@code true} if {@code factory} is a full factory instance, {@code false} else
+     */
+    public static boolean isFullInstance(AasFactory factory) {
+        return !(factory == AasFactory.DUMMY || ServiceLoaderUtils.hasExcludeFirst(factory));
+    }
     
     /**
      * Defines the actual instance. This shall be used when there is intentionally no AAS implementation, e.g., 

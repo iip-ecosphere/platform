@@ -59,5 +59,20 @@ public class LifecycleHandler {
     private static void forEach(Consumer<LifecycleDescriptor> consumer) {
         ServiceLoader.load(LifecycleDescriptor.class).forEach(consumer);
     }
+    
+    /**
+     * Runs all lifecycle steps {@link #attachShutdownHooks()}, {@link #shutdown} as shutdown hook and 
+     * {@link #startup(String[])}. 
+     * 
+     * @param args command line arguments to be passed to {@link #startup(String[])}
+     */
+    public static void waitUntilEnd(String[] args) {
+        attachShutdownHooks();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
+        startup(args);
+        while (true) {
+            TimeUtils.sleep(500);
+        }
+    }
 
 }
