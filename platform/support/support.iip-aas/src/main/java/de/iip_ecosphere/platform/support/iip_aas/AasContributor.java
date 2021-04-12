@@ -16,12 +16,14 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
  * Service interface to contribute to an AAS. Platform components with individual AAS
  * shall implement this interface and contribute to the {@link AasPartRegistry}.
  * 
  * @author Holger Eichelberger, SSE
+ * @see ExcludeFirst
  */
 public interface AasContributor {
     

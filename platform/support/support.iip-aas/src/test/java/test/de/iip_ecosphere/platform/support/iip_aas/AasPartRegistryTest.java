@@ -187,7 +187,7 @@ public class AasPartRegistryTest {
         Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS).getSubmodel("c1"));
         Assert.assertNotNull(hashedAas.get(NAME_MY_AAS).getSubmodel("c2"));
 
-        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
         // no impl server here, no real active aas
         Server server = AasPartRegistry.deploy(res.getAas()).start();
         Aas deployedAas = AasPartRegistry.retrieveIipAas();

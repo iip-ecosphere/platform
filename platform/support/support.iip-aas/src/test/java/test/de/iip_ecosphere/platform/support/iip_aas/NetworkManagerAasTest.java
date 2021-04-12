@@ -48,7 +48,7 @@ public class NetworkManagerAasTest {
     @Test
     public void testAas() throws ExecutionException, IOException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(NetworkManagerAas.class));
-        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
         ServerAddress oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
         // active AAS require two server instances and a deployment

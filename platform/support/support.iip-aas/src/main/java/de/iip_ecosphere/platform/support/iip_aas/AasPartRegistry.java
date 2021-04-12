@@ -31,11 +31,13 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.
  * 
  * @author Holger Eichelberger, SSE
+ * @see ExcludeFirst
  */
 public class AasPartRegistry {
 

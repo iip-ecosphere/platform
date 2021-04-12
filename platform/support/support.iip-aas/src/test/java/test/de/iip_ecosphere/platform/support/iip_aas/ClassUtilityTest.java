@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Skip;
 
@@ -188,7 +189,7 @@ public class ClassUtilityTest {
         
         // deploy the AAS
         ServerAddress serverAdr = new ServerAddress(Schema.HTTP);
-        Endpoint regEp = new Endpoint(serverAdr, "registry");
+        Endpoint regEp = new Endpoint(serverAdr, AasPartRegistry.DEFAULT_ENDPOINT);
         Server httpServer = AasFactory.getInstance()
             .createDeploymentRecipe(new Endpoint(serverAdr, ""))
             .addInMemoryRegistry(regEp.getEndpoint())
