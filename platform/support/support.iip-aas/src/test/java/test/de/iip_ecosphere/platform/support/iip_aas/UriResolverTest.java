@@ -72,7 +72,7 @@ public class UriResolverTest {
         Assert.assertTrue(resolved.isFile());
         Assert.assertEquals(f.length(), resolved.length());
 
-        ServerAddress addr = new ServerAddress(Schema.HTTP, "localhost", 8080); // localhost, ephemeral
+        ServerAddress addr = new ServerAddress(Schema.HTTP); // localhost, ephemeral
         HttpServer server = HttpServer.create(new InetSocketAddress(addr.getPort()), 0);
         server.createContext("/test", new MyHandler());
         server.setExecutor(null); // creates a default executor
