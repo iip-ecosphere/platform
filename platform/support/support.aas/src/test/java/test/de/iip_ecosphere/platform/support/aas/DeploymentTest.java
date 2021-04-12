@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -47,16 +48,17 @@ public class DeploymentTest {
      * Tests a local dynamic sub-model deployment.
      * 
      * @throws IOException shall not occur if the test works
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void localSubmodelDynamicDeployment() throws IOException {
+    public void localSubmodelDynamicDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
         //final int port = NetUtils.getEphemeralPort();
         final String registryPath = "registry";
         
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
-        aasB.createSubmodelBuilder("initial", null).build();
+        aasB.createSubmodelBuilder("initial", null).defer();
         Aas aas = aasB.build();
         
         ServerAddress serverAdr = new ServerAddress(Schema.HTTP);
@@ -74,6 +76,18 @@ public class DeploymentTest {
 
         aas = reg.retrieveAas(urn);
         Assert.assertNotNull(aas.getSubmodel("dynamic"));
+        
+        SubmodelBuilder smb = aas.createSubmodelBuilder("dynamic", null);
+        smb.createPropertyBuilder("prop").setValue(Type.STRING, "bb").build();
+        smb.defer(); // this defer/buildDeferred is useless here, but tests the mechanism on AAS level
+        aas.buildDeferred();
+
+        aas = reg.retrieveAas(urn);
+        sub = aas.getSubmodel("dynamic");
+        Assert.assertNotNull(sub);
+        Property prop = sub.getProperty("prop");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals("bb", prop.getValue());
 
         server.stop(true);
     }
@@ -111,11 +125,21 @@ public class DeploymentTest {
         smcB.build();
 
         aas = reg.retrieveAas(urn);
+        Aas aas1 = reg.retrieveAas(urn); // snapshot
+        
         sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
         SubmodelElementCollection coll = sub.getSubmodelElementCollection("coll");
         Assert.assertNotNull(coll);
-        // do not access prop, fails in BaSyx-0.1.0
+
+        SubmodelElementCollection coll1 = aas1.getSubmodel("sub").getSubmodelElementCollection("coll");
+        Assert.assertNull(coll1.getProperty("prop1")); // does not exist, not yet created (here, forces init)
+        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
+        smcB.createPropertyBuilder("prop1").setValue(Type.BOOLEAN, true).build();
+        smcB.build();
+        Assert.assertNull(coll1.getProperty("prop1")); // exists in other instance, e.g., other process
+        coll1.update(); // force update
+        Assert.assertNotNull(coll1.getProperty("prop1")); // there it is
 
         sub.delete(coll);
 
@@ -170,10 +194,25 @@ public class DeploymentTest {
         Property prop = coll.getProperty("prop");
         Assert.assertNotNull(prop);
         Assert.assertEquals(true, prop.getValue());
-
         prop.setValue(false);
         Assert.assertEquals(false, prop.getValue());
 
+        // add dynamically, no sub-model builder available, call buildDeferred at the end
+        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
+        smcB.createPropertyBuilder("prop2").setValue(Type.STRING, "aa").build();
+        SubmodelElementCollectionBuilder smcBI 
+            = smcB.createSubmodelElementCollectionBuilder("coll_inner", false, false);
+        smcBI.createPropertyBuilder("prop2I").setValue(Type.STRING, "ab").build();
+        smcBI.defer();
+        smcB.defer();
+        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
+        smcB.createPropertyBuilder("prop3").setValue(Type.STRING, "bb").build();
+        smcBI = smcB.createSubmodelElementCollectionBuilder("coll_inner", false, false);
+        smcBI.createPropertyBuilder("prop3I").setValue(Type.STRING, "ac").build();
+        smcBI.defer();
+        smcB.buildDeferred();
+        aas.accept(new AasPrintVisitor());
+        
         aas = reg.retrieveAas(urn);
         sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
@@ -183,6 +222,22 @@ public class DeploymentTest {
         Assert.assertNotNull(prop);
         Assert.assertEquals(false, prop.getValue());
 
+        prop = coll.getProperty("prop2");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals("aa", prop.getValue());
+        prop = coll.getProperty("prop3");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals("bb", prop.getValue());
+
+        SubmodelElementCollection collInner = coll.getSubmodelElementCollection("coll_inner");
+        Assert.assertNotNull(collInner);
+        prop = collInner.getProperty("prop2I");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals("ab", prop.getValue());
+        prop = collInner.getProperty("prop3I");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals("ac", prop.getValue());
+        
         server.stop(true);
     }
 

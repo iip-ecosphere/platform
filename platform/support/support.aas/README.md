@@ -2,7 +2,7 @@
 
 Asset Administration Shell (AAS) abstraction to ease use of AAS in IIP-Ecosphere and to make the integration
 of AAS implementations more flexible/stable. For now, we not aim to be complete here rather than useful for the the 
-project at the actual point in time. 
+project at the actual point in time. Also provides explicit support for distributed/deferred building of AAS parts.
 
 For now, this component also contains the most basic utility classes of the 
 IIP-Ecosphere platform. Might be that we factor them out in a future version, but so far it is just a single class
@@ -14,14 +14,6 @@ We apply the following principles (with links also in the package description of
  - The ``AasFactory`` provides top-level access, in particular to the ``AasBuilder``. Actual implementations such as for BaSyx are realized in own projects and hook themselves into via ``AasFactoryDescriptor`` and the Java Service Loader. So far, the factory just takes the "first" implementation. No resolution is implemented if multiple implementations are there (we will think about that when the case occurs).
  - Implementation-specific parts like VAB-based remote method accesses are (so far) not represented by the abstraction rather than provided by the specific implementation. However, the output of these supporting/creation methods shall plugin into the builder mechanism explained above.
  
-** Issues **
-
-Setting values of dynamically created properties seems to cause problems, as the server responds that the
-respective element does not exist (while it can read it).
-
-We will investigate whether this issue arise from the abstraction or from the underlying implementation. May be, an
-update to a more recent state of BaSyx could resolve these problems.
-
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties and operations do exist; the others will be added incrementally on demand)
 - Further deployment abstractions (remote)

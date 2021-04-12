@@ -17,11 +17,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +31,7 @@ import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 
-import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
@@ -44,12 +42,13 @@ import de.iip_ecosphere.platform.services.Version;
  * 
  * @author Monika Staciwa, SSE
  */
-public class DockerContainerManager implements ContainerManager {
+public class DockerContainerManager extends AbstractContainerManager<DockerContainerDescriptor> {
 
     // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
     private static String dockerhost = "unix:///var/run/docker.sock";
 
     // don't change name of outer/inner class
+    // TODO upon start, scan file-system for containers and add them automatically if applicable
     
     /**
      * Implements the factory descriptor for hooking the Docker container manager 
@@ -68,7 +67,7 @@ public class DockerContainerManager implements ContainerManager {
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
-        return null; // TODO implement
+        return null; // TODO implement, use super.addContainer(id, descriptor)
     }
     
     /**
@@ -91,23 +90,28 @@ public class DockerContainerManager implements ContainerManager {
     public void startContainer(String id) throws ExecutionException {
         DockerClient dockerClient = getDockerClient();     
         dockerClient.startContainerCmd(id).exec();
+        setState(getContainer(id, "id", "start"), ContainerState.DEPLOYED);
     }
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
         DockerClient dockerClient = getDockerClient();     
         dockerClient.stopContainerCmd(id).exec();     
+        setState(getContainer(id, "id", "stop"), ContainerState.STOPPED);
     }
 
     @Override
-    public void migrateContainer(String id, URI location) throws ExecutionException {
-        // TODO implement        
+    public void migrateContainer(String id, String resourceId) throws ExecutionException {
+        // TODO implement, use super.migrateContainer
+        // TODO must change host value in AAS!
     }
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
+        super.undeployContainer(id);
         DockerClient dockerClient = getDockerClient();
         dockerClient.removeContainerCmd(id).exec();          
+        setState(getContainer(id, "id", "undeploy"), ContainerState.UNKNOWN);
     }
 
     @Override
@@ -116,7 +120,6 @@ public class DockerContainerManager implements ContainerManager {
     }
 
     @Override
-    public ContainerState getState(String id) {
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         for (DockerContainerDescriptor container : containers) {
             String containerId = container.getId();
@@ -246,6 +249,7 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public String getContainerSystemVersion() {
+        return null; // TODO Docker VERSION
         // TODO implement
         return null;
     }

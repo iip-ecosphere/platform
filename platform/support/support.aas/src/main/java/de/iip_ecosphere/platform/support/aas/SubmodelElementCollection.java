@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.Builder;
-
 /**
  * Defines the interface of a sub-model element collection.
  * 
@@ -27,7 +25,7 @@ public interface SubmodelElementCollection extends SubmodelElement {
      * @author Holger Eichelberger, SSE
      */
     public interface SubmodelElementCollectionBuilder extends SubmodelElementContainerBuilder, 
-        Builder<SubmodelElementCollection> {
+        DeferredBuilder<SubmodelElementCollection> {
         
         /**
          * Creates a reference to the sub-model element collection created by this builder.
@@ -60,6 +58,14 @@ public interface SubmodelElementCollection extends SubmodelElement {
      * @return the property, <b>null</b> for none
      */
     public Property getProperty(String idShort);
+
+    /**
+     * Returns an operation with the given name.
+     * 
+     * @param idShort the short id of the operation
+     * @return the operation, <b>null</b> for none
+     */
+    public Operation getOperation(String idShort);
 
     /**
      * Returns a reference element with the given name.
@@ -98,5 +104,12 @@ public interface SubmodelElementCollection extends SubmodelElement {
      * @return the reference
      */
     public Reference createReference();
-    
+
+    /**
+     * Deletes the specified submodel element.
+     * 
+     * @param idShort the id of the element to delete
+     */
+    public void deleteElement(String idShort);
+
 }

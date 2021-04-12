@@ -21,9 +21,18 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
  */
 public class YamlRelation implements Relation {
 
+    private String id;
     private String channel = "";
     private YamlEndpoint endpoint;
-    
+    private String description = "";
+    private String type;
+    private Direction direction = Direction.OTHER;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String getChannel() {
         return channel;
@@ -34,6 +43,30 @@ public class YamlRelation implements Relation {
         return endpoint;
     }
     
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    /**
+     * Defines the id of this relation. [Required by SnakeYaml]
+     * 
+     * @param id the id of this relation
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
     /**
      * Defines the name of the communication channel this relation is realized by. [Required by SnakeYaml]
      * 
@@ -52,5 +85,32 @@ public class YamlRelation implements Relation {
     public void setEndpoint(YamlEndpoint endpoint) {
         this.endpoint = endpoint;
     }
-    
+
+    /**
+     * Defines the description of the relation. [required by SnakeYaml]
+     * 
+     * @param description the description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Defines the type of the data. [required by SnakeYaml]
+     * 
+     * @param type the type as qualified Java name
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * Defines the direction of the relation. [required by SnakeYaml]
+     * 
+     * @param direction the direction
+     */
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
 }

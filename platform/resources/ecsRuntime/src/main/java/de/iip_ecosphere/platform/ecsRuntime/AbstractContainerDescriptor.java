@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Abstract {@link ContainerDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 

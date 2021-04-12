@@ -19,11 +19,13 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <!-- NO dependency to de.iip-ecosphere.platform.services!! -->
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>services</artifactId>
+     <artifactId>support.aas.basyx</artifactId>
      <version>${project.version}</version>
-    </dependency>
+     <scope>test</scope>
+    </dependency>  
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

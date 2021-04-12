@@ -20,8 +20,9 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    VersionTest.class,
+    AbstractServiceDescriptorTest.class,
     ServiceManagerTest.class,
+    ServicesAasTest.class
 })
 public class AllTests {
 

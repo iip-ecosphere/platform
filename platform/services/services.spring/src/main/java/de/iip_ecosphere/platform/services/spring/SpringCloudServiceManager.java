@@ -13,25 +13,54 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.deployer.spi.app.AppDeployer;
+import org.springframework.cloud.deployer.spi.app.AppStatus;
+import org.springframework.cloud.deployer.spi.app.DeploymentState;
+import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
+import org.springframework.context.annotation.Import;
+import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.ServiceState;
+import de.iip_ecosphere.platform.services.ServicesAas;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
+
+import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 
 /**
- * Service manager for Spring Cloud Stream.
+ * Service manager for Spring Cloud Stream. Requires {@link SpringInstances} set correctly before use.
  * 
  * @author Holger Eichelberger, SSE
  */
+@Component
+@Import(SpringCloudServiceConfiguration.class)
 public class SpringCloudServiceManager 
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
-    private int artifactId;
-    private int serviceId;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
+    private Predicate<TypedDataConnectorDescriptor> available = c -> true;
     
     // do not rename this class or the following descriptor class! Java Service Loader
     
@@ -48,90 +77,292 @@ public class SpringCloudServiceManager
         }
         
     }
-    
+
+    // TODO upon start, scan file-system for containers and add them automatically if applicable
+
     /**
      * Prevents external creation.
      */
     private SpringCloudServiceManager() {
     }
-    
-    /**
-     * Returns the id of the own resource.
-     * 
-     * @return the id
-     */
-    private String getResourceId() {
-        return "<resource-id>_"; // TODO preliminary, security!
-    }
 
-    /**
-     * Creates an artifact id.
-     * 
-     * @return the artifact id
-     */
-    private String createArtifactId() {
-        return getResourceId() + artifactId++; // TODO preliminary, security!
-    }
-    
-    /**
-     * Creates a service id.
-     * 
-     * @return the service id
-     */
-    @SuppressWarnings("unused")
-    private String createServiceId() {
-        return getResourceId() + serviceId++; // TODO preliminary, security!
+    @Override
+    protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
+        if (null == available) {
+            available = ServicesAas.createAvailabilityPredicate(SpringInstances.getConfig().getWaitingTime(), 500, 
+                false); // TODO 500 -> config
+        }
+        return available;
     }
     
     @Override
     public String addArtifact(URI location) throws ExecutionException {
-        String aId = createArtifactId();
-        
-        // DOWNLOAD, Folder dependent on location
-        // read in deployment descriptor
-        List<SpringCloudServiceDescriptor> services = new ArrayList<>();
-        // parse in services
-        File jarFile = new File("");
-        SpringCloudArtifactDescriptor artifact = new SpringCloudArtifactDescriptor(aId, "", jarFile, services);
-        return super.addArtifact(aId, artifact);
+        location = resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
+        YamlArtifact yamlArtifact = null;
+        File jarFile;
+        if ("file".equals(location.getScheme())) {
+            jarFile = new File(location);
+            yamlArtifact = readFromFile(jarFile);
+        } else {
+            throw new ExecutionException("Cannot load " + location + ". Must be a (resolved) file.", null);
+        }
+        Validator val = new Validator();
+        val.validate(yamlArtifact);
+        if (val.hasMessages()) {
+            throw new ExecutionException("Problems in descriptor:\n" + val.getMessages(), null);
+        }
+        SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(yamlArtifact, jarFile);
+        return super.addArtifact(artifact.getId(), artifact);
+    }
+    
+    /**
+     * Resolves an external/remote {@code uri} to a local file URI. if {@code uri} is already a file, {@code uri} is 
+     * returned.
+     * 
+     * @param uri the URI to resolve
+     * @param dir the directory to store resolved files, may be <b>null</b> for temporary files
+     * @return the URI that resolves to a local file
+     * @throws ExecutionException in case that URI cannot be resolved/opened/transferred
+     */
+    private static URI resolveToFile(URI uri, File dir) throws ExecutionException {
+        URI result = uri;
+        // rather simple option, more needed? 
+        if (!"file".equals(uri.getScheme())) {
+            try {
+                URL url = uri.toURL();
+                InputStream in = url.openStream();
+                File f;
+                if (null == dir) {
+                    f = File.createTempFile("iip", ".jar");
+                } else {
+                    String path = uri.getPath();
+                    int pos = path.lastIndexOf("/");
+                    if (pos > 0 && pos < path.length() - 1) {
+                        path = path.substring(pos + 1);
+                    }
+                    pos = path.lastIndexOf(".");
+                    String suffix = "";
+                    if (pos > 0) {
+                        suffix = path.substring(pos);
+                        path = path.substring(0, pos);
+                    }
+                    path += "-" + System.currentTimeMillis() + suffix;
+                    f = new File(dir, path);
+                }
+                Files.copy(in, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                result = f.toURI();
+            } catch (IOException e) {
+                throw new ExecutionException(e);
+            } 
+        }
+        return result;
+    }
+    
+    /**
+     * Reads the YAML deployment descriptor from {@code file}.
+     * 
+     * @param file the file to read from
+     * @return the parsed descriptor
+     * @throws ExecutionException if reading fails for some reason
+     */
+    static YamlArtifact readFromFile(File file) throws ExecutionException {
+        YamlArtifact result = null;
+        if (file.getName().endsWith(".jar")) {
+            try {
+                LOGGER.info("Reading artifact " + file + ", descriptor " + getConfig().getDescriptorName());
+                InputStream descStream = JarUtils.findFile(new FileInputStream(file), 
+                    "BOOT-INF/classes/" + getConfig().getDescriptorName());
+                if (null != descStream) {
+                    result = YamlArtifact.readFromYaml(descStream); 
+                } else {
+                    throw new ExecutionException(getConfig().getDescriptorName() + " does not exist in " + file, null);
+                }
+            } catch (IOException e) {
+                throw new ExecutionException(e);
+            }
+        } else {
+            throw new ExecutionException(file + " is not considered as JAR file", null);
+        }
+        return result;
     }
 
     @Override
-    public void startService(String name) throws ExecutionException {
+    public void startService(String... serviceIds) throws ExecutionException {
+        AppDeployer deployer = getDeployer();
+        // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
+        List<String> errors = new ArrayList<>();
+        for (String ids : sortByDependency(serviceIds)) {
+            SpringCloudServiceDescriptor service = getService(ids);
+            if (null == service) {
+                errors.add("No service for id '" + ids + "' known.");
+            } else {
+                // TODO check/wait for dependencies
+                AppDeploymentRequest req = service.createDeploymentRequest(getConfig());
+                if (null != req) {
+                    setState(service, ServiceState.DEPLOYING);
+                    LOGGER.info("Starting ... ");
+                    String id = deployer.deploy(req);
+                    waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
+                    LOGGER.info("Starting " + id + ": " + deployer.status(id));
+                    AppStatus status = deployer.status(id); 
+                    service.setDeploymentId(id);
+                    if (DeploymentState.deployed == status.getState()) {
+                        setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                    } else {
+                        setState(service, ServiceState.FAILED);
+                        errors.add("Starting service id '" + ids + "' failed:\n" + getDeployer().getLog(id));
+                    }
+                } // else, this is an ensemble service
+            }
+        }
+        checkErrors(errors);
+    }
+    
+    /**
+     * Checks the given errors list. If there are errors, composes a message and throws an exception.
+     * 
+     * @param errors the errors to check for
+     * @throws ExecutionException an exception if there are errors
+     */
+    private void checkErrors(List<String> errors) throws ExecutionException {
+        if (errors.size() > 0) {
+            String result = "";
+            for (String s : errors) {
+                if (result.length() > 0) {
+                    result += "\n";
+                }
+                result += s;
+            }
+            throw new ExecutionException(result, null);
+        }
+    }
+    
+    /**
+     * Waits for completing a deployer operation.
+     * 
+     * @param id the service id to wait for
+     * @param initState the initial deployment state, may be <b>null</b> for none
+     * @param endCond the end condition when to stop waiting, anyway at longest 
+     *   {@link SpringCloudServiceConfiguration#getWaitingTime()}.
+     * @return the service state at the end of waiting
+     */
+    private DeploymentState waitFor(String id, DeploymentState initState, Predicate<DeploymentState> endCond) {
+        AppDeployer deployer = getDeployer();
+        int waitingTime = getConfig().getWaitingTime();
+        long start = System.currentTimeMillis();
+        DeploymentState state = null;
+        do {
+            if (endCond.test(state)) { // preliminary, always synchronous deployment
+                state = deployer.status(id).getState();
+                TimeUtils.sleep(500);
+            }
+            if (System.currentTimeMillis() - start > waitingTime) {
+                break;
+            }
+        } while (endCond.test(state));
+        return state;
+    }
+
+    @Override
+    public void stopService(String... serviceIds) throws ExecutionException {
+        List<String> errors = new ArrayList<>();
+        AppDeployer deployer = getDeployer();
+        // TODO add/check causes for failing
+        for (String ids : serviceIds) {
+            SpringCloudServiceDescriptor service = getService(ids);
+            String id = service.getDeploymentId();
+            if (null != id) {
+                AppStatus status = deployer.status(id);
+                if (null != status) {
+                    DeploymentState state = status.getState();
+                    if (state == DeploymentState.deployed) {
+                        setState(service, ServiceState.STOPPING);
+                        LOGGER.info("Stopping " + id + "... ");
+                        deployer.undeploy(id);
+                        state = waitFor(id, state, s -> DeploymentState.deployed == s);
+                        LOGGER.info("Stopping " + id + "... " + state);
+                        if (null == state || state == DeploymentState.undeployed) {
+                            setState(service, ServiceState.STOPPED);
+                        } else if (state == DeploymentState.error || state == DeploymentState.failed) {
+                            setState(service, ServiceState.FAILED);
+                        }
+                    } else {
+                        setState(service, ServiceState.STOPPED);
+                    }
+                }
+            } 
+        }
+        checkErrors(errors);
+    }
+
+    @Override
+    public void migrateService(String serviceId, String resourceId) throws ExecutionException {
+        super.migrateService(serviceId, resourceId);
+        throw new ExecutionException("not implemented", null);  // TODO must change host value in AAS!
+    }
+
+    @Override
+    public void removeArtifact(String artifactId) throws ExecutionException {
+        checkId(artifactId, "artifactId");
+        SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
+        super.removeArtifact(artifactId);
+        // desc cannot be null otherwise exception by parent method
+        // proper construction shall not leave jar null
+        File jar = desc.getJar();
+        File downloadDir = getConfig().getDownloadDir();
+        if (null != downloadDir && jar.toPath().startsWith(downloadDir.toPath())) {
+            if (getConfig().getDeleteArtifacts()) {
+                FileUtils.deleteQuietly(desc.getJar());
+            }
+        }
+    }
+
+    @Override
+    public void updateService(String serviceId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
     }
 
     @Override
-    public void stopService(String name) throws ExecutionException {
-        throw new ExecutionException("not implemented", null);  // TODO
-    }
-
-    @Override
-    public void migrateService(String name, URI location) throws ExecutionException {
-        super.migrateService(name, location);
-        throw new ExecutionException("not implemented", null);  // TODO
-    }
-
-    @Override
-    public void removeArtifact(String name) throws ExecutionException {
-        super.removeArtifact(name);
-        throw new ExecutionException("not implemented", null);  // TODO
-    }
-
-    @Override
-    public void updateService(String name, URI location) throws ExecutionException {
-        throw new ExecutionException("not implemented", null);  // TODO
-    }
-
-    @Override
-    public void switchToService(String name, String target) throws ExecutionException {
-        super.switchToService(name, target);
+    public void switchToService(String serviceId, String target) throws ExecutionException {
+        super.switchToService(serviceId, target);
         throw new ExecutionException("not implemented", null); // TODO
     }
 
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
+    }
+
+    @Override
+    public void activateService(String serviceId) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "activate");
+        if (ServiceState.PASSIVATED == service.getState()) {
+            // TODO activate
+            setState(service, ServiceState.RUNNING);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void passivateService(String serviceId) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "passivate");
+        if (ServiceState.RUNNING == service.getState()) {
+            setState(service, ServiceState.PASSIVATING);
+            // TODO passivate
+            setState(service, ServiceState.PASSIVATED);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    @Override
+    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
+        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "reconfigure");
+        ServiceState state = service.getState();
+        setState(service, ServiceState.RECONFIGURING);
+        // TODO reconfigure
+        setState(service, state);
     }
 
 }

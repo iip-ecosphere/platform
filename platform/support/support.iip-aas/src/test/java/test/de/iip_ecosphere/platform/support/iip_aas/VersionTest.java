@@ -10,12 +10,12 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.services;
+package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Tests {@link Version}.

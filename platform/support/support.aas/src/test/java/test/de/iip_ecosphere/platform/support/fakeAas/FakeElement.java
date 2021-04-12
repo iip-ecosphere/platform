@@ -36,5 +36,10 @@ public abstract class FakeElement implements Element {
     public String getIdShort() {
         return idShort;
     }
+    
+    @Override
+    public void update() {
+        // not needed here
+    }
 
 }

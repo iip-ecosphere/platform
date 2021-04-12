@@ -28,7 +28,6 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.Tools;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
@@ -171,7 +170,7 @@ public class ClassUtilityTest {
         String id2 = ClassUtility.getId(prefix, o);
         Assert.assertNotNull(id2);
         Assert.assertTrue(id2.length() > 0);
-        Assert.assertTrue(id2.indexOf(id1) == prefix.length());
+        Assert.assertTrue(id2.startsWith(prefix));
     }
     
     /**
@@ -214,17 +213,6 @@ public class ClassUtilityTest {
         assertTypeSubmodel(aas);
 
         httpServer.stop(true);
-    }
-
-    /**
-     * Tests {@link ClassUtility#translateToAasName(String)}.
-     */
-    @Test
-    public void testTranslateToAasName() {
-        Tools.checkId(ClassUtility.translateToAasName("de.uni-hildesheim.sse.Test$TEst"));
-        Tools.checkId(ClassUtility.translateToAasName("1de.uni-hildesheim.sse.Test"));
-        Tools.checkId(ClassUtility.translateToAasName("1de.uni-hildesheim.sse.Test$TEst"));
-        Tools.checkId(ClassUtility.translateToAasName("jenkins-2@localhost"));
     }
 
 }

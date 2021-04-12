@@ -14,7 +14,7 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * A test container descriptor.

@@ -252,4 +252,29 @@ public abstract class AasFactory {
      */
     public abstract ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port);
     
+    /**
+     * Modifies a given {@code id} so that it fits the needs of the implementation.
+     * 
+     * @param id the id
+     * @return the fixed id
+     */
+    public String fixId(String id) { // generic code for AAS Spec, may be overridden
+        String result = id;
+        if (id != null && id.length() > 0) {
+            if (!Character.isAlphabetic(id.charAt(0))) {
+                id = "a" + id;
+            }
+            result = "";
+            for (int i = 0; i < id.length(); i++) {
+                char c = id.charAt(i);
+                if (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
+                    result += c;
+                } else {
+                    result += "_";
+                }
+            }
+        }
+        return result;
+    }
+    
 }

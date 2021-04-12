@@ -12,20 +12,27 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
+import de.iip_ecosphere.platform.services.spring.DescriptorTest;
+import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlRelation;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
-import de.iip_ecosphere.platform.services.spring.yaml.YamlServiceDependency;
 
 /**
  * Tests the YAML descriptor implementation and the {@link Validator}.
@@ -57,15 +64,20 @@ public class ArtifactInfoTest {
         Assert.assertEquals("art-name", info.getName());
         Assert.assertFalse(info.getServices().isEmpty());
         Assert.assertEquals(2, info.getServices().size());
+        Assert.assertEquals(2, info.getTypes().size());
+        Assert.assertEquals("myType", info.getTypes().get(0).getName());
+        Assert.assertEquals(2, info.getTypes().get(0).getFields().size());
+        Assert.assertEquals("a", info.getTypes().get(0).getFields().get(0).getName());
+        Assert.assertEquals("String", info.getTypes().get(0).getFields().get(0).getType());
+        Assert.assertEquals("myType1", info.getTypes().get(1).getName());
+        Assert.assertEquals(2, info.getTypes().get(1).getFields().size());
         
         YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
         assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
-        assertStringList(service.getEnsembleWith(), "id-1");
-        Assert.assertEquals(0, service.getDependencies().size());
+        Assert.assertEquals(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(2, service.getRelations().size());
-        service.getRelations().get(0);
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
         assertRelation(service.getRelations().get(1), "input", 9872, "me.here.de");
         Assert.assertNull(service.getProcess());
@@ -74,13 +86,11 @@ public class ArtifactInfoTest {
         assertServiceBasics(service, "id-1", "name-1", "1.0.3", "desc desc-1");
         assertServiceCharacteristics(service, true, ServiceKind.SINK_SERVICE);
         assertStringList(service.getCmdArg());
-        assertStringList(service.getEnsembleWith());
-        Assert.assertEquals(1, service.getDependencies().size());
-        assertDependency(service.getDependencies().get(0), "id-0");
+        Assert.assertNull(service.getEnsembleWith());
         Assert.assertEquals(1, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
-        assertProcess(service.getProcess(), "impl/python", "python", "MyServiceWrapper.py");
+        assertProcess(service.getProcess(), "impl/python", false, "python", "MyServiceWrapper.py");
         Assert.assertEquals(2, service.getInstances());
         Assert.assertEquals(1024, service.getMemory());
         Assert.assertEquals(500, service.getDisk());
@@ -90,6 +100,75 @@ public class ArtifactInfoTest {
         val.validate(info);
         Assert.assertFalse(val.hasMessages());
         val.clear();
+    }
+    
+    /**
+     * Tests the class resolution.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testResolution() throws IOException {
+        YamlArtifact info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test.yml"));
+
+        Validator val = new Validator();
+        val.validate(info);
+        SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(info, null);
+        Assert.assertNotNull(aDesc);
+        ServiceDescriptor sDesc = aDesc.getService("id-0");
+        TypedDataDescriptor param = sDesc.getParameters().get(0);
+        assertTypedData(param, "param1", "", String.class.getName());
+        param = sDesc.getParameters().get(1);
+        Class<?> paramType = assertTypedData(param, "param2", "", "myType1");
+        try {
+            Assert.assertEquals(String.class, paramType.getDeclaredField("a").getType());
+            Assert.assertEquals("myType", paramType.getDeclaredField("b").getType().getName());
+        } catch (NoSuchFieldException e) {
+            Assert.fail(e.getMessage());
+        }
+        Assert.assertEquals(1, sDesc.getOutputDataConnectors().size());
+        assertTypedData(sDesc.getOutputDataConnectors().get(0), "intern", "input", "", "myType");
+        
+        sDesc = aDesc.getService("id-1");
+        Assert.assertEquals(1, sDesc.getInputDataConnectors().size());
+        assertTypedData(sDesc.getInputDataConnectors().get(0), "intern", "output", "", "int");
+    }
+
+    /**
+     * Asserts properties of a typed connector descriptor.
+     * 
+     * @param desc the connector descriptor
+     * @param id the identifier of the descriptor (not tested if <b>null</b>)
+     * @param name the name of the parameter
+     * @param description the description
+     * @param type the type (not tested if <b>null</b>)
+     * @return the type of the typed data as class (may be <b>null</b>, but not if {@code type} was given and asserted)
+     */
+    private static Class<?> assertTypedData(TypedDataConnectorDescriptor desc, String id, String name, 
+        String description, String type) {
+        if (null != id) {
+            Assert.assertEquals(id, desc.getId());
+        }
+        return assertTypedData(desc, name, description, type);
+    }
+
+    /**
+     * Asserts properties of a typed data descriptor.
+     * 
+     * @param desc the data descriptor
+     * @param name the name of the parameter
+     * @param description the description
+     * @param type the type (not tested if <b>null</b>)
+     * @return the type of the typed data as class (may be <b>null</b>, but not if {@code type} was given and asserted)
+     */
+    private static Class<?> assertTypedData(TypedDataDescriptor desc, String name, String description, String type) {
+        Assert.assertEquals(name, desc.getName());
+        Assert.assertEquals(description, desc.getDescription());
+        if (null != type) {
+            Assert.assertNotNull(desc.getType());
+            Assert.assertEquals(type, desc.getType().getName());
+        }
+        return desc.getType();
     }
     
     /**
@@ -186,29 +265,38 @@ public class ArtifactInfoTest {
     }
     
     /**
-     * Asserts properties of a {@link YamlServiceDependency} (to be extended).
-     * 
-     * @param id the expected service id
-     * @param dependency the dependency to be asserted
-     */
-    private static void assertDependency(YamlServiceDependency dependency, String id) {
-        Assert.assertNotNull(dependency);
-        Assert.assertEquals(id, dependency.getId());
-    }
-    
-    /**
      * Asserts {@link YamlProcess} information.
      * 
      * @param process the process to assert
      * @param path the expected path
+     * @param started whether the process is marked as aready started
      * @param cmdArgs the expected command line arguments
      */
-    private static void assertProcess(YamlProcess process, String path, 
+    private static void assertProcess(YamlProcess process, String path, boolean started,
         String... cmdArgs) {
         Assert.assertEquals(path, process.getPath());
         assertEndpoint(process.getStreamEndpoint(), 1234, "localhost");
         assertEndpoint(process.getAasEndpoint(), 1235, "aas.de");
         assertStringList(process.getCmdArg(), cmdArgs);
+        Assert.assertEquals(started, process.isStarted());
+    }
+
+    /**
+     * Tests {@link DescriptorTest}.
+     * 
+     * @throws IOException in case that descriptors/files cannot be read
+     */
+    @Test
+    public void testFileDescriptorTest() throws IOException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream("test.yml");
+        Assert.assertNotNull(in);
+        File f = File.createTempFile("services.spring", ".xml");
+        java.nio.file.Files.copy(in, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        
+        DescriptorTest.main(f.getAbsolutePath());
+        
+        f = new File("./target/jars/simpleStream.spring.jar");
+        DescriptorTest.main(f.getAbsolutePath());
     }
     
 }

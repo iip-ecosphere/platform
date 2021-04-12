@@ -30,4 +30,9 @@ public abstract class BaSyxSubmodelElement implements SubmodelElement {
      */
     abstract ISubmodelElement getSubmodelElement();
     
+    @Override
+    public void update() {
+        // nothing to do
+    }
+
 }

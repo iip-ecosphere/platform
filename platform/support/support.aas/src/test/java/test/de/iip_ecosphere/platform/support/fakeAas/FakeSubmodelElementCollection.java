@@ -16,8 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
@@ -33,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 public class FakeSubmodelElementCollection extends FakeElement implements SubmodelElementCollection {
 
     private Map<String, SubmodelElement> elements = new HashMap<>();
+    private Map<String, Builder<?>> deferred;
     
     /**
      * The builder.
@@ -76,18 +80,17 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
             boolean allowDuplicates) {
-            return new FakeSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates); 
+            SubmodelElementCollectionBuilder result = DeferredBuilder.getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class, instance.deferred);
+            if (null == result) {
+                result = new FakeSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates); 
+            }
+            return result; 
         }
 
         @Override
         public Reference createReference() {
             return new FakeReference();
-        }
-
-        @Override
-        public SubmodelElementCollection build() {
-            parent.register(instance);
-            return instance;
         }
 
         @Override
@@ -129,6 +132,33 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             return isNew;
         }
         
+        @Override
+        void defer(String shortId, Builder<?> builder) {
+            instance.deferred = DeferredBuilder.defer(shortId, builder, instance.deferred);
+        }
+
+        @Override
+        void buildMyDeferred() {
+            DeferredBuilder.buildDeferred(instance.deferred);            
+        }
+
+        @Override
+        public void buildDeferred() {
+            parent.buildMyDeferred();
+        }
+
+        @Override
+        public void defer() {
+            parent.defer(instance.getIdShort(), this);
+        }
+
+        @Override
+        public SubmodelElementCollection build() {
+            buildMyDeferred();
+            parent.register(instance);
+            return instance;
+        }
+
     }
     
     /**
@@ -205,6 +235,16 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
     @Override
     public Reference createReference() {
         return new FakeReference();
+    }
+
+    @Override
+    public void deleteElement(String idShort) {
+        elements.remove(idShort);
+    }
+
+    @Override
+    public Operation getOperation(String idShort) {
+        return filter(idShort, Operation.class);
     }
 
 }

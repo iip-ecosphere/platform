@@ -63,6 +63,7 @@
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
+    <!-- If changed, check against forced JUnit provider -->
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
     <com.hivemq.version>2020.4</com.hivemq.version>
@@ -99,13 +100,22 @@
   <dependencyManagement>
     <dependencies>
     
-      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx! -->
+      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx/Spring! -->
       
 	  <dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 		<version>${org.slf4j.version}</version>
 	  </dependency>
+	  <!-- Also tests must be able to use the logging. However, this is optional as bindings may come through 
+	       BaSyx/Spring and may then require specific configuration! -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org.slf4j.version}</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
     
       <!-- Commons stuff -->
 
@@ -304,7 +314,7 @@
           </execution>
         </executions>
       </plugin>      
-       
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -314,6 +324,15 @@
             <include>**/AllTests.class</include>
           </includes>
         </configuration>
+        <dependencies>
+          <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
+               jUnit 4.12 ;)  -->
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>${org.apache.maven.surefire.version}</version>
+          </dependency>
+        </dependencies>        
       </plugin>
       
       <plugin>

@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.services.AbstractArtifactDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MyArtifactDescriptor extends AbstractArtifactDescriptor<MyServiceDesciptor> {
+public class MyArtifactDescriptor extends AbstractArtifactDescriptor<MyServiceDescriptor> {
 
     /**
      * Creates an artifact descriptor.
@@ -30,7 +30,7 @@ public class MyArtifactDescriptor extends AbstractArtifactDescriptor<MyServiceDe
      * @param name the (file) name
      * @param services the contained services
      */
-    MyArtifactDescriptor(String id, String name, List<MyServiceDesciptor> services) {
+    MyArtifactDescriptor(String id, String name, List<MyServiceDescriptor> services) {
         super(id, name, services);
     }
 

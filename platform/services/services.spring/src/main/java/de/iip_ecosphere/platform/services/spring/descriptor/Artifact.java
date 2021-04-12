@@ -44,4 +44,11 @@ public interface Artifact {
      */
     public List<? extends Service> getServices();
 
+    /**
+     * Returns the declared types.
+     * 
+     * @return the types
+     */
+    public List<? extends Type> getTypes();
+
 }

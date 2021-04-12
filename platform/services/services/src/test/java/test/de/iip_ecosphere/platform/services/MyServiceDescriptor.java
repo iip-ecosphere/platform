@@ -12,21 +12,22 @@
 
 package test.de.iip_ecosphere.platform.services;
 
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceKind;
-import de.iip_ecosphere.platform.services.ServiceState;
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * A test service descriptor.
  * 
  * @author Holger Eichelberger, SSE
  */
-class MyServiceDesciptor extends AbstractServiceDescriptor {
+class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor> {
 
+    private MyServiceDescriptor ensembleLeader;
+    
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
      * 
@@ -35,35 +36,42 @@ class MyServiceDesciptor extends AbstractServiceDescriptor {
      * @param description the description of the service
      * @param version the version
      */
-    protected MyServiceDesciptor(String id, String name, String description, Version version) {
+    protected MyServiceDescriptor(String id, String name, String description, Version version) {
         super(id, name, description, version);
     }
     
     @Override
-    public void passivate() throws ExecutionException {
-        if (ServiceState.RUNNING == getState()) {
-            setState(ServiceState.PASSIVATING);
-            setState(ServiceState.PASSIVATED);
-        } else {
-            throw new ExecutionException("Cannot passivate as service is in state " + getState(), null);
-        }
+    public void addParameter(TypedDataDescriptor parameter) {
+        super.addParameter(parameter);
     }
 
     @Override
-    public void activate() throws ExecutionException {
-        if (ServiceState.PASSIVATED == getState()) {
-            setState(ServiceState.RUNNING);
-        } else {
-            throw new ExecutionException("Cannot passivate as service is in state " + getState(), null);
-        }
+    public void addInputDataConnector(TypedDataConnectorDescriptor input) {
+        super.addInputDataConnector(input);
+    }
+
+    @Override
+    public void addOutputDataConnector(TypedDataConnectorDescriptor output) {
+        super.addOutputDataConnector(output);
     }
     
     @Override
-    public void reconfigure(Map<String, Object> values) throws ExecutionException {
-        ServiceState state = getState();
-        setState(ServiceState.RECONFIGURING);
-        // reconfigure
-        setState(state);
+    public ServiceDescriptor getEnsembleLeader() {
+        return ensembleLeader;
+    }
+    
+    /**
+     * Sets the ensemble leader.
+     * 
+     * @param ensembleLeader the ensemble leader
+     */
+    void setEnsembleLeader(MyServiceDescriptor ensembleLeader) {
+        this.ensembleLeader = ensembleLeader;
+    }
+    
+    @Override
+    public String toString() {
+        return getId();
     }
     
 }

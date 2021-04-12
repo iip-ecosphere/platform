@@ -90,11 +90,27 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
             boolean allowDuplicates) {
-            return instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+            SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
+                SubmodelElementCollectionBuilder.class);
+            if (null == result) {
+                result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+            }
+            return result;
+        }
+        
+        @Override
+        public void defer() {
+            parentBuilder.defer(instance.getIdShort(), this);
+        }
+
+        @Override
+        public void buildDeferred() {
+            parentBuilder.buildMyDeferred();
         }
 
         @Override
         public Submodel build() {
+            buildMyDeferred();
             return null == parentBuilder ? instance : parentBuilder.register(instance);
         }
 
@@ -119,7 +135,6 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
         }
 
     }
-    
 
     /**
      * Creates an instance. Prevents external creation.
@@ -158,14 +173,16 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
      */
     private SubmodelElementCollectionBuilder obtainSubmodelElementCollectionBuilder(
         BaSyxSubmodelElementContainerBuilder<?> parent, String idShort, boolean ordered, boolean allowDuplicates) {
-        SubmodelElementCollectionBuilder result;
-        SubmodelElementCollection sub = getSubmodelElementCollection(idShort);
-        if (null == sub) {
-            result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, idShort, 
-                ordered, allowDuplicates);
-        } else {
-            result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, 
-               (BaSyxSubmodelElementCollection) sub);
+        SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
+        if (null == result) {
+            SubmodelElementCollection sub = getSubmodelElementCollection(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, idShort, 
+                    ordered, allowDuplicates);
+            } else {
+                result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(parent, 
+                   (BaSyxSubmodelElementCollection) sub);
+            }
         }
         return result;
     }
@@ -177,6 +194,10 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
             + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
             idShort, ordered, allowDuplicates);
+    }
+
+    @Override
+    public void update() {
     }
 
 }

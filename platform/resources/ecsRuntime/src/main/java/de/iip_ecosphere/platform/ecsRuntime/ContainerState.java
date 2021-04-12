@@ -72,6 +72,6 @@ public enum ContainerState {
     /**
      * The state of the container is not known.
      */
-    UNKOWN
+    UNKNOWN
 
 }

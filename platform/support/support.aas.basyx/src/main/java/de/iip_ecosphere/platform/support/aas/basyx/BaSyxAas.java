@@ -18,6 +18,7 @@ import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
@@ -72,17 +73,20 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
                     + "whether it is an instance or a type. Further, the missing asset may prevent persisting the "
                     + "AAS.");
             }
+            buildMyDeferred();
             return instance;
         }
 
         @Override
         public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
-            SubmodelBuilder result;
-            Submodel sub =  instance.getSubmodel(idShort);
-            if (null == instance.getSubmodel(idShort)) {
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
-            } else { // no connected here
-                result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
+            SubmodelBuilder result = instance.getDeferred(idShort, SubmodelBuilder.class);
+            if (null == result) {
+                Submodel sub =  instance.getSubmodel(idShort);
+                if (null == instance.getSubmodel(idShort)) {
+                    result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
+                } else { // no connected here
+                    result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
+                }
             }
             return result;
         }
@@ -120,6 +124,16 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
             instance.registerAsset(asset);
         }
         
+        @Override
+        void defer(String shortId, Builder<?> builder) {
+            getInstance().defer(shortId, builder);
+        }
+
+        @Override
+        void buildMyDeferred() {
+            getInstance().buildDeferred();
+        }
+        
     }
 
     /**
@@ -133,7 +147,11 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
 
     @Override
     public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
-        return new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort, identifier);
+        SubmodelBuilder result = getDeferred(idShort, SubmodelBuilder.class);
+        if (null == result) {
+            result = new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort, identifier);
+        } 
+        return result;
     }
 
     @Override
@@ -152,6 +170,10 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         getAas().setAsset((Asset) a);
         // reference is needed for Reading back AASX; works also without setAsset; unclear wether both ar needed
         getAas().setAssetReference((Reference) a.getReference()); 
+    }
+
+    @Override
+    public void update() {
     }
 
 }

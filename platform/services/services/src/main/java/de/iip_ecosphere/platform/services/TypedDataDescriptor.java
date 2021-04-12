@@ -10,32 +10,35 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring.yaml;
-
-import de.iip_ecosphere.platform.services.spring.descriptor.ServiceDependency;
+package de.iip_ecosphere.platform.services;
 
 /**
- * Represents a service dependency. This class is currently rather simple, but further aspects like timeout conditions
- * may follow.
+ * Describes a typed data (element).
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlServiceDependency implements ServiceDependency {
-    
-    private String id;
-    
-    @Override
-    public String getId() {
-        return id;
-    }
+public interface TypedDataDescriptor {
+
+    /**
+     * The name of the element.
+     * 
+     * @return the name
+     */
+    public String getName();
+
+    /**
+     * The type of the element.
+     * 
+     * @return the type, either a standard java class or a dynamic proxy for types declared by the services that are
+     *   not available in this (execution/platform) environment
+     */
+    public Class<?> getType();
     
     /**
-     * Defines the id of the service. [required by SnakeYaml]
+     * The description of the element.
      * 
-     * @param id the id
+     * @return the description, may be empty
      */
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getDescription();
 
 }

@@ -15,8 +15,6 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -24,9 +22,13 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+
+import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 /**
  * Builds an active AAS for the {@link NetworkManager}.
@@ -94,7 +96,7 @@ public class NetworkManagerAas implements AasContributor {
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(OP_RESERVE_PORT), 
             p -> toJson(NetworkManagerFactory.getInstance().reservePort(readString(p, 0, null), 
-                readServerAddress(readString(p, 1, null)))));
+                JsonUtils.serverAddressFromJson(readString(p, 1, null)))));
         sBuilder.defineOperation(getQName(OP_OBTAIN_PORT), 
             p -> toJson(NetworkManagerFactory.getInstance().obtainPort(readString(p, 0, null))));
         sBuilder.defineOperation(getQName(OP_GET_PORT), 
@@ -102,7 +104,7 @@ public class NetworkManagerAas implements AasContributor {
         sBuilder.defineOperation(getQName(OP_IS_IN_USE_PORT), 
             p -> NetworkManagerFactory.getInstance().isInUse(readInt(p, 0, -1)));
         sBuilder.defineOperation(getQName(OP_IS_IN_USE_ADR), 
-            p -> NetworkManagerFactory.getInstance().isInUse(readServerAddress(readString(p, 0, null))));
+            p -> NetworkManagerFactory.getInstance().isInUse(JsonUtils.serverAddressFromJson(readString(p, 0, null))));
         sBuilder.defineOperation(getQName(OP_RELEASE_PORT), 
             p -> { NetworkManagerFactory.getInstance().releasePort(readString(p, 0, null)); return null; });
         sBuilder.defineProperty(getQName(PROP_HIGH_PORT), 
@@ -124,127 +126,12 @@ public class NetworkManagerAas implements AasContributor {
     }
 
     /**
-     * Reads the {@code index} argument from {@code} args as String.
-     * 
-     * @param args the array to take the value from 
-     * @param index the 0-based index into {@code} args
-     * @param dflt default value if the {@code index} is wrong, there is no value/null ...
-     * @return the value
-     */
-    public static String readString(Object[] args, int index, String dflt) {
-        Object param = index >= 0 && index < args.length ? args[index] : null;
-        return null == param ? dflt : param.toString();
-    }
-    
-    /**
-     * Reads the {@code index} argument from {@code} args as int.
-     * 
-     * @param args the array to take the value from 
-     * @param index the 0-based index into {@code} args
-     * @param dflt default value if the {@code index} is wrong, there is no value/null, the value is no int...
-     * @return the value
-     */
-    public static int readInt(Object[] args, int index, int dflt) {
-        Object param = index >= 0 && index < args.length ? args[index] : null;
-        int result = dflt;
-        if (null != param) {
-            try {
-                result = Integer.parseInt(param.toString());
-            } catch (NumberFormatException e) {
-                // handled by result = deflt
-            }
-        }
-        return result;
-    }
-
-    /**
-     * A proxy for {@link ServerAddress} as we do not want to have setters there.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    static class ServerAddressHolder {
-        private int port;
-        private String host;
-        private Schema schema;
-
-        /**
-         * Creates an instance (deserialization).
-         */
-        ServerAddressHolder() {
-        }
-
-        /**
-         * Creates an instance from a given instance (serialization).
-         * 
-         * @param addr the instance to take data from
-         */
-        ServerAddressHolder(ServerAddress addr) {
-            port = addr.getPort();
-            host = addr.getHost();
-            schema = addr.getSchema();
-        }
-        
-        /**
-         * Returns the port value.
-         * 
-         * @return the port
-         */
-        public int getPort() {
-            return port;
-        }
-        
-        /**
-         * Defines the {@link #port} value.
-         * 
-         * @param port the new value of {@link #port}
-         */
-        public void setPort(int port) {
-            this.port = port;
-        }
-        
-        /**
-         * Returns the host value.
-         * 
-         * @return the host
-         */
-        public String getHost() {
-            return host;
-        }
-        
-        /**
-         * Defines the {@link #host} value.
-         * 
-         * @param host the new value of {@link #host}
-         */
-        public void setHost(String host) {
-            this.host = host;
-        }
-        
-        /**
-         * Returns the schema value.
-         * 
-         * @return the schema
-         */
-        public Schema getSchema() {
-            return schema;
-        }
-
-        /**
-         * Defines the {@link #schema} value.
-         * 
-         * @param schema the new value of {@link #schema}
-         */
-        public void setSchema(Schema schema) {
-            this.schema = schema;
-        }
-    }
-
-    /**
      * A proxy for {@link ManagedServerAddress} as we do not want to have setters there.
      * 
      * @author Holger Eichelberger, SSE
      */
     static class ManagedServerAddressHolder extends ServerAddressHolder {
+        
         private boolean isNew;
 
         /**
@@ -284,57 +171,18 @@ public class NetworkManagerAas implements AasContributor {
     }
 
     /**
-     * Reads a {@link ServerAddress} from a JSON string.
-     * 
-     * @param json the JSON string
-     * @return the server address or <b>null</b> if reading fails
-     */
-    public static ServerAddress readServerAddress(String json) {
-        ServerAddress result = null;
-        if (null != json) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ServerAddressHolder tmp = objectMapper.readValue(json, ServerAddressHolder.class);
-                result = new ServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort());
-            } catch (JsonProcessingException e) {
-                // result = null;
-            }
-        }
-        return result;        
-    }
-    
-    /**
-     * Turns a {@link ServerAddress} into JSON.
-     * 
-     * @param address the address (may be <b>null</b>)
-     * @return the JSON string or an empty string in case of problems/no address
-     */
-    public static String toJson(ServerAddress address) {
-        String result = "";
-        if (null != address) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ServerAddressHolder tmp = new ServerAddressHolder(address);
-                result = objectMapper.writeValueAsString(tmp);
-            } catch (JsonProcessingException e) {
-                // handled by default value
-            }
-        } 
-        return result;
-    }
-
-    /**
      * Reads a {@link ManagedServerAddress} from a JSON string.
      * 
-     * @param json the JSON string
+     * @param json the JSON object, usually a String
      * @return the server address or <b>null</b> if reading fails
      */
-    public static ManagedServerAddress readManagedServerAddress(String json) {
+    public static ManagedServerAddress managedServerAddressFromJson(Object json) {
         ManagedServerAddress result = null;
         if (null != json) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                ManagedServerAddressHolder tmp = objectMapper.readValue(json, ManagedServerAddressHolder.class);
+                ManagedServerAddressHolder tmp = objectMapper.readValue(json.toString(), 
+                    ManagedServerAddressHolder.class);
                 result = new ManagedServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort(), tmp.isNew());
             } catch (JsonProcessingException e) {
                 //result = null;

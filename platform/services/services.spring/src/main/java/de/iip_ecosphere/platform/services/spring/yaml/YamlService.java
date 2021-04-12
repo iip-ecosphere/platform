@@ -30,15 +30,15 @@ public class YamlService implements Service {
     private String version;
     private String description = "";
     private List<String> cmdArg = new ArrayList<>();
-    private List<String> ensembleWith = new ArrayList<>();
-    private List<YamlServiceDependency> dependencies = new ArrayList<>();
+    private String ensembleWith;
     private List<YamlRelation> relations = new ArrayList<>();
+    private List<YamlTypedData> parameters = new ArrayList<>();
     private YamlProcess process;
     private ServiceKind kind;
     private boolean deployable = false;
     private int instances = 1;
-    private int memory = -1;
-    private int disk = -1;
+    private long memory = -1;
+    private long disk = -1;
     private int cpus = 1;
 
     @Override
@@ -67,20 +67,20 @@ public class YamlService implements Service {
     }
     
     @Override
-    public List<String> getEnsembleWith() {
+    public String getEnsembleWith() {
         return ensembleWith;
     }
     
     @Override
-    public List<YamlServiceDependency> getDependencies() {
-        return dependencies;
-    }
-
-    @Override
     public List<YamlRelation> getRelations() {
         return relations;
     }
-    
+
+    @Override
+    public List<YamlTypedData> getParameters() {
+        return parameters;
+    }
+
     @Override
     public YamlProcess getProcess() {
         return process;
@@ -102,12 +102,12 @@ public class YamlService implements Service {
     }
 
     @Override
-    public int getMemory() {
+    public long getMemory() {
         return memory;
     }
 
     @Override
-    public int getDisk() {
+    public long getDisk() {
         return disk;
     }
 
@@ -162,21 +162,12 @@ public class YamlService implements Service {
     }
 
     /**
-     * Defines the service ids to be started with this service. [required by SnakeYaml]
+     * Defines the service id of the ensemble leader starting this service. [required by SnakeYaml]
      * 
-     * @param ensembleWith the service ids (may be empty for none)
+     * @param ensembleWith the service id of the ensemble leader (may be <b>null</b> for none)
      */
-    public void setEnsembleWith(List<String> ensembleWith) {
+    public void setEnsembleWith(String ensembleWith) {
         this.ensembleWith = ensembleWith;
-    }
-
-    /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @param dependencies the service dependences(may be empty for none)
-     */
-    public void setDependencies(List<YamlServiceDependency> dependencies) {
-        this.dependencies = dependencies;
     }
 
     /**
@@ -186,6 +177,15 @@ public class YamlService implements Service {
      */
     public void setRelations(List<YamlRelation> relations) {
         this.relations = relations;
+    }
+
+    /**
+     * Defines the service-specific configurable parameter. [required by SnakeYaml]
+     * 
+     * @param parameters the parameters, may be empty
+     */
+    public void setParameters(List<YamlTypedData> parameters) {
+        this.parameters = parameters;
     }
 
     /**
@@ -229,9 +229,10 @@ public class YamlService implements Service {
      * Defines the desired memory for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @param memory the desired memory in bytes, ignored if not positive
+     * @param memory the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), 
+     *   ignored if not positive
      */
-    public void setMemory(int memory) {
+    public void setMemory(long memory) {
         this.memory = memory;
     }
 
@@ -239,9 +240,10 @@ public class YamlService implements Service {
      * Defines the desired disk space for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @param disk the desired disk space in bytes, ignored if not positive
+     * @param disk the desired disk space in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"),
+     *   ignored if not positive
      */
-    public void setDisk(int disk) {
+    public void setDisk(long disk) {
         this.disk = disk;
     }
 

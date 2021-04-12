@@ -1,5 +1,15 @@
 id:
 name:
+types:
+  - name:
+  - name: test
+    fields:
+      - name:
+      - type: 
+  - name: java.lang.String
+    fields:
+      - name: field
+        type: String
 services:
   - name: name-1
     version: 1.0.3
@@ -8,15 +18,15 @@ services:
       - arg-1-1
       - arg-1-2
     ensembleWith:
-      -
   - id:
     name:
-    dependencies:
-      - id:
     cmdArg:
       -
-    ensembleWith:
-      - id5 
+    ensembleWith: id5 
+    parameters:
+      - name:
+      - name: test
+        type:
     relations:
       - channel:
         endpoint:

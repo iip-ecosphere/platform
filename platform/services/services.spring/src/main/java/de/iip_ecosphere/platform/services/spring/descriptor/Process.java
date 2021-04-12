@@ -40,9 +40,18 @@ public interface Process {
      *     {@link #getAASEndpoint() AAS endpoint} will be added anyway
      */
     public List<String> getCmdArg();
+
+    /**
+     * Returns streaming endpoint (port/host) on the service side the process shall communicate with. Counterpart of
+     * {@link #getStreamEndpoint()}.
+     * 
+     * @return the streaming endpoint
+     */
+    public Endpoint getServiceStreamEndpoint();
     
     /**
-     * Returns streaming endpoint (port/host) the service shall communicate with. 
+     * Returns streaming endpoint (port/host) on the process side the service shall communicate with. Counterpart of 
+     * {@link #getServiceStreamEndpoint()}.
      * 
      * @return the streaming endpoint
      */
@@ -54,5 +63,12 @@ public interface Process {
      * @return the AAS endpoint
      */
     public Endpoint getAasEndpoint();
+    
+    /**
+     * Returns whether the underlying process is already started when firing up the service.
+     * 
+     * @return {@code true} for started, {@code false} else (default)
+     */
+    public boolean isStarted();
     
 }

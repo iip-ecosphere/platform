@@ -7,14 +7,15 @@ services:
     description: Creates text tokens.
     deployable: true
     kind: SOURCE_SERVICE
-    dependencies:
-      - id: simpleStream-log
-    ensembleWith:
-      - simpleStream-log
+    ensembleWith: simpleStream-log
     relations:
       - endpoint:
           portArg: --mqtt.port=${port}
           hostArg: --mqtt.host=${host}
+      - channel: create-out-0
+        id: intern
+        type: String
+        direction: OUT        
   - id: simpleStream-log
     name: log
     version: 0.2.0
@@ -25,3 +26,7 @@ services:
       - endpoint:
           portArg: --mqtt.port=${port}
           hostArg: --mqtt.host=${host}
+      - channel: log-in-0
+        id: intern
+        type: String
+        direction: IN

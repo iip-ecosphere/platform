@@ -33,4 +33,11 @@ public interface Element {
      */
     public void accept(AasVisitor visitor);
 
+    /**
+     * Causes cached data to be updated. If an implementation relies on life data/direct queries against the
+     * corresponding AAS element, nothing needs to be done. If an implementation caches information, the caches
+     * shall be refreshed through this update or reset so that the next query returns fresh data.
+     */
+    public void update();
+    
 }

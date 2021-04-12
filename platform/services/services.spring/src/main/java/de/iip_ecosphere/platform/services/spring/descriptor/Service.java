@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.ServiceKind;
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Information about a single service. {@link #getId()} and {@link #getName()} must be given, both not empty, 
@@ -65,19 +65,11 @@ public interface Service {
     public List<String> getCmdArg();
 
     /**
-     * Returns the service ids this service is starting as an ensemble with itself.
-     * The ensemble services shall not be started on their own.
+     * Returns the service id of the ensemble leader. The ensemble services shall then be started on its own.
      * 
-     * @return the service ids (may be empty for none)
+     * @return the service id of the ensemble leader (may be <b>null</b> for none)
      */
-    public List<String> getEnsembleWith();
-
-    /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @return the service dependences(may be empty for none)
-     */
-    public List<? extends ServiceDependency> getDependencies();
+    public String getEnsembleWith();
 
     /**
      * Returns the service-specific relations and command line arguments.
@@ -85,6 +77,13 @@ public interface Service {
      * @return the relations, may be empty
      */
     public List<? extends Relation> getRelations();
+
+    /**
+     * Returns the service-specific configurable parameters.
+     * 
+     * @return the parameter, may be empty
+     */
+    public List<? extends TypedData> getParameters();
     
     /**
      * Returns an optional attached process realizing the service.
@@ -119,17 +118,19 @@ public interface Service {
      * Returns the desired memory for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @return the desired memory in bytes, ignored if not positive
+     * @return the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), ignored
+     *   if not positive
      */
-    public int getMemory();
+    public long getMemory();
 
     /**
      * Returns the desired disk space for instances of this service. This property is considered during deployment
      * only if the deployer supports it.
      * 
-     * @return the desired disk space in bytes, ignored if not positive
+     * @return the desired disk space in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), 
+     *   ignored if not positive
      */
-    public int getDisk();
+    public long getDisk();
 
     /**
      * Returns the desired number of CPUs for instances of this service. This property is considered during deployment

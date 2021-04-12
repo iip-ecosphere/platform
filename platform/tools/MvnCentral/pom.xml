@@ -91,6 +91,22 @@
         <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+        <artifactId>ecsRuntime.docker</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>services.spring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+        <artifactId>test.simpleStream.spring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+
   </dependencies>
   
   <build>

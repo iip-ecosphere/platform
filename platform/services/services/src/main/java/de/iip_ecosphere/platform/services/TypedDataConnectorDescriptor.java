@@ -10,21 +10,22 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring.descriptor;
+package de.iip_ecosphere.platform.services;
 
 /**
- * Represents a service dependency. This class is currently rather simple, but further aspects like timeout conditions
- * may follow.
+ * A typed data connector, i.e., points where data flows into and out from a service. We introduced this interface as 
+ * channels may exhibit in the future also their connection details, e.g., for display in the service AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ServiceDependency {
+public interface TypedDataConnectorDescriptor extends TypedDataDescriptor {
     
     /**
-     * Returns the name of the service.
+     * Returns the id of the connector. Depending on the implementation, id may be the same as {@link #getName()} or
+     * differ, e.g, if {@link #getName()} points to a technical channel name.
      * 
-     * @return the name
+     * @return the id
      */
     public String getId();
-    
+
 }

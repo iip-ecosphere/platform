@@ -12,8 +12,11 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Describes a service.
@@ -56,6 +59,14 @@ public interface ServiceDescriptor {
      * @return the state
      */
     public ServiceState getState();
+    
+    /**
+     * Returns the ensemble leader service, i.e., if multiple services are packaged together and shall be executed
+     * in the same process, it is important to synchronize aspects (via the ensemble leader service).
+     * 
+     * @return the ensemble leader, may be <b>null</b> if there is none
+     */
+    public ServiceDescriptor getEnsembleLeader();
 
     /**
      * Changes the state. [R133c]
@@ -87,26 +98,24 @@ public interface ServiceDescriptor {
     public ArtifactDescriptor getArtifact();
     
     /**
-     * Passivates the service.
+     * Returns all information about parameter for {@link #reconfigure(Map)}.
      * 
-     * @throws ExecutionException if passivating fails for some reason
+     * @return the name-descriptor mapping for all supported parameters
      */
-    public void passivate() throws ExecutionException;
+    public List<TypedDataDescriptor> getParameters();
     
     /**
-     * Activates the service.
+     * Returns all (asynchronous) input connectors into this service.
      * 
-     * @throws ExecutionException if activating fails for some reason
+     * @return all input channels
      */
-    public void activate() throws ExecutionException;
+    public List<TypedDataConnectorDescriptor> getInputDataConnectors();
 
     /**
-     * Reconfigures the underlying service.
+     * Returns all (asynchronous) output connectors from this service.
      * 
-     * @param values the (service-specific) values that shall lead to a reconfiguration of the service
-     * @throws ExecutionException if reconfiguration fails
+     * @return all input channels
      */
-    public void reconfigure(Map<String, Object> values) throws ExecutionException;
-    
-    // TODO endpoints, data connectors
+    public List<TypedDataConnectorDescriptor> getOutputDataConnectors();
+
 }
