@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.services.Version;
 
 /**
@@ -33,5 +34,20 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     protected DockerContainerDescriptor(String id, String name, Version version) {
         super(id, name, version);
     }
+    /**
+     * TODO.
+     * @param state
+     */
+    public void callSetState(ContainerState state) {
+        super.setState(state);
+    }
+    
+    
+    @Override
+    public void setState(ContainerState state) {
+        super.setState(state);
+    }
+
+
 
 }
