@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
-import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Implements a container descriptor for docker-based container managment.
