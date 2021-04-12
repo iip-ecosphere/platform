@@ -17,12 +17,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -35,7 +34,8 @@ import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-import de.iip_ecosphere.platform.services.Version;
+//import de.iip_ecosphere.platform.services.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
@@ -120,6 +120,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
 
     @Override
+    public ContainerState getState(String id) {
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         for (DockerContainerDescriptor container : containers) {
             String containerId = container.getId();
@@ -169,14 +170,14 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             state = ContainerState.DEPLOYED;
             break;
         default :
-            state = ContainerState.UNKOWN;
+            state = ContainerState.UNKNOWN;
             break;
         }
         return state;
     }
     
     @Override
-    public Collection<? extends ContainerDescriptor> getContainers() {
+    public Collection<DockerContainerDescriptor> getContainers() {
         List<DockerContainerDescriptor> containers = new ArrayList<DockerContainerDescriptor>();
         
         Runtime rt = Runtime.getRuntime();
@@ -228,11 +229,11 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
 
     @Override
-    public ContainerDescriptor getContainer(String id) {
+    public DockerContainerDescriptor getContainer(String id) {
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         int containerNumber = containers.size();
         for (int i = 0; i < containerNumber; i++) {
-            ContainerDescriptor container = containers.get(i);
+            DockerContainerDescriptor container = containers.get(i);
             String containerId = container.getId();
             if (containerId.equals(id)) {
                 return container;
@@ -249,7 +250,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public String getContainerSystemVersion() {
-        return null; // TODO Docker VERSION
         // TODO implement
         return null;
     }
