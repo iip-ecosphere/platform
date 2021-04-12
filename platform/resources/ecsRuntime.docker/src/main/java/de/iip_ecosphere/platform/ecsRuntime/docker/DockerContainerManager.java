@@ -12,10 +12,19 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -28,6 +37,7 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
+import de.iip_ecosphere.platform.services.Version;
 
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
@@ -61,9 +71,8 @@ public class DockerContainerManager implements ContainerManager {
         return null; // TODO implement
     }
     
-    
     /**
-     * This method configures a Docker Client.
+     * Configures a Docker Client.
      * 
      * @return DockerClient
      */
@@ -97,7 +106,7 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
-        DockerClient dockerClient = getDockerClient();     
+        DockerClient dockerClient = getDockerClient();
         dockerClient.removeContainerCmd(id).exec();          
     }
 
@@ -108,32 +117,131 @@ public class DockerContainerManager implements ContainerManager {
 
     @Override
     public ContainerState getState(String id) {
-        // TODO implement
+        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
+        for (DockerContainerDescriptor container : containers) {
+            String containerId = container.getId();
+            if (containerId.equals(id)) {
+                return container.getState();
+            }
+        }
         return null;
     }
 
     @Override
     public Set<String> getIds() {
-        // TODO implement
-        return null;
+        Set<String> ids = new HashSet<String>();
+        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
+        for (DockerContainerDescriptor container : containers) {
+            ids.add(container.getId());
+        }
+        return ids;
     }
-
+    
+    /**
+     * Converts Docker's state of container (string) into a ContainerState.
+     * 
+     * @param dockerState Docker's status of container
+     * @return state ContainerState
+     */
+    public static ContainerState convertDockerContainerState(String dockerState) {
+        // Getting the first word in string - name of the state.
+        String[] listOfWords = dockerState.split(" ");
+        String dockerStateName = "";
+        for (String word : listOfWords) {
+            if (!word.equals("")) {
+                dockerStateName = word;
+                break;
+            }
+        }
+        // Matching docker's state with IIP-Ecosphere platform's state.
+        ContainerState state;
+        switch(dockerStateName) {
+        case "Up":
+            state = ContainerState.AVAILABLE;
+            break;
+        case "Exited":
+            state = ContainerState.STOPPED;
+            break;
+        case "Created":
+            state = ContainerState.DEPLOYED;
+            break;
+        default :
+            state = ContainerState.UNKOWN;
+            break;
+        }
+        return state;
+    }
+    
     @Override
     public Collection<? extends ContainerDescriptor> getContainers() {
-        // TODO implement
-        return null;
+        List<DockerContainerDescriptor> containers = new ArrayList<DockerContainerDescriptor>();
+        
+        Runtime rt = Runtime.getRuntime();
+        String command = "docker container ls -a";
+        try {
+            Process proc = rt.exec(command);
+            BufferedReader stdInput = new BufferedReader(new 
+                 InputStreamReader(proc.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new 
+                 InputStreamReader(proc.getErrorStream()));
+            
+            // Read the output from the command
+            String line = null;
+            while (true) {
+                line = stdInput.readLine();
+                if (line == null) {
+                    break;
+                }
+                
+                // Output to parse:
+                // CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS    
+                // 8f6983acd81a        arvindr226/alpine-ssh    "/usr/sbin/sshd -D"      3 weeks ago         Up 3 secon
+                
+                // Skipping the header
+                if (line.substring(0, 12).equals("CONTAINER ID")) {
+                    continue;
+                }
+                int lineLength = line.length();
+                String id = line.substring(0, 12).trim();
+                String dockerState = line.substring(90, 117).trim();
+                ContainerState state = convertDockerContainerState(dockerState);
+                String conName = line.substring(138, lineLength).trim();
+                Version version = new Version("1.0"); // TODO using default version for now
+                
+                DockerContainerDescriptor containerDescriptor = new DockerContainerDescriptor(id, conName, version);
+                containerDescriptor.setState(state);
+                containers.add(containerDescriptor);
+                    
+            }
+            // Read any errors from the attempted command
+            while ((line = stdError.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        return containers;
     }
 
     @Override
     public ContainerDescriptor getContainer(String id) {
-        // TODO Auto-generated method stub
+        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
+        int containerNumber = containers.size();
+        for (int i = 0; i < containerNumber; i++) {
+            ContainerDescriptor container = containers.get(i);
+            String containerId = container.getId();
+            if (containerId.equals(id)) {
+                return container;
+            }
+        }
         return null;
     }
 
     @Override
     public String getContainerSystemName() {
-        // TODO implement
-        return null;
+        // TODO is es ok so?
+        return "Docker";
     }
 
     @Override
