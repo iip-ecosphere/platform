@@ -17,9 +17,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +43,7 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 
@@ -89,73 +87,33 @@ public class SpringCloudServiceManager
     @Override
     protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
         if (null == available) {
-            available = ServicesAas.createAvailabilityPredicate(SpringInstances.getConfig().getWaitingTime(), 500, 
-                false); // TODO 500 -> config
+            available = ServicesAas.createAvailabilityPredicate(SpringInstances.getConfig().getWaitingTime(), 
+                SpringInstances.getConfig().getAvailabilityRetryDelay(), false);
         }
         return available;
     }
     
     @Override
     public String addArtifact(URI location) throws ExecutionException {
-        location = resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
-        YamlArtifact yamlArtifact = null;
-        File jarFile;
-        if ("file".equals(location.getScheme())) {
-            jarFile = new File(location);
-            yamlArtifact = readFromFile(jarFile);
-        } else {
-            throw new ExecutionException("Cannot load " + location + ". Must be a (resolved) file.", null);
+        try {
+            File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
+            YamlArtifact yamlArtifact = null;
+            if (null != jarFile) {
+                yamlArtifact = readFromFile(jarFile);
+            } else {
+                throw new ExecutionException("Cannot load " + location + ". Must be a (resolved) file.", null);
+            }
+            Validator val = new Validator();
+            val.validate(yamlArtifact);
+            if (val.hasMessages()) {
+                throw new ExecutionException("Problems in descriptor:\n" + val.getMessages(), null);
+            }
+            SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
+                yamlArtifact, jarFile);
+            return super.addArtifact(artifact.getId(), artifact);
+        } catch (IOException e) {
+            throw new ExecutionException(e);
         }
-        Validator val = new Validator();
-        val.validate(yamlArtifact);
-        if (val.hasMessages()) {
-            throw new ExecutionException("Problems in descriptor:\n" + val.getMessages(), null);
-        }
-        SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(yamlArtifact, jarFile);
-        return super.addArtifact(artifact.getId(), artifact);
-    }
-    
-    /**
-     * Resolves an external/remote {@code uri} to a local file URI. if {@code uri} is already a file, {@code uri} is 
-     * returned.
-     * 
-     * @param uri the URI to resolve
-     * @param dir the directory to store resolved files, may be <b>null</b> for temporary files
-     * @return the URI that resolves to a local file
-     * @throws ExecutionException in case that URI cannot be resolved/opened/transferred
-     */
-    private static URI resolveToFile(URI uri, File dir) throws ExecutionException {
-        URI result = uri;
-        // rather simple option, more needed? 
-        if (!"file".equals(uri.getScheme())) {
-            try {
-                URL url = uri.toURL();
-                InputStream in = url.openStream();
-                File f;
-                if (null == dir) {
-                    f = File.createTempFile("iip", ".jar");
-                } else {
-                    String path = uri.getPath();
-                    int pos = path.lastIndexOf("/");
-                    if (pos > 0 && pos < path.length() - 1) {
-                        path = path.substring(pos + 1);
-                    }
-                    pos = path.lastIndexOf(".");
-                    String suffix = "";
-                    if (pos > 0) {
-                        suffix = path.substring(pos);
-                        path = path.substring(0, pos);
-                    }
-                    path += "-" + System.currentTimeMillis() + suffix;
-                    f = new File(dir, path);
-                }
-                Files.copy(in, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                result = f.toURI();
-            } catch (IOException e) {
-                throw new ExecutionException(e);
-            } 
-        }
-        return result;
     }
     
     /**

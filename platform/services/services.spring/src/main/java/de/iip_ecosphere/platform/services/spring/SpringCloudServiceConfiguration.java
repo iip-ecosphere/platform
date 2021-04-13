@@ -32,6 +32,7 @@ public class SpringCloudServiceConfiguration {
     private File downloadDir;
     private String descriptorName = "deployment.yml";
     private int waitingTime = 30000;
+    private int availabilityRetryDelay = 500;
 
     /**
      * Returns the name of the broker host.
@@ -88,6 +89,15 @@ public class SpringCloudServiceConfiguration {
     }
     
     /**
+     * Returns the delay between two availability checks.
+     * 
+     * @return the retry delay in ms
+     */
+    public int getAvailabilityRetryDelay() {
+        return availabilityRetryDelay;
+    }
+    
+    /**
      * Defines the name of the broker host. [required by Spring]
      * 
      * @param brokerHost the host name 
@@ -124,7 +134,7 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Defines the name of the descriptor file to load from an artifact.
+     * Defines the name of the descriptor file to load from an artifact. [required by Spring]
      * 
      * @param descriptorName the name of the descriptor file (ignored if <b>null</b> or empty)
      */
@@ -135,12 +145,21 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Defines the waiting time for longer operations, e.g., deploying a service.
+     * Defines the waiting time for longer operations, e.g., deploying a service. [required by Spring]
      * 
      * @param waitingTime the waiting time in ms
      */
     public void setWaitingTime(int waitingTime) {
         this.waitingTime = waitingTime;
+    }
+
+    /**
+     * Changes the delay between two availability checks.
+     * 
+     * @param availabilityRetryDelay the retry delay in ms
+     */
+    public void setAvailabilityRetryDelay(int availabilityRetryDelay) {
+        this.availabilityRetryDelay = availabilityRetryDelay;
     }
 
 }

@@ -90,7 +90,7 @@ public class TestServiceManager {
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
-        oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
         oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof ServicesAas);
         
@@ -126,13 +126,7 @@ public class TestServiceManager {
 
             /*@Override
             public void testDescriptor(ArtifactDescriptor aDesc) {
-                SpringCloudServiceDescriptor inputService = 
-                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-create");
-                SpringCloudServiceDescriptor outputService = 
-                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-log");
-                
-                inputService.get
-                
+                // more specific tests may go here
             }*/
 
         });
@@ -150,13 +144,7 @@ public class TestServiceManager {
 
             /*@Override
             public void testDescriptor(ArtifactDescriptor aDesc) {
-                SpringCloudServiceDescriptor inputService = 
-                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-create");
-                SpringCloudServiceDescriptor outputService = 
-                    (SpringCloudServiceDescriptor) aDesc.getService("simpleStream-log");
-                
-                inputService.get
-                
+                // more specific tests may go here
             }*/
 
         });
