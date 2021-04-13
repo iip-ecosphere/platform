@@ -19,13 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 /**
  * The lifecycle descriptor for the spring cloud service manager. Requires service management implementation and AAS 
@@ -72,21 +66,6 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
             System.out.println("IIP-Ecosphere Service Manager (Spring Cloud Streams).");
             System.out.println("Configuration: " + SpringInstances.getConfig().getClass().getName());
             System.out.println("Deployer: " + SpringInstances.getDeployer().getClass().getName());
-            if (AasFactory.isFullInstance()) {
-                AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
-                AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
-                AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
-                
-                // active AAS require two server instances and a deployment
-                Server implServer = res.getProtocolServerBuilder().build();
-                implServer.start();
-                // TODO remote deployment, destination to be defined via JAML/AasPartRegistry
-                Server aasServer = AasPartRegistry.deploy(res.getAas()); 
-                aasServer.start();
-            } else {
-                System.out.println("No full AAS implementation registered. Cannot build up Services AAS. Please add an "
-                    + "appropriate dependency.");
-            }
         };
     }
     

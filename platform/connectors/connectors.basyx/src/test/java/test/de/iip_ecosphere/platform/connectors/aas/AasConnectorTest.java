@@ -64,7 +64,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
     private static final ServerAddress AAS_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-    private static final Endpoint REGISTRY = new Endpoint(AAS_SERVER, "registry");
+    private static final Endpoint REGISTRY = new Endpoint(AAS_SERVER, AasPartRegistry.DEFAULT_ENDPOINT);
     
     private static Server platformAasServer;
     private static Server httpServer;

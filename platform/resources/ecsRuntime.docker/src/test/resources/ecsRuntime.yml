@@ -1,0 +1,1 @@
+dockerHost: unix:///var/run/docker.sock

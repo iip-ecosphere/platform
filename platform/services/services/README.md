@@ -13,3 +13,6 @@ Contains a startup program for running the service manager in standalone mode, e
 setup Requires service management implementation and AAS implementation to be hooked in properly via JSL. Depending on 
 the setup, also requires a proper setup of the network manager via JSL. Intended to be called from a separate project 
 with adequate dependencies.
+
+## Missing
+* ECS Monitoring
