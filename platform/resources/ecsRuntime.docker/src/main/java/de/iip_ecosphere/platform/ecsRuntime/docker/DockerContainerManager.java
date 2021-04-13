@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -31,10 +32,10 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
+import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-//import de.iip_ecosphere.platform.services.Version;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -67,7 +68,21 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
-        return null; // TODO implement, use super.addContainer(id, descriptor)
+        // ---> TODO read the id, name and version from yaml file
+        String id = "";
+        String name = "";
+        Version version = new Version("");
+        // <---- 
+        
+        // TODO unpack docker image
+        DockerClient dockerClient = getDockerClient();
+        dockerClient.createContainerCmd(name);
+        // TODO get docker id and state of a new container and save it in the descriptor
+        // TODO maybe new constructor for descriptor
+        DockerContainerDescriptor descriptor = new DockerContainerDescriptor(id, name, version);
+        descriptor.setState(ContainerState.AVAILABLE);
+        super.addContainer(id, descriptor);
+        return null; 
     }
     
     /**
@@ -88,16 +103,24 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public void startContainer(String id) throws ExecutionException {
-        DockerClient dockerClient = getDockerClient();     
-        dockerClient.startContainerCmd(id).exec();
-        setState(getContainer(id, "id", "start"), ContainerState.DEPLOYED);
+        DockerContainerDescriptor container = super.getContainer(id, "id", "start");
+        String dockerId = container.getDockerId(); // TODO check if dockerId not null
+        
+        DockerClient dockerClient = getDockerClient();
+        dockerClient.startContainerCmd(dockerId).exec();
+        
+        String dockerState = ""; // TODO get docker state using docker id
+        ContainerState state = convertDockerContainerState(dockerState);
+        setState(container, state);
     }
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
+        /*
         DockerClient dockerClient = getDockerClient();     
         dockerClient.stopContainerCmd(id).exec();     
         setState(getContainer(id, "id", "stop"), ContainerState.STOPPED);
+        */
     }
 
     @Override
@@ -108,19 +131,22 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
+        /*
         super.undeployContainer(id);
         DockerClient dockerClient = getDockerClient();
         dockerClient.removeContainerCmd(id).exec();          
         setState(getContainer(id, "id", "undeploy"), ContainerState.UNKNOWN);
+        */
     }
 
     @Override
     public void updateContainer(String id, URI location) throws ExecutionException {
-        // TODO implement        
+        // TODO implement (compare version)
     }
 
     @Override
     public ContainerState getState(String id) {
+        /*
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         for (DockerContainerDescriptor container : containers) {
             String containerId = container.getId();
@@ -128,17 +154,20 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 return container.getState();
             }
         }
+        */
         return null;
     }
 
     @Override
     public Set<String> getIds() {
+        /*
         Set<String> ids = new HashSet<String>();
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         for (DockerContainerDescriptor container : containers) {
             ids.add(container.getId());
         }
-        return ids;
+        */
+        return null;
     }
     
     /**
@@ -166,7 +195,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         case "Exited":
             state = ContainerState.STOPPED;
             break;
-        case "Created":
+        case "Created": // TODO not sure about this
             state = ContainerState.DEPLOYED;
             break;
         default :
@@ -178,8 +207,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public Collection<DockerContainerDescriptor> getContainers() {
-        List<DockerContainerDescriptor> containers = new ArrayList<DockerContainerDescriptor>();
+        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) super.getContainers();
         
+        /*
         Runtime rt = Runtime.getRuntime();
         String command = "docker container ls -a";
         try {
@@ -211,7 +241,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 String dockerState = line.substring(90, 117).trim();
                 ContainerState state = convertDockerContainerState(dockerState);
                 String conName = line.substring(138, lineLength).trim();
-                Version version = new Version("1.0"); // TODO using default version for now
+                Version version = new Version("1.0"); // TODO using default version for now (Info aus Datei)
                 
                 DockerContainerDescriptor containerDescriptor = new DockerContainerDescriptor(id, conName, version);
                 containerDescriptor.setState(state);
@@ -220,16 +250,18 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             }
             // Read any errors from the attempted command
             while ((line = stdError.readLine()) != null) {
-                System.out.println(line);
+                System.out.println(line);Map<String, C> containers
             }
         } catch (IOException e) {
             System.out.println(e);
         }
+        */
         return containers;
     }
 
     @Override
     public DockerContainerDescriptor getContainer(String id) {
+        /*
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
         int containerNumber = containers.size();
         for (int i = 0; i < containerNumber; i++) {
@@ -239,18 +271,28 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 return container;
             }
         }
+        */
         return null;
     }
 
     @Override
     public String getContainerSystemName() {
-        // TODO is es ok so?
         return "Docker";
     }
 
     @Override
     public String getContainerSystemVersion() {
-        // TODO implement
+        // TODO implement (engine version)
         return null;
+    }
+    /**
+     * sss.
+     * @param args
+     */
+    public static void main(String[] args) {
+        FactoryDescriptor factory = new FactoryDescriptor();
+        DockerContainerManager manager = (DockerContainerManager) factory.createContainerManagerInstance();
+        
+        System.out.println("kakak: " + manager.getIds());
     }
 }
