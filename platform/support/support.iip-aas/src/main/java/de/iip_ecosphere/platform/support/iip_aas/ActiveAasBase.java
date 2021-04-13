@@ -86,9 +86,9 @@ public class ActiveAasBase {
                     Submodel submodel = aas.getSubmodel(subId);
                     if (null != submodel) {
                         if (NotificationMode.SYNCHRONOUS == mode) {
-                            exec.execute(() -> processor.process(submodel, aas));
-                        } else {
                             processor.process(submodel, aas);
+                        } else {
+                            exec.execute(() -> processor.process(submodel, aas));
                         }
                     }
                 } else {
