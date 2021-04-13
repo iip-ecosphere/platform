@@ -55,7 +55,7 @@ public class EcsAasTest {
     public void testAas() throws IOException, ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(EcsAas.class));
-        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, "registry"));
+        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
         ServerAddress oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof EcsAas);
         
