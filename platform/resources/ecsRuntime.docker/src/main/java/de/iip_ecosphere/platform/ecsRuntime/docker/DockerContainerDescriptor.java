@@ -22,7 +22,8 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * @author Monika Staciwa, SSE
  */
 public class DockerContainerDescriptor extends AbstractContainerDescriptor {
-
+     
+    private String dockerId;
     /**
      * Creates a container descriptor instance.
      * 
@@ -34,20 +35,17 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     protected DockerContainerDescriptor(String id, String name, Version version) {
         super(id, name, version);
     }
-    /**
-     * TODO.
-     * @param state
-     */
-    public void callSetState(ContainerState state) {
-        super.setState(state);
-    }
-    
     
     @Override
     public void setState(ContainerState state) {
         super.setState(state);
     }
-
-
-
+    
+    /**
+     *  TODO doc.
+     * @return Docker id
+     */
+    public String getDockerId() {
+        return this.dockerId;
+    }
 }
