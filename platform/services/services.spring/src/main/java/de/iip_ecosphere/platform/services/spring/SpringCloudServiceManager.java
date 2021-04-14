@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
@@ -72,6 +73,11 @@ public class SpringCloudServiceManager
         @Override
         public ServiceManager createInstance() {
             return new SpringCloudServiceManager();
+        }
+
+        @Override
+        public AasSetup getAasSetup() {
+            return SpringInstances.getConfig().getAas();
         }
         
     }

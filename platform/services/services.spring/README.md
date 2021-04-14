@@ -67,12 +67,13 @@ process is already started (default is `false`), e.g., in case of a database.
 
 Also the service manager itself can be configured via the ``application.yml``, i.e., with this extension Spring execution concepts are/must be added to the containing component.
 
-Currently, the following properties can be configured:
-* `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000`). `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker, e.g., a MQTT broker. `deleteArtifacts` allows the service manager to delete downloaded artifacts.
+In addition to the basic AAS settings, the following properties can be configured:
+* `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000` ms). `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms). `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker, e.g., a MQTT broker. `deleteArtifacts` allows the service manager to delete downloaded artifacts.
 * `cloud.deployer.local` refers to the underlying mechanism of Spring Cloud Stream. Service artifacts and their working directory may be temporary if not configured or in a given folder. These files may be deleted automatically on exit or remain in the folder. Both settings are helpful for debugging.
 
     service-mgr:
       waitingTime: <Integer>
+      availabilityRetryDelay: <Integer>
       brokerHost: <String>
       brokerPort: <Integer>
       deleteArtifacts: <Boolean>
