@@ -18,6 +18,8 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+
 /**
  * Provides access to the service manager instance.
  * 
@@ -26,8 +28,24 @@ import org.slf4j.LoggerFactory;
 public class ServiceFactory {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class.getName());
+    private static ServiceFactoryDescriptor desc;
     private static ServiceManager manager = null;
 
+    /**
+     * Initializes this factory.
+     */
+    private static void init() {
+        if (null == desc) {
+            ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
+            Optional<ServiceFactoryDescriptor> first = loader.findFirst();
+            if (first.isPresent()) {
+                desc = first.get();
+            } else {
+                LOGGER.error("No Service manager implementation known.");
+            }
+        }
+    }
+    
     /**
      * Returns the service manager.
      * 
@@ -35,18 +53,31 @@ public class ServiceFactory {
      */
     public static ServiceManager getServiceManager() {
         if (null == manager) {
-            ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
-            Optional<ServiceFactoryDescriptor> first = loader.findFirst();
-            if (first.isPresent()) {
-                manager = first.get().createInstance();
+            init();
+            if (null != desc) {
+                manager = desc.createInstance();
                 if (null != manager) {
-                    LOGGER.warn("Service manager implementation registered: " + manager.getClass().getName());
+                    LOGGER.info("Service manager implementation registered: " + manager.getClass().getName());
                 }
-            } else {
-                LOGGER.error("No Service manager implementation known.");
             }
         }
         return manager;
+    }
+    
+    /**
+     * Returns the actual AAS setup for the implementing service manager.
+     * 
+     * @return the AAS setup
+     */
+    static AasSetup getAasSetup() {
+        AasSetup result;
+        init();
+        if (null != desc) {
+            result = desc.getAasSetup();
+        } else {
+            result = new AasSetup();
+        }
+        return result;
     }
 
 }
