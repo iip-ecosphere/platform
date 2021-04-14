@@ -20,6 +20,8 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+
 /**
  * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add
  * their specific configuration settings. Subclasses must have a no-arg constructor and getters/setters for all
@@ -28,6 +30,26 @@ import org.yaml.snakeyaml.error.YAMLException;
  * @author Holger Eichelberger, SSE
  */
 public class Configuration {
+    
+    private AasSetup aas = new AasSetup();
+    
+    /**
+     * Returns the AAS setup.
+     * 
+     * @return the AAS setup
+     */
+    public AasSetup getAas() {
+        return aas;
+    }
+    
+    /**
+     * Defines the AAS setup.
+     * 
+     * @param aas the AAS setup
+     */
+    public void setAas(AasSetup aas) {
+        this.aas = aas;
+    }
 
     /**
      * Reads a {@link Configuration} instance from the root folder of the jar. [public for testing] 

@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
+import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 
 /**
@@ -26,6 +27,11 @@ public class MyEcsFactoryDescriptor implements EcsFactoryDescriptor {
     @Override
     public MyContainerManager createContainerManagerInstance() {
         return new MyContainerManager();
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return new Configuration();
     }
 
 }

@@ -26,7 +26,23 @@ import org.slf4j.LoggerFactory;
 public class EcsFactory {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(EcsFactory.class.getName());
+    private static EcsFactoryDescriptor desc;
     private static ContainerManager manager = null;
+
+    /**
+     * Initializes this factory.
+     */
+    private static void init() {
+        if (null == desc) {
+            ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
+            Optional<EcsFactoryDescriptor> first = loader.findFirst();
+            if (first.isPresent()) {
+                desc = first.get();
+            } else {
+                LOGGER.error("No Container manager implementation known.");
+            }
+        }
+    }
 
     /**
      * Returns the service manager.
@@ -35,18 +51,31 @@ public class EcsFactory {
      */
     public static ContainerManager getContainerManager() {
         if (null == manager) {
-            ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
-            Optional<EcsFactoryDescriptor> first = loader.findFirst();
-            if (first.isPresent()) {
-                manager = first.get().createContainerManagerInstance();
+            init();
+            if (null != desc) {
+                manager = desc.createContainerManagerInstance();
                 if (null != manager) {
-                    LOGGER.warn("Container manager implementation registered: " + manager.getClass().getName());
+                    LOGGER.info("Container manager implementation registered: " + manager.getClass().getName());
                 }
-            } else {
-                LOGGER.error("No Container manager implementation known.");
             }
         }
         return manager;
+    }
+
+    /**
+     * Returns the actual configuration instance for the implementing container manager.
+     * 
+     * @return the configuration instance
+     */
+    static Configuration getConfiguration() {
+        Configuration result;
+        init();
+        if (null != desc) {
+            result = desc.getConfiguration();
+        } else {
+            result = new Configuration();
+        }
+        return result;
     }
 
 }

@@ -25,5 +25,12 @@ public interface EcsFactoryDescriptor {
      * @return the instance
      */
     public ContainerManager createContainerManagerInstance();
+    
+    /**
+     * Returns the configuration instance.
+     * 
+     * @return the configuration
+     */
+    public Configuration getConfiguration();
 
 }
