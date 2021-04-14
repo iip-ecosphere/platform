@@ -33,6 +33,8 @@ import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelPare
  */
 public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements BaSyxSubmodelParent {
 
+    private BaSyxRegistry registry;
+    
     /**
      * Builder for {@code BaSyxAas}.
      * 
@@ -96,6 +98,9 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
             if (null == instance.getSubmodel(submodel.getIdShort())) {
                 instance.getAas().addSubModel(submodel.getSubmodel());
                 instance.register(submodel);
+                if (null != instance.registry) {
+                    instance.registry.createSubmodel(instance, submodel);
+                }
             }
             return submodel;
         }
@@ -168,8 +173,17 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         setAsset(asset);
         IAsset a = asset.getAsset();
         getAas().setAsset((Asset) a);
-        // reference is needed for Reading back AASX; works also without setAsset; unclear wether both ar needed
+        // reference is needed for Reading back AASX; works also without setAsset; unclear whether both are needed
         getAas().setAssetReference((Reference) a.getReference()); 
+    }
+
+    /**
+     * Sets the registry as part of a remote deployment process to {@code registry}.
+     * 
+     * @param registry the registry instance
+     */
+    void registerRegistry(BaSyxRegistry registry) {
+        this.registry = registry;
     }
 
     @Override

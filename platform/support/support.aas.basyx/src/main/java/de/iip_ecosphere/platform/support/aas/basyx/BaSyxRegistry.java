@@ -87,7 +87,9 @@ public class BaSyxRegistry implements Registry {
         if (!(aas instanceof BaSyxAas)) {
             throw new IllegalArgumentException("The aas must be created by the AasFactory.");
         }
-        manager.createAAS(((BaSyxAas) aas).getAas(), endpointURL);
+        BaSyxAas a = (BaSyxAas) aas;
+        a.registerRegistry(this);
+        manager.createAAS(a.getAas(), endpointURL);
     }
 
     @Override
@@ -98,7 +100,6 @@ public class BaSyxRegistry implements Registry {
         if (!(submodel instanceof BaSyxSubmodel)) {
             throw new IllegalArgumentException("The submodel must be created by the AasFactory.");
         }
-        
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
         manager.createSubModel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
     }
