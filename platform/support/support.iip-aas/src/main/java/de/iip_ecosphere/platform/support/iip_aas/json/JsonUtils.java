@@ -15,8 +15,8 @@ package de.iip_ecosphere.platform.support.iip_aas.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 
 /**
  * Some JSON utility methods, also reading/writing of specific types.
@@ -24,88 +24,6 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  * @author Holger Eichelberger, SSE
  */
 public class JsonUtils {
-
-    /**
-     * A proxy for {@link ServerAddress} as we do not want to have setters there.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class ServerAddressHolder {
-        private int port;
-        private String host;
-        private Schema schema;
-
-        /**
-         * Creates an instance (deserialization).
-         */
-        protected ServerAddressHolder() {
-        }
-
-        /**
-         * Creates an instance from a given instance (serialization).
-         * 
-         * @param addr the instance to take data from
-         */
-        protected ServerAddressHolder(ServerAddress addr) {
-            port = addr.getPort();
-            host = addr.getHost();
-            schema = addr.getSchema();
-        }
-        
-        /**
-         * Returns the port value.
-         * 
-         * @return the port
-         */
-        public int getPort() {
-            return port;
-        }
-        
-        /**
-         * Defines the {@link #port} value.
-         * 
-         * @param port the new value of {@link #port}
-         */
-        public void setPort(int port) {
-            this.port = port;
-        }
-        
-        /**
-         * Returns the host value.
-         * 
-         * @return the host
-         */
-        public String getHost() {
-            return host;
-        }
-        
-        /**
-         * Defines the {@link #host} value.
-         * 
-         * @param host the new value of {@link #host}
-         */
-        public void setHost(String host) {
-            this.host = host;
-        }
-        
-        /**
-         * Returns the schema value.
-         * 
-         * @return the schema
-         */
-        public Schema getSchema() {
-            return schema;
-        }
-
-        /**
-         * Defines the {@link #schema} value.
-         * 
-         * @param schema the new value of {@link #schema}
-         */
-        public void setSchema(Schema schema) {
-            this.schema = schema;
-        }
-    }
 
     /**
      * Reads a {@link ServerAddress} from a JSON string.
