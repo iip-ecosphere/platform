@@ -22,6 +22,9 @@ package de.iip_ecosphere.platform.support;
  * @author Holger Eichelberger, SSE
  */
 public interface LifecycleDescriptor {
+
+    public static final int INIT_PRIORITY = 1;
+    public static final int AAS_PRIORITY = 100;
     
     // Java Service Loading, do not change class name/package!
     
@@ -45,4 +48,11 @@ public interface LifecycleDescriptor {
      */
     public Thread getShutdownHook();
 
+    /**
+     * Returns a numeric priority to establish an order of lifecycle descriptors.
+     * 
+     * @return a numeric priority
+     */
+    public int priority();
+    
 }

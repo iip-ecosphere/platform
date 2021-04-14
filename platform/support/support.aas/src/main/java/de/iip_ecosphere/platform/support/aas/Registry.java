@@ -51,8 +51,9 @@ public interface Registry {
     public void createAas(Aas aas, String endpointURL);
 
     /**
-     * Creates a submodel for the specified asset. In other words, deploys {@code submodel} into the endpoint of 
-     * {@code aas}.
+     * Creates a submodel for the specified stand-alone submodel (as created by 
+     * {@link AasFactory#createSubmodelBuilder(String, String)}. In other words, deploys {@code submodel} into the 
+     * endpoint of {@code aas}.
      * 
      * @param aas the hosting AAS
      * @param submodel the submodel to deploy

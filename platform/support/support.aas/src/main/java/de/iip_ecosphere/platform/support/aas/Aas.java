@@ -33,7 +33,9 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
 
         /**
          * Creates a builder for a contained sub-model. Calling this method again with the same name shall
-         * lead to a builder that allows for modifying the sub-model.
+         * lead to a builder that allows for modifying the sub-model. If the parent AAS was deployed before via 
+         * {@link Registry#createAas(Aas, String)}, the {@link SubmodelBuilder#build()} will automatically deploy
+         * this submodel into the parent AAS via the parent registry.
          * 
          * @param idShort the short id of the sub-model
          * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on

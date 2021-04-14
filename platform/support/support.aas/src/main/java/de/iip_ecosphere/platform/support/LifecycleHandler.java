@@ -57,7 +57,10 @@ public class LifecycleHandler {
      * @param consumer the consumer
      */
     private static void forEach(Consumer<LifecycleDescriptor> consumer) {
-        ServiceLoader.load(LifecycleDescriptor.class).forEach(consumer);
+        ServiceLoader.load(LifecycleDescriptor.class)
+            .stream()
+            .sorted((d1, d2) -> Integer.compare(d1.get().priority(), d2.get().priority()))
+            .forEach(d -> consumer.accept(d.get()));
     }
     
     /**

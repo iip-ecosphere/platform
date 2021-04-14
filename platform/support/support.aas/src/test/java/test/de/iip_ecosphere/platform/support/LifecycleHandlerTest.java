@@ -57,6 +57,11 @@ public class LifecycleHandlerTest {
             shutdownHookCount++;
             return null;
         }
+
+        @Override
+        public int priority() {
+            return INIT_PRIORITY;
+        }
         
     }
 
@@ -82,6 +87,11 @@ public class LifecycleHandlerTest {
         public Thread getShutdownHook() {
             shutdownHookCount++;
             return new Thread(() -> { shutdownHookCalledCount++; } ); // anyway too late to assert
+        }
+
+        @Override
+        public int priority() {
+            return AAS_PRIORITY;
         }
         
     }

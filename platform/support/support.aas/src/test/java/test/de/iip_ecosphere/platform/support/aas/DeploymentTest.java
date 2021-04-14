@@ -270,12 +270,20 @@ public class DeploymentTest {
         reg.createAas(aas, serverEp.toUri());
 
         // Create/Push the docuSubmodel to the cloud
+        // first variant: factory-based standalone submodel assigned to AAS
         final String smUrn = "urn:::AAS:::ovenDoc#";
         SubmodelBuilder smB = factory.createSubmodelBuilder("oven_doc", smUrn);
         smB.createPropertyBuilder("max_temp").setValue(1000).build();
         reg.createSubmodel(aas, smB.build());
-
-        assertRemoteAas(regEp, aasUrn, smUrn);
+        
+        // second variant: AAS-based submodel, registry is known through AAS
+        final String smUrn2 = "urn:::AAS:::ovenDoc2#";
+        smB = aas.createSubmodelBuilder("oven_doc2", smUrn2);
+        smB.createPropertyBuilder("max_temp").setValue(1000).build();
+        smB.build();
+        
+        assertRemoteAas(regEp, aasUrn, "oven_doc", smUrn);
+        assertRemoteAas(regEp, aasUrn, "oven_doc2", smUrn2);
 
         cloudServer.stop(true);
         regServer.stop(true);
@@ -284,12 +292,13 @@ public class DeploymentTest {
     /**
      * Asserts the remote AAS created by {@link #remoteAasDeploymentTest()}.
      * 
-     * @param regEp the registry enpoint
+     * @param regEp the registry endpoint
      * @param aasUrn the AAS URN
+     * @param submName the name of the submodel to assert for
      * @param smUrn the submodel URN
      * @throws IOException in case that obtaining the registry/receiving the AAS fails
      */
-    private void assertRemoteAas(Endpoint regEp, String aasUrn, String smUrn) throws IOException {
+    private void assertRemoteAas(Endpoint regEp, String aasUrn, String submName, String smUrn) throws IOException {
         // could use reg from above, "simulate" access from other location
         Registry reg = AasFactory.getInstance().obtainRegistry(regEp);
         Aas aas = reg.retrieveAas(aasUrn);
@@ -297,7 +306,7 @@ public class DeploymentTest {
         Assert.assertEquals("oven", aas.getIdShort());
         Submodel sm = reg.retrieveSubmodel(aasUrn, smUrn);
         Assert.assertNotNull(sm);
-        Assert.assertEquals("oven_doc", sm.getIdShort());
+        Assert.assertEquals(submName, sm.getIdShort());
         Assert.assertNotNull(sm.getProperty("max_temp"));
     }
 
