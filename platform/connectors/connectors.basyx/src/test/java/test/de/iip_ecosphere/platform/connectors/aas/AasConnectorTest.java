@@ -29,7 +29,6 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorRegistry;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -42,6 +41,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
@@ -64,12 +64,13 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
     private static final ServerAddress AAS_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-    private static final Endpoint REGISTRY = new Endpoint(AAS_SERVER, AasPartRegistry.DEFAULT_ENDPOINT);
+    private static final Endpoint REGISTRY = new Endpoint(AAS_SERVER, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
     
     private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
     private static NotificationMode oldNotificationMode;
+    private static AasSetup oldSetup;
     
     /**
      * Creates an instance of this test.
@@ -90,8 +91,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         
-        AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_HOST, 
-            NetUtils.getEphemeralPort(), AasPartRegistry.DEFAULT_ENDPOINT));
+        oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
         // we don't start all active AAS here as we do not need them for this test
         AasBuildResult bResult = AasPartRegistry.build(d -> d.getKind() != Kind.ACTIVE);
         Server implServer = bResult.getProtocolServerBuilder().build();
@@ -126,7 +126,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         LOGGER.info("Platform/AAS server stopped");
         platformAasServer.stop(true);
 
-        AasPartRegistry.setAasEndpoint(AasPartRegistry.DEFAULT_EP);
+        AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldNotificationMode);
     }
     
