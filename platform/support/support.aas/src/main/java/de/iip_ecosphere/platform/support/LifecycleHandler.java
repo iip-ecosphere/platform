@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
@@ -29,14 +31,14 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
-        forEach(l -> l.startup(args));
+        forEach(l -> l.startup(args), false);
     }
 
     /**
      * Calls {@link LifecycleDescriptor#shutdown()} on all known descriptors.
      */
     public static void shutdown() {
-        forEach(l -> l.shutdown());
+        forEach(l -> l.shutdown(), true);
     }
 
     /**
@@ -48,19 +50,23 @@ public class LifecycleHandler {
             if (null != t) {
                 Runtime.getRuntime().addShutdownHook(t);
             }
-        });
+        }, true);
     }
 
     /**
      * Utility method to execute {@code consumer} on all currently known {@link LifecycleDescriptor descriptors}.
      * 
      * @param consumer the consumer
+     * @param revert revert the sorting, i.e., lowest priority first
      */
-    private static void forEach(Consumer<LifecycleDescriptor> consumer) {
-        ServiceLoader.load(LifecycleDescriptor.class)
-            .stream()
-            .sorted((d1, d2) -> Integer.compare(d1.get().priority(), d2.get().priority()))
-            .forEach(d -> consumer.accept(d.get()));
+    private static void forEach(Consumer<LifecycleDescriptor> consumer, boolean revert) {
+        List<LifecycleDescriptor> desc = CollectionUtils.toList(
+            ServiceLoader.load(LifecycleDescriptor.class).iterator());
+        int factor = revert ? -1 : 1;
+        Collections.sort(desc, (d1, d2) -> factor * Integer.compare(d1.priority(), d2.priority()));
+        for (LifecycleDescriptor d : desc) {
+            consumer.accept(d);
+        }
     }
     
     /**
