@@ -36,11 +36,11 @@ public class ServiceLoaderUtils {
     public static <D> Optional<D> filterExcluded(Class<D> descriptorClass) {
         ServiceLoader<D> loader = ServiceLoader.load(descriptorClass);
         // in test settings, the fake descriptor may also be there - filter it out
-        List<D> tmp = CollectionUtils.toList(loader.iterator());
+        List<D> tmp = CollectionUtils.toList(loader.iterator()); // JDK 1.8
         Optional<D> first = tmp.stream()
             .filter(d -> !hasExcludeFirst(d))
             .findFirst();
-        if (first.isEmpty()) {
+        if (!first.isPresent()) { // JDK 1.8
             first = loader.findFirst();
         }
         return first;

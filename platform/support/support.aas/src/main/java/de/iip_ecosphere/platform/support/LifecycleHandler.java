@@ -61,7 +61,7 @@ public class LifecycleHandler {
      */
     private static void forEach(Consumer<LifecycleDescriptor> consumer, boolean revert) {
         List<LifecycleDescriptor> desc = CollectionUtils.toList(
-            ServiceLoader.load(LifecycleDescriptor.class).iterator());
+            ServiceLoader.load(LifecycleDescriptor.class).iterator()); // JDK 1.8
         int factor = revert ? -1 : 1;
         Collections.sort(desc, (d1, d2) -> factor * Integer.compare(d1.priority(), d2.priority()));
         for (LifecycleDescriptor d : desc) {
