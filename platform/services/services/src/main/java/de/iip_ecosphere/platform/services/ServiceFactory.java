@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Provides access to the service manager instance.
@@ -37,7 +38,7 @@ public class ServiceFactory {
     private static void init() {
         if (null == desc) {
             ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
-            Optional<ServiceFactoryDescriptor> first = loader.findFirst();
+            Optional<ServiceFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
             if (first.isPresent()) {
                 desc = first.get();
             } else {

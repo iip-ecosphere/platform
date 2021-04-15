@@ -18,6 +18,8 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+
 /**
  * Provides access to the ECS instances.
  * 
@@ -35,7 +37,7 @@ public class EcsFactory {
     private static void init() {
         if (null == desc) {
             ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
-            Optional<EcsFactoryDescriptor> first = loader.findFirst();
+            Optional<EcsFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
             if (first.isPresent()) {
                 desc = first.get();
             } else {
