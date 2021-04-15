@@ -12,9 +12,10 @@
 
 package de.iip_ecosphere.platform.support.jsl;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 
@@ -36,14 +37,40 @@ public class ServiceLoaderUtils {
     public static <D> Optional<D> filterExcluded(Class<D> descriptorClass) {
         ServiceLoader<D> loader = ServiceLoader.load(descriptorClass);
         // in test settings, the fake descriptor may also be there - filter it out
-        List<D> tmp = CollectionUtils.toList(loader.iterator()); // JDK 1.8
-        Optional<D> first = tmp.stream()
+        Optional<D> first = stream(loader)
             .filter(d -> !hasExcludeFirst(d))
             .findFirst();
         if (!first.isPresent()) { // JDK 1.8
-            first = loader.findFirst();
+            first = findFirst(loader);
         }
         return first;
+    }
+
+    /**
+     * Load the first available service provider of the given {@code loader}'s service. [JDK 1.8 compatibility]
+     *
+     * @param <D> the service descriptor type
+     * @param loader the loader instance
+     * @return the first service provider
+     */
+    public static <D> Optional<D> findFirst(ServiceLoader<D> loader) {
+        Iterator<D> iterator = loader.iterator();
+        if (iterator.hasNext()) {
+            return Optional.of(iterator.next());
+        } else {
+            return Optional.empty();
+        }
+    }
+    
+    /**
+     * Turns the service loader into a stream. [JDK 1.8 compatibility]
+     * 
+     * @param <D> the service descriptor type
+     * @param loader the loader instance
+     * @return the stream of descriptor
+     */
+    public static <D> Stream<D> stream(ServiceLoader<D> loader) {
+        return CollectionUtils.toList(loader.iterator()).stream(); // JDK 1.8
     }
     
     /**
