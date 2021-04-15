@@ -12,8 +12,11 @@
 
 package de.iip_ecosphere.platform.support.jsl;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+
+import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * Helper functions for Java Service Loading.
@@ -33,8 +36,8 @@ public class ServiceLoaderUtils {
     public static <D> Optional<D> filterExcluded(Class<D> descriptorClass) {
         ServiceLoader<D> loader = ServiceLoader.load(descriptorClass);
         // in test settings, the fake descriptor may also be there - filter it out
-        Optional<D> first = loader.stream()
-            .map(p -> p.get())
+        List<D> tmp = CollectionUtils.toList(loader.iterator());
+        Optional<D> first = tmp.stream()
             .filter(d -> !hasExcludeFirst(d))
             .findFirst();
         if (first.isEmpty()) {
