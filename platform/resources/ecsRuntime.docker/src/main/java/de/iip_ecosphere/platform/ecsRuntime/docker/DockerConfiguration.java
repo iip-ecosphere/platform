@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import java.io.IOException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 
 /**
@@ -48,8 +50,15 @@ public class DockerConfiguration extends Configuration {
      *
      * @return configuration instance
      */
-    public static DockerConfiguration readFromYaml() throws IOException {
-        return Configuration.readFromYaml(DockerConfiguration.class);
+    public static DockerConfiguration readFromYaml() {
+        DockerConfiguration result;
+        try {
+            return Configuration.readFromYaml(DockerConfiguration.class);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(DockerConfiguration.class).error("Reading configuration: " + e.getMessage());
+            result = new DockerConfiguration();
+        }
+        return result;
     }
     
 }

@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+
 /**
  * A factory descriptor for Java Service loading.
  * 
@@ -26,4 +28,11 @@ public interface ServiceFactoryDescriptor {
      */
     public ServiceManager createInstance();
 
+    /**
+     * Returns the AAS setup.
+     * 
+     * @return the setup
+     */
+    public AasSetup getAasSetup();
+    
 }

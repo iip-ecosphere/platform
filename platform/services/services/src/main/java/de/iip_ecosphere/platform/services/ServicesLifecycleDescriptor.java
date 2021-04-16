@@ -12,47 +12,20 @@
 
 package de.iip_ecosphere.platform.services;
 
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 
 /**
  * Implements the generic lifecycle descriptor for the service manager.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServicesLifecycleDescriptor implements LifecycleDescriptor {
+public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
 
-    @Override
-    public void startup(String[] args) {
-        if (AasFactory.isFullInstance()) {
-            AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
-            AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
-            AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
-            
-            // active AAS require two server instances and a deployment
-            Server implServer = res.getProtocolServerBuilder().build();
-            implServer.start();
-            // TODO remote deployment, destination to be defined via JAML/AasPartRegistry
-            Server aasServer = AasPartRegistry.deploy(res.getAas()); 
-            aasServer.start();
-        } else {
-            System.out.println("No full AAS implementation registered. Cannot build up Services AAS. Please add an "
-                + "appropriate dependency.");
-        }
+    /**
+     * Creates an instance for the service manager.
+     */
+    public ServicesLifecycleDescriptor() {
+        super("Services", () -> ServiceFactory.getAasSetup());
     }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @Override
-    public Thread getShutdownHook() {
-        return null;
-    }
-
+    
 }

@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -41,6 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
@@ -187,7 +191,7 @@ public class AasPartRegistryTest {
         Assert.assertNotNull(hashedAas.get(AasPartRegistry.NAME_AAS).getSubmodel("c1"));
         Assert.assertNotNull(hashedAas.get(NAME_MY_AAS).getSubmodel("c2"));
 
-        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
         // no impl server here, no real active aas
         Server server = AasPartRegistry.deploy(res.getAas()).start();
         Aas deployedAas = AasPartRegistry.retrieveIipAas();
@@ -214,7 +218,7 @@ public class AasPartRegistryTest {
         client.assertOp();
         
         server.stop(true);
-        AasPartRegistry.setAasEndpoint(oldEp);
+        AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldP);
     }
 
@@ -259,6 +263,100 @@ public class AasPartRegistryTest {
         list.add(AasFactory.getInstance().createAasBuilder("test2", "urn:::AAS:::test2#").build());
         Assert.assertNull(AasPartRegistry.getAas(list, ""));
         Assert.assertNotNull(AasPartRegistry.getAas(list, "test"));
+    }
+    
+    /**
+     * Configuration class for YAML test.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Configuration {
+
+        private String name = "";
+        private AasSetup aas = new AasSetup();
+
+        /**
+         * Returns the "name" of the configuration.
+         * 
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Defines the "name" of the configuration.
+         * 
+         * @param name the name
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+        /**
+         * Returns the AAS setup.
+         * 
+         * @return the AAS setup
+         */
+        public AasSetup getAas() {
+            return aas;
+        }
+
+        /**
+         * Defines the AAS setup.
+         * 
+         * @param aas the AAS setup
+         */
+        public void setAas(AasSetup aas) {
+            this.aas = aas;
+        }
+    }
+    
+    /**
+     * Tests configuration for {@link AasSetup}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testConfiguration() throws IOException {
+        Configuration config = null;
+        InputStream in = getClass().getResourceAsStream("/aasPartRegistry.yml");
+        if (in != null) {
+            try {        
+                Yaml yaml = new Yaml(new Constructor(Configuration.class));
+                config = yaml.load(in);
+                in.close();
+            } catch (YAMLException e) {
+                throw new IOException(e);
+            }
+        }
+
+        Assert.assertNotNull(config);
+        Assert.assertEquals("test", config.getName());
+
+        AasSetup setup = config.getAas();
+        Assert.assertNotNull(setup);
+        Assert.assertNotNull(setup.getServer());
+        Assert.assertNotNull(setup.getServerEndpoint());
+        Assert.assertNotNull(setup.getRegistry());
+        Assert.assertNotNull(setup.getRegistryEndpoint());
+        Assert.assertEquals("VAB", setup.getImplementationProtocol());
+        Assert.assertNotNull(setup.getImplementationServer());
+
+        Assert.assertEquals(Schema.HTTP, setup.getServer().getSchema());
+        Assert.assertEquals("here.de", setup.getServer().getHost());
+        Assert.assertEquals(9994, setup.getServer().getPort());
+        Assert.assertEquals("aas", setup.getServer().getPath());
+        
+        Assert.assertEquals(Schema.HTTP, setup.getRegistry().getSchema());
+        Assert.assertEquals("me.de", setup.getRegistry().getHost());
+        Assert.assertEquals(9995, setup.getRegistry().getPort());
+        Assert.assertEquals("registry", setup.getRegistry().getPath());
+        
+        Assert.assertEquals(Schema.TCP, setup.getImplementation().getSchema());
+        Assert.assertEquals("localhost", setup.getImplementation().getHost());
+        Assert.assertEquals(10220, setup.getImplementation().getPort());
+        Assert.assertEquals("VAB", setup.getImplementation().getProtocol());
     }
 
 }

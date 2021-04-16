@@ -17,6 +17,8 @@ import java.io.File;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+
 /**
  * Configures the service manager.
  * 
@@ -33,6 +35,7 @@ public class SpringCloudServiceConfiguration {
     private String descriptorName = "deployment.yml";
     private int waitingTime = 30000;
     private int availabilityRetryDelay = 500;
+    private AasSetup aas = new AasSetup();
 
     /**
      * Returns the name of the broker host.
@@ -96,7 +99,16 @@ public class SpringCloudServiceConfiguration {
     public int getAvailabilityRetryDelay() {
         return availabilityRetryDelay;
     }
-    
+
+    /**
+     * Returns the AAS setup.
+     * 
+     * @return the AAs setup
+     */
+    public AasSetup getAas() {
+        return aas;
+    }
+
     /**
      * Defines the name of the broker host. [required by Spring]
      * 
@@ -160,6 +172,15 @@ public class SpringCloudServiceConfiguration {
      */
     public void setAvailabilityRetryDelay(int availabilityRetryDelay) {
         this.availabilityRetryDelay = availabilityRetryDelay;
+    }
+
+    /**
+     * Defines the AAS setup.
+     * 
+     * @param aas the AAS setup
+     */
+    public void setAas(AasSetup aas) {
+        this.aas = aas;
     }
 
 }

@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+
 /**
  * Provides access to the network manager.
  * 
@@ -34,7 +36,7 @@ public class NetworkManagerFactory {
     public static NetworkManager getInstance() {
         if (null == instance) {
             ServiceLoader<NetworkManagerDescriptor> loader = ServiceLoader.load(NetworkManagerDescriptor.class);
-            Optional<NetworkManagerDescriptor> first = loader.findFirst();
+            Optional<NetworkManagerDescriptor> first = ServiceLoaderUtils.findFirst(loader);
             if (first.isPresent()) {
                 instance = first.get().createInstance();
                 if (null != instance) {

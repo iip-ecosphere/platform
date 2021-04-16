@@ -44,6 +44,11 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
         return null; // not needed
     }
     
+    @Override
+    public int priority() {
+        return INIT_PRIORITY;
+    }
+    
     /**
      * Brings the startup application listener into this context and fills {@link SpringInstances}.
      * 

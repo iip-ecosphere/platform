@@ -12,48 +12,26 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 
 /**
  * The basic ECS lifecycle descriptor for powering up the AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsLifecycleDescriptor implements LifecycleDescriptor {
+public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
+
+    /**
+     * Creates an instance for the service manager.
+     */
+    public EcsLifecycleDescriptor() {
+        super("ECS", () -> EcsFactory.getConfiguration().getAas());
+    }
 
     @Override
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere ECS Runtime.");
-        if (AasFactory.isFullInstance()) {
-            AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
-            AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
-            AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
-            
-            // active AAS require two server instances and a deployment
-            Server implServer = res.getProtocolServerBuilder().build();
-            implServer.start();
-            // TODO remote deployment, destination to be defined via JAML/AasPartRegistry
-            Server aasServer = AasPartRegistry.deploy(res.getAas()); 
-            aasServer.start();
-        } else {
-            System.out.println("No full AAS implementation registered. Cannot build up Services AAS. Please add an "
-                + "appropriate dependency.");
-        }
+        super.startup(args);
     }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @Override
-    public Thread getShutdownHook() {
-        return null;
-    }
-
+    
 }

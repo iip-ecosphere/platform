@@ -46,13 +46,13 @@ import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
 
@@ -72,8 +72,7 @@ public class TestServiceManager {
 
     private static TestHiveMqServer server;
     private static NotificationMode oldM;
-    private static Endpoint oldEp;
-    private static ServerAddress oldImpl;
+    private static AasSetup oldSetup;
     private static Server implServer;
     private static Server aasServer;
     @Autowired
@@ -90,8 +89,7 @@ public class TestServiceManager {
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
-        oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
-        oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
+        oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof ServicesAas);
         
         implServer = res.getProtocolServerBuilder().build();
@@ -108,8 +106,7 @@ public class TestServiceManager {
         server.stop(false);
         aasServer.stop(true);
         implServer.stop(true);
-        AasPartRegistry.setAasEndpoint(oldEp);
-        AasPartRegistry.setProtocolAddress(oldImpl);
+        AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
     }
     

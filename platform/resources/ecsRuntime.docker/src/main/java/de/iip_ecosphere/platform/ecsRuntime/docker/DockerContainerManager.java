@@ -47,6 +47,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
     private static String dockerhost = "unix:///var/run/docker.sock";
+    private static DockerConfiguration config = DockerConfiguration.readFromYaml();
 
     // don't change name of outer/inner class
     // TODO upon start, scan file-system for containers and add them automatically if applicable
@@ -62,6 +63,11 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         @Override
         public ContainerManager createContainerManagerInstance() {
             return new DockerContainerManager();
+        }
+        
+        @Override
+        public Configuration getConfiguration() {
+            return config;
         }
         
     }

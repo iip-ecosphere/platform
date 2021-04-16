@@ -18,14 +18,12 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas;
 import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAas;
 import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAasClient;
@@ -48,8 +46,7 @@ public class NetworkManagerAasTest {
     @Test
     public void testAas() throws ExecutionException, IOException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(NetworkManagerAas.class));
-        Endpoint oldEp = AasPartRegistry.setAasEndpoint(new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_ENDPOINT));
-        ServerAddress oldImpl = AasPartRegistry.setProtocolAddress(new ServerAddress(Schema.TCP));
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
         // active AAS require two server instances and a deployment
         Server implServer = res.getProtocolServerBuilder().build();
@@ -71,7 +68,6 @@ public class NetworkManagerAasTest {
         
         aasServer.stop(true);
         implServer.stop(true);
-        AasPartRegistry.setAasEndpoint(oldEp);
-        AasPartRegistry.setProtocolAddress(oldImpl);
+        AasPartRegistry.setAasSetup(oldSetup);
     }
 }
