@@ -166,8 +166,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         */
         return null;
     }
-    
-    System.out.println("kakak: " + manager.getIds());
 
     @Override
     public Set<String> getIds() {
@@ -295,13 +293,5 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getContainerSystemVersion() {
         // TODO implement (engine version)
         return null;
-    }
-    /**
-     * sss.
-     * @param args
-     */
-    public static void main(String[] args) {
-        FactoryDescriptor factory = new FactoryDescriptor();
-        DockerContainerManager manager = (DockerContainerManager) factory.createContainerManagerInstance();
     }
 }
