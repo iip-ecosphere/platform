@@ -77,10 +77,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // TODO unpack docker image
         DockerClient dockerClient = getDockerClient();
         dockerClient.createContainerCmd(name);
-        // TODO get docker id and state of a new container and save it in the descriptor
-        // TODO maybe new constructor for descriptor
+        
+        String dockerId, dockerState = null; // TODO get docker id and state of a new container
+        
         DockerContainerDescriptor descriptor = new DockerContainerDescriptor(id, name, version);
-        descriptor.setState(ContainerState.AVAILABLE);
+        descriptor.setState(convertDockerContainerState(dockerState));
+        // TODO set docker id and state
         super.addContainer(id, descriptor);
         return null; 
     }
