@@ -66,7 +66,8 @@
     <!-- If changed, check against forced JUnit provider -->
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
-    <com.hivemq.version>2020.4</com.hivemq.version>
+    <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
+    <io.moquette.version>0.12</io.moquette.version> <!-- Requires JDK 11 -->
     <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
     <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
     <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
@@ -95,6 +96,17 @@
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
     </repository>
+    
+    <repository>
+	    <id>bintray</id>
+	    <url>https://jcenter.bintray.com</url>
+	    <releases>
+	      <enabled>true</enabled>
+	    </releases>
+	    <snapshots>
+	      <enabled>false</enabled>
+	    </snapshots>
+	</repository>
   </repositories>
 
   <dependencyManagement>
@@ -156,6 +168,12 @@
         <version>${eclipse.paho.version}</version>
       </dependency>
       <!-- for testing -->
+      <dependency>
+        <groupId>io.moquette</groupId>
+        <artifactId>moquette-broker</artifactId>
+        <version>${io.moquette.version}</version>
+      </dependency>
+      
       <dependency>
         <groupId>com.hivemq</groupId>
         <artifactId>hivemq-community-edition-embedded</artifactId>
