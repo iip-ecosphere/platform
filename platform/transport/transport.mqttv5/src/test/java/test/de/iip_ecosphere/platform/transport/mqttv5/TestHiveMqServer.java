@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
- * A simple embedded HiveMQ/MQTT test server for testing/experiments.
+ * A simple embedded HiveMQ/MQTT test server for testing/experiments. This class requires Java 11.
  * 
  * @author Holger Eichelberger, SSE
  */

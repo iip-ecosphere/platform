@@ -57,7 +57,7 @@ public class PahoMqttV3TransportConnectorTest {
 
         Assert.assertEquals(PahoMqttV3TransportConnector.NAME, TransportFactory.getConnectorName());
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
-        TestHiveMqServer server = new TestHiveMqServer(addr);
+        TestMoquetteServer server = new TestMoquetteServer(addr);
         server.start();
         AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
         AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);

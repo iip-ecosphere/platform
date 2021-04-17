@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
- * A simple AMQP server for testing/experiments.
+ * A simple AMQP server for testing/experiments. This class works with Java 8.
  * 
  * @author Holger Eichelberger, SSE
  */
