@@ -83,10 +83,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // TODO unpack docker image
         DockerClient dockerClient = getDockerClient();
         dockerClient.createContainerCmd(name);
-        // TODO get docker id and state of a new container and save it in the descriptor
-        // TODO maybe new constructor for descriptor
+        
+        String dockerId = null;
+        String dockerState = null; // TODO get docker id and state of a new container
+        
         DockerContainerDescriptor descriptor = new DockerContainerDescriptor(id, name, version);
-        descriptor.setState(ContainerState.AVAILABLE);
+        descriptor.setState(convertDockerContainerState(dockerState));
+        // TODO set docker id and state
         super.addContainer(id, descriptor);
         return null; 
     }
@@ -290,15 +293,5 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getContainerSystemVersion() {
         // TODO implement (engine version)
         return null;
-    }
-    /**
-     * sss.
-     * @param args
-     */
-    public static void main(String[] args) {
-        FactoryDescriptor factory = new FactoryDescriptor();
-        DockerContainerManager manager = (DockerContainerManager) factory.createContainerManagerInstance();
-        
-        System.out.println("kakak: " + manager.getIds());
     }
 }
