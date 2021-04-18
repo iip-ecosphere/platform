@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>test.mqtt.hivemq</artifactId>
+  <packaging>jar</packaging>
+  <name>Optinal HiveMq integration</name>
+  <description>HiveMq requires JDK 11. Due to the restiction to JDK 8 it can only be utilized optionally.</description>
+    
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+      <dependency>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>transport</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- tests -->
+
+      <dependency>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>transport</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.hivemq</groupId>
+        <artifactId>hivemq-community-edition-embedded</artifactId>
+        <scope>test</scope>
+      </dependency>
+        
+  </dependencies>
+  
+</project>
