@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
     <target name="maven"> 
         <maven pomFile="pom.xml" goal="package"/>
-        <mvnDeployResolveArtifact folderName="test-ampq-qpid" pomFile="pom.xml" jarFolder="target" artifactPattern="test.ampq.qpid*.*.*.jar" />
+        <mvnDeployResolveArtifact folderName="test-amqp-qpid" pomFile="pom.xml" jarFolder="target" artifactPattern="test.amqp.qpid*.*.*.jar" />
     </target>
 </project>
