@@ -61,6 +61,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+        <groupId>io.moquette</groupId>
+        <artifactId>moquette-broker</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
       <version>${project.version}</version>

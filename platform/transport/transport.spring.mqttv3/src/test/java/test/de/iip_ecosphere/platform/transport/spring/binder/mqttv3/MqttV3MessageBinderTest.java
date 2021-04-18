@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 import de.iip_ecosphere.platform.transport.spring.binder.mqttv3.MqttClient;
-import test.de.iip_ecosphere.platform.transport.mqttv3.TestHiveMqServer;
+import test.de.iip_ecosphere.platform.transport.mqttv3.TestMoquetteServer;
 import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 
 /**
@@ -61,7 +61,7 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 public class MqttV3MessageBinderTest {
 
     private static final ServerAddress ADDR = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
-    private static TestHiveMqServer server;
+    private static TestMoquetteServer server;
     private static String received;
 
     @Autowired
@@ -90,7 +90,7 @@ public class MqttV3MessageBinderTest {
      */
     @BeforeClass
     public static void init() {
-        server = new TestHiveMqServer(ADDR);
+        server = new TestMoquetteServer(ADDR);
         server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
