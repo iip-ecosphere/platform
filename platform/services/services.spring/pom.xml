@@ -47,8 +47,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.hivemq</groupId>
-      <artifactId>hivemq-community-edition-embedded</artifactId>
+      <groupId>io.moquette</groupId>
+      <artifactId>moquette-broker</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -65,7 +65,7 @@
     </dependency>
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>transport.mqttv5</artifactId>
+      <artifactId>transport.mqttv3</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

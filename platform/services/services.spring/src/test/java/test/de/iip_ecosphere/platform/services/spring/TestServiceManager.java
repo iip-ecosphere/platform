@@ -54,10 +54,10 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
+import test.de.iip_ecosphere.platform.transport.mqttv3.TestMoquetteServer;
 
 /**
- * Tests {@ink SpringCloudServiceManager}.
+ * Tests {@ink SpringCloudServiceManager}. We assume that the test artifacts are prepared for MQTT v3.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -70,7 +70,7 @@ public class TestServiceManager {
 
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
 
-    private static TestHiveMqServer server;
+    private static TestMoquetteServer server;
     private static NotificationMode oldM;
     private static AasSetup oldSetup;
     private static Server implServer;
@@ -84,7 +84,7 @@ public class TestServiceManager {
      */
     @BeforeClass
     public static void init() {
-        server = new TestHiveMqServer(BROKER);
+        server = new TestMoquetteServer(BROKER);
         server.start();
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);

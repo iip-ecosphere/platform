@@ -133,13 +133,16 @@ public class SpringCloudServiceManager
         YamlArtifact result = null;
         if (file.getName().endsWith(".jar")) {
             try {
-                LOGGER.info("Reading artifact " + file + ", descriptor " + getConfig().getDescriptorName());
-                InputStream descStream = JarUtils.findFile(new FileInputStream(file), 
-                    "BOOT-INF/classes/" + getConfig().getDescriptorName());
+                String descName = "deployment.yml";
+                if (null != getConfig()) { // null in case of standalone/non-spring execution
+                    descName = getConfig().getDescriptorName();
+                }
+                LOGGER.info("Reading artifact " + file + ", descriptor " + descName);
+                InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream); 
                 } else {
-                    throw new ExecutionException(getConfig().getDescriptorName() + " does not exist in " + file, null);
+                    throw new ExecutionException(descName + " does not exist in " + file, null);
                 }
             } catch (IOException e) {
                 throw new ExecutionException(e);
