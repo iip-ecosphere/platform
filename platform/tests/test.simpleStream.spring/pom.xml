@@ -20,7 +20,7 @@
     </dependency>
     <dependency>  
       <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>transport.spring.hivemqv5</artifactId>
+      <artifactId>transport.spring.mqttv3</artifactId>
       <version>${project.version}</version>
     </dependency>  
     <dependency>
@@ -32,15 +32,21 @@
     </dependency>  
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>transport.mqttv5</artifactId>
+      <artifactId>transport.mqttv3</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
       <type>test-jar</type>
     </dependency>
     <dependency>
-      <groupId>com.hivemq</groupId>
-      <artifactId>hivemq-community-edition-embedded</artifactId>
-      <optional>true</optional>
+        <groupId>io.moquette</groupId>
+        <artifactId>moquette-broker</artifactId>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
+        <optional>true</optional>
     </dependency>
     <dependency>
          <groupId>org.springframework.boot</groupId>
@@ -140,6 +146,10 @@
                         <dependency>
                           <groupId>com.hivemq</groupId>
                           <artifactId>hivemq-community-edition-embedded</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.moquette</groupId>
+                            <artifactId>moquette-broker</artifactId>
                         </dependency>
                         <dependency>
                           <groupId>com.hivemq</groupId>

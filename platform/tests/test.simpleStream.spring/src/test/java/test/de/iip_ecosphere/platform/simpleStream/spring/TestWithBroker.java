@@ -1,16 +1,12 @@
 package test.de.iip_ecosphere.platform.simpleStream.spring;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
  * Executes the streams in {@link Test} with as well as a broker.
@@ -21,10 +17,10 @@ public class TestWithBroker {
 
     private static Server broker;
 
-    /**
+    /*
      * Tries to extract the broker configuration.
      */
-    private static void extractBrokerConfig() {
+    /*private static void extractBrokerConfig() {
         try {
             String loc = "hivemqv5cfg.zip"; // Maven turns file names to small caps                
             if (AbstractTestServer.runsFromJar() && null != loc && loc.length() > 0) {
@@ -37,7 +33,7 @@ public class TestWithBroker {
         } catch (IOException e) {
             System.err.println("Cannot find/extract server configuration: " + e.getMessage());
         }
-    }
+    }*/
     
     /**
      * Main function.
@@ -57,8 +53,8 @@ public class TestWithBroker {
         aTmp.toArray(args);
         
         // start broker
-        extractBrokerConfig();
-        broker = new test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer(addr);
+        //extractBrokerConfig();
+        broker = new test.de.iip_ecosphere.platform.transport.mqttv3.TestMoquetteServer(addr);
         broker.start();
         
         Test.main(args);

@@ -29,7 +29,7 @@ spring:
                     destination: ingest
                 log-in-0:
                     destination: ingest
-            defaultBinder: hivemqv5Binder
+            defaultBinder: mqttv3Binder
 
 ---
 
