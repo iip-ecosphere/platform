@@ -15,3 +15,6 @@ component.
 - Validation/fixing topic names w.r.t. MQTT specification
 - Authentication/Security
 
+**Issues**
+- This project requires JDK 11 for testing.
+

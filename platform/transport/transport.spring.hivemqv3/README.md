@@ -16,3 +16,5 @@ The implementation is initial and could be optimized. The following configuratio
 - Validation/fixing topic names w.r.t. MQTT specification
 - Authentication/Security
 
+**Issues**
+- This project requires JDK 11 for testing.
