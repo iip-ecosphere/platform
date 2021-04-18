@@ -1,17 +1,15 @@
 # IIP-Ecosphere platform documentation
 
-# Further documents 
+## Further documents 
 * Platform handbook (soon)
 * [Guideline to open the projects and setup the environment](../documentation/Guideline.pdf?raw=true)
 * [Release guideline] (../documentation/RELEASE.md)
 
-# Guidelines
+## Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
   how existing and new parts are related.
 * **Java projects** are created with Eclipse (2020-12-R). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters.
-* For now, we use **JDK 8** in order to be compliant with Edge devices. To have exchangeable projects across development 
-  installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in 
-  future. Unfortunately, Eclipse 2020-12-R complains again about complier compliance. If a solution for this is known, please describe here.
+* For now, we use **JDK 8** in order to be compliant with Edge devices. In particular, for the lower layers that shall be used on edge devices, code must be executable on JDK 8. For higher layers, this limitation may be relaxed. To achieve exchangeable projects across development installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in future. To be on the safe side, install a recent (open) JDK 1.8 and associated it in Eclipse to JavaSE-1.8 so that only the JDK 1.8 library is available, i.e., no newer operations. 
 * Use **Javadoc** to describe the parts and pieces as well as their contract and intention. We assume that parameters of reference types are passed in with instances unless the documentation indicates that null (in Javadoc in bold font) can be used.
 * A related Java **Checkstyle** definition is based on Checkstyle 8.35 (definitions are working also with 8.36.1). Please use it. The style definition is in ``platformDependencies`` and shall be added as a project local definition named ``IIP Code Conventions``to Checkstyle before importing the other projects (see [setup guideline](../documentation/Guideline.pdf?raw=true) for details). Please use empty lines as paragraph breaks in text, i.e., whenever a unit of code has been completed that is not an own method. An empty line after each line of code is not recommended in this project. However, empty lines in this sense are not part of the Checkstyle rules.
 * Please install **FindBugs** or **Spotbugs** to avoid obvious programming problems.
@@ -29,3 +27,8 @@
   For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT 
   file that executes Maven and deploys the artifacts.
 * For new components, please write a **short documentation** in terms of a ``README.md`` and hook that component appropriately into the parent documentations.
+
+## Issues
+
+* So far, there are **no binary releases of BaSyx**. As BaSxy is still evolving (as the IIP-Ecosphere platform), interfaces, classes and imports may change. Therefore, we rely on a certain version in the SSE Maven repository with the same group/artifact id as the official BaSyx code. Thus, if you compiled and installed an own BaSyx version after the point in time when our BaSyx version was packaged, your BaSyx version may syntactically differ from our version, which may lead to execution problems, such as *classes/operations missing*. In this case, please remove BaSyx from your local Maven repository and rely on the version for the IIP-Ecosphere platform. If you still need the other BaSyx version, using two local Maven repositories may be a solution.
+* Due to the **restriction to JDK 8**, libraries that are compiled for newer Java versions may not be executed. We try to avoid such libraries, in particular in production code. However, in test code, we cannot always avoid such libraries, e.g., if there is no alternative functionality (so far, we are not aware of a MQTT v5 broker for JDK 1.8). In such cases, *execution on a more recent JDK may be adequate* (you can control this by selecting the JDK, e.g., in the respective Eclipse execution environment). This does not taint broker installations, e.g., on edge devices, as there any (even binary, e.g., C based) version that provides the required protocol may be used. Please *check the documentation/README.md* whether the problem is already known, and if not, please inform the platform team about the problem.
