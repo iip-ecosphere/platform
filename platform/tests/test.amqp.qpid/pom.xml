@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>test.mqtt.hivemq</artifactId>
+  <artifactId>test.amqp.qpid</artifactId>
   <packaging>jar</packaging>
-  <name>Optional HiveMq integration</name>
-  <description>HiveMq requires JDK 11. Due to the restiction to JDK 8 it can only be utilized optionally.</description>
+  <name>Optional Apache QPid integration</name>
+  <description>AMPQ protocol for testing/experiments.</description>
     
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -31,9 +31,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>com.hivemq</groupId>
-        <artifactId>hivemq-community-edition-embedded</artifactId>
-        <scope>test</scope>
+       <groupId>org.apache.qpid</groupId>
+       <artifactId>qpid-broker</artifactId>
+       <version>8.0.2</version>
+       <scope>test</scope>
       </dependency>
         
   </dependencies>

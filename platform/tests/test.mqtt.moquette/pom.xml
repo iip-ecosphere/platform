@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>test.mqtt.hivemq</artifactId>
+  <artifactId>test.mqtt.moquette</artifactId>
   <packaging>jar</packaging>
-  <name>Optional HiveMq integration</name>
-  <description>HiveMq requires JDK 11. Due to the restiction to JDK 8 it can only be utilized optionally.</description>
+  <name>Optional Moquette integration</name>
+  <description>Moquette for testing.</description>
     
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -31,8 +31,8 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>com.hivemq</groupId>
-        <artifactId>hivemq-community-edition-embedded</artifactId>
+        <groupId>io.moquette</groupId>
+        <artifactId>moquette-broker</artifactId>
         <scope>test</scope>
       </dependency>
         
