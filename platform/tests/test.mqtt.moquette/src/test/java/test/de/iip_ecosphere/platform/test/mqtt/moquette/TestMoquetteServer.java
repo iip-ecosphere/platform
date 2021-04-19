@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.test.mqtt.hivemq;
+package test.de.iip_ecosphere.platform.test.mqtt.moquette;
 
 import java.io.IOException;
 import java.util.Properties;
