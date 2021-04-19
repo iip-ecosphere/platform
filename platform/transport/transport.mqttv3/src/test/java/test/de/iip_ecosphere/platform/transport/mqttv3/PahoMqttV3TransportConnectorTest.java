@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.ProductProtobufSerializer;
+import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
 
 /**
  * Tests the {@link PahoMqttV3TransportConnector}.
