@@ -46,8 +46,8 @@ import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTrans
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 import de.iip_ecosphere.platform.transport.spring.binder.amqp.AmqpClient;
-import test.de.iip_ecosphere.platform.transport.connectors.rabbitmq.TestQpidServer;
 import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Test class for the message binder. This class uses the application configuration from transport.spring!
