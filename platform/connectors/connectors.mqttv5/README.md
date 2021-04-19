@@ -6,3 +6,5 @@ MQTTv5 machine/platform for bi-directional access to machines and already instal
 - Connectors AAS 
 - Authentication/Security
 
+**Issue**
+Testing requires JDK 11.
