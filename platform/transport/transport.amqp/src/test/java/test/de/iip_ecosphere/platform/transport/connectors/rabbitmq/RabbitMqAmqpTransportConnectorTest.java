@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTrans
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.ProductProtobufSerializer;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Tests the {@link RabbitMqAmqpTransportConnector}.

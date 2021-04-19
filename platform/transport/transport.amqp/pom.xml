@@ -38,6 +38,13 @@
     </dependency>
     <!-- A Java AMQP server for testing -->
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>test.amqp.qpid</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.qpid</groupId>
       <artifactId>qpid-broker</artifactId>
       <scope>test</scope>
