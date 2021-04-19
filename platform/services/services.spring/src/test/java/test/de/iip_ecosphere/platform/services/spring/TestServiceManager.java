@@ -54,7 +54,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import test.de.iip_ecosphere.platform.transport.mqttv3.TestMoquetteServer;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Tests {@ink SpringCloudServiceManager}. We assume that the test artifacts are prepared for MQTT v3.
@@ -70,7 +70,7 @@ public class TestServiceManager {
 
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
 
-    private static TestMoquetteServer server;
+    private static Server server;
     private static NotificationMode oldM;
     private static AasSetup oldSetup;
     private static Server implServer;
@@ -79,12 +79,12 @@ public class TestServiceManager {
     private SpringCloudServiceConfiguration config;
 
     /**
-     * Initializes the test by starting an embedded MQTT server. Requires the HiveMq configuration xml/extensions 
-     * folder in src/test.
+     * Initializes the test by starting an embedded AMQP server. Requires the Qpid configuration file in src/test.
+     * We do not rely on MQTT here, because moquette is not stable enough and Hivemq requires JDK 11.
      */
     @BeforeClass
     public static void init() {
-        server = new TestMoquetteServer(BROKER);
+        server = new TestQpidServer(BROKER); // prescribes protocol for artifacts
         server.start();
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
