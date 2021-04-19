@@ -23,8 +23,8 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
 import test.de.iip_ecosphere.platform.transport.Product;
 import test.de.iip_ecosphere.platform.connectors.AbstractSerializingConnectorTest;
+import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
 import test.de.iip_ecosphere.platform.transport.Command;
-import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
 
 /**
  * Implements a test for {@link PahoMqttv5Connector}. Data is sent via the test server from a transport connector
