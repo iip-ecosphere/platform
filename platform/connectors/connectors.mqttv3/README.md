@@ -3,6 +3,7 @@
 MQTTv3 machine/platform for bi-directional access to machines and already installed platforms.  
 
 **Missing**
-- Connectors AAS 
 - Authentication/Security
 
+**Issues**
+- So far, testing this component requires JDK 11 as it does not work with Moquette/JDK8.

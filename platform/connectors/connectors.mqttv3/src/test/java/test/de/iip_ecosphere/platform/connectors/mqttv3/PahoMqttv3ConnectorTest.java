@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import test.de.iip_ecosphere.platform.transport.Product;
 import test.de.iip_ecosphere.platform.connectors.AbstractSerializingConnectorTest;
 import test.de.iip_ecosphere.platform.transport.Command;
-import test.de.iip_ecosphere.platform.transport.mqttv3.TestHiveMqServer;
+import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
 
 /**
  * Implements a test for {@link PahoMqttv3Connector}. Data is sent via the test server from a transport connector

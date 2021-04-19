@@ -3,7 +3,6 @@
 MQTTv5 machine/platform for bi-directional access to machines and already installed platforms.  
 
 **Missing**
-- Connectors AAS 
 - Authentication/Security
 
 **Issue**
