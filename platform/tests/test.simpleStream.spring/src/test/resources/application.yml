@@ -7,6 +7,11 @@ mqtt:
     mqtt.qos: AT_MOST_ONCE
     host: localhost
     clientId: test
+amqp:
+    host: localhost
+    port: 8883
+    user: user
+    password: pwd
 logging:
     level:
         root: INFO
@@ -29,7 +34,7 @@ spring:
                     destination: ingest
                 log-in-0:
                     destination: ingest
-            defaultBinder: mqttv3Binder
+            defaultBinder: amqpBinder
 
 ---
 

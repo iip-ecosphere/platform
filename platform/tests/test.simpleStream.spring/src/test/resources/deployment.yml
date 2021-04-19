@@ -11,8 +11,8 @@ services:
       - --spring.profiles.active=source
     relations:
       - endpoint:
-          portArg: --mqtt.port=${port}
-          hostArg: --mqtt.host=${host}
+          portArg: --mqtt.port=${port} --amqp.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host}
       - channel: create-out-0
         id: intern
         type: String
@@ -27,8 +27,8 @@ services:
       - --spring.profiles.active=sink
     relations:
       - endpoint:
-          portArg: --mqtt.port=${port}
-          hostArg: --mqtt.host=${host}
+          portArg: --mqtt.port=${port} --amqp.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host}
       - channel: log-in-0
         id: intern
         type: String
