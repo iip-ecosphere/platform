@@ -67,7 +67,8 @@
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.10.0</rabbitmq.version>
     <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
-    <io.moquette.version>0.12</io.moquette.version> <!-- Requires JDK 11 -->
+    <io.moquette.version>0.13</io.moquette.version>
+    <org.apache.qpid.version>8.0.2</org.apache.qpid.version>
     <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
     <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
     <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
@@ -173,7 +174,12 @@
         <artifactId>moquette-broker</artifactId>
         <version>${io.moquette.version}</version>
       </dependency>
-      
+      <dependency>
+       <groupId>org.apache.qpid</groupId>
+       <artifactId>qpid-broker</artifactId>
+       <version>${org.apache.qpid.version}</version>
+       <scope>test</scope>
+      </dependency>
       <dependency>
         <groupId>com.hivemq</groupId>
         <artifactId>hivemq-community-edition-embedded</artifactId>
