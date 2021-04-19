@@ -57,6 +57,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>test.mqtt.hivemq</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>       
+    <dependency>
       <groupId>com.hivemq</groupId>
       <artifactId>hivemq-community-edition-embedded</artifactId>
       <scope>test</scope>

@@ -56,10 +56,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.hivemq</groupId>
-      <artifactId>hivemq-community-edition-embedded</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>test.mqtt.moquette</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
-    </dependency>
+    </dependency>        
     <dependency>
         <groupId>io.moquette</groupId>
         <artifactId>moquette-broker</artifactId>

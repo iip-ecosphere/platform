@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 import de.iip_ecosphere.platform.transport.spring.binder.hivemqv5.HivemqV5Client;
-import test.de.iip_ecosphere.platform.transport.mqttv5.TestHiveMqServer;
+import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
 import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 
 /**

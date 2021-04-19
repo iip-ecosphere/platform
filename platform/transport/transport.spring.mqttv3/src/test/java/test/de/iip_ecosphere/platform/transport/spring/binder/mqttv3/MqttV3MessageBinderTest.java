@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 import de.iip_ecosphere.platform.transport.spring.binder.mqttv3.MqttClient;
-import test.de.iip_ecosphere.platform.transport.mqttv3.TestMoquetteServer;
+import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
 import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 
 /**
