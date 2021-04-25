@@ -13,9 +13,13 @@
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +41,7 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
-
+import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
  * 
@@ -74,11 +78,37 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
-        // ---> TODO read the id, name and version from yaml file
-        String id = "";
-        String name = "";
-        Version version = new Version("");
-        // <---- 
+        // TODO unzip de.iip_ecosphere.platform.support.JarUtils
+        String standartDockerImageYamlFilename = "test_container.yml";
+        String pathToYamlFile = "file://" + location.getPath() + standartDockerImageYamlFilename;
+        System.out.println("Path to yml: " + pathToYamlFile);
+        
+        DockerContainerDescriptor container;
+        try {
+            URI yamlFileURI = new URI(pathToYamlFile);
+            File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
+            container = DockerContainerDescriptor.readFromYamlFile(yamlFile);
+            String imageName = container.getImageName();
+            System.out.println("Name of the image: " + imageName);
+            
+            // Creating a docker container
+            String pathToDockerImageFile = "file://" + location.getPath() + imageName;
+            URI dockerImageURI = new URI(pathToDockerImageFile);
+            File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, null);
+            
+            DockerClient dockerClient = getDockerClient();
+            InputStream in = new FileInputStream(dockerImageFile);
+            dockerClient.loadImageCmd(in).exec();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        
+        
+        /*
+        - 
         
         // TODO unpack docker image
         DockerClient dockerClient = getDockerClient();
@@ -91,7 +121,30 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         descriptor.setState(convertDockerContainerState(dockerState));
         // TODO set docker id and state
         super.addContainer(id, descriptor);
+        */
         return null; 
+    }
+    
+    /**
+     * TODO.
+     * @param args
+     * @throws ExecutionException 
+     */
+    public static void main(String[] args) throws ExecutionException {
+       
+        FactoryDescriptor factory = new FactoryDescriptor();
+        DockerContainerManager manager = (DockerContainerManager) factory.createContainerManagerInstance();
+        String uriStr = "file:///home/monika/SSE/docker_image/alpine-ssh-image/";
+        try {
+            URI location = new URI(uriStr);
+            manager.addContainer(location);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        /*
+        DockerConfiguration config = DockerConfiguration.readFromYaml();
+        System.out.println("Host: " + config.getDockerHost());
+        */
     }
     
     /**
@@ -216,6 +269,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public Collection<DockerContainerDescriptor> getContainers() {
+        
         List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) super.getContainers();
         
         /*
@@ -294,4 +348,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // TODO implement (engine version)
         return null;
     }
+
+    
 }
