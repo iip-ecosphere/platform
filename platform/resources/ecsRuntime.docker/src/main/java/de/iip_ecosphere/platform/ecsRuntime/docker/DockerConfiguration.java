@@ -50,7 +50,7 @@ public class DockerConfiguration extends Configuration {
     }
     
     /**
-     * TODO .
+     * Returns the container's id.
      * @return id
      */
     public int getId() {
@@ -58,23 +58,23 @@ public class DockerConfiguration extends Configuration {
     }
 
     /**
-     * TODO .
-     * @param id
+     * Defines the container's id.
+     * @param id the container's id
      */
     public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * TODO.
-     * @return name
+     * Returns the container's name.
+     * @return name 
      */
     public String getName() {
         return name;
     }
     
     /**
-     * TODO .
+     * Defines the container's name.
      * @param name
      */
     public void setName(String name) {
@@ -82,7 +82,7 @@ public class DockerConfiguration extends Configuration {
     }
 
     /**
-     * TODO .
+     * Returns the container's version.
      * @return version
      */
     public Version getVersion() {
@@ -90,7 +90,7 @@ public class DockerConfiguration extends Configuration {
     }
 
     /**
-     * TODO .
+     * Defines the container's version.
      * @param version
      */
     public void setVersion(Version version) {
