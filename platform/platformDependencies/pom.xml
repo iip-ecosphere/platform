@@ -296,6 +296,7 @@
           <encoding>${java.encoding}</encoding>
           <source>1.8</source>
           <excludePackageNames>*.proto.*</excludePackageNames>
+          <failOnError>false</failOnError>
         </configuration>
         <executions>
           <execution>
