@@ -52,7 +52,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
     private static String dockerhost = "unix:///var/run/docker.sock";
     private static DockerConfiguration config = DockerConfiguration.readFromYaml();
-
+    private static String standartDockerImageYamlFilename = "container-info.yml";
+    
     // don't change name of outer/inner class
     // TODO upon start, scan file-system for containers and add them automatically if applicable
     
@@ -78,73 +79,44 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
-        // TODO unzip de.iip_ecosphere.platform.support.JarUtils
-        String standartDockerImageYamlFilename = "test_container.yml";
+        // TODO version with zip (de.iip_ecosphere.platform.support.JarUtils)
+        String id = null;
         String pathToYamlFile = "file://" + location.getPath() + standartDockerImageYamlFilename;
-        System.out.println("Path to yml: " + pathToYamlFile);
-        
         DockerContainerDescriptor container;
         try {
+            // Getting information about docker image from yaml file.
             URI yamlFileURI = new URI(pathToYamlFile);
             File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
             container = DockerContainerDescriptor.readFromYamlFile(yamlFile);
-            String imageName = container.getImageName();
-            System.out.println("Name of the image: " + imageName);
+            String dockerImageZipfile = container.getDockerImageZipfile();
             
-            // Creating a docker container
-            String pathToDockerImageFile = "file://" + location.getPath() + imageName;
+            // Loading a docker image
+            String pathToDockerImageFile = "file://" + location.getPath() + dockerImageZipfile;
             URI dockerImageURI = new URI(pathToDockerImageFile);
             File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, null);
-            
             DockerClient dockerClient = getDockerClient();
             InputStream in = new FileInputStream(dockerImageFile);
             dockerClient.loadImageCmd(in).exec();
             
+            // Creating a docker container
+            String dockerImageName = container.getDockerImageName();
+            String containerName = container.getName();
+            // TODO throws exeception if container with given name already exists 
+            // ( com.github.dockerjava.api.exception.ConflictException)
+            dockerClient.createContainerCmd(dockerImageName).withName(containerName).exec(); 
+            
+            // Getting docker id
+            String dockerId = getDockerId(containerName);
+            container.setDockerId(dockerId);
+            container.setState(ContainerState.AVAILABLE);
+            
+            id = super.addContainer(container.getId(), container);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        
-        
-        /*
-        - 
-        
-        // TODO unpack docker image
-        DockerClient dockerClient = getDockerClient();
-        dockerClient.createContainerCmd(name);
-        
-        String dockerId = null;
-        String dockerState = null; // TODO get docker id and state of a new container
-        
-        DockerContainerDescriptor descriptor = new DockerContainerDescriptor(id, name, version);
-        descriptor.setState(convertDockerContainerState(dockerState));
-        // TODO set docker id and state
-        super.addContainer(id, descriptor);
-        */
-        return null; 
-    }
-    
-    /**
-     * TODO.
-     * @param args
-     * @throws ExecutionException 
-     */
-    public static void main(String[] args) throws ExecutionException {
-       
-        FactoryDescriptor factory = new FactoryDescriptor();
-        DockerContainerManager manager = (DockerContainerManager) factory.createContainerManagerInstance();
-        String uriStr = "file:///home/monika/SSE/docker_image/alpine-ssh-image/";
-        try {
-            URI location = new URI(uriStr);
-            manager.addContainer(location);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        /*
-        DockerConfiguration config = DockerConfiguration.readFromYaml();
-        System.out.println("Host: " + config.getDockerHost());
-        */
+        return id; 
     }
     
     /**
@@ -171,18 +143,18 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         DockerClient dockerClient = getDockerClient();
         dockerClient.startContainerCmd(dockerId).exec();
         
-        String dockerState = ""; // TODO get docker state using docker id
-        ContainerState state = convertDockerContainerState(dockerState);
-        setState(container, state);
+        setState(container, ContainerState.DEPLOYED);
     }
 
     @Override
     public void stopContainer(String id) throws ExecutionException {
-        /*
+        DockerContainerDescriptor container = super.getContainer(id, "id", "stop");
+        String dockerId = container.getDockerId();
+        
         DockerClient dockerClient = getDockerClient();     
-        dockerClient.stopContainerCmd(id).exec();     
-        setState(getContainer(id, "id", "stop"), ContainerState.STOPPED);
-        */
+        dockerClient.stopContainerCmd(dockerId).exec();
+        
+        setState(container, ContainerState.STOPPED);
     }
 
     @Override
@@ -208,15 +180,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public ContainerState getState(String id) {
-        /*
-        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
-        for (DockerContainerDescriptor container : containers) {
-            String containerId = container.getId();
-            if (containerId.equals(id)) {
-                return container.getState();
-            }
-        }
-        */
+        // TODO implement
         return null;
     }
 
@@ -269,10 +233,17 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public Collection<DockerContainerDescriptor> getContainers() {
+        return super.getContainers();
+    }
+    
+    /**
+     * Returns an id of a Docker container with a given {@code name}.
+     * @param name container's name
+     * @return docker container id
+     */
+    public String getDockerId(String name) {
+        String dockerId = null;
         
-        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) super.getContainers();
-        
-        /*
         Runtime rt = Runtime.getRuntime();
         String command = "docker container ls -a";
         try {
@@ -300,42 +271,20 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                     continue;
                 }
                 int lineLength = line.length();
-                String id = line.substring(0, 12).trim();
-                String dockerState = line.substring(90, 117).trim();
-                ContainerState state = convertDockerContainerState(dockerState);
                 String conName = line.substring(138, lineLength).trim();
-                Version version = new Version("1.0"); // TODO using default version for now (Info aus Datei)
-                
-                DockerContainerDescriptor containerDescriptor = new DockerContainerDescriptor(id, conName, version);
-                containerDescriptor.setState(state);
-                containers.add(containerDescriptor);
-                    
-            }
-            // Read any errors from the attempted command
-            while ((line = stdError.readLine()) != null) {
-                System.out.println(line);Map<String, C> containers
+                if (conName.equals(name)) {
+                    dockerId = line.substring(0, 12).trim();
+                }
             }
         } catch (IOException e) {
             System.out.println(e);
         }
-        */
-        return containers;
+        return dockerId;
     }
 
     @Override
     public DockerContainerDescriptor getContainer(String id) {
-        /*
-        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
-        int containerNumber = containers.size();
-        for (int i = 0; i < containerNumber; i++) {
-            DockerContainerDescriptor container = containers.get(i);
-            String containerId = container.getId();
-            if (containerId.equals(id)) {
-                return container;
-            }
-        }
-        */
-        return null;
+        return super.getContainer(id);
     }
 
     @Override
@@ -348,6 +297,4 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // TODO implement (engine version)
         return null;
     }
-
-    
 }

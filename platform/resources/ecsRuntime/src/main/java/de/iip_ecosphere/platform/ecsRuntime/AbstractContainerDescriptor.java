@@ -29,6 +29,12 @@ public abstract class AbstractContainerDescriptor implements ContainerDescriptor
     
     /**
      * Creates a container descriptor instance.
+     */
+    public AbstractContainerDescriptor() {
+    }
+    
+    /**
+     * Creates a container descriptor instance.
      * 
      * @param id the container id
      * @param name the (file) name of the container
