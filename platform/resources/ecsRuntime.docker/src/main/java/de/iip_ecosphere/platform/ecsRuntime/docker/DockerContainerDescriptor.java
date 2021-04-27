@@ -49,7 +49,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * Creates a container descriptor instance.
      */
     public DockerContainerDescriptor() {
-        super();
+        //super();
     }
     /**
      * Creates a container descriptor instance.
