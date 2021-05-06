@@ -83,6 +83,7 @@
     <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
     <org.jacoco.maven.jacoco.version>0.8.2</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
+    <net.ssehub.easyProducer.version>1.3.0-SNAPSHOT</net.ssehub.easyProducer.version>
 
     <!-- for now due to edge deployment/initial experience -->
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -207,6 +208,59 @@
         <groupId>org.eclipse.milo</groupId>
         <artifactId>sdk-server</artifactId>
         <version>${eclipse.milo.version}</version>
+      </dependency>
+      
+      <!-- EASy-Producer -->
+
+      <dependency>
+          <groupId>net.ssehub.easy</groupId>
+          <artifactId>basics</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy</groupId>
+          <artifactId>varModel</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy</groupId>
+          <artifactId>ivml</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.vil</groupId>
+          <artifactId>buildlang</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.vil</groupId>
+          <artifactId>templateLang</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.reasoning</groupId>
+          <artifactId>sseReasoner</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.runtime</groupId>
+          <artifactId>loader</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+	      <groupId>net.ssehub.easy.instantiation</groupId>
+	      <artifactId>maven</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+	  </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.instantiation</groupId>
+          <artifactId>java</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>net.ssehub.easy.instantiation</groupId>
+          <artifactId>ant</artifactId>
+          <version>${net.ssehub.easyProducer.version}</version>
       </dependency>
       
       <!-- Spring boot/cloud stream, individual dependencies for better packaging -->
