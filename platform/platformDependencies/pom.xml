@@ -213,54 +213,11 @@
       <!-- EASy-Producer -->
 
       <dependency>
-          <groupId>net.ssehub.easy</groupId>
-          <artifactId>basics</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy</groupId>
-          <artifactId>varModel</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy</groupId>
-          <artifactId>ivml</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.vil</groupId>
-          <artifactId>buildlang</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.vil</groupId>
-          <artifactId>templateLang</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.reasoning</groupId>
-          <artifactId>sseReasoner</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.runtime</groupId>
-          <artifactId>loader</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-	      <groupId>net.ssehub.easy.instantiation</groupId>
-	      <artifactId>maven</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-	  </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.instantiation</groupId>
-          <artifactId>java</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>net.ssehub.easy.instantiation</groupId>
-          <artifactId>ant</artifactId>
-          <version>${net.ssehub.easyProducer.version}</version>
+        <groupId>net.ssehub.easy.runtime</groupId>
+        <artifactId>EASy-dependencies</artifactId>
+        <version>${net.ssehub.easyProducer.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       
       <!-- Spring boot/cloud stream, individual dependencies for better packaging -->
