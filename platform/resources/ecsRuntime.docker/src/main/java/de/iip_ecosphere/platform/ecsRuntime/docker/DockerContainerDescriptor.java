@@ -113,14 +113,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     }
     
     /**
-     * Defines the container's version.
-     * @param version
-     */
-    public void setVersion(Version version) {
-        super.setVersion(version);
-    }
-    
-    /**
      * Returns a DockerContainerDescriptor with a information from a yaml file.
      * @param file yaml file
      * @return DockerContainerDescriptor
