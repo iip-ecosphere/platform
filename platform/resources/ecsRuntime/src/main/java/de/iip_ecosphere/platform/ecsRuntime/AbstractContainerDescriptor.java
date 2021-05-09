@@ -73,6 +73,29 @@ public abstract class AbstractContainerDescriptor implements ContainerDescriptor
     }
     
     /**
+     * Defines the container's id.
+     * @param id
+     */
+    public void setId(String id) {
+         this.id = id;
+    }
+    
+    /**
+     * Defines the container's name.
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    /**
+     * Defines the container's version.
+     * @param version
+     */
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+    
+    /**
      * Changes the container state.
      * 
      * @param state the new container state
