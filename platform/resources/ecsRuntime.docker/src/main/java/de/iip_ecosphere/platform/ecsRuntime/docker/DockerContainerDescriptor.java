@@ -37,10 +37,6 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     
-    private String id;
-    private String name;
-    private Version version;
-    
     private String dockerId;
     private String dockerImageName;
     private String dockerImageZipfile;
@@ -73,15 +69,14 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * @param id
      */
     public void setId(String id) {
-        this.id = id;
+        super.setId(id);
     }
-    
     /**
      * Returns the container's id.
      * @return id
      */
     public String getId() {
-        return this.id;
+        return super.getId();
     }
     
     /**
@@ -137,29 +132,29 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * @return name
      */
     public String getName() {
-        return this.name;
+        return super.getName();
     }
     /**
      * Defines the container's name.
      * @param name
      */
     public void setName(String name) {
-        this.name = name;
+        super.setName(name);
     }
     
     /**
      * Returns the container's version.
      * @return version    
-     */
+     *//*
     public Version getVersion() {
         return this.version;
-    }
+    }*/
     /**
      * Defines the container's version.
      * @param version
      */
     public void setVersion(Version version) {
-        this.version = version;
+        super.setVersion(version);
     }
     
     /**
