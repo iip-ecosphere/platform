@@ -45,7 +45,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * Creates a container descriptor instance.
      */
     public DockerContainerDescriptor() {
-        //super();
+        
     }
     /**
      * Creates a container descriptor instance.
@@ -62,21 +62,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     @Override
     public void setState(ContainerState state) {
         super.setState(state);
-    }
-    
-    /**
-     * Defines the container's id.
-     * @param id
-     */
-    public void setId(String id) {
-        super.setId(id);
-    }
-    /**
-     * Returns the container's id.
-     * @return id
-     */
-    public String getId() {
-        return super.getId();
     }
     
     /**
@@ -127,28 +112,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
         return this.dockerImageName;
     }
     
-    /**
-     * Returns the container's name.
-     * @return name
-     */
-    public String getName() {
-        return super.getName();
-    }
-    /**
-     * Defines the container's name.
-     * @param name
-     */
-    public void setName(String name) {
-        super.setName(name);
-    }
-    
-    /**
-     * Returns the container's version.
-     * @return version    
-     *//*
-    public Version getVersion() {
-        return this.version;
-    }*/
     /**
      * Defines the container's version.
      * @param version
