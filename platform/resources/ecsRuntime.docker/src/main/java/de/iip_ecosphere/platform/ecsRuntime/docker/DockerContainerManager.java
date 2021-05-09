@@ -165,12 +165,14 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
-        /*
-        super.undeployContainer(id);
+        DockerContainerDescriptor container = getContainer(id);
+        // Removing container from Docker
+        String dockerId = container.getDockerId();
         DockerClient dockerClient = getDockerClient();
-        dockerClient.removeContainerCmd(id).exec();          
-        setState(getContainer(id, "id", "undeploy"), ContainerState.UNKNOWN);
-        */
+        dockerClient.removeContainerCmd(dockerId).exec();
+        // Removing container from platform
+        super.undeployContainer(id);
+        
     }
 
     @Override
