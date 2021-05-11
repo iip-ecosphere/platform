@@ -62,7 +62,7 @@ public class DockerContainerManagerTest {
         // TODO go on testing with cm
         String testId = "01";
         String testName = "test-container";
-        /*
+        
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = workingDir + "/src/test/resources/";
@@ -75,28 +75,24 @@ public class DockerContainerManagerTest {
         Assert.assertNotNull(cm.getDockerId(testName));
         
         //---- Starting container -----------------
-        
         cm.startContainer(testId);
-        System.out.println("con started");
         Thread.sleep(3000);
         // Checking if there is a running container with a given name
         Assert.assertNotNull(getContainerId(testName, "running", cm));
 
         //---- Stopping container -----------------
-        
         cm.stopContainer(testId);
         Thread.sleep(3000);
         Assert.assertNull(getContainerId(testName, "running", cm));
 
         // Removing container
         cm.undeployContainer(testId);
-        */
-        
-        
+                
+        /*
         // Removing container directly with API client
         DockerClient dockerClient = cm.getDockerClient();
         dockerClient.removeContainerCmd("test-container").exec();
-        
+        */
         ActiveAasBase.setNotificationMode(oldM);
     }
     
