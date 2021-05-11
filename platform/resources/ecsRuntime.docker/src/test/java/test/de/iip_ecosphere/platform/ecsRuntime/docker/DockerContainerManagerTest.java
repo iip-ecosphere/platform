@@ -12,31 +12,20 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime.docker;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 
-import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
-import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerManager;
-import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerManager.FactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
@@ -87,24 +76,21 @@ public class DockerContainerManagerTest {
 
         // Removing container
         cm.undeployContainer(testId);
-                
-        /*
-        // Removing container directly with API client
-        DockerClient dockerClient = cm.getDockerClient();
-        dockerClient.removeContainerCmd("test-container").exec();
-        */
+
         ActiveAasBase.setNotificationMode(oldM);
     }
     
     /**
-     * todo.
-     * @param name
-     * @param state
-     * @param cm
-     * @return Docker container id
+     * Returns the Docker Id of a container with a given {@code name} and {@code state}.
+     * 
+     * @param name container's name
+     * @param state container's state (created, running etc)
+     * @param cm container Manager
+     * @return container Docker Id
      */
     public static String getContainerId(String name, String state, DockerContainerManager cm) {
         DockerClient dockerClient = cm.getDockerClient();
+        
         ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
                 .withStatusFilter(Arrays.asList(state))
                 .withNameFilter(Arrays.asList(name))
@@ -125,53 +111,4 @@ public class DockerContainerManagerTest {
         }
         return null;
     }
-    /**
-     * Returns a Docker state of a given container {@code dockerId}.
-     * 
-     * @param dockerId Docker id of the container
-     * @return state Docker state of the container
-     * @throws URISyntaxException
-     */
-    /*
-    public static String getDockerState(String dockerId) throws URISyntaxException {
-        String dockerState = null;
-        
-        Runtime rt = Runtime.getRuntime();
-        String command = "docker container ls -a";
-        try {
-            Process proc = rt.exec(command);
-            BufferedReader stdInput = new BufferedReader(new 
-                 InputStreamReader(proc.getInputStream()));
-            
-            // Read the output from the command
-            String line = null;
-            while (true) {
-                line = stdInput.readLine();
-                if (line == null) {
-                    break;
-                }
-                
-                // Output to parse:
-                // CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS    
-                // 8f6983acd81a        arvindr226/alpine-ssh    "/usr/sbin/sshd -D"      3 weeks ago         Up 3 secon
-                
-                // Skipping the header
-                if (line.substring(0, 12).equals("CONTAINER ID")) {
-                    continue;
-                }
-                String conId = line.substring(0, 12).trim();
-                
-                if (conId.equals(dockerId)) {
-                    String status = line.substring(90, 120).trim();
-                    String[] statusAsList = status.split(" ");
-                    dockerState = statusAsList[0];
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        
-        return dockerState;
-    }
-    */
 }
