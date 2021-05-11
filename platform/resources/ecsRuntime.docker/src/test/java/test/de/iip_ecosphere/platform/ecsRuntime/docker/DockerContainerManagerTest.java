@@ -18,8 +18,10 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -28,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Container;
 
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
@@ -47,6 +50,8 @@ public class DockerContainerManagerTest {
     /**
      * Template test.
      * @throws URISyntaxException 
+     * @throws ExecutionException 
+     * @throws InterruptedException 
      */
     @Test
     public void testContainerManager() throws URISyntaxException, ExecutionException, InterruptedException {
@@ -56,40 +61,104 @@ public class DockerContainerManagerTest {
         Assert.assertTrue(cm instanceof DockerContainerManager);
         // TODO go on testing with cm
         String testId = "01";
+        String testName = "test-container";
         
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = workingDir + "/src/test/resources/";
         URI location = new URI(imageLocationStr);
-        
+
         // Is the id of the container same as in the yaml file?
         Assert.assertEquals(testId, cm.addContainer(location));
-        
-        // Is Docker container with a given name deployed?
-        String dockerId = cm.getContainer(testId).getDockerId();
-        Assert.assertEquals("Created", getDockerState(dockerId));
+        Thread.sleep(2000);
+        // Does the container have a Docker Id?
+        Assert.assertNotNull(cm.getDockerId(testName));
+
         /*
-        //---- Starting container -----------------
-        cm.startContainer(testId);
-        Thread.sleep(3000);
-        Assert.assertEquals("Up", getDockerState(dockerId));
+        System.out.println("con nach Name: " 
+            + dockerClient.listContainersCmd().withNameFilter(Arrays.asList("/test-container")).exec());
         
+        System.out.println("con Created: " 
+            + dockerClient.listContainersCmd()
+                          .withStatusFilter(statusCreatedList)
+                          .withNameFilter(Arrays.asList(testName))
+                          .exec());
+        ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
+                .withStatusFilter(statusCreatedList)
+                .withNameFilter(Arrays.asList(testName))
+                .exec();
+        System.out.println("Container: " + containers);
+        for (int i = 0; i < containers.size(); i++) {
+            Container container = containers.get(i);
+            String[] dockerNames = container.getNames();
+            String dockerName = container.getNames()[0];
+            dockerName = dockerName.substring(1, dockerName.length());
+            if (dockerName.equals(testName)) {
+                String dockerId = container.getId();
+                System.out.println("Name: " + dockerName + "  Id"  + dockerId);
+            }
+            
+            
+        }
+        */
+        // TODO Is Docker container with a given name deployed?
+        //Assert.assertEquals("Created", getDockerState(dockerId)); does not work
+        
+        //---- Starting container -----------------
+        
+        cm.startContainer(testId);
+        System.out.println("con started");
+        Thread.sleep(3000);
+        // Checking if there is a running container with a given name
+        Assert.assertNotNull(getContainerId(testName, "running", cm));
+
         //---- Stopping container -----------------
         
         cm.stopContainer(testId);
         Thread.sleep(3000);
+        Assert.assertNull(getContainerId(testName, "running", cm));
+        /*
+        Thread.sleep(3000);
         Assert.assertEquals("Exited", getDockerState(dockerId));
         */
         // Removing container
-        //cm.undeployContainer(testId);
-        
+        cm.undeployContainer(testId);
+        /*
         // Removing container directly with API client
-        DockerClient dockerClient = cm.getDockerClient();
         dockerClient.removeContainerCmd("test-container").exec();
-        
+        */
         ActiveAasBase.setNotificationMode(oldM);
     }
     
+    /**
+     * todo.
+     * @param name
+     * @param state
+     * @param cm
+     * @return Docker container id
+     */
+    public static String getContainerId(String name, String state, DockerContainerManager cm) {
+        DockerClient dockerClient = cm.getDockerClient();
+        ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
+                .withStatusFilter(Arrays.asList(state))
+                .withNameFilter(Arrays.asList(name))
+                .exec();
+        
+        if (containers.size() == 0) {
+            return null;
+        } 
+        
+        for (int i = 0; i < containers.size(); i++) {
+            Container container = containers.get(i);
+            String dockerName = container.getNames()[0];
+            // removing the slash symbol before the name
+            dockerName = dockerName.substring(1, dockerName.length());
+            if (dockerName.equals(name)) {
+                return container.getId();
+            }
+        }
+        return null;
+    }
     /**
      * Returns a Docker state of a given container {@code dockerId}.
      * 
@@ -97,6 +166,7 @@ public class DockerContainerManagerTest {
      * @return state Docker state of the container
      * @throws URISyntaxException
      */
+    /*
     public static String getDockerState(String dockerId) throws URISyntaxException {
         String dockerState = null;
         
@@ -137,5 +207,5 @@ public class DockerContainerManagerTest {
         
         return dockerState;
     }
-    
+    */
 }
