@@ -240,7 +240,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         return super.getContainers();
     }
     
-    /** TODO change so it is working for container in any state!
+    /** 
      * Returns an id of a Docker container with a given {@code name}.
      * @param name container's name
      * @return docker container id
@@ -248,7 +248,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getDockerId(String name) {
         DockerClient dockerClient = this.getDockerClient();
         ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
-                .withStatusFilter(Arrays.asList("created"))
+                .withStatusFilter(Arrays.asList("created", "restarting", "running", "paused", "exited"))
                 .withNameFilter(Arrays.asList(name))
                 .exec();
         
@@ -268,44 +268,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         
         return null;
-        
-        /* Old version
-        Runtime rt = Runtime.getRuntime();
-        String command = "docker container ls -a";
-        try {
-            Process proc = rt.exec(command);
-            BufferedReader stdInput = new BufferedReader(new 
-                 InputStreamReader(proc.getInputStream()));
-
-            BufferedReader stdError = new BufferedReader(new 
-                 InputStreamReader(proc.getErrorStream()));
-            
-            // Read the output from the command
-            String line = null;
-            while (true) {
-                line = stdInput.readLine();
-                if (line == null) {
-                    break;
-                }
-                
-                // Output to parse:
-                // CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS    
-                // 8f6983acd81a        arvindr226/alpine-ssh    "/usr/sbin/sshd -D"      3 weeks ago         Up 3 secon
-                
-                // Skipping the header
-                if (line.substring(0, 12).equals("CONTAINER ID")) {
-                    continue;
-                }
-                int lineLength = line.length();
-                String conName = line.substring(138, lineLength).trim();
-                if (conName.equals(name)) {
-                    dockerId = line.substring(0, 12).trim();
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        */
     }
 
     @Override
