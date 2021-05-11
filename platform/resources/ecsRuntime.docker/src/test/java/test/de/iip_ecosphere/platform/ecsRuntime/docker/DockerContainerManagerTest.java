@@ -52,11 +52,6 @@ public class DockerContainerManagerTest {
         String testId = "01";
         String testName = "test-container";
         
-        DockerClient dockerClient = cm.getDockerClient();
-        dockerClient.removeContainerCmd(testName).exec();
-        
-        
-        /*
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = workingDir + "/src/test/resources/";
@@ -81,7 +76,7 @@ public class DockerContainerManagerTest {
 
         // Removing container
         cm.undeployContainer(testId);
-        */
+        
         ActiveAasBase.setNotificationMode(oldM);
     }
     
