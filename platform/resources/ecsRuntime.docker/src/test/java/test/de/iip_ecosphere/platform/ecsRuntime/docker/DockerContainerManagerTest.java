@@ -62,7 +62,7 @@ public class DockerContainerManagerTest {
         // TODO go on testing with cm
         String testId = "01";
         String testName = "test-container";
-        
+        /*
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = workingDir + "/src/test/resources/";
@@ -73,36 +73,6 @@ public class DockerContainerManagerTest {
         Thread.sleep(2000);
         // Does the container have a Docker Id?
         Assert.assertNotNull(cm.getDockerId(testName));
-
-        /*
-        System.out.println("con nach Name: " 
-            + dockerClient.listContainersCmd().withNameFilter(Arrays.asList("/test-container")).exec());
-        
-        System.out.println("con Created: " 
-            + dockerClient.listContainersCmd()
-                          .withStatusFilter(statusCreatedList)
-                          .withNameFilter(Arrays.asList(testName))
-                          .exec());
-        ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
-                .withStatusFilter(statusCreatedList)
-                .withNameFilter(Arrays.asList(testName))
-                .exec();
-        System.out.println("Container: " + containers);
-        for (int i = 0; i < containers.size(); i++) {
-            Container container = containers.get(i);
-            String[] dockerNames = container.getNames();
-            String dockerName = container.getNames()[0];
-            dockerName = dockerName.substring(1, dockerName.length());
-            if (dockerName.equals(testName)) {
-                String dockerId = container.getId();
-                System.out.println("Name: " + dockerName + "  Id"  + dockerId);
-            }
-            
-            
-        }
-        */
-        // TODO Is Docker container with a given name deployed?
-        //Assert.assertEquals("Created", getDockerState(dockerId)); does not work
         
         //---- Starting container -----------------
         
@@ -117,16 +87,16 @@ public class DockerContainerManagerTest {
         cm.stopContainer(testId);
         Thread.sleep(3000);
         Assert.assertNull(getContainerId(testName, "running", cm));
-        /*
-        Thread.sleep(3000);
-        Assert.assertEquals("Exited", getDockerState(dockerId));
-        */
+
         // Removing container
         cm.undeployContainer(testId);
-        /*
-        // Removing container directly with API client
-        dockerClient.removeContainerCmd("test-container").exec();
         */
+        
+        
+        // Removing container directly with API client
+        DockerClient dockerClient = cm.getDockerClient();
+        dockerClient.removeContainerCmd("test-container").exec();
+        
         ActiveAasBase.setNotificationMode(oldM);
     }
     
