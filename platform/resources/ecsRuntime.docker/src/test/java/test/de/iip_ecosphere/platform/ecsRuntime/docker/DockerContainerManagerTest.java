@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.dockerjava.api.DockerClient;
+
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor;
@@ -79,8 +81,9 @@ public class DockerContainerManagerTest {
         Assert.assertEquals("Exited", getDockerState(dockerId));
         */
         // Removing container
-        cm.undeployContainer(testId);
-        
+        //cm.undeployContainer(testId);
+        DockerClient dockerClient = cm.getDockerClient();
+        dockerClient.removeContainerCmd("test-container").exec();
         ActiveAasBase.setNotificationMode(oldM);
     }
     
