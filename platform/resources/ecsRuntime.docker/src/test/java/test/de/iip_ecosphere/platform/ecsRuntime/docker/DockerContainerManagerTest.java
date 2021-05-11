@@ -55,6 +55,7 @@ public class DockerContainerManagerTest {
         DockerClient dockerClient = cm.getDockerClient();
         dockerClient.removeContainerCmd(testName).exec();
         
+        
         /*
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
