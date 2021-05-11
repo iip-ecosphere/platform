@@ -240,7 +240,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         return super.getContainers();
     }
     
-    /** 
+    /** TODO change so it is working for container in any state!
      * Returns an id of a Docker container with a given {@code name}.
      * @param name container's name
      * @return docker container id
@@ -248,6 +248,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getDockerId(String name) {
         DockerClient dockerClient = this.getDockerClient();
         ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
+                .withStatusFilter(Arrays.asList("created"))
                 .withNameFilter(Arrays.asList(name))
                 .exec();
         
