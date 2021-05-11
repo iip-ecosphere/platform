@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -232,20 +234,42 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         return state;
     }
-    
+    // TODO do I need it?
     @Override
     public Collection<DockerContainerDescriptor> getContainers() {
         return super.getContainers();
     }
     
-    /**
+    /** TODO change so it is working for container in any state!
      * Returns an id of a Docker container with a given {@code name}.
      * @param name container's name
      * @return docker container id
      */
     public String getDockerId(String name) {
-        String dockerId = null;
+        DockerClient dockerClient = this.getDockerClient();
+        ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
+                .withStatusFilter(Arrays.asList("created"))
+                .withNameFilter(Arrays.asList(name))
+                .exec();
         
+        if (containers.size() == 0) {
+            // TODO exception?
+            return null;
+        } 
+        
+        for (int i = 0; i < containers.size(); i++) {
+            Container container = containers.get(i);
+            String dockerName = container.getNames()[0];
+            // removing the slash symbol before the name
+            dockerName = dockerName.substring(1, dockerName.length());
+            if (dockerName.equals(name)) {
+                return container.getId();
+            }
+        }
+        
+        return null;
+        
+        /* Old version
         Runtime rt = Runtime.getRuntime();
         String command = "docker container ls -a";
         try {
@@ -281,7 +305,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         } catch (IOException e) {
             System.out.println(e);
         }
-        return dockerId;
+        */
     }
 
     @Override
