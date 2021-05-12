@@ -82,7 +82,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             // VIL model name is fix, IVML/Configuration name may change
             exec.setVilModelName(ConfigurationSetup.PLATFORM_META_MODEL_NAME);
             // self-instantiation into gen, assumed to be empty, may be cleaned up
-            exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl/java"));
+            //exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl")); // can be, but not needed
             exec.setVilSource(setup.getGenTarget());
             exec.setVilTarget(setup.getGenTarget());
             File ivmlCfg = setup.getIvmlConfigFolder();
