@@ -68,6 +68,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
       <version>${project.version}</version>
