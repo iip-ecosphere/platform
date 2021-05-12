@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.support.net;
 
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -35,8 +34,7 @@ public class NetworkManagerFactory {
      */
     public static NetworkManager getInstance() {
         if (null == instance) {
-            ServiceLoader<NetworkManagerDescriptor> loader = ServiceLoader.load(NetworkManagerDescriptor.class);
-            Optional<NetworkManagerDescriptor> first = ServiceLoaderUtils.findFirst(loader);
+            Optional<NetworkManagerDescriptor> first = ServiceLoaderUtils.findFirst(NetworkManagerDescriptor.class);
             if (first.isPresent()) {
                 instance = first.get().createInstance();
                 if (null != instance) {

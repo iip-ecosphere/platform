@@ -45,6 +45,17 @@ public class ServiceLoaderUtils {
         }
         return first;
     }
+    
+    /**
+     * Convenience method for {@link #findFirst(ServiceLoader)} based on default loading of the service descriptors.
+     * 
+     * @param <D> the descriptor type
+     * @param descriptorClass the descriptor class
+     * @return the first service provider
+     */
+    public static <D> Optional<D> findFirst(Class<D> descriptorClass) {
+        return findFirst(ServiceLoader.load(descriptorClass));
+    }
 
     /**
      * Load the first available service provider of the given {@code loader}'s service. [JDK 1.8 compatibility]
