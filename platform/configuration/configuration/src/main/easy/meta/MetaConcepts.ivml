@@ -1,0 +1,101 @@
+project MetaConcepts {
+
+    // type names in here with prefix C for "Conceptual Level" to ease 
+    // later usage
+    
+    const String COPY_PREFIX = "TMP_";
+    typedef NonEmptyString String with (size(NonEmptyString) > 0 and isDefined(NonEmptyString));
+	enum BindingTime {compile = 0, startup = 1, runtimeMon = 2, runtimeEnact = 3};
+	annotate BindingTime bindingTime = BindingTime::compile to MetaConcepts;
+    
+    compound CResource {
+        NonEmptyString name;
+    }
+    
+    compound CComputer refines CResource {
+    }
+    
+    compound CComponent {
+        NonEmptyString name;
+        setOf(refTo(CResource)) requires;
+        assign(bindingTime = BindingTime::runtimeEnact) to {
+            refTo(CResource) allocatedTo;
+        }
+    }
+    
+    // pragmatic separations as pipeline components are defined a bit differently
+    compound CDataComponent refines CComponent {
+        sequenceOf(CDataProperty) input;
+        sequenceOf(CDataProperty) output;
+        sequenceOf(CReversibleProperty) parameters;
+    }
+    
+    def Boolean fieldCheck(sequenceOf(CStructuralProperty) fTuples, sequenceOf(CStructuralProperty) aTuples) = true;
+    def Boolean parameterCheck(sequenceOf(CStructuralProperty) fParam, sequenceOf(CStructuralProperty) aParam) = true;
+    
+    // family has members of a certain compound type; for pragmatic (legacy) reasons,
+    // we do not require the actual runtime element to be part of the family
+    compound CFamily refines CDataComponent {
+        setOf(refTo(CDataComponent)) members;
+        
+        Constraint inputCheck = members->forAll(refTo(CDataComponent) m | fieldCheck(input, m.input));
+        Constraint outputCheck = members->forAll(refTo(CDataComponent) m | fieldCheck(output, m.output));
+        Constraint parameterCheck = members->forAll(refTo(CDataComponent) m | parameterCheck(parameters, m.parameters));
+        Constraint memberCheck = size(members) > 0 and isDefined(members);
+    }
+    
+    // a family that manages the active and available elements
+    compound CActiveFamily refines CFamily {
+        assign(bindingTime = BindingTime::runtimeEnact) to {
+            refTo(CDataComponent) actual;
+            // runtime instances may be used in different places and may have different properties
+            setOf(refTo(CDataComponent)) available = copy(members, COPY_PREFIX);
+            Constraint actualAlgorithmCheck = isDefined(actual) implies available.includes(actual);
+        }
+    }
+    
+    // pragmatic alternative to CActiveFamily: components can hold a family
+    // and the actual element is part of the members
+    compound CActiveComponent refines CComponent {
+        refTo(CFamily) family;
+        assign(bindingTime = BindingTime::runtimeEnact) to {
+            refTo(CDataComponent) actual;
+            // runtime instances may be used in different places and may have different properties
+            setOf(refTo(CDataComponent)) available = copy(family.members, COPY_PREFIX);
+            Constraint actualAlgorithmCheck = isDefined(actual) implies available.includes(actual);
+        }
+    }
+    
+    // and CDataComponents may also act as family holders
+    compound CActiveDataComponent refines CDataComponent {
+        refTo(CFamily) family;
+        assign(bindingTime = BindingTime::runtimeEnact) to {
+            refTo(CDataComponent) actual;
+            // runtime instances may be used in different places and may have different properties
+            setOf(refTo(CDataComponent)) available = copy(family.members, COPY_PREFIX);
+            Constraint actualAlgorithmCheck = isDefined(actual) implies available.includes(actual);
+        }
+    }
+    
+    compound CConnector {
+        NonEmptyString name;
+        refTo(Any) destination;
+    }
+    
+    abstract compound CStructuralProperty {
+        NonEmptyString name;
+    }
+    
+    compound CIrreversibleProperty refines CStructuralProperty {
+        Any type; // must be redefined
+        Any value; // must be redefined
+    }
+    
+    compound CReversibleProperty refines CIrreversibleProperty {
+        value.bindingTime = BindingTime::runtimeEnact;
+    }
+    
+    compound CDataProperty refines CStructuralProperty {
+    }
+
+}

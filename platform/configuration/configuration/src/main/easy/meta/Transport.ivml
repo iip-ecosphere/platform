@@ -1,0 +1,11 @@
+project Transport {
+
+    import DataTypes;
+    
+    enum Serializer { JSON, PROTOBUF };
+    Serializer serializer;
+    
+    // TODO what is the transport protocol
+    // playload limitation
+    
+}

@@ -1,0 +1,8 @@
+DS:net.ssehub.easy.reasoning.sseReasoner.Reasoner
+DS:net.ssehub.easy.instantiation.core.model.BuiltIn
+DS:de.uni_hildesheim.sse.IvmlParser
+DS:de.uni_hildesheim.sse.vil.templatelang.VtlExpressionParser
+DS:de.uni_hildesheim.sse.VilExpressionParser
+DS:net.ssehub.easy.instantiation.java.Registration
+DS:net.ssehub.easy.instantiation.ant.Registration
+DS:net.ssehub.easy.instantiation.maven.Registration

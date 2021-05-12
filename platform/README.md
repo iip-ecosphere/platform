@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform
 
-This is for all code realizing the IIP-Ecosphere platform. So far present:
+This is for all code realizing the IIP-Ecosphere platform consisting of:
 * Managed [Platform dependencies](https://github.com/iip-ecosphere/platform/tree/main/platform/platformDependencies/README.md) (parent POM)
 * [Support Layer](https://github.com/iip-ecosphere/platform/tree/main/platform/support/README.md) (with links to contained parts)
     * Asset Administration Shell (AAS) abstraction with Visitor, communication protocol support and useful recipes for deployment and I/O
@@ -17,11 +17,16 @@ This is for all code realizing the IIP-Ecosphere platform. So far present:
        * Platform connector for OPC UA v1 based on [Eclipse Milo](https://projects.eclipse.org/projects/iot.milo)
        * Platform connector for AAS based on the abstraction in the support layer
        * Platform connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
- * Services (in progress)
+ * Services
     * [Service management](https://github.com/iip-ecosphere/platform/tree/main/platform/services/README.md)
-    * [Resource services](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md)
-
-More to come soon with next focus on configuration integration and edge deployment. 
+ * Resources and Monitoring
+    * [Resource management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md)
+ * Security and Data Protection
+ * Reusable Intelligent Services
+ * Configuration
+    * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
+    * resource optimization
+    * adaptation
 
 For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md).
 

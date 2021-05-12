@@ -1,8 +1,9 @@
 # IIP-Ecosphere platform releases
 
 ### Upcoming release
-* Initial version of services layer
-* Initial version of resources/ECS runtime
+* Initial version of services layer, service management for Spring Cloud Stream
+* Initial version of resources/ECS runtime, container management for Docker
+* Initial configuration model/integration
 * Maven central deployment script, deployment guideline
 
 ### First release on Maven central (2021/03/06)

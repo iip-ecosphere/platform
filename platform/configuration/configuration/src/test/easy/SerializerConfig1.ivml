@@ -1,0 +1,27 @@
+project SerializerConfig1 {
+
+    import IIPEcosphere;
+    import DataTypes;
+    
+    serializer = Serializer::JSON;
+    
+    RecordType rec1 = {
+        name = "Rec1",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    // unconditional free for testing
+    freeze {
+        serializer;
+        rec1;
+    };
+
+}

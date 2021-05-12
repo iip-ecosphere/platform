@@ -1,0 +1,25 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+vilScript IIPEcosphere (Project source, Configuration config, Project target) {
+
+    // preliminary!!!
+
+    Path javaSrc = "${target}/src/main/java";
+    Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
+    Path javaSerializersSrc = "${javaSrc}/iip/serializers";
+    
+    main(Project source, Configuration config, Project target) = {
+        javaDatatypesSrc.mkdir();
+        javaSerializersSrc.mkdir();
+        for (RecordType r : RecordType.allInstances()) {
+            // generate for all languages and according to serializer settings
+            //String clsName = asTypeName(r.name); // TODO parameter passing fails
+            String recName = r.name;
+            String clsName = recName.firstToUpperCase().toIdentifier();
+            vilTemplateProcessor("JavaType", config, "${target}/src/main/java/iip/datatypes/${clsName}.java", type=r, pkg="iip.datatypes");
+            vilTemplateProcessor("JavaJsonSerializer", config, "${target}/src/main/java/iip/serializers/${clsName}Serializer.java", type=r, pkg="iip.serializers", typePkg="iip.datatypes");
+        };
+    }
+
+}
