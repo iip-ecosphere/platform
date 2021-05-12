@@ -118,32 +118,4 @@
     </dependency>
   </dependencies>
   
-  <build>
-    <plugins>
-      <!-- experiment  -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.2</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/jars</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>false</overWriteSnapshots>
-              <overWriteIfNewer>true</overWriteIfNewer>
-              <prependGroupId>true</prependGroupId>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- experiment  -->
-    </plugins>
-  </build>
-  
 </project>
