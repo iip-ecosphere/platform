@@ -60,6 +60,21 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     }
     
     @Override
+    public void setId(String id) {
+        super.setId(id);
+    }
+    
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
+    
+    @Override
+    public void setVersion(Version version) {
+        super.setVersion(version);
+    }
+    
+    @Override
     public void setState(ContainerState state) {
         super.setState(state);
     }
