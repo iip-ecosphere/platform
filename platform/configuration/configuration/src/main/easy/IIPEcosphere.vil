@@ -3,7 +3,7 @@ import JavaBasics;
 @advice(IIPEcosphere)
 vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
-    // preliminary!!!
+    // preliminary!!! make it language-generic
 
     Path javaSrc = "${target}/src/main/java";
     Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
@@ -14,9 +14,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         javaSerializersSrc.mkdir();
         for (RecordType r : RecordType.allInstances()) {
             // generate for all languages and according to serializer settings
-            //String clsName = asTypeName(r.name); // TODO parameter passing fails
-            String recName = r.name;
-            String clsName = recName.firstToUpperCase().toIdentifier();
+            String clsName = asTypeName(r.name);
             vilTemplateProcessor("JavaType", config, "${target}/src/main/java/iip/datatypes/${clsName}.java", type=r, pkg="iip.datatypes");
             vilTemplateProcessor("JavaJsonSerializer", config, "${target}/src/main/java/iip/serializers/${clsName}Serializer.java", type=r, pkg="iip.serializers", typePkg="iip.datatypes");
         };
