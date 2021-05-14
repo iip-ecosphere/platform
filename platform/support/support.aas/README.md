@@ -19,3 +19,8 @@ We apply the following principles (with links also in the package description of
 - Further deployment abstractions (remote)
 - Authentication/Security
 - AAS Events (currently occurring in BaSyx)
+
+**Open questions**
+- How to resolve references to their target?
+- How to correctly store an AAS so that the AASX also can read them back?
+- How to define semantic references, e.g., to eClass.
