@@ -134,7 +134,7 @@ public class MqttV5MessageBinderTest {
     /**
      * Testing.
      */
-    @Test
+    @Test(timeout = 180 * 1000)
     public void testMessages() {
         // wait for delivery
         TimeUtils.sleep(2000);

@@ -40,7 +40,7 @@ public class PahoMqttV5TransportConnectorTest {
      * 
      * @throws IOException in case that connection/communication fails
      */
-    @Test
+    @Test(timeout = 180 * 1000)
     public void testPahoConnector() throws IOException {
         ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 

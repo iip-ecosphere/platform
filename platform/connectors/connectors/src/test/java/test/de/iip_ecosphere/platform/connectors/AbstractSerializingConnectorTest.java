@@ -99,8 +99,8 @@ public abstract class AbstractSerializingConnectorTest {
      * 
      * @throws IOException in case that connection/communication fails
      */
-    @Test
-    public void testPahoConnector() throws IOException {
+    @Test(timeout = 180 * 1000)
+    public void testConnector() throws IOException {
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
         Server server = createTestServer(addr);
         server.start();
