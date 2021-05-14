@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
@@ -111,6 +112,17 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             return this;
         }
 
+        @Override
+        public PropertyBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (instance.property instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement
+                .dataelement.property.Property && ref != null) {
+                ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property) 
+                    instance.property).setSemanticID(ref);
+            }
+            return this;
+        }
+        
         @Override
         public Property build() {
             instance.property = property;

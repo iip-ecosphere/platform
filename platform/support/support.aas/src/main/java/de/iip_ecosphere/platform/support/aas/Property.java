@@ -73,6 +73,14 @@ public interface Property extends Element, DataElement {
          * @return <b>this</b>
          */
         public PropertyBuilder setValue(Type type, Object value);
+        
+        /**
+         * Sets the semantic ID of the property in terms of a reference.
+         * 
+         * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
+         * @return <b>this</b>
+         */
+        public PropertyBuilder setSemanticId(String refValue);
 
         /**
          * Binds the value of the property against functions, e.g., accessing an underlying object.

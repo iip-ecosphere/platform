@@ -15,7 +15,7 @@ We apply the following principles (with links also in the package description of
  - Implementation-specific parts like VAB-based remote method accesses are (so far) not represented by the abstraction rather than provided by the specific implementation. However, the output of these supporting/creation methods shall plugin into the builder mechanism explained above.
  
 **Missing**
-- Various AAS concepts (AAS, sub-model, sub-model elements, properties and operations do exist; the others will be added incrementally on demand)
+- Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
 - Further deployment abstractions (remote)
 - Authentication/Security
 - AAS Events (currently occurring in BaSyx)

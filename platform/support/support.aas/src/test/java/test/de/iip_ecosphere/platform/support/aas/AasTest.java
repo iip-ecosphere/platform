@@ -162,6 +162,7 @@ public class AasTest {
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
             .setType(Type.DOUBLE)
+            .setSemanticId("irdi:0173-1#02-AAV232#002") // id taken from BaSyX -> temperature ???
             .bind(invC.createGetter(NAME_VAR_POWCONSUMPTION), InvocablesCreator.READ_ONLY)
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)

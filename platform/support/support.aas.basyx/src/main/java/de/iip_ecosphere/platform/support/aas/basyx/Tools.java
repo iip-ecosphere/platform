@@ -21,6 +21,11 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
+import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
+import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +212,7 @@ public class Tools {
     }
 
     /**
-     * Translates an identifier.
+     * Translates an identifier. (supports URN and custom ids)
      * 
      * @param id the id showing some form of type, e.g., prefix "urn:", may be empty or <b>null</b> leading to 
      *   a custom identifier based on {@code dfltCustom}
@@ -223,6 +228,23 @@ public class Tools {
         } else {
             result = new CustomId(id);
         } // IRI, others?
+        return result;
+    }
+
+    /**
+     * Translates a reference. (supports IRDI)
+     * 
+     * @param id the for declaring the reference showing some form of type, e.g., prefix "irdi:", may be empty or 
+     * <b>null</b> leading to <b>null</b>
+     * @return the reference or <b>null</b>
+     */
+    public static IReference translateReference(String id) {
+        IReference result = null;
+        if (id != null) {
+            if (id.startsWith("irdi:")) {
+                result = new Reference(new Key(KeyElements.PROPERTY, false, id.substring(5), KeyType.IRDI));
+            }
+        }
         return result;
     }
     

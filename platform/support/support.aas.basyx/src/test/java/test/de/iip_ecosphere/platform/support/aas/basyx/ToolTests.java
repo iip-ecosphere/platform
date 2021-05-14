@@ -16,6 +16,10 @@ import org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
+import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
 import org.junit.Assert;
 import org.junit.Test;
@@ -186,6 +190,26 @@ public class ToolTests {
         assertIIdentifier("xyz", IdentifierType.CUSTOM, Tools.translateIdentifier("xyz", "aas"));
         assertIIdentifier("urn:::AAS:::testMachines#", IdentifierType.IRI, 
             Tools.translateIdentifier("urn:::AAS:::testMachines#", "aas"));
+    }
+    
+    /**
+     * Tests {@link Tools#translateReference(String)}.
+     */
+    @Test
+    public void testTranslateReference() {
+        Assert.assertNull(Tools.translateReference(null));
+        Assert.assertNull(Tools.translateReference(""));
+        Assert.assertNull(Tools.translateReference("aas"));
+        final String irdi = "0173-1#02-AAV232#002";
+        IReference ref = Tools.translateReference("irdi:" + irdi);
+        Assert.assertNotNull(ref);
+        Assert.assertTrue(ref.getKeys().size() > 0);
+        IKey key = ref.getKeys().get(0);
+        Assert.assertNotNull(key);
+        Assert.assertEquals(KeyElements.PROPERTY, key.getType());
+        Assert.assertEquals(false, key.isLocal());
+        Assert.assertEquals(irdi, key.getValue());
+        Assert.assertEquals(KeyType.IRDI, key.getIdType());
     }
 
     /**

@@ -31,6 +31,8 @@ public class FakeProperty extends FakeElement implements Property {
     private Object value;
     @SuppressWarnings("unused")
     private Type type;
+    @SuppressWarnings("unused")
+    private String semanticId;
     
     /**
      * A fake property builder.
@@ -83,6 +85,12 @@ public class FakeProperty extends FakeElement implements Property {
             return this;
         }
 
+        @Override
+        public PropertyBuilder setSemanticId(String refValue) {
+            instance.semanticId = refValue;
+            return this;
+        }
+        
         @Override
         public Property build() {
             return parent.register(instance);
