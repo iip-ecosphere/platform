@@ -44,11 +44,17 @@ public class DockerContainerManagerTest {
      */
     @Test
     public void testContainerManager() throws URISyntaxException, ExecutionException, InterruptedException {
+
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         // TODO test against full AAS setup, see EcsAasTest
         DockerContainerManager cm = (DockerContainerManager) EcsFactory.getContainerManager();
         Assert.assertTrue(cm instanceof DockerContainerManager);
-        // TODO go on testing with cm
+        
+        // Checking if Docker API Client can connect with Docker daemon.
+        if (cm.getDockerClient() == null) {
+            return;
+        }
+        
         String testId = "01";
         String testName = "test-container";
         
@@ -78,6 +84,7 @@ public class DockerContainerManagerTest {
         cm.undeployContainer(testId);
         
         ActiveAasBase.setNotificationMode(oldM);
+        
     }
     
     /**

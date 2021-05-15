@@ -122,7 +122,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
     
     /**
-     * Configures a Docker Client.
+     * Returns a Docker API Client.
+     * If there is not running Docker daemon on the host it returns null.
      * 
      * @return DockerClient
      */
@@ -134,6 +135,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 .sslConfig(standardConfig.getSSLConfig())
                 .build();
         DockerClient dockerClient = DockerClientImpl.getInstance(standardConfig, httpClient);
+        try {
+            dockerClient.infoCmd().exec();
+        } catch (Exception e) {
+            System.out.println("DockerContainerManager.getDockerClient() throws: " + e);
+            return null;
+        }
         return dockerClient;
     }
     
@@ -143,9 +150,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         String dockerId = container.getDockerId(); // TODO check if dockerId not null
         
         DockerClient dockerClient = getDockerClient();
-        dockerClient.startContainerCmd(dockerId).exec();
+        if (dockerClient != null) {
+            dockerClient.startContainerCmd(dockerId).exec();
+            setState(container, ContainerState.DEPLOYED);
+        } else {
+            int i = 0; // TODO
+        }
         
-        setState(container, ContainerState.DEPLOYED);
     }
 
     @Override
