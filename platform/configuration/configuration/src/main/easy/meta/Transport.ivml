@@ -2,10 +2,17 @@ project Transport {
 
     import DataTypes;
     
-    enum Serializer { JSON, PROTOBUF };
-    Serializer serializer;
+    // enum for now
+    enum Serializer { Json, ProtoBuf };
+    Serializer serializer = Serializer::Json;
+    Constraint serializerDefined = isDefined(serializer) and serializer <> null;
     
     // TODO what is the transport protocol
     // playload limitation
+    
+    freeze {
+        // prevent later changes of constraint but make it referencable to .text
+        serializerDefined;
+    };
     
 }

@@ -2,8 +2,9 @@ project SerializerConfig1 {
 
     import IIPEcosphere;
     import DataTypes;
-    
-    serializer = Serializer::JSON;
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
     
     RecordType rec1 = {
         name = "Rec1",
@@ -21,6 +22,8 @@ project SerializerConfig1 {
     // unconditional free for testing
     freeze {
         serializer;
+        serviceManager;
+        containerManager;
         rec1;
     };
 
