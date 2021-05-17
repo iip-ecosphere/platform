@@ -18,6 +18,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaType", config, "${target}/src/main/java/iip/datatypes/${clsName}.java", type=r, pkg="iip.datatypes");
             vilTemplateProcessor("JavaJsonSerializer", config, "${target}/src/main/java/iip/serializers/${clsName}Serializer.java", type=r, pkg="iip.serializers", typePkg="iip.datatypes");
         };
+        
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${target}/ecs.xml");
     }
 
 }

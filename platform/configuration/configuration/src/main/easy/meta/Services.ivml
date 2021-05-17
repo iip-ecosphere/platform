@@ -2,4 +2,15 @@ project Services {
 
    import Connectors;
    
+   // enum for now
+   enum ServiceManager { SpringCloudStream };
+   ServiceManager serviceManager = ServiceManager::SpringCloudStream;
+   Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
+ 
+   freeze {
+       // prevent later changes of constraint but make it referencable to .text
+       serviceManagerDefined;
+   };
+    
+   
 }

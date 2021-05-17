@@ -26,6 +26,8 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import net.ssehub.easy.reasoning.core.reasoner.Message;
+import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 
 /**
  * Tests the configuration component, in particular the IVML models.
@@ -80,7 +82,14 @@ public class IvmlTests {
         ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
-        Assert.assertFalse(ConfigurationManager.validateAndPropagate().hasConflict());
+        ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
+        for (int m = 0; m < rRes.getMessageCount(); m++) {
+            Message msg = rRes.getMessage(m);
+            System.out.println(msg.getDescription());
+            System.out.println(msg.getConflictComments());
+            System.out.println(msg.getConflictSuggestions());
+        }
+        Assert.assertFalse(rRes.hasConflict());
         // throws exception if it fails
         ConfigurationManager.instantiate();
         lcd.shutdown();

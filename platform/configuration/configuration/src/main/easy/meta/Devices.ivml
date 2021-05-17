@@ -1,5 +1,19 @@
 project Devices {
 
     import Services;
+    
+    // enum for now
+    enum ContainerManager { Docker };
+    ContainerManager containerManager = ContainerManager::Docker;
+    Constraint containerManagerDefined = isDefined(containerManager) and containerManager <> null;
+    
+    compound EcsDevice {
+        String id;
+    }
+    
+    freeze {
+        // prevent later changes of constraint but make it referencable to .text
+        containerManagerDefined;
+    };
 
 }
