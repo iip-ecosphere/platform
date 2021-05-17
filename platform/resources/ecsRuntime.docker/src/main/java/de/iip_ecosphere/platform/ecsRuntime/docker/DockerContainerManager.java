@@ -287,12 +287,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
 
     @Override
-    public String getContainerSystemVersion() throws IOException {
+    public String getContainerSystemVersion() {
         DockerContainerManager cm = (DockerContainerManager) EcsFactory.getContainerManager();
         DockerClient dockerClient = cm.getDockerClient();
+        /*
         if (dockerClient == null) {
             throw new IOException("No running Docker daemon found.");
-        }
+        }*/
         Info dockerInfo = dockerClient.infoCmd().exec();
         String dockerServerVersion = dockerInfo.getServerVersion();
         return dockerServerVersion;
