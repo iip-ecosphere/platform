@@ -26,6 +26,8 @@ import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 public class DockerConfiguration extends Configuration {
 
     private String dockerHost;
+    private String dockerImageYamlFilename;
+    private boolean deleteWhenUndeployed;
    
     /**
      * Returns the docker host.
@@ -45,6 +47,42 @@ public class DockerConfiguration extends Configuration {
         this.dockerHost = dockerHost;
     }
     
+    /**
+     * Returns the name of the Yaml file with information about the Docker Image.
+     * 
+     * @return Name of the Yaml file
+     */
+    public String getDockerImageYamlFilename() {
+        return this.dockerImageYamlFilename;
+    }
+    
+    /**
+     * Defines the standard name of the Yaml file with a information about the Docker Image.
+     * 
+     * @param filename the name of the Yaml file
+     */
+    public void setDockerImageYamlFilename(String filename) {
+        this.dockerImageYamlFilename = filename;
+    }
+    
+    /**
+     * Returns True if Docker files should be removed when the corresponding container
+     * gets undeployed. Otherwise it returns False.
+     *  
+     * @return True/False
+     */
+    public boolean getDeleteWhenUndeployed() {
+        return this.deleteWhenUndeployed;
+    }
+    /**
+     * Defines if Docker files should be deleted when the corresponding container 
+     * gets undeployed.
+     * 
+     * @param deleteWhenUndeployed True or False
+     */
+    public void setDeleteWhenUndeployed(boolean deleteWhenUndeployed) {
+        this.deleteWhenUndeployed = deleteWhenUndeployed;
+    }
      /**
      * Reads a {@link DockerConfiguration} instance from a default "ecsRuntime.yml" file in the root folder of the jar. 
      *
