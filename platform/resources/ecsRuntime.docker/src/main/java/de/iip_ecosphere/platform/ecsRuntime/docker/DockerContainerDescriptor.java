@@ -15,18 +15,11 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
