@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
@@ -104,7 +105,8 @@ public interface ContainerOperations {
      * of {@link Version}, we just return here a string.
      * 
      * @return the version
+     * @throws IOException if connecting to container service failed
      */
-    public String getContainerSystemVersion();
+    public String getContainerSystemVersion() throws IOException;
 
 }
