@@ -105,8 +105,7 @@ public interface ContainerOperations {
      * of {@link Version}, we just return here a string.
      * 
      * @return the version
-     * @throws IOException if connecting to container service failed
      */
-    public String getContainerSystemVersion() throws IOException;
+    public String getContainerSystemVersion();
 
 }
