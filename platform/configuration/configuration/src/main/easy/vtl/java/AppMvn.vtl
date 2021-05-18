@@ -5,7 +5,7 @@ template AppMvn(Configuration config, XmlFileArtifact target) {
 
     def main(Configuration config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
-        String projectVersion = "$" + "{project.version}";
+        String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "app.exec", "ConfiguredApp", "Configured Application");

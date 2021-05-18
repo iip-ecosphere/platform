@@ -28,8 +28,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         };
         
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");
+        //maven("${appRoot}");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
+        //maven("${ecsRuntimeRoot}");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
+        //maven("${serviceMgrRoot}");
     }
 
 }

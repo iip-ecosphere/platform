@@ -12,7 +12,7 @@ template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
 
     def main(Configuration config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
-        String projectVersion = "$" + "{project.version}";
+        String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "ecsRuntime.exec", "ConfiguredEcsRuntime", "Configured ECS runtime");
