@@ -77,7 +77,9 @@ public class IvmlTests {
         ConfigurationSetup setup = ConfigurationSetup.getConfiguration();
         setup.setIvmlModelName("SerializerConfig1");
         setup.setIvmlConfigFolder(new File("src/test/easy"));
-        File gen = FileUtils.createTmpFolder("gen-SerializerConfig1", true);
+        File gen = new File("gen/tests/SerializerConfig1");
+        FileUtils.deleteQuietly(gen);
+        gen.mkdirs();
         setup.setGenTarget(gen);
         ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
@@ -96,7 +98,6 @@ public class IvmlTests {
         setup.reset();
         assertFile(gen, "src/main/java/iip/datatypes/Rec1.java");
         assertFile(gen, "src/main/java/iip/serializers/Rec1Serializer.java");
-        FileUtils.deleteQuietly(gen);
     }
     
     /**

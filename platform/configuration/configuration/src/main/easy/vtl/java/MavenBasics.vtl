@@ -1,0 +1,57 @@
+@advice(IIPEcosphere)
+template MavenBasics(Configuration config, XmlFileArtifact target) {
+
+    // creates the Maven root element(s) in the given [empty] XML file
+    // returns the <project> node
+    def XmlElement createMavenRoot(XmlFileArtifact target) {
+        target.setOmitXmlDeclaration(true);
+        XmlElement project = target.createRootElement("project");
+        buildAttribute(buildAttribute(buildAttribute(project, "xmlns", "http://maven.apache.org/POM/4.0.0"), "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"), "xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd");
+        buildElement(project, "modelVersion", "4.0.0");
+    }
+    
+    // appends a dependency. parent shall be a <dependencies> node. If groupId or artifactId are empty, nothing is emitted
+    // version, type and scope are as in Maven and, by default, empty
+    // returns the dependency XML element 
+    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "") {
+        if (groupId.length() > 0 and artifactId.length() > 0) {
+            XmlElement dep = new XmlElement(parent, "dependency");
+            new XmlElement(dep, "groupId", groupId);
+            new XmlElement(dep, "artifactId", artifactId);
+            if (ver.length() > 0) {
+                new XmlElement(dep, "version", ver);
+            }
+            if (type.length() > 0) {
+                new XmlElement(dep, "type", type);
+            }
+            if (scope.length() > 0) {
+                new XmlElement(dep, "scope", scope);
+            }
+            dep;
+        }
+    }
+    
+    // creates the Maven attributes for the project itself. The parent is the <project> node as e.g. returned by createMavenRoot
+    // name or description may be omitted, packaging is by default "jar"
+    def createMavenProjectAttributes(XmlElement project, String artifactId, String name, String description, String packaging="jar") {
+        new XmlElement(project, "artifactId", artifactId);
+        new XmlElement(project, "packaging", packaging);
+        if (name.length() > 0) {
+            new XmlElement(project, "name", name);
+        }
+        if (description.length() > 0) {
+            new XmlElement(project, "description", description);
+        }
+    }
+
+    // creates the Maven parent element, to reference to a parent pom
+    // The parent is the <project> node as e.g. returned by createMavenRoot     
+    def createMavenParent(XmlElement project, String groupId, String artifactId, String version) {
+        XmlElement par = new XmlElement(project, "parent");
+        new XmlElement(par, "groupId", groupId);
+        new XmlElement(par, "artifactId", artifactId);
+        new XmlElement(par, "version", version);
+        par;
+    }
+
+}

@@ -1,62 +1,25 @@
-import JavaBasics;
+import MavenBasics;
 
 @advice(IIPEcosphere)
 template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
 
-    def XmlElement createMavenRoot(XmlFileArtifact target) {
-        target.setOmitXmlDeclaration(true);
-        XmlElement project = target.createRootElement("project");
-        buildAttribute(buildAttribute(buildAttribute(project, "xmlns", "http://maven.apache.org/POM/4.0.0"), "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"), "xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd");
-        buildElement(project, "modelVersion", "4.0.0");
-    }
-    
-    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "") {
-        XmlElement dep = new XmlElement(parent, "dependency");
-        new XmlElement(dep, "groupId", groupId);
-        new XmlElement(dep, "artifactId", artifactId);
-        if (ver.length() > 0) {
-            new XmlElement(dep, "version", ver);
+    def String containerManager(IIPEcosphere cfg) {
+        switch(cfg.containerManager) {
+            ContainerManager::Docker: "ecsRuntime.docker",
+            default: ""
         }
-        if (type.length() > 0) {
-            new XmlElement(dep, "type", type);
-        }
-        if (scope.length() > 0) {
-            new XmlElement(dep, "scope", scope);
-        }
-        dep;
-    }
-    
-    def createMavenProjectAttributes(XmlElement project, String artifactId, String name, String description, String packaging="jar") {
-        new XmlElement(project, "artifactId", artifactId);
-        new XmlElement(project, "packaging", packaging);
-        if (name.length() > 0) {
-            new XmlElement(project, "name", name);
-        }
-        if (description.length() > 0) {
-            new XmlElement(project, "description", description);
-        }
-    }
-    
-    def createMavenParent(XmlElement project, String groupId, String artifactId, String version) {
-        XmlElement par = new XmlElement(project, "parent");
-        new XmlElement(par, "groupId", groupId);
-        new XmlElement(par, "artifactId", artifactId);
-        new XmlElement(par, "version", version);
-        par;
     }
 
     def main(Configuration config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "$" + "{project.version}";
+        
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "ecsRuntime.exec", "EcsRuntime", "Configured ECS runtime");
+        createMavenProjectAttributes(project, "ecsRuntime.exec", "ConfiguredEcsRuntime", "Configured ECS runtime");
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
-        IIPEcosphere cfg = config;
-        if (cfg.containerManager == ContainerManager::Docker) {
-            appendDependency(dep, iipGroup, "ecsRuntime.docker", projectVersion);
-        }
+        appendDependency(dep, iipGroup, containerManager(config), projectVersion);
         appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
     }
 

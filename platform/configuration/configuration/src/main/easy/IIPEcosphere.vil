@@ -20,6 +20,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         };
         
         vilTemplateProcessor("EcsRuntimeMvn", config, "${target}/ecs.xml");
+        vilTemplateProcessor("ServiceControlMvn", config, "${target}/services.xml");
     }
 
 }
