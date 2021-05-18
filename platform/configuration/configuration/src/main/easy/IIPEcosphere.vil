@@ -5,22 +5,30 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // preliminary!!! make it language-generic
 
-    Path javaSrc = "${target}/src/main/java";
+    Path appRoot = "${target}/app";
+    Path javaSrc = "${appRoot}/src/main/java";
+    String javaDatatypesPackage = "iip.datatypes"; // link to javaDatatypesSrc
     Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
+    String javaSerializersPackage = "iip.serializers"; // link to javaSerializersSrc
     Path javaSerializersSrc = "${javaSrc}/iip/serializers";
+    Path ecsRuntimeRoot = "${target}/ecsRuntime";
+    Path serviceMgrRoot = "${target}/serviceMgr";
     
     main(Project source, Configuration config, Project target) = {
         javaDatatypesSrc.mkdir();
         javaSerializersSrc.mkdir();
+        ecsRuntimeRoot.mkdir();
+        serviceMgrRoot.mkdir();
+        
         for (RecordType r : RecordType.allInstances()) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
-            vilTemplateProcessor("JavaType", config, "${target}/src/main/java/iip/datatypes/${clsName}.java", type=r, pkg="iip.datatypes");
-            vilTemplateProcessor("JavaJsonSerializer", config, "${target}/src/main/java/iip/serializers/${clsName}Serializer.java", type=r, pkg="iip.serializers", typePkg="iip.datatypes");
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
         };
         
-        vilTemplateProcessor("EcsRuntimeMvn", config, "${target}/ecs.xml");
-        vilTemplateProcessor("ServiceControlMvn", config, "${target}/services.xml");
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
+        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
     }
 
 }

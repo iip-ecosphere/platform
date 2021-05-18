@@ -96,8 +96,10 @@ public class IvmlTests {
         ConfigurationManager.instantiate();
         lcd.shutdown();
         setup.reset();
-        assertFile(gen, "src/main/java/iip/datatypes/Rec1.java");
-        assertFile(gen, "src/main/java/iip/serializers/Rec1Serializer.java");
+        assertFile(gen, "app/src/main/java/iip/datatypes/Rec1.java");
+        assertFile(gen, "app/src/main/java/iip/serializers/Rec1Serializer.java");
+        assertFile(gen, "ecsRuntime/pom.xml");
+        assertFile(gen, "serviceMgr/pom.xml");
     }
     
     /**
