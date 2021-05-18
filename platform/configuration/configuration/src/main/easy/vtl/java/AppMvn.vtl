@@ -1,0 +1,17 @@
+import MavenBasics;
+
+@advice(IIPEcosphere)
+template AppMvn(Configuration config, XmlFileArtifact target) {
+
+    def main(Configuration config, XmlFileArtifact target) {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String projectVersion = "$" + "{project.version}";
+        
+        XmlElement project = createMavenRoot(target);
+        createMavenProjectAttributes(project, "app.exec", "ConfiguredApp", "Configured Application");
+        createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
+        XmlElement dep = new XmlElement(project, "dependencies");
+        appendDependency(dep, iipGroup, "transport", projectVersion);
+    }
+
+}
