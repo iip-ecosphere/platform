@@ -29,8 +29,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");
         maven("${appRoot}");
+        // TODO instantiate application.yml
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
         maven("${ecsRuntimeRoot}");
+        // TODO instantiate application.yml
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
         maven("${serviceMgrRoot}");
     }
