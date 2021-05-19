@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime.docker;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import org.junit.Test;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 
+import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerManager;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -41,9 +43,11 @@ public class DockerContainerManagerTest {
      * @throws URISyntaxException 
      * @throws ExecutionException 
      * @throws InterruptedException 
+     * @throws IOException 
      */
     @Test
-    public void testContainerManager() throws URISyntaxException, ExecutionException, InterruptedException {
+    public void testContainerManager() throws 
+        URISyntaxException, ExecutionException, InterruptedException, IOException {
 
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         // TODO test against full AAS setup, see EcsAasTest
@@ -65,7 +69,8 @@ public class DockerContainerManagerTest {
 
         // Is the id of the container same as in the yaml file?
         Assert.assertEquals(testId, cm.addContainer(location));
-        Thread.sleep(2000);
+        Assert.assertEquals(ContainerState.AVAILABLE, cm.getState(testId));
+        Thread.sleep(4000);
         // Does the container have a Docker Id?
         Assert.assertNotNull(cm.getDockerId(testName));
         
@@ -74,11 +79,13 @@ public class DockerContainerManagerTest {
         Thread.sleep(3000);
         // Checking if there is a running container with a given name
         Assert.assertNotNull(getContainerId(testName, "running", cm));
+        Assert.assertEquals(ContainerState.DEPLOYED, cm.getState(testId));
 
         //---- Stopping container -----------------
         cm.stopContainer(testId);
         Thread.sleep(3000);
         Assert.assertNull(getContainerId(testName, "running", cm));
+        Assert.assertEquals(ContainerState.STOPPED, cm.getState(testId));
 
         // Removing container
         cm.undeployContainer(testId);

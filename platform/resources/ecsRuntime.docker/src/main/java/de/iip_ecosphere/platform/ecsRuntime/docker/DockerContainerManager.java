@@ -12,25 +12,21 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -41,8 +37,8 @@ import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
+import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
@@ -52,9 +48,9 @@ import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 public class DockerContainerManager extends AbstractContainerManager<DockerContainerDescriptor> {
 
     // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
-    private static String dockerhost = "unix:///var/run/docker.sock";
+    //private static String dockerhost = "unix:///var/run/docker.sock";
     private static DockerConfiguration config = DockerConfiguration.readFromYaml();
-    private static String standartDockerImageYamlFilename = "container-info.yml";
+    //private static String standartDockerImageYamlFilename = "image-info.yml";
     
     // don't change name of outer/inner class
     // TODO upon start, scan file-system for containers and add them automatically if applicable
@@ -83,7 +79,10 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String addContainer(URI location) throws ExecutionException {
         // TODO version with zip (de.iip_ecosphere.platform.support.JarUtils)
         String id = null;
-        String pathToYamlFile = "file://" + location.getPath() + standartDockerImageYamlFilename;
+        
+        FactoryDescriptor factory = new FactoryDescriptor();
+        DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
+        String pathToYamlFile = "file://" + location.getPath() + config.getDockerImageYamlFilename();
         DockerContainerDescriptor container;
         try {
             // Getting information about docker image from yaml file.
@@ -97,6 +96,10 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             URI dockerImageURI = new URI(pathToDockerImageFile);
             File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, null);
             DockerClient dockerClient = getDockerClient();
+            if (dockerClient == null) {
+                throw new IOException("No running Docker daemon found. Adding a container failed.");
+            }
+            
             InputStream in = new FileInputStream(dockerImageFile);
             dockerClient.loadImageCmd(in).exec();
             
@@ -121,13 +124,17 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         return id; 
     }
     
+    
+    
     /**
      * Returns a Docker API Client.
      * If there is not running Docker daemon on the host it returns null.
      * 
-     * @return DockerClient
+     * @return DockerClient/NULL
      */
     public DockerClient getDockerClient() {
+        DockerConfiguration config = DockerConfiguration.readFromYaml();
+        String dockerhost = config.getDockerHost();
         DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerhost).build(); 
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
@@ -150,21 +157,17 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         String dockerId = container.getDockerId(); // TODO check if dockerId not null
         
         DockerClient dockerClient = getDockerClient();
-        if (dockerClient != null) {
-            dockerClient.startContainerCmd(dockerId).exec();
-            setState(container, ContainerState.DEPLOYED);
-        } else {
-            int i = 0; // TODO
-        }
         
+        dockerClient.startContainerCmd(dockerId).exec();
+        setState(container, ContainerState.DEPLOYED);
     }
-
+    
     @Override
     public void stopContainer(String id) throws ExecutionException {
         DockerContainerDescriptor container = super.getContainer(id, "id", "stop");
         String dockerId = container.getDockerId();
         
-        DockerClient dockerClient = getDockerClient();     
+        DockerClient dockerClient = getDockerClient();        
         dockerClient.stopContainerCmd(dockerId).exec();
         
         setState(container, ContainerState.STOPPED);
@@ -195,20 +198,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public ContainerState getState(String id) {
-        // TODO implement
-        return null;
+        return super.getState(id);
     }
 
     @Override
     public Set<String> getIds() {
-        /*
-        Set<String> ids = new HashSet<String>();
-        List<DockerContainerDescriptor> containers = (List<DockerContainerDescriptor>) this.getContainers();
-        for (DockerContainerDescriptor container : containers) {
-            ids.add(container.getId());
-        }
-        */
-        return null;
+        return super.getIds();
     }
     
     /**
@@ -293,7 +288,14 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public String getContainerSystemVersion() {
-        // TODO implement (engine version)
-        return null;
+        DockerContainerManager cm = (DockerContainerManager) EcsFactory.getContainerManager();
+        DockerClient dockerClient = cm.getDockerClient();
+        /*
+        if (dockerClient == null) {
+            throw new IOException("No running Docker daemon found.");
+        }*/
+        Info dockerInfo = dockerClient.infoCmd().exec();
+        String dockerServerVersion = dockerInfo.getServerVersion();
+        return dockerServerVersion;
     }
 }
