@@ -1,14 +1,8 @@
 import MavenBasics;
+import JavaMapping;
 
 @advice(IIPEcosphere)
 template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
-
-    def String serviceManager(IIPEcosphere cfg) {
-        switch(cfg.serviceManager) {
-            ServiceManager.SpringCloudStream: "services.spring",
-            default: ""
-        }
-    }
 
     def main(Configuration config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
@@ -21,8 +15,9 @@ template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "services", projectVersion);
-        appendDependency(dep, iipGroup, serviceManager(config), projectVersion);
+        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, springGroup, "spring-boot-starter-web");
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
         

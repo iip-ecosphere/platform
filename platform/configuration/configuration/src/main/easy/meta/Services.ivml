@@ -6,6 +6,12 @@ project Services {
    enum ServiceManager { SpringCloudStream };
    ServiceManager serviceManager = ServiceManager::SpringCloudStream;
    Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
+   // TODO service manager requires corresponding broker
+ 
+   enum ServiceProtocol {AMQP, MQTTv3, MQTTv5, MQTTv3hive, MQTTv5hive};
+   ServiceProtocol serviceProtocol = ServiceProtocol::AMQP;
+   Constraint serviceProtocolDefined = isDefined(serviceProtocol) and serviceProtocol <> null;
+   // TODO link service to transport
  
    freeze {
        // prevent later changes of constraint but make it referencable to .text

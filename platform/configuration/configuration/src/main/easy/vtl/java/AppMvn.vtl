@@ -1,4 +1,5 @@
 import MavenBasics;
+import JavaMapping;
 
 @advice(IIPEcosphere)
 template AppMvn(Configuration config, XmlFileArtifact target) {
@@ -13,6 +14,8 @@ template AppMvn(Configuration config, XmlFileArtifact target) {
         
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "transport", projectVersion);
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
     }
 
 }

@@ -1,1 +1,2 @@
 Services::serviceManagerDefined = The service manager must be defined.
+Services::serviceProtocol = The service/streaming data protocol must be defined.

@@ -7,6 +7,10 @@ project Transport {
     Serializer serializer = Serializer::Json;
     Constraint serializerDefined = isDefined(serializer) and serializer <> null;
     
+    enum TransportProtocol {AMQP, MQTTv3, MQTTv5};
+    TransportProtocol transportProtocol = TransportProtocol::AMQP;
+    Constraint transportProtocolDefined = isDefined(transportProtocol) and transportProtocol<> null;
+    
     // TODO what is the transport protocol
     // playload limitation
     

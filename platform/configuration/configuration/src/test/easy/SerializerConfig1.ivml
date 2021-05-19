@@ -21,8 +21,10 @@ project SerializerConfig1 {
     
     // unconditional free for testing
     freeze {
+        transportProtocol;
         serializer;
         serviceManager;
+        serviceProtocol;
         containerManager;
         rec1;
     };

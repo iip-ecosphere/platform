@@ -1,14 +1,8 @@
 import MavenBasics;
+import JavaMapping;
 
 @advice(IIPEcosphere)
 template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
-
-    def String containerManager(IIPEcosphere cfg) {
-        switch(cfg.containerManager) {
-            ContainerManager.Docker: "ecsRuntime.docker",
-            default: ""
-        }
-    }
 
     def main(Configuration config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
@@ -20,7 +14,8 @@ template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
 
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
-        appendDependency(dep, iipGroup, containerManager(config), projectVersion);
+        appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
 
         XmlElement plugins = createMavenBuildElement(project, "", true);

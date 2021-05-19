@@ -1,0 +1,49 @@
+@advice(IIPEcosphere)
+template JavaMapping(Configuration config, XmlFileArtifact target) {
+
+    def String serviceManagerModule(IIPEcosphere cfg) {
+        switch(cfg.serviceManager) {
+            ServiceManager.SpringCloudStream: "services.spring",
+            default: ""
+        }
+    }
+    
+    def String containerManagerModule(IIPEcosphere cfg) {
+        switch(cfg.containerManager) {
+            ContainerManager.Docker: "ecsRuntime.docker",
+            default: ""
+        }
+    }
+
+    def String transportProtocolModule(IIPEcosphere cfg) {
+        switch(cfg.transportProtocol) {
+            TransportProtocol.AMQP: "transport.amqp", 
+            TransportProtocol.MQTTv3: "transport.mqttv3", 
+            TransportProtocol.MQTTv5: "transport.mqttv5", 
+            default: ""
+        }
+    }
+    
+    def String serviceProtocolModulePrefix(IIPEcosphere cfg) {
+        switch(cfg.serviceManager) {
+            ServiceManager.SpringCloudStream: "transport.spring.",
+            default: ""
+        }
+    }
+    
+    def String serviceProtocolModuleName(IIPEcosphere cfg) {
+        switch(cfg.serviceProtocol) {
+            ServiceProtocol.AMQP: "amqp", 
+            ServiceProtocol.MQTTv3: "mqttv3", 
+            ServiceProtocol.MQTTv5: "mqttv5", 
+            ServiceProtocol.MQTTv3hive: "hivemqv3", 
+            ServiceProtocol.MQTTv5hive: "hivemqv5", 
+            default: ""
+        }
+    }
+
+    def String serviceProtocolModule(IIPEcosphere cfg) {
+        serviceProtocolModulePrefix(cfg)+ serviceProtocolModuleName(cfg);
+    }
+
+}
