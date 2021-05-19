@@ -14,11 +14,13 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg) {
         String clsName = asTypeName(type.name);
-        'public package ${pkg};
+        'package ${pkg};
         
+        import java.io.IOException;
         import de.iip_ecosphere.platform.transport.serialization.*;
         ${importTypePackage(pkg, typePkg)}
         import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;
         
         /**
          * Transport serializer for ${clsName}.
@@ -40,7 +42,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public byte[] to(${clsName} source) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    return objectMapper.writeValueAsString(source).toBytes();
+                    return objectMapper.writeValueAsString(source).getBytes();
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
                 }

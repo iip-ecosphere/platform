@@ -26,6 +26,8 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 
@@ -69,6 +71,7 @@ public class IvmlTests {
 
     /**
      * Tests loading, reasoning and instantiating "SerializerConfig1".
+     * Depending on Maven setup/exclusions, this Test may require Java 11.
      * 
      * @throws ExecutionException shall not occur
      */
@@ -98,6 +101,7 @@ public class IvmlTests {
         setup.reset();
         assertFile(gen, "app/src/main/java/iip/datatypes/Rec1.java");
         assertFile(gen, "app/src/main/java/iip/serializers/Rec1Serializer.java");
+        assertFile(gen, "app/pom.xml");
         assertFile(gen, "ecsRuntime/pom.xml");
         assertFile(gen, "serviceMgr/pom.xml");
     }
