@@ -10,6 +10,7 @@ template AppMvn(Configuration config, XmlFileArtifact target) {
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "app.exec", "ConfiguredApp", "Configured Application");
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
+        
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "transport", projectVersion);
     }

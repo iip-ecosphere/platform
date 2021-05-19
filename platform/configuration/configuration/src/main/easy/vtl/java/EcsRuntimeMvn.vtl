@@ -5,7 +5,7 @@ template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
 
     def String containerManager(IIPEcosphere cfg) {
         switch(cfg.containerManager) {
-            ContainerManager::Docker: "ecsRuntime.docker",
+            ContainerManager.Docker: "ecsRuntime.docker",
             default: ""
         }
     }
@@ -17,10 +17,14 @@ template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "ecsRuntime.exec", "ConfiguredEcsRuntime", "Configured ECS runtime");
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
-        XmlElement dep = new XmlElement(project, "dependencies");
+
+        XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, containerManager(config), projectVersion);
         appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
+
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenJarPlugin(plugins, "\\${org.apache.maven.jar.version}", true, "de.iip_ecosphere.platform.ecsRuntime.Starter", "");
     }
 
 }

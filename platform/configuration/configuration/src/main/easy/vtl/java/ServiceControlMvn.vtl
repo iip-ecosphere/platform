@@ -5,7 +5,7 @@ template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
 
     def String serviceManager(IIPEcosphere cfg) {
         switch(cfg.serviceManager) {
-            ServiceManager::SpringCloudStream: "services.spring",
+            ServiceManager.SpringCloudStream: "services.spring",
             default: ""
         }
     }
@@ -18,12 +18,16 @@ template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "services.exec", "ConfiguredServiceControl", "Configured service control");
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
-        XmlElement dep = new XmlElement(project, "dependencies");
+        
+        XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "services", projectVersion);
         appendDependency(dep, iipGroup, serviceManager(config), projectVersion);
         appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
         appendDependency(dep, springGroup, "spring-boot-starter-web");
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenJarPlugin(plugins, "\\${org.apache.maven.jar.version}", true, "de.iip_ecosphere.platform.services.Starter", "");
     }
 
 }

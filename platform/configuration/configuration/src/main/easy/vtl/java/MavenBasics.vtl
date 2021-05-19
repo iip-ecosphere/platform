@@ -53,5 +53,66 @@ template MavenBasics(Configuration config, XmlFileArtifact target) {
         new XmlElement(par, "version", version);
         par;
     }
+    
+    // creates the element for the Maven build section
+    def createMavenBuildElement(XmlElement project, String srcDir="\\${basedir}/", Boolean withPlugins=false) {
+        XmlElement build = new XmlElement(project, "build");
+        if (srcDir.length() > 0) {
+            new XmlElement(build, "sourceDirectory", srcDir);
+        }
+        if (withPlugins) {
+            createPlugins(build);
+        } else {
+            build;
+        }
+    }
+    
+    def XmlElement appendPlugin(XmlElement parent, String groupId, String artifactId, String ver, Boolean cfg) {
+        XmlElement p1 = new XmlElement(parent, "plugin");
+        if (groupId.length() > 0) {
+            new XmlElement(p1, "groupId", groupId);
+        }
+        buildElement(buildElement(p1, "artifactId", artifactId), "version", ver);
+        if (cfg) {
+            appendConfiguration(p1);
+        } else {
+            p1;
+        }
+    }
+    
+    def appendConfiguration(XmlElement parent) {
+        new XmlElement(parent, "configuration");
+    }
+
+    def createPlugins(XmlElement parent) {
+        new XmlElement(parent, "plugins");
+    }
+    
+    def createDependencies(XmlElement project) {
+        new XmlElement(project, "dependencies");
+    }
+
+    def appendExecutions(XmlElement parent) {
+        new XmlElement(new XmlElement(parent, "executions"), "execution");
+    }
+
+    def appendGoal(XmlElement execution, String goal) {
+        new XmlElement(new XmlElement(execution, "goals"), "goal", goal);
+    }
+    
+    def XmlElement appendMavenJarPlugin(XmlElement plugins, String version, Boolean addClassPath, String mainClass="", String goal="") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-jar-plugin", version, false);
+        if (addClassPath and mainClass.length() > 0) {
+            XmlElement config = appendConfiguration(plugin);
+            XmlElement manifest = new XmlElement(new XmlElement(config, "archive"), "manifest");
+            new XmlElement(manifest, "addClasspath", addClassPath);
+            if (mainClass.length() > 0) {
+                new XmlElement(manifest, "mainClass", mainClass);
+            }
+        }
+        if (goal.length() > 0) {
+            appendGoal(appendExecutions(plugin), goal);
+        }
+    }    
 
 }

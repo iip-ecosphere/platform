@@ -26,8 +26,6 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
-import net.ssehub.easy.basics.logger.EASyLoggerFactory;
-import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 
