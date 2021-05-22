@@ -1,4 +1,8 @@
 @advice(IIPEcosphere)
+
+// defines the mappings of types/constants to java. we rely here on compounds rather than enums so that the individual
+// elements become configurable. We also rely here on dynamic dispatch rather than switch case so that components added
+// later can define the respective mapping functions directly along with their type/instance 
 template JavaMapping(Configuration config, XmlFileArtifact target) {
 
     def String serviceManagerModule(IIPEcosphere cfg) {
@@ -46,7 +50,7 @@ template JavaMapping(Configuration config, XmlFileArtifact target) {
         serviceProtocolModulePrefix(cfg.serviceManager);
     }
     
-        // dispatch basis
+    // dispatch basis
     def String serviceProtocolModulePrefix(ServiceManager mgr) {
         "";
     }
@@ -58,15 +62,35 @@ template JavaMapping(Configuration config, XmlFileArtifact target) {
     // --------------------------------------------------------------
     
     def String serviceProtocolModuleName(IIPEcosphere cfg) {
-        switch(cfg.serviceProtocol) {
-            ServiceProtocol.AMQP: "amqp", 
-            ServiceProtocol.MQTTv3: "mqttv3", 
-            ServiceProtocol.MQTTv5: "mqttv5", 
-            ServiceProtocol.MQTTv3hive: "hivemqv3", 
-            ServiceProtocol.MQTTv5hive: "hivemqv5", 
-            default: ""
-        }
+        serviceProtocolModuleName(cfg.serviceProtocol);
     }
+    
+    // dispatch basis
+    def String serviceProtocolModuleName(ServiceProtocol cfg) {
+        "";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolAMQP cfg) {
+        "amqp";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv3 cfg) {
+        "mqttv3";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv5 cfg) {
+        "mqttv5";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv3hive cfg) {
+        "hivemqv3";
+    }
+
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv5hive cfg) {
+        "hivemqv5";
+    }
+    
+    // --------------------------------------------------------------
 
     def String serviceProtocolModule(IIPEcosphere cfg) {
         serviceProtocolModulePrefix(cfg)+ serviceProtocolModuleName(cfg);

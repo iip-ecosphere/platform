@@ -6,6 +6,13 @@ project Services {
    };
    
    compound SpringCloudStream refines ServiceManager {
+       // logging.level.root: INFO
+       Boolean deleteFilesOnExit = true;
+       Boolean deleteArtifacts = true;
+       Integer waitingTime = 30000;
+       String brokerHost = "localhost";
+       Integer brokerPort = 8883;
+       Integer availabilityRetryDelay = 500;
    };
    
    ServiceManager serviceManager = SpringCloudStream {
@@ -13,30 +20,28 @@ project Services {
    
    Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
    // TODO service manager requires corresponding broker
-   // service manager configuration (spring)
-   /* 
-     logging:
-    level:
-        root: INFO
-spring:
-    main:
-        banner-mode: off
-    cloud:
-        deployer:
-            local:
-                deleteFilesOnExit: true
-                0workingDirectoriesRoot: FOLDER
-service-mgr:
-  deleteArtifacts: false
-  waitingTime: 30000
-  brokerHost: localhost
-  brokerPort: 8883
-  availabilityRetryDelay: 500
-  */
-  
  
-   enum ServiceProtocol {AMQP, MQTTv3, MQTTv5, MQTTv3hive, MQTTv5hive};
-   ServiceProtocol serviceProtocol = ServiceProtocol::AMQP;
+   abstract compound ServiceProtocol {
+   };
+   
+   compound ServiceProtocolAMQP refines ServiceProtocol {
+   };
+   
+   compound ServiceProtocolMQTTv3 refines ServiceProtocol {
+   }
+   
+   compound ServiceProtocolMQTTv5 refines ServiceProtocol {
+   }
+   
+   compound ServiceProtocolMQTTv3hive refines ServiceProtocol {
+   }
+   
+   compound ServiceProtocolMQTTv5hive refines ServiceProtocol {
+   };
+   
+   ServiceProtocol serviceProtocol = ServiceProtocolAMQP {
+   };
+   
    Constraint serviceProtocolDefined = isDefined(serviceProtocol) and serviceProtocol <> null;
    // TODO link service to transport
  
