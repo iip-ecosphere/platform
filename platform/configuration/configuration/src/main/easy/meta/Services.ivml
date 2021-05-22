@@ -2,9 +2,15 @@ project Services {
 
    import Connectors;
    
-   // enum for now
-   enum ServiceManager { SpringCloudStream };
-   ServiceManager serviceManager = ServiceManager::SpringCloudStream;
+   abstract compound ServiceManager { 
+   };
+   
+   compound SpringCloudStream refines ServiceManager {
+   };
+   
+   ServiceManager serviceManager = SpringCloudStream {
+   };
+   
    Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
    // TODO service manager requires corresponding broker
    // service manager configuration (spring)
