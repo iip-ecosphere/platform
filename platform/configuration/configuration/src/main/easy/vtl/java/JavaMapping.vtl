@@ -36,12 +36,24 @@ template JavaMapping(Configuration config, XmlFileArtifact target) {
     // --------------------------------------------------------------
 
     def String transportProtocolModule(IIPEcosphere cfg) {
-        switch(cfg.transportProtocol) {
-            TransportProtocol.AMQP: "transport.amqp", 
-            TransportProtocol.MQTTv3: "transport.mqttv3", 
-            TransportProtocol.MQTTv5: "transport.mqttv5", 
-            default: ""
-        }
+        transportProtocolModule(cfg.transportProtocol);
+    }
+    
+    // dispatch basis
+    def String transportProtocolModule(TransportProtocol proto) {
+        "";
+    }
+
+    def String transportProtocolModule(TransportProtocolAMQP proto) {
+        "transport.amqp";
+    }
+
+    def String transportProtocolModule(TransportProtocolMQTTv3 proto) {
+        "transport.mqttv3";
+    }
+
+    def String transportProtocolModule(TransportProtocolMQTTv5 proto) {
+        "transport.mqttv5";
     }
     
     // --------------------------------------------------------------

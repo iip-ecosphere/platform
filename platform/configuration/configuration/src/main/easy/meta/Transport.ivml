@@ -8,8 +8,21 @@ project Transport {
     Constraint serializerDefined = isDefined(serializer) and serializer <> null;
     
     // enum for now
-    enum TransportProtocol {AMQP, MQTTv3, MQTTv5};
-    TransportProtocol transportProtocol = TransportProtocol::AMQP;
+    abstract compound TransportProtocol {
+    };
+    
+    compound TransportProtocolAMQP refines TransportProtocol {
+    };
+    
+    compound TransportProtocolMQTTv3 refines TransportProtocol {
+    };
+    
+    compound TransportProtocolMQTTv5 refines TransportProtocol {
+    };    
+    
+    TransportProtocol transportProtocol = TransportProtocolAMQP {
+    };
+    
     Constraint transportProtocolDefined = isDefined(transportProtocol) and transportProtocol<> null;
     
     // TODO 
