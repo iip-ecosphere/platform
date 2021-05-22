@@ -77,18 +77,27 @@ public class DockerContainerManagerTest {
         //---- Starting container -----------------
         cm.startContainer(testId);
         Thread.sleep(3000);
-        // Checking if there is a running container with a given name
+        // Is there a running container with a given name?
         Assert.assertNotNull(getContainerId(testName, "running", cm));
         Assert.assertEquals(ContainerState.DEPLOYED, cm.getState(testId));
 
         //---- Stopping container -----------------
         cm.stopContainer(testId);
         Thread.sleep(3000);
-        Assert.assertNull(getContainerId(testName, "running", cm));
+        // Is there a exited container with a given name?
+        Assert.assertNotNull(getContainerId(testName, "exited", cm));
         Assert.assertEquals(ContainerState.STOPPED, cm.getState(testId));
 
-        // Removing container
+        //---- Undeploying container --------------
         cm.undeployContainer(testId);
+        Thread.sleep(3000);
+        // Removed from Docker system?
+        Assert.assertNull(cm.getDockerId(testName));
+        // Removed from Platform?
+        Assert.assertNull(cm.getContainer(testId));
+        
+        //---- Docker System Version --------------
+        Assert.assertNotEquals("", cm.getContainerSystemVersion());
         
         ActiveAasBase.setNotificationMode(oldM);
         
