@@ -33,6 +33,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     private String dockerId;
     private String dockerImageName;
     private String dockerImageZipfile;
+    private String downloadDirectory;
         
     /**
      * Creates a container descriptor instance.
@@ -118,6 +119,25 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      */
     public String getDockerImageName() {
         return this.dockerImageName;
+    }
+    
+    /**
+     * Defines the download directory.
+     * @param directory
+     */
+    public void setDownloadDirectory(String directory) {
+        this.downloadDirectory = directory;
+    }
+    
+    /**
+     * Returns the download directory. If the download directory is null, it returns an empty string.
+     * @return directory
+     */
+    public String getDownloadDirectory() {
+        if (this.downloadDirectory == null) {
+            return "";
+        }
+        return this.downloadDirectory;
     }
     
     /**

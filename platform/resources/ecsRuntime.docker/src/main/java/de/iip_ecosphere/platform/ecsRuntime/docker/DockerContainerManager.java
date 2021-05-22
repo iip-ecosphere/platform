@@ -74,7 +74,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
-        // TODO version with zip (de.iip_ecosphere.platform.support.JarUtils)
         String id = null;
         
         FactoryDescriptor factory = new FactoryDescriptor();
@@ -84,6 +83,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         try {
             // Getting information about docker image from yaml file.
             URI yamlFileURI = new URI(pathToYamlFile);
+            //File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
             File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
             container = DockerContainerDescriptor.readFromYamlFile(yamlFile);
             String dockerImageZipfile = container.getDockerImageZipfile();
@@ -91,7 +91,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             // Loading a docker image
             String pathToDockerImageFile = "file://" + location.getPath() + dockerImageZipfile;
             URI dockerImageURI = new URI(pathToDockerImageFile);
-            File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, null);
+            String downloadDirectory = container.getDownloadDirectory();
+            File downloadDir = new File(downloadDirectory);            
+            File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, downloadDir);
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
                 throw new ExecutionException(
