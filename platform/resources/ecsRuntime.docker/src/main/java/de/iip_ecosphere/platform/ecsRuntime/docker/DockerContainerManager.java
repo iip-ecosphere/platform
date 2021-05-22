@@ -47,10 +47,7 @@ import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
  */
 public class DockerContainerManager extends AbstractContainerManager<DockerContainerDescriptor> {
 
-    // Docker daemon listens for Docker Engine API on three different types of Socket: unix, tcp and fd.
-    //private static String dockerhost = "unix:///var/run/docker.sock";
     private static DockerConfiguration config = DockerConfiguration.readFromYaml();
-    //private static String standartDockerImageYamlFilename = "image-info.yml";
     
     // don't change name of outer/inner class
     // TODO upon start, scan file-system for containers and add them automatically if applicable
@@ -97,7 +94,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, null);
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
-                throw new IOException("No running Docker daemon found. Adding a container failed.");
+                throw new ExecutionException(
+                        "Could not connect with the Docker daemon. Adding a container failed.", null);
             }
             
             InputStream in = new FileInputStream(dockerImageFile);
@@ -106,12 +104,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             // Creating a docker container
             String dockerImageName = container.getDockerImageName();
             String containerName = container.getName();
-            // TODO throws exeception if container with given name already exists 
-            // ( com.github.dockerjava.api.exception.ConflictException)
             dockerClient.createContainerCmd(dockerImageName).withName(containerName).exec(); 
             
             // Getting docker id
             String dockerId = getDockerId(containerName);
+            if (dockerId == null) {
+                throw new ExecutionException("The Docker container id is null.", null);
+            }
             container.setDockerId(dockerId);
             container.setState(ContainerState.AVAILABLE);
             
@@ -123,8 +122,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         return id; 
     }
-    
-    
     
     /**
      * Returns a Docker API Client.
@@ -157,7 +154,10 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         String dockerId = container.getDockerId(); // TODO check if dockerId not null
         
         DockerClient dockerClient = getDockerClient();
-        
+        if (dockerClient == null) {
+            throw new ExecutionException("Could not connect with the Docker daemon. Starting container failed.", null);
+        }
+        setState(container, ContainerState.DEPLOYING);
         dockerClient.startContainerCmd(dockerId).exec();
         setState(container, ContainerState.DEPLOYED);
     }
@@ -167,9 +167,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         DockerContainerDescriptor container = super.getContainer(id, "id", "stop");
         String dockerId = container.getDockerId();
         
-        DockerClient dockerClient = getDockerClient();        
+        DockerClient dockerClient = getDockerClient();
+        if (dockerClient == null) {
+            throw new ExecutionException("Could not connect with the Docker daemon. Stoping container failed.", null);
+        }
+        setState(container, ContainerState.STOPPING);
         dockerClient.stopContainerCmd(dockerId).exec();
-        
         setState(container, ContainerState.STOPPED);
     }
 
@@ -182,13 +185,16 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void undeployContainer(String id) throws ExecutionException {
         DockerContainerDescriptor container = getContainer(id);
-        // Removing container from Docker
         String dockerId = container.getDockerId();
-        DockerClient dockerClient = getDockerClient();
-        dockerClient.removeContainerCmd(dockerId).exec();
-        // Removing container from platform
-        super.undeployContainer(id);
         
+        DockerClient dockerClient = getDockerClient();
+        if (dockerClient == null) {
+            throw new ExecutionException(
+                    "Could not connect with the Docker daemon. Undeploying container failed.", null);
+        }
+        dockerClient.removeContainerCmd(dockerId).exec();
+        
+        super.undeployContainer(id);
     }
 
     @Override
@@ -206,41 +212,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         return super.getIds();
     }
     
-    /**
-     * Converts Docker's state of container (string) into a ContainerState.
-     * 
-     * @param dockerState Docker's status of container
-     * @return state ContainerState
-     */
-    public static ContainerState convertDockerContainerState(String dockerState) {
-        // Getting the first word in string - name of the state.
-        String[] listOfWords = dockerState.split(" ");
-        String dockerStateName = "";
-        for (String word : listOfWords) {
-            if (!word.equals("")) {
-                dockerStateName = word;
-                break;
-            }
-        }
-        // Matching docker's state with IIP-Ecosphere platform's state.
-        ContainerState state;
-        switch(dockerStateName) {
-        case "Up":
-            state = ContainerState.AVAILABLE;
-            break;
-        case "Exited":
-            state = ContainerState.STOPPED;
-            break;
-        case "Created": // TODO not sure about this
-            state = ContainerState.DEPLOYED;
-            break;
-        default :
-            state = ContainerState.UNKNOWN;
-            break;
-        }
-        return state;
-    }
-    // TODO do I need it?
     @Override
     public Collection<DockerContainerDescriptor> getContainers() {
         return super.getContainers();
@@ -249,20 +220,25 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     /** 
      * Returns an id of a Docker container with a given {@code name}.
      * @param name container's name
-     * @return docker container id
+     * @return docker container id/NULL
+     * @throws ExecutionException if connecting to Docker API Client failed 
      */
-    public String getDockerId(String name) {
+    public String getDockerId(String name) throws ExecutionException { // TODO what about retrun null ?
         DockerClient dockerClient = this.getDockerClient();
+        if (dockerClient == null) {
+            throw new ExecutionException(
+                    "Could not connect with the Docker daemon. Getting container's id failed.", null);
+        }
+        // Getting list of all container that Docker "knows".
         ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
                 .withStatusFilter(Arrays.asList("created", "restarting", "running", "paused", "exited"))
                 .withNameFilter(Arrays.asList(name))
                 .exec();
         
         if (containers.size() == 0) {
-            // TODO exception?
             return null;
         } 
-        
+        // Looking for the container with a given name.
         for (int i = 0; i < containers.size(); i++) {
             Container container = containers.get(i);
             String dockerName = container.getNames()[0];
@@ -272,7 +248,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 return container.getId();
             }
         }
-        
         return null;
     }
 
@@ -290,10 +265,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getContainerSystemVersion() {
         DockerContainerManager cm = (DockerContainerManager) EcsFactory.getContainerManager();
         DockerClient dockerClient = cm.getDockerClient();
-        /*
         if (dockerClient == null) {
-            throw new IOException("No running Docker daemon found.");
-        }*/
+            return "";
+        }
         Info dockerInfo = dockerClient.infoCmd().exec();
         String dockerServerVersion = dockerInfo.getServerVersion();
         return dockerServerVersion;
