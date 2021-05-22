@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.configuration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +28,7 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
-import net.ssehub.easy.reasoning.core.reasoner.Message;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 
 /**
@@ -72,9 +74,10 @@ public class IvmlTests {
      * Depending on Maven setup/exclusions, this Test may require Java 11.
      * 
      * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
-    public void testSerializerConfig1() throws ExecutionException {
+    public void testSerializerConfig1() throws ExecutionException, IOException {
         ConfigurationSetup setup = ConfigurationSetup.getConfiguration();
         setup.setIvmlModelName("SerializerConfig1");
         setup.setIvmlConfigFolder(new File("src/test/easy"));
@@ -86,22 +89,16 @@ public class IvmlTests {
         lcd.startup(new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
-        for (int m = 0; m < rRes.getMessageCount(); m++) {
-            Message msg = rRes.getMessage(m);
-            System.out.println(msg.getDescription());
-            System.out.println(msg.getConflictComments());
-            System.out.println(msg.getConflictSuggestions());
-        }
+        EasyExecutor.printReasoningMessages(rRes);
         Assert.assertFalse(rRes.hasConflict());
-        // throws exception if it fails
-        ConfigurationManager.instantiate();
+        ConfigurationManager.instantiate(); // throws exception if it fails
         lcd.shutdown();
         setup.reset();
         assertFile(gen, "app/src/main/java/iip/datatypes/Rec1.java");
         assertFile(gen, "app/src/main/java/iip/serializers/Rec1Serializer.java");
-        assertFile(gen, "app/pom.xml");
-        assertFile(gen, "ecsRuntime/pom.xml");
-        assertFile(gen, "serviceMgr/pom.xml");
+        assertFileContains(gen, "app/pom.xml", "transport.spring.amqp", "transport.amqp");
+        assertFileContains(gen, "ecsRuntime/pom.xml", "ecsRuntime.docker", "transport.amqp");
+        assertFileContains(gen, "serviceMgr/pom.xml", "services.spring", "transport.amqp");
     }
     
     /**
@@ -109,11 +106,29 @@ public class IvmlTests {
      * 
      * @param base the base folder
      * @param name the name/path to the file
+     * @return the actual asserted file ({@code base} + {@code name})
      */
-    private static void assertFile(File base, String name) {
+    private static File assertFile(File base, String name) {
         File f = new File(base, name);
         Assert.assertTrue(f.exists());
         Assert.assertTrue(f.length() > 0);
+        return f;
+    }
+
+    /**
+     * Asserts that the specified file exists, has contents and contains the specified {@code search} string(s).
+     * 
+     * @param base the base folder
+     * @param name the name/path to the file
+     * @param search the content/search strings to assert
+     * @throws IOException if the file cannot be read
+     */
+    private static void assertFileContains(File base, String name, String... search) throws IOException {
+        File f = assertFile(base, name);
+        String contents = org.apache.commons.io.FileUtils.readFileToString(f, Charset.defaultCharset());
+        for (String s : search) {
+            Assert.assertTrue("File " + f + " must contain '" + s + "'", contents.contains(s));
+        }
     }
     
 }

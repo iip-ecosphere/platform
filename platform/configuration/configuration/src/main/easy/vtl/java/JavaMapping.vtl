@@ -9,10 +9,15 @@ template JavaMapping(Configuration config, XmlFileArtifact target) {
     }
     
     def String containerManagerModule(IIPEcosphere cfg) {
-        switch(cfg.containerManager) {
-            ContainerManager.Docker: "ecsRuntime.docker",
-            default: ""
-        }
+        containerManagerModule(cfg.containerManager);
+    }
+    
+    def String containerManagerModule(ContainerManager mgr) {
+        "";
+    }
+
+    def String containerManagerModule(DockerContainerManager mgr) {
+        "ecsRuntime.docker";
     }
 
     def String transportProtocolModule(IIPEcosphere cfg) {

@@ -7,6 +7,27 @@ project Services {
    ServiceManager serviceManager = ServiceManager::SpringCloudStream;
    Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
    // TODO service manager requires corresponding broker
+   // service manager configuration (spring)
+   /* 
+     logging:
+    level:
+        root: INFO
+spring:
+    main:
+        banner-mode: off
+    cloud:
+        deployer:
+            local:
+                deleteFilesOnExit: true
+                0workingDirectoriesRoot: FOLDER
+service-mgr:
+  deleteArtifacts: false
+  waitingTime: 30000
+  brokerHost: localhost
+  brokerPort: 8883
+  availabilityRetryDelay: 500
+  */
+  
  
    enum ServiceProtocol {AMQP, MQTTv3, MQTTv5, MQTTv3hive, MQTTv5hive};
    ServiceProtocol serviceProtocol = ServiceProtocol::AMQP;
@@ -16,6 +37,7 @@ project Services {
    freeze {
        // prevent later changes of constraint but make it referencable to .text
        serviceManagerDefined;
+       serviceProtocolDefined;
    };
     
    

@@ -27,6 +27,7 @@ import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.instantiation.core.model.templateModel.TemplateModel;
 import net.ssehub.easy.instantiation.core.model.tracing.ConsoleTracerFactory;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.frontend.ReasonerFrontend;
 import net.ssehub.easy.reasoning.core.reasoner.ReasonerConfiguration;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -69,6 +70,7 @@ public class Starter {
                 ReasoningResult rResult = ReasonerFrontend.getInstance().propagate(cfg, rCfg, 
                     ProgressObserver.NO_OBSERVER);
                 System.out.println("Reasoning is ok: " + (!rResult.hasConflict()));
+                EasyExecutor.printReasoningMessages(rResult);
                 
                 List<ModelInfo<Script>> vil = BuildModel.INSTANCE.availableModels().getModelInfo("IIPEcosphere");
                 if (null != vil && !vil.isEmpty()) {
