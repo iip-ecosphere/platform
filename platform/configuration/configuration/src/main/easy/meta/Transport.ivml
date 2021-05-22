@@ -6,8 +6,9 @@ project Transport {
     enum Serializer { Json, ProtoBuf };
     Serializer serializer = Serializer::Json;
     Constraint serializerDefined = isDefined(serializer) and serializer <> null;
+
+    // ----------------------------------------------
     
-    // enum for now
     abstract compound TransportProtocol {
     };
     
