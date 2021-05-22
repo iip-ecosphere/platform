@@ -4,4 +4,9 @@
   <fileset name="all" enabled="true" check-config-name="IIP Code Conventions" local="false">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/test/hiveMqv5Cfg"/>
+    <filter-data value="src/test/qpidCfg"/>
+    <filter-data value="src/test/resources"/>
+  </filter>
 </fileset-config>
