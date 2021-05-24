@@ -6,17 +6,33 @@ project Transport {
     enum Serializer { Json, ProtoBuf };
     Serializer serializer = Serializer::Json;
     Constraint serializerDefined = isDefined(serializer) and serializer <> null;
+
+    // ----------------------------------------------
     
-    enum TransportProtocol {AMQP, MQTTv3, MQTTv5};
-    TransportProtocol transportProtocol = TransportProtocol::AMQP;
+    abstract compound TransportProtocol {
+    };
+    
+    compound TransportProtocolAMQP refines TransportProtocol {
+    };
+    
+    compound TransportProtocolMQTTv3 refines TransportProtocol {
+    };
+    
+    compound TransportProtocolMQTTv5 refines TransportProtocol {
+    };    
+    
+    TransportProtocol transportProtocol = TransportProtocolAMQP {
+    };
+    
     Constraint transportProtocolDefined = isDefined(transportProtocol) and transportProtocol<> null;
     
-    // TODO what is the transport protocol
-    // playload limitation
+    // TODO 
+    // - transport protocol playload limitation
     
     freeze {
         // prevent later changes of constraint but make it referencable to .text
         serializerDefined;
+        transportProtocolDefined;
     };
     
 }

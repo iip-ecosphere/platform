@@ -1,46 +1,108 @@
 @advice(IIPEcosphere)
+
+// defines the mappings of types/constants to java. we rely here on compounds rather than enums so that the individual
+// elements become configurable. We also rely here on dynamic dispatch rather than switch case so that components added
+// later can define the respective mapping functions directly along with their type/instance 
 template JavaMapping(Configuration config, XmlFileArtifact target) {
 
     def String serviceManagerModule(IIPEcosphere cfg) {
-        switch(cfg.serviceManager) {
-            ServiceManager.SpringCloudStream: "services.spring",
-            default: ""
-        }
+        serviceManagerModule(cfg.serviceManager);
     }
+    
+    // dispatch basis
+    def String serviceManagerModule(ServiceManager mgr) {
+        "";
+    }
+    
+    def String serviceManagerModule(SpringCloudStream mgr) {
+        "services.spring";
+    }
+    
+    // --------------------------------------------------------------
     
     def String containerManagerModule(IIPEcosphere cfg) {
-        switch(cfg.containerManager) {
-            ContainerManager.Docker: "ecsRuntime.docker",
-            default: ""
-        }
+        containerManagerModule(cfg.containerManager);
+    }
+    
+    // dispatch basis
+    def String containerManagerModule(ContainerManager mgr) {
+        "";
     }
 
-    def String transportProtocolModule(IIPEcosphere cfg) {
-        switch(cfg.transportProtocol) {
-            TransportProtocol.AMQP: "transport.amqp", 
-            TransportProtocol.MQTTv3: "transport.mqttv3", 
-            TransportProtocol.MQTTv5: "transport.mqttv5", 
-            default: ""
-        }
+    def String containerManagerModule(DockerContainerManager mgr) {
+        "ecsRuntime.docker";
     }
+    
+    // --------------------------------------------------------------
+
+    def String transportProtocolModule(IIPEcosphere cfg) {
+        transportProtocolModule(cfg.transportProtocol);
+    }
+    
+    // dispatch basis
+    def String transportProtocolModule(TransportProtocol proto) {
+        "";
+    }
+
+    def String transportProtocolModule(TransportProtocolAMQP proto) {
+        "transport.amqp";
+    }
+
+    def String transportProtocolModule(TransportProtocolMQTTv3 proto) {
+        "transport.mqttv3";
+    }
+
+    def String transportProtocolModule(TransportProtocolMQTTv5 proto) {
+        "transport.mqttv5";
+    }
+    
+    // --------------------------------------------------------------
     
     def String serviceProtocolModulePrefix(IIPEcosphere cfg) {
-        switch(cfg.serviceManager) {
-            ServiceManager.SpringCloudStream: "transport.spring.",
-            default: ""
-        }
+        serviceProtocolModulePrefix(cfg.serviceManager);
     }
     
-    def String serviceProtocolModuleName(IIPEcosphere cfg) {
-        switch(cfg.serviceProtocol) {
-            ServiceProtocol.AMQP: "amqp", 
-            ServiceProtocol.MQTTv3: "mqttv3", 
-            ServiceProtocol.MQTTv5: "mqttv5", 
-            ServiceProtocol.MQTTv3hive: "hivemqv3", 
-            ServiceProtocol.MQTTv5hive: "hivemqv5", 
-            default: ""
-        }
+    // dispatch basis
+    def String serviceProtocolModulePrefix(ServiceManager mgr) {
+        "";
     }
+    
+    def String serviceProtocolModulePrefix(SpringCloudStream mgr) {
+        "transport.spring.";
+    }
+    
+    // --------------------------------------------------------------
+    
+    def String serviceProtocolModuleName(IIPEcosphere cfg) {
+        serviceProtocolModuleName(cfg.serviceProtocol);
+    }
+    
+    // dispatch basis
+    def String serviceProtocolModuleName(ServiceProtocol cfg) {
+        "";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolAMQP cfg) {
+        "amqp";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv3 cfg) {
+        "mqttv3";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv5 cfg) {
+        "mqttv5";
+    }
+    
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv3hive cfg) {
+        "hivemqv3";
+    }
+
+    def String serviceProtocolModuleName(ServiceProtocolMQTTv5hive cfg) {
+        "hivemqv5";
+    }
+    
+    // --------------------------------------------------------------
 
     def String serviceProtocolModule(IIPEcosphere cfg) {
         serviceProtocolModulePrefix(cfg)+ serviceProtocolModuleName(cfg);
