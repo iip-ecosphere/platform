@@ -64,9 +64,9 @@ public class DockerContainerManagerTest {
         
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
-        String imageLocationStr = workingDir + "/src/test/resources/";
-        URI location = new URI(imageLocationStr);
-
+        String imageLocationStr = "file://" + workingDir + "/src/test/resources/";
+        URI location = new URI(imageLocationStr);        
+        
         // Is the id of the container same as in the yaml file?
         Assert.assertEquals(testId, cm.addContainer(location));
         Assert.assertEquals(ContainerState.AVAILABLE, cm.getState(testId));

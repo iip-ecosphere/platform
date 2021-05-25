@@ -75,40 +75,42 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public String addContainer(URI location) throws ExecutionException {
         String id = null;
+        //"file:///home/monika/SSE/platform/platform/resources/ecsRuntime.docker/src/test/resources/";
         
-        FactoryDescriptor factory = new FactoryDescriptor();
-        DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
-        String pathToYamlFile = "file://" + location.getPath() + config.getDockerImageYamlFilename();
         DockerContainerDescriptor container;
         try {
-            // Getting information about docker image from yaml file.
-            URI yamlFileURI = new URI(pathToYamlFile);
-            //File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
-            File yamlFile = UriResolver.resolveToFile(yamlFileURI, null);
-            container = DockerContainerDescriptor.readFromYamlFile(yamlFile);
-            String dockerImageZipfile = container.getDockerImageZipfile();
+            FactoryDescriptor factory = new FactoryDescriptor();
+            DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
             
-            // Loading a docker image
-            String pathToDockerImageFile = "file://" + location.getPath() + dockerImageZipfile;
-            URI dockerImageURI = new URI(pathToDockerImageFile);
+            // Getting information about Docker image from image-info.yml
+            String pathToYaml = location.toString() + config.getDockerImageYamlFilename();
+            URI yamlURI = new URI(pathToYaml);
+            File imageInfo = UriResolver.resolveToFile(yamlURI, null);
+            container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
+                        
+            // Loading image
+            String imageName = container.getDockerImageZipfile();
+            String pathToImage = location.toString() + imageName;
+            URI imageURI = new URI(pathToImage);
             String downloadDirectory = container.getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);            
-            File dockerImageFile = UriResolver.resolveToFile(dockerImageURI, downloadDir);
+            File image = UriResolver.resolveToFile(imageURI, downloadDir);
+            
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
                 throw new ExecutionException(
                         "Could not connect with the Docker daemon. Adding a container failed.", null);
             }
             
-            InputStream in = new FileInputStream(dockerImageFile);
+            InputStream in = new FileInputStream(image);
             dockerClient.loadImageCmd(in).exec();
             
-            // Creating a docker container
+            // Creating Docker container
             String dockerImageName = container.getDockerImageName();
             String containerName = container.getName();
             dockerClient.createContainerCmd(dockerImageName).withName(containerName).exec(); 
             
-            // Getting docker id
+            // Getting Docker id
             String dockerId = getDockerId(containerName);
             if (dockerId == null) {
                 throw new ExecutionException("The Docker container id is null.", null);
