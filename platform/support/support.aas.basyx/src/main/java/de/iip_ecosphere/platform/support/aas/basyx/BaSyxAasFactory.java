@@ -14,15 +14,8 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 
-import org.eclipse.basyx.components.IComponent;
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.registry.RegistryComponent;
-import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
-
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
@@ -30,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -66,30 +60,8 @@ public class BaSyxAasFactory extends AasFactory {
     }
 
     @Override
-    public Server createRegistryServer(Endpoint endpoint, String... options) {
-        // Start an InMemory registry server with a direct configuration
-        BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(endpoint.getPort(), 
-            endpoint.getEndpoint());
-        RegistryBackend backend = Tools.getOption(options, RegistryBackend.INMEMORY, RegistryBackend.class);
-        BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(backend);
-        final IComponent component = new RegistryComponent(contextConfig, registryConfig);
-        return new Server() {
-
-            @Override
-            public Server start() {
-                component.startComponent();
-                return this;
-            }
-
-            @Override
-            public void stop(boolean dispose) {
-                component.stopComponent();
-                if (dispose) { // if not disposable, schedule for deletion at JVM end
-                    Tools.disposeTomcatWorkingDir(null, endpoint.getPort());
-                }
-            }
-
-        };
+    protected ServerRecipe createDefaultServerRecipe() {
+        return new BaSyxServerRecipe();
     }
     
     @Override

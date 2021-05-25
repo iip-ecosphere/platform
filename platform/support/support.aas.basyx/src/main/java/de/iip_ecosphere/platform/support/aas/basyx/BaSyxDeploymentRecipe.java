@@ -14,28 +14,21 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistryService;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.aas.registration.restapi.DirectoryModelProvider;
 import org.eclipse.basyx.aas.restapi.AASModelProvider;
 import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
-import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.submodel.restapi.SubModelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
-import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -54,7 +47,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
  */
 public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
-    private DeploymentSpec deploymentSpec = new DeploymentSpec();
+    private DeploymentSpec deploymentSpec;
 
     /**
      * Creates a deployment builder with root/empty document base path.
@@ -62,17 +55,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * @param endpoint the endpoint to create the deployment context for
      */
     BaSyxDeploymentRecipe(Endpoint endpoint) {
-        deploymentSpec.endpoint = endpoint;
-        deploymentSpec.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort());
-        deploymentSpec.contextConfig = new BaSyxContextConfiguration(
-            endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort()) {
-            
-            @Override
-            public BaSyxContext createBaSyxContext() {
-                return deploymentSpec.context;
-            }
-            
-        };
+        deploymentSpec = new DeploymentSpec(endpoint);
     }
 
     /**
@@ -84,20 +67,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * @param docBasePath the documents base path (may be empty, otherwise shall start with a "/") 
      */
     BaSyxDeploymentRecipe(String host, int port, String contextPath, String docBasePath) {
-    }
-    
-    /**
-     * Stores basic common deployment information.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class DeploymentSpec {
-        private Endpoint endpoint;
-        private BaSyxContextConfiguration contextConfig;
-        private BaSyxContext context;
-        private IAASRegistryService registry;
-        private Map<String, BaSyxAasDescriptor> descriptors = new HashMap<>();
-        
+        deploymentSpec = new DeploymentSpec();
     }
 
     /**
@@ -122,10 +92,10 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
     @Override
     public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint) {
-        deploymentSpec.registry = new InMemoryRegistry();
-        IModelProvider registryProvider = new DirectoryModelProvider(deploymentSpec.registry);
+        deploymentSpec.setRegistry(new InMemoryRegistry());
+        IModelProvider registryProvider = new DirectoryModelProvider(deploymentSpec.getRegistry());
         HttpServlet registryServlet = new VABHTTPInterface<IModelProvider>(registryProvider);
-        deploymentSpec.context.addServletMapping(Endpoint.checkEndpoint(regEndpoint) + "/*", registryServlet);
+        deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(regEndpoint) + "/*", registryServlet);
         return new BaSyxImmediateDeploymentRecipe();
     }
 
@@ -154,8 +124,8 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
         @Override
         public AasServer createServer(String... options) {
-            return new BaSyxRegistryDeploymentAasServer(deploymentSpec, 
-                endpoint.toUri(), options);
+            return new BaSyxRegistryDeploymentAasServer(deploymentSpec, endpoint.toUri(), 
+                AASServerBackend.INMEMORY, options);
         }
         
     }
@@ -172,7 +142,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * @param aas the AAS
      */
     static void deploy(DeploymentSpec deploymentSpec, Aas aas) {
-        if (null == deploymentSpec.registry) {
+        if (null == deploymentSpec.getRegistry()) {
             throw new IllegalArgumentException("No registry created before");
         }
         if (!(aas instanceof BaSyxAas)) {
@@ -186,166 +156,24 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         fullProvider.setAssetAdministrationShell(aasProvider);
 
         AASDescriptor aasDescriptor = new AASDescriptor(bAas.getAas(), 
-            AbstractAas.getAasEndpoint(deploymentSpec.endpoint, aas));
+            AbstractAas.getAasEndpoint(deploymentSpec.getEndpoint(), aas));
         for (Submodel sm: bAas.submodels()) {
             if (sm instanceof BaSyxSubmodel) {
                 BaSyxSubmodel submodel = (BaSyxSubmodel) sm;
                 SubModelProvider subModelProvider = new SubModelProvider(submodel.getSubmodel());
                 fullProvider.addSubmodel(subModelProvider);
                 aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(submodel.getSubmodel(), 
-                    AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.endpoint, aas, submodel)));
+                    AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.getEndpoint(), aas, submodel)));
             } // connected sub-models are already deployed
         }
         
         HttpServlet aasServlet = new VABHTTPInterface<IModelProvider>(fullProvider);
-        deploymentSpec.registry.register(aasDescriptor);
+        deploymentSpec.getRegistry().register(aasDescriptor);
         
-        deploymentSpec.context.addServletMapping("/" + Tools.idToUrlPath(aas.getIdShort()) + "/*", aasServlet);
-        deploymentSpec.descriptors.put(aas.getIdShort(), new BaSyxAasDescriptor(fullProvider, aasDescriptor));
-    }
-    
-    /**
-     * An internal AAS deployment descriptor.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class BaSyxAasDescriptor {
-        private AASDescriptor aasDescriptor;
-        private VABMultiSubmodelProvider fullProvider;
-        
-        /**
-         * Creates an instance.
-         * 
-         * @param fullProvider the sub-model provider
-         * @param aasDescriptor the AAS descriptor
-         */
-        private BaSyxAasDescriptor(VABMultiSubmodelProvider fullProvider, AASDescriptor aasDescriptor) {
-            this.fullProvider = fullProvider;
-            this.aasDescriptor = aasDescriptor;
-        }
-    }
-    
-    /**
-     * Implements the {@link AasServer} instance.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private abstract static class BaSyxAbstractAasServer implements AasServer {
-
-        private DeploymentSpec deploymentSpec;
-        
-        /**
-         * Creates a new BaSyx AAS server.
-         * 
-         * @param deploymentSet the deployment set instance for runtime deployments
-         */
-        BaSyxAbstractAasServer(DeploymentSpec deploymentSet) {
-            this.deploymentSpec = deploymentSet;
-        }
-        
-        @Override
-        public void deploy(Aas aas) throws IOException {
-            BaSyxDeploymentRecipe.deploy(deploymentSpec, aas);
-        }
-        
-        @Override
-        public void deploy(Aas aas, Submodel submodel) {
-            if (!(submodel instanceof BaSyxSubmodel)) {
-                throw new IllegalArgumentException("The subModel must be of instance BaSyxSubModel, i.e., created "
-                    + "through the AasFactory.");
-            }
-            BaSyxAasDescriptor desc = deploymentSpec.descriptors.get(aas.getIdShort());
-            if (null == desc) {
-                throw new IllegalArgumentException("The AAS " + aas.getIdShort() + " is unknown on this server "
-                    + "instance.");
-            }
-            
-            BaSyxSubmodel sm = (BaSyxSubmodel) submodel;
-            SubModelProvider subModelProvider = new SubModelProvider(sm.getSubmodel());
-            desc.fullProvider.addSubmodel(subModelProvider);
-            desc.aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(sm.getSubmodel(), 
-                AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.endpoint, aas, submodel)));
-        }
-        
-        @Override
-        public void stop(boolean dispose) {
-            if (dispose) {
-                Tools.disposeTomcatWorkingDir(null, deploymentSpec.endpoint.getPort());
-            }
-        }
-
+        deploymentSpec.getContext().addServletMapping("/" + Tools.idToUrlPath(aas.getIdShort()) + "/*", aasServlet);
+        deploymentSpec.putDescriptor(aas.getIdShort(), new BaSyxAasDescriptor(fullProvider, aasDescriptor));
     }
 
-    /**
-     * Implements the {@link AasServer} instance.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class BaSyxImmediateDeploymentAasServer extends BaSyxAbstractAasServer {
-
-        private AASHTTPServer server;
-        
-        /**
-         * Creates a new BaSyx AAS server.
-         * 
-         * @param deploymentSet the deployment set instance for runtime deployments
-         */
-        BaSyxImmediateDeploymentAasServer(DeploymentSpec deploymentSet) {
-            super(deploymentSet);
-            server = new AASHTTPServer(deploymentSet.context);
-        }
-        
-        @Override
-        public AasServer start() {
-            server.start();
-            return this;
-        }
-
-        @Override
-        public void stop(boolean dispose) {
-            server.shutdown();
-            super.stop(dispose); // if not disposable, schedule for deletion at JVM end
-        }
-
-    }
-
-    /**
-     * Implements the {@link AasServer} instance.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class BaSyxRegistryDeploymentAasServer extends BaSyxAbstractAasServer {
-
-        private AASServerComponent server; 
-        
-        /**
-         * Creates a new BaSyx AAS server.
-         * 
-         * @param deploymentSet the deployment set instance for runtime deployments
-         * @param regUrl the registryUR
-         * @param options for server creation
-         */
-        BaSyxRegistryDeploymentAasServer(DeploymentSpec deploymentSet, String regUrl, String... options) {
-            super(deploymentSet);
-            AASServerBackend backend = Tools.getOption(options, AASServerBackend.INMEMORY, AASServerBackend.class);
-            server = new AASServerComponent(deploymentSet.contextConfig, new BaSyxAASServerConfiguration(
-                backend, "", regUrl)); // may require source via options
-        }
-        
-        @Override
-        public AasServer start() {
-            server.startComponent();
-            return this;
-        }
-
-        @Override
-        public void stop(boolean dispose) {
-            server.stopComponent();
-            super.stop(dispose); // if not disposable, schedule for deletion at JVM end
-        }
-
-    }
-    
     /** 
      * This method creates a control component.
      * 

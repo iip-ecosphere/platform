@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>support.aas.basyx</artifactId>
-  <name>support AAS/BaSyx</name>
-  <description>The IIP-Ecosphere AAS/BaSyx extension.</description>
+  <name>support AAS/BaSyx (client)</name>
+  <description>The IIP-Ecosphere AAS/BaSyx (client) extension.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
