@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -253,7 +254,8 @@ public class DeploymentTest {
 
         // start a registry server
         Endpoint regEp = new Endpoint(Schema.HTTP, "registry");
-        Server regServer = factory.createRegistryServer(regEp).start();
+        Server regServer = factory.createServerRecipe()
+            .createRegistryServer(regEp, LocalPersistenceType.INMEMORY).start();
         
         // Start target deployment server and connect to the registry
         Endpoint serverEp = new Endpoint(Schema.HTTP, "cloud");

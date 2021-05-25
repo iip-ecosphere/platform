@@ -24,10 +24,11 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -58,8 +59,8 @@ public class FactoryTest {
             }
             
             @Override
-            public Server createRegistryServer(Endpoint endpoint, String... options) {
-                return DUMMY.createRegistryServer(endpoint, options);
+            protected ServerRecipe createDefaultServerRecipe() {
+                return new FakeServerReceipe();
             }
 
             @Override
@@ -122,7 +123,11 @@ public class FactoryTest {
         Assert.assertNotNull(instance.createSubmodelBuilder("", ""));
 
         Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
-        Assert.assertNull(instance.createRegistryServer(new Endpoint(ep, "/registry"), ""));
+        ServerRecipe serverRecipe = instance.createServerRecipe();
+        Assert.assertNotNull(serverRecipe);
+        Endpoint regEp = new Endpoint(ep, "/registry");
+        Assert.assertNull(serverRecipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, ""));
+        Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
         Assert.assertNull(instance.obtainRegistry(ep));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
 
@@ -153,7 +158,11 @@ public class FactoryTest {
         Assert.assertNull(instance.createSubmodelBuilder("", ""));
 
         Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
-        Assert.assertNull(instance.createRegistryServer(new Endpoint(ep, "/registry")));
+        ServerRecipe serverRecipe = instance.createServerRecipe();
+        Assert.assertNotNull(serverRecipe);
+        Endpoint regEp = new Endpoint(ep, "/registry");
+        Assert.assertNull(serverRecipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, ""));
+        Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
         assertRegistry(instance.obtainRegistry(ep));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
 

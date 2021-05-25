@@ -13,7 +13,6 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 import java.io.IOException;
@@ -25,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
@@ -67,8 +67,8 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
-    public Server createRegistryServer(Endpoint endpoint, String... options) {
-        return null;
+    protected ServerRecipe createDefaultServerRecipe() {
+        return new FakeServerReceipe();
     }
 
     @Override

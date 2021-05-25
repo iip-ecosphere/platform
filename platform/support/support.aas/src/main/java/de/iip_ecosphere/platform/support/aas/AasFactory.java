@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -53,7 +52,7 @@ public abstract class AasFactory {
         }
 
         @Override
-        public Server createRegistryServer(Endpoint endpoint, String... options) {
+        protected ServerRecipe createDefaultServerRecipe() {
             return null;
         }
 
@@ -202,14 +201,29 @@ public abstract class AasFactory {
     public abstract SubmodelBuilder createSubmodelBuilder(String idShort, String identifier);
 
     /**
-     * Creates a registry server.
+     * Creates a server recipe. Utilizes JLS via {@link AasServerRecipeDescriptor} to determine a specific recipe.
+     * If none is found, {@link #createDefaultServerRecipe()} is called.
      * 
-     * @param endpoint the endpoint path on the server for the registry (host is ignored, always on localhost)
-     * @param options for the server, names of implementation-specific options to be enabled, 
-     *   may be empty for none
-     * @return the registry server
+     * @return the registry server recipe (may be <b>null</b> for none)
      */
-    public abstract Server createRegistryServer(Endpoint endpoint, String... options);
+    public final ServerRecipe createServerRecipe() {
+        ServerRecipe result = null;
+        Optional<AasServerRecipeDescriptor> first = ServiceLoaderUtils.filterExcluded(AasServerRecipeDescriptor.class);
+        if (first.isPresent()) {
+            result  = first.get().createInstance();
+        } 
+        if (null == result) {
+            result = createDefaultServerRecipe();
+        }
+        return result;
+    }
+    
+    /**
+     * Creates the default server recipe.
+     * 
+     * @return the default server recipe (may be <b>null</b> for none)
+     */
+    protected abstract ServerRecipe createDefaultServerRecipe();
     
     /**
      * Obtains access to a registry.
