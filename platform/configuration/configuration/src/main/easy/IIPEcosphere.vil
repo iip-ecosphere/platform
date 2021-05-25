@@ -13,12 +13,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path javaSerializersSrc = "${javaSrc}/iip/serializers";
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
+    Path platformRoot = "${target}/platform";
     
     main(Project source, Configuration config, Project target) = {
         javaDatatypesSrc.mkdir();
         javaSerializersSrc.mkdir();
         ecsRuntimeRoot.mkdir();
         serviceMgrRoot.mkdir();
+        platformRoot.mkdir();
         
         for (RecordType r : RecordType.allInstances()) {
             // generate for all languages and according to serializer settings
@@ -35,6 +37,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // TODO instantiate application.yml
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
         maven("${serviceMgrRoot}");
+        // TODO instantiate application.yml
+        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
+        maven("${platformRoot}");
     }
 
 }
