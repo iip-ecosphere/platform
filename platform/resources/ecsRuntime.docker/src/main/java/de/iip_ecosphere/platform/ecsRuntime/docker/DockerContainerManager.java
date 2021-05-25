@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
@@ -93,7 +95,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             String pathToImage = location.toString() + imageName;
             URI imageURI = new URI(pathToImage);
             String downloadDirectory = container.getDownloadDirectory();
-            File downloadDir = new File(downloadDirectory);            
+            File downloadDir = new File(downloadDirectory);            //TODO add file://
             File image = UriResolver.resolveToFile(imageURI, downloadDir);
             
             DockerClient dockerClient = getDockerClient();
@@ -197,6 +199,29 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                     "Could not connect with the Docker daemon. Undeploying container failed.", null);
         }
         dockerClient.removeContainerCmd(dockerId).exec();
+        
+        // Removing image from download directory
+        FactoryDescriptor factory = new FactoryDescriptor();
+        DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
+        if (config.getDeleteWhenUndeployed()) {
+            File downloadDirectory = new File(container.getDownloadDirectory());
+            File[] listOfFiles = downloadDirectory.listFiles();
+            for (File file : listOfFiles) {
+                String fileName = file.getName();
+                // Getting the name of the image file to delete (without extension e.g. .gz)
+                String imageZipfileName = container.getDockerImageZipfile();
+                int index = imageZipfileName.lastIndexOf(".");
+                String imageZipfileNameSubstring = imageZipfileName.substring(0, index);
+                Pattern pattern = Pattern.compile(imageZipfileNameSubstring);
+                Matcher matcher = pattern.matcher(fileName);
+                if (matcher.find()) {
+                    if (!file.delete()) {
+                        throw new ExecutionException(
+                                "Removing of the Docker image zipfile from the download directory failed", null);
+                    }
+                }
+            }
+        }
         
         super.undeployContainer(id);
     }
