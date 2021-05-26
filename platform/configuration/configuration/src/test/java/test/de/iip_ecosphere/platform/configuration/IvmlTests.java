@@ -94,11 +94,19 @@ public class IvmlTests {
         ConfigurationManager.instantiate(); // throws exception if it fails
         lcd.shutdown();
         setup.reset();
+        
         assertFile(gen, "app/src/main/java/iip/datatypes/Rec1.java");
         assertFile(gen, "app/src/main/java/iip/serializers/Rec1Serializer.java");
         assertFileContains(gen, "app/pom.xml", "transport.spring.amqp", "transport.amqp");
-        assertFileContains(gen, "ecsRuntime/pom.xml", "ecsRuntime.docker", "transport.amqp");
-        assertFileContains(gen, "serviceMgr/pom.xml", "services.spring", "transport.amqp");
+        
+        assertFileContains(gen, "ecsRuntime/pom.xml", "ecsRuntime.docker", "transport.amqp", "support.aas.basyx");
+        assertFile(gen, "ecsRuntime/src/main/resources/ecsRuntime.yml");
+        
+        assertFileContains(gen, "serviceMgr/pom.xml", "services.spring", "transport.amqp", "support.aas.basyx");
+        assertFile(gen, "serviceMgr/src/main/resources/application.yml");
+        
+        assertFileContains(gen, "platform/pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
+            "configuration.configuration", "transport.amqp");
     }
     
     /**
