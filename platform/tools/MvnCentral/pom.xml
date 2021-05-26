@@ -28,6 +28,18 @@
         <version>${project.version}</version>
         <type>pom</type>
     </dependency>
+    
+    <dependency>
+        <artifactId>support.aas.basyx</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.aas.basyx.server</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    
     <dependency>
         <artifactId>connectors.opcuav1</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -47,7 +59,7 @@
         <artifactId>connectors.aas</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency>    
+    </dependency>
 
     <dependency>
         <artifactId>transport.amqp</artifactId>
@@ -100,9 +112,25 @@
         <artifactId>services.spring</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>configuration.configuration</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
     </dependency> 
+
     <dependency>
         <artifactId>test.mqtt.hivemq</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>test.mqtt.moquette</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>test.amqp.qpid</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
@@ -111,7 +139,6 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-
   </dependencies>
   
   <build>
