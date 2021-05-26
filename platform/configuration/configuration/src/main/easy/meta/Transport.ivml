@@ -1,6 +1,6 @@
 project Transport {
 
-    import DataTypes;
+    import Aas;
     
     // enum for now
     enum Serializer { Json, ProtoBuf };

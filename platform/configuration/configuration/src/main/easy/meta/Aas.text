@@ -1,0 +1,2 @@
+Services::aasDefined = The AAS implementation must be defined.
+Services::aasProtocolDefined = The AAS protocol must be defined.

@@ -31,13 +31,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");
         maven("${appRoot}");
-        // TODO instantiate application.yml
+        
+        Path p = "${ecsRuntimeRoot}/src/main/resources";
+        p.mkdir();
+        vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/ecsRuntime.yml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
         maven("${ecsRuntimeRoot}");
-        // TODO instantiate application.yml
+        
+        p = "${serviceMgrRoot}/src/main/resources";
+        p.mkdir();
+        vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/application.yml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
         maven("${serviceMgrRoot}");
-        // TODO instantiate application.yml
+        
+        p = "${platformRoot}/src/main/resources";
+        p.mkdir();
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
         maven("${platformRoot}");
     }

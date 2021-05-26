@@ -16,7 +16,7 @@ template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
+        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenShadePlugin(plugins, "2.3", "de.iip_ecosphere.platform.ecsRuntime.Starter");

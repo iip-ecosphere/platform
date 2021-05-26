@@ -1,0 +1,20 @@
+project Aas {
+
+    import DataTypes;
+    
+    // enum for now
+    enum AasImpl { BaSyx };
+    AasImpl aas = AasImpl::BaSyx;
+    Constraint aasDefined = isDefined(aas) and aas <> null;
+
+    enum AasProtocol { Default, VAB };
+    AasProtocol aasProtocol = AasProtocol::VAB;
+    Constraint aasProtocolDefined = isDefined(aasProtocol) and aasProtocol <> null;
+
+    freeze {
+        // prevent later changes of constraint but make it referencable to .text
+        aasDefined;
+        aasProtocolDefined;
+    };
+    
+}

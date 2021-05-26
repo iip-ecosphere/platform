@@ -3,7 +3,7 @@
 // defines the mappings of types/constants to java. we rely here on compounds rather than enums so that the individual
 // elements become configurable. We also rely here on dynamic dispatch rather than switch case so that components added
 // later can define the respective mapping functions directly along with their type/instance 
-template JavaMapping(Configuration config, XmlFileArtifact target) {
+template JavaMapping(Configuration config, FileArtifact target) {
 
     def String serviceManagerModule(IIPEcosphere cfg) {
         serviceManagerModule(cfg.serviceManager);
@@ -106,6 +106,29 @@ template JavaMapping(Configuration config, XmlFileArtifact target) {
 
     def String serviceProtocolModule(IIPEcosphere cfg) {
         serviceProtocolModulePrefix(cfg)+ serviceProtocolModuleName(cfg);
+    }
+    
+    // ---------------------------------------------------------------
+    
+    def String aasClientModule(IIPEcosphere cfg) {
+        switch (cfg.aas) {
+            AasImpl::BaSyx : "support.aas.basyx",
+            default: ""
+        }
+    }
+
+    def String aasServerModule(IIPEcosphere cfg) {
+        switch (cfg.aas) {
+            AasImpl::BaSyx : "support.aas.basyx.server",
+            default: ""
+        }
+    }
+
+    def String aasProtocolName(IIPEcosphere cfg) {
+        switch (cfg.aasProtocol) {
+            AasProtocol.VAB : "VAB-IIP",
+            default: ""
+        }
     }
 
 }

@@ -21,6 +21,8 @@ project SerializerConfig1 {
     
     // unconditional free for testing
     freeze {
+        aas;
+        aasProtocol;
         transportProtocol;
         serializer;
         serviceManager;

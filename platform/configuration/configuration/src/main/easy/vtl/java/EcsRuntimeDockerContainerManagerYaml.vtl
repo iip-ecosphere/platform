@@ -1,0 +1,31 @@
+import JavaMapping;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        DockerContainerManager mgr = config.containerManager;
+        'dockerHost: ${mgr.dockerHost}
+        dockerImageYamlFilename: ${mgr.dockerImageYamlFilename}
+        deleteWhenUndeployed: ${mgr.deleteWhenUndeployed}
+        aas:
+            server:
+                port:
+                host:
+                schema:
+                path:
+            registry:
+                port:
+                host:
+                schema:
+                path:
+            implementation:
+                port:
+                host:
+                schema:
+                protocol:
+        '
+    }
+
+}

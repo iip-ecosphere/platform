@@ -1,1 +1,2 @@
+Services::serializerDefined = The serializer mechanism must be defined.
 Services::transportProtocolDefined = The transport protocol must be defined.

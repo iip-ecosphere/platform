@@ -10,13 +10,14 @@ template PlatformMvn(Configuration config, XmlFileArtifact target) {
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "services.exec", "ConfiguredServiceControl", "Configured service control");
+        createMavenProjectAttributes(project, "platform.exec", "ConfiguredPlatformInstance", "Configured platform instance");
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
         
         XmlElement dep = createDependencies(project);
-        appendDependency(dep, iipGroup, "support.aas.basyx", projectVersion);
-        appendDependency(dep, iipGroup, "support.aas.basyx.server", projectVersion);
+        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenShadePlugin(plugins, "2.3", "");
