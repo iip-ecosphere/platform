@@ -17,7 +17,6 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
-import org.apache.ibatis.binding.MapperMethod.MethodSignature;
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -25,8 +24,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 
 /**
  * Basic implementation for a container-based model element. Subclasses must call {@link #buildMyDeferred()} in an 
- * appropriate {@link MethodSignature} and use {@link #getDeferred(String, Class)} when potentially creating a 
- * builder that could be deferred.
+ * appropriate {@link MethodSignature} and use {@link DeferredBuilder#getDeferred(String, Class)} when potentially 
+ * creating a builder that could be deferred.
  * 
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE

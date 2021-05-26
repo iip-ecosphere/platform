@@ -5,13 +5,18 @@
   <artifactId>support.aas.basyx.server</artifactId>
   <packaging>jar</packaging>
   <name>support AAS/BaSyx (server)</name>
-  <description>he IIP-Ecosphere AAS/BaSyx (client) extension.</description>
+  <description>he IIP-Ecosphere AAS/BaSyx (server) extension.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
      <version>0.2.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <basyx.version>0.1.0-SNAPSHOT</basyx.version> 
+    <basyx.vab.version>0.0.1-SNAPSHOT</basyx.vab.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -19,7 +24,23 @@
       <artifactId>support.aas.basyx</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.lib</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.registry</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.AASServer</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+ 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas.basyx</artifactId>

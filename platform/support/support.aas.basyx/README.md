@@ -10,7 +10,7 @@ Client-side Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx
 - AAS Visitor
 - shortID validation for recommended/forbidden names. As in BaSyx, shortId must neither be ``value`` nor ``invocationList``. In addition, and more strict than BaSyx, we require that shortIds comply to the RegEx ``[a-zA-Z][a-zA-Z0-9_]+``.
 
-This package is intended to represent in particular the client side of an AAS (which may imply a local server). For a compliant AAS server, i.e., for remote deployment of AAS, please refer to the [Basyx AAS server abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basxy/README.md), which complements the
+This package is intended to represent in particular the client side of an AAS (which may imply a local server). For a compliant AAS server, i.e., for remote deployment of AAS, please refer to the [Basyx AAS server abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basxy.server/README.md), which complements the
 client side with server-sided functionality. We separated client and server side in particular to manage, reduce and optimizer the dependencies and resource usage on (Edge) client side.
 
 May be, future versions need to switch to lazy loading of deployed AAS instances (supported now by submodel elements collection, but no submodel or AAS).
@@ -42,4 +42,5 @@ Why not simply relying on BaSyx in Maven Central? Because, so far BaSyx was not 
   ``workspaces/IIP_basyx-components``
     - Execute the Jenkins BaSyx deployment task (also to record the time there).
     - The platform will build automatically.
+- Review the reduced dependencies for this component. Check also the [Basyx AAS server abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basxy.server/README.md) component.
 - Notify all colleagues working on the platform that BaSyx was updated, that at least the local Maven shall be forced to update the snapshots and whether an update of the local workspace via git is required.
