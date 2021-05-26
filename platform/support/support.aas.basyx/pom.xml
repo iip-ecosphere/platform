@@ -48,6 +48,10 @@
       		<groupId>com.h2database</groupId>
       		<artifactId>h2</artifactId>
       	</exclusion>
+      	<exclusion>
+      		<groupId>com.zaxxer</groupId>
+      		<artifactId>HikariCP</artifactId>
+      	</exclusion>
       </exclusions>
     </dependency>
     <dependency>
