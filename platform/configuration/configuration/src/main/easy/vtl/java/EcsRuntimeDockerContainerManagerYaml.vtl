@@ -4,28 +4,35 @@ import JavaMapping;
 @indent(indentation = 4, additional = 0)
 template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
 
+    def produceAas(IIPEcosphere config) {
+        EndpointAddress aasServer = config.aasServer;
+        EndpointAddress aasRegistryServer = config.aasRegistryServer;
+        ImplAddress aasImplServer = config.aasImplServer;
+        'aas:
+            server:
+                port: ${aasServer.port}
+                host: ${aasServer.host}
+                schema: ${aasServer.schema}
+                path: ${aasServer.path}
+            registry:
+                port: ${aasRegistryServer.port}
+                host: ${aasRegistryServer.host}
+                schema: ${aasRegistryServer.schema}
+                path: ${aasRegistryServer.path}
+            implementation:
+                port: ${aasImplServer.port}
+                host: ${aasImplServer.host}
+                schema: ${aasImplServer.host}
+                protocol: ${aasImplServer.protocol}'
+    }
+
     def main(IIPEcosphere config, FileArtifact target) {
         DockerContainerManager mgr = config.containerManager;
+        
         'dockerHost: ${mgr.dockerHost}
         dockerImageYamlFilename: ${mgr.dockerImageYamlFilename}
         deleteWhenUndeployed: ${mgr.deleteWhenUndeployed}
-        aas:
-            server:
-                port:
-                host:
-                schema:
-                path:
-            registry:
-                port:
-                host:
-                schema:
-                path:
-            implementation:
-                port:
-                host:
-                schema:
-                protocol:
-        '
+        ${produceAas(config)}'
     }
 
 }

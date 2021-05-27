@@ -22,7 +22,7 @@ template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
-        appendMavenShadePlugin(plugins, "2.3", "de.iip_ecosphere.platform.services.Starter");
+        appendMavenShadePlugin(plugins, "2.3", "de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown");
     }
 
 }

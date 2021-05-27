@@ -14,12 +14,10 @@ package de.iip_ecosphere.platform.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
+
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * The setup for the configuration component. As there are also EASy-Producer configuration classes with different 
@@ -27,7 +25,7 @@ import org.yaml.snakeyaml.error.YAMLException;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConfigurationSetup {
+public class ConfigurationSetup extends AbstractConfiguration {
 
     public static final String PLATFORM_META_MODEL_NAME = "IIPEcosphere";
     private static ConfigurationSetup instance;
@@ -156,26 +154,15 @@ public class ConfigurationSetup {
      * @return the configuration instance
      */
     public static ConfigurationSetup getConfiguration() {
-        ConfigurationSetup result = instance;
-        if (null == result) {
-            Class<ConfigurationSetup> cls = ConfigurationSetup.class;
-            InputStream in = cls.getResourceAsStream("/configuration.yml");
-            if (in != null) {
-                try {        
-                    Yaml yaml = new Yaml(new Constructor(cls));
-                    result = yaml.load(in);
-                    in.close();
-                } catch (IOException | YAMLException e) {
-                    LoggerFactory.getLogger(ConfigurationSetup.class).error(e.getMessage(), e);
-                    result = null;
-                }
+        if (null == instance) {
+            try {
+                instance = readFromYaml(ConfigurationSetup.class, "/configuration.yml");
+            } catch (IOException e) {
+                LoggerFactory.getLogger(ConfigurationSetup.class).error(e.getMessage(), e);
+                instance = new ConfigurationSetup();
             }
-            if (null == result) {
-                result = new ConfigurationSetup();
-            }
-            instance = result;
         }
-        return result;        
+        return instance;
     }
 
 }

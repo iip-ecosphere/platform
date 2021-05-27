@@ -2,6 +2,13 @@ project DataTypes {
 
     import MetaConcepts;
     
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    typedef EphemeralPort Integer with (EphemeralPort >= -1 and Port <= 65535);
+    typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
+    typedef Port EphemeralPort with (Port >= 0);
+    typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
+    
     abstract compound DataType {
         NonEmptyString name;
     }

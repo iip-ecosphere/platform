@@ -3,6 +3,8 @@ project SerializerConfig1 {
     import IIPEcosphere;
     import DataTypes;
 
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
     serializer = Serializer::Json;
     // serviceManager, containerManager are already defined    
     
@@ -19,16 +21,35 @@ project SerializerConfig1 {
         }
     };
     
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 8080,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 8081,
+        host = "127.0.0.1"
+    };
+    aasImplServer = {
+        port = 8082,
+        host = "127.0.0.1"
+    };
+    
+    // TODO freezing is not recursive
     // unconditional free for testing
     freeze {
         aas;
-        aasProtocol;
-        transportProtocol;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
         serializer;
+        transportProtocol;
         serviceManager;
         serviceProtocol;
         containerManager;
-        rec1;
-    };
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

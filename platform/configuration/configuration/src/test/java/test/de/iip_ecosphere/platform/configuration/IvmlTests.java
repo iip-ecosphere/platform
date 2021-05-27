@@ -107,6 +107,7 @@ public class IvmlTests {
         
         assertFileContains(gen, "platform/pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
             "configuration.configuration", "transport.amqp");
+        assertFile(gen, "platform/src/main/resources/application.yml");
     }
     
     /**

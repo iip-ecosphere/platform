@@ -2,6 +2,8 @@ project Services {
 
    import Connectors;
    
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   
    abstract compound ServiceManager { 
    };
    
@@ -22,28 +24,36 @@ project Services {
    // TODO service manager requires corresponding broker
  
    abstract compound ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Mqttv3;
    };
    
    compound ServiceProtocolAMQP refines ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Amqp;
    };
    
    compound ServiceProtocolMQTTv3 refines ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Mqttv3;
    }
    
    compound ServiceProtocolMQTTv5 refines ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Mqttv5;
    }
    
    compound ServiceProtocolMQTTv3hive refines ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Mqttv3;
    }
    
    compound ServiceProtocolMQTTv5hive refines ServiceProtocol {
+   	   ProtocolType type = ProtocolType::Mqttv5;
    };
    
    ServiceProtocol serviceProtocol = ServiceProtocolAMQP {
    };
    
+   // might be too strict, but its ok for now
+   //serviceProtocol.type == transportProtocol.type;
+   
    Constraint serviceProtocolDefined = isDefined(serviceProtocol) and serviceProtocol <> null;
-   // TODO link service to transport
  
    freeze {
        // prevent later changes of constraint but make it referencable to .text

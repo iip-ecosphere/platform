@@ -46,6 +46,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
+        vilTemplateProcessor("PlatformYaml", config, "${p}/application.yml");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
         maven("${platformRoot}");
     }

@@ -1,0 +1,21 @@
+import JavaMapping;
+import EcsRuntimeDockerContainerManagerYaml;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PlatformYaml(IIPEcosphere config, FileArtifact target) {
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        DockerContainerManager mgr = config.containerManager;
+        EndpointAddress aasServer = config.aasServer;
+        EndpointAddress aasRegistryServer = config.aasRegistryServer;
+        ImplAddress aasImplServer = config.aasImplServer;
+        
+        'dockerHost: ${mgr.dockerHost}
+        dockerImageYamlFilename: ${mgr.dockerImageYamlFilename}
+        deleteWhenUndeployed: ${mgr.deleteWhenUndeployed}
+        ${produceAas(config)}
+            persistence: ${config.aasPersistency}'
+    }
+
+}

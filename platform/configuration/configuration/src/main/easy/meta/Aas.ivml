@@ -2,19 +2,53 @@ project Aas {
 
     import DataTypes;
     
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
     // enum for now
     enum AasImpl { BaSyx };
     AasImpl aas = AasImpl::BaSyx;
     Constraint aasDefined = isDefined(aas) and aas <> null;
 
     enum AasProtocol { Default, VAB };
-    AasProtocol aasProtocol = AasProtocol::VAB;
-    Constraint aasProtocolDefined = isDefined(aasProtocol) and aasProtocol <> null;
+    enum AasSchema {HTTP, HTTPS, TCP};
+    enum Persistency {INMEMORY, MONGO};
+
+    compound EphemeralServerAddress {
+    	AasSchema schema = AasSchema::HTTPS;
+        NonEmptyString host;
+        NonEmptyEphemeralPort port;
+    }
+
+    compound ServerAddress refines EphemeralServerAddress {
+        NonEmptyPort port;
+    }
+
+    compound EndpointAddress refines ServerAddress {
+        String path = "";
+    }
+
+    compound ImplAddress refines EphemeralServerAddress {
+        AasProtocol protocol = AasProtocol::VAB;
+    	AasSchema schema = AasSchema::TCP;
+    }
+    //Constraint aasProtocolDefined = isDefined(aasProtocol) and aasProtocol <> null;
+    
+    EndpointAddress aasServer;
+    Constraint aasServerDefined = isDefined(aasServer) and aasServer <> null;
+    EndpointAddress aasRegistryServer;
+    Constraint aasRegistryServerDefined = isDefined(aasRegistryServer) and aasRegistryServer <> null;
+    ImplAddress aasImplServer;
+    Constraint aasImplServerDefined = isDefined(aasImplServer) and aasImplServer <> null;
+    Persistency aasPersistency = Persistency::INMEMORY;
+    Constraint aasPersistencyDefined = isDefined(aasPersistency) and aasPersistency <> null;
 
     freeze {
         // prevent later changes of constraint but make it referencable to .text
         aasDefined;
-        aasProtocolDefined;
+        aasServerDefined;
+        aasRepositoryServerDefined;
+        aasImplServerDefined;
+        //aasProtocolDefined;
     };
     
 }

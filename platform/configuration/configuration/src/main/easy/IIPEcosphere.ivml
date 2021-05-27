@@ -1,5 +1,7 @@
 project IIPEcosphere {
 
     import Devices; // preliminary
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
    
 }

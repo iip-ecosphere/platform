@@ -2,6 +2,8 @@ project Transport {
 
     import Aas;
     
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
     // enum for now
     enum Serializer { Json, ProtoBuf };
     Serializer serializer = Serializer::Json;
@@ -9,16 +11,22 @@ project Transport {
 
     // ----------------------------------------------
     
+    enum ProtocolType { Mqttv3, Mqttv5, Amqp };
+    
     abstract compound TransportProtocol {
+    	ProtocolType type;
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {
+    	ProtocolType type = ProtocolType::Amqp;
     };
     
     compound TransportProtocolMQTTv3 refines TransportProtocol {
+    	ProtocolType type = ProtocolType::Mqttv3;
     };
     
     compound TransportProtocolMQTTv5 refines TransportProtocol {
+    	ProtocolType type = ProtocolType::Mqttv5;
     };    
     
     TransportProtocol transportProtocol = TransportProtocolAMQP {

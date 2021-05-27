@@ -2,6 +2,8 @@ project Devices {
 
     import Services;
     
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+        
     abstract compound ContainerManager {
          // - globally allocated hosts/ports
          // - global AAS location/URN/URI
