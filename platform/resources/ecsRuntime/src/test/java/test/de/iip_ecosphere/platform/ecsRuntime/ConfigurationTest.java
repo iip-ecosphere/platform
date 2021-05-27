@@ -31,12 +31,16 @@ public class ConfigurationTest {
      */
     @Test
     public void testConfiguration() throws IOException {
-        // does not exist, anyway no configuration content
-        Configuration cfg = Configuration.readFromYaml(Configuration.class, "me.yml");
-        Assert.assertNotNull(cfg);
+        // does not exist
+        try {
+            Configuration.readFromYaml(Configuration.class, "me.yml");
+            Assert.fail("No exception");
+        } catch (IOException e) {
+            // ok
+        }
         
         // for now no configuration content
-        cfg = Configuration.readFromYaml();
+        Configuration cfg = Configuration.readFromYaml();
         Assert.assertNotNull(cfg);
     }
 
