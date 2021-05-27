@@ -30,7 +30,7 @@ import org.yaml.snakeyaml.representer.Representer;
 public abstract class AbstractConfiguration {
 
     /**
-     * Reads a {@link Configuration} instance from the root folder of the JAR/classpath. Unknown properties are ignored.
+     * Reads an instance from the root folder of the JAR/classpath. Unknown properties are ignored.
      *
      * @param <C> the specific type of configuration to read
      * @param cls the class of configuration to read
@@ -39,12 +39,28 @@ public abstract class AbstractConfiguration {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, String filename) throws IOException {
-        C result = null;
         String fname = filename;
         if (!fname.startsWith("/")) {
             fname = "/" + fname; 
         }
         InputStream in = AbstractConfiguration.class.getResourceAsStream(fname);
+        if (null == in) {
+            throw new IOException("Cannot read " + fname);
+        }
+        return readFromYaml(cls, in);  
+    }
+
+    /**
+     * Reads a instance from {@code in}. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param in the stream to read from (ignored if <b>null</b>)
+     * @return the configuration instance
+     * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYaml(Class<C> cls, InputStream in) throws IOException {
+        C result = null;
         if (in != null) {
             try {
                 Representer representer = new Representer();
@@ -55,8 +71,6 @@ public abstract class AbstractConfiguration {
             } catch (YAMLException e) {
                 throw new IOException(e);
             }
-        } else {
-            throw new IOException("Cannot read " + fname);
         }
         if (null == result) {
             try {
