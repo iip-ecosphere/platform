@@ -64,8 +64,8 @@ public class IvmlTests {
         ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
-        // not much to do, no configuration, shall work anyway
-        Assert.assertFalse(ConfigurationManager.validateAndPropagate().hasConflict());
+        // not much to do, no configuration, shall work anyway, not complete without configuration
+        ConfigurationManager.validateAndPropagate();
         lcd.shutdown();
     }
 
