@@ -51,12 +51,8 @@ public class ArtifactInfoTest {
         YamlArtifact info = YamlArtifact.readFromYaml(null);
         Assert.assertTrue(info.getServices().isEmpty());
         
-        try {
-            info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test-error.yml"));
-            Assert.fail("No exception");
-        } catch (IOException e) {
-            // ok here, desired
-        }
+        // changed responsibility, does not fail anymore, stream can/shall be checked for null before
+        info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test-error.yml"));
         
         // failing test.yml
         info = YamlArtifact.readFromYaml(getClass().getClassLoader().getResourceAsStream("test.yml"));
