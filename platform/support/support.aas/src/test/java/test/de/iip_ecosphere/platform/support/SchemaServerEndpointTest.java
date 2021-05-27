@@ -40,6 +40,14 @@ public class SchemaServerEndpointTest {
      */
     @Test
     public void testServerAddress() {
+        Assert.assertTrue(ServerAddress.isValidPort(0));
+        Assert.assertTrue(ServerAddress.isValidPort(8080));
+        Assert.assertFalse(ServerAddress.isValidPort(-1));
+        Assert.assertFalse(ServerAddress.isValidPort(66000));
+        Assert.assertEquals(0, ServerAddress.validatePort(0));
+        Assert.assertEquals(1024, ServerAddress.validatePort(1024));
+        Assert.assertTrue(ServerAddress.isValidPort(ServerAddress.validatePort(-1)));
+        
         ServerAddress add = new ServerAddress(Schema.IGNORE);
         Assert.assertEquals(Schema.IGNORE, add.getSchema());
         Assert.assertTrue(add.getPort() > 0);

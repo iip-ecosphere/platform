@@ -119,4 +119,29 @@ public class ServerAddress {
         return schema.ordinal() ^ host.hashCode() ^ port;
     }
     
+    /**
+     * Validates {@code port} and if {@code port} is not valid, turn it into an {@link NetUtils#getEphemeralPort() 
+     * ephemeral port}.
+     * 
+     * @param port the port to validate
+     * @return the validated port, i.e., {@code port} or an ephemeral port number
+     * @see #isValidPort(int)
+     */
+    public static int validatePort(int port) {
+        if (!isValidPort(port)) {
+            port = NetUtils.getEphemeralPort();
+        } 
+        return port;
+    }
+
+    /**
+     * Returns whether {@code port} is a valid port number.
+     * 
+     * @param port the port number
+     * @return {@code true} for valid, {@code false} else
+     */
+    public static boolean isValidPort(int port) {
+        return (port >= 0 && port <= 65535);
+    }
+    
 }
