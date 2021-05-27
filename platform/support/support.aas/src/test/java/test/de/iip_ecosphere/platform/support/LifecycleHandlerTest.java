@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
+import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
 
 /**
  * Tests {@link LifecycleDescriptor} and {@link LifecycleHandler}.
@@ -70,8 +71,10 @@ public class LifecycleHandlerTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class LcDesc2 implements LifecycleDescriptor {
+    public static class LcDesc2 implements TerminatingLifecycleDescriptor {
 
+        private int waitingCount = 0;
+        
         @Override
         public void startup(String[] args) {
             Assert.assertArrayEquals(args, cmdArgs);
@@ -93,11 +96,16 @@ public class LifecycleHandlerTest {
         public int priority() {
             return AAS_PRIORITY;
         }
+
+        @Override
+        public boolean continueWaiting() {
+            return waitingCount++ < 10;
+        }
         
     }
     
     /**
-     * Tests the lifecycle handler.
+     * Tests the lifecycle handler with no waiting.
      */
     @Test
     public void testLifecycleHandler() {
@@ -118,6 +126,54 @@ public class LifecycleHandlerTest {
         LifecycleHandler.shutdown();
         Assert.assertEquals(2, shutdownCount);
         // no assert for shutdownHookCalledCount
+        
+        startupCount = 0;
+        shutdownCount = 0;
+        shutdownHookCount = 0;
+        shutdownHookCalledCount = 0;
+        countDescriptors = 0;
+        LifecycleHandler.OneShotStarter.main(cmdArgs);
+        Assert.assertEquals(2, shutdownHookCount);
+        Assert.assertEquals(2, startupCount);
+        Assert.assertEquals(2, shutdownCount);
+    }
+
+    /**
+     * Tests the lifecycle handler with waiting and shutdown by hook. May end up in an endless loop in case of bugs. 
+     * {@link LcDesc2} shall terminate the loop after 10 iterations.
+     */
+    @Test(timeout = 10 * 1000)
+    public void testLifecycleHandlerWaiting() {
+        cmdArgs = new String[] {"arg1", "arg2"};
+        startupCount = 0;
+        shutdownCount = 0;
+        shutdownHookCount = 0;
+        shutdownHookCalledCount = 0;
+        countDescriptors = 0;
+
+        LifecycleHandler.WaitingStarter.main(cmdArgs);
+        Assert.assertEquals(2, shutdownHookCount);
+        Assert.assertEquals(2, startupCount);
+        // shutdowns not guaranteed
+    }
+
+    /**
+     * Tests the lifecycle handler with waiting and shutdown at the end. May end up in an endless loop in case of bugs. 
+     * {@link LcDesc2} shall terminate the loop after 10 iterations.
+     */
+    @Test(timeout = 10 * 1000)
+    public void testLifecycleHandlerWaitingShutdown() {
+        cmdArgs = new String[] {"arg1", "arg2"};
+        startupCount = 0;
+        shutdownCount = 0;
+        shutdownHookCount = 0;
+        shutdownHookCalledCount = 0;
+        countDescriptors = 0;
+
+        LifecycleHandler.WaitingStarterWithShutdown.main(cmdArgs);
+        Assert.assertEquals(2, shutdownHookCount);
+        Assert.assertEquals(2, startupCount);
+        Assert.assertEquals(2, shutdownCount);
     }
 
 }
