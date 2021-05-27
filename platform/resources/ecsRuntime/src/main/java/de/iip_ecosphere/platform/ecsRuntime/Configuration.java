@@ -13,14 +13,8 @@
 package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
 
 /**
  * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add
@@ -29,59 +23,8 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Configuration {
-    
-    private AasSetup aas = new AasSetup();
-    
-    /**
-     * Returns the AAS setup.
-     * 
-     * @return the AAS setup
-     */
-    public AasSetup getAas() {
-        return aas;
-    }
-    
-    /**
-     * Defines the AAS setup.
-     * 
-     * @param aas the AAS setup
-     */
-    public void setAas(AasSetup aas) {
-        this.aas = aas;
-    }
+public class Configuration extends AasConfiguration {
 
-    /**
-     * Reads a {@link Configuration} instance from the root folder of the jar. [public for testing] 
-     *
-     * @param <C> the specific type of configuration to read (extended from {@code Configuration}}
-     * @param cls the class of configuration to read
-     * @param filename the filename
-     * @return the configuration instance
-     */
-    public static <C extends Configuration> C readFromYaml(Class<C> cls, String filename) throws IOException {
-        C result = null;
-        InputStream in = Configuration.class.getResourceAsStream("/" + filename);
-        if (in != null) {
-            try {        
-                Yaml yaml = new Yaml(new Constructor(cls));
-                result = yaml.load(in);
-                in.close();
-            } catch (YAMLException e) {
-                throw new IOException(e);
-            }
-        }
-        if (null == result) {
-            try {
-                result = cls.getConstructor().newInstance();
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException 
-                | InvocationTargetException e) {
-                throw new IOException(e);
-            }
-        } 
-        return result;
-    }
-    
     /**
      * Reads a {@link Configuration} instance from a default "ecsRuntime.yml" file in the root folder of the jar.
      * This method shall be used by subclasses akin to {@link #readFromYaml()}. 

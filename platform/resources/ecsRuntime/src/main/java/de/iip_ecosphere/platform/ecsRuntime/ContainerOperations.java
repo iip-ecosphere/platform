@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 

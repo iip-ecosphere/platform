@@ -15,10 +15,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-    </dependency>
-    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
