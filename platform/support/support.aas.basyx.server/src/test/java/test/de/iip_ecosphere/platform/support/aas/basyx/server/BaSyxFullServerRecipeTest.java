@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.aas.basyx.server.BaSyxFullServerRecipe;
+import de.iip_ecosphere.platform.support.aas.basyx.server.BaSyxFullServerRecipe.ServerPersistenceType;
 
 /**
  * Tests {@link BaSyxFullServerRecipe}.
@@ -78,5 +79,20 @@ public class BaSyxFullServerRecipeTest {
         aasServer.stop(true);
         regServer.stop(true);
     }
+    
+    /**
+     * Tests the persistence type translation.
+     */
+    @Test
+    public void testPersistenceType() {
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, rcp.toPersistenceType("")); // fallback
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, rcp.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
+        Assert.assertEquals(ServerPersistenceType.MONGO, 
+            rcp.toPersistenceType(ServerPersistenceType.MONGO.name()));
+        Assert.assertEquals(ServerPersistenceType.MONGO, 
+            rcp.toPersistenceType(ServerPersistenceType.MONGO.name().toLowerCase()));
+    }
+
     
 }

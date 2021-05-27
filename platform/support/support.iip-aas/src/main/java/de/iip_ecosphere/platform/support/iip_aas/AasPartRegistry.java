@@ -191,7 +191,7 @@ public class AasPartRegistry {
         public void setImplementation(ProtocolAddressHolder implementation) {
             this.implementation = implementation;
         }
-        
+
         /**
          * Returns a default setup with all hosts to {@link ServerAddress#LOCALHOST} and all ports to ephemeral
          * while the registry port is the same as the aas port.
@@ -200,11 +200,22 @@ public class AasPartRegistry {
          */
         @JsonIgnore
         public static AasSetup createLocalEphemeralSetup() {
+            return createLocalEphemeralSetup(true);
+        }
+        
+        /**
+         * Returns a default setup with all hosts to {@link ServerAddress#LOCALHOST} and all ports to ephemeral.
+         * 
+         * @param regPortSame shall the registry port be the same as the AAS port
+         * @return the local ephemeral setup
+         */
+        @JsonIgnore
+        public static AasSetup createLocalEphemeralSetup(boolean regPortSame) {
             AasSetup result = new AasSetup();
             result.server.setHost(ServerAddress.LOCALHOST);
             result.server.setPort(NetUtils.getEphemeralPort());
             result.registry.setHost(ServerAddress.LOCALHOST);
-            result.registry.setPort(result.server.getPort());
+            result.registry.setPort(regPortSame ? result.server.getPort() : NetUtils.getEphemeralPort());
             result.implementation.setHost(ServerAddress.LOCALHOST);
             result.implementation.setPort(NetUtils.getEphemeralPort()); // could both be the same?
             return result;

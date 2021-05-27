@@ -48,6 +48,17 @@ public class BaSyxFullServerRecipe extends BaSyxServerRecipe {
     public enum ServerPersistenceType implements PersistenceType {
         MONGO;
     }
+    
+    @Override
+    public PersistenceType toPersistenceType(String type) {
+        PersistenceType result;
+        try {
+            result = ServerPersistenceType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            result = super.toPersistenceType(type);
+        }
+        return result;
+    }
 
     @Override
     protected RegistryBackend translateForRegistry(PersistenceType type) {
