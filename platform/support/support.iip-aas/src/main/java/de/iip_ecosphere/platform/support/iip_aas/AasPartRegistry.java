@@ -175,6 +175,7 @@ public class AasPartRegistry {
 
         /**
          * Returns the implementation (server) information. [required by data mapper]
+         * For convenience, the port number may be invalid and is turned then into an ephemeral port.
          * 
          * @return the implementation (server) information
          */
@@ -352,9 +353,10 @@ public class AasPartRegistry {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         ProtocolAddressHolder impl = setup.getImplementation();
+        int implPort = ServerAddress.validatePort(impl.getPort());
         InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), impl.getHost(), 
-            impl.getPort());
-        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), impl.getPort());
+            implPort);
+        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort);
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();

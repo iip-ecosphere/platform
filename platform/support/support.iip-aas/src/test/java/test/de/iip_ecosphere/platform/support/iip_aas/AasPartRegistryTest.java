@@ -13,7 +13,6 @@
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Schema;
@@ -48,6 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Tests {@link AasPartRegistry}, {@link ActiveAasBase} and {@link SubmodelClient}. Do not rename, this class is 
@@ -270,7 +267,7 @@ public class AasPartRegistryTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Configuration {
+    public static class Configuration extends AbstractConfiguration {
 
         private String name = "";
         private AasSetup aas = new AasSetup();
@@ -319,17 +316,7 @@ public class AasPartRegistryTest {
      */
     @Test
     public void testConfiguration() throws IOException {
-        Configuration config = null;
-        InputStream in = getClass().getResourceAsStream("/aasPartRegistry.yml");
-        if (in != null) {
-            try {        
-                Yaml yaml = new Yaml(new Constructor(Configuration.class));
-                config = yaml.load(in);
-                in.close();
-            } catch (YAMLException e) {
-                throw new IOException(e);
-            }
-        }
+        Configuration config = Configuration.readFromYaml(Configuration.class, "/aasPartRegistry.yml");
 
         Assert.assertNotNull(config);
         Assert.assertEquals("test", config.getName());
