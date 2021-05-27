@@ -1,0 +1,4 @@
+aas:
+    server:
+        port: 8081
+persistence: INMEMORY        
