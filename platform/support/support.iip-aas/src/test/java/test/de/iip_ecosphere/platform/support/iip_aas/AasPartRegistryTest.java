@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -44,7 +45,6 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Tests {@link AasPartRegistry}, {@link ActiveAasBase} and {@link SubmodelClient}. Do not rename, this class is 
@@ -267,10 +267,9 @@ public class AasPartRegistryTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Configuration extends AbstractConfiguration {
+    public static class Configuration extends AasConfiguration {
 
         private String name = "";
-        private AasSetup aas = new AasSetup();
 
         /**
          * Returns the "name" of the configuration.
@@ -290,23 +289,6 @@ public class AasPartRegistryTest {
             this.name = name;
         }
         
-        /**
-         * Returns the AAS setup.
-         * 
-         * @return the AAS setup
-         */
-        public AasSetup getAas() {
-            return aas;
-        }
-
-        /**
-         * Defines the AAS setup.
-         * 
-         * @param aas the AAS setup
-         */
-        public void setAas(AasSetup aas) {
-            this.aas = aas;
-        }
     }
     
     /**
