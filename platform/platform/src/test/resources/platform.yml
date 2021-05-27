@@ -1,4 +1,17 @@
 aas:
     server:
+        port: 8080
+        schema: HTTPS
+        host: 127.0.0.1
+        path: aas
+    registry:
+        schema: HTTPS
+        host: 127.0.0.1
         port: 8081
-persistence: INMEMORY        
+        path: registry
+    implementation:
+        schema: TCP
+        host: 127.0.0.1
+        port: 8082
+        protocol: VAB-IIP
+    persistence: MONGO        

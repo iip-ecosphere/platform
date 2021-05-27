@@ -36,11 +36,12 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor {
         AasSetup aasSetup = cfg.getAas();
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
-        PersistenceType pType = rcp.toPersistenceType(cfg.getPersistence().name());
+        PersistenceType pType = rcp.toPersistenceType(cfg.getAas().getPersistence().name());
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
+        // TODO VAB-Server
     }
 
     @Override

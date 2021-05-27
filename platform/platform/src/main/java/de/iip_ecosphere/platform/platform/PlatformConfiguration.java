@@ -16,14 +16,14 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Platform configuration.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlatformConfiguration extends AasConfiguration {
+public class PlatformConfiguration extends AbstractConfiguration {
 
     /**
      * Common persistence types.
@@ -36,34 +36,24 @@ public class PlatformConfiguration extends AasConfiguration {
     }
     
     private static PlatformConfiguration instance;
+    private PersistentAasSetup aas = new PersistentAasSetup();
     
-    private ConfiguredPersistenceType persistence = ConfiguredPersistenceType.INMEMORY;
-
     /**
-     * Returns the persistence type.
+     * Returns the AAS setup.
      * 
-     * @return the persistence type
+     * @return the AAS setup
      */
-    public ConfiguredPersistenceType getPersistence() {
-        return persistence;
+    public PersistentAasSetup getAas() {
+        return aas;
     }
     
     /**
-     * Setting the persistence type.
+     * Defines the AAS setup.
      * 
-     * @param persistence the persistence type
+     * @param aas the AAS setup
      */
-    public void setPersistence(ConfiguredPersistenceType persistence) {
-        this.persistence = persistence;
-    }
-    
-    /**
-     * Setting the persistence type.
-     * 
-     * @param persistence the persistence type
-     */
-    public void setPersistence(String persistence) {
-        this.persistence = ConfiguredPersistenceType.valueOf(persistence);
+    public void setAas(PersistentAasSetup aas) {
+        this.aas = aas;
     }
     
     /**
