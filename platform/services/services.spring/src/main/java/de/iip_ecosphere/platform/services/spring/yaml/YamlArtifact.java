@@ -17,12 +17,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -101,17 +98,7 @@ public class YamlArtifact implements Artifact {
      * @return the artifact info
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
-        YamlArtifact result;
-        if (null == in) {
-            result = new YamlArtifact();
-        } else {
-            try {        
-                Yaml yaml = new Yaml(new Constructor(YamlArtifact.class));
-                result = yaml.load(in);
-            } catch (YAMLException e) {
-                throw new IOException(e);
-            }
-        }
+        YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
         if (null == result.services) {
             result.services = new ArrayList<>();
         }
