@@ -18,6 +18,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
@@ -32,6 +33,18 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 public class BaSyxServerRecipe implements ServerRecipe {
 
     // currently this does not allow to run registry and server on the same port...
+    
+    @Override
+    public PersistenceType toPersistenceType(String type) {
+        PersistenceType result = LocalPersistenceType.INMEMORY;
+        try {
+            result = LocalPersistenceType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            LoggerFactory.getLogger(getClass()).warn("Persistence type '" + type + "' is unknown. Using " 
+                + LocalPersistenceType.INMEMORY + " as fallback.");
+        }
+        return result;
+    }
     
     @Override
     public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
