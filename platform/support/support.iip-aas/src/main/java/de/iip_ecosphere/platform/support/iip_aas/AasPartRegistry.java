@@ -200,18 +200,22 @@ public class AasPartRegistry {
          */
         @JsonIgnore
         public static AasSetup createLocalEphemeralSetup() {
-            return createLocalEphemeralSetup(true);
+            return createLocalEphemeralSetup(null, true);
         }
         
         /**
          * Returns a default setup with all hosts to {@link ServerAddress#LOCALHOST} and all ports to ephemeral.
          * 
+         * @param setup the instance to set up (if <b>null</b> a new one is created)
          * @param regPortSame shall the registry port be the same as the AAS port
          * @return the local ephemeral setup
          */
         @JsonIgnore
-        public static AasSetup createLocalEphemeralSetup(boolean regPortSame) {
-            AasSetup result = new AasSetup();
+        public static AasSetup createLocalEphemeralSetup(AasSetup setup, boolean regPortSame) {
+            AasSetup result = setup;
+            if (null == result) {
+                result = new AasSetup();
+            }
             result.server.setHost(ServerAddress.LOCALHOST);
             result.server.setPort(NetUtils.getEphemeralPort());
             result.registry.setHost(ServerAddress.LOCALHOST);
