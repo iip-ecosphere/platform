@@ -12,7 +12,7 @@ import de.iip_ecosphere.platform.support.Schema;
  */
 public class EndpointHolder extends ServerAddressHolder {
 
-    private String path;
+    private String path = "";
     
     /**
      * Creates an instance (deserialization).
