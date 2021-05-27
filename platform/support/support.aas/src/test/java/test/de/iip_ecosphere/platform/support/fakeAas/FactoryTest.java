@@ -139,6 +139,10 @@ public class FactoryTest {
         Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
         
         Assert.assertEquals("id", instance.fixId("id"));
+        
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, serverRecipe.toPersistenceType("")); // fallback
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, 
+            serverRecipe.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
     }
 
     /**

@@ -47,6 +47,14 @@ public interface ServerRecipe {
     }
     
     /**
+     * Returns a supported persistence type.
+     * 
+     * @param type the textual representation
+     * @return the persistence type, {@link LocalPersistenceType#INMEMORY} as fallback
+     */
+    public PersistenceType toPersistenceType(String type);
+    
+    /**
      * Creates a AAS server. If {@code type} is local, a similar server as in {@link DeploymentRecipe} 
      * is created.
      * 

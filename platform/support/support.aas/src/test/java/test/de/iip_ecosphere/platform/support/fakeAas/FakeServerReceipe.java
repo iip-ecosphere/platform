@@ -35,4 +35,9 @@ public class FakeServerReceipe implements ServerRecipe {
         return null;
     }
 
+    @Override
+    public PersistenceType toPersistenceType(String type) {
+        return LocalPersistenceType.INMEMORY;
+    }
+
 }
