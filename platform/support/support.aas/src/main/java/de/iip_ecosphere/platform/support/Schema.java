@@ -23,7 +23,12 @@ public enum Schema {
      * HTTP unencrypted.
      */
     HTTP("http://", false), 
-    
+
+    /**
+     * HTTP encrypted.
+     */
+    HTTPS("https://", true), 
+
     /**
      * TCP unencrypted.
      */
