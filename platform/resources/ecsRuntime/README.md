@@ -8,8 +8,7 @@ network manager and a service manager. Intended to be called from a separate pro
 
 ## Configuration
 
-The basic YAML configuration of the services management allows for the following AAS (asset administration shell) 
-settings:
+The basic YAML configuration of the services management (in ``iipecosphere.yml``) allows for the following AAS (asset administration shell) settings:
 
     aas:
       server:

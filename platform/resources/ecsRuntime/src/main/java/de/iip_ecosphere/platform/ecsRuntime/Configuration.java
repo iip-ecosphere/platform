@@ -26,8 +26,8 @@ import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
 public class Configuration extends AasConfiguration {
 
     /**
-     * Reads a {@link Configuration} instance from a default "ecsRuntime.yml" file in the root folder of the jar.
-     * This method shall be used by subclasses akin to {@link #readFromYaml()}. 
+     * Reads a {@link Configuration} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * the jar/classpath. This method shall be used by subclasses akin to {@link #readFromYaml()}. 
      *
      * @param <C> the specific type of configuration to read (extended from {@code Configuration}}
      * @param cls the class of configuration to read
@@ -35,17 +35,18 @@ public class Configuration extends AasConfiguration {
      * @see #readFromYaml(Class, String)
      */
     public static <C extends Configuration> C readConfiguration(Class<C> cls) throws IOException {
-        return readFromYaml(cls, "ecsRuntime.yml");
+        return readFromYaml(cls);
     }
     
     /**
-     * Reads a {@link Configuration} instance from a default "ecsRuntime.yml" file in the root folder of the jar. 
+     * Reads a {@link Configuration} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * the jar/classpath. 
      *
      * @return the configuration instance
      * @see #readFromYaml(Class)
      */
     public static Configuration readConfiguration() throws IOException {
-        return readFromYaml(Configuration.class, "ecsRuntime.yml");
+        return readFromYaml(Configuration.class);
     }
 
 }
