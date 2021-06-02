@@ -40,7 +40,7 @@ public class ConfigurationTest {
         }
         
         // for now no configuration content
-        Configuration cfg = Configuration.readFromYaml();
+        Configuration cfg = Configuration.readConfiguration();
         Assert.assertNotNull(cfg);
     }
 

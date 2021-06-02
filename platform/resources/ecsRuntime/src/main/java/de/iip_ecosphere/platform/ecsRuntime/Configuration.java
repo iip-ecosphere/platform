@@ -34,7 +34,7 @@ public class Configuration extends AasConfiguration {
      * @return the configuration instance
      * @see #readFromYaml(Class, String)
      */
-    public static <C extends Configuration> C readFromYaml(Class<C> cls) throws IOException {
+    public static <C extends Configuration> C readConfiguration(Class<C> cls) throws IOException {
         return readFromYaml(cls, "ecsRuntime.yml");
     }
     
@@ -44,7 +44,7 @@ public class Configuration extends AasConfiguration {
      * @return the configuration instance
      * @see #readFromYaml(Class)
      */
-    public static Configuration readFromYaml() throws IOException {
+    public static Configuration readConfiguration() throws IOException {
         return readFromYaml(Configuration.class, "ecsRuntime.yml");
     }
 
