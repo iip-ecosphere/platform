@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>ecsRuntime.kubernetes</artifactId>
+  <packaging>jar</packaging>
+  <name>ECSRuntime-Kubernetes</name>
+  <description>Kubernetes extension for IIP-Ecosphere ECS-Runtime.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>ecsRuntime</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <!-- NO dependency to de.iip-ecosphere.platform.services!! -->
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
