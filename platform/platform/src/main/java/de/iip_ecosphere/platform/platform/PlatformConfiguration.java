@@ -65,7 +65,7 @@ public class PlatformConfiguration extends AbstractConfiguration {
     public static PlatformConfiguration getInstance() {
         if (null == instance) {
             try {
-                instance = readFromYaml(PlatformConfiguration.class, "platform.yml");
+                instance = readFromYaml(PlatformConfiguration.class);
             } catch (IOException e) {
                 LoggerFactory.getLogger(PlatformConfiguration.class).error(
                     "Cannot start AAS server: " + e.getMessage());

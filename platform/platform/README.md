@@ -4,7 +4,7 @@ The platform component for configuring and starting platform services.
 
 ## Configuration
 
-The basic YAML configuration of the plattform services provide the following settings:
+The basic YAML configuration of the plattform services (in ``iipecosphere.yml``) provide the following settings:
 
     aas:
       server:
