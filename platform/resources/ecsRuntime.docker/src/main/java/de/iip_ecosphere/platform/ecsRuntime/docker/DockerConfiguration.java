@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Implements the docker specific configuration. For configuration prerequisites, see {@link Configuration}.
@@ -26,8 +27,8 @@ import de.iip_ecosphere.platform.ecsRuntime.Configuration;
 public class DockerConfiguration extends Configuration {
 
     private String dockerHost;
-    private String dockerImageYamlFilename;
-    private boolean deleteWhenUndeployed;
+    private String dockerImageYamlFilename = "image-info.yml";
+    private boolean deleteWhenUndeployed = false;
    
     /**
      * Returns the docker host.
@@ -83,11 +84,13 @@ public class DockerConfiguration extends Configuration {
     public void setDeleteWhenUndeployed(boolean deleteWhenUndeployed) {
         this.deleteWhenUndeployed = deleteWhenUndeployed;
     }
-     /**
-     * Reads a {@link DockerConfiguration} instance from a default "ecsRuntime.yml" file in the root folder of the jar. 
-     *
-     * @return configuration instance
-     */
+    
+    /**
+    * Reads a {@link DockerConfiguration} instance from a {@link AbstractConfiguration#DEFAULT_FNAME} in the 
+    * root folder of the jar/classpath. 
+    *
+    * @return configuration instance
+    */
     public static DockerConfiguration readFromYaml() {
         DockerConfiguration result;
         try {
