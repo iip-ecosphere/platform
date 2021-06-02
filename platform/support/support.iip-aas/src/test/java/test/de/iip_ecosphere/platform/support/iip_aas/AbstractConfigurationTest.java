@@ -90,19 +90,24 @@ public class AbstractConfigurationTest {
             // ok
         }
         try {
-            Cfg2.readFromYaml(Cfg2.class, "test.yaml");
+            Cfg2.readFromYaml(Cfg2.class, AbstractConfiguration.DEFAULT_FNAME);
             Assert.fail("No exception, class cannot be instantiated");
         } catch (IOException e) {
             // ok
         }
 
         // readable, without leading /
-        Cfg cfg = Cfg.readFromYaml(Cfg.class, "test.yaml");
+        Cfg cfg = Cfg.readFromYaml(Cfg.class, AbstractConfiguration.DEFAULT_FNAME);
+        Assert.assertNotNull(cfg);
+        Assert.assertEquals(42, cfg.getProperty());
+
+        // readable, default name
+        cfg = Cfg.readFromYaml(Cfg.class);
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
 
         // readable, with leading /
-        cfg = Cfg.readFromYaml(Cfg.class, "/test.yaml");
+        cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractConfiguration.DEFAULT_FNAME);
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
     }

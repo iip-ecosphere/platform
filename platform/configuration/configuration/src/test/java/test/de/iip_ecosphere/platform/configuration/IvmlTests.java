@@ -65,7 +65,8 @@ public class IvmlTests {
         lcd.startup(new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
         // not much to do, no configuration, shall work anyway, not complete without configuration
-        ConfigurationManager.validateAndPropagate();
+        ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
+        EasyExecutor.printReasoningMessages(rRes);
         lcd.shutdown();
     }
 

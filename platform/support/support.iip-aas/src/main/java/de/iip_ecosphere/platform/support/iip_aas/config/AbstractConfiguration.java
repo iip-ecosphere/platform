@@ -29,8 +29,23 @@ import org.yaml.snakeyaml.representer.Representer;
  */
 public abstract class AbstractConfiguration {
 
+    public static final String DEFAULT_FNAME = "iipecosphere.yml";
+
     /**
-     * Reads an instance from the root folder of the JAR/classpath. Unknown properties are ignored.
+     * Reads a configurationfrom {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
+     * are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @return the configuration instance
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYaml(Class<C> cls) throws IOException {
+        return readFromYaml(cls, DEFAULT_FNAME);
+    }
+    
+    /**
+     * Reads a configuration from the root folder of the JAR/classpath. Unknown properties are ignored.
      *
      * @param <C> the specific type of configuration to read
      * @param cls the class of configuration to read
