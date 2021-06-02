@@ -13,13 +13,14 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * The lifecycle descriptor for the spring cloud service manager. Requires service management implementation and AAS 
@@ -32,7 +33,10 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void startup(String[] args) {
-        SpringApplication.run(SpringLifecycleDescriptor.class, args);
+        new SpringApplicationBuilder(SpringLifecycleDescriptor.class)
+            .properties("spring.config.name:" + AbstractConfiguration.DEFAULT_NAME)
+            .build()
+            .run(args);
     }
 
     @Override

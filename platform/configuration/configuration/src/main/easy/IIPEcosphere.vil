@@ -34,19 +34,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
-        vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/ecsRuntime.yml");
+        vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecoshere.yml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
         maven("${ecsRuntimeRoot}");
         
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
-        vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/application.yml");
+        vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
         maven("${serviceMgrRoot}");
         
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
-        vilTemplateProcessor("PlatformYaml", config, "${p}/application.yml");
+        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
         maven("${platformRoot}");
     }

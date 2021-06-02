@@ -101,14 +101,14 @@ public class IvmlTests {
         assertFileContains(gen, "app/pom.xml", "transport.spring.amqp", "transport.amqp");
         
         assertFileContains(gen, "ecsRuntime/pom.xml", "ecsRuntime.docker", "transport.amqp", "support.aas.basyx");
-        assertFile(gen, "ecsRuntime/src/main/resources/ecsRuntime.yml");
+        assertFile(gen, "ecsRuntime/src/main/resources/iipecosphere.yml");
         
         assertFileContains(gen, "serviceMgr/pom.xml", "services.spring", "transport.amqp", "support.aas.basyx");
-        assertFile(gen, "serviceMgr/src/main/resources/application.yml");
+        assertFile(gen, "serviceMgr/src/main/resources/iipecosphere.yml");
         
         assertFileContains(gen, "platform/pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
             "configuration.configuration", "transport.amqp");
-        assertFile(gen, "platform/src/main/resources/application.yml");
+        assertFile(gen, "platform/src/main/resources/iipecosphere.yml");
     }
     
     /**

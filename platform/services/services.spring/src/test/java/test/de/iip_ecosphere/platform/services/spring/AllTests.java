@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     UtilsTest.class,
     TestServiceManager.class,
-    ArtifactInfoTest.class
+    ArtifactInfoTest.class,
+    TestLifecycleDescriptor.class
 })
 public class AllTests {
 }

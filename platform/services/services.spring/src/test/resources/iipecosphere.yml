@@ -4,6 +4,7 @@ logging:
 spring:
     main:
         banner-mode: off
+        web-application-type: none
     cloud:
         deployer:
             local:
