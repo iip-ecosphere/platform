@@ -91,7 +91,7 @@ public class DockerConfiguration extends Configuration {
     public static DockerConfiguration readFromYaml() {
         DockerConfiguration result;
         try {
-            return Configuration.readFromYaml(DockerConfiguration.class);
+            return Configuration.readConfiguration(DockerConfiguration.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(DockerConfiguration.class).error("Reading configuration: " + e.getMessage());
             result = new DockerConfiguration();

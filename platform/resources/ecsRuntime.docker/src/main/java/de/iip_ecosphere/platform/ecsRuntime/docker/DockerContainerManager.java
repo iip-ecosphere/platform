@@ -129,6 +129,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         return id; 
     }
     
+    // checkstyle: stop exception type check
+    
     /**
      * Returns a Docker API Client.
      * If there is not running Docker daemon on the host it returns null.
@@ -153,7 +155,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         return dockerClient;
     }
-    
+
+    // checkstyle: resume exception type check
+
     @Override
     public void startContainer(String id) throws ExecutionException {
         DockerContainerDescriptor container = super.getContainer(id, "id", "start");
