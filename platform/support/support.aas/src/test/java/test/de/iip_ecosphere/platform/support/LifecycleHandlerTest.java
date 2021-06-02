@@ -120,6 +120,8 @@ public class LifecycleHandlerTest {
         Assert.assertEquals(2, countDescriptors);
        
         Assert.assertNotNull(LifecycleHandler.descriptors());
+        Assert.assertTrue(LifecycleHandler.getAnyDescriptor(LifecycleDescriptor.class).isPresent());
+        
         LifecycleHandler.attachShutdownHooks();
         Assert.assertEquals(2, shutdownHookCount);
         LifecycleHandler.startup(cmdArgs);

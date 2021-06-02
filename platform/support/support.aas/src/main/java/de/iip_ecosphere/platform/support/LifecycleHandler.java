@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
@@ -204,6 +205,21 @@ public class LifecycleHandler {
      */
     public static List<LifecycleDescriptor> descriptors() {
         return Collections.unmodifiableList(getDescriptors());
+    }
+    
+    /**
+     * Returns any lifecycle descriptor of a certain type.
+     * 
+     * @param <L> the type of the lifecycle descriptor
+     * @param cls the class describing the type
+     * @return the descriptor (optional object)
+     */
+    public static <L extends LifecycleDescriptor> Optional<L> getAnyDescriptor(Class<L> cls) {
+        return LifecycleHandler.descriptors()
+            .stream()
+            .filter(d -> cls.isInstance(d))
+            .map(d -> cls.cast(d))
+            .findAny();
     }
 
 }
