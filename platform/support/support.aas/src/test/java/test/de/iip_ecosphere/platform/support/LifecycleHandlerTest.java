@@ -118,7 +118,8 @@ public class LifecycleHandlerTest {
         
         ServiceLoader.load(LifecycleDescriptor.class).forEach(l -> { countDescriptors++; });
         Assert.assertEquals(2, countDescriptors);
-        
+       
+        Assert.assertNotNull(LifecycleHandler.descriptors());
         LifecycleHandler.attachShutdownHooks();
         Assert.assertEquals(2, shutdownHookCount);
         LifecycleHandler.startup(cmdArgs);

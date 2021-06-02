@@ -196,5 +196,14 @@ public class LifecycleHandler {
             shutdown();
         }
     }
+    
+    /**
+     * Returns the known descriptors.
+     * 
+     * @return the descriptors (unmodifiable)
+     */
+    public static List<LifecycleDescriptor> descriptors() {
+        return Collections.unmodifiableList(getDescriptors());
+    }
 
 }
