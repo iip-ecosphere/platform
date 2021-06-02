@@ -29,7 +29,15 @@ import org.yaml.snakeyaml.representer.Representer;
  */
 public abstract class AbstractConfiguration {
 
-    public static final String DEFAULT_FNAME = "iipecosphere.yml";
+    /**
+     * Just the name of the default configuration file, no extension, no path.
+     */
+    public static final String DEFAULT_NAME = "iipecosphere";
+    
+    /**
+     * Name of the default configuration file with extension (no path).
+     */
+    public static final String DEFAULT_FNAME = DEFAULT_NAME + ".yml";
 
     /**
      * Reads a configurationfrom {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
