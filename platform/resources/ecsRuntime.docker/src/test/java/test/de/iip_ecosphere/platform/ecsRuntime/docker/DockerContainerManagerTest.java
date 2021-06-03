@@ -65,7 +65,6 @@ public class DockerContainerManagerTest {
         //---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = "file://" + workingDir + "/src/test/resources/";
-        //String imageLocationStr = "http://localhost:8081/";
         URI location = new URI(imageLocationStr);        
         
         // Is the id of the container same as in the yaml file?
@@ -134,5 +133,5 @@ public class DockerContainerManagerTest {
             }
         }
         return null;
-    }
+    }    
 }
