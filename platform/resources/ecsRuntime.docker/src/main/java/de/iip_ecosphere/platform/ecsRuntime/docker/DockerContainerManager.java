@@ -81,7 +81,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
             
             // Getting information about Docker image from image-info.yml
-            String pathToYaml = location.toString() + config.getDockerImageYamlFilename();
+            String pathToYaml = location.toString() + config.getDocker().getDockerImageYamlFilename();
             URI yamlURI = new URI(pathToYaml);
             File imageInfo = UriResolver.resolveToFile(yamlURI, null);
             container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
@@ -138,7 +138,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      */
     public DockerClient getDockerClient() {
         DockerConfiguration config = DockerConfiguration.readFromYaml();
-        String dockerhost = config.getDockerHost();
+        String dockerhost = config.getDocker().getDockerHost();
         DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerhost).build(); 
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
@@ -160,7 +160,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void startContainer(String id) throws ExecutionException {
         DockerContainerDescriptor container = super.getContainer(id, "id", "start");
-        String dockerId = container.getDockerId(); // TODO check if dockerId not null
+        String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
@@ -206,7 +206,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // Removing image from download directory
         FactoryDescriptor factory = new FactoryDescriptor();
         DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
-        if (config.getDeleteWhenUndeployed()) {
+        if (config.getDocker().getDeleteWhenUndeployed()) {
             File downloadedImageZipfile = new File(container.getDownloadedImageZipfile());
             if (downloadedImageZipfile.exists()) {
                 downloadedImageZipfile.delete();

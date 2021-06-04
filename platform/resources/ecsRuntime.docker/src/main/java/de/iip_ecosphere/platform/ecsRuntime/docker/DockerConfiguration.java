@@ -26,63 +26,22 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  */
 public class DockerConfiguration extends Configuration {
 
-    private String dockerHost;
-    private String dockerImageYamlFilename = "image-info.yml";
-    private boolean deleteWhenUndeployed = false;
-   
+    private Docker docker = new Docker();
+
     /**
-     * Returns the docker host.
-     * 
-     * @return the docker host as Docker host string, e.g., unix:///var/run/docker.sock
+     * Returns Docker configuration.
+     * @return docker
      */
-    public String getDockerHost() {
-        return dockerHost;
+    public Docker getDocker() {
+        return docker;
     }
     
     /**
-     * Defines the docker host. [required by SnakeYaml]
-     * 
-     * @param dockerHost the docker host as Docker host string, e.g., unix:///var/run/docker.sock
+     * Defines Docker configuration.
+     * @param docker 
      */
-    public void setDockerHost(String dockerHost) {
-        this.dockerHost = dockerHost;
-    }
-    
-    /**
-     * Returns the name of the Yaml file with information about the Docker Image.
-     * 
-     * @return Name of the Yaml file
-     */
-    public String getDockerImageYamlFilename() {
-        return this.dockerImageYamlFilename;
-    }
-    
-    /**
-     * Defines the standard name of the Yaml file with a information about the Docker Image.
-     * 
-     * @param filename the name of the Yaml file
-     */
-    public void setDockerImageYamlFilename(String filename) {
-        this.dockerImageYamlFilename = filename;
-    }
-    
-    /**
-     * Returns True if Docker files should be removed when the corresponding container
-     * gets undeployed. Otherwise it returns False.
-     *  
-     * @return True/False
-     */
-    public boolean getDeleteWhenUndeployed() {
-        return this.deleteWhenUndeployed;
-    }
-    /**
-     * Defines if Docker files should be deleted when the corresponding container 
-     * gets undeployed.
-     * 
-     * @param deleteWhenUndeployed True or False
-     */
-    public void setDeleteWhenUndeployed(boolean deleteWhenUndeployed) {
-        this.deleteWhenUndeployed = deleteWhenUndeployed;
+    public void setDocker(Docker docker) {
+        this.docker = docker;
     }
     
     /**
