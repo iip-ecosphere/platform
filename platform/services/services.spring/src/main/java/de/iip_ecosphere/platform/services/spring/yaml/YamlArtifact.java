@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -26,11 +27,28 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact extends de.iip_ecosphere.platform.services.environment.YamlArtifact<YamlService> 
-    implements Artifact {
+public class YamlArtifact implements Artifact { // inheritance from Service environment with <S> does not work with yaml
 
+    private String id;
+    private String name;
+    private List<YamlService> services;
     private List<YamlType> types = new ArrayList<>();
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+    
+    @Override
+    public List<YamlService> getServices() {
+        return services;
+    }
+    
     @Override
     public List<YamlType> getTypes() {
         return types;
@@ -46,6 +64,33 @@ public class YamlArtifact extends de.iip_ecosphere.platform.services.environment
     }
 
     /**
+     * Defines the id of the service. [required by SnakeYaml]
+     * 
+     * @param id the id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Defines the name of the service. [required by SnakeYaml]
+     * 
+     * @param name the name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    /**
+     * Sets the service instances. [required by SnakeYaml]
+     * 
+     * @param services the services
+     */
+    public void setServices(List<YamlService> services) {
+        this.services = services;
+    }
+
+    /**
      * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
      * Use {@link Validator} to test the returned instance for validity.
      * 
@@ -53,7 +98,11 @@ public class YamlArtifact extends de.iip_ecosphere.platform.services.environment
      * @return the artifact info
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
-        return readFromYaml(in, YamlArtifact.class);
+        YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
+        if (null == result.getServices()) {
+            result.setServices(new ArrayList<>());
+        }
+        return result;
     }
 
 }
