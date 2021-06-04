@@ -24,7 +24,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
-import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
