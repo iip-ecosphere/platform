@@ -17,9 +17,11 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
+import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*;
 
 /**
@@ -89,7 +91,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
 
     @Override
     public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_RECONF).invoke(serviceId, ServicesAas.writeMap(values)));
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_RECONF).invoke(serviceId, writeMap(values)));
     }
 
     @Override

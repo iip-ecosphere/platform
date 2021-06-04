@@ -10,15 +10,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring.yaml;
+package de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
-import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
@@ -27,40 +25,37 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact implements Artifact { // inheritance from Service environment with <S> does not work with yaml
+public class YamlArtifact {
 
     private String id;
     private String name;
     private List<YamlService> services;
-    private List<YamlType> types = new ArrayList<>();
 
-    @Override
+    /**
+     * Returns the name of the service.
+     * 
+     * @return the name
+     */
     public String getId() {
         return id;
     }
 
-    @Override
+    /**
+     * Returns the name of the service.
+     * 
+     * @return the name
+     */
     public String getName() {
         return name;
     }
     
-    @Override
+    /**
+     * Returns the services.
+     * 
+     * @return the services
+     */
     public List<YamlService> getServices() {
         return services;
-    }
-    
-    @Override
-    public List<YamlType> getTypes() {
-        return types;
-    }
-
-    /**
-     * Sets the declared types. [required by SnakeYaml]
-     * 
-     * @param types the types
-     */
-    public void setTypes(List<YamlType> types) {
-        this.types = types;
     }
 
     /**
@@ -92,15 +87,14 @@ public class YamlArtifact implements Artifact { // inheritance from Service envi
 
     /**
      * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
-     * Use {@link Validator} to test the returned instance for validity.
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
         YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
-        if (null == result.getServices()) {
-            result.setServices(new ArrayList<>());
+        if (null == result.services) {
+            result.services = new ArrayList<>();
         }
         return result;
     }

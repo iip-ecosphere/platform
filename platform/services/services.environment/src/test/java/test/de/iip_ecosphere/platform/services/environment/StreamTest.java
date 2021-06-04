@@ -1,4 +1,5 @@
-/********************************************************************************
+/**
+ * ******************************************************************************
  * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -8,22 +9,25 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.services.environment;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.Test;
 
 /**
- * Defines the tests to be executed.
+ * Tests the test streaming side pretending that there is an environment to test against. The AAS is used in 
+ * {@link AbstractEnvironmentTest} to test the real environment implementations.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    AasTest.class,
-    StreamTest.class,
-    JavaEnvironmentTest.class,
-    PythonEnvironmentTest.class
-})
-public class AllTests {
+public class StreamTest {
+
+    /**
+     * Tests the streaming side.
+     */
+    @Test
+    public void testAas() {
+        // placeholder
+    }
+
 }

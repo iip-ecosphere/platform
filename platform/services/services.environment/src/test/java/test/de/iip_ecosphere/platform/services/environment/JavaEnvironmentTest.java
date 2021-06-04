@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2021} The original author or authors
+ * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -10,33 +10,25 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services;
+package test.de.iip_ecosphere.platform.services.environment;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
- * Defines the service kind.
+ * Tests the Java environment.
  * 
  * @author Holger Eichelberger, SSE
  */
-public enum ServiceKind {
+public class JavaEnvironmentTest extends AbstractEnvironmentTest {
 
     /**
-     * A source service providing some form of input data, e.g., a connector.
+     * Tests the Java implementation.
      */
-    SOURCE_SERVICE,
-    
-    /**
-     * A transformation service in the widest sense, may be an AI service.
-     */
-    TRANSFORMATION_SERVICE,
-    
-    /**
-     * A sink service consuming data and not re-emitting data.
-     */
-    SINK_SERVICE,
-    
-    /**
-     * A probe service receiving data and turning it into alarms or monitoring information.
-     */
-    PROBE_SERVICE
+    @Ignore("So far there is no Java implementation")
+    @Test
+    public void testJavaEnvironment() {
+        // disabled placeholder
+    }
     
 }

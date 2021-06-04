@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 
 /**
@@ -23,44 +22,18 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlService implements Service {
+public class YamlService extends de.iip_ecosphere.platform.services.environment.YamlService implements Service {
     
-    private String id;
-    private String name;
-    private String version;
-    private String description = "";
     private List<String> cmdArg = new ArrayList<>();
     private String ensembleWith;
     private List<YamlRelation> relations = new ArrayList<>();
     private List<YamlTypedData> parameters = new ArrayList<>();
     private YamlProcess process;
-    private ServiceKind kind;
-    private boolean deployable = false;
     private int instances = 1;
     private long memory = -1;
     private long disk = -1;
     private int cpus = 1;
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
+    
     @Override
     public List<String> getCmdArg() {
         return cmdArg;
@@ -87,16 +60,6 @@ public class YamlService implements Service {
     }
     
     @Override
-    public ServiceKind getKind() {
-        return kind;
-    }
-    
-    @Override
-    public boolean isDeployable() {
-        return deployable;
-    }
-    
-    @Override
     public int getInstances() {
         return instances;
     }
@@ -114,42 +77,6 @@ public class YamlService implements Service {
     @Override
     public int getCpus() {
         return cpus;
-    }
-
-    /**
-     * Defines the id of the service. [required by SnakeYaml]
-     * 
-     * @param id the id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Defines the name of the service. [required by SnakeYaml]
-     * 
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Defines the version of the service. [required by SnakeYaml]
-     * 
-     * @param version the version
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * Defines the description of the service. [required by SnakeYaml]
-     * 
-     * @param description the description
-     */
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /**
@@ -195,24 +122,6 @@ public class YamlService implements Service {
      */
     public void setProcess(YamlProcess process) {
         this.process = process;
-    }
-    
-    /**
-     * Sets the service kind. [required by SnakeYaml]
-     * 
-     * @param kind the service kind
-     */
-    public void setKind(ServiceKind kind) {
-        this.kind = kind;
-    }
-    
-    /**
-     * Sets whether this service is decentrally deployable.
-     * 
-     * @param deployable {@code true} for deployable, {@code false} for not deployable 
-     */
-    public void setDeployable(boolean deployable) {
-        this.deployable = deployable;
     }
 
     /**

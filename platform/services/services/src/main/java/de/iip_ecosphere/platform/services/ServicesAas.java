@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -31,13 +32,11 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -441,34 +440,6 @@ public class ServicesAas implements AasContributor {
                 return found;
             }
         };
-    }
-    
-    /**
-     * Reads the {@code index} argument from {@code} args as map of strings.
-     * 
-     * @param args the array to take the value from 
-     * @param index the 0-based index into {@code} args
-     * @param dflt default value if the {@code index} is wrong, there is no value/null ...
-     * @return the map
-     */
-    @SuppressWarnings("unchecked")
-    public static Map<String, String> readMap(Object[] args, int index, Map<String, String> dflt) {
-        Object param = index >= 0 && index < args.length ? args[index] : null;
-        Map<String, String> result = dflt;
-        if (null != param) {
-            result = JsonUtils.fromJson(result, Map.class);
-        }
-        return result;
-    }
-    
-    /**
-     * Writes a map to JSON.
-     * 
-     * @param map the map
-     * @return the JSON representation
-     */
-    public static String writeMap(Map<String, String> map) {
-        return JsonUtils.toJson(map);
     }
     
     /**
