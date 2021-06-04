@@ -115,5 +115,24 @@ public class YamlService {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    /**
+     * Sets whether this service is decentrally deployable.
+     * 
+     * @param deployable {@code true} for deployable, {@code false} for not deployable 
+     */
+    public void setDeployable(boolean deployable) {
+        this.deployable = deployable;
+    }
+    
+    /**
+     * Sets the service kind. [required by SnakeYaml]
+     * 
+     * @param kind the service kind
+     */
+    public void setKind(ServiceKind kind) {
+        this.kind = kind;
+    }
+
 
 }

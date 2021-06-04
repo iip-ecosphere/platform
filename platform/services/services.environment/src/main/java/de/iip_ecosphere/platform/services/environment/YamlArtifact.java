@@ -25,11 +25,11 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact <S extends YamlService> {
+public class YamlArtifact {
 
     private String id;
     private String name;
-    private List<S> services;
+    private List<YamlService> services;
 
     /**
      * Returns the name of the service.
@@ -54,7 +54,7 @@ public class YamlArtifact <S extends YamlService> {
      * 
      * @return the services
      */
-    public List<S> getServices() {
+    public List<YamlService> getServices() {
         return services;
     }
 
@@ -81,24 +81,20 @@ public class YamlArtifact <S extends YamlService> {
      * 
      * @param services the services
      */
-    public void setServices(List<S> services) {
+    public void setServices(List<YamlService> services) {
         this.services = services;
     }
 
     /**
      * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
      * 
-     * @param <S> the service type
-     * @param <Y> the artifact type
      * @param in the input stream (may be <b>null</b>)
-     * @param cls the class to read (for refinements)
      * @return the artifact info
      */
-    public static <S extends YamlService, Y extends YamlArtifact<S>> Y readFromYaml(InputStream in, 
-        Class<Y> cls) throws IOException {
-        Y result = AbstractConfiguration.readFromYaml(cls, in);
-        if (null == result.getServices()) {
-            result.setServices(new ArrayList<>());
+    public static YamlArtifact readFromYaml(InputStream in) throws IOException {
+        YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
+        if (null == result.services) {
+            result.services = new ArrayList<>();
         }
         return result;
     }
