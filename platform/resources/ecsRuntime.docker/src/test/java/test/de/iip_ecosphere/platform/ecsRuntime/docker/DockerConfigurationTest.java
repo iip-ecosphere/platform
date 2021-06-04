@@ -33,8 +33,8 @@ public class DockerConfigurationTest {
     public void testConfiguration() throws IOException {
         DockerConfiguration cfg = DockerConfiguration.readFromYaml();
         Assert.assertNotNull(cfg);
-        Assert.assertNotNull(cfg.getDockerHost());
-        Assert.assertTrue(cfg.getDockerHost().length() > 0);
+        Assert.assertNotNull(cfg.getDocker().getDockerHost());
+        Assert.assertTrue(cfg.getDocker().getDockerHost().length() > 0);
     }
 
 }
