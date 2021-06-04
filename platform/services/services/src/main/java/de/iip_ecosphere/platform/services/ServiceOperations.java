@@ -16,6 +16,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+
 /**
  * Basic service operations that shall also be available via an AAS.
  * 

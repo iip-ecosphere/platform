@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
  * {@link #removeService(String)}, {@link #switchToService(String, String)}, {@link #migrateService(String, String)}
