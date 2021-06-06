@@ -127,7 +127,7 @@ public class AasTest {
             machine.stop();
             return null;
         });
-        Assert.assertNull(builder.createPayloadCodec());
+        builder.createPayloadCodec(); // there are specific tests for that, we ignore the result here..
         return builder.build();
     }
 
