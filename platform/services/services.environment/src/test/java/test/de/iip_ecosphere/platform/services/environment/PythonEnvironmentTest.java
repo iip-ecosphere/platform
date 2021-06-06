@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 public class PythonEnvironmentTest extends AbstractEnvironmentTest {
 
     private static Process python;
+    private static ServerAddress vabServer;
     
     /**
      * Operations before all tests. Startup Python.
@@ -32,7 +33,9 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      */
     @BeforeClass
     public static void setup() throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "__init__.py", "--port", "8080");
+        vabServer = new ServerAddress(Schema.HTTP); // ephemeral
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "__init__.py", "--port", 
+            String.valueOf(vabServer.getPort()));
         processBuilder.directory(new File("./src/test/python"));
         processBuilder.inheritIO();
         python = processBuilder.start();
@@ -45,7 +48,9 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     public static void shutdown() {
         if (null != python) {
             python.destroy();
+            python = null;
         }
+        vabServer = null;
     }
     
     /**
@@ -55,8 +60,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws ExecutionException shall not occur
      */
     @Test
-    public void testPythonEnvironment1() throws IOException, ExecutionException {
-        ServerAddress vabServer = new ServerAddress(Schema.HTTP, ServerAddress.LOCALHOST, 8080); // TODO port!!
+    public void testPythonEnvironment() throws IOException, ExecutionException {
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
         Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
