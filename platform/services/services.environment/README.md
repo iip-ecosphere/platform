@@ -9,7 +9,7 @@ However, it is important to recall, that this component shall not contain the fu
 
 ## Java
 
-On the Java side, this component provides the ``IService`` interface and a ``ServiceMapper`` linking the known service functions through ``ProtocolServerBuilder`` into an AAS implementation server. 
+On the Java side, this component provides the ``Service`` interface and a ``ServiceMapper`` linking the known service functions through ``ProtocolServerBuilder`` into an AAS implementation server. 
 
 TBD: Miguel: The current general monitoring properties provided by Spring/Micrometer.io including health monitoring.
 

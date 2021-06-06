@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface IService {
+public interface Service {
 
     /**
      * Returns the unique id of the service.

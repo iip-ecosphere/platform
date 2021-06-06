@@ -56,7 +56,7 @@ public class ServiceMapper {
      * 
      * @param service the service to define
      */
-    public void define(IService service) {
+    public void define(Service service) {
         builder.defineProperty(getQName(service, NAME_PROP_ID), 
             () -> service.getId(), null);
         builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
@@ -121,7 +121,7 @@ public class ServiceMapper {
      * @param elementName the element name
      * @return the qualified name
      */
-    public static String getQName(IService service, String elementName) {
+    public static String getQName(Service service, String elementName) {
         return NAME_SUBMODEL + "_" + service.getId() + "_" + elementName;
     }
     

@@ -25,5 +25,5 @@ def start(services):
         mapService(builder, service)
 
     # further args may go for data server port, VAB protocol (TCP/HTTP-REST)
-    server = BaSyxTCPServer(builder)
-    server.start(args.port[0])
+    server = BaSyxTCPServer(builder, args.port[0])
+    server.start()
