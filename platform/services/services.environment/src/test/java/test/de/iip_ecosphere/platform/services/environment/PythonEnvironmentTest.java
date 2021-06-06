@@ -2,6 +2,9 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.AfterClass;
@@ -25,6 +28,24 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
 
     private static Process python;
     private static ServerAddress vabServer;
+
+    /**
+     * Redirects an input stream to another stream (in parallel).
+     * 
+     * @param src the source stream
+     * @param dest the destination stream
+     */
+    private static void redirectIO(final InputStream src, final PrintStream dest) {
+        new Thread(new Runnable() {
+            public void run() {
+                Scanner sc = new Scanner(src);
+                while (sc.hasNextLine()) {
+                    dest.println(sc.nextLine());
+                }
+                sc.close();
+            }
+        }).start();
+    }
     
     /**
      * Operations before all tests. Startup Python.
@@ -44,8 +65,10 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         ProcessBuilder processBuilder = new ProcessBuilder(pythonPath, "__init__.py", "--port", 
             String.valueOf(vabServer.getPort()));
         processBuilder.directory(new File("./src/test/python"));
-        processBuilder.inheritIO();
+        //processBuilder.inheritIO(); // somehow does not work in Maven surefire testing
         python = processBuilder.start();
+        redirectIO(python.getInputStream(), System.out);
+        redirectIO(python.getErrorStream(), System.err);
     }
     
     /**
