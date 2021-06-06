@@ -15,6 +15,7 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -65,10 +66,12 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         ProcessBuilder processBuilder = new ProcessBuilder(pythonPath, "__init__.py", "--port", 
             String.valueOf(vabServer.getPort()));
         processBuilder.directory(new File("./src/test/python"));
-        //processBuilder.inheritIO(); // somehow does not work in Maven surefire testing
+        //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         python = processBuilder.start();
         redirectIO(python.getInputStream(), System.out);
         redirectIO(python.getErrorStream(), System.err);
+        
+        TimeUtils.sleep(1000); // works without on windows, but not on Jenkins/Linux
     }
     
     /**
