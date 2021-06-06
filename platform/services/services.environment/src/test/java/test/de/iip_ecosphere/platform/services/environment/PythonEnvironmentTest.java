@@ -34,7 +34,14 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     @BeforeClass
     public static void setup() throws IOException {
         vabServer = new ServerAddress(Schema.HTTP); // ephemeral
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "__init__.py", "--port", 
+        String pythonPath = "python";
+        // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
+        File jenkinsPath = new File("/var/lib/jenkins/python/active/python");
+        if (jenkinsPath.exists()) {
+            pythonPath = jenkinsPath.toString();
+        }
+        System.out.println("Using Python: " + pythonPath);
+        ProcessBuilder processBuilder = new ProcessBuilder(pythonPath, "__init__.py", "--port", 
             String.valueOf(vabServer.getPort()));
         processBuilder.directory(new File("./src/test/python"));
         processBuilder.inheritIO();
