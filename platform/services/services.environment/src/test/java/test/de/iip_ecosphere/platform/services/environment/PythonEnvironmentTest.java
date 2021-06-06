@@ -1,11 +1,11 @@
 package test.de.iip_ecosphere.platform.services.environment;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Ignore;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -23,14 +23,29 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  */
 public class PythonEnvironmentTest extends AbstractEnvironmentTest {
 
+    private static Process python;
+    
     /**
-     * Preliminary.
+     * Operations before all tests. Startup Python.
      * 
      * @throws IOException shall not occur
-     * @throws ExecutionException shall not occur
      */
-    @Test
-    public void testPythonEnvironment() throws IOException, ExecutionException {
+    @BeforeClass
+    public static void setup() throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "__init__.py", "--port", "8080");
+        processBuilder.directory(new File("./src/test/python"));
+        processBuilder.inheritIO();
+        python = processBuilder.start();
+    }
+    
+    /**
+     * Operations after all tests. Kill Python.
+     */
+    @AfterClass
+    public static void shutdown() {
+        if (null != python) {
+            python.destroy();
+        }
     }
     
     /**
@@ -39,31 +54,14 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws IOException shall not occur
      * @throws ExecutionException shall not occur
      */
-    @Ignore("waiting for Python")
     @Test
     public void testPythonEnvironment1() throws IOException, ExecutionException {
-        ServerAddress vabServer = new ServerAddress(Schema.HTTP);
+        ServerAddress vabServer = new ServerAddress(Schema.HTTP, ServerAddress.LOCALHOST, 8080); // TODO port!!
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
         Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
         Aas aas = AasCreator.createAas(vabServer);
-              
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/python/__init__.py");
-        processBuilder.redirectErrorStream(true);
-        Process p = processBuilder.start();
-        BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = "";
-        while ((line = bfr.readLine()) != null) {
-            System.out.println(line);
-        }
-        
-
-/*        URL url = new URL("http://0.0.0.0:5000/api/AiTestAas/AiService/MyService1/RUNNING");
-        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-        httpCon.setRequestMethod("GET");
-        
-        httpCon.disconnect();*/
         
         Server httpServer = AasFactory.getInstance()
             .createDeploymentRecipe(aasServerBase)
@@ -75,7 +73,6 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         AbstractEnvironmentTest.testAas(aasServerRegistry);
 
         httpServer.stop(true);
-        p.destroy();
     }
 
 }
