@@ -201,6 +201,11 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
         public Server build() {
             return BaSyxDeploymentRecipe.createControlComponent(instance.createModelProvider(), port);
         }
+
+        @Override
+        public PayloadCodec createPayloadCodec() {
+            return new BaSyxVABTCPPayloadCodec();
+        }
         
     }
     
