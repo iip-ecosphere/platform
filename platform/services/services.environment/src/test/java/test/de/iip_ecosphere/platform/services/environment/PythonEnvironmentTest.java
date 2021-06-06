@@ -57,7 +57,6 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             python.destroy();
             python = null;
         }
-        vabServer = null;
     }
     
     /**
