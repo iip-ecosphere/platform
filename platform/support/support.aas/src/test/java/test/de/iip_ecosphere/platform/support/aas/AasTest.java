@@ -127,6 +127,7 @@ public class AasTest {
             machine.stop();
             return null;
         });
+        Assert.assertNull(builder.createPayloadCodec());
         return builder.build();
     }
 
