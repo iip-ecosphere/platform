@@ -97,6 +97,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
+        MyService service = new MyService(); // pendent to Python service, used here as expected value(s)
         Aas aas = AasCreator.createAas(vabServer);
         
         Server httpServer = AasFactory.getInstance()
@@ -106,7 +107,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             .createServer()
             .start();
             
-        AbstractEnvironmentTest.testAas(aasServerRegistry);
+        AbstractEnvironmentTest.testAas(aasServerRegistry, service);
 
         httpServer.stop(true);
     }

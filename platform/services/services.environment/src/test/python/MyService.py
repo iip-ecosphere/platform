@@ -8,6 +8,6 @@ class MyService(AbstractService):
     
     def __init__(self):
         """Initializes the service.""" 
-        super().__init__("1234", "MyService", Version("1.0.0"), "Default Service", True, ServiceKind.TRANSFORMATION_SERVICE)
+        super().__init__("1234", "MyService", Version("1.2.3"), "Default Service", True, ServiceKind.TRANSFORMATION_SERVICE)
 
     # may specialize operations

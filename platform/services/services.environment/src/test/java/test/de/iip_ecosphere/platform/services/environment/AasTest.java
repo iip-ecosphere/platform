@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -36,8 +37,6 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  */
 public class AasTest {
 
-    private static ServiceState state = ServiceState.CREATED; 
-    
     /**
      * Tests the AAS.
      * 
@@ -55,13 +54,14 @@ public class AasTest {
         
         ProtocolServerBuilder pBuilder = AasFactory.getInstance()
             .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_NAME, () -> "MyService", null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_VERSION, () -> "1.2.3", null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_STATE, () -> state.name(), null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_DESCRIPTION, () -> "Some Service", null);
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_ACTIVATE, params -> activate());
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_PASSIVATE, params -> passivate());
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_SET_STATE, params -> setState(params));
+        MyService service = new MyService();
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_NAME, () -> service.getName(), null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_VERSION, () -> service.getVersion().toString(), null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_STATE, () -> service.getState().name(), null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_DESCRIPTION, () -> service.getDescription(), null);
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_ACTIVATE, params -> activate(service));
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_PASSIVATE, params -> passivate(service));
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_SET_STATE, params -> setState(service, params));
         Server server = pBuilder.build();
         server.start();
         
@@ -72,7 +72,7 @@ public class AasTest {
             .createServer()
             .start();
         
-        AbstractEnvironmentTest.testAas(aasServerRegistry);
+        AbstractEnvironmentTest.testAas(aasServerRegistry, service);
 
         httpServer.stop(true);
         server.stop(true);
@@ -81,11 +81,14 @@ public class AasTest {
     /**
      * Activates the service.
      * 
+     * @param service the service instance
      * @return <b>null</b> for convenience
      */
-    private static Object activate() {
-        if (state == ServiceState.PASSIVATED) {
-            state = ServiceState.RUNNING;
+    private static Object activate(Service service) {
+        try {
+            service.activate();
+        } catch (ExecutionException e) {
+            // ignore for now, will disappear when aligned with Python
         }
         return null;
     }
@@ -93,32 +96,36 @@ public class AasTest {
     /**
      * Passivates the service.
      * 
+     * @param service the service instance
      * @return <b>null</b> for convenience
      */
-    private static Object passivate() {
-        if (state == ServiceState.RUNNING) {
-            state = ServiceState.PASSIVATED;
+    private static Object passivate(Service service) {
+        try {
+            service.passivate();
+        } catch (ExecutionException e) {
+            // ignore for now, will disappear when aligned with Python
         }
         return null;
     }
 
     /**
      * Changes the service state.
-     * 
+     *
+     * @param service the service instance
      * @param params the call parameters, only the first is evaluated
      * @return if the operation was successful
      */
-    private static Boolean setState(Object[] params) {
-        boolean result = false;
+    private static Object setState(Service service, Object[] params) {
         if (params.length > 0 && params[0] != null) {
             try {
-                state = ServiceState.valueOf(params[0].toString());
-                result = true;
+                service.setState(ServiceState.valueOf(params[0].toString()));
             } catch (IllegalArgumentException e) {
                 // result = false;
+            } catch (ExecutionException e) {
+                // ignore for now, will disappear when aligned with Python
             }
         }
-        return result;
+        return null;
     }
 
 }
