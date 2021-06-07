@@ -24,21 +24,22 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
  */
 public class ServiceMapper {
     
+    // aligned to Python.ServiceMapper
     public static final String NAME_SUBMODEL = "service";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_STATE = "state";
+    public static final String NAME_PROP_DEPLOYABLE = "deployable";
     public static final String NAME_PROP_KIND = "kind";
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_DESCRIPTION = "description";
-    public static final String NAME_PROP_TYPE = "type";
     public static final String NAME_OP_ACTIVATE = "activate";
     public static final String NAME_OP_PASSIVATE = "passivate";
-    public static final String NAME_OP_MIGRATE = "migrateService";
-    public static final String NAME_OP_UPDATE = "updateService";
-    public static final String NAME_OP_SWITCH = "switchToService";
-    public static final String NAME_OP_RECONF = "reconfigureService";
-    public static final String NAME_OP_SET_STATE = "setServiceSate";
+    public static final String NAME_OP_MIGRATE = "migrate";
+    public static final String NAME_OP_UPDATE = "update";
+    public static final String NAME_OP_SWITCH = "switchTo";
+    public static final String NAME_OP_RECONF = "reconfigure";
+    public static final String NAME_OP_SET_STATE = "setState";
     
     private ProtocolServerBuilder builder;
     
@@ -69,6 +70,8 @@ public class ServiceMapper {
             () -> service.getState().toString(), null);
         builder.defineProperty(getQName(service, NAME_PROP_NAME), 
             () -> service.getName(), null);
+        builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
+            () -> service.isDeployable(), null);
         builder.defineOperation(getQName(service, NAME_OP_ACTIVATE), 
             new JsonResultWrapper(p -> {
                 service.activate(); 
@@ -83,7 +86,7 @@ public class ServiceMapper {
         ));
         builder.defineOperation(getQName(service, NAME_OP_MIGRATE), 
             new JsonResultWrapper(p -> {
-                service.migrateService(readString(p)); 
+                service.migrate(readString(p)); 
                 return null;
             }
         ));
@@ -102,13 +105,13 @@ public class ServiceMapper {
         ));
         builder.defineOperation(getQName(service, NAME_OP_SWITCH), 
             new JsonResultWrapper(p -> {
-                service.switchToService(readString(p));
+                service.switchTo(readString(p));
                 return null;
             }
         ));
         builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
             new JsonResultWrapper(p -> {
-                service.updateService(readUri(p, 0, EMPTY_URI));
+                service.update(readUri(p, 0, EMPTY_URI));
                 return null;
             }
         ));

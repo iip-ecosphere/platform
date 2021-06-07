@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services.environment;
 
+import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -38,14 +39,6 @@ public class AasCreator {
     public static final String AAS_SUBMODEL_OPERATION_ACTIVATE = "activate";
     public static final String AAS_SUBMODEL_OPERATION_SETSTATE = "setState";
     
-    public static final String VAB_PROPERTY_NAME = AAS_SUBMODEL_PROPERTY_NAME;
-    public static final String VAB_PROPERTY_VERSION = AAS_SUBMODEL_PROPERTY_VERSION;
-    public static final String VAB_PROPERTY_DESCRIPTION = AAS_SUBMODEL_PROPERTY_DESCRIPTION;
-    public static final String VAB_PROPERTY_STATE = AAS_SUBMODEL_PROPERTY_STATE;
-    public static final String VAB_OPERATION_PASSIVATE = AAS_SUBMODEL_OPERATION_PASSIVATE;
-    public static final String VAB_OPERATION_ACTIVATE = AAS_SUBMODEL_OPERATION_ACTIVATE;
-    public static final String VAB_OPERATION_SETSTATE = AAS_SUBMODEL_OPERATION_SETSTATE;
-
     /**
      * Creates an AAS for testing.
      * 
@@ -60,28 +53,28 @@ public class AasCreator {
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_NAME)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(VAB_PROPERTY_NAME), InvocablesCreator.READ_ONLY)
+            .bind(iCreator.createGetter(ServiceMapper.NAME_PROP_NAME), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_VERSION)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(VAB_PROPERTY_VERSION), InvocablesCreator.READ_ONLY)
+            .bind(iCreator.createGetter(ServiceMapper.NAME_PROP_VERSION), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DESCRIPTION)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(VAB_PROPERTY_DESCRIPTION), InvocablesCreator.READ_ONLY)
+            .bind(iCreator.createGetter(ServiceMapper.NAME_PROP_DESCRIPTION), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(VAB_PROPERTY_STATE), InvocablesCreator.READ_ONLY)
+            .bind(iCreator.createGetter(ServiceMapper.NAME_PROP_STATE), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_ACTIVATE)
-            .setInvocable(iCreator.createInvocable(VAB_OPERATION_ACTIVATE))
+            .setInvocable(iCreator.createInvocable(ServiceMapper.NAME_OP_ACTIVATE))
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_PASSIVATE)
-            .setInvocable(iCreator.createInvocable(VAB_OPERATION_PASSIVATE))
+            .setInvocable(iCreator.createInvocable(ServiceMapper.NAME_OP_PASSIVATE))
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SETSTATE)
-            .setInvocable(iCreator.createInvocable(VAB_OPERATION_SETSTATE))
+            .setInvocable(iCreator.createInvocable(ServiceMapper.NAME_OP_SET_STATE))
             .addInputVariable("state", Type.STRING)
             .addOutputVariable("result", Type.BOOLEAN)
             .build();

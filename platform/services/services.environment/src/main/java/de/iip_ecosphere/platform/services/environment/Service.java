@@ -88,7 +88,7 @@ public interface Service {
      * @param resourceId the target resource id, e.g., a device
      * @throws ExecutionException if migration fails
      */
-    public void migrateService(String resourceId) throws ExecutionException;
+    public void migrate(String resourceId) throws ExecutionException;
     
     /**
      * Updates the service by the service in the given {@code location}. This operation is responsible for stopping
@@ -98,7 +98,7 @@ public interface Service {
      * @throws ExecutionException if the given service cannot be updated for some reason, e.g., because the replacement
      *   service is not an evolved version of the running service
      */
-    public void updateService(URI location) throws ExecutionException;
+    public void update(URI location) throws ExecutionException;
     
     /**
      * Switches to an interface-compatible service. This method cares for stopping the old service, performing
@@ -107,7 +107,7 @@ public interface Service {
      * @param targetId the id of the target service
      * @throws ExecutionException if switching the service cannot be performed for some reason
      */
-    public void switchToService(String targetId) throws ExecutionException;
+    public void switchTo(String targetId) throws ExecutionException;
     
     /**
      * Activates the service. [adaptation]

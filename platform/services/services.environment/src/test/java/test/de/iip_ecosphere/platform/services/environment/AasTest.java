@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -54,13 +55,13 @@ public class AasTest {
         
         ProtocolServerBuilder pBuilder = AasFactory.getInstance()
             .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
-        pBuilder.defineProperty(AasCreator.AAS_SUBMODEL_PROPERTY_NAME, () -> "MyService", null);
-        pBuilder.defineProperty(AasCreator.AAS_SUBMODEL_PROPERTY_VERSION, () -> "1.2.3", null);
-        pBuilder.defineProperty(AasCreator.AAS_SUBMODEL_PROPERTY_STATE, () -> state.name(), null);
-        pBuilder.defineProperty(AasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, () -> "Some Service", null);
-        pBuilder.defineOperation(AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, params -> activate());
-        pBuilder.defineOperation(AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, params -> passivate());
-        pBuilder.defineOperation(AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, params -> setState(params));
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_NAME, () -> "MyService", null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_VERSION, () -> "1.2.3", null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_STATE, () -> state.name(), null);
+        pBuilder.defineProperty(ServiceMapper.NAME_PROP_DESCRIPTION, () -> "Some Service", null);
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_ACTIVATE, params -> activate());
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_PASSIVATE, params -> passivate());
+        pBuilder.defineOperation(ServiceMapper.NAME_OP_SET_STATE, params -> setState(params));
         Server server = pBuilder.build();
         server.start();
         

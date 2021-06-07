@@ -68,7 +68,7 @@ class Service:
         
         Returns:
           str
-            The description of the service.
+            The description of the service, may be empty.
         """
         raise NotImplementedError
 
@@ -111,7 +111,7 @@ class Service:
         
         raise NotImplementedError
 
-    def migrateService(self, resourceId:str):
+    def migrate(self, resourceId:str):
         """Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]
         
         Parameters:
@@ -120,7 +120,7 @@ class Service:
 
         raise NotImplementedError
         
-    def updateService(self, location):
+    def update(self, location:str):
         """Updates the service by the service in the given URL location. This operation is responsible for stopping
         the running service (if needed), replacing it, starting the new service.
         
@@ -130,7 +130,7 @@ class Service:
         
         raise NotImplementedError
        
-    def switchToService(self, targetId:str):
+    def switchTo(self, targetId:str):
         """Switches to an interface-compatible service. This method cares for stopping the old service, performing
         a handover if adequate, starting the target service. [adaptation]
         
