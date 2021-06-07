@@ -165,6 +165,7 @@ public abstract class AbstractEnvironmentTest {
      * @param expectedValue the expected value
      * @return {@code true} if {@code obj} fulfills the properties to test, {@code false} else
      */
+    @SuppressWarnings("unused")
     private static boolean checkBoolean(Object obj, boolean expectedValue) {
         return checkBoolean(obj) && ((Boolean) obj) == expectedValue; 
     }
