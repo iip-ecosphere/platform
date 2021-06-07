@@ -32,7 +32,7 @@ def mapService(builder, service):
     builder.defineProperty(getQName("name", service), getName, None)
     
     def getVersion():
-        return composeResult(service.getVersion(), None)
+        return composeResult(service.getVersion().toString(), None)
     builder.defineProperty(getQName("version", service), getVersion, None)
     
     def getDescription():

@@ -1,6 +1,5 @@
-from enum import Enum;
-import logging as logger
-logger.basicConfig(level="DEBUG")
+from enum import Enum
+from Version import Version
 
 class ServiceState(Enum):
     """Denotes the service state. Names and ordinals must be aligned with Java."""
@@ -32,9 +31,9 @@ class ServiceKind(Enum):
     PROBE_SERVICE = 3
 
 class Service:
-    """Interface of an administrative service wrapper."""
+    """Interface of an administrative service interface."""
 
-    def getId():
+    def getId(self) -> str:
         """Returns the unique id of the service.
         
         Returns:
@@ -44,7 +43,7 @@ class Service:
         
         raise NotImplementedError
     
-    def getName():
+    def getName(self) -> str:
         """Returns the name of the service.
         
         Returns:
@@ -54,17 +53,17 @@ class Service:
 
         raise NotImplementedError
     
-    def getVersion():
+    def getVersion(self) -> Version:
         """Returns the version of the service.
         
         Returns:
-          str
+          Version
             The version of the service.
         """
         
         raise NotImplementedError
     
-    def getDescription():
+    def getDescription(self) -> str:
         """Returns the description of the service.
         
         Returns:
@@ -73,7 +72,7 @@ class Service:
         """
         raise NotImplementedError
 
-    def getState():
+    def getState(self) -> ServiceState:
         """Returns the state of the service. [R4c]
         
         Returns:
@@ -83,7 +82,7 @@ class Service:
         
         raise NotImplementedError
 
-    def setState(state:ServiceState):
+    def setState(self, state:ServiceState):
         """Changes the state. [R133c]
         
         Parameters:
@@ -92,7 +91,7 @@ class Service:
         
         raise NotImplementedError
     
-    def isDeployable():
+    def isDeployable(self) -> bool:
         """Returns whether the service is deployable in distributable manner or fixed in deployment location.
         
         Returns:
@@ -102,7 +101,7 @@ class Service:
         
         raise NotImplementedError
     
-    def getKind():
+    def getKind(self) -> ServiceKind:
         """Returns the service kind.
         
         Returns:
@@ -112,7 +111,7 @@ class Service:
         
         raise NotImplementedError
 
-    def migrateService(resourceId:str):
+    def migrateService(self, resourceId:str):
         """Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]
         
         Parameters:
@@ -121,7 +120,7 @@ class Service:
 
         raise NotImplementedError
         
-    def updateService(location):
+    def updateService(self, location):
         """Updates the service by the service in the given URL location. This operation is responsible for stopping
         the running service (if needed), replacing it, starting the new service.
         
@@ -131,7 +130,7 @@ class Service:
         
         raise NotImplementedError
        
-    def switchToService(targetId:str):
+    def switchToService(self, targetId:str):
         """Switches to an interface-compatible service. This method cares for stopping the old service, performing
         a handover if adequate, starting the target service. [adaptation]
         
@@ -141,17 +140,17 @@ class Service:
         
         raise NotImplementedError
    
-    def activate():
+    def activate(self):
         """Activates the service. [adaptation]"""
         
         raise NotImplementedError
 
-    def passivate():
+    def passivate(self):
         """Passivates the service. [adaptation]"""
         
         raise NotImplementedError
     
-    def reconfigure(values:dict):
+    def reconfigure(self, values:dict):
         """Reconfigures the service. [adaptation]
         
         Parameters:
