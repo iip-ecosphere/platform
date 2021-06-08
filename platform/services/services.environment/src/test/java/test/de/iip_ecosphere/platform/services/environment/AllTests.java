@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     AasTest.class,
+    YamlTest.class, 
     StreamTest.class,
     JavaEnvironmentTest.class,
     PythonEnvironmentTest.class

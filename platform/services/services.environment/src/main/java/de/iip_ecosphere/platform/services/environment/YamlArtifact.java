@@ -25,30 +25,10 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact {
+public class YamlArtifact extends AbstractYamlArtifact {
 
-    private String id;
-    private String name;
     private List<YamlService> services;
 
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-    
     /**
      * Returns the services.
      * 
@@ -58,24 +38,6 @@ public class YamlArtifact {
         return services;
     }
 
-    /**
-     * Defines the id of the service. [required by SnakeYaml]
-     * 
-     * @param id the id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Defines the name of the service. [required by SnakeYaml]
-     * 
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-    
     /**
      * Sets the service instances. [required by SnakeYaml]
      * 

@@ -1,0 +1,36 @@
+id: art
+name: simpleStream.spring
+version: 0.1.9
+services:
+  - id: simpleStream-create
+    name: create
+    version: 0.2.0
+    description: Creates text tokens.
+    deployable: true
+    kind: SOURCE_SERVICE
+    cmdArg: 
+      - --spring.profiles.active=source
+    relations:
+      - endpoint:
+          portArg: --mqtt.port=${port} --amqp.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host}
+      - channel: create-out-0
+        id: intern
+        type: String
+        direction: OUT
+  - id: simpleStream-log
+    name: log
+    version: 0.2.0
+    description: Receives text tokens.
+    deployable: true
+    kind: SINK_SERVICE
+    cmdArg: 
+      - --spring.profiles.active=sink
+    relations:
+      - endpoint:
+          portArg: --mqtt.port=${port} --amqp.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host}
+      - channel: log-in-0
+        id: intern
+        type: String
+        direction: IN

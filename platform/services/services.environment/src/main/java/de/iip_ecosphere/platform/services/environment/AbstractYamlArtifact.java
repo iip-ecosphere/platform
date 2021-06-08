@@ -15,18 +15,16 @@ package de.iip_ecosphere.platform.services.environment;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
- * Information about a single service.
+ * Basic information about an artifact containing services, abstract because template-based service objects do not
+ * work with SnakeYaml. 
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlService {
-    
+public class AbstractYamlArtifact {
+
     private String id;
     private String name;
     private Version version;
-    private String description = "";
-    private ServiceKind kind;
-    private boolean deployable = false;
 
     /**
      * Returns the name of the service.
@@ -45,7 +43,7 @@ public class YamlService {
     public String getName() {
         return name;
     }
-
+    
     /**
      * Returns the version of the service.
      * 
@@ -53,33 +51,6 @@ public class YamlService {
      */
     public Version getVersion() {
         return version;
-    }
-
-    /**
-     * Returns the description of the service.
-     * 
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-    
-    /**
-     * Sets the service kind.
-     * 
-     * @return the service kind
-     */
-    public ServiceKind getKind() {
-        return kind;
-    }
-    
-    /**
-     * Returns whether this service is decentrally deployable.
-     * 
-     * @return {@code true} for deployable, {@code false} for not deployable 
-     */
-    public boolean isDeployable() {
-        return deployable;
     }
     
     /**
@@ -99,7 +70,7 @@ public class YamlService {
     public void setName(String name) {
         this.name = name;
     }
-
+    
     /**
      * Defines the version of the service. [required by SnakeYaml]
      * 
@@ -108,32 +79,5 @@ public class YamlService {
     public void setVersion(Version version) {
         this.version = version;
     }
-
-    /**
-     * Defines the description of the service. [required by SnakeYaml]
-     * 
-     * @param description the description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
     
-    /**
-     * Sets whether this service is decentrally deployable.
-     * 
-     * @param deployable {@code true} for deployable, {@code false} for not deployable 
-     */
-    public void setDeployable(boolean deployable) {
-        this.deployable = deployable;
-    }
-    
-    /**
-     * Sets the service kind. [required by SnakeYaml]
-     * 
-     * @param kind the service kind
-     */
-    public void setKind(ServiceKind kind) {
-        this.kind = kind;
-    }
-
 }
