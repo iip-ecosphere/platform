@@ -23,6 +23,7 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
+import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -199,7 +200,23 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
 
         @Override
         public Server build() {
-            return BaSyxDeploymentRecipe.createControlComponent(instance.createModelProvider(), port);
+            // Server where the control component is reachable.
+            BaSyxTCPServer<VABModelProvider> server = new BaSyxTCPServer<>(instance.createModelProvider(), port);
+            Server result = new Server() {
+
+                @Override
+                public Server start() {
+                    server.start();
+                    return this;
+                }
+
+                @Override
+                public void stop(boolean dispose) {
+                    server.stop();
+                }
+
+            };
+            return result;            
         }
 
         @Override

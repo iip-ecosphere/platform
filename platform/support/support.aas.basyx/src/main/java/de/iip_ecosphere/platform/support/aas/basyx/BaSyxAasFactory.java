@@ -33,7 +33,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  */
 public class BaSyxAasFactory extends AasFactory {
 
-    private static final String PROTOCOL_VAB_IIP = "VAB-IIP";
+    // package local, do not reference from outside
+    static final String PROTOCOL_VAB_TCP = "VAB-TCP";
     
     /**
      * Factory descriptor for Java Service Loader.
@@ -86,12 +87,12 @@ public class BaSyxAasFactory extends AasFactory {
 
     @Override
     public String[] getProtocols() {
-        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_IIP};
+        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP};
     }
 
     @Override
     public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
+        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
             return new VabIipInvocablesCreator(host, port);
         } else {
             throw new IllegalArgumentException("Unknown protocol: " + protocol);
@@ -100,7 +101,7 @@ public class BaSyxAasFactory extends AasFactory {
 
     @Override
     public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
+        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
             return new VabIipOperationsProvider.VabIipOperationsBuilder(port);
         } else {
             throw new IllegalArgumentException("Unknown protocol: " + protocol);
