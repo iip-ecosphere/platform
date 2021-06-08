@@ -14,8 +14,12 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 
+import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
+
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
@@ -35,6 +39,8 @@ public class BaSyxAasFactory extends AasFactory {
 
     // package local, do not reference from outside
     static final String PROTOCOL_VAB_TCP = "VAB-TCP";
+    static final String PROTOCOL_VAB_HTTP = "VAB-HTTP";
+    static final String PROTOCOL_VAB_HTTPS = "VAB-HTTPS";
     
     /**
      * Factory descriptor for Java Service Loader.
@@ -87,13 +93,18 @@ public class BaSyxAasFactory extends AasFactory {
 
     @Override
     public String[] getProtocols() {
-        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP};
+        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP, PROTOCOL_VAB_HTTP}; // , PROTOCOL_VAB_HTTPS
     }
 
     @Override
     public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
         if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
-            return new VabIipInvocablesCreator(host, port);
+            return new VabInvocablesCreator(new BaSyxConnector(host, port)); 
+        } else if (PROTOCOL_VAB_HTTP.equals(protocol)) {
+            return new VabInvocablesCreator(new HTTPConnector("http://" + host + ":" + port));
+        } else if (PROTOCOL_VAB_HTTPS.equals(protocol)) {
+            return new VabInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
+                new BaSyxJerseyHttpsClientFactory())); // TODO for now with self-signed
         } else {
             throw new IllegalArgumentException("Unknown protocol: " + protocol);
         }
@@ -102,7 +113,11 @@ public class BaSyxAasFactory extends AasFactory {
     @Override
     public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
         if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
-            return new VabIipOperationsProvider.VabIipOperationsBuilder(port);
+            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
+        } else if (PROTOCOL_VAB_HTTP.equals(protocol)) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP);
+        } else if (PROTOCOL_VAB_HTTPS.equals(protocol)) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS);
         } else {
             throw new IllegalArgumentException("Unknown protocol: " + protocol);
         }
