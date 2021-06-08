@@ -168,3 +168,12 @@ class Version:
             return self.segments == version.segments
         else:
             return False
+            
+    def __str__(self):
+        """Returns the string representation for print.
+        
+        Returns:
+          str
+            the String representation for print via toString()
+        """
+        return self.toString()
