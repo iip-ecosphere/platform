@@ -82,29 +82,21 @@ def mapService(builder, service):
     builder.defineOperation(getQName(NAME_OP_ACTIVATE, service), activate)
 
     def setState(params):
-        try:
-            service.setState(ServiceState[params[0]])
-            return composeResult(True, None)
-        except ValueError as e:
-            return composeResult(None, e.message)
+        return composeResult(service.setState, lambda: ServiceState[params[0]])
     builder.defineOperation(getQName(NAME_OP_SET_STATE, service), setState)
 
     def migrate(params):
-        service.migrate(params[0])
-        return composeResult(True, None)
+        return composeResult(service.migrate, params[0])
     builder.defineOperation(getQName(NAME_OP_MIGRATE, service), setState)
 
     def update(params):
-        service.update(params[0])
-        return composeResult(True, None)
+        return composeResult(service.update, params[0])
     builder.defineOperation(getQName(NAME_OP_UPDATE, service), setState)
 
     def switch(params):
-        service.switchTo(params[0])
-        return composeResult(True, None)
+        return composeResult(service.switchTo, params[0])
     builder.defineOperation(getQName(NAME_OP_SWITCH, service), setState)
 
     def reconf(params):
-        service.reconfigure(params[0], json.loads(params[1]))
-        return composeResult(True, None)
+        return composeResult(service.reconfigure, params[0], json.loads(params[1]))
     builder.defineOperation(getQName(NAME_OP_RECONF, service), setState)

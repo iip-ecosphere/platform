@@ -83,7 +83,6 @@ class AbstractService(Service):
         Parameters:
           - newState -- the new state (ServiceState)
         """
-        
         self.state = state # check whether this is permissible
     
     def isDeployable(self):

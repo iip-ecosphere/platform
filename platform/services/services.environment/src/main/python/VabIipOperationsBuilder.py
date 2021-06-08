@@ -7,26 +7,49 @@ PREFIX_STATUS = "status/"
 PREFIX_SERVICE = "operations/service/"
 
 # mimicks de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper
-def composeResult(value, exception):
+def composeResult(function, *args):
     """Composes a result in the format of the IIP-Ecosphere JsonResultWrapper.
-        For now, just returns the value as long as we use this on the example.
+    Executes the given function on the given args. Catches exceptions that occur 
+    (JsonResultWrapper only ExecutionExceptions) and turns the respective result
+    either into an empty string (result is None), a JSON string with the result
+    in case of success or a JSON string containing the exception message.
 
     Parameters:
-        value -- the value to return, may be None
-        exception -- the exception message to return. If given, takes
-            precedence over value.
+      - function -- the function to execute
+      - args -- the arguments as list, turned into the arguments of function 
+          when being called; individual arguments may be callables/lambda 
+          functions causing a delayed evaluation within the try/except block 
+          of this function, handled then implicitly as JSON exception message
+    Returns: 
+      str
+        the result string to be passed on to the (remote) caller
     """
-
-    if not(exception is None):
-        return ''
-        #return {"exception" : "+exception+"}
-    else:
+    try:
+        args = [x() if callable(x) else x for x in args]
+        value = function(*args)
         if value is None:
             return ''
-            #return {}
         else:
             return value
             #return {"result" : " + value + "}
+    except Exception as e:
+        return composeException(e)
+        
+def composeException(e):
+    """Turns an exception into a result String. Made re-usable if needed
+    when exceptions must be caued explicitly, not implicitly through
+    delayed execution in composeResult.
+    
+    Parameters:
+      - e --- the exception
+    Returns: 
+      str
+        the result string to be passed on to the (remote) caller
+    """
+    msg = "{0}".format(e)
+    return ''
+    #return {"exception" : "+msg+"}
+
 
 # the Python correspondence of the VabIipOperationsBuilder (support.aas.basxy)
 class VabIipOperationsBuilder: 

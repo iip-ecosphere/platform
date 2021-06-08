@@ -4,7 +4,6 @@ import argparse
 from BaSyxTCPServer import BaSyxTCPServer
 
 from VabIipOperationsBuilder import VabIipOperationsBuilder
-from ServiceMapper import composeResult
 from ServiceMapper import mapService
 
 def start(services):
