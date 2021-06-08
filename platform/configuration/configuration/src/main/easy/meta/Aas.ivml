@@ -9,7 +9,7 @@ project Aas {
     AasImpl aas = AasImpl::BaSyx;
     isDefined(aas);
 
-    enum AasProtocol { Default, VAB };
+    enum AasProtocol { Default, VAB_TCP };
     enum AasSchema {HTTP, HTTPS, TCP};
     enum Persistency {INMEMORY, MONGO};
 
@@ -28,7 +28,7 @@ project Aas {
     }
 
     compound ImplAddress refines EphemeralServerAddress {
-        AasProtocol protocol = AasProtocol::VAB;
+        AasProtocol protocol = AasProtocol::VAB_TCP;
     	AasSchema schema = AasSchema::TCP;
     	isDefined(aasProtocol);
     }

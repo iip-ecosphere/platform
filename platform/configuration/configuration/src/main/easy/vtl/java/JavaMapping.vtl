@@ -126,7 +126,7 @@ template JavaMapping(Configuration config, FileArtifact target) {
 
     def String aasProtocolName(IIPEcosphere cfg) {
         switch (cfg.aasImplServer.protocol) {
-            AasProtocol::VAB : "VAB-IIP",
+            AasProtocol::VAB_TCP : "VAB-TCP",
             default: ""
         }
     }
