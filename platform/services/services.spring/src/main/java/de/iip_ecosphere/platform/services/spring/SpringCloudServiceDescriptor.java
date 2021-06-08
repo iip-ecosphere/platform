@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -55,7 +54,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @see #setClassification(ServiceKind, boolean)
      */
     public SpringCloudServiceDescriptor(Service service, TypeResolver resolver) {
-        super(service.getId(), service.getName(), service.getDescription(), new Version(service.getVersion()));
+        super(service.getId(), service.getName(), service.getDescription(), service.getVersion());
         setClassification(service.getKind(), service.isDeployable());
         this.service = service;
         

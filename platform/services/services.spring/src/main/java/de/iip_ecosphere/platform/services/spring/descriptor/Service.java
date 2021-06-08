@@ -48,7 +48,7 @@ public interface Service {
      * 
      * @return the version
      */
-    public String getVersion();
+    public Version getVersion();
 
     /**
      * Returns the description of the service.

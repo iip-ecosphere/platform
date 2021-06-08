@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.List;
 
+import de.iip_ecosphere.platform.support.iip_aas.Version;
+
 /**
  * Information about an artifact containing services. The artifact is to be deployed. {@link #getId()} and 
  * {@link #getName()} must be given, both not empty. {@link #getServices()} may be empty, but if not the services
@@ -24,21 +26,28 @@ import java.util.List;
 public interface Artifact {
 
     /**
-     * Returns the name of the service.
+     * Returns the name of the artifact.
      * 
      * @return the name
      */
     public String getId();
 
     /**
-     * Returns the name of the service.
+     * Returns the name of the artifact.
      * 
      * @return the name
      */
     public String getName();
     
     /**
-     * Returns the services.
+     * Returns the version of this artifact.
+     * 
+     * @return the version
+     */
+    public Version getVersion();
+    
+    /**
+     * Returns the contained services.
      * 
      * @return the services
      */

@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
@@ -27,22 +28,11 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact implements Artifact { // inheritance from Service environment with <S> does not work with yaml
+public class YamlArtifact extends AbstractYamlArtifact implements Artifact { 
+    // inheritance from Service environment with <S> does not work with yaml
 
-    private String id;
-    private String name;
     private List<YamlService> services;
     private List<YamlType> types = new ArrayList<>();
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
     
     @Override
     public List<YamlService> getServices() {
@@ -61,24 +51,6 @@ public class YamlArtifact implements Artifact { // inheritance from Service envi
      */
     public void setTypes(List<YamlType> types) {
         this.types = types;
-    }
-
-    /**
-     * Defines the id of the service. [required by SnakeYaml]
-     * 
-     * @param id the id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Defines the name of the service. [required by SnakeYaml]
-     * 
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
     
     /**

@@ -214,7 +214,7 @@ public class ArtifactInfoTest {
         Assert.assertNotNull(service);
         Assert.assertEquals(id, service.getId());
         Assert.assertEquals(name, service.getName());
-        Assert.assertEquals(version, service.getVersion());
+        Assert.assertEquals(version, service.getVersion().toString());
         Assert.assertEquals(descr, service.getDescription());
     }
 
