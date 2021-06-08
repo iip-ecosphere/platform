@@ -100,7 +100,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         
         TestMachine machine = new TestMachine();
         // start required here by basyx-0.1.0-SNAPSHOT
-        ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine).start(); 
+        ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, AasFactory.DEFAULT_PROTOCOL).start(); 
         Aas aas = createAAS(machine);
 
         DeploymentRecipe dBuilder = AasFactory.getInstance()
@@ -142,7 +142,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
-        BaSyxTest.createAasOperationsElements(subModelBuilder, VAB_SERVER);
+        BaSyxTest.createAasOperationsElements(subModelBuilder, VAB_SERVER, AasFactory.DEFAULT_PROTOCOL);
         
         subModelBuilder.build();
         return aasBuilder.build();
