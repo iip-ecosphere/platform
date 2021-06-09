@@ -24,7 +24,8 @@ import org.junit.runners.Suite;
     YamlTest.class, 
     StreamTest.class,
     JavaEnvironmentTest.class,
-    PythonEnvironmentTest.class
+    PythonEnvironmentTest.class,
+    PythonEnvironmentSuiteTest.class
 })
 public class AllTests {
 }
