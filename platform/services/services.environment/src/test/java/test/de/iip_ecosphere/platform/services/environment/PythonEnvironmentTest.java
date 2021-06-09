@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
@@ -49,13 +51,15 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     }
     
     /**
-     * Operations before all tests. Startup Python.
+     * Creates and starts a Python process.
      * 
-     * @throws IOException shall not occur
+     * @param dir the home dir where to find the script/run it within
+     * @param script the Python script to run
+     * @param args the command line arguments for the script
+     * @return the created process
+     * @throws IOException if process creation fails
      */
-    @BeforeClass
-    public static void setup() throws IOException {
-        vabServer = new ServerAddress(Schema.HTTP); // ephemeral
+    public static Process createPythonProcess(File dir, String script, String... args) throws IOException {
         String pythonPath = "python";
         // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
         File jenkinsPath = new File("/var/lib/jenkins/python/active/python");
@@ -63,15 +67,44 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             pythonPath = jenkinsPath.toString();
         }
         System.out.println("Using Python: " + pythonPath);
-        ProcessBuilder processBuilder = new ProcessBuilder(pythonPath, "__init__.py", "--port", 
-            String.valueOf(vabServer.getPort()));
-        processBuilder.directory(new File("./src/test/python"));
+        List<String> tmp = new ArrayList<String>();
+        tmp.add(pythonPath);
+        tmp.add(script);
+        for (String a : args) {
+            tmp.add(a);
+        }
+        
+        ProcessBuilder processBuilder = new ProcessBuilder(tmp);
+        processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         python = processBuilder.start();
         redirectIO(python.getInputStream(), System.out);
         redirectIO(python.getErrorStream(), System.err);
-        
-        TimeUtils.sleep(1000); // works without on windows, but not on Jenkins/Linux
+        return python;
+    }
+
+    /**
+     * Creates and starts a Python process with home directory "./src/test/python".
+     * 
+     * @param script the Python script to run
+     * @param args the command line arguments for the script
+     * @return the created process
+     * @throws IOException if process creation fails
+     */
+    public static Process createPythonProcess(String script, String... args) throws IOException {
+        return createPythonProcess(new File("./src/test/python"), script, args);
+    }
+
+    /**
+     * Operations before all tests. Startup Python.
+     * 
+     * @throws IOException shall not occur
+     */
+    @BeforeClass
+    public static void setup() throws IOException {
+        vabServer = new ServerAddress(Schema.HTTP); // ephemeral
+        python = createPythonProcess("__init__.py", "--port", String.valueOf(vabServer.getPort()));
+        TimeUtils.sleep(1000); // works without on Windows, but not on Jenkins/Linux
     }
     
     /**
