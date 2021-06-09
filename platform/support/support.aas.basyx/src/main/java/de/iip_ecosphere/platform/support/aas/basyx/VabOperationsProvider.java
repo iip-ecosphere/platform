@@ -271,6 +271,7 @@ public class VabOperationsProvider extends HashMap<String, Object> {
             Endpoint endpoint = new Endpoint(schema, port, ""); // So far only default endpoints, no prefix
             HttpServlet vabServlet = new VABHTTPInterface<IModelProvider>(instance.createModelProvider());
             DeploymentSpec deploymentSpec = new DeploymentSpec(endpoint);
+            // schema == SCHEMA.HTTPS requires new DeploymentSpec(endpoint, true, keyPath, keyPass)
             deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(endpoint.getEndpoint()) + "/*", 
                 vabServlet);
             AASHTTPServer server = new AASHTTPServer(deploymentSpec.getContext());
