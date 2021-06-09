@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -110,10 +112,45 @@ public abstract class AasFactory {
         }
         
     };
+    
+    /**
+     * Functions needed to create an implementation protocol.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ProtocolCreator {
 
+        /**
+         * Creates an invocables creator for a certain protocol.
+         * 
+         * @param host the host name to communicate with
+         * @param port the port number to communicate on
+         * @return the invocables creator
+         * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
+         * @see #createProtocolServerBuilder(String, int)
+         */
+        public InvocablesCreator createInvocablesCreator(String host, int port);
+
+        /**
+         * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
+         * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
+         * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
+         * {@link #createDeploymentRecipe(Endpoint)}.
+         * 
+         * @param port the port number to communicate on
+         * @return the builder instance
+         * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
+         * @see #createInvocablesCreator(String, String, int)
+         */
+        public ProtocolServerBuilder createProtocolServerBuilder(int port);
+        
+    }    
+    
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
+    
+    private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
     
     /**
      * Returns the actual instance.
@@ -167,6 +204,16 @@ public abstract class AasFactory {
             instance = newInstance;
         }
         return oldInstance;
+    }
+    
+    /**
+     * Registers a protocol creator.
+     * 
+     * @param protocol the protocol name
+     * @param creator the creator
+     */
+    protected void registerProtocolCreator(String protocol, ProtocolCreator creator) {
+        protocolCreators.put(protocol, creator);
     }
     
     /**

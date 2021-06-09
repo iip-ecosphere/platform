@@ -51,6 +51,24 @@ public class FakeAasFactory extends AasFactory {
         
     }
     
+    /**
+     * Creates a factory instance.
+     */
+    public FakeAasFactory() {
+        registerProtocolCreator(DEFAULT_PROTOCOL, new ProtocolCreator() {
+            
+            @Override
+            public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+                return new FakeProtocolServerBuilder();
+            }
+            
+            @Override
+            public InvocablesCreator createInvocablesCreator(String host, int port) {
+                return new FakeInvocablesCreator();
+            }
+        });
+    }
+    
     @Override
     public String getName() {
         return "fake";
