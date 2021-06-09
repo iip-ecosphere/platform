@@ -14,12 +14,19 @@ def start(services):
     """ 
     
     parser = argparse.ArgumentParser(description='VAB/TCP Server')
-    parser.add_argument('--port', dest='port', action='store', nargs=1, type=int, required=True, help='The TCP port')
+    parser.add_argument('--port', dest='port', action='store', nargs=1, type=int, required=True, help='The TCP port.')
+    parser.add_argument('--protocol', dest='protocol', action='store', nargs=1, type=str, required=False, default="VAB-TCP", 
+        help='The implementation protocol (see AasFactory).')
     args = parser.parse_args()
     
     #preliminary
     
-    builder = VabIipOperationsBuilder()
+    if args.protocol=="" or args.protocol=="VAB-TCP":
+        builder = VabIipOperationsBuilder()
+    else:
+        logger.info("Protocol '" + args.protocol + "' unknown. Using default.");
+        builder = VabIipOperationsBuilder()
+        
     for service in services:
         mapService(builder, service)
 

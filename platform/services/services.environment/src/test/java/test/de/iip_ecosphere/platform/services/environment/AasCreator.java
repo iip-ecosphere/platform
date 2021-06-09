@@ -54,12 +54,12 @@ public class AasCreator {
      * 
      * @param addr the server address (schema ignored)
      * @param service the service to create the AAS for (qualified naming)
+     * @param protocol the AAS implementation protocol (see {@link AasFactory#getProtocols()}
      * @return the AAS
      */
-    public static Aas createAas(ServerAddress addr, Service service) {
+    public static Aas createAas(ServerAddress addr, Service service, String protocol) {
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator iCreator = factory.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, 
-            addr.getHost(), addr.getPort());
+        InvocablesCreator iCreator = factory.createInvocablesCreator(protocol, addr.getHost(), addr.getPort());
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
         ServiceStub stub = new ServiceStub(iCreator, service.getId());

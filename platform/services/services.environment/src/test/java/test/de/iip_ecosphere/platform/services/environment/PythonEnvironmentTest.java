@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -28,9 +26,6 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  * @author Sakshi Singh, SSE
  */
 public class PythonEnvironmentTest extends AbstractEnvironmentTest {
-
-    private static Process python;
-    private static ServerAddress vabServer;
 
     /**
      * Redirects an input stream to another stream (in parallel).
@@ -77,7 +72,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
-        python = processBuilder.start();
+        Process python = processBuilder.start();
         redirectIO(python.getInputStream(), System.out);
         redirectIO(python.getErrorStream(), System.err);
         return python;
@@ -96,29 +91,6 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     }
 
     /**
-     * Operations before all tests. Startup Python.
-     * 
-     * @throws IOException shall not occur
-     */
-    @BeforeClass
-    public static void setup() throws IOException {
-        vabServer = new ServerAddress(Schema.HTTP); // ephemeral
-        python = createPythonProcess("__init__.py", "--port", String.valueOf(vabServer.getPort()));
-        TimeUtils.sleep(1000); // works without on Windows, but not on Jenkins/Linux
-    }
-    
-    /**
-     * Operations after all tests. Kill Python.
-     */
-    @AfterClass
-    public static void shutdown() {
-        if (null != python) {
-            python.destroy();
-            python = null;
-        }
-    }
-    
-    /**
      * Tests the Python implementation.
      * 
      * @throws IOException shall not occur
@@ -126,12 +98,37 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      */
     @Test
     public void testPythonEnvironment() throws IOException, ExecutionException {
+        testPythonEnvironment(AasFactory.DEFAULT_PROTOCOL);
+    }
+    
+    /**
+     * Tests the Python implementation.
+     * 
+     * @param protocol the AAS implementation protocol (see {@link AasFactory#getProtocols()}
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur
+     */
+    private void testPythonEnvironment(String protocol) throws IOException, ExecutionException {
+        ServerAddress vabServer = new ServerAddress(Schema.HTTP); // ephemeral
+        List<String> args = new ArrayList<String>();
+        args.add("--port");
+        args.add(String.valueOf(vabServer.getPort()));
+        if (protocol.length() > 0) {
+            args.add("--protocol");
+            args.add(protocol);
+        }
+        String[] tmp = new String[args.size()];
+        Process python = createPythonProcess("__init__.py", args.toArray(tmp));
+        // add protocol
+        TimeUtils.sleep(1000); // works without on Windows, but not on Jenkins/Linux
+
+        
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
         Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
         MyService service = new MyService(); // pendent to Python service, used here as expected value(s)
-        Aas aas = AasCreator.createAas(vabServer, service);
+        Aas aas = AasCreator.createAas(vabServer, service, protocol);
         
         Server httpServer = AasFactory.getInstance()
             .createDeploymentRecipe(aasServerBase)
@@ -143,6 +140,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         AbstractEnvironmentTest.testAas(aasServerRegistry, service);
 
         httpServer.stop(true);
+        python.destroy();
     }
 
 }

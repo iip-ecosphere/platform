@@ -49,7 +49,7 @@ public class AasTest {
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
         MyService service = new MyService();
-        Aas aas = AasCreator.createAas(vabServer, service);
+        Aas aas = AasCreator.createAas(vabServer, service, AasFactory.DEFAULT_PROTOCOL);
         
         ProtocolServerBuilder pBuilder = AasFactory.getInstance()
             .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
