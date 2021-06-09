@@ -108,12 +108,12 @@ class AbstractService(Service):
     def activate(self):
         """Activates the service. [adaptation]"""
         
-        if self.state == ServiceState.RUNNING:
-            self.state = ServiceState.PASSIVATED # preliminary
+        if self.state == ServiceState.PASSIVATED:
+            self.state = ServiceState.RUNNING # preliminary consider state machine
 
     def passivate(self):
         """Passivates the service. [adaptation]"""
         
-        if self.state == ServiceState.PASSIVATED:
-            self.state = ServiceState.RUNNING # preliminary consider state machine
+        if self.state == ServiceState.RUNNING:
+            self.state = ServiceState.PASSIVATED # preliminary consider state machine
     

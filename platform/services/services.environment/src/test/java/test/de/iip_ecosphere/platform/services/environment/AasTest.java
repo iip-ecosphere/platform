@@ -17,9 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
-import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
@@ -50,18 +48,14 @@ public class AasTest {
         Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
-        Aas aas = AasCreator.createAas(vabServer);
+        MyService service = new MyService();
+        Aas aas = AasCreator.createAas(vabServer, service);
         
         ProtocolServerBuilder pBuilder = AasFactory.getInstance()
             .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
-        MyService service = new MyService();
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_NAME, () -> service.getName(), null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_VERSION, () -> service.getVersion().toString(), null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_STATE, () -> service.getState().name(), null);
-        pBuilder.defineProperty(ServiceMapper.NAME_PROP_DESCRIPTION, () -> service.getDescription(), null);
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_ACTIVATE, params -> activate(service));
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_PASSIVATE, params -> passivate(service));
-        pBuilder.defineOperation(ServiceMapper.NAME_OP_SET_STATE, params -> setState(service, params));
+
+        ServiceMapper mapper = new ServiceMapper(pBuilder);
+        mapper.mapService(service);
         Server server = pBuilder.build();
         server.start();
         
@@ -76,56 +70,6 @@ public class AasTest {
 
         httpServer.stop(true);
         server.stop(true);
-    }
-    
-    /**
-     * Activates the service.
-     * 
-     * @param service the service instance
-     * @return <b>null</b> for convenience
-     */
-    private static Object activate(Service service) {
-        try {
-            service.activate();
-        } catch (ExecutionException e) {
-            // ignore for now, will disappear when aligned with Python
-        }
-        return null;
-    }
-
-    /**
-     * Passivates the service.
-     * 
-     * @param service the service instance
-     * @return <b>null</b> for convenience
-     */
-    private static Object passivate(Service service) {
-        try {
-            service.passivate();
-        } catch (ExecutionException e) {
-            // ignore for now, will disappear when aligned with Python
-        }
-        return null;
-    }
-
-    /**
-     * Changes the service state.
-     *
-     * @param service the service instance
-     * @param params the call parameters, only the first is evaluated
-     * @return if the operation was successful
-     */
-    private static Object setState(Service service, Object[] params) {
-        if (params.length > 0 && params[0] != null) {
-            try {
-                service.setState(ServiceState.valueOf(params[0].toString()));
-            } catch (IllegalArgumentException e) {
-                // result = false;
-            } catch (ExecutionException e) {
-                // ignore for now, will disappear when aligned with Python
-            }
-        }
-        return null;
     }
 
 }

@@ -34,8 +34,8 @@ def getQName(name, service):
         the (qualified) name
     """ 
     
-    return name
-    #TODO return service.getId() + "_" + name
+    #return name
+    return NAME_SUBMODEL + "_" + service.getId() + "_" + name
 
 def mapService(builder, service):
     """Maps know functions of a service to functions and registers them appropriately with builder.

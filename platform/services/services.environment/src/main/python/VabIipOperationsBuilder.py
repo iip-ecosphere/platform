@@ -28,10 +28,10 @@ def composeResult(function, *args):
         args = [x() if callable(x) else x for x in args]
         value = function(*args)
         if value is None:
-            return ''
+            return {}
         else:
-            return value
-            #return {"result" : " + value + "}
+            #return value
+            return {"result" : " + value + "}
     except Exception as e:
         return composeException(e)
         
@@ -47,8 +47,8 @@ def composeException(e):
         the result string to be passed on to the (remote) caller
     """
     msg = "{0}".format(e)
-    return ''
-    #return {"exception" : "+msg+"}
+    #return ''
+    return {"exception" : " + msg + "}
 
 
 # the Python correspondence of the VabIipOperationsBuilder (support.aas.basxy)

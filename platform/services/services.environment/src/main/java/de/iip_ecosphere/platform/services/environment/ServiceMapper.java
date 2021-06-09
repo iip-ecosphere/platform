@@ -53,11 +53,11 @@ public class ServiceMapper {
     }
     
     /**
-     * Define the given service into the protocol service builder.
+     * Maps the given service onto the protocol service builder.
      * 
      * @param service the service to define
      */
-    public void define(Service service) {
+    public void mapService(Service service) {
         builder.defineProperty(getQName(service, NAME_PROP_ID), 
             () -> service.getId(), null);
         builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
@@ -66,7 +66,7 @@ public class ServiceMapper {
             () -> service.getVersion().toString(), null);
         builder.defineProperty(getQName(service, NAME_PROP_KIND), 
             () -> service.getKind().toString(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_VERSION), 
+        builder.defineProperty(getQName(service, NAME_PROP_STATE), 
             () -> service.getState().toString(), null);
         builder.defineProperty(getQName(service, NAME_PROP_NAME), 
             () -> service.getName(), null);

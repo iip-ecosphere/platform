@@ -19,6 +19,7 @@ import java.util.function.Function;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -27,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
  * The common test code for all environments. Maximize code here rather than in specific environment tests.
@@ -50,20 +52,27 @@ public abstract class AbstractEnvironmentTest {
         Submodel submodel = aas.getSubmodel(AasCreator.AAS_SUBMODEL_NAME);
         Assert.assertNotNull("Submodel " + AasCreator.AAS_SUBMODEL_NAME + " shall be there", submodel);
 
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_ID, o -> checkString(o, expected.getId()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_NAME, o -> checkString(o, expected.getName()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, 
             o -> checkString(o, expected.getDescription()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_VERSION, o -> checkVersion(o, expected.getVersion()));
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, o -> checkStateString(o));
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, o -> checkStateString(o, expected.getState()));
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_KIND, o -> checkKindString(o, expected.getKind()));
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DEPLOYABLE, 
+            o -> checkBoolean(o, expected.isDeployable()));
         
         // do not make too many assumptions for now
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, ServiceState.RUNNING.name());
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, 
+            ServiceState.RUNNING.name());
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
             o -> checkStateString(o, ServiceState.RUNNING));
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, null);
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, o -> checkStateString(o));
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, ServiceState.PASSIVATED));
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, null);
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, o -> checkStateString(o));
+        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, ServiceState.RUNNING));
     }
 
     /**
@@ -86,7 +95,7 @@ public abstract class AbstractEnvironmentTest {
     }
 
     /**
-     * Asserts an operation invocation result.
+     * Asserts an operation invocation result through {@link JsonResultWrapper#fromJson(Object)}.
      * 
      * @param submodel the submodel
      * @param operationName the name/short id of the operation
@@ -94,11 +103,11 @@ public abstract class AbstractEnvironmentTest {
      * @param args the operation invocation arguments
      * @throws ExecutionException if accessing AAS property values or performing operation invocations fails
      */
-    private static void assertOperation(Submodel submodel, String operationName, Function<Object, Boolean> cond, 
+    private static void assertOperation(Submodel submodel, String operationName, Function<String, Boolean> cond, 
         Object... args) throws ExecutionException {
         Operation op = submodel.getOperation(operationName);
         Assert.assertNotNull("Operation " + operationName + " not found", op);
-        Object result = op.invoke(args);
+        String result = JsonResultWrapper.fromJson(op.invoke(args));
         if (null != cond) {
             Assert.assertTrue("Condition on result of " + operationName + " does not hold", cond.apply(result));
         }
@@ -112,6 +121,17 @@ public abstract class AbstractEnvironmentTest {
      */
     private static boolean checkNonEmptyString(Object obj) {
         return obj instanceof String && ((String) obj).length() > 0; 
+    }
+
+    /**
+     * Checks whether {@code obj} is an empty string.
+     * 
+     * @param obj the object to test
+     * @return {@code true} if {@code o} fulfills the properties to test, {@code false} else
+     */
+    @SuppressWarnings("unused")
+    private static boolean checkEmptyString(Object obj) {
+        return obj instanceof String && ((String) obj).length() == 0; 
     }
 
     /**
@@ -176,6 +196,7 @@ public abstract class AbstractEnvironmentTest {
      * @param obj the object to test
      * @return {@code true} if {@code o} fulfills the properties to test, {@code false} else
      */
+    @SuppressWarnings("unused")
     private static boolean checkStateString(Object obj) {
         return checkStateString(obj, null);
     }
@@ -201,5 +222,28 @@ public abstract class AbstractEnvironmentTest {
         }
         return ok;
     }
+
     
+    /**
+     * Checks whether {@code obj} is a string representing a value of {@code ServiceKind}.
+     * 
+     * @param obj the object to test
+     * @param expectedValue the expected state value, no test is performed if <b>null</b>
+     * @return {@code true} if {@code o} fulfills the properties to test, {@code false} else
+     */
+    private static boolean checkKindString(Object obj, ServiceKind expectedValue) {
+        boolean ok = checkNonEmptyString(obj);
+        if (ok) {
+            try {
+                ServiceKind kind = ServiceKind.valueOf(obj.toString());
+                if (null != expectedValue) {
+                    ok = expectedValue.equals(kind);
+                }
+            } catch (IllegalArgumentException e) {
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
 }
