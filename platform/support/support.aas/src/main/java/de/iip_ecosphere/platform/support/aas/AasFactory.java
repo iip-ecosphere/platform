@@ -311,11 +311,17 @@ public abstract class AasFactory {
      *   the default protocol}
      * @param host the host name to communicate with
      * @param port the port number to communicate on
-     * @return the invocables creator
+     * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
      * @see #createProtocolServerBuilder(String, int)
      */
-    public abstract InvocablesCreator createInvocablesCreator(String protocol, String host, int port);
+    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+        ProtocolCreator creator = protocolCreators.get(protocol);
+        if (null == creator) {
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+        }
+        return creator.createInvocablesCreator(host, port);
+    }
 
     /**
      * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
@@ -326,11 +332,17 @@ public abstract class AasFactory {
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}
      * @param port the port number to communicate on
-     * @return the builder instance
+     * @return the builder instance (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
      * @see #createInvocablesCreator(String, String, int)
      */
-    public abstract ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port);
+    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
+        ProtocolCreator creator = protocolCreators.get(protocol);
+        if (null == creator) {
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+        }
+        return creator.createProtocolServerBuilder(port);
+    }
     
     /**
      * Modifies a given {@code id} so that it fits the needs of the implementation.

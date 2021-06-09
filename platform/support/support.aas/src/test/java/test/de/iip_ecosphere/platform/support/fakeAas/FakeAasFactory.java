@@ -109,14 +109,4 @@ public class FakeAasFactory extends AasFactory {
         return new String[]{DEFAULT_PROTOCOL};
     }
 
-    @Override
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        return new FakeInvocablesCreator();
-    }
-
-    @Override
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        return new FakeProtocolServerBuilder();
-    }
-
 }
