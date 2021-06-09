@@ -19,16 +19,16 @@ def start(services):
         help='The implementation protocol (see AasFactory).')
     args = parser.parse_args()
     
-    if args.protocol=="" or args.protocol=="VAB-TCP":
-        builder = VabIipOperationsBuilder()
-    #further protocols may be inserted here
-    else:
-        logger.info("Protocol '" + args.protocol + "' unknown. Using default.");
-        builder = VabIipOperationsBuilder()
-        
+    builder = VabIipOperationsBuilder()
     for service in services:
         mapService(builder, service)
 
-    # further args may go for data server port, VAB protocol (TCP/HTTP-REST)
-    server = BaSyxTCPServer(builder, args.port[0])
+    port = args.port[0]
+    if args.protocol=="" or args.protocol=="VAB-TCP":
+        server = BaSyxTCPServer(builder, port)
+        #other protocols would go into here
+    else:
+        logger.info("Protocol '" + args.protocol + "' unknown. Using default.");
+        server = BaSyxTCPServer(builder, port)
+        
     server.start()
