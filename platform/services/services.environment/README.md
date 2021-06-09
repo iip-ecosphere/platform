@@ -15,9 +15,14 @@ TBD: Miguel: The current general monitoring properties provided by Spring/Microm
 
 Further additional support classes allow reading basic information from the YAML service deployment descriptors (forward defintion for services component).
 
-## Python (at least Python version 3.5)
+## Python
 
 On the Python side, this component provides a simple framework around the "abstract" ``Service`` class and similar ``ServiceMapper`` linking the known service functions through a Python port of the ``ProtocolServerBuilder`` into an AAS implementation server. It is important to recall, that the Python side just provides the implementation server. No more interaction with the AAS is needed. 
+
+Prerequisites/requirements:
+
+- Python at least version 3.5
+- pyyaml for YAML parsing 
 
 ## missing
 
