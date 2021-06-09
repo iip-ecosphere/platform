@@ -41,6 +41,13 @@ public class ServiceMapper {
     public static final String NAME_OP_RECONF = "reconfigure";
     public static final String NAME_OP_SET_STATE = "setState";
     
+    public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_STATE, NAME_PROP_DEPLOYABLE, 
+        NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION}; 
+    public static final String[] PROP_WRITEONLY = {}; 
+    public static final String[] PROP_READWRITE = {}; 
+    public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, NAME_OP_UPDATE, 
+        NAME_OP_SWITCH, NAME_OP_RECONF, NAME_OP_SET_STATE}; 
+    
     private ProtocolServerBuilder builder;
     
     /**

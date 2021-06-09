@@ -12,17 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_OP_ACTIVATE;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_OP_PASSIVATE;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_OP_SET_STATE;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_DEPLOYABLE;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_DESCRIPTION;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_ID;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_KIND;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_NAME;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_STATE;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.NAME_PROP_VERSION;
-import static de.iip_ecosphere.platform.services.environment.ServiceMapper.getQName;
+import static de.iip_ecosphere.platform.services.environment.ServiceMapper.*;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -33,6 +23,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
@@ -56,24 +47,19 @@ public class ServiceStub implements Service {
      * @param serviceId the service id to create the qualified names via {@link ServiceMapper#getQName(Service, String)}
      */
     public ServiceStub(InvocablesCreator iCreator, String serviceId) {
-        registerProperty(NAME_PROP_ID, iCreator.createGetter(getQName(serviceId, NAME_PROP_ID)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_NAME, iCreator.createGetter(getQName(serviceId, NAME_PROP_NAME)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_VERSION, iCreator.createGetter(getQName(serviceId, NAME_PROP_VERSION)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_DESCRIPTION, iCreator.createGetter(getQName(serviceId, NAME_PROP_DESCRIPTION)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_STATE, iCreator.createGetter(getQName(serviceId, NAME_PROP_STATE)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_KIND, iCreator.createGetter(getQName(serviceId, NAME_PROP_KIND)), 
-            InvocablesCreator.READ_ONLY);
-        registerProperty(NAME_PROP_DEPLOYABLE, iCreator.createGetter(getQName(serviceId, NAME_PROP_DEPLOYABLE)), 
-            InvocablesCreator.READ_ONLY);
-        
-        registerOperation(NAME_OP_ACTIVATE, iCreator.createInvocable(getQName(serviceId, NAME_OP_ACTIVATE)));
-        registerOperation(NAME_OP_PASSIVATE, iCreator.createInvocable(getQName(serviceId, NAME_OP_PASSIVATE)));
-        registerOperation(NAME_OP_SET_STATE, iCreator.createInvocable(getQName(serviceId, NAME_OP_SET_STATE)));
+        for (String n : PROP_READONLY) {
+            registerProperty(n, iCreator.createGetter(getQName(serviceId, n)), InvocablesCreator.READ_ONLY);
+        }
+        for (String n : PROP_WRITEONLY) {
+            registerProperty(n, InvocablesCreator.WRITE_ONLY, iCreator.createSetter(getQName(serviceId, n)));
+        }
+        for (String n : PROP_READWRITE) {
+            registerProperty(n, iCreator.createGetter(getQName(serviceId, n)), 
+                iCreator.createSetter(getQName(serviceId, n)));
+        }
+        for (String n : OPERATIONS) {
+            registerOperation(n, iCreator.createInvocable(getQName(serviceId, n)));
+        }
     }
     
     /**
@@ -171,19 +157,19 @@ public class ServiceStub implements Service {
 
     @Override
     public void migrate(String resourceId) throws ExecutionException {
-        //TODO JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE).apply(new String[] {}));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE).apply(new String[] {}));
     }
 
     @Override
     public void update(URI location) throws ExecutionException {
-        //TODO Object[] param = new Object[] {location.toString()};
-        //JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE).apply(param));
+        Object[] param = new Object[] {location.toString()};
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE).apply(param));
     }
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
-        //TODO Object[] param = new Object[] {targetId};
-        //JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH_TO).apply(param));
+        Object[] param = new Object[] {targetId};
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH).apply(param));
     }
 
     @Override
@@ -198,8 +184,8 @@ public class ServiceStub implements Service {
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
-        // TODO Turn values to JSON
-        //JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONFIGURE).apply(param));
+        Object[] param = new Object[] {AasUtils.writeMap(values)};
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONF).apply(param));
     }
 
 }

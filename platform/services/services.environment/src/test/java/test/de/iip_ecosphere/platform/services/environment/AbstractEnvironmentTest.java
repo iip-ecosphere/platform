@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
@@ -63,16 +65,25 @@ public abstract class AbstractEnvironmentTest {
             o -> checkBoolean(o, expected.isDeployable()));
         
         // do not make too many assumptions for now
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, 
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, null,
             ServiceState.RUNNING.name());
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
             o -> checkStateString(o, ServiceState.RUNNING));
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, null);
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, null, null);
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
             o -> checkStateString(o, ServiceState.PASSIVATED));
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, null);
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, null, null);
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
             o -> checkStateString(o, ServiceState.RUNNING));
+
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_MIGRATE, null, e -> true, "myResource");
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SWITCH, null, e -> true, "otherService");
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_UPDATE, null, e -> true, 
+            "http://wherever.com/service/0.1.0");
+        Map<String, Object> values = new HashMap<>();
+        values.put("name1", new Object());
+        values.put("name2", 25);
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_RECONF, null, e -> true, values);
     }
 
     /**
@@ -100,16 +111,30 @@ public abstract class AbstractEnvironmentTest {
      * @param submodel the submodel
      * @param operationName the name/short id of the operation
      * @param cond a condition to apply on the result value, if <b>null</b> no assert is performed
+     * @param exc a condition to apply on the result value, if <b>null</b> no assert is performed but also no exception 
+     *     may occur
      * @param args the operation invocation arguments
-     * @throws ExecutionException if accessing AAS property values or performing operation invocations fails
+     * @throws ExecutionException if accessing AAS property values or performing operation invocations fails and 
+     *    {@code exc} does not allow for catching/asserting
      */
     private static void assertOperation(Submodel submodel, String operationName, Function<String, Boolean> cond, 
-        Object... args) throws ExecutionException {
+        Function<Exception, Boolean> exc, Object... args) throws ExecutionException {
         Operation op = submodel.getOperation(operationName);
         Assert.assertNotNull("Operation " + operationName + " not found", op);
-        String result = JsonResultWrapper.fromJson(op.invoke(args));
-        if (null != cond) {
-            Assert.assertTrue("Condition on result of " + operationName + " does not hold", cond.apply(result));
+        try {
+            String result = JsonResultWrapper.fromJson(op.invoke(args));
+            if (null != exc) {
+                Assert.fail("Exception expected when calling " + operationName);
+            }
+            if (null != cond) {
+                Assert.assertTrue("Condition on result of " + operationName + " does not hold", cond.apply(result));
+            }
+        } catch (ExecutionException e) {
+            if (null != exc) {
+                Assert.assertTrue("Condition on exception of " + operationName + " does not hold", exc.apply(e));
+            } else {
+                throw e;
+            }
         }
     }
 

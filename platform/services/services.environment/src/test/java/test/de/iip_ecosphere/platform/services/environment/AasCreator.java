@@ -44,6 +44,10 @@ public class AasCreator {
     public static final String AAS_SUBMODEL_OPERATION_PASSIVATE = "passivate";
     public static final String AAS_SUBMODEL_OPERATION_ACTIVATE = "activate";
     public static final String AAS_SUBMODEL_OPERATION_SETSTATE = "setState";
+    public static final String AAS_SUBMODEL_OPERATION_MIGRATE = "migrate";
+    public static final String AAS_SUBMODEL_OPERATION_UPDATE = "update";
+    public static final String AAS_SUBMODEL_OPERATION_SWITCH = "switch";
+    public static final String AAS_SUBMODEL_OPERATION_RECONF = "reconfigure";
     
     /**
      * Creates an AAS for testing.
@@ -89,18 +93,39 @@ public class AasCreator {
             .bind(stub.getGetter(NAME_PROP_DEPLOYABLE), InvocablesCreator.READ_ONLY)
             .build();
         
+        // returns are always strings here through JsonResultWrapper
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_ACTIVATE)
             .setInvocable(stub.getOperation(NAME_OP_ACTIVATE))
-            .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
+            .addOutputVariable("result", Type.STRING)
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_PASSIVATE)
             .setInvocable(stub.getOperation(NAME_OP_PASSIVATE))
-            .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
+            .addOutputVariable("result", Type.STRING)
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SETSTATE)
             .setInvocable(stub.getOperation(NAME_OP_SET_STATE))
             .addInputVariable("state", Type.STRING)
-            .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_MIGRATE)
+            .setInvocable(stub.getOperation(NAME_OP_MIGRATE))
+            .addInputVariable("resourceId", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_UPDATE)
+            .setInvocable(stub.getOperation(NAME_OP_UPDATE))
+            .addInputVariable("location", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SWITCH)
+            .setInvocable(stub.getOperation(NAME_OP_SWITCH))
+            .addInputVariable("targetId", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_RECONF)
+            .setInvocable(stub.getOperation(NAME_OP_RECONF))
+            .addInputVariable("values", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
             .build();
         smBuilder.build();
         return aasBuilder.build();
