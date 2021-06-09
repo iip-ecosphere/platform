@@ -19,10 +19,9 @@ def start(services):
         help='The implementation protocol (see AasFactory).')
     args = parser.parse_args()
     
-    #preliminary
-    
     if args.protocol=="" or args.protocol=="VAB-TCP":
         builder = VabIipOperationsBuilder()
+    #further protocols may be inserted here
     else:
         logger.info("Protocol '" + args.protocol + "' unknown. Using default.");
         builder = VabIipOperationsBuilder()
