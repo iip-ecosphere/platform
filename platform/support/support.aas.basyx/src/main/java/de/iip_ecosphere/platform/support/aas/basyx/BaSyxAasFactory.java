@@ -56,6 +56,80 @@ public class BaSyxAasFactory extends AasFactory {
         
     }
     
+    /**
+     * The VAB-TCP Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class VabTcpProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new BaSyxConnector(host, port)); 
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
+        }
+        
+    }
+    
+    /**
+     * The VAB-HTTP Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class VabHttpProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new HTTPConnector("http://" + host + ":" + port));
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP);
+        }
+        
+    }
+    
+    /**
+     * The VAB-HTTPS Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class VabHttpsProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
+                new BaSyxJerseyHttpsClientFactory())); // TODO for now with self-signed
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS);
+        }
+        
+    }
+    
+    /**
+     * Creates an instance.
+     */
+    public BaSyxAasFactory() {
+        VabTcpProtocolCreator tcp = new VabTcpProtocolCreator();
+        registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
+        registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
+        registerProtocolCreator(PROTOCOL_VAB_HTTP, new VabHttpProtocolCreator());
+        registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
+    }
+
+    @Override
+    public String[] getProtocols() {
+        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP, PROTOCOL_VAB_HTTP}; // , PROTOCOL_VAB_HTTPS
+    }
+    
     @Override
     public AasBuilder createAasBuilder(String idShort, String identifier) {
         return new BaSyxAas.BaSyxAasBuilder(idShort, identifier);
@@ -89,38 +163,6 @@ public class BaSyxAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return new BaSyxPersistenceRecipe();
-    }
-
-    @Override
-    public String[] getProtocols() {
-        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP, PROTOCOL_VAB_HTTP}; // , PROTOCOL_VAB_HTTPS
-    }
-
-    @Override
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
-            return new VabInvocablesCreator(new BaSyxConnector(host, port)); 
-        } else if (PROTOCOL_VAB_HTTP.equals(protocol)) {
-            return new VabInvocablesCreator(new HTTPConnector("http://" + host + ":" + port));
-        } else if (PROTOCOL_VAB_HTTPS.equals(protocol)) {
-            return new VabInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
-                new BaSyxJerseyHttpsClientFactory())); // TODO for now with self-signed
-        } else {
-            throw new IllegalArgumentException("Unknown protocol: " + protocol);
-        }
-    }
-
-    @Override
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_TCP.equals(protocol)) {
-            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
-        } else if (PROTOCOL_VAB_HTTP.equals(protocol)) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP);
-        } else if (PROTOCOL_VAB_HTTPS.equals(protocol)) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS);
-        } else {
-            throw new IllegalArgumentException("Unknown protocol: " + protocol);
-        }
     }
 
 }
