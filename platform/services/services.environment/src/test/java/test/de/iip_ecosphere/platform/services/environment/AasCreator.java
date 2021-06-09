@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -57,46 +58,47 @@ public class AasCreator {
             addr.getHost(), addr.getPort());
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
+        ServiceStub stub = new ServiceStub(iCreator, service.getId());
         
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_ID)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_ID)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_ID), stub.getSetter(NAME_PROP_ID))
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_NAME)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_NAME)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_NAME), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_VERSION)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_VERSION)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_VERSION), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DESCRIPTION)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_DESCRIPTION)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_DESCRIPTION), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_STATE)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_STATE), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_KIND)
             .setType(Type.STRING)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_KIND)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_KIND), InvocablesCreator.READ_ONLY)
             .build();
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DEPLOYABLE)
             .setType(Type.BOOLEAN)
-            .bind(iCreator.createGetter(getQName(service, NAME_PROP_DEPLOYABLE)), InvocablesCreator.READ_ONLY)
+            .bind(stub.getGetter(NAME_PROP_DEPLOYABLE), InvocablesCreator.READ_ONLY)
             .build();
         
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_ACTIVATE)
-            .setInvocable(iCreator.createInvocable(getQName(service, NAME_OP_ACTIVATE)))
+            .setInvocable(stub.getOperation(NAME_OP_ACTIVATE))
             .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_PASSIVATE)
-            .setInvocable(iCreator.createInvocable(getQName(service, NAME_OP_PASSIVATE)))
+            .setInvocable(stub.getOperation(NAME_OP_PASSIVATE))
             .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SETSTATE)
-            .setInvocable(iCreator.createInvocable(getQName(service, NAME_OP_SET_STATE)))
+            .setInvocable(stub.getOperation(NAME_OP_SET_STATE))
             .addInputVariable("state", Type.STRING)
             .addOutputVariable("result", Type.STRING) // through JsonResultWrapper
             .build();

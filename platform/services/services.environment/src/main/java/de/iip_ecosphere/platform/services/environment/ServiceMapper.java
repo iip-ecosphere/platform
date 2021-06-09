@@ -125,7 +125,18 @@ public class ServiceMapper {
      * @return the qualified name
      */
     public static String getQName(Service service, String elementName) {
-        return NAME_SUBMODEL + "_" + service.getId() + "_" + elementName;
+        return getQName(service.getId(), elementName);
     }
-    
+
+    /**
+     * Returns the qualified name for an operation/property implementation.
+     * 
+     * @param serviceId the service id to prefix
+     * @param elementName the element name
+     * @return the qualified name
+     */
+    public static String getQName(String serviceId, String elementName) {
+        return NAME_SUBMODEL + "_" + serviceId + "_" + elementName;
+    }
+
 }
