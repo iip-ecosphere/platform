@@ -99,7 +99,7 @@ public class BaSyxAasFactory extends AasFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class VabHttpsProtocolCreator implements ProtocolCreator {
+    /*private static class VabHttpsProtocolCreator implements ProtocolCreator {
 
         @Override
         public InvocablesCreator createInvocablesCreator(String host, int port) {
@@ -112,7 +112,7 @@ public class BaSyxAasFactory extends AasFactory {
             return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS);
         }
         
-    }
+    }*/
     
     /**
      * Creates an instance.
@@ -122,12 +122,7 @@ public class BaSyxAasFactory extends AasFactory {
         registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
         registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
         registerProtocolCreator(PROTOCOL_VAB_HTTP, new VabHttpProtocolCreator());
-        registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
-    }
-
-    @Override
-    public String[] getProtocols() {
-        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_TCP, PROTOCOL_VAB_HTTP}; // , PROTOCOL_VAB_HTTPS
+        //registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
     }
     
     @Override
