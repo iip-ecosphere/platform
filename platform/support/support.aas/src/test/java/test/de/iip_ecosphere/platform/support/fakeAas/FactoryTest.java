@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
+import de.iip_ecosphere.platform.support.aas.ProtocolDescriptor;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -102,6 +103,11 @@ public class FactoryTest {
             public String fixId(String id) {
                 return DUMMY.fixId(id);
             }
+            
+            @Override
+            protected boolean accept(ProtocolDescriptor creator) {
+                return true; // allow the fake test protocol creator for testing
+            }
 
         };
         
@@ -174,8 +180,8 @@ public class FactoryTest {
 
         Assert.assertNotNull(instance.getProtocols());
         Assert.assertTrue(instance.getProtocols().length > 0);
-        Assert.assertNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
-        Assert.assertNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
+        Assert.assertNotNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
+        Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
 
         AasFactory.setInstance(old);
     }

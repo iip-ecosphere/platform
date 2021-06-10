@@ -14,13 +14,16 @@ package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -95,20 +98,10 @@ public abstract class AasFactory {
         public PersistenceRecipe createPersistenceRecipe() {
             return null;
         }
-
+        
         @Override
-        public String[] getProtocols() {
-            return new String[]{DEFAULT_PROTOCOL};
-        }
-
-        @Override
-        public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-            return null;
-        }
-
-        @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-            return null;
+        protected boolean accept(ProtocolDescriptor creator) {
+            return true; // allow the fake test protocol creator for testing
         }
         
     };
@@ -151,6 +144,53 @@ public abstract class AasFactory {
     private static AasFactory instance = DUMMY;
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
+    private String[] protocols;
+
+    /**
+     * Creates the factory instance.
+     * 
+     * @see #accept(ProtocolCreator)
+     */
+    protected AasFactory() {
+        // load specified first so that refined classes can overwrite protocols on demand later in their constructor
+        ServiceLoader<ProtocolDescriptor> loader = ServiceLoader.load(ProtocolDescriptor.class);
+        Iterator<ProtocolDescriptor> iter = loader.iterator();
+        while (iter.hasNext()) {
+            ProtocolDescriptor desc = iter.next();
+            if (accept(desc)) {
+                ProtocolCreator creator = desc.createInstance();
+                registerProtocolCreator(desc.getName(), creator);
+                if (1 == protocolCreators.size()) {
+                    registerProtocolCreator(DEFAULT_PROTOCOL, creator);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Returns whether a protocol is considered acceptable for this factory. By default, we exclude all 
+     * {@link ExcludeFirst} annotated creators.
+     * 
+     * @param creator the creator to check
+     * @return {@code true} for acceptable, {@code false} else
+     */
+    protected boolean accept(ProtocolDescriptor creator) {
+        return !creator.getClass().isAnnotationPresent(ExcludeFirst.class);
+    }
+    
+    /**
+     * Returns the supported protocols.
+     * 
+     * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
+     * @see #createInvocablesCreator(String, String, int)
+     */
+    public String[] getProtocols() {
+        if (null == protocols) {
+            protocols = new String[protocolCreators.size()];
+            protocolCreators.keySet().toArray(protocols);
+        }
+        return protocols;
+    }
     
     /**
      * Returns the actual instance.
@@ -295,14 +335,6 @@ public abstract class AasFactory {
      * @return the recipe (may be <b>null</b> if no AAS implementation is registered)
      */
     public abstract PersistenceRecipe createPersistenceRecipe();
-    
-    /**
-     * Returns the supported protocols.
-     * 
-     * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
-     * @see #createInvocablesCreator(String, String, int)
-     */
-    public abstract String[] getProtocols();
     
     /**
      * Creates an invocables creator for a certain protocol.

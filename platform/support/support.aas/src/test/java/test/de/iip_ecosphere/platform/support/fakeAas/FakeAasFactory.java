@@ -104,9 +104,4 @@ public class FakeAasFactory extends AasFactory {
         return null;
     }
 
-    @Override
-    public String[] getProtocols() {
-        return new String[]{DEFAULT_PROTOCOL};
-    }
-
 }
