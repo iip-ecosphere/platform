@@ -18,10 +18,14 @@ This is for all code realizing the IIP-Ecosphere platform consisting of:
        * Platform connector for OPC UA v1 based on [Eclipse Milo](https://projects.eclipse.org/projects/iot.milo)
        * Platform connector for AAS based on the abstraction in the support layer
        * Platform connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
- * Services
-    * [Service management](https://github.com/iip-ecosphere/platform/tree/main/platform/services/README.md)
- * Resources and Monitoring
-    * [Resource management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md)
+ * [Services](https://github.com/iip-ecosphere/platform/tree/main/platform/services/README.md) 
+    * Basic platform [service management](https://github.com/iip-ecosphere/platform/tree/main/platform/services/services/README.md) 
+    * Default [service management](https://github.com/iip-ecosphere/platform/tree/main/platform/services/services.spring/README.md) for Spring Cloud Streams
+    * Multi-language [service execution environment](https://github.com/iip-ecosphere/platform/tree/main/platform/services/services.execution/README.md) for Java and Python (connected through protocols of the Support Layer)
+ * [Resource management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md) and Monitoring
+    * [Edge Cloud Server (ECS) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md)
+    * Default resource management for [Docker](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime.docker/README.md)
+   * Upcoming: Resource management for Kubernetes
  * Security and Data Protection
  * Reusable Intelligent Services
  * Configuration
