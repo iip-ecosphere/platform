@@ -5,7 +5,7 @@ package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
  * Proxy for client machine (WorkerProxy)
  * Proxy for server machine (MasterProxy)
  * 
- * @author Holger Eichelberger, Ahmad Alamoush, SSE
+ * @author Ahmad Alamoush, SSE
  */
 public enum ProxyType {
 
