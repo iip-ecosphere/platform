@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) {2021} The original author or authors
+ * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -20,7 +20,12 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AppTest.class,
+    AasTest.class,
+    YamlTest.class, 
+    StreamTest.class,
+    JavaEnvironmentTest.class,
+    PythonEnvironmentTest.class,
+    PythonEnvironmentSuiteTest.class
 })
 public class AllTests {
 }

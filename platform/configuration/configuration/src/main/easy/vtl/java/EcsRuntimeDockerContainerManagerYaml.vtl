@@ -8,6 +8,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
+        DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
         'aas:
             server:
                 port: ${aasServer.port}
@@ -23,7 +24,11 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
                 port: ${aasImplServer.port}
                 host: ${aasImplServer.host}
                 schema: ${aasImplServer.host}
-                protocol: ${aasImplServer.protocol}'
+                protocol: ${aasImplServer.protocol}
+            docker:
+                dockerHost: ${containerManager.dockerHost}
+                dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
+                deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
     }
 
     def main(IIPEcosphere config, FileArtifact target) {

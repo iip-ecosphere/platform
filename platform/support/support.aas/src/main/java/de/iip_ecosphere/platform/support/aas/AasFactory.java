@@ -13,12 +13,17 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -93,27 +98,99 @@ public abstract class AasFactory {
         public PersistenceRecipe createPersistenceRecipe() {
             return null;
         }
-
+        
         @Override
-        public String[] getProtocols() {
-            return new String[]{DEFAULT_PROTOCOL};
-        }
-
-        @Override
-        public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-            return null;
-        }
-
-        @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-            return null;
+        protected boolean accept(ProtocolDescriptor creator) {
+            return true; // allow the fake test protocol creator for testing
         }
         
     };
+    
+    /**
+     * Functions needed to create an implementation protocol.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ProtocolCreator {
 
+        /**
+         * Creates an invocables creator for a certain protocol.
+         * 
+         * @param host the host name to communicate with
+         * @param port the port number to communicate on
+         * @return the invocables creator
+         * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
+         * @see #createProtocolServerBuilder(String, int)
+         */
+        public InvocablesCreator createInvocablesCreator(String host, int port);
+
+        /**
+         * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
+         * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
+         * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
+         * {@link #createDeploymentRecipe(Endpoint)}.
+         * 
+         * @param port the port number to communicate on
+         * @return the builder instance
+         * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
+         * @see #createInvocablesCreator(String, String, int)
+         */
+        public ProtocolServerBuilder createProtocolServerBuilder(int port);
+        
+    }    
+    
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
+    
+    private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
+    private String[] protocols;
+
+    /**
+     * Creates the factory instance.
+     * 
+     * @see #accept(ProtocolCreator)
+     */
+    protected AasFactory() {
+        // load specified first so that refined classes can overwrite protocols on demand later in their constructor
+        ServiceLoader<ProtocolDescriptor> loader = ServiceLoader.load(ProtocolDescriptor.class);
+        Iterator<ProtocolDescriptor> iter = loader.iterator();
+        while (iter.hasNext()) {
+            ProtocolDescriptor desc = iter.next();
+            if (accept(desc)) {
+                ProtocolCreator creator = desc.createInstance();
+                registerProtocolCreator(desc.getName(), creator);
+                if (1 == protocolCreators.size()) {
+                    registerProtocolCreator(DEFAULT_PROTOCOL, creator);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Returns whether a protocol is considered acceptable for this factory. By default, we exclude all 
+     * {@link ExcludeFirst} annotated creators.
+     * 
+     * @param creator the creator to check
+     * @return {@code true} for acceptable, {@code false} else
+     */
+    protected boolean accept(ProtocolDescriptor creator) {
+        return !creator.getClass().isAnnotationPresent(ExcludeFirst.class);
+    }
+    
+    /**
+     * Returns the supported protocols.
+     * 
+     * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
+     * @see #createInvocablesCreator(String, String, int)
+     */
+    public String[] getProtocols() {
+        if (null == protocols) {
+            protocols = new String[protocolCreators.size()];
+            protocolCreators.keySet().toArray(protocols);
+        }
+        return protocols;
+    }
     
     /**
      * Returns the actual instance.
@@ -167,6 +244,16 @@ public abstract class AasFactory {
             instance = newInstance;
         }
         return oldInstance;
+    }
+    
+    /**
+     * Registers a protocol creator.
+     * 
+     * @param protocol the protocol name
+     * @param creator the creator
+     */
+    protected void registerProtocolCreator(String protocol, ProtocolCreator creator) {
+        protocolCreators.put(protocol, creator);
     }
     
     /**
@@ -250,25 +337,23 @@ public abstract class AasFactory {
     public abstract PersistenceRecipe createPersistenceRecipe();
     
     /**
-     * Returns the supported protocols.
-     * 
-     * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
-     * @see #createInvocablesCreator(String, String, int)
-     */
-    public abstract String[] getProtocols();
-    
-    /**
      * Creates an invocables creator for a certain protocol.
      * 
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}
      * @param host the host name to communicate with
      * @param port the port number to communicate on
-     * @return the invocables creator
+     * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
      * @see #createProtocolServerBuilder(String, int)
      */
-    public abstract InvocablesCreator createInvocablesCreator(String protocol, String host, int port);
+    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+        ProtocolCreator creator = protocolCreators.get(protocol);
+        if (null == creator) {
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+        }
+        return creator.createInvocablesCreator(host, port);
+    }
 
     /**
      * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
@@ -279,11 +364,17 @@ public abstract class AasFactory {
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}
      * @param port the port number to communicate on
-     * @return the builder instance
+     * @return the builder instance (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
      * @see #createInvocablesCreator(String, String, int)
      */
-    public abstract ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port);
+    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
+        ProtocolCreator creator = protocolCreators.get(protocol);
+        if (null == creator) {
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+        }
+        return creator.createProtocolServerBuilder(port);
+    }
     
     /**
      * Modifies a given {@code id} so that it fits the needs of the implementation.

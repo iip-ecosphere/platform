@@ -30,13 +30,32 @@ class DeploymentSpec {
     }
     
     /**
-     * Creates a deployment specification based on a given {@code endpoint}, but without setting the registry.
+     * Creates an unencrypted deployment specification based on a given {@code endpoint}, but without setting the 
+     * registry.
      * 
      * @param endpoint the endpoint
      */
     DeploymentSpec(Endpoint endpoint) {
+        this(endpoint, false, null, null);
+    }
+
+    /**
+     * Creates a deployment specification based on a given {@code endpoint}, but without setting the registry.
+     * 
+     * @param endpoint the endpoint
+     * @param isSecuredCon do we need a secure connection, then {@code keyPath} and {@code keyPass} must be given; else 
+     *     they are ignored
+     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
+     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
+     */
+    DeploymentSpec(Endpoint endpoint, boolean isSecuredCon, String keyPath,  String keyPass) {
         this.endpoint = endpoint;
-        this.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort());
+        if (isSecuredCon) {
+            this.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort(), true, 
+                keyPath, keyPass);
+        } else {
+            this.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort());
+        }
         this.contextConfig = new BaSyxContextConfiguration(
             endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort()) {
             

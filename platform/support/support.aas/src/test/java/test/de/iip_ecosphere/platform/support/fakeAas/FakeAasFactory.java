@@ -51,6 +51,24 @@ public class FakeAasFactory extends AasFactory {
         
     }
     
+    /**
+     * Creates a factory instance.
+     */
+    public FakeAasFactory() {
+        registerProtocolCreator(DEFAULT_PROTOCOL, new ProtocolCreator() {
+            
+            @Override
+            public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+                return new FakeProtocolServerBuilder();
+            }
+            
+            @Override
+            public InvocablesCreator createInvocablesCreator(String host, int port) {
+                return new FakeInvocablesCreator();
+            }
+        });
+    }
+    
     @Override
     public String getName() {
         return "fake";
@@ -84,21 +102,6 @@ public class FakeAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return null;
-    }
-
-    @Override
-    public String[] getProtocols() {
-        return new String[]{DEFAULT_PROTOCOL};
-    }
-
-    @Override
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        return new FakeInvocablesCreator();
-    }
-
-    @Override
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        return new FakeProtocolServerBuilder();
     }
 
 }

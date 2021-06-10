@@ -13,9 +13,30 @@
 package de.iip_ecosphere.platform.services.environment;
 
 /**
- * Template.
+ * Defines the service kind.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class App {
+public enum ServiceKind {
+
+    /**
+     * A source service providing some form of input data, e.g., a connector.
+     */
+    SOURCE_SERVICE,
+    
+    /**
+     * A transformation service in the widest sense, may be an AI service.
+     */
+    TRANSFORMATION_SERVICE,
+    
+    /**
+     * A sink service consuming data and not re-emitting data.
+     */
+    SINK_SERVICE,
+    
+    /**
+     * A probe service receiving data and turning it into alarms or monitoring information.
+     */
+    PROBE_SERVICE
+    
 }

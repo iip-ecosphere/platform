@@ -20,7 +20,7 @@ project Services {
    ServiceManager serviceManager = SpringCloudStream {
    };
    
-   Constraint serviceManagerDefined = isDefined(serviceManager) and serviceManager <> null;
+   Constraint serviceManagerDefined = isDefined(serviceManager);
    // TODO service manager requires corresponding broker
  
    abstract compound ServiceProtocol {
@@ -53,7 +53,7 @@ project Services {
    // might be too strict, but its ok for now
    //serviceProtocol.type == transportProtocol.type;
    
-   Constraint serviceProtocolDefined = isDefined(serviceProtocol) and serviceProtocol <> null;
+   Constraint serviceProtocolDefined = isDefined(serviceProtocol);
  
    freeze {
        // prevent later changes of constraint but make it referencable to .text

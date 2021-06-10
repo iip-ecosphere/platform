@@ -19,11 +19,19 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.servlet.http.HttpServlet;
+
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
+import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
+import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
+import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
+import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
@@ -48,7 +56,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class VabIipOperationsProvider extends HashMap<String, Object> {
+public class VabOperationsProvider extends HashMap<String, Object> {
 
     /**
      * The path separator.
@@ -170,36 +178,123 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class VabIipOperationsBuilder implements ProtocolServerBuilder {
+    static class VabTcpOperationsBuilder implements ProtocolServerBuilder {
 
         private int port;
-        private VabIipOperationsProvider instance;
+        private VabOperationsProvider instance;
         
         /**
          * Creates a builder instance.
          * 
          * @param port the target communication port
          */
-        VabIipOperationsBuilder(int port) {
+        VabTcpOperationsBuilder(int port) {
             this.port = port;
-            this.instance = new VabIipOperationsProvider();
+            this.instance = new VabOperationsProvider();
         }
         
         @Override
-        public VabIipOperationsBuilder defineOperation(String name, Function<Object[], Object> function) {
+        public VabTcpOperationsBuilder defineOperation(String name, Function<Object[], Object> function) {
             instance.defineServiceFunction(name, function);
             return this;
         }
 
         @Override
-        public VabIipOperationsBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+        public VabTcpOperationsBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
             instance.defineProperty(name, get, set);
             return this;
         }
 
         @Override
         public Server build() {
-            return BaSyxDeploymentRecipe.createControlComponent(instance.createModelProvider(), port);
+            BaSyxTCPServer<VABModelProvider> server = new BaSyxTCPServer<>(instance.createModelProvider(), port);
+            Server result = new Server() {
+
+                @Override
+                public Server start() {
+                    server.start();
+                    return this;
+                }
+
+                @Override
+                public void stop(boolean dispose) {
+                    server.stop();
+                }
+
+            };
+            return result;
+        }
+
+        @Override
+        public PayloadCodec createPayloadCodec() {
+            return new BaSyxVABTCPPayloadCodec();
+        }
+        
+    }
+    
+    /**
+     * The protocol server builder for this provider.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class VabHttpOperationsBuilder implements ProtocolServerBuilder {
+
+        private int port;
+        private Schema schema;
+        private VabOperationsProvider instance;
+        
+        /**
+         * Creates a builder instance.
+         * 
+         * @param port the target communication port
+         * @param schema the protocol schema, shall be {@link Schema#HTTP} or {@link Schema#HTTPS}
+         */
+        VabHttpOperationsBuilder(int port, Schema schema) {
+            this.port = port;
+            this.instance = new VabOperationsProvider();
+        }
+
+        @Override
+        public ProtocolServerBuilder defineOperation(String name, Function<Object[], Object> function) {
+            instance.defineServiceFunction(name, function);
+            return null;
+        }
+
+        @Override
+        public ProtocolServerBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+            instance.defineProperty(name, get, set);
+            return null;
+        }
+
+        @Override
+        public Server build() {
+            Endpoint endpoint = new Endpoint(schema, port, ""); // So far only default endpoints, no prefix
+            HttpServlet vabServlet = new VABHTTPInterface<IModelProvider>(instance.createModelProvider());
+            DeploymentSpec deploymentSpec = new DeploymentSpec(endpoint);
+            // schema == SCHEMA.HTTPS requires new DeploymentSpec(endpoint, true, keyPath, keyPass)
+            deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(endpoint.getEndpoint()) + "/*", 
+                vabServlet);
+            AASHTTPServer server = new AASHTTPServer(deploymentSpec.getContext());
+            Server result = new Server() {
+
+                @Override
+                public Server start() {
+                    server.start();
+                    return this;
+                }
+
+                @Override
+                public void stop(boolean dispose) {
+                    server.shutdown();
+                }
+
+            };
+            return result;
+        }
+
+        @Override
+        public PayloadCodec createPayloadCodec() {
+            return new BaSyxVABTCPPayloadCodec(); // TODO preliminary
         }
         
     }
@@ -207,7 +302,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
     /**
      * Creates a VAB operations provider instance.
      */
-    public VabIipOperationsProvider() {
+    public VabOperationsProvider() {
         super();
         put(getStatusPath(), status);
         put(getOperationsPath(), operations);
@@ -276,7 +371,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * @return <b>this</b>
      * @throws IllegalArgumentException if the operation is already registered
      */
-    public VabIipOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
+    public VabOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
         String uName = makeUnique(operationFunctions, category + "/" + name);
         Map<String, Entry> o = this.operations.get(category);
         if (null == o) {
@@ -301,7 +396,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * @see #defineOperation(String, String, Function)
      * @throws IllegalArgumentException if the operation is already registered
      */
-    public VabIipOperationsProvider defineServiceFunction(String name, Function<Object[], Object> function) {
+    public VabOperationsProvider defineServiceFunction(String name, Function<Object[], Object> function) {
         return defineOperation(getServicePath(), name, function);
     }
     
@@ -316,7 +411,7 @@ public class VabIipOperationsProvider extends HashMap<String, Object> {
      * @return <b>this</b>
      * @throws IllegalArgumentException if the property is already registered
      */
-    public VabIipOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+    public VabOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
         if (properties.containsKey(name)) {
             throw new IllegalArgumentException("Property " + name + " is already known");
         }

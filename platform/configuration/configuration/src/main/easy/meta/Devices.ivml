@@ -18,7 +18,7 @@ project Devices {
     ContainerManager containerManager = DockerContainerManager {
         dockerHost = "unix:///var/run/docker.sock"
     };
-    Constraint containerManagerDefined = isDefined(containerManager) and containerManager <> null;
+    Constraint containerManagerDefined = isDefined(containerManager);
     
     compound EcsDevice {
         String id;

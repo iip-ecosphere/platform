@@ -40,4 +40,9 @@ public class FakeProtocolServerBuilder implements ProtocolServerBuilder {
         return this;
     }
 
+    @Override
+    public PayloadCodec createPayloadCodec() {
+        return null;
+    }
+
 }

@@ -14,8 +14,12 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 
+import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
+
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
@@ -33,7 +37,10 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
  */
 public class BaSyxAasFactory extends AasFactory {
 
-    private static final String PROTOCOL_VAB_IIP = "VAB-IIP";
+    // package local, do not reference from outside
+    static final String PROTOCOL_VAB_TCP = "VAB-TCP";
+    static final String PROTOCOL_VAB_HTTP = "VAB-HTTP";
+    static final String PROTOCOL_VAB_HTTPS = "VAB-HTTPS";
     
     /**
      * Factory descriptor for Java Service Loader.
@@ -47,6 +54,75 @@ public class BaSyxAasFactory extends AasFactory {
             return new BaSyxAasFactory();
         }
         
+    }
+    
+    /**
+     * The VAB-TCP Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class VabTcpProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new BaSyxConnector(host, port)); 
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
+        }
+        
+    }
+    
+    /**
+     * The VAB-HTTP Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class VabHttpProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new HTTPConnector("http://" + host + ":" + port));
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP);
+        }
+        
+    }
+    
+    /**
+     * The VAB-HTTPS Protocol creator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    /*private static class VabHttpsProtocolCreator implements ProtocolCreator {
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String host, int port) {
+            return new VabInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
+                new BaSyxJerseyHttpsClientFactory())); // TODO for now with self-signed
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS);
+        }
+        
+    }*/
+    
+    /**
+     * Creates an instance.
+     */
+    public BaSyxAasFactory() {
+        VabTcpProtocolCreator tcp = new VabTcpProtocolCreator();
+        registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
+        registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
+        registerProtocolCreator(PROTOCOL_VAB_HTTP, new VabHttpProtocolCreator());
+        //registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
     }
     
     @Override
@@ -82,29 +158,6 @@ public class BaSyxAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return new BaSyxPersistenceRecipe();
-    }
-
-    @Override
-    public String[] getProtocols() {
-        return new String[] {DEFAULT_PROTOCOL, PROTOCOL_VAB_IIP};
-    }
-
-    @Override
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
-            return new VabIipInvocablesCreator(host, port);
-        } else {
-            throw new IllegalArgumentException("Unknown protocol: " + protocol);
-        }
-    }
-
-    @Override
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        if (DEFAULT_PROTOCOL.equals(protocol) || PROTOCOL_VAB_IIP.equals(protocol)) {
-            return new VabIipOperationsProvider.VabIipOperationsBuilder(port);
-        } else {
-            throw new IllegalArgumentException("Unknown protocol: " + protocol);
-        }
     }
 
 }

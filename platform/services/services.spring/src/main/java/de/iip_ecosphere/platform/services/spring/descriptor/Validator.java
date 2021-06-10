@@ -82,6 +82,7 @@ public class Validator {
         String msgContext = "";
         assertStringNotEmpty(artifact.getId(), "id", msgContext);
         assertStringNotEmpty(artifact.getName(), "name", msgContext);
+        assertVersion(artifact.getVersion(), "version", msgContext);
 
         Map<String, Type> typeMap = new HashMap<>();
         for (Type t : artifact.getTypes()) {
@@ -149,9 +150,7 @@ public class Validator {
             serviceIds.add(service.getId());
         }
         assertStringNotEmpty(service.getName(), "name", msgContext);
-        assertStringNotEmpty(service.getVersion(), "version", msgContext);
-        assertCondition(Version.isVersion(service.getVersion()), 
-            "Field 'version' must be formatted as a version string", msgContext);
+        assertVersion(service.getVersion(), "version", msgContext);
         assertFieldNotNull(service.getDescription(), "description", msgContext); // optional
         assertFieldNotNull(service.getKind(), "kind", msgContext);
         assertStringList(service.getCmdArg(), "cmdArg", "arg", msgContext);
@@ -338,6 +337,24 @@ public class Validator {
      */
     private boolean assertFieldNotNull(Object object, String field, String msgContext) {
         return assertCondition(object != null, "Field '" + field + "' must not be null", msgContext); 
+    }
+    
+    /**
+     * Asserts that {@code object} in a field is a version.
+     * 
+     * @param object the object to check
+     * @param field the field the string is taken from for composing an error message
+     * @param msgContext the context of the message/validate element for better location by the caller, ignored if 
+     *   empty or <b>null</b>
+     * @return {@code true} if successful, {@code false} if failed
+     */
+    private boolean assertVersion(Object object, String field, String msgContext) {
+        boolean ok = assertCondition(object instanceof Version, "Field '" + field + "' must be a version", msgContext);
+        if (ok) {
+            ok = assertCondition(Version.isVersion(object.toString()), 
+                "Field 'version' must be formatted as a version string", msgContext);
+        }
+        return ok;
     }
 
     /**

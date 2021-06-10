@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
@@ -77,15 +75,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public String addContainer(URI location) throws ExecutionException {
         String id = null;
-        //"file:///home/monika/SSE/platform/platform/resources/ecsRuntime.docker/src/test/resources/";
-        
         DockerContainerDescriptor container;
         try {
             FactoryDescriptor factory = new FactoryDescriptor();
             DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
             
             // Getting information about Docker image from image-info.yml
-            String pathToYaml = location.toString() + config.getDockerImageYamlFilename();
+            String pathToYaml = location.toString() + config.getDocker().getDockerImageYamlFilename();
             URI yamlURI = new URI(pathToYaml);
             File imageInfo = UriResolver.resolveToFile(yamlURI, null);
             container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
@@ -95,8 +91,11 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             String pathToImage = location.toString() + imageName;
             URI imageURI = new URI(pathToImage);
             String downloadDirectory = container.getDownloadDirectory();
-            File downloadDir = new File(downloadDirectory);            //TODO add file://
+            File downloadDir = new File(downloadDirectory);
             File image = UriResolver.resolveToFile(imageURI, downloadDir);
+            
+            String downloadedImageZipfile = image.getPath();
+            container.setDownloadedImageZipfile(downloadedImageZipfile);
             
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
@@ -139,7 +138,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      */
     public DockerClient getDockerClient() {
         DockerConfiguration config = DockerConfiguration.readFromYaml();
-        String dockerhost = config.getDockerHost();
+        String dockerhost = config.getDocker().getDockerHost();
         DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerhost).build(); 
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
@@ -161,7 +160,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void startContainer(String id) throws ExecutionException {
         DockerContainerDescriptor container = super.getContainer(id, "id", "start");
-        String dockerId = container.getDockerId(); // TODO check if dockerId not null
+        String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
@@ -207,23 +206,10 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         // Removing image from download directory
         FactoryDescriptor factory = new FactoryDescriptor();
         DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
-        if (config.getDeleteWhenUndeployed()) {
-            File downloadDirectory = new File(container.getDownloadDirectory());
-            File[] listOfFiles = downloadDirectory.listFiles();
-            for (File file : listOfFiles) {
-                String fileName = file.getName();
-                // Getting the name of the image file to delete (without extension e.g. .gz)
-                String imageZipfileName = container.getDockerImageZipfile();
-                int index = imageZipfileName.lastIndexOf(".");
-                String imageZipfileNameSubstring = imageZipfileName.substring(0, index);
-                Pattern pattern = Pattern.compile(imageZipfileNameSubstring);
-                Matcher matcher = pattern.matcher(fileName);
-                if (matcher.find()) {
-                    if (!file.delete()) {
-                        throw new ExecutionException(
-                                "Removing of the Docker image zipfile from the download directory failed", null);
-                    }
-                }
+        if (config.getDocker().getDeleteWhenUndeployed()) {
+            File downloadedImageZipfile = new File(container.getDownloadedImageZipfile());
+            if (downloadedImageZipfile.exists()) {
+                downloadedImageZipfile.delete();
             }
         }
         
@@ -256,7 +242,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      * @return docker container id/NULL
      * @throws ExecutionException if connecting to Docker API Client failed 
      */
-    public String getDockerId(String name) throws ExecutionException { // TODO what about retrun null ?
+    public String getDockerId(String name) throws ExecutionException {
         DockerClient dockerClient = this.getDockerClient();
         if (dockerClient == null) {
             throw new ExecutionException(

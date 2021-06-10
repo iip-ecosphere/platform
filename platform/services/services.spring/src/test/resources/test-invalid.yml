@@ -36,4 +36,4 @@ services:
       path:
       streamEndpoint:
       aasEndpoint:
-  - version: 1.a.b
+  - version: 1.0.2

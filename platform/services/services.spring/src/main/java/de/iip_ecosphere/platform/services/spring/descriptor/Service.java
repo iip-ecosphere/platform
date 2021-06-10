@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.List;
 
-import de.iip_ecosphere.platform.services.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -48,7 +48,7 @@ public interface Service {
      * 
      * @return the version
      */
-    public String getVersion();
+    public Version getVersion();
 
     /**
      * Returns the description of the service.
@@ -93,14 +93,14 @@ public interface Service {
     public Process getProcess();
     
     /**
-     * Sets the service kind. [required by SnakeYaml]
+     * Returns the service kind.
      * 
      * @return the service kind
      */
     public ServiceKind getKind();
     
     /**
-     * Sets whether this service is decentrally deployable.
+     * Returns whether this service is decentrally deployable.
      * 
      * @return {@code true} for deployable, {@code false} for not deployable 
      */

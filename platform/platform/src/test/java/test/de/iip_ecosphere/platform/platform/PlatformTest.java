@@ -48,7 +48,7 @@ public class PlatformTest {
         Assert.assertEquals(8082, cfg.getAas().getImplementation().getPort());
         Assert.assertEquals(Schema.TCP, cfg.getAas().getImplementation().getSchema());
         Assert.assertEquals("127.0.0.1", cfg.getAas().getImplementation().getHost());
-        Assert.assertEquals("VAB-IIP", cfg.getAas().getImplementation().getProtocol());
+        Assert.assertEquals("VAB-TCP", cfg.getAas().getImplementation().getProtocol());
         
         Assert.assertEquals(ConfiguredPersistenceType.MONGO, cfg.getAas().getPersistence());
 

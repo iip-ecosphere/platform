@@ -14,8 +14,10 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 /**
  * Helper functions for active AAS.
@@ -140,6 +142,34 @@ public class AasUtils {
      */
     public static String fixId(String id) {
         return AasFactory.getInstance().fixId(id);
+    }
+    
+    /**
+     * Reads the {@code index} argument from {@code} args as map of strings.
+     * 
+     * @param args the array to take the value from 
+     * @param index the 0-based index into {@code} args
+     * @param dflt default value if the {@code index} is wrong, there is no value/null ...
+     * @return the map
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> readMap(Object[] args, int index, Map<String, String> dflt) {
+        Object param = index >= 0 && index < args.length ? args[index] : null;
+        Map<String, String> result = dflt;
+        if (null != param) {
+            result = JsonUtils.fromJson(result, Map.class);
+        }
+        return result;
+    }
+    
+    /**
+     * Writes a map to JSON.
+     * 
+     * @param map the map
+     * @return the JSON representation
+     */
+    public static String writeMap(Map<String, String> map) {
+        return JsonUtils.toJson(map);
     }
 
 }

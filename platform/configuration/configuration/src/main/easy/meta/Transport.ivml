@@ -7,7 +7,7 @@ project Transport {
     // enum for now
     enum Serializer { Json, ProtoBuf };
     Serializer serializer = Serializer::Json;
-    Constraint serializerDefined = isDefined(serializer) and serializer <> null;
+    Constraint serializerDefined = isDefined(serializer);
 
     // ----------------------------------------------
     
@@ -32,7 +32,7 @@ project Transport {
     TransportProtocol transportProtocol = TransportProtocolAMQP {
     };
     
-    Constraint transportProtocolDefined = isDefined(transportProtocol) and transportProtocol<> null;
+    Constraint transportProtocolDefined = isDefined(transportProtocol);
     
     // TODO 
     // - transport protocol playload limitation

@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import javax.servlet.http.HttpServlet;
 
@@ -26,13 +25,9 @@ import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.submodel.restapi.SubModelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
-import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
-import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
-import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -172,46 +167,6 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         
         deploymentSpec.getContext().addServletMapping("/" + Tools.idToUrlPath(aas.getIdShort()) + "/*", aasServlet);
         deploymentSpec.putDescriptor(aas.getIdShort(), new BaSyxAasDescriptor(fullProvider, aasDescriptor));
-    }
-
-    /** 
-     * This method creates a control component.
-     * 
-     * @param cc the control component (usually hash-based model provider)
-     * @param port the port to run on
-     * @return the server instance
-     * @see #createControlComponent(VABModelProvider, int)
-     */
-    public static Server createControlComponent(HashMap<String, Object> cc, int port) {
-        // Server where the control component is reachable.
-        return createControlComponent(new VABMapProvider(cc), port);
-    }
-
-    /** 
-     * This method creates a control component for a model provider.
-     * 
-     * @param provider the model provider
-     * @param port the port to run on
-     * @return the server instance
-     */
-    public static Server createControlComponent(VABModelProvider provider, int port) {
-        // Server where the control component is reachable.
-        BaSyxTCPServer<VABModelProvider> server = new BaSyxTCPServer<>(provider, port);
-        Server result = new Server() {
-
-            @Override
-            public Server start() {
-                server.start();
-                return this;
-            }
-
-            @Override
-            public void stop(boolean dispose) {
-                server.stop();
-            }
-
-        };
-        return result;
     }
 
 }

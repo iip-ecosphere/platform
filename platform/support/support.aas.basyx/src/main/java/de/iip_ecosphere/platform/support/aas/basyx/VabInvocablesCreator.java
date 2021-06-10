@@ -18,52 +18,50 @@ import java.util.function.Supplier;
 
 import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
+import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.protocol.api.IBaSyxConnector;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 
 /**
- * implements an invocables creator for the VAB following the naming conventions of {@link VabIipOperationsProvider}.
+ * implements an invocables creator for the VAB following the naming conventions of {@link VabOperationsProvider}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class VabIipInvocablesCreator implements InvocablesCreator {
+public class VabInvocablesCreator implements InvocablesCreator {
 
-    private String host;
-    private int port;
+    private IModelProvider provider;
     
     /**
      * Creates an invocables creator instance.
      * 
-     * @param host the host to communicate with
-     * @param port the port to communicate on
+     * @param connector the connector to use
      */
-    VabIipInvocablesCreator(String host, int port) {
-        this.host = host;
-        this.port = port;
+    VabInvocablesCreator(IBaSyxConnector connector) {
+        this.provider = new JSONConnector(connector); 
     }
     
     @Override
     public Supplier<Object> createGetter(String name) {
         return () -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            return proxy.getModelPropertyValue(VabIipOperationsProvider.PREFIX_STATUS + name);
+            VABElementProxy proxy = new VABElementProxy("", provider);
+            return proxy.getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name);
         };
     }
 
     @Override
     public Consumer<Object> createSetter(String name) {
         return (params) -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            proxy.setModelPropertyValue(VabIipOperationsProvider.PREFIX_STATUS + name, params);
+            VABElementProxy proxy = new VABElementProxy("", provider);
+            proxy.setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name, params);
         };
     }
 
     @Override
     public Function<Object[], Object> createInvocable(String name) {
         return (params) -> {
-            VABElementProxy proxy = new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
-            return proxy.invokeOperation(VabIipOperationsProvider.PREFIX_SERVICE + name, params);
+            VABElementProxy proxy = new VABElementProxy("", provider);
+            return proxy.invokeOperation(VabOperationsProvider.PREFIX_SERVICE + name, params);
         };
     }
 

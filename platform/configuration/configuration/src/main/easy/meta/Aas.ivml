@@ -7,9 +7,9 @@ project Aas {
     // enum for now
     enum AasImpl { BaSyx };
     AasImpl aas = AasImpl::BaSyx;
-    Constraint aasDefined = isDefined(aas) and aas <> null;
+    isDefined(aas);
 
-    enum AasProtocol { Default, VAB };
+    enum AasProtocol { Default, VAB_TCP };
     enum AasSchema {HTTP, HTTPS, TCP};
     enum Persistency {INMEMORY, MONGO};
 
@@ -28,27 +28,18 @@ project Aas {
     }
 
     compound ImplAddress refines EphemeralServerAddress {
-        AasProtocol protocol = AasProtocol::VAB;
+        AasProtocol protocol = AasProtocol::VAB_TCP;
     	AasSchema schema = AasSchema::TCP;
+    	isDefined(aasProtocol);
     }
-    //Constraint aasProtocolDefined = isDefined(aasProtocol) and aasProtocol <> null;
     
     EndpointAddress aasServer;
-    Constraint aasServerDefined = isDefined(aasServer) and aasServer <> null;
+    isDefined(aasServer);
     EndpointAddress aasRegistryServer;
-    Constraint aasRegistryServerDefined = isDefined(aasRegistryServer) and aasRegistryServer <> null;
+    isDefined(aasRegistryServer);
     ImplAddress aasImplServer;
-    Constraint aasImplServerDefined = isDefined(aasImplServer) and aasImplServer <> null;
+    isDefined(aasImplServer);
     Persistency aasPersistency = Persistency::INMEMORY;
-    Constraint aasPersistencyDefined = isDefined(aasPersistency) and aasPersistency <> null;
-
-    freeze {
-        // prevent later changes of constraint but make it referencable to .text
-        aasDefined;
-        aasServerDefined;
-        aasRepositoryServerDefined;
-        aasImplServerDefined;
-        //aasProtocolDefined;
-    };
+    isDefined(aasPersistency);
     
 }

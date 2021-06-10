@@ -14,7 +14,6 @@ package test.de.iip_ecosphere.platform.services;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
-import de.iip_ecosphere.platform.services.ServiceKind;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Version;

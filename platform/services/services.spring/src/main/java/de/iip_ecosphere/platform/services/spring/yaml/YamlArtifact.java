@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
@@ -27,49 +28,29 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlArtifact implements Artifact {
+public class YamlArtifact extends AbstractYamlArtifact implements Artifact { 
+    // inheritance from Service environment with <S> does not work with yaml
 
-    private String id;
-    private String name;
     private List<YamlService> services;
     private List<YamlType> types = new ArrayList<>();
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
     
     @Override
     public List<YamlService> getServices() {
         return services;
     }
-
+    
     @Override
     public List<YamlType> getTypes() {
         return types;
     }
 
     /**
-     * Defines the id of the service. [required by SnakeYaml]
+     * Sets the declared types. [required by SnakeYaml]
      * 
-     * @param id the id
+     * @param types the types
      */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Defines the name of the service. [required by SnakeYaml]
-     * 
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
+    public void setTypes(List<YamlType> types) {
+        this.types = types;
     }
     
     /**
@@ -82,15 +63,6 @@ public class YamlArtifact implements Artifact {
     }
 
     /**
-     * Sets the declared types. [required by SnakeYaml]
-     * 
-     * @param types the types
-     */
-    public void setTypes(List<YamlType> types) {
-        this.types = types;
-    }
-
-    /**
      * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
      * Use {@link Validator} to test the returned instance for validity.
      * 
@@ -99,8 +71,8 @@ public class YamlArtifact implements Artifact {
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
         YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
-        if (null == result.services) {
-            result.services = new ArrayList<>();
+        if (null == result.getServices()) {
+            result.setServices(new ArrayList<>());
         }
         return result;
     }

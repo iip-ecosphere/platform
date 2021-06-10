@@ -13,5 +13,5 @@ aas:
         schema: TCP
         host: 127.0.0.1
         port: 8082
-        protocol: VAB-IIP
+        protocol: VAB-TCP
     persistence: MONGO        
