@@ -55,6 +55,16 @@ public abstract class AbstractService implements Service {
         this.state = ServiceState.AVAILABLE;
     }
 
+    /**
+     * Creates an abstract service from YAML information.
+     * 
+     * @param yaml the service information as read from YAML
+     */
+    protected AbstractService(YamlService yaml) {
+        this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
+            yaml.getKind());
+    }
+
     // checkstyle: resume parameter number check
     
     @Override
@@ -95,6 +105,20 @@ public abstract class AbstractService implements Service {
     @Override
     public ServiceKind getKind() {
         return kind;
+    }
+    
+    @Override
+    public void activate() throws ExecutionException {
+        if (getState() == ServiceState.PASSIVATED) {
+            setState(ServiceState.RUNNING);
+        }
+    }
+
+    @Override
+    public void passivate() throws ExecutionException {
+        if (getState() == ServiceState.RUNNING) {
+            setState(ServiceState.PASSIVATED);
+        }
     }
 
 }
