@@ -23,12 +23,16 @@ import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Abstract {@link ServiceDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 
  * statemachine. We do not protect the setters here explicitly, e.g., through a builder pattern as we assume that 
- * the respective messages will only be called within the package of the implementing manager.
+ * the respective messages will only be called within the package of the implementing manager. 
+ * 
+ * Holds a {@link ServiceStub} while the underlying service instance is operational. Must be set by the service manager,
+ * will be released when state goes to {@link ServiceState#STOPPING}.
  * 
  * @param <A> the type of artifact descriptor
  * @author Holger Eichelberger, SSE
@@ -46,6 +50,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private List<TypedDataDescriptor> parameters = new ArrayList<>(); 
     private List<TypedDataConnectorDescriptor> input = new ArrayList<>(); 
     private List<TypedDataConnectorDescriptor> output = new ArrayList<>(); 
+    private ServiceStub stub;
     
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
@@ -62,14 +67,27 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         this.version = version;
         this.state = ServiceState.AVAILABLE;
     }
+    
+    /**
+     * Returns the utilized artifact descriptor class.
+     * 
+     * @return the class
+     */
+    protected abstract Class<A> getArtifactDescriptorClass();
 
     /**
      * Defines an artifact.
      * 
      * @param artifact the containing artifact descriptor
      */
-    protected void setArtifact(A artifact) {
-        this.artifact = artifact;
+    protected void setArtifact(ArtifactDescriptor artifact) {
+        Class<A> cls = getArtifactDescriptorClass();
+        if (cls.isInstance(artifact)) {
+            this.artifact = cls.cast(artifact);
+        } else {
+            throw new IllegalArgumentException("artifact is not of type " 
+                + getArtifactDescriptorClass().getClass().getName());
+        }
     }
     
     /**
@@ -90,46 +108,64 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     
     @Override
     public String getId() {
-        return id;
+        return id; // no stub here, we shall have consistent information
     }
 
     @Override
     public String getName() {
-        return name;
+        return name; // no stub here, we shall have consistent information
     }
 
     @Override
     public Version getVersion() {
-        return version;
+        return version; // no stub here, we shall have consistent information
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return description; // no stub here, we shall have consistent information
     }
 
     @Override
     public ServiceState getState() {
-        return null != getEnsembleLeader() ? getEnsembleLeader().getState() : state;
+        ServiceState result;
+        ServiceDescriptor leader = getEnsembleLeader();
+        if (null != leader) {
+            result = leader.getState();
+
+            /*else if (null != stub) {
+                result = stub.getState();
+                this.state = result; // keep the descriptor up to date
+            } */            
+            
+        } else {
+            result = state;
+        }
+        return result;
     }
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         if (null != getEnsembleLeader()) {
+            // TODO true for all states?
             getEnsembleLeader().setState(state);
         } else {
+            // if there is a stub, this is just a shadow state; agreement check may be needed
             this.state = state;
-        }        
+        }
+        if (ServiceState.STOPPING == state) {
+            stub = null;
+        }
     }
 
     @Override
     public boolean isDeployable() {
-        return isDeployable;
+        return isDeployable; // no stub here, we shall have consistent information
     }
 
     @Override
     public ServiceKind getKind() {
-        return kind;
+        return kind; // no stub here, we shall have consistent information
     }
     
     @Override
@@ -150,6 +186,24 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     @Override
     public List<TypedDataConnectorDescriptor> getOutputDataConnectors() {
         return Collections.unmodifiableList(output); 
+    }
+    
+    /**
+     * Returns a service stub to control the service when it is running.
+     *  
+     * @return the service stub (may be <b>null</b> if the service is only available or about to be removed)
+     */
+    protected ServiceStub getStub() {
+        return stub;
+    }
+    
+    /**
+     * Defines the actual service stub.
+     * 
+     * @param stub the stub
+     */
+    protected void setStub(ServiceStub stub) {
+        this.stub = stub;
     }
     
     /**

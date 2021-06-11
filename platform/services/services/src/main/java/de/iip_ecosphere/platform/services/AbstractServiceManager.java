@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -36,7 +37,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractServiceManager<A extends AbstractArtifactDescriptor<S>, 
-    S extends AbstractServiceDescriptor> implements ServiceManager {
+    S extends AbstractServiceDescriptor<A>> implements ServiceManager {
 
     private Map<String, A> artifacts = Collections.synchronizedMap(new HashMap<>());
 
@@ -165,6 +166,58 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                 + ". Cannot migrate service.", null);
         }
     }
+    
+    @Override
+    public void passivateService(String serviceId) throws ExecutionException {
+        S service = getServiceDescriptor(serviceId, "serviceId", "passivate");
+        ServiceStub stub = service.getStub();
+        if (ServiceState.RUNNING == service.getState() || null == stub) {
+            setState(service, ServiceState.PASSIVATING);
+            stub.passivate();
+            setState(service, ServiceState.PASSIVATED);
+        } else {
+            throw new ExecutionException("Cannot passivate service '" + serviceId + "'as it is in state " 
+                + service.getState() + "/not running.", null);
+        }
+    }
+    
+    @Override
+    public void activateService(String serviceId) throws ExecutionException {
+        S service = getServiceDescriptor(serviceId, "serviceId", "activate");
+        ServiceStub stub = service.getStub();
+        if (ServiceState.PASSIVATED == service.getState() || null == stub) {
+            stub.activate();
+            setState(service, ServiceState.RUNNING);
+        } else {
+            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
+        }
+    }
+
+    
+    @Override
+    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
+        S service = getServiceDescriptor(serviceId, "serviceId", "reconfigure");
+        ServiceStub stub = service.getStub();
+        if (stub != null) {
+            ServiceState state = service.getState();
+            setState(service, ServiceState.RECONFIGURING);
+            stub.reconfigure(values);
+            setState(service, state);
+        } else {
+            throw new ExecutionException("Cannot reconfigure service '" + serviceId + "'as it is in state " 
+                + service.getState() + "/not running.", null);
+        }
+    }
+    
+    /**
+     * Returns the service stub for implementing the service operations.
+     * 
+     * @param service the service to return the stub for
+     * @return the stub, may be <b>null</b> if the service is not running
+     */
+    protected ServiceStub getStub(S service) {
+        return service.getStub();
+    }
 
     /**
      * Returns a service descriptor.
@@ -224,7 +277,6 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         ServicesAas.notifyServiceStateChanged(old, service);
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public List<TypedDataDescriptor> getParameters(String serviceId) {
         List<TypedDataDescriptor> result = null;
@@ -235,7 +287,6 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<TypedDataConnectorDescriptor> getInputDataConnectors(String serviceId) {
         List<TypedDataConnectorDescriptor> result = null;
@@ -246,7 +297,6 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<TypedDataConnectorDescriptor> getOutputDataConnectors(String serviceId) {
         List<TypedDataConnectorDescriptor> result = null;
