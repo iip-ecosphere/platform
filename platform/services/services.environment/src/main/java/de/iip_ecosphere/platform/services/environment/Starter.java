@@ -39,7 +39,7 @@ public class Starter {
      * 
      * @param args the arguments
      */
-    public static void parse(String[] args) {
+    public static void parse(String... args) {
         AasFactory factory = AasFactory.getInstance();
         int port = getIntArg(args, PARAM_IIP_PORT, -1);
         if (port < 0) {
