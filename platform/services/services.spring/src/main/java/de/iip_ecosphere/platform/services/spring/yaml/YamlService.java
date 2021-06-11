@@ -44,8 +44,9 @@ public class YamlService extends de.iip_ecosphere.platform.services.environment.
     public List<String> getCmdArg(int port, String protocol) {
         List<String> result = new ArrayList<String>();
         for (String arg : cmdArg) {
-            result.add(arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port)));
-            result.add(arg.replace(PROTOCOL_PLACEHOLDER, String.valueOf(protocol)));
+            arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
+            arg = arg.replace(PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
+            result.add(arg);
         }
         return result;
     }

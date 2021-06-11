@@ -29,6 +29,7 @@ services:
     cmdArg: 
       - arg-0-1
       - arg-0-2
+      - --arg3=${protocol}@${port}
     ensembleWith: id-1
     relations:
       - endpoint:

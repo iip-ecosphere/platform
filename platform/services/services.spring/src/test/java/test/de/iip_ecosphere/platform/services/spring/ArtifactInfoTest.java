@@ -71,7 +71,8 @@ public class ArtifactInfoTest {
         YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
-        assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
+        assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2", "--arg3=${protocol}@${port}");
+        assertStringList(service.getCmdArg(1234, "TCP"), "arg-0-1", "arg-0-2", "--arg3=TCP@1234");
         Assert.assertEquals(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(2, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
