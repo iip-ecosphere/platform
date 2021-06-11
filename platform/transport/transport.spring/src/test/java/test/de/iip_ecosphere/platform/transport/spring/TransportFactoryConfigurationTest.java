@@ -9,7 +9,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 
 /**
  * Brings up a spring application doing nothing rather than testing the automatic configuration of the transport
@@ -30,8 +29,7 @@ public class TransportFactoryConfigurationTest {
         SpringApplication.run(TransportFactoryConfigurationTest.class);
         Assert.assertTrue(TransportFactory.createConnector() instanceof FakeTransportConnector1);
         Assert.assertTrue(TransportFactory.createIpcConnector() instanceof FakeTransportConnector2);
-        Assert.assertTrue(TransportFactory.createDirectMemoryConnector() 
-            instanceof DirectMemoryTransferTransportConnector);
+        Assert.assertNotNull(TransportFactory.createDirectMemoryConnector()); // someone from before
     }
 
 }
