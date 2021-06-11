@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import de.iip_ecosphere.platform.transport.DefaultTransportFactoryDescriptor;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -75,15 +77,14 @@ public class DirectMemoryTransportConnectorTest {
     private static final TransportConnector MY_FAKE_CONNECTOR = new FakeConnector();
     
     /**
-     * Tests the connector through explicitly setting/resetting the factory
-     * implementation.
+     * A descriptor for testing.
      * 
-     * @throws IOException in case that connection/communication fails
+     * @author Holger Eichelberger, SSE
      */
-    @Test
-    public void testMemoryConnector() throws IOException {
-        // just for the test as it is based on the factory
-        ConnectorCreator dmc = new ConnectorCreator() {
+    @ExcludeFirst
+    public static class TestFactoryDescriptor extends DefaultTransportFactoryDescriptor {
+
+        private ConnectorCreator dmc = new ConnectorCreator() {
 
             @Override
             public TransportConnector createConnector() {
@@ -97,7 +98,7 @@ public class DirectMemoryTransportConnectorTest {
             
         };
         
-        ConnectorCreator fake = new ConnectorCreator() {
+        private ConnectorCreator fake = new ConnectorCreator() {
 
             @Override
             public TransportConnector createConnector() {
@@ -110,12 +111,34 @@ public class DirectMemoryTransportConnectorTest {
             }
 
         };
+               
+        @Override
+        public ConnectorCreator getMainCreator() {
+            return dmc;
+        }
 
-        ConnectorCreator mainOld = TransportFactory.setMainImplementation(dmc);
-        ConnectorCreator ipcOld = TransportFactory.setIpcImplementation(fake);
-        ConnectorCreator dmOld = TransportFactory.setDmImplementation(fake);
+        @Override
+        public ConnectorCreator getIpcCreator() {
+            return fake;
+        }
 
-        // as we have constants above, 
+        @Override
+        public ConnectorCreator getDmCreator() {
+            return fake;
+        }
+
+    }
+    
+    /**
+     * Tests the connector through explicitly setting/resetting the factory
+     * implementation.
+     * 
+     * @throws IOException in case that connection/communication fails
+     */
+    @Test
+    public void testMemoryConnector() throws IOException {
+        // Assuming that TestFactoryDescriptor has been loaded
+        
         Assert.assertTrue(TransportFactory.createConnector() == MY_DM_CONNECTOR);
         Assert.assertTrue(TransportFactory.createDirectMemoryConnector() == MY_FAKE_CONNECTOR);
         Assert.assertTrue(TransportFactory.createIpcConnector() == MY_FAKE_CONNECTOR);
@@ -125,10 +148,6 @@ public class DirectMemoryTransportConnectorTest {
         AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
         MY_DM_CONNECTOR.clear(); // just as we want to have constants
         AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
-        
-        TransportFactory.setMainImplementation(mainOld);
-        TransportFactory.setMainImplementation(ipcOld);
-        TransportFactory.setMainImplementation(dmOld);
     }
 
 }

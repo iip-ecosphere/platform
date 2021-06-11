@@ -10,8 +10,10 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport;
 
+import java.util.Optional;
+
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 
 /**
  * A factory for creating transport connector instances. This factory shall
@@ -47,28 +49,10 @@ public class TransportFactory {
         
     }
     
-    /**
-     * The default factory implementation (to be able to return to this instance if needed).
-     */
-    private static final ConnectorCreator DEFAULT = new ConnectorCreator() {
-
-        @Override
-        public TransportConnector createConnector() {
-            return new DirectMemoryTransferTransportConnector();
-        }
-
-        @Override
-        public String getName() {
-            return DirectMemoryTransferTransportConnector.NAME;
-        }
-        
-    };
-    
-    private static ConnectorCreator mainCreator = DEFAULT;
-    
-    private static ConnectorCreator ipcCreator = DEFAULT;
-    
-    private static ConnectorCreator dmCreator = DEFAULT;
+    private static ConnectorCreator mainCreator = DefaultTransportFactoryDescriptor.DEFAULT_DM_CREATOR;
+    private static ConnectorCreator ipcCreator = DefaultTransportFactoryDescriptor.DEFAULT_DM_CREATOR;
+    private static ConnectorCreator dmCreator = DefaultTransportFactoryDescriptor.DEFAULT_DM_CREATOR;
+    private static boolean initialized = false;
 
     /**
      * Changes the main factory implementation. May be replaced by an injection-based
@@ -115,6 +99,32 @@ public class TransportFactory {
         return old;
     }
     
+    /**
+     * Initializes the factory if not already done.
+     */
+    private static void initialize() {
+        if (!initialized) {
+            Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.findFirst(TransportFactoryDescriptor.class);
+            if (desc.isPresent()) {
+                TransportFactoryDescriptor descriptor = desc.get();
+                mainCreator = getCreator(descriptor.getMainCreator(), mainCreator);
+                ipcCreator = getCreator(descriptor.getIpcCreator(), ipcCreator);
+                dmCreator = getCreator(descriptor.getDmCreator(), dmCreator);
+            } 
+            initialized = true;
+        } 
+    }
+    
+    /**
+     * Returns either {@code creator} if not <b>null</b> or {@code dflt}.
+     * 
+     * @param creator the primary creator to return (if not <b>null</b>)
+     * @param dflt the default creator to return if the primary creator is not present
+     * @return the creator, either {@code creator} or {@code dflt}
+     */
+    private static ConnectorCreator getCreator(ConnectorCreator creator, ConnectorCreator dflt) {
+        return null == creator ? dflt : creator;
+    }
 
     /**
      * Creates a connector instance.
@@ -122,6 +132,7 @@ public class TransportFactory {
      * @return the created connector instance
      */
     public static TransportConnector createConnector() {
+        initialize();
         return mainCreator.createConnector();
     }
     
@@ -131,6 +142,7 @@ public class TransportFactory {
      * @return the created connector instance
      */
     public static TransportConnector createIpcConnector() {
+        initialize();
         return ipcCreator.createConnector();
     }
     
@@ -140,6 +152,7 @@ public class TransportFactory {
      * @return the direct memory connector instance
      */
     public static TransportConnector createDirectMemoryConnector() {
+        initialize();
         return dmCreator.createConnector();
     }
     
@@ -149,6 +162,7 @@ public class TransportFactory {
      * @return the descriptive name
      */
     public static String getConnectorName() {
+        initialize();
         return mainCreator.getName();
     }
 
