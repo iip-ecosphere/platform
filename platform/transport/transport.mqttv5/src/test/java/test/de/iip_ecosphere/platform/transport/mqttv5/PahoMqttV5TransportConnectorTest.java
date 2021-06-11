@@ -18,8 +18,6 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
@@ -42,20 +40,6 @@ public class PahoMqttV5TransportConnectorTest {
      */
     @Test(timeout = 180 * 1000)
     public void testPahoConnector() throws IOException {
-        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
-
-            @Override
-            public TransportConnector createConnector() {
-                return new PahoMqttV5TransportConnector();
-            }
-
-            @Override
-            public String getName() {
-                return PahoMqttV5TransportConnector.NAME;
-            }
-            
-        });
-
         Assert.assertEquals(PahoMqttV5TransportConnector.NAME, TransportFactory.getConnectorName());
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
         TestHiveMqServer server = new TestHiveMqServer(addr);
@@ -63,7 +47,6 @@ public class PahoMqttV5TransportConnectorTest {
         AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
         AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
         server.stop(true);
-        TransportFactory.setMainImplementation(old);
     }
 
 }
