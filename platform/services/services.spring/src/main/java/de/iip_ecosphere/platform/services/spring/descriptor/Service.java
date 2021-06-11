@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -29,6 +30,8 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public interface Service {
 
+    public static final String PROTOCOL_PLACEHOLDER = "${protocol}";
+    
     /**
      * Returns the name of the service.
      * 
@@ -58,12 +61,24 @@ public interface Service {
     public String getDescription();
 
     /**
-     * Returns the command line arguments.
+     * Returns additional/optional command line arguments required to start the service. Placeholders are not replaced. 
      * 
      * @return the command line arguments (may be empty for none)
      */
     public List<String> getCmdArg();
-
+    
+    /**
+     * Returns additional/optional command line arguments required to start the service. The port placeholder
+     * {@link Endpoint#PORT_PLACEHOLDER} will be replaced with the command port the platform is using to send
+     * administrative commands to the service (see {@link de.iip_ecosphere.platform.services.environment.Service}).
+     * Similarly {@link #PROTOCOL_PLACEHOLDER} will be replaced with the AAS {@link AasFactory#getProtocols() protocol}.
+     
+     * @param port the port used for the command communication
+     * @param protocol the protocol used for the command communication
+     * @return the resolved command line arguments (may be empty for none)
+     */
+    public List<String> getCmdArg(int port, String protocol);
+    
     /**
      * Returns the service id of the ensemble leader. The ensemble services shall then be started on its own.
      * 

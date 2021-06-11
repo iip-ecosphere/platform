@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
@@ -24,6 +25,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
@@ -31,6 +34,8 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -45,6 +50,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private Service service;
     private SpringCloudServiceDescriptor ensembleLeader;
     private String deploymentId;
+    private List<String> portKeys = new ArrayList<String>();
     
     /**
      * Creates an instance.
@@ -73,6 +79,37 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         }
     }
     
+    @Override
+    protected Class<SpringCloudArtifactDescriptor> getArtifactDescriptorClass() {
+        return SpringCloudArtifactDescriptor.class;
+    }
+    
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        super.setState(state);
+        if (ServiceState.STOPPING == state) {
+            NetworkManager mgr = NetworkManagerFactory.getInstance();
+            for (String key : portKeys) {
+                mgr.releasePort(key);
+            }
+        }
+    }
+
+    /**
+     * Obtains a network port and registers it if necessary for release in {@link #setState(ServiceState)}.
+     * 
+     * @param mgr the network manager instance
+     * @param key the key to obtain the network address
+     * @return the obtained address
+     */
+    private ManagedServerAddress registerPort(NetworkManager mgr, String key) {
+        ManagedServerAddress result = mgr.obtainPort(key);
+        if (result.isNew()) {
+            portKeys.add(key);
+        }
+        return result;
+    }
+    
     /**
      * Defines the ensemble leader.
      * 
@@ -94,6 +131,16 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     @Override
     public SpringCloudServiceDescriptor getEnsembleLeader() {
         return ensembleLeader;
+    }
+    
+    /**
+     * Returns the network manager key used by this descriptor to allocate dynamic network ports for service commands.
+     * 
+     * @param serviceId the service id
+     * @return the key
+     */
+    public static String getServiceCommandNetworkMgrKey(String serviceId) {
+        return "admin_" + serviceId;
     }
     
     /**
@@ -120,7 +167,12 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
             List<String> cmdLine = new ArrayList<String>();
-            cmdLine.addAll(service.getCmdArg());
+            ManagedServerAddress adminAdr = registerPort(mgr, getServiceCommandNetworkMgrKey(getId()));
+            String serviceProtocol = config.getServiceProtocol();
+            cmdLine.addAll(service.getCmdArg(adminAdr.getPort(), serviceProtocol));
+            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
+                adminAdr.getHost(), adminAdr.getPort());
+            setStub(new ServiceStub(iCreator, getId()));
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
@@ -133,14 +185,14 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             de.iip_ecosphere.platform.services.spring.descriptor.Process proc = service.getProcess();
             if (null != proc) {
                 // TODO consider isGeneric
-                ManagedServerAddress adr = mgr.obtainPort(getStreamingNetmanagerKey()); // TODO release on stop
+                ManagedServerAddress adr = registerPort(mgr, getStreamingNetmanagerKey());
                 addEndpointArgs(cmdLine, proc.getServiceStreamEndpoint(), adr);
 
                 List<String> procCmdLine = new ArrayList<String>();
                 procCmdLine.addAll(proc.getCmdArg());
                 addEndpointArgs(cmdLine, proc.getStreamEndpoint(), adr);
 
-                ManagedServerAddress adrAas = mgr.obtainPort(getAasNetmanagerKey()); // TODO release on stop??
+                ManagedServerAddress adrAas = registerPort(mgr, getAasNetmanagerKey());
                 addEndpointArgs(cmdLine, proc.getAasEndpoint(), adrAas);
 
                 // TODO start process before, consider started

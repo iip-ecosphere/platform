@@ -17,6 +17,7 @@ import java.io.File;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 
 /**
@@ -36,6 +37,7 @@ public class SpringCloudServiceConfiguration {
     private int waitingTime = 30000;
     private int availabilityRetryDelay = 500;
     private AasSetup aas = new AasSetup();
+    private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
 
     /**
      * Returns the name of the broker host.
@@ -107,6 +109,15 @@ public class SpringCloudServiceConfiguration {
      */
     public AasSetup getAas() {
         return aas;
+    }
+    
+    /**
+     * Returns the service administration protocol.
+     * 
+     * @return the service administration protocol (see {@link AasFactory#getProtocols()}
+     */
+    public String getServiceProtocol() {
+        return serviceProtocol;
     }
 
     /**
@@ -181,6 +192,15 @@ public class SpringCloudServiceConfiguration {
      */
     public void setAas(AasSetup aas) {
         this.aas = aas;
+    }
+
+    /**
+     * Defines the service administration protocol.
+     * 
+     * @param serviceProtocol the service administration protocol (see {@link AasFactory#getProtocols()}
+     */
+    public void setServiceProtocol(String serviceProtocol) {
+        this.serviceProtocol = serviceProtocol;
     }
 
 }

@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 
 /**
@@ -37,6 +38,16 @@ public class YamlService extends de.iip_ecosphere.platform.services.environment.
     @Override
     public List<String> getCmdArg() {
         return cmdArg;
+    }
+
+    @Override
+    public List<String> getCmdArg(int port, String protocol) {
+        List<String> result = new ArrayList<String>();
+        for (String arg : cmdArg) {
+            result.add(arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port)));
+            result.add(arg.replace(PROTOCOL_PLACEHOLDER, String.valueOf(protocol)));
+        }
+        return result;
     }
     
     @Override
@@ -78,7 +89,7 @@ public class YamlService extends de.iip_ecosphere.platform.services.environment.
     public int getCpus() {
         return cpus;
     }
-
+    
     /**
      * Defines the command line arguments. [required by SnakeYaml]
      * 
@@ -86,8 +97,8 @@ public class YamlService extends de.iip_ecosphere.platform.services.environment.
      */
     public void setCmdArg(List<String> cmdArg) {
         this.cmdArg = cmdArg;
-    }
-
+    }    
+    
     /**
      * Defines the service id of the ensemble leader starting this service. [required by SnakeYaml]
      * 

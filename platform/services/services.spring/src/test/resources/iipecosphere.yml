@@ -16,4 +16,5 @@ service-mgr:
   brokerHost: localhost
   brokerPort: 8883
   availabilityRetryDelay: 500
+  serviceProtocol: VAB-TCP
   

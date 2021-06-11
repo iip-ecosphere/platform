@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -298,38 +297,6 @@ public class SpringCloudServiceManager
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
-    }
-
-    @Override
-    public void activateService(String serviceId) throws ExecutionException {
-        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "activate");
-        if (ServiceState.PASSIVATED == service.getState()) {
-            // TODO activate
-            setState(service, ServiceState.RUNNING);
-        } else {
-            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
-        }
-    }
-
-    @Override
-    public void passivateService(String serviceId) throws ExecutionException {
-        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "passivate");
-        if (ServiceState.RUNNING == service.getState()) {
-            setState(service, ServiceState.PASSIVATING);
-            // TODO passivate
-            setState(service, ServiceState.PASSIVATED);
-        } else {
-            throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
-        }
-    }
-
-    @Override
-    public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
-        SpringCloudServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "reconfigure");
-        ServiceState state = service.getState();
-        setState(service, ServiceState.RECONFIGURING);
-        // TODO reconfigure
-        setState(service, state);
     }
 
 }

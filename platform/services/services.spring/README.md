@@ -7,7 +7,7 @@ Alternative service management implementation for services running with [Spring 
 In addition, service deployment properties are given in a separate descriptor, the `deployment.yml` with the following structure. Unless stated explicitly, fields are mandatory.
 * Artifact: Unique identifier `id` and `name` of the artifact. `version` of the artifact as dot-separated numbers. An artifact definition encounters the contained `services`. An artifact may declare `types`, i.e., types used by the services for passing data. Java types (in particular primitives, `String` without qualification) and types known to the platform must not be declared and can be referenced by their qualified name. Service specific types must be declared, in particular as record/class like structures with their declared qualified `name` and their contained fields, each consisting of a `name` and a `type`.
 * Service: Unique identifier `id`, `name`, `version` (numbers separated by dots) and an optional `description` of the service (default is empty). Optional specification whether the service is `deployable` in distributed fashion (default is `true`) and the service kind (see `de.iip_ecosphere.platform.services.ServiceKind`). A service may contain further sub-structures:
-* `cmdArg`: Optional list of command line arguments to be passed when the service is started. 
+* `cmdArg`: Optional list of command line arguments to be passed when the service is started. Within this list, `${port}` is substituted with the service command port and `${protocol}` with the command protocol, one of the AAS protocols. 
 * `instances`: The optional number of service replicas to be launched. Ignored if negative. Default value is `1`.
 * resource desires: Optional values for the number of `cpus`, the `memory` and the `disk` space, the latter in bytes. If not given or not positive, internal default values are used, i.e., one CPU and, e.g., automatically determined for a JVM. The deployer may ignore these values if not applicable to the type of process to be started.
 * `parameters`: Parameters of the service that can be modified at runtime, each with `name`, optional `description` and qualified Java `type` name either pointing to a Java (primitive) type, a platform type or a type declared in the `types` section of the containing artifact.
@@ -71,7 +71,7 @@ The descriptor structure looks as following:
 Also the service manager itself can be configured via the ``iipecosphere.yml``, i.e., with this extension Spring execution concepts are/must be added to the containing component.
 
 In addition to the basic AAS settings, the following properties can be configured:
-* `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000` ms). `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms). `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker, e.g., a MQTT broker. `deleteArtifacts` allows the service manager to delete downloaded artifacts.
+* `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000` ms). `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms). `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker, e.g., a MQTT broker. `deleteArtifacts` allows the service manager to delete downloaded artifacts. The `serviceProtocol` defines the AAS implementation protocol to be used for administrative communication with the services (default is the empty string denoting the default AAS protocol).
 * `cloud.deployer.local` refers to the underlying mechanism of Spring Cloud Stream. Service artifacts and their working directory may be temporary if not configured or in a given folder. These files may be deleted automatically on exit or remain in the folder. Both settings are helpful for debugging.
 
 The configuration structure is as shown below:
@@ -82,6 +82,7 @@ The configuration structure is as shown below:
       brokerHost: <String>
       brokerPort: <Integer>
       deleteArtifacts: <Boolean>
+      serviceProtocol: <|VAB-TCP|...>
     cloud:
       deployer:
         local:
