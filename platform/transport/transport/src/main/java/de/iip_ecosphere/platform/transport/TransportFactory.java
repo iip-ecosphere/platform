@@ -12,6 +12,8 @@ package de.iip_ecosphere.platform.transport;
 
 import java.util.Optional;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 
@@ -62,6 +64,7 @@ public class TransportFactory {
      * @return the factory implementation instance before calling this method
      */
     public static ConnectorCreator setMainImplementation(ConnectorCreator inst) {
+        initialize();
         ConnectorCreator old = mainCreator;
         if (null != inst) {
             mainCreator = inst;
@@ -77,6 +80,7 @@ public class TransportFactory {
      * @return the factory implementation instance before calling this method
      */
     public static ConnectorCreator setIpcImplementation(ConnectorCreator inst) {
+        initialize();
         ConnectorCreator old = ipcCreator;
         if (null != inst) {
             ipcCreator = inst;
@@ -92,6 +96,7 @@ public class TransportFactory {
      * @return the factory implementation instance before calling this method
      */
     public static ConnectorCreator setDmImplementation(ConnectorCreator inst) {
+        initialize();
         ConnectorCreator old = dmCreator;
         if (null != inst) {
             dmCreator = inst;
@@ -107,6 +112,8 @@ public class TransportFactory {
             Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.findFirst(TransportFactoryDescriptor.class);
             if (desc.isPresent()) {
                 TransportFactoryDescriptor descriptor = desc.get();
+                LoggerFactory.getLogger(TransportFactory.class).info("Configuring TransportFactory with " 
+                    + descriptor.getClass().getName());
                 mainCreator = getCreator(descriptor.getMainCreator(), mainCreator);
                 ipcCreator = getCreator(descriptor.getIpcCreator(), ipcCreator);
                 dmCreator = getCreator(descriptor.getDmCreator(), dmCreator);
