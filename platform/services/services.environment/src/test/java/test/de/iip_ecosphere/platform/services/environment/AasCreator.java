@@ -50,6 +50,26 @@ public class AasCreator {
     public static final String AAS_SUBMODEL_OPERATION_RECONF = "reconfigure";
     
     /**
+     * Collects AAS creation results.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class AasResult {
+        
+        private ServiceStub stub;
+        
+        /**
+         * Returns the service stub.
+         * 
+         * @return the stub
+         */
+        public ServiceStub getStub() {
+            return stub;
+        }
+        
+    }
+    
+    /**
      * Creates an AAS for testing.
      * 
      * @param addr the server address (schema ignored)
@@ -58,6 +78,20 @@ public class AasCreator {
      * @return the AAS
      */
     public static Aas createAas(ServerAddress addr, Service service, String protocol) {
+        return createAas(addr, service, protocol, null);
+    }
+    
+    /**
+     * Creates an AAS for testing.
+     * 
+     * @param addr the server address (schema ignored)
+     * @param service the service to create the AAS for (qualified naming)
+     * @param protocol the AAS implementation protocol (see {@link AasFactory#getProtocols()}
+     * @param result optional instance to be modified as side effect to have more details about the creation, 
+     *     may be <b>null</b> for nothing
+     * @return the AAS
+     */
+    public static Aas createAas(ServerAddress addr, Service service, String protocol, AasResult result) {
         AasFactory factory = AasFactory.getInstance();
         InvocablesCreator iCreator = factory.createInvocablesCreator(protocol, addr.getHost(), addr.getPort());
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
@@ -128,6 +162,11 @@ public class AasCreator {
             .addOutputVariable("result", Type.STRING)
             .build();
         smBuilder.build();
+        
+        if (result != null) {
+            result.stub = stub;
+        }
+        
         return aasBuilder.build();
     }
     

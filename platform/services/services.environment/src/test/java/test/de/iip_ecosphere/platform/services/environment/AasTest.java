@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
 
 /**
  * Tests the test AAS pretending that there is an environment to test against. The AAS is used in 
@@ -49,7 +50,8 @@ public class AasTest {
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
 
         MyService service = new MyService();
-        Aas aas = AasCreator.createAas(vabServer, service, AasFactory.DEFAULT_PROTOCOL);
+        AasResult res = new AasResult();
+        Aas aas = AasCreator.createAas(vabServer, service, AasFactory.DEFAULT_PROTOCOL, res);
         
         ProtocolServerBuilder pBuilder = AasFactory.getInstance()
             .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
@@ -67,6 +69,7 @@ public class AasTest {
             .start();
         
         AbstractEnvironmentTest.testAas(aasServerRegistry, service);
+        AbstractEnvironmentTest.testAasResult(res, service);
 
         httpServer.stop(true);
         server.stop(true);
