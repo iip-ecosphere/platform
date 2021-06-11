@@ -109,7 +109,8 @@ public class TransportFactory {
      */
     private static void initialize() {
         if (!initialized) {
-            Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.findFirst(TransportFactoryDescriptor.class);
+            Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.filterExcluded(
+                TransportFactoryDescriptor.class);
             if (desc.isPresent()) {
                 TransportFactoryDescriptor descriptor = desc.get();
                 LoggerFactory.getLogger(TransportFactory.class).info("Configuring TransportFactory with " 

@@ -31,6 +31,7 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
+@ExcludeFirst
 public class DirectMemoryTransportConnectorTest {
 
     /**
