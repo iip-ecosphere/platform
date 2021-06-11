@@ -132,12 +132,9 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         ServiceDescriptor leader = getEnsembleLeader();
         if (null != leader) {
             result = leader.getState();
-
-            /*else if (null != stub) {
-                result = stub.getState();
-                this.state = result; // keep the descriptor up to date
-            } */            
-            
+        } else if (null != stub) {
+            result = stub.getState();
+            this.state = result; // keep the descriptor shadow state up to date
         } else {
             result = state;
         }
@@ -146,15 +143,19 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
+        if (ServiceState.STOPPING == state || ServiceState.STOPPED == state) {
+            // stub shall only be active when service is active, avoid confusion/exceptions during shutdown
+            // and switch back to descriptor shadow state
+            stub = null; 
+        }
         if (null != getEnsembleLeader()) {
             // TODO true for all states?
             getEnsembleLeader().setState(state);
         } else {
-            // if there is a stub, this is just a shadow state; agreement check may be needed
-            this.state = state;
-        }
-        if (ServiceState.STOPPING == state) {
-            stub = null;
+            if (null != stub) {
+                stub.setState(state);
+            }
+            this.state = state; // keep the descriptor shadow state up to date
         }
     }
 
