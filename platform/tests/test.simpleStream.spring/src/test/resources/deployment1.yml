@@ -8,6 +8,9 @@ services:
     description: Creates text tokens.
     deployable: true
     kind: SOURCE_SERVICE
+    cmdArg: 
+      - --iip.port=${port}
+      - --iip.protocol=${protocol}
     ensembleWith: simpleStream-log
     relations:
       - endpoint:
@@ -23,6 +26,9 @@ services:
     description: Receives text tokens.
     deployable: true
     kind: SINK_SERVICE
+    cmdArg: 
+      - --iip.port=${port}
+      - --iip.protocol=${protocol}
     relations:
       - endpoint:
           portArg: --mqtt.port=${port} --amqp.port=${port}
