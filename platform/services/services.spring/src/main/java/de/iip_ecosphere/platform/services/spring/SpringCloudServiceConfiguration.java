@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ public class SpringCloudServiceConfiguration {
     private int availabilityRetryDelay = 500;
     private AasSetup aas = new AasSetup();
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
+    private HashMap<String, String> executables = new HashMap<String, String>();
 
     /**
      * Returns the name of the broker host.
@@ -121,6 +123,23 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
+     * Returns the configured value for an executable, i.e., either from the configured executables mapping or the
+     * {@code Executable}. The idea here is to allow the configuration to override commands that are available via
+     * the OS path in certain cases.
+     * 
+     * @param executable the executable to look for
+     * @return either {@code executable} or the mapped executable value
+     */
+    public String getExecutable(String executable) {
+        String result = executables.get(executable);
+        if (null == result) {
+            result = executable;
+        }
+        return result;
+    }
+
+
+    /**
      * Defines the name of the broker host. [required by Spring]
      * 
      * @param brokerHost the host name 
@@ -202,5 +221,16 @@ public class SpringCloudServiceConfiguration {
     public void setServiceProtocol(String serviceProtocol) {
         this.serviceProtocol = serviceProtocol;
     }
+    
+    /**
+     * Defines the executables mapping, i.e., an optional mapping of OS command names to paths or other command names
+     * that are available on the respective target system.
+     * 
+     * @param executables the executables mapping
+     */
+    public void setExecutables(HashMap<String, String> executables) {
+        this.executables = executables;
+    }
+
 
 }

@@ -105,7 +105,7 @@ public interface Service {
      * 
      * @return the process information, may be <b>null</b>
      */
-    public Process getProcess();
+    public ProcessSpec getProcess();
     
     /**
      * Returns the service kind.

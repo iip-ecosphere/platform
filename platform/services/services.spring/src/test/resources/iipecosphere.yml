@@ -17,4 +17,7 @@ service-mgr:
   brokerPort: 8883
   availabilityRetryDelay: 500
   serviceProtocol: VAB-TCP
+  executables:
+    perl: /usr/bin/perl
+    php: /home/edge/php/active/bin/php
   

@@ -50,8 +50,8 @@ import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
-import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.support.Schema;
@@ -305,7 +305,7 @@ public class TestServiceManager {
     private void startFakeServiceCommandServers(ServiceManager mgr, String[] ids) {
         NetworkManager nMgr = NetworkManagerFactory.getInstance();
         for (String id : ids) {
-            String key = SpringCloudServiceDescriptor.getServiceCommandNetworkMgrKey(id);
+            String key = Starter.getServiceCommandNetworkMgrKey(id);
             ManagedServerAddress addr = nMgr.obtainPort(key);
             if (addr.isNew()) {
                 netKeyToRelease.add(key);

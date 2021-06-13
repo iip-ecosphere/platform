@@ -222,7 +222,7 @@ public class Validator {
      * 
      * @param process the process to validate
      */
-    public void validate(Process process) {
+    public void validate(ProcessSpec process) {
         validate(process, "");
     }
 
@@ -232,8 +232,11 @@ public class Validator {
      * @param process the process to validate
      * @param msgContext nested context information for location of unnamed elements in validation messages
      */
-    private void validate(Process process, String msgContext) {
-        assertStringNotEmpty(process.getPath(), "path", msgContext);
+    private void validate(ProcessSpec process, String msgContext) {
+        assertStringList(process.getArtifacts(), "artifacts", "artifact", msgContext);
+        assertCondition(process.getArtifacts() != null && process.getArtifacts().size() > 0, 
+            "At least one artifact must be given", msgContext);
+        assertStringNotEmpty(process.getExecutable(), "executable", msgContext);
         assertStringList(process.getCmdArg(), "cmdArg", "arg", msgContext);
         if (assertFieldNotNull(process.getAasEndpoint(), "aasEndpoint", msgContext)) {
             validate(process.getAasEndpoint(), appendToContext(msgContext, "aasEndpoint"));
@@ -244,6 +247,7 @@ public class Validator {
         if (assertFieldNotNull(process.getServiceStreamEndpoint(), "serviceStreamEndpoint", msgContext)) {
             validate(process.getServiceStreamEndpoint(), appendToContext(msgContext, "serviceStreamEndpoint"));
         }
+        // started and waitTime are valid anyway
     }
 
     /**
