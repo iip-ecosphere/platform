@@ -31,14 +31,42 @@ public class StarterTest {
      */
     @Test
     public void testStarter() {
+        String serviceId = "my Service - 1"; // shall be given without space -> normalize below
+        assertStringContaining(Starter.getServiceCommandNetworkMgrKey(serviceId), serviceId);
+        assertStringContaining(Starter.getServiceProcessNetworkMgrKey(serviceId), serviceId);
+        
         int port = NetUtils.getEphemeralPort();
         Starter.parse("file", "--myParam", 
-            Starter.PARAM_PREFIX + Starter.PARAM_IIP_PROTOCOL + Starter.PARAM_VALUE_SEP + AasFactory.DEFAULT_PROTOCOL, 
-            Starter.PARAM_PREFIX + Starter.PARAM_IIP_PORT + Starter.PARAM_VALUE_SEP + port,
+            Starter.composeArgument(Starter.PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL), 
+            Starter.composeArgument(Starter.PARAM_IIP_PORT, port),
+            Starter.composeArgument(Starter.getServicePortName(serviceId), 12345),
             "--endParam");
         Assert.assertNotNull(Starter.getProtocolBuilder());
+        Assert.assertEquals(12345, Starter.getServicePort(serviceId));
+        Assert.assertEquals(-1, Starter.getServicePort("unknown"));
         Starter.start();
         Starter.shutdown();
+    }
+    
+    /**
+     * Asserts that {@code str} is a non-empty string.
+     * 
+     * @param str the string to assert
+     */
+    private static void assertString(String str) {
+        Assert.assertNotNull(str);
+        Assert.assertTrue(str.length() > 0);
+    }
+
+    /**
+     * Asserts that {@code str} is a non-empty string containing {@code expected}.
+     * 
+     * @param str the string to assert
+     * @param expected expected substring of  {@code str}
+     */
+    private static void assertStringContaining(String str, String expected) {
+        assertString(str);
+        Assert.assertTrue(str.indexOf(expected) > 0);
     }
 
 }
