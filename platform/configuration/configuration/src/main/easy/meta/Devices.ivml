@@ -1,6 +1,7 @@
 project Devices {
 
     import Services;
+    import MetaConcepts;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
         
@@ -20,7 +21,7 @@ project Devices {
     };
     isDefined(containerManager);
     
-    compound EcsDevice {
+    compound EcsDevice refines CComputer {
         String id;
     }
 

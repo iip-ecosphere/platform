@@ -4,4 +4,15 @@ project Applications {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
+    compound Application {
+        NonEmptyString id;
+        NonEmptyString name;
+        String description;
+        Version version;
+        setOf(ServiceNet) services;
+    }
+    
+    compound ServiceNet {
+    }
+
 }

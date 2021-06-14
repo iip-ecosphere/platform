@@ -1,8 +1,11 @@
 project Services {
 
    import Connectors;
+   import MetaConcepts;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   // -------------------- service manager ------------------
    
    abstract compound ServiceManager { 
    };
@@ -21,6 +24,8 @@ project Services {
    
    isDefined(serviceManager);
    // TODO service manager requires corresponding broker
+
+   // -------------------- service protocol ------------------
  
    abstract compound ServiceProtocol {
    	   ProtocolType type;
@@ -52,5 +57,35 @@ project Services {
    //serviceProtocol.type == transportProtocol.type;
    
    isDefined(serviceProtocol);
+
+   // -------------------- services ------------------
+   
+   // aligned to services.environment
+   enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
+   
+   abstract compound Service refines CDataComponent {
+       NonEmptyString id;
+       NonEmptyString name;
+       NonEmptyString description;
+       Version version;
+       ServiceKind kind;
+       Boolean deployable;
+       
+       // refine parameter
+       // refine input
+       // refine output
+   }
+   
+   compound JavaService refines Service {
+   }
+   
+   compound PythonService refines Service {
+   }
+   
+   // ------------------------ families -----------------
+   
+   abstract compound ServiceFamily refines CFamily {
+        setOf(refTo(Service)) members;
+   }
    
 }
