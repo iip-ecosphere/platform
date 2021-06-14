@@ -1,5 +1,6 @@
-Devices::containerManagerDefined = The container manager must be defined.
-
+Devices::containerManager = The container manager
 Devices::DockerContainerManager::dockerHost = The operating-system specific docker host access, e.g., a device file name.
 Devices::DockerContainerManager::dockerImageYamlFilename = The name of the Yaml container descriptor file.
 Devices::DockerContainerManager::deleteWhenUndeployed = Delete containers when they are undeployed/not used. 
+Devices::EcsDevice = An device for executing services
+Devices::EcsDevice::id = Device identification

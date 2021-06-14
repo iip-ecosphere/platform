@@ -17,14 +17,13 @@ project Services {
        Integer availabilityRetryDelay = 500;
    };
    
-   ServiceManager serviceManager = SpringCloudStream {
-   };
+   ServiceManager serviceManager = SpringCloudStream {};
    
-   Constraint serviceManagerDefined = isDefined(serviceManager);
+   isDefined(serviceManager);
    // TODO service manager requires corresponding broker
  
    abstract compound ServiceProtocol {
-   	   ProtocolType type = ProtocolType::Mqttv3;
+   	   ProtocolType type;
    };
    
    compound ServiceProtocolAMQP refines ServiceProtocol {
@@ -47,19 +46,11 @@ project Services {
    	   ProtocolType type = ProtocolType::Mqttv5;
    };
    
-   ServiceProtocol serviceProtocol = ServiceProtocolAMQP {
-   };
+   ServiceProtocol serviceProtocol = ServiceProtocolAMQP {};
    
    // might be too strict, but its ok for now
    //serviceProtocol.type == transportProtocol.type;
    
-   Constraint serviceProtocolDefined = isDefined(serviceProtocol);
- 
-   freeze {
-       // prevent later changes of constraint but make it referencable to .text
-       serviceManagerDefined;
-       serviceProtocolDefined;
-   };
-    
+   isDefined(serviceProtocol);
    
 }

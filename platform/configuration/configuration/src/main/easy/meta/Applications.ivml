@@ -1,7 +1,7 @@
-project IIPEcosphere {
+project Applications {
 
-    import Applications; 
+    import Devices;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
-   
+
 }
