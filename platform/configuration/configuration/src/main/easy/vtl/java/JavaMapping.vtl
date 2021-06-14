@@ -125,10 +125,24 @@ template JavaMapping(Configuration config, FileArtifact target) {
     }
 
     def String aasProtocolName(IIPEcosphere cfg) {
-        switch (cfg.aasImplServer.protocol) {
-            AasProtocol::VAB_TCP : "VAB-TCP",
-            default: ""
-        }
+    println(getType(cfg.aasProtocol));
+        aasProtocolName(cfg.aasProtocol);
     }
 
+    def String aasProtocolName(AasProtocol proto) {
+        "";
+    }
+    
+    def String aasProtocolName(AasProtocolDefault proto) {
+        "";
+    }
+
+    def String aasProtocolName(AasProtocolVabTcp proto) {
+        "VAB-TCP";
+    }
+
+    def String aasProtocolName(AasProtocolVabHttp proto) {
+        "VAB-HTTP";
+    }
+    
 }
