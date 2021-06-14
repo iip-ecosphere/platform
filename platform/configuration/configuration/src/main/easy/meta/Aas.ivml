@@ -26,7 +26,7 @@ project Aas {
     // missing VAB-HTTPS
     
     AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
-    //isDefined(aasProtocol);
+    isDefined(aasProtocol);
     
     enum AasSchema {HTTP, HTTPS, TCP};
     enum Persistency {INMEMORY, MONGO};
