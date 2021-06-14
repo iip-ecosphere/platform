@@ -65,7 +65,6 @@ project Services {
    
    abstract compound Service refines CDataComponent {
        NonEmptyString id;
-       NonEmptyString name;
        NonEmptyString description;
        Version version;
        ServiceKind kind;
@@ -86,6 +85,9 @@ project Services {
    
    abstract compound ServiceFamily refines CFamily {
         setOf(refTo(Service)) members;
+        Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size < 2;
+        ServiceKind kind;
+        kind == members[0].kind; // propagate
    }
    
 }
