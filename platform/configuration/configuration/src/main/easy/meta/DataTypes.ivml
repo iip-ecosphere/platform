@@ -4,11 +4,11 @@ project DataTypes {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    typedef EphemeralPort Integer with (EphemeralPort >= -1 and Port <= 65535);
+    typedef EphemeralPort Integer with (EphemeralPort >= -1 and EphemeralPort <= 65535);
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
     typedef Port EphemeralPort with (Port >= 0);
     typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
-    typedef Version NonEmptyString with (matches(Version, "^\\d+(\\.\\d+)*$"));
+    typedef IipVersion NonEmptyString with (matches(IipVersion, "^\\d+(\\.\\d+)*$"));
     typedef Id NonEmptyString with (matches(Id, "^\\S+$")); // non whitespace
     
     abstract compound DataType {

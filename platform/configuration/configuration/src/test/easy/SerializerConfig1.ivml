@@ -5,22 +5,11 @@ project SerializerConfig1 {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
+    // ------------ component setup ------------------
+
     serializer = Serializer::Json;
     // serviceManager, containerManager are already defined    
-    
-    RecordType rec1 = {
-        name = "Rec1",
-        fields = {
-            Field {
-                name = "intField",
-                type = refBy(IntegerType)
-            }, Field {
-                name = "stringField",
-                type = refBy(StringType)
-            }
-        }
-    };
-    
+        
     aasServer = {
         schema = AasSchema::HTTP,
         port = 8080,
@@ -36,9 +25,96 @@ project SerializerConfig1 {
         host = "127.0.0.1"
     };
     aasProtocol = AasProtocolVabTcp{};
+
+    // ------------ data types ------------------
     
-    // TODO freezing is not recursive
-    // unconditional free for testing
+    RecordType rec1 = {
+        name = "Rec1",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+        
+    Service mySourceService = JavaService {
+        id = "mySource",
+        name = "mySource example",
+        description = "",
+        version = "0.1.0",
+        deployable = true,
+        class = "MySourceImpl",
+        artifact = ""
+        // input, output, parameter
+    };
+
+    Service myAnonymizerService = JavaService {
+        id = "myAnonymizer",
+        name = "myAnonymizer example",
+        description = "",
+        version = "0.1.0",
+        deployable = true,
+        class = "MyAnonymizerImpl",
+        artifact = ""
+        // input, output, parameter
+    };
+
+    Service myKiService = JavaService {
+        id = "myKi",
+        name = "myKi example",
+        description = "",
+        version = "0.1.0",
+        deployable = true,
+        class = "MyAnonymizerImpl",
+        artifact = ""
+        // input, output, parameter
+    };
+    
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "myApp",
+        name = "myApp example",
+        version = "0.1.0",
+        description = "",
+        services = {refBy(myNet)}        
+    };
+    
+    ServiceNet myNet = {
+        description = "initial service net",
+        sources = {refBy(mySource)}
+    };
+    
+    NetSource mySource = {
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyAnonymizer)}
+    };
+    
+    NetConnector myConnMySourceMyAnonymizer = {
+        next = refBy(myAnonymizer)
+    };
+
+    NetProcessor myAnonymizer = {
+        impl = refBy(myAnonymizerService),
+        next = {refBy(myConnMyAnonymizerMyKi)}
+    };
+
+    NetConnector myConnMyAnonymizerMyKi = {
+        next = refBy(myKi)
+    };
+
+    NetProcessor myKi = {
+        impl = refBy(myKiService)
+    };
+
+    // ------------ freezing ------------------
+    
     freeze {
         aas;
         aasServer;
@@ -51,7 +127,7 @@ project SerializerConfig1 {
         serviceManager;
         serviceProtocol;
         containerManager;
-        .;
+        .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

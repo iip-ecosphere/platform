@@ -2,6 +2,7 @@ project Applications {
 
     import Devices;
     import Services;
+    import DataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -9,23 +10,25 @@ project Applications {
         Id id;
         NonEmptyString name;
         String description;
-        Version version;
+        IipVersion version;
         setOf(refTo(ServiceNet)) services;
     }
     
     compound ServiceNet {
+        String description;
         setOf(refTo(NetSource)) sources;
     }
     
     compound NetElement {
         NonEmptyString name;
         ServiceKind kind;
-        refTo(ServiceFamily) impl;
+        refTo(ServiceBase) impl; // allow for family or service
         
         name == impl.name; // propagate
         kind == impl.kind; // propagate
     }
     
+    // hint to requirements!
     compound NetConnector refines CConnector {
         refTo(NetInnerElement) next;
     }
@@ -36,7 +39,7 @@ project Applications {
         kind == ServiceKind::SOURCE_SERVICE;
     }
     
-    compound NetInnerElement refines NetElement {
+    abstract compound NetInnerElement refines NetElement {
         setOf(refTo(NetConnector)) next;
     }
     

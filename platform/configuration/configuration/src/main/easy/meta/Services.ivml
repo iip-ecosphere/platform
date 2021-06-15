@@ -2,6 +2,7 @@ project Services {
 
    import Connectors;
    import MetaConcepts;
+   import DataTypes;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
@@ -63,19 +64,28 @@ project Services {
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
    
-   abstract compound Service refines CDataComponent {
-       Id id;
-       NonEmptyString description;
-       Version version;
+   // service base is the parent type of Service and ServiceFamily. They may be used in interchangable manner
+   // in some situations while in others it is important to have a service not being a family avoiding potential
+   // instance recursions
+   abstract compound ServiceBase refines CDataComponent {
+       NonEmptyString name; // forward declaration
        ServiceKind kind;
-       Boolean deployable;
-       
+
        // refine parameter
        // refine input
        // refine output
    }
    
+   abstract compound Service refines ServiceBase {
+       Id id;
+       String description;
+       IipVersion version;
+       Boolean deployable;
+   }
+   
    compound JavaService refines Service {
+       NonEmptyString class;
+       String artifact; // optional maven artifact
    }
    
    compound PythonService refines Service {
@@ -83,11 +93,10 @@ project Services {
    
    // ------------------------ families -----------------
    
-   abstract compound ServiceFamily refines CFamily {
-        setOf(refTo(Service)) members;
-        Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size < 2;
-        ServiceKind kind;
-        kind == members[0].kind; // propagate
+   abstract compound ServiceFamily refines ServiceBase, CFamily {
+        setOf(refTo(Service)) members; // refinement
+        Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
+        kind == members.asSequence().first().kind; // propagate
    }
    
 }

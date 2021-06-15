@@ -49,7 +49,7 @@ project Aas {
 
     compound ImplAddress refines EphemeralServerAddress {
         AasProtocol protocol = aasProtocol;
-    	AasSchema schema = AasProtocolVabTcp{};
+        AasSchema schema = AasSchema::HTTP; // TODO link to protocol
     	isDefined(protocol);
     }
     
