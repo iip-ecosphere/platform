@@ -225,7 +225,7 @@ public abstract class AbstractEnvironmentTest {
     }
     
     /**
-     * Checks whether the given {@code obj} complies with the {@link expected} version.
+     * Checks whether the given {@code obj} complies with the {@code expected} version.
      * 
      * @param obj the object to test
      * @param expected the expected version, may be <b>null</b> then we check for {@code obj} <b>null</b>

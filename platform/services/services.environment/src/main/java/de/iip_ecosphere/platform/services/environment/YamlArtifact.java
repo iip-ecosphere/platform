@@ -52,6 +52,7 @@ public class YamlArtifact extends AbstractYamlArtifact {
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
+     * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
         YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
