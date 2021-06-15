@@ -10,6 +10,8 @@ services:
     kind: SOURCE_SERVICE
     cmdArg: 
       - --spring.profiles.active=source
+      - --iip.port=${port}
+      - --iip.protocol=${protocol}
     relations:
       - endpoint:
           portArg: --mqtt.port=${port} --amqp.port=${port}
@@ -26,6 +28,8 @@ services:
     kind: SINK_SERVICE
     cmdArg: 
       - --spring.profiles.active=sink
+      - --iip.port=${port}
+      - --iip.protocol=${protocol}
     relations:
       - endpoint:
           portArg: --mqtt.port=${port} --amqp.port=${port}

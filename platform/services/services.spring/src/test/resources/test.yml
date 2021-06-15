@@ -29,6 +29,7 @@ services:
     cmdArg: 
       - arg-0-1
       - arg-0-2
+      - --arg3=${protocol}@${port}
     ensembleWith: id-1
     relations:
       - endpoint:
@@ -56,10 +57,13 @@ services:
         direction: IN
         type: int
     process:
-      path: impl/python
+      artifacts: 
+        - /impl/python-id-0.zip
+      executable: python
       cmdArg:
-        - python
         - MyServiceWrapper.py
+        - --port=${port}
+        - --protocol=${protocol}
       serviceStreamEndpoint:
         portArg: --id1.streamPort=${port}
         hostArg: --id1.streamHost=${host}
@@ -69,6 +73,8 @@ services:
       aasEndpoint:
         portArg: aasPort=${port}
         hostArg: aasHost=${host}
+      started: false
+      waitTime : 250
     instances: 2
     memory: 1024
     disk: 500

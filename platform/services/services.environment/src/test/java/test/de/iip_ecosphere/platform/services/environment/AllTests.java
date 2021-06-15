@@ -25,7 +25,8 @@ import org.junit.runners.Suite;
     StreamTest.class,
     JavaEnvironmentTest.class,
     PythonEnvironmentTest.class,
-    PythonEnvironmentSuiteTest.class
+    PythonEnvironmentSuiteTest.class,
+    StarterTest.class
 })
 public class AllTests {
 }

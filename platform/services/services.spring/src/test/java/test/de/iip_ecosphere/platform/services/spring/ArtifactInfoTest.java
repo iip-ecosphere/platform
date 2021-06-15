@@ -71,7 +71,8 @@ public class ArtifactInfoTest {
         YamlService service = info.getServices().get(0);
         assertServiceBasics(service, "id-0", "name-0", "1.0.2", "desc desc-0");
         assertServiceCharacteristics(service, true, ServiceKind.SOURCE_SERVICE);
-        assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2");
+        assertStringList(service.getCmdArg(), "arg-0-1", "arg-0-2", "--arg3=${protocol}@${port}");
+        assertStringList(service.getCmdArg(1234, "TCP"), "arg-0-1", "arg-0-2", "--arg3=TCP@1234");
         Assert.assertEquals(service.getEnsembleWith(), "id-1");
         Assert.assertEquals(2, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "", 1234, "localhost");
@@ -86,7 +87,11 @@ public class ArtifactInfoTest {
         Assert.assertEquals(1, service.getRelations().size());
         assertRelation(service.getRelations().get(0), "output", 9872, "me.here.de");
         Assert.assertNotNull(service.getProcess());
-        assertProcess(service.getProcess(), "impl/python", false, "python", "MyServiceWrapper.py");
+
+        assertProcess(service.getProcess(), "/impl/python-id-0.zip", "python", false, 250, "MyServiceWrapper.py", 
+            "--port=${port}", "--protocol=${protocol}");
+        assertStringList(service.getProcess().getCmdArg(1224, "HTTP"), "MyServiceWrapper.py", 
+            "--port=1224", "--protocol=HTTP");
         Assert.assertEquals(2, service.getInstances());
         Assert.assertEquals(1024, service.getMemory());
         Assert.assertEquals(500, service.getDisk());
@@ -260,22 +265,30 @@ public class ArtifactInfoTest {
             endpoint.getHostArg(host));
     }
     
+    // checkstyle: stop parameter number check
+    
     /**
      * Asserts {@link YamlProcess} information.
      * 
      * @param process the process to assert
-     * @param path the expected path
-     * @param started whether the process is marked as aready started
+     * @param artifact the expected artifact
+     * @param executable the expected executable
+     * @param started whether the process is marked as already started
+     * @param waitTime the expected wait time
      * @param cmdArgs the expected command line arguments
      */
-    private static void assertProcess(YamlProcess process, String path, boolean started,
-        String... cmdArgs) {
-        Assert.assertEquals(path, process.getPath());
+    private static void assertProcess(YamlProcess process, String artifact, String executable, boolean started, 
+        int waitTime, String... cmdArgs) {
+        assertStringList(process.getArtifacts(), artifact);
+        Assert.assertEquals(executable, process.getExecutable());
         assertEndpoint(process.getStreamEndpoint(), 1234, "localhost");
         assertEndpoint(process.getAasEndpoint(), 1235, "aas.de");
         assertStringList(process.getCmdArg(), cmdArgs);
         Assert.assertEquals(started, process.isStarted());
+        Assert.assertEquals(waitTime, process.getWaitTime());
     }
+    
+    // checkstyle: resume parameter number check
 
     /**
      * Tests {@link DescriptorTest}.

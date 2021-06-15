@@ -72,5 +72,10 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
     public String toString() {
         return getId();
     }
+
+    @Override
+    protected Class<MyArtifactDescriptor> getArtifactDescriptorClass() {
+        return MyArtifactDescriptor.class;
+    }
     
 }

@@ -33,6 +33,7 @@ services:
           portArg:
       - endpoint:
     process:
+      artifacts:
       path:
       streamEndpoint:
       aasEndpoint:

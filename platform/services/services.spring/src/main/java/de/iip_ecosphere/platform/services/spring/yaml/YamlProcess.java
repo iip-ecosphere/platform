@@ -15,7 +15,9 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.services.spring.descriptor.Process;
+import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
+import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
+import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
@@ -25,23 +27,41 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Process;
  *  
  * @author Holger Eichelberger, SSE
  */
-public class YamlProcess implements Process {
-    
-    private String path;
+public class YamlProcess implements ProcessSpec {
+
+    private List<String> artifacts = new ArrayList<String>();
+    private String executable;
     private List<String> cmdArg = new ArrayList<>();
     private YamlEndpoint serviceStreamEndpoint;
     private YamlEndpoint streamEndpoint;
     private YamlEndpoint aasEndpoint;
     private boolean started = false;
+    private int waitTime = 0;
 
     @Override
-    public String getPath() {
-        return path;
+    public List<String> getArtifacts() {
+        return artifacts;
+    }
+    
+    @Override
+    public String getExecutable() {
+        return executable;
     }
     
     @Override
     public List<String> getCmdArg() {
         return cmdArg;
+    }
+    
+    @Override
+    public List<String> getCmdArg(int port, String protocol) {
+        List<String> result = new ArrayList<String>();
+        for (String arg : cmdArg) {
+            arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
+            arg = arg.replace(Service.PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
+            result.add(arg);
+        }
+        return result;
     }
 
     @Override
@@ -63,14 +83,29 @@ public class YamlProcess implements Process {
     public boolean isStarted() {
         return started;
     }
+
+    @Override
+    public int getWaitTime() {
+        return waitTime;
+    }
+    
     
     /**
-     * Returns the path within the artifact to be extracted. [required by SnakeYaml]
+     * Defines the process implementing artifacts within the containing artifact to be extracted.
      * 
-     * @param path the relative path
+     * @param artifacts the relative paths to the artifacts
      */
-    public void setPath(String path) {
-        this.path = path;
+    public void setArtifacts(List<String> artifacts) {
+        this.artifacts = artifacts;
+    }
+    
+    /**
+     * Defines the path within the artifact to be extracted. [required by SnakeYaml]
+     * 
+     * @param executable the name/path
+     */
+    public void setExecutable(String executable) {
+        this.executable = executable;
     }
     
     /**
@@ -118,6 +153,15 @@ public class YamlProcess implements Process {
      */
     public void setStarted(boolean started) {
         this.started = started;
+    }
+
+    /**
+     * Defines the time to wait for the process before going on with starting other services.
+     * 
+     * @param waitTime the wait time in ms, ignored if not positive
+     */
+    public void setWaitTime(int waitTime) {
+        this.waitTime = waitTime;
     }
 
 }

@@ -12,10 +12,14 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
@@ -24,19 +28,29 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
+import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
 /**
  * Specific descriptor implementation for spring cloud streams. [public for testing]
+ * Relies on parameter functions from {@link Starter}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -45,6 +59,9 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private Service service;
     private SpringCloudServiceDescriptor ensembleLeader;
     private String deploymentId;
+    private List<String> portKeys = new ArrayList<String>();
+    private Process process;
+    private File processDir;
     
     /**
      * Creates an instance.
@@ -71,6 +88,52 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                     r.getDescription(), resolver.resolve(r.getType())));
             }
         }
+    }
+    
+    @Override
+    protected Class<SpringCloudArtifactDescriptor> getArtifactDescriptorClass() {
+        return SpringCloudArtifactDescriptor.class;
+    }
+    
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        super.setState(state);
+        if (ServiceState.STOPPING == state) {
+            release();
+        }
+    }
+    
+    /**
+     * Releases the {@link #process} as well as the ports in {@link #portKeys}.
+     */
+    private void release() {
+        if (null != process) {
+            process.destroy();
+            process = null;
+        }
+        if (null != processDir) {
+            FileUtils.deleteQuietly(processDir);
+        }
+        NetworkManager mgr = NetworkManagerFactory.getInstance();
+        for (String key : portKeys) {
+            mgr.releasePort(key);
+        }
+        portKeys.clear();
+    }
+
+    /**
+     * Obtains a network port and registers it if necessary for release in {@link #setState(ServiceState)}.
+     * 
+     * @param mgr the network manager instance
+     * @param key the key to obtain the network address
+     * @return the obtained address
+     */
+    private ManagedServerAddress registerPort(NetworkManager mgr, String key) {
+        ManagedServerAddress result = mgr.obtainPort(key);
+        if (result.isNew()) {
+            portKeys.add(key);
+        }
+        return result;
     }
     
     /**
@@ -102,8 +165,9 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @param config the service manager configuration instance
      * @return the deployment request, may be <b>null</b> if this service is an ensemble follower and should not be 
      * started individually
+     * @throws ExecutionException when preparing the service fails for some reason
      */
-    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceConfiguration config) {
+    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceConfiguration config) throws ExecutionException {
         AppDeploymentRequest result = null;
         if (null == ensembleLeader) {
             NetworkManager mgr = NetworkManagerFactory.getInstance();
@@ -120,34 +184,93 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
             List<String> cmdLine = new ArrayList<String>();
-            cmdLine.addAll(service.getCmdArg());
+            ManagedServerAddress adminAdr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+            String serviceProtocol = config.getServiceProtocol();
+            cmdLine.addAll(service.getCmdArg(adminAdr.getPort(), serviceProtocol));
+            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
+                adminAdr.getHost(), adminAdr.getPort());
+            setStub(new ServiceStub(iCreator, getId()));
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
                     addEndpointArgs(cmdLine, endpoint, config.getBrokerPort(), config.getBrokerHost());
                 } else {
-                    ManagedServerAddress adr = mgr.obtainPort(r.getChannel());
+                    ManagedServerAddress adr = registerPort(mgr, r.getChannel());
                     addEndpointArgs(cmdLine, endpoint, adr);
                 }
             }
-            de.iip_ecosphere.platform.services.spring.descriptor.Process proc = service.getProcess();
-            if (null != proc) {
-                // TODO consider isGeneric
-                ManagedServerAddress adr = mgr.obtainPort(getStreamingNetmanagerKey()); // TODO release on stop
-                addEndpointArgs(cmdLine, proc.getServiceStreamEndpoint(), adr);
+            ProcessSpec pSpec = service.getProcess();
+            if (null != pSpec) {
+                ManagedServerAddress adr = registerPort(mgr, getStreamingNetmanagerKey());
+                addEndpointArgs(cmdLine, pSpec.getServiceStreamEndpoint(), adr);
 
                 List<String> procCmdLine = new ArrayList<String>();
-                procCmdLine.addAll(proc.getCmdArg());
-                addEndpointArgs(cmdLine, proc.getStreamEndpoint(), adr);
+                procCmdLine.addAll(pSpec.getCmdArg());
+                addEndpointArgs(cmdLine, pSpec.getStreamEndpoint(), adr);
 
-                ManagedServerAddress adrAas = mgr.obtainPort(getAasNetmanagerKey()); // TODO release on stop??
-                addEndpointArgs(cmdLine, proc.getAasEndpoint(), adrAas);
-
-                // TODO start process before, consider started
-                // TODO store processid in descriptor
-                // TODO consider for stopping
+                ManagedServerAddress adrAas = registerPort(mgr, getAasNetmanagerKey());
+                addEndpointArgs(cmdLine, pSpec.getAasEndpoint(), adrAas);
+                
+                int procPort = startProcess(config, pSpec);
+                if (procPort > 0) {
+                    cmdLine.add(Starter.composeArgument(Starter.getServicePortName(getId()), procPort));
+                }
             }
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
+        }
+        return result;
+    }
+    
+    /**
+     * Starts the non-Java execution process if needed.
+     * 
+     * @param config the service manager configuration instance
+     * @param pSpec the specification of the service to start
+     * @return the process port, valid if positive
+     * @throws ExecutionException when preparing the service fails for some reason
+     */
+    private int startProcess(SpringCloudServiceConfiguration config, ProcessSpec pSpec) throws ExecutionException {
+        int result = -1;
+        if (!pSpec.isStarted()) {
+            NetworkManager mgr = NetworkManagerFactory.getInstance();
+            String serviceProtocol = config.getServiceProtocol();
+            try {
+                // create process home dir
+                processDir = new File(SpringInstances.getConfig().getDownloadDir(), 
+                        Starter.normalizeServiceId(getId()) + "-" + System.currentTimeMillis());
+                FileUtils.deleteQuietly(processDir); // unlikely, just to be sure
+                processDir.mkdirs();
+
+                    // unpack artifact
+                for (String artPath : pSpec.getArtifacts()) {
+                    if (!artPath.startsWith("/")) {
+                        artPath = "/" + artPath;
+                    }
+                    InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
+                    if (null == artifact) {
+                        throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
+                    }
+                    JarUtils.extractZip(artifact, processDir.toPath());
+                    artifact.close();
+                }
+
+                // compose start arguments and start service implementation
+                ManagedServerAddress procAdr = registerPort(mgr, Starter.getServiceProcessNetworkMgrKey(getId()));
+                List<String> args = new ArrayList<String>();
+                args.add(config.getExecutable(pSpec.getExecutable()));
+                args.addAll(pSpec.getCmdArg(procAdr.getPort(), serviceProtocol));
+                ProcessBuilder processBuilder = new ProcessBuilder(args);
+                processBuilder.directory(processDir);
+                processBuilder.inheritIO();
+                process = processBuilder.start();
+                if (pSpec.getWaitTime() > 0) {
+                    TimeUtils.sleep(pSpec.getWaitTime());
+                }
+                result = procAdr.getPort();
+            } catch (IOException e) {
+                release();
+                throw new ExecutionException(e);
+            }
         }
         return result;
     }

@@ -37,5 +37,31 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-assembly-plugin</artifactId>
+         <version>3.1.1</version>
+         <executions>
+             <execution>
+                 <id>python</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/main/assembly/python.xml</descriptor>
+                     </descriptors>
+                     <outputDirectory>${project.build.directory}</outputDirectory>
+                     <attach>false</attach>
+                 </configuration>
+              </execution>
+         </executions>
+        </plugin>
+    </plugins>
+  </build>
 
 </project>

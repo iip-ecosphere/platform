@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -48,20 +47,6 @@ public class MyService extends AbstractService {
     @Override
     public void switchTo(String targetId) throws ExecutionException {
         throw new ExecutionException("not implemented", null); // for now
-    }
-
-    @Override
-    public void activate() throws ExecutionException {
-        if (getState() == ServiceState.PASSIVATED) {
-            setState(ServiceState.RUNNING);
-        }
-    }
-
-    @Override
-    public void passivate() throws ExecutionException {
-        if (getState() == ServiceState.RUNNING) {
-            setState(ServiceState.PASSIVATED);
-        }
     }
 
     @Override

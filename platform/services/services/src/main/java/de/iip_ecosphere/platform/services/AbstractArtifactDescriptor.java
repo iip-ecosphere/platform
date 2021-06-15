@@ -25,7 +25,7 @@ import java.util.Set;
  * @param <S> the service descriptor type
  * @author Holger Eichelberger, SSE
  */
-public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor> implements ArtifactDescriptor {
+public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> implements ArtifactDescriptor {
 
     private String id;
     private String name;

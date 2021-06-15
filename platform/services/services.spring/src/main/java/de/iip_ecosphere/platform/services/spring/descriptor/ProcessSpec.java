@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.List;
 
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service. The process implementation (whatever it is) will be extracted 
@@ -23,14 +25,21 @@ import java.util.List;
  *  
  * @author Holger Eichelberger, SSE
  */
-public interface Process {
-    
+public interface ProcessSpec {
+
     /**
-     * Returns the path within the artifact to be extracted.
+     * Returns the process implementing artifacts within the containing artifact to be extracted.
      * 
-     * @return the relative path
+     * @return the relative paths to the artifacts, shall start with "/" as part of ZIP/JAR
      */
-    public String getPath();
+    public List<String> getArtifacts();
+
+    /**
+     * Returns the system command or relative path within the artifact to be executed.
+     * 
+     * @return the command or relative path
+     */
+    public String getExecutable();
     
     /**
      * Returns the command line arguments to start the process. The shell will be executed within the folder where
@@ -40,6 +49,18 @@ public interface Process {
      *     {@link #getAASEndpoint() AAS endpoint} will be added anyway
      */
     public List<String> getCmdArg();
+
+    /**
+     * Returns additional/optional command line arguments required to start the service. The port placeholder
+     * {@link Endpoint#PORT_PLACEHOLDER} will be replaced with the command port the platform is using to send
+     * administrative commands to the service (see {@link de.iip_ecosphere.platform.services.environment.Service}).
+     * Similarly {@link #PROTOCOL_PLACEHOLDER} will be replaced with the AAS {@link AasFactory#getProtocols() protocol}.
+     
+     * @param port the port used for the command communication
+     * @param protocol the protocol used for the command communication
+     * @return the resolved command line arguments (may be empty for none)
+     */
+    public List<String> getCmdArg(int port, String protocol);
 
     /**
      * Returns streaming endpoint (port/host) on the service side the process shall communicate with. Counterpart of
@@ -70,5 +91,12 @@ public interface Process {
      * @return {@code true} for started, {@code false} else (default)
      */
     public boolean isStarted();
+    
+    /**
+     * Returns the time to wait for the process before going on with starting other services.
+     * 
+     * @return the wait time in ms, ignored if not positive
+     */
+    public int getWaitTime();
     
 }

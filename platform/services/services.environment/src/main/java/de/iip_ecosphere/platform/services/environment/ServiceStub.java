@@ -146,7 +146,7 @@ public class ServiceStub implements Service {
 
     @Override
     public ServiceKind getKind() {
-        return ServiceKind.valueOf(getters.get(NAME_PROP_STATE).get().toString());
+        return ServiceKind.valueOf(getters.get(NAME_PROP_KIND).get().toString());
     }
     
     @Override

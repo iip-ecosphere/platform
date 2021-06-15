@@ -1,6 +1,7 @@
 project Devices {
 
     import Services;
+    import MetaConcepts;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
         
@@ -18,15 +19,10 @@ project Devices {
     ContainerManager containerManager = DockerContainerManager {
         dockerHost = "unix:///var/run/docker.sock"
     };
-    Constraint containerManagerDefined = isDefined(containerManager);
+    isDefined(containerManager);
     
-    compound EcsDevice {
+    compound EcsDevice refines CComputer {
         String id;
     }
-    
-    freeze {
-        // prevent later changes of constraint but make it referencable to .text
-        containerManagerDefined;
-    };
 
 }

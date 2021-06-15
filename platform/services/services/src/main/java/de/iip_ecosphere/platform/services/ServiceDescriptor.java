@@ -16,12 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
- * Describes a service.
+ * Describes a service. Intentionally, a service descriptor does not contain administrative operations form 
+ * {@link Service} as those operations shall be handled by the {@link ServiceManager} in consistent manner, 
+ * e.g., across services.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -119,5 +122,5 @@ public interface ServiceDescriptor {
      * @return all input channels
      */
     public List<TypedDataConnectorDescriptor> getOutputDataConnectors();
-
+    
 }

@@ -1,0 +1,53 @@
+project Applications {
+
+    import Devices;
+    import Services;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    compound Application {
+        NonEmptyString id;
+        NonEmptyString name;
+        String description;
+        Version version;
+        setOf(refTo(ServiceNet)) services;
+    }
+    
+    compound ServiceNet {
+        setOf(refTo(NetSource)) sources;
+    }
+    
+    compound NetElement {
+        NonEmptyString name;
+        ServiceKind kind;
+        refTo(ServiceFamily) impl;
+        
+        name == impl.name; // propagate
+        kind == impl.kind; // propagate
+    }
+    
+    compound NetConnector refines CConnector {
+        refTo(NetInnerElement) next;
+    }
+    
+    compound NetSource refines NetElement {
+        setOf(refTo(NetConnector)) next;
+        
+        kind == ServiceKind::SOURCE_SERVICE;
+    }
+    
+    compound NetInnerElement refines NetElement {
+        setOf(refTo(NetConnector)) next;
+    }
+    
+    compound NetProcessor refines NetInnerElement {
+
+        kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
+    }
+    
+    compound NetSink refines NetInnerElement {
+
+        kind == ServiceKind::SINK_SERVICE;
+    }
+
+}

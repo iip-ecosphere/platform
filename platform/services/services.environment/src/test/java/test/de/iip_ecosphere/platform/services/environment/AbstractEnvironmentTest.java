@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +25,7 @@ import org.junit.Assert;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -31,6 +34,7 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
 
 /**
  * The common test code for all environments. Maximize code here rather than in specific environment tests.
@@ -85,6 +89,52 @@ public abstract class AbstractEnvironmentTest {
         values.put("name2", 25);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_RECONF, null, e -> true, values);
     }
+    
+    /**
+     * Does further tests based on the given result instance.
+     * 
+     * @param result the AAS result instance to test
+     * @param expected expected service (with values)
+     */
+    public static void testAasResult(AasResult result, Service expected) {
+        if (null != result && result.getStub() != null) {
+            ServiceStub stub = result.getStub();
+            checkString(stub.getId(), expected.getId());
+            checkString(stub.getName(), expected.getName());
+            checkString(stub.getDescription(), expected.getDescription());
+            checkVersion(stub.getVersion(), expected.getVersion());
+            checkStateString(stub.getState(), expected.getState());
+            checkKindString(stub.getKind(), expected.getKind());
+            checkBoolean(stub.isDeployable(), expected.isDeployable());
+            
+            checkStateString(stub.getState().name(), expected.getState());
+            try {
+                stub.migrate("myResource");
+                Assert.fail("Shall throw exception");
+            } catch (ExecutionException e) {
+            }
+            try {
+                stub.switchTo("otherService");
+                Assert.fail("Shall throw exception");
+            } catch (ExecutionException e) {
+            }
+            try {
+                stub.update(new URI("https://here.de"));
+                Assert.fail("Shall throw exception");
+            } catch (ExecutionException e) {
+            } catch (URISyntaxException e) {
+            }
+            try {
+                Map<String, String> values = new HashMap<>();
+                values.put("name1", "{}");
+                values.put("name2", "{'test' : 25}");
+                stub.reconfigure(values);
+                Assert.fail("Shall throw exception");
+            } catch (ExecutionException e) {
+            }
+        }
+    }
+
 
     /**
      * Asserts a property/value.
@@ -137,7 +187,7 @@ public abstract class AbstractEnvironmentTest {
             }
         }
     }
-
+    
     /**
      * Checks whether {@code obj} is a non-empty string.
      * 
@@ -175,7 +225,7 @@ public abstract class AbstractEnvironmentTest {
     }
     
     /**
-     * Checks whether the given {@code obj} complies with the {@link expected} version.
+     * Checks whether the given {@code obj} complies with the {@code expected} version.
      * 
      * @param obj the object to test
      * @param expected the expected version, may be <b>null</b> then we check for {@code obj} <b>null</b>

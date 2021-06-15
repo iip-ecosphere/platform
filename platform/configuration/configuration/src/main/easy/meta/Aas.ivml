@@ -9,9 +9,29 @@ project Aas {
     AasImpl aas = AasImpl::BaSyx;
     isDefined(aas);
 
-    enum AasProtocol { Default, VAB_TCP };
+    // AAS implementation protocols - extensible in code, enum not sufficient here
+
+    abstract compound AasProtocol {
+    }
+    
+    compound AasProtocolDefault refines AasProtocol {
+    }
+    
+    compound AasProtocolVabTcp refines AasProtocol {
+    }
+    
+    compound AasProtocolVabHttp refines AasProtocol {
+    }
+    
+    // missing VAB-HTTPS
+    
+    AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
+    isDefined(aasProtocol);
+    
     enum AasSchema {HTTP, HTTPS, TCP};
     enum Persistency {INMEMORY, MONGO};
+    
+    // global AAS network addresses, so far no discovery protocol available 
 
     compound EphemeralServerAddress {
     	AasSchema schema = AasSchema::HTTPS;
@@ -28,9 +48,9 @@ project Aas {
     }
 
     compound ImplAddress refines EphemeralServerAddress {
-        AasProtocol protocol = AasProtocol::VAB_TCP;
-    	AasSchema schema = AasSchema::TCP;
-    	isDefined(aasProtocol);
+        AasProtocol protocol = aasProtocol;
+    	AasSchema schema = AasProtocolVabTcp{};
+    	isDefined(protocol);
     }
     
     EndpointAddress aasServer;
