@@ -1,4 +1,5 @@
 import JavaBasics;
+import Basics;
 
 @advice(IIPEcosphere)
 vilScript IIPEcosphere (Project source, Configuration config, Project target) {
@@ -12,6 +13,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
     String javaSerializersPackage = "iip.serializers"; // link to javaSerializersSrc
     Path javaSerializersSrc = "${javaSrc}/iip/serializers";
+    String javaNodesPackage = "iip.nodes"; // link to javaNodesSrc
+    Path javaNodesSrc = "${javaSrc}/iip/nodes";
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
     Path platformRoot = "${target}/platform";
@@ -30,6 +33,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
             vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
+        };
+        
+        for (Application a : Application.allInstances()) {
+            for (ServiceNet n : a.services) {
+                setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e));
+                for (NetElement no : nodes) {
+                    String clsName = asTypeName(no.name);
+                    vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage);
+                };
+            };
         };
         
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");

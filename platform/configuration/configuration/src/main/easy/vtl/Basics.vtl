@@ -1,0 +1,20 @@
+@advice(IIPEcosphere)
+template Basics(Configuration config, FileArtifact target) {
+	
+	def setOf(NetInnerElement) nextNetNodes(NetElement elt) {
+	    getNextNetNodes(elt);
+    }
+
+    def setOf(NetInnerElement) getNextNetNodes(NetElement elt) {
+        {};
+    }
+    
+    def setOf(NetInnerElement) getNextNetNodes(NetSource source) {
+        source.next->collect(NetConnector c|c.next);
+    }
+
+    def setOf(NetInnerElement) getNextNetNodes(NetInnerElement elt) {
+        elt.next->collect(NetConnector c|c.next);
+    }
+	
+}
