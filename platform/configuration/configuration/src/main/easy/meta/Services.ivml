@@ -64,7 +64,7 @@ project Services {
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
    
    abstract compound Service refines CDataComponent {
-       NonEmptyString id;
+       Id id;
        NonEmptyString description;
        Version version;
        ServiceKind kind;

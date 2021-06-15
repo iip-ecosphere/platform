@@ -1,0 +1,35 @@
+@advice(IIPEcosphere)
+template PythonBasics(Configuration config, FileArtifact target) {
+
+    def String asIdentifier(String s) {
+        s;
+    }
+
+    def String asMethodNameSuffix(String s) {
+        s.firstToUpperCase().toIdentifier();
+    }
+    
+    def String asTypeName(String s) {
+        s.firstToUpperCase().toIdentifier();
+    }
+    
+    def String test(String s) {
+        s;
+    }
+    
+    def String toTypeName(DataType type) {
+        type.name;
+    }
+    
+    def String toTypeName(PrimitiveType type) {
+        switch(type.name) {
+            "Integer" : "int",
+            "Long" : "int",
+            "String" : "str",
+            "Boolean" : "bool",
+            "Float" : "float",
+            "Double" : "float"
+        }
+    }
+    
+}

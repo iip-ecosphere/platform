@@ -8,7 +8,8 @@ project DataTypes {
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
     typedef Port EphemeralPort with (Port >= 0);
     typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
-    typedef Version NonEmptyString with (matches(Version, "\\d+(\\.\\d+)*"));
+    typedef Version NonEmptyString with (matches(Version, "^\\d+(\\.\\d+)*$"));
+    typedef Id NonEmptyString with (matches(Id, "^\\S+$")); // non whitespace
     
     abstract compound DataType {
         NonEmptyString name;

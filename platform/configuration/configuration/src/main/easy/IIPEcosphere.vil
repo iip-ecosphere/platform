@@ -7,6 +7,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     Path appRoot = "${target}/app";
     Path javaSrc = "${appRoot}/src/main/java";
+    Path pySrc = "${appRoot}/src/main/python";
     String javaDatatypesPackage = "iip.datatypes"; // link to javaDatatypesSrc
     Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
     String javaSerializersPackage = "iip.serializers"; // link to javaSerializersSrc
@@ -27,6 +28,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String clsName = asTypeName(r.name);
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+            vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
+            vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
         };
         
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");

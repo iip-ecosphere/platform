@@ -6,7 +6,7 @@ project Applications {
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
     compound Application {
-        NonEmptyString id;
+        Id id;
         NonEmptyString name;
         String description;
         Version version;

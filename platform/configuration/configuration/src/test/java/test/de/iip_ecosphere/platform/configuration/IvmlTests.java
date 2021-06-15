@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.configuration;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -26,10 +27,13 @@ import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+
+import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironmentTest.*;
 
 /**
  * Tests the configuration component, in particular the IVML models.
@@ -96,19 +100,81 @@ public class IvmlTests {
         lcd.shutdown();
         setup.reset();
         
-        assertFile(gen, "app/src/main/java/iip/datatypes/Rec1.java");
-        assertFile(gen, "app/src/main/java/iip/serializers/Rec1Serializer.java");
+        assertApplication(gen);
+        assertEcsRuntime(gen);
+        assertServiceManager(gen);
+        assertPlatform(gen);
+    }
+
+    /**
+     * Asserts file and contents of the application part.
+     * 
+     * @param gen the generation base folder
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void assertApplication(File gen) throws IOException {
+        File base = new File(gen, "app");
+        File srcMain = new File(base, "src/main");
+        File srcMainJava = new File(srcMain, "java");
+        File srcMainPython = new File(srcMain, "python");
+        
+        assertFile(srcMainJava, "iip/datatypes/Rec1.java");
+        assertFile(srcMainJava, "iip/serializers/Rec1Serializer.java");
+        
+        assertFile(srcMainPython, "Rec1.py");
+        assertFile(srcMainPython, "Rec1Serializer.py");
+
         assertFileContains(gen, "app/pom.xml", "transport.spring.amqp", "transport.amqp");
         
-        assertFileContains(gen, "ecsRuntime/pom.xml", "ecsRuntime.docker", "transport.amqp", "support.aas.basyx");
-        assertFile(gen, "ecsRuntime/src/main/resources/iipecosphere.yml");
+        FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
+        JarUtils.extractZip(zip, srcMainPython.toPath());
+        zip.close();
         
-        assertFileContains(gen, "serviceMgr/pom.xml", "services.spring", "transport.amqp", "support.aas.basyx");
-        assertFile(gen, "serviceMgr/src/main/resources/iipecosphere.yml");
-        
-        assertFileContains(gen, "platform/pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
+        try {
+            int res = createPythonProcess(srcMainPython, "-m", "py_compile", "Rec1.py").waitFor();
+            Assert.assertEquals("Source code checking Rec1.py", 0, res);
+            res = createPythonProcess(srcMainPython, "-m", "py_compile", "Rec1Serializer.py").waitFor();
+            Assert.assertEquals("Source code checking Rec1Serializer.py", 0, res);
+        } catch (InterruptedException e) {
+            Assert.fail("Python code check shall not be interrupted: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Asserts file and contents of the ECS runtime component.
+     * 
+     * @param gen the generation base folder
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void assertEcsRuntime(File gen) throws IOException {
+        File base = new File(gen, "ecsRuntime");
+        assertFileContains(base, "pom.xml", "ecsRuntime.docker", "transport.amqp", "support.aas.basyx");
+        assertFile(base, "src/main/resources/iipecosphere.yml");
+    }
+
+    /**
+     * Asserts file and contents of the service manager component.
+     * 
+     * @param gen the generation base folder
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void assertServiceManager(File gen) throws IOException {
+        File base = new File(gen, "serviceMgr");
+        assertFileContains(base, "pom.xml", "services.spring", "transport.amqp", "support.aas.basyx");
+        assertFile(base, "src/main/resources/iipecosphere.yml");
+    }
+
+    /**
+     * Asserts file and contents of the platform (server) component.
+     * 
+     * @param gen the generation base folder
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void assertPlatform(File gen) throws IOException {
+        File base = new File(gen, "platform");
+        assertFileContains(base, "pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
             "configuration.configuration", "transport.amqp");
-        assertFile(gen, "platform/src/main/resources/iipecosphere.yml");
+        assertFile(base, "src/main/resources/iipecosphere.yml");
     }
     
     /**
