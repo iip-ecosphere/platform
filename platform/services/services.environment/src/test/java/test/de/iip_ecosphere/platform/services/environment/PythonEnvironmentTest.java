@@ -49,12 +49,11 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * Creates and starts a Python process.
      * 
      * @param dir the home dir where to find the script/run it within
-     * @param script the Python script to run
-     * @param args the command line arguments for the script
+     * @param args the process arguments for the script including python arguments (first), script and script arguments
      * @return the created process
      * @throws IOException if process creation fails
      */
-    public static Process createPythonProcess(File dir, String script, String... args) throws IOException {
+    public static Process createPythonProcess(File dir, String... args) throws IOException {
         String pythonPath = "python";
         // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
         File jenkinsPath = new File("/var/lib/jenkins/python/active/bin/python3");
@@ -64,11 +63,11 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         System.out.println("Using Python: " + pythonPath);
         List<String> tmp = new ArrayList<String>();
         tmp.add(pythonPath);
-        tmp.add(script);
         for (String a : args) {
             tmp.add(a);
         }
         
+        System.out.println("Cmd line: " + tmp);
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
@@ -81,13 +80,12 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     /**
      * Creates and starts a Python process with home directory "./src/test/python".
      * 
-     * @param script the Python script to run
-     * @param args the command line arguments for the script
+     * @param args the process arguments for the script including python arguments (first), script and script arguments
      * @return the created process
      * @throws IOException if process creation fails
      */
-    public static Process createPythonProcess(String script, String... args) throws IOException {
-        return createPythonProcess(new File("./src/test/python"), script, args);
+    public static Process createPythonProcess(String... args) throws IOException {
+        return createPythonProcess(new File("./src/test/python"), args);
     }
 
     /**
@@ -111,6 +109,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     private void testPythonEnvironment(String protocol) throws IOException, ExecutionException {
         ServerAddress vabServer = new ServerAddress(Schema.HTTP); // ephemeral
         List<String> args = new ArrayList<String>();
+        args.add("__init__.py");
         args.add("--port");
         args.add(String.valueOf(vabServer.getPort()));
         if (protocol.length() > 0) {
@@ -118,7 +117,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             args.add(protocol);
         }
         String[] tmp = new String[args.size()];
-        Process python = createPythonProcess("__init__.py", args.toArray(tmp));
+        Process python = createPythonProcess(args.toArray(tmp));
         // add protocol
         TimeUtils.sleep(1000); // works without on Windows, but not on Jenkins/Linux
 
