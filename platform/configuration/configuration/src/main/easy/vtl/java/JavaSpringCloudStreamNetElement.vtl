@@ -11,8 +11,9 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     def generateSpringMethods(NetSource elt) {
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
+            String methodSuffix = type.firstToUpperCase();
             '@Bean
-            public Supplier<${type}> create() {
+            public Supplier<${type}> create${methodSuffix}() {
                 return () -> null; // link to service
             }'
         }
@@ -22,8 +23,9 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         if (elt.impl.asynchronous) {
             for (IOType in : elt.input) {
                 String type = toTypeName(in.type);
+                String methodSuffix = type.firstToUpperCase();
                 '@Bean
-                public Consumer<${type}> process() {
+                public Consumer<${type}> process${methodSuffix}() {
                     return data -> {}; // link to service
                 }'
             }
@@ -35,8 +37,9 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
                 p = p + 1;
                 String inType = toTypeName(in.type);
                 String outType = toTypeName(out.type);
+                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
                 '@Bean
-                public Function<${inType}, ${outType}> process() {
+                public Function<${inType}, ${outType}> transform${methodSuffix}() {
                     return data -> null; // link to service
                 }'
             }
@@ -46,8 +49,9 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     def generateSpringMethods(NetSink elt) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
+            String methodSuffix = type.firstToUpperCase();
             '@Bean
-            public Consumer<${type}> receive() {
+            public Consumer<${type}> receive${methodSuffix}() {
                 return data -> {}; // link to service
             }'
         }

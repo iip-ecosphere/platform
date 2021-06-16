@@ -10,26 +10,45 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
     def generateDataMethods(NetSource elt) {
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
+            String methodSuffix = type.firstToUpperCase();
             '@Override
-            public ${type} create() {
+            public ${type} create${methodSuffix}() {
                 return null; // TODO connect via VAB
             }'
         }
     }
 
     def generateDataMethods(NetProcessor elt) {
-        //'@Bean
-        //public Function<String, String> process() {
-        //    return data -> ""; // input/output types required
-        //}'
-        '// missing method for processor'
+        if (elt.impl.asynchronous) {
+            for (IOType in : elt.input) {
+                String type = toTypeName(in.type);
+                String methodSuffix = type.firstToUpperCase();
+                'public void process${methodSuffix}(${type} data) {
+                    // TODO connect via VAB
+                }'
+            }
+        } else {
+            Integer p = 0;
+            while (p < elt.input.size()) {
+                IOType in = elt.input[p];
+                IOType out = elt.output[p];
+                p = p + 1;
+                String inType = toTypeName(in.type);
+                String outType = toTypeName(out.type);
+                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
+                'public ${outType} transform${methodSuffix}(${inType} data) {
+                    return null; // TODO connect via VAB
+                }'
+            }
+        }
     }
 
     def generateDataMethods(NetSink elt) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
+            String methodSuffix = type.firstToUpperCase();
             '@Override
-            public abstract receive(${type} data) {
+            public receive${methodSuffix}(${type} data) {
                 // TODO connect via VAB
             }'
         }

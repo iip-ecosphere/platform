@@ -10,22 +10,37 @@ template JavaNetElementInterface(Configuration config, FileArtifact target, NetE
     def generateDataMethods(NetSource elt) {
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
-            'public abstract ${type} create();'
+            String methodSuffix = type.firstToUpperCase();
+            'public abstract ${type} create${methodSuffix}();'
         }
     }
 
     def generateDataMethods(NetProcessor elt) {
-        //'@Bean
-        //public Function<String, String> process() {
-        //    return data -> ""; // input/output types required
-        //}'
-        '// missing method for processor'
+        if (elt.impl.asynchronous) {
+            for (IOType in : elt.input) {
+                String type = toTypeName(in.type);
+                String methodSuffix = type.firstToUpperCase();
+                'public abstract void process${methodSuffix}(${type} data);'
+            }
+        } else {
+            Integer p = 0;
+            while (p < elt.input.size()) {
+                IOType in = elt.input[p];
+                IOType out = elt.output[p];
+                p = p + 1;
+                String inType = toTypeName(in.type);
+                String outType = toTypeName(out.type);
+                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
+                'public abstract ${outType} transform${methodSuffix}(${inType} data);'
+            }
+        }
     }
 
     def generateDataMethods(NetSink elt) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
-            'public abstract receive(${type} data);'
+            String methodSuffix = type.firstToUpperCase();
+            'public abstract receive${methodSuffix}(${type} data);'
         }
     }
 
