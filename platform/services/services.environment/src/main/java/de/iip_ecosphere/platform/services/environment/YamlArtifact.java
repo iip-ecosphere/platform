@@ -50,6 +50,37 @@ public class YamlArtifact extends AbstractYamlArtifact {
     }
 
     /**
+     * Returns a YAML service information object based on the given service id.
+     * 
+     * @param id the service id
+     * @return the YamlService, <b>null</b> if none was found
+     */
+    public YamlService getService(String id) {
+        YamlService result = null;
+        for (int s = 0; null == result && s < services.size(); s++) {
+            YamlService tmp = services.get(s);
+            if (tmp.getId().equals(id)) {
+                result = tmp;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns a YAML service information object based on the given service id.
+     * 
+     * @param id the service id
+     * @return the YamlService, a default instance if none was found
+     */
+    public YamlService getServiceSafe(String id) {
+        YamlService result = getService(id);
+        if (null == result) {
+            result = new YamlService();
+        }
+        return result;
+    }
+
+    /**
      * Reads an {@link YamlArtifact} from a YAML input stream. The returned artifact may be invalid.
      * 
      * @param in the input stream (may be <b>null</b>)

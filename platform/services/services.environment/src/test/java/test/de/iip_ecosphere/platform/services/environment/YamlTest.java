@@ -48,6 +48,15 @@ public class YamlTest {
         Assert.assertEquals("0.2.0", service.getVersion().toString());
         Assert.assertEquals(ServiceKind.SOURCE_SERVICE, service.getKind());
         Assert.assertTrue(service.isDeployable());
+        
+        Assert.assertNull(art.getService("xyz"));
+        Assert.assertNotNull(art.getService("simpleStream-create"));
+        Assert.assertEquals("simpleStream-create", art.getService("simpleStream-create").getId());
+        
+        Assert.assertNotNull(art.getServiceSafe("xyz"));
+        Assert.assertEquals(null, art.getServiceSafe("xyz").getId());
+        Assert.assertNotNull(art.getServiceSafe("simpleStream-create"));
+        Assert.assertEquals("simpleStream-create", art.getServiceSafe("simpleStream-create").getId());
     }
     
 }
