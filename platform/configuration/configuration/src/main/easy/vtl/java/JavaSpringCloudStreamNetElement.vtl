@@ -13,16 +13,34 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             String type = toTypeName(out.type);
             '@Bean
             public Supplier<${type}> create() {
-                return () -> ""; // input/output types required
+                return () -> null; // link to service
             }'
         }
     }
 
     def generateSpringMethods(NetProcessor elt) {
-        '@Bean
-        public Function<String, String> process() {
-            return data -> ""; // input/output types required
-        }'
+        if (elt.impl.asynchronous) {
+            for (IOType in : elt.input) {
+                String type = toTypeName(in.type);
+                '@Bean
+                public Consumer<${type}> process() {
+                    return data -> {}; // link to service
+                }'
+            }
+        } else {
+            Integer p = 0;
+            while (p < elt.input.size()) {
+                IOType in = elt.input[p];
+                IOType out = elt.output[p];
+                p = p + 1;
+                String inType = toTypeName(in.type);
+                String outType = toTypeName(out.type);
+                '@Bean
+                public Function<${inType}, ${outType}> process() {
+                    return data -> null; // link to service
+                }'
+            }
+        }
     }
 
     def generateSpringMethods(NetSink elt) {
@@ -30,7 +48,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             String type = toTypeName(in.type);
             '@Bean
             public Consumer<${type}> receive() {
-                return data -> {}; // input/output types required
+                return data -> {}; // link to service
             }'
         }
     }

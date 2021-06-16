@@ -53,7 +53,7 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(StringType)}}
-        // parameter
+        // TODO parameter
     };
 
     Service myAnonymizerService = JavaService {
@@ -67,7 +67,7 @@ project SerializerConfig1 {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(StringType)}},
         output = {{type=refBy(rec1)}}
-        // input, output, parameter
+        // TODO parameter
     };
 
     Service myKiService = JavaService {
@@ -75,15 +75,16 @@ project SerializerConfig1 {
         name = "myKi example",
         description = "",
         version = "0.1.0",
+        asynchronous = false,
         deployable = true,
         class = "MyAnonymizerImpl",
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(StringType)}}
-        // input, output, parameter
+        // TODO parameter
     };
-    
+
     // ------------ application and service nets ------------------
     
     Application myApp = {

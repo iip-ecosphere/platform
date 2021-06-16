@@ -75,11 +75,16 @@ project Services {
    abstract compound ServiceBase refines CDataComponent {
        NonEmptyString name; // forward declaration
        ServiceKind kind;
-       // TODO kind defines input/output required
+       Boolean asynchronous = true;
        sequenceOf(IOType) input;
        sequenceOf(IOType) output;
        // TODO refine parameter
        //sequenceOf(CReversibleProperty) parameters;
+
+       kind == ServiceKind.SOURCE_SERVICE implies output.size() > 0;
+       kind == ServiceKind.SINK_SERVICE implies input.size() > 0;
+       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies input.size() > 0 and output.size() > 0;
+       not(asynchronous) implies input.size() == output.size();
    }
    
    abstract compound Service refines ServiceBase {
