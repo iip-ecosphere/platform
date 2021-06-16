@@ -1,20 +1,34 @@
 @advice(IIPEcosphere)
 template Basics(Configuration config, FileArtifact target) {
 	
-	def setOf(NetInnerElement) nextNetNodes(NetElement elt) {
-	    getNextNetNodes(elt);
+	def setOf(NetInnerElement) nextNetNodes(NetElement elt, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+	    getNextNetNodes(elt, mappedNet);
     }
 
-    def setOf(NetInnerElement) getNextNetNodes(NetElement elt) {
+    def setOf(NetInnerElement) getNextNetNodes(NetElement elt, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
         {};
     }
     
-    def setOf(NetInnerElement) getNextNetNodes(NetSource source) {
-        source.next->collect(NetConnector c|c.next);
+    def setOf(NetInnerElement) getNextNetNodes(NetSource source, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+        mapNext(source, source.next, mappedNet);
     }
 
-    def setOf(NetInnerElement) getNextNetNodes(NetInnerElement elt) {
-        elt.next->collect(NetConnector c|c.next);
+    def setOf(NetInnerElement) getNextNetNodes(NetInnerElement elt, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+        mapNext(elt, elt.next, mappedNet);
+    }
+    
+    def setOf(NetInnerElement) mapNext(NetElement elt, setOf(NetConnector) next, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+        for (NetConnector c: next) {
+            setOf(NetConnector) connectors; // TODO could a getAdd(elt, {}) operation help here?
+            if (mappedNet.containsKey(elt)) {
+                connectors = mappedNet.get(elt);
+            } else {
+                connectors = {};
+                mappedNet.add(elt, connectors);
+            }
+            connectors.add(c);
+        }
+        next->collect(NetConnector c|c.next);
     }
 	
 }

@@ -1,0 +1,24 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+template SpringCloudStreamBasics(Configuration config, FileArtifact target) {
+
+    def functionName(NetElement elt) {
+        "";
+    }
+    
+    // TODO add datatype
+    
+    def functionName(NetSource elt) {
+        "create" + asMethodNameSuffix(elt.name);
+    }
+
+    def functionName(NetProcessor elt) {
+        "process" + asMethodNameSuffix(elt.name);
+    }
+
+    def functionName(NetSink elt) {
+        "receive" + asMethodNameSuffix(elt.name);
+    }
+    
+}

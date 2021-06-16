@@ -60,6 +60,11 @@ project Services {
    isDefined(serviceProtocol);
 
    // -------------------- services ------------------
+
+   // required by meta concepts, direct ref would be alternative but conflit with QM   
+   compound IOType refines CDataProperty {
+       refTo(DataType) type;
+   }
    
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
@@ -70,10 +75,11 @@ project Services {
    abstract compound ServiceBase refines CDataComponent {
        NonEmptyString name; // forward declaration
        ServiceKind kind;
-
-       // refine parameter
-       // refine input
-       // refine output
+       // TODO kind defines input/output required
+       sequenceOf(IOType) input;
+       sequenceOf(IOType) output;
+       // TODO refine parameter
+       //sequenceOf(CReversibleProperty) parameters;
    }
    
    abstract compound Service refines ServiceBase {

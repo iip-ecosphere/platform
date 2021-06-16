@@ -50,8 +50,10 @@ project SerializerConfig1 {
         version = "0.1.0",
         deployable = true,
         class = "MySourceImpl",
-        artifact = ""
-        // input, output, parameter
+        artifact = "",
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(StringType)}}
+        // parameter
     };
 
     Service myAnonymizerService = JavaService {
@@ -61,7 +63,10 @@ project SerializerConfig1 {
         version = "0.1.0",
         deployable = true,
         class = "MyAnonymizerImpl",
-        artifact = ""
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(StringType)}},
+        output = {{type=refBy(rec1)}}
         // input, output, parameter
     };
 
@@ -72,7 +77,10 @@ project SerializerConfig1 {
         version = "0.1.0",
         deployable = true,
         class = "MyAnonymizerImpl",
-        artifact = ""
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(StringType)}}
         // input, output, parameter
     };
     

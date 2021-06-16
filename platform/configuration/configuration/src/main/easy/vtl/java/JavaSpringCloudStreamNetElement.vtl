@@ -1,4 +1,5 @@
 import JavaBasics;
+import SpringCloudStreamBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -8,10 +9,13 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     }
 
     def generateSpringMethod(NetSource elt) {
-        '@Bean
-        public Supplier<String> create() {
-            return () -> ""; // input/output types required
-        }'
+        for (IOType out : elt.output) {
+            String type = toTypeName(out.type);
+            '@Bean
+            public Supplier<${type}> create() {
+                return () -> ""; // input/output types required
+            }'
+        }
     }
 
     def generateSpringMethod(NetProcessor elt) {
@@ -22,10 +26,13 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     }
 
     def generateSpringMethod(NetSink elt) {
-        '@Bean
-        public Consumer<String> receive() {
-            return data -> {}; // input/output types required
-        }'
+        for (IOType in : elt.input) {
+            String type = toTypeName(in.type);
+            '@Bean
+            public Consumer<${type}> receive() {
+                return data -> {}; // input/output types required
+            }'
+        }
     }
 
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
@@ -35,6 +42,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         import java.util.function.*;
         import org.springframework.context.annotation.Bean;
         import org.springframework.stereotype.Component;
+        import iip.datatypes.*;
 
         /**
          * Spring Cloud Stream service frame for net node \'${elt.name}\'.

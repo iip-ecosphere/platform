@@ -33,8 +33,12 @@ project Applications {
         refTo(NetInnerElement) next;
     }
     
+    // TODO input, output, in/out propagation
+    
     compound NetSource refines NetElement {
         setOf(refTo(NetConnector)) next;
+        sequenceOf(IOType) output;
+        output == impl.output;
         
         kind == ServiceKind::SOURCE_SERVICE;
     }
@@ -44,11 +48,17 @@ project Applications {
     }
     
     compound NetProcessor refines NetInnerElement {
+        sequenceOf(IOType) input;
+        sequenceOf(IOType) output;
+        input == impl.input;
+        output == impl.output;
 
         kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
     }
     
     compound NetSink refines NetInnerElement {
+        sequenceOf(IOType) input;
+        input == impl.input;
 
         kind == ServiceKind::SINK_SERVICE;
     }

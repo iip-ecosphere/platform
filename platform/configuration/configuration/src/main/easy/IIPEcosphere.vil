@@ -35,36 +35,39 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
         };
         
+        // TODO individualize paths per application
         for (Application a : Application.allInstances()) {
+            mapOf(NetElement, setOf(NetConnector)) mappedNet = {};
             for (ServiceNet n : a.services) {
-                setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e));
+                setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e, mappedNet));
                 for (NetElement no : nodes) {
                     String clsName = asTypeName(no.name);
                     vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage);
                 };
             };
+            vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${appRoot}/src/main/resources/application.yml", mappedNet=mappedNet);
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");
         };
         
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml");
-        maven("${appRoot}");
+        //maven("${appRoot}");
         
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
-        maven("${ecsRuntimeRoot}");
+        //maven("${ecsRuntimeRoot}");
         
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
-        maven("${serviceMgrRoot}");
+        //maven("${serviceMgrRoot}");
         
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
-        maven("${platformRoot}");
+        //maven("${platformRoot}");
     }
 
 }
