@@ -35,7 +35,7 @@ public class YamlTest {
      */
     @Test
     public void testYaml() throws IOException {
-        YamlArtifact art = YamlArtifact.readFromYaml(YamlTest.class.getResourceAsStream("/deployment.yml"));
+        YamlArtifact art = YamlArtifact.readFromYamlSafe(YamlTest.class.getResourceAsStream("/deployment.yml"));
         Assert.assertEquals("art", art.getId());
         Assert.assertEquals("simpleStream.spring", art.getName());
         Assert.assertEquals("0.1.9", art.getVersion().toString());

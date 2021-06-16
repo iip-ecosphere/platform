@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
@@ -58,6 +60,33 @@ public class YamlArtifact extends AbstractYamlArtifact {
         YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
         if (null == result.services) {
             result.services = new ArrayList<>();
+        }
+        return result;
+    }
+    
+    /**
+     * Reads from the given YAML input stream, closes the stream. Logs errors and returns a default instance in case 
+     * of failures.
+     * 
+     * @param in the input stream (may be <b>null</b>)
+     * @return the YAML artifact
+     */
+    public static YamlArtifact readFromYamlSafe(InputStream in) {
+        YamlArtifact result; 
+        try {
+            result = readFromYaml(in);
+            if (null != in) {
+                in.close();
+            }
+        } catch (IOException e) {
+            if (null != in) {
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                }
+            }
+            result = new YamlArtifact();
+            LoggerFactory.getLogger(YamlArtifact.class).warn("Cannot read deployment.yml: " + e.getMessage());
         }
         return result;
     }
