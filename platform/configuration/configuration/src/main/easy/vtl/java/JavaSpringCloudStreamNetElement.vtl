@@ -5,10 +5,10 @@ import SpringCloudStreamBasics;
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) {
 
-    def generateSpringMethod(NetElement elt) {
+    def generateSpringMethods(NetElement elt) {
     }
 
-    def generateSpringMethod(NetSource elt) {
+    def generateSpringMethods(NetSource elt) {
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
             '@Bean
@@ -18,14 +18,14 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }
     }
 
-    def generateSpringMethod(NetProcessor elt) {
+    def generateSpringMethods(NetProcessor elt) {
         '@Bean
         public Function<String, String> process() {
             return data -> ""; // input/output types required
         }'
     }
 
-    def generateSpringMethod(NetSink elt) {
+    def generateSpringMethods(NetSink elt) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
             '@Bean
@@ -43,6 +43,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         import org.springframework.context.annotation.Bean;
         import org.springframework.stereotype.Component;
         import iip.datatypes.*;
+        import iip.interfaces.*;
+        import iip.stubs.*;
 
         /**
          * Spring Cloud Stream service frame for net node \'${elt.name}\'.
@@ -51,7 +53,9 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         @Component
         public class ${clsName} {
         
-            ${generateSpringMethod(elt)}
+            private ${clsName}Service service;
+        
+            ${generateSpringMethods(elt)}
         
         }'
     }
