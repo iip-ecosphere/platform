@@ -1,0 +1,63 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template NetBasics(Configuration config, FileArtifact target) {
+
+    def generateDataMethods(NetElement elt) {
+    }
+
+    def generateDataMethods(NetSource elt) {
+        for (IOType out : elt.output) {
+            String type = toTypeName(out.type);
+            String methodSuffix = type.firstToUpperCase();
+            generateSourceMethod(type, methodSuffix);
+        }
+    }
+
+    def generateDataMethods(NetProcessor elt) {
+        if (elt.impl.asynchronous) {
+            for (IOType in : elt.input) {
+                String type = toTypeName(in.type);
+                String methodSuffix = type.firstToUpperCase();
+                generateAsyncProcessorInMethod(type, methodSuffix);
+            }
+        } else {
+            Integer p = 0;
+            while (p < elt.input.size()) {
+                IOType in = elt.input[p];
+                IOType out = elt.output[p];
+                p = p + 1;
+                String inType = toTypeName(in.type);
+                String outType = toTypeName(out.type);
+                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
+                generateSyncProcessorMethod(inType, outType, methodSuffix);
+            }
+        }
+    }
+
+    def generateDataMethods(NetSink elt) {
+        for (IOType in : elt.input) {
+            String type = toTypeName(in.type);
+            String methodSuffix = type.firstToUpperCase();
+            generateSinkMethod(type, methodSuffix);
+        }
+    }
+
+    def generateSourceMethod(String type, String methodSuffix) {
+        ''
+    } 
+
+    def generateAsyncProcessorInMethod(String type, String methodSuffix) {
+        ''
+    } 
+
+    def generateSyncProcessorMethod(String inType, String outType, String methodSuffix) {
+        ''
+    } 
+    
+    def generateSinkMethod(String type, String methodSuffix) {
+        ''
+    } 
+    
+}

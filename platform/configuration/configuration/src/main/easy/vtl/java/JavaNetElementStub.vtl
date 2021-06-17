@@ -1,10 +1,11 @@
 import JavaBasics;
+import NetBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaNetElementStub(Configuration config, FileArtifact target, NetElement elt, String pkg) {
+template JavaNetElementStub(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
 
-    def generateDataMethods(NetElement elt) {
+    /*def generateDataMethods(NetElement elt) {
     }
 
     def generateDataMethods(NetSource elt) {
@@ -52,7 +53,33 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
                 // TODO connect via VAB
             }'
         }
-    }
+    }*/
+    
+    def generateSourceMethod(String type, String methodSuffix) {
+        '@Override
+        public ${type} create${methodSuffix}() {
+            return null; // TODO connect via VAB
+        }'
+    } 
+
+    def generateAsyncProcessorInMethod(String type, String methodSuffix) {
+        'public void process${methodSuffix}(${type} data) {
+            // TODO connect via VAB
+        }'
+    } 
+
+    def generateSyncProcessorMethod(String inType, String outType, String methodSuffix) {
+        'public ${outType} transform${methodSuffix}(${inType} data) {
+            return null; // TODO connect via VAB
+        }'
+    } 
+    
+    def generateSinkMethod(String type, String methodSuffix) {
+        '@Override
+        public receive${methodSuffix}(${type} data) {
+            // TODO connect via VAB
+        }'
+    } 
 
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
