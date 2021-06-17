@@ -8,74 +8,55 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
 
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(String type, String methodSuffix) {
-        '@Bean
+        '/**
+        * Creates data to be ingested.
+        *
+        * @return the data supplier functor
+        */
+        @Bean
         public Supplier<${type}> create${methodSuffix}() {
-            return () -> null; // link to service
+            return () -> service.create${methodSuffix}(); 
         }'
     } 
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
     def generateAsyncProcessorInMethod(String type, String methodSuffix) {
-        '@Bean
+        '/**
+        * Called when data arrived that shall be processed (asynchronously).
+        *
+        * @return the data consumer functor
+        */
+        @Bean
         public Consumer<${type}> process${methodSuffix}() {
-            return data -> {}; // link to service
+            return data -> service.process${methodSuffix}(data);
         }'
     } 
 
     // called via NetBasics.generateDataMethods for synch NetProcessor
     def generateSyncProcessorMethod(String inType, String outType, String methodSuffix) {
-        '@Bean
+        '/**
+        * Called when data arrived that shall be processed (synchronously).
+        *
+        * @return the data transformation functor
+        */
+        @Bean
         public Function<${inType}, ${outType}> transform${methodSuffix}() {
-            return data -> null; // link to service
+            return data -> service.transform${methodSuffix}(data);
         }'
     } 
     
     // called via NetBasics.generateDataMethods for NetSink
     def generateSinkMethod(String type, String methodSuffix) {
-        '@Bean
+        '/**
+        * Called when data arrived that shall be received (data sink).
+        *
+        * @return the data consumer functor
+        */
+        @Bean
         public Consumer<${type}> receive${methodSuffix}() {
-            return data -> {}; // link to service
+            return data -> service.receive${methodSuffix}(data);
         }'
     } 
-
-
-    /*def generateSpringMethods(NetProcessor elt) {
-        if (elt.impl.asynchronous) {
-            for (IOType in : elt.input) {
-                String type = toTypeName(in.type);
-                String methodSuffix = type.firstToUpperCase();
-                '@Bean
-                public Consumer<${type}> process${methodSuffix}() {
-                    return data -> {}; // link to service
-                }'
-            }
-        } else {
-            Integer p = 0;
-            while (p < elt.input.size()) {
-                IOType in = elt.input[p];
-                IOType out = elt.output[p];
-                p = p + 1;
-                String inType = toTypeName(in.type);
-                String outType = toTypeName(out.type);
-                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
-                '@Bean
-                public Function<${inType}, ${outType}> transform${methodSuffix}() {
-                    return data -> null; // link to service
-                }'
-            }
-        }
-    }
-
-    def generateSpringMethods(NetSink elt) {
-        for (IOType in : elt.input) {
-            String type = toTypeName(in.type);
-            String methodSuffix = type.firstToUpperCase();
-            '@Bean
-            public Consumer<${type}> receive${methodSuffix}() {
-                return data -> {}; // link to service
-            }'
-        }
-    }*/
 
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
@@ -95,7 +76,10 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         @Component
         public class ${clsName} {
         
-            private ${clsName}Service service;
+            private ${clsName}Service service; // TODO create service instance
+            // so far plain delegation, no support for service switching
+            // TODO link with administrative service part
+            // TODO link with asynchronous data output
         
             ${generateDataMethods(elt)}
         

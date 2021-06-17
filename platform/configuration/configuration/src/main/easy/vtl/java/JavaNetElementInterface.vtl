@@ -7,22 +7,43 @@ template JavaNetElementInterface(Configuration config, FileArtifact target, NetE
 
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(String type, String methodSuffix) {
-        'public abstract ${type} create${methodSuffix}();'
+        '/**
+        * Creates data to be ingested.
+        *
+        * @return the created data, <b>null</b> for no data
+        */
+        public abstract ${type} create${methodSuffix}();'
     } 
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
     def generateAsyncProcessorInMethod(String type, String methodSuffix) {
-        'public abstract void process${methodSuffix}(${type} data);'
+        '/**
+        * Called when data arrived that shall be processed (asynchronously).
+        *
+        * @param data the arrived data 
+        */
+        public abstract void process${methodSuffix}(${type} data);'
     } 
 
     // called via NetBasics.generateDataMethods for synch NetProcessor
     def generateSyncProcessorMethod(String inType, String outType, String methodSuffix) {
-        'public abstract ${outType} transform${methodSuffix}(${inType} data);'
+        '/**
+        * Called when data arrived that shall be processed (synchronously).
+        *
+        * @param data the arrived data
+        * @return the transformation result, <b>null</b> for no data
+        */
+        public abstract ${outType} transform${methodSuffix}(${inType} data);'
     } 
     
     // called via NetBasics.generateDataMethods for NetSink
     def generateSinkMethod(String type, String methodSuffix) {
-        'public abstract receive${methodSuffix}(${type} data);'
+        '/**
+        * Called when data arrived that shall be received (data sink).
+        *
+        * @param data the data received data
+        */
+        public abstract receive${methodSuffix}(${type} data);'
     } 
 
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
