@@ -1,25 +1,45 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
+import NetBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) {
+template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
 
-    def generateSpringMethods(NetElement elt) {
-    }
+    // called via NetBasics.generateDataMethods for NetSource
+    def generateSourceMethod(String type, String methodSuffix) {
+        '@Bean
+        public Supplier<${type}> create${methodSuffix}() {
+            return () -> null; // link to service
+        }'
+    } 
 
-    def generateSpringMethods(NetSource elt) {
-        for (IOType out : elt.output) {
-            String type = toTypeName(out.type);
-            String methodSuffix = type.firstToUpperCase();
-            '@Bean
-            public Supplier<${type}> create${methodSuffix}() {
-                return () -> null; // link to service
-            }'
-        }
-    }
+    // called via NetBasics.generateDataMethods for asynch NetProcessor
+    def generateAsyncProcessorInMethod(String type, String methodSuffix) {
+        '@Bean
+        public Consumer<${type}> process${methodSuffix}() {
+            return data -> {}; // link to service
+        }'
+    } 
 
-    def generateSpringMethods(NetProcessor elt) {
+    // called via NetBasics.generateDataMethods for synch NetProcessor
+    def generateSyncProcessorMethod(String inType, String outType, String methodSuffix) {
+        '@Bean
+        public Function<${inType}, ${outType}> transform${methodSuffix}() {
+            return data -> null; // link to service
+        }'
+    } 
+    
+    // called via NetBasics.generateDataMethods for NetSink
+    def generateSinkMethod(String type, String methodSuffix) {
+        '@Bean
+        public Consumer<${type}> receive${methodSuffix}() {
+            return data -> {}; // link to service
+        }'
+    } 
+
+
+    /*def generateSpringMethods(NetProcessor elt) {
         if (elt.impl.asynchronous) {
             for (IOType in : elt.input) {
                 String type = toTypeName(in.type);
@@ -55,7 +75,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
                 return data -> {}; // link to service
             }'
         }
-    }
+    }*/
 
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
@@ -77,7 +97,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         
             private ${clsName}Service service;
         
-            ${generateSpringMethods(elt)}
+            ${generateDataMethods(elt)}
         
         }'
     }
