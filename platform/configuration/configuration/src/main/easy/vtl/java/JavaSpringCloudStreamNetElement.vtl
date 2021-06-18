@@ -21,6 +21,12 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             '${text}';
         }
     }
+    
+    def attachIngestors() {
+         for (String type : ingestorTypes) {
+             'service.attachIngestor(null);'
+         }
+    }
 
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(NetSource src, String type, String methodSuffix) {
@@ -74,6 +80,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }'
     } 
 
+    // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
         'package ${pkg};
@@ -97,7 +104,21 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             // TODO link with administrative service part
             // TODO link with asynchronous data output
         
+            /**
+             * Creates an instance.
+             */
+            public ${clsName}() {
+                attachIngestors();
+            }
+        
             ${generateDataMethods(elt)}
+
+            /**
+             * Attaches the ingestors.
+             */
+            private void attachIngestors() {
+                ${attachIngestors()}
+            }
         
         }'
     }
