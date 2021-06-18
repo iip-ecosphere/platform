@@ -5,6 +5,15 @@ import NetBasics;
 @indent(indentation = 4, additional = 0)
 template JavaNetElementStub(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
     
+    def generateIngestors() {
+         for (String type : ingestorTypes) {
+             '@Override
+             public void attachIngestor(DataIngestor<${type}> ingestor) {
+                 // TODO clarify with Python
+             }'
+         }
+    }
+    
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(NetSource src, String type, String methodSuffix) {
         '@Override
@@ -62,6 +71,7 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
             
             ${generateDataMethods(elt)}
         
+            ${generateIngestors()}
         }'
     }
     

@@ -4,6 +4,17 @@ import NetBasics;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaNetElementInterface(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
+    
+    def generateIngestors() {
+         for (String type : ingestorTypes) {
+             '/**
+             * Called by the platform to attach an asynchronous data ingestor for the type "${type}".
+             *
+             * @param ingestor the "${type}" ingestor instance
+             */
+             public abstract void attachIngestor(DataIngestor<${type}> ingestor);'
+         }
+    }
 
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(NetSource src, String type, String methodSuffix) {
@@ -70,7 +81,8 @@ template JavaNetElementInterface(Configuration config, FileArtifact target, NetE
             }*/
             
             ${generateDataMethods(elt)}
-        
+
+            ${generateIngestors()}        
         }'
     }
     
