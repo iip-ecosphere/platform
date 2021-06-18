@@ -32,7 +32,7 @@ project Transport {
     TransportProtocol transportProtocol = TransportProtocolAMQP {
     };
     
-    Constraint transportProtocolDefined = isDefined(transportProtocol);
+    isDefined(transportProtocol);
     
     // TODO 
     // - transport protocol playload limitation
@@ -40,7 +40,6 @@ project Transport {
     freeze {
         // prevent later changes of constraint but make it referencable to .text
         serializerDefined;
-        transportProtocolDefined;
     };
     
 }

@@ -95,11 +95,19 @@ project Services {
    }
    
    compound JavaService refines Service {
-       NonEmptyString class;
+       String class; // optional class name, if not given do not generate service binding
        String artifact; // optional maven artifact
+       
+       isDefined(class); // must be defined, not necessarily with a value
+       isDefined(artifact); // must be defined, not necessarily with a value
    }
    
    compound PythonService refines Service {
+   }
+   
+   // IIP-Ecosphere provided connectors
+   compound Connector refines Service {
+       kind == ServiceKind.SOURCE_SERVICE;
    }
    
    // ------------------------ families -----------------

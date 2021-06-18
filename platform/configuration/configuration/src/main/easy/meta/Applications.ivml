@@ -33,7 +33,7 @@ project Applications {
         refTo(NetInnerElement) next;
     }
     
-    // TODO input, output, in/out propagation
+    // TODO graph validation -> QM
     
     compound NetSource refines NetElement {
         setOf(refTo(NetConnector)) next;
