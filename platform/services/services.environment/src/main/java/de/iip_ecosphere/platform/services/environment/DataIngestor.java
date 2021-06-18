@@ -13,10 +13,11 @@
 package de.iip_ecosphere.platform.services.environment;
 
 /**
- * Allows to ingest data asynchronously.
- * @author Holger Eichelberger, SSE
+ * Allows to ingest data asynchronously. An ingestor encapsulates access to a certain named channel but
+ * does not expose the channel or its name.
  *
  * @param <D> the type od data to ingest
+ * @author Holger Eichelberger, SSE
  */
 public interface DataIngestor<D> {
     
