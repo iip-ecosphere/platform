@@ -16,7 +16,7 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
     }
     
     // called via NetBasics.generateDataMethods for NetSource
-    def generateSourceMethod(NetSource src, String type, String methodSuffix) {
+    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '@Override
         public ${type} ${methodSuffix}() {
             return null; // TODO connect via VAB
@@ -24,21 +24,21 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
     } 
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix) {
+    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         'public void ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 
 
     // called via NetBasics.generateDataMethods for synch NetProcessor
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix) {
+    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         'public ${outType} ${methodSuffix}(${inType} data) {
             return null; // TODO connect via VAB
         }'
     } 
     
     // called via NetBasics.generateDataMethods for NetSink
-    def generateSinkMethod(NetSink snk, String type, String methodSuffix) {
+    def generateSinkMethod(NetSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '@Override
         public ${methodSuffix}(${type} data) {
             // TODO connect via VAB

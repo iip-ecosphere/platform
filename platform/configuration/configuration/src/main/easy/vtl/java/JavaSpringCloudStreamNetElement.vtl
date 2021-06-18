@@ -22,61 +22,61 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }
     }
     
-    def attachIngestors(String serviceId) {
+    def attachIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
              String type = ingestors.get(methodSuffix);
-             'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${serviceId}_${methodSuffix}", data));'
+             'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${methodSuffix}", data));'
          }
     }
-
+    
     // called via NetBasics.generateDataMethods for NetSource
-    def generateSourceMethod(NetSource src, String type, String methodSuffix) {
+    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Creates data to be ingested.
         *
         * @return the data supplier functor
         */
         @Bean
-        public Supplier<${type}> ${methodSuffix}() {
+        public Supplier<${type}> ${methodSuffixWithServiceId}() {
             return () -> ${fallbackToNull(src, "service.${methodSuffix}()")}; 
         }'
     } 
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix) {
+    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (asynchronously).
         *
         * @return the data consumer functor
         */
         @Bean
-        public Consumer<${type}> ${methodSuffix}() {
+        public Consumer<${type}> ${methodSuffixWithServiceId}() {
             return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
         }'
     } 
 
     // called via NetBasics.generateDataMethods for synch NetProcessor
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix) {
+    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (synchronously).
         *
         * @return the data transformation functor
         */
         @Bean
-        public Function<${inType}, ${outType}> ${methodSuffix}() {
+        public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}() {
             return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
         }'
     } 
     
     // called via NetBasics.generateDataMethods for NetSink
-    def generateSinkMethod(NetSink snk, String type, String methodSuffix) {
+    def generateSinkMethod(NetSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be received (data sink).
         *
         * @return the data consumer functor
         */
         @Bean
-        public Consumer<${type}> ${methodSuffix}() {
+        public Consumer<${type}> ${methodSuffixWithServiceId}() {
             return data -> ${fallbackToNull(snk, "service.${methodSuffix}(data)")};
         }'
     } 
@@ -85,7 +85,6 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
         ServiceBase impl = elt.impl;
-        String serviceId = impl.id.toIdentifier();
         'package ${pkg};
         
         import java.util.function.*;
@@ -124,7 +123,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
              * Attaches the ingestors.
              */
             private void attachIngestors() {
-                ${attachIngestors(serviceId)}
+                ${attachIngestors()}
             }
         
         }'

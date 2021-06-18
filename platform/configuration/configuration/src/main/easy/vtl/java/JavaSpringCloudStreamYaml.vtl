@@ -1,9 +1,10 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
+import NetBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) extends NetBasics {
 
     // TODO do we need a sequence here?
     def function(mapOf(NetElement, setOf(NetConnector)) mappedNet) {
@@ -12,18 +13,43 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
             if (result.length() > 0) {
                 result = result + ";";
             }
-            result = result + functionName(elt);
+            result = result + generateDataMethods(elt);
         }        
         result;
     }
     
     def bindings(mapOf(NetElement, setOf(NetConnector)) mappedNet) {
         for (NetElement elt: mappedNet.keys()) {
-            '${elt.name}:
-                destination: xxx'
+            String eltMet = generateDataMethods(elt);
+            '${eltMet}-out-0:
+                destination: ${eltMet}
+            '
+            for (NetConnector conn: mappedNet.get(elt)) {
+                NetInnerElement next = conn.next;
+                String nextMeth = generateDataMethods(next);
+                '${nextMeth}-in-0:
+                    destination: ${eltMet}
+                '
+            }
         }
     }
+    
+    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        methodSuffixWithServiceId;
+    } 
 
+    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        methodSuffixWithServiceId;
+    } 
+
+    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+        methodSuffixWithServiceId;
+    } 
+    
+    def generateSinkMethod(NetSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        methodSuffixWithServiceId;
+    } 
+ 
     def main(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
         'spring:
             cloud:
