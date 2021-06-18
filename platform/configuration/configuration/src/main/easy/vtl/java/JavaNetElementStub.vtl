@@ -6,9 +6,10 @@ import NetBasics;
 template JavaNetElementStub(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
     
     def generateIngestors() {
-         for (String type : ingestorTypes) {
+         for (String methodSuffix : ingestors.getKeys()) {
+             String type = ingestors.get(methodSuffix);
              '@Override
-             public void attachIngestor(DataIngestor<${type}> ingestor) {
+             public void attach${methodSuffix}Ingestor(DataIngestor<${type}> ingestor) {
                  // TODO clarify with Python
              }'
          }
@@ -17,21 +18,21 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(NetSource src, String type, String methodSuffix) {
         '@Override
-        public ${type} create${methodSuffix}() {
+        public ${type} ${methodSuffix}() {
             return null; // TODO connect via VAB
         }'
     } 
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
     def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix) {
-        'public void process${methodSuffix}(${type} data) {
+        'public void ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 
 
     // called via NetBasics.generateDataMethods for synch NetProcessor
     def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix) {
-        'public ${outType} transform${methodSuffix}(${inType} data) {
+        'public ${outType} ${methodSuffix}(${inType} data) {
             return null; // TODO connect via VAB
         }'
     } 
@@ -39,7 +40,7 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
     // called via NetBasics.generateDataMethods for NetSink
     def generateSinkMethod(NetSink snk, String type, String methodSuffix) {
         '@Override
-        public receive${methodSuffix}(${type} data) {
+        public ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 

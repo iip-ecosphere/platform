@@ -22,9 +22,10 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }
     }
     
-    def attachIngestors() {
-         for (String type : ingestorTypes) {
-             'service.attachIngestor(null);'
+    def attachIngestors(String serviceId) {
+         for (String methodSuffix : ingestors.getKeys()) {
+             String type = ingestors.get(methodSuffix);
+             'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${serviceId}_${methodSuffix}", data));'
          }
     }
 
@@ -36,8 +37,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         * @return the data supplier functor
         */
         @Bean
-        public Supplier<${type}> create${methodSuffix}() {
-            return () -> ${fallbackToNull(src, "service.create${methodSuffix}()")}; 
+        public Supplier<${type}> ${methodSuffix}() {
+            return () -> ${fallbackToNull(src, "service.${methodSuffix}()")}; 
         }'
     } 
 
@@ -49,8 +50,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         * @return the data consumer functor
         */
         @Bean
-        public Consumer<${type}> process${methodSuffix}() {
-            return data -> ${fallbackToNull(proc, "service.process${methodSuffix}(data)")};
+        public Consumer<${type}> ${methodSuffix}() {
+            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
         }'
     } 
 
@@ -62,8 +63,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         * @return the data transformation functor
         */
         @Bean
-        public Function<${inType}, ${outType}> transform${methodSuffix}() {
-            return data -> ${fallbackToNull(proc, "service.transform${methodSuffix}(data)")};
+        public Function<${inType}, ${outType}> ${methodSuffix}() {
+            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
         }'
     } 
     
@@ -75,18 +76,22 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         * @return the data consumer functor
         */
         @Bean
-        public Consumer<${type}> receive${methodSuffix}() {
-            return data -> ${fallbackToNull(snk, "service.receive${methodSuffix}(data)")};
+        public Consumer<${type}> ${methodSuffix}() {
+            return data -> ${fallbackToNull(snk, "service.${methodSuffix}(data)")};
         }'
     } 
 
     // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
+        ServiceBase impl = elt.impl;
+        String serviceId = impl.id.toIdentifier();
         'package ${pkg};
         
         import java.util.function.*;
+        import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.context.annotation.Bean;
+        import org.springframework.cloud.stream.function.StreamBridge;
         import org.springframework.stereotype.Component;
         import iip.datatypes.*;
         import iip.interfaces.*;
@@ -99,6 +104,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         @Component
         public class ${clsName} {
         
+            @Autowired
+            private StreamBridge streamBridge;
             private ${clsName}Service service; // TODO create service instance
             // so far plain delegation, no support for service switching
             // TODO link with administrative service part
@@ -117,7 +124,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
              * Attaches the ingestors.
              */
             private void attachIngestors() {
-                ${attachIngestors()}
+                ${attachIngestors(serviceId)}
             }
         
         }'

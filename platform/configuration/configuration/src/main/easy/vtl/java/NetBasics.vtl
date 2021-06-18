@@ -4,7 +4,7 @@ import JavaBasics;
 @indent(indentation = 4, additional = 0)
 template NetBasics(Configuration config, FileArtifact target) {
 
-    setOf(String) ingestorTypes = {};
+    mapOf(String, String) ingestors = {};
 
     def generateDataMethods(NetElement elt) {
     }
@@ -12,8 +12,8 @@ template NetBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(NetSource elt) {
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
-            String methodSuffix = type.firstToUpperCase();
-            ingestorTypes.add(type);
+            String methodSuffix = "create" + type.firstToUpperCase();
+            ingestors.add(methodSuffix, type);
             generateSourceMethod(elt, type, methodSuffix);
         }
     }
@@ -22,8 +22,8 @@ template NetBasics(Configuration config, FileArtifact target) {
         if (elt.impl.asynchronous) {
             for (IOType in : elt.input) {
                 String type = toTypeName(in.type);
-                String methodSuffix = type.firstToUpperCase();
-                ingestorTypes.add(type);
+                String methodSuffix = "process" + type.firstToUpperCase();
+                ingestors.add(methodSuffix, type);
                 generateAsyncProcessorInMethod(elt, type, methodSuffix);
             }
         } else {
@@ -34,8 +34,8 @@ template NetBasics(Configuration config, FileArtifact target) {
                 p = p + 1;
                 String inType = toTypeName(in.type);
                 String outType = toTypeName(out.type);
-                ingestorTypes.add(outType);
-                String methodSuffix = inType.firstToUpperCase() + outType.firstToUpperCase();
+                String methodSuffix = "transform" + inType.firstToUpperCase() + outType.firstToUpperCase();
+                ingestors.add(methodSuffix, outType);
                 generateSyncProcessorMethod(elt, inType, outType, methodSuffix);
             }
         }
@@ -44,7 +44,7 @@ template NetBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(NetSink elt) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
-            String methodSuffix = type.firstToUpperCase();
+            String methodSuffix = "receive" + type.firstToUpperCase();
             generateSinkMethod(elt, type, methodSuffix);
         }
     }

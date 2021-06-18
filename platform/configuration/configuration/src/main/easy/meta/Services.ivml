@@ -73,6 +73,7 @@ project Services {
    // in some situations while in others it is important to have a service not being a family avoiding potential
    // instance recursions
    abstract compound ServiceBase refines CDataComponent {
+       Id id; // forward declaration
        NonEmptyString name; // forward declaration
        ServiceKind kind;
        Boolean asynchronous = true;
@@ -88,7 +89,6 @@ project Services {
    }
    
    abstract compound Service refines ServiceBase {
-       Id id;
        String description;
        IipVersion version;
        Boolean deployable;
