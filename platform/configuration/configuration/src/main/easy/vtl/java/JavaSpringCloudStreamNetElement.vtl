@@ -6,21 +6,29 @@ import NetBasics;
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
 
-    def fallbackToNull(NetElement elt, String text) {
-        fallbackToNull(elt.impl, text);
+    // -------------- special case no service allowed for convenience when building up a configuration ------------------
+
+    def fallbackToNull(NetElement elt, String text, Boolean func) {
+        fallbackToNull(elt.impl, text, func);
     }
 
-    def fallbackToNull(ServiceBase service, String text) {
+    def fallbackToNull(ServiceBase service, String text, Boolean func) {
         text;
     }
 
-    def fallbackToNull(JavaService service, String text) {
-        if (service.class.length() > 0) {
-            'null';
+    def fallbackToNull(JavaService service, String text, Boolean func) {
+        if (service.class.length() == 0) {
+            if (func) {
+                'null';
+            } else {
+                '{}';
+            }
         } else {
             '${text}';
         }
     }
+
+    // ----------------------------- NetBasics refinement/use ----------------------------
     
     def attachIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
@@ -38,7 +46,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         */
         @Bean
         public Supplier<${type}> ${methodSuffixWithServiceId}() {
-            return () -> ${fallbackToNull(src, "service.${methodSuffix}()")}; 
+            return () -> ${fallbackToNull(src, "service.${methodSuffix}()", true)}; 
         }'
     } 
 
@@ -51,7 +59,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         */
         @Bean
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
+            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", false)};
         }'
     } 
 
@@ -64,7 +72,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         */
         @Bean
         public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)")};
+            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", true)};
         }'
     } 
     
@@ -77,9 +85,39 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         */
         @Bean
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(snk, "service.${methodSuffix}(data)")};
+            return data -> ${fallbackToNull(snk, "service.${methodSuffix}(data)", false)};
         }'
     } 
+    
+    // --------------- initial service to obtain a service instance to run with -------------------------
+    
+    def initialService(ServiceBase service) {
+        ''
+    }
+
+    def initialService(Service service) {
+        ''
+    }
+
+    def initialService(JavaService service) {
+        if (service.class.length() > 0) {
+            '// service = new ${service.class}(); use reflection as no dependency'
+        } else {
+            '// NO service defined, no initialization possible'
+        }
+    }
+
+    // TODO connector
+
+    /*def initialService(ServiceFamily family) {
+       initialService(family.members.toSequence().first());
+    }*/
+
+    def initialService(PythonService service) {
+        '// TODO create ServiceStub'
+    }
+    
+    // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
@@ -106,14 +144,14 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             @Autowired
             private StreamBridge streamBridge;
             private ${clsName}Service service; // TODO create service instance
-            // so far plain delegation, no support for service switching
+            // so far plain delegation, preparation but so far no support for service switching
             // TODO link with administrative service part
-            // TODO link with asynchronous data output
         
             /**
              * Creates an instance.
              */
             public ${clsName}() {
+                ${initialService(elt.impl)}
                 attachIngestors();
             }
         

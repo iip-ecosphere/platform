@@ -77,7 +77,7 @@ project SerializerConfig1 {
         version = "0.1.0",
         asynchronous = false,
         deployable = true,
-        class = "MyAnonymizerImpl",
+        class = "MyKiImpl",
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
