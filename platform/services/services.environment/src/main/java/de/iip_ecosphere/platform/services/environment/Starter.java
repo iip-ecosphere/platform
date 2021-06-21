@@ -162,6 +162,15 @@ public class Starter {
     public static ProtocolServerBuilder getProtocolBuilder() {
         return builder;
     }
+
+    /**
+     * Returns the service mapper linked to {@link #getProtocolBuilder()}.
+     * 
+     * @return the service mapper, <b>null</b> if {@link #parse(String[])} was not called before
+     */
+    public static ServiceMapper getServiceMapper() {
+        return new ServiceMapper(builder);
+    }
     
     /**
      * Terminates running server instances.
@@ -209,6 +218,17 @@ public class Starter {
             result = dflt;
         }
         return result;
+    }
+
+    /**
+     * Simple default start main program without mapping any services before startup. This can be done on-demand
+     * through {@link #getProtocolBuilder()} and {@link #getServiceMapper()}.
+     * 
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Starter.parse(args);
+        Starter.start();
     }
 
 }
