@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -63,6 +65,37 @@ public abstract class AbstractService implements Service {
     protected AbstractService(YamlService yaml) {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
             yaml.getKind());
+    }
+
+    /**
+     * Convenience method for creating class instances using the class loader of this class.
+     * 
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor)
+     * @return the service instance (<b>null</b> if the service cannot be found/initialized)
+     */
+    public static Service createInstance(String className) {
+        return createInstance(AbstractService.class.getClassLoader(), className);
+    }
+    
+    /**
+     * Convenience method for creating class instances.
+     * 
+     * @param loader the class loader to load the class with
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor)
+     * @return the service instance (<b>null</b> if the service cannot be found/initialized)
+     */
+    public static Service createInstance(ClassLoader loader, String className) {
+        Service result = null;
+        try {
+            Class<?> serviceClass = loader.loadClass(className);
+            result = (Service) serviceClass.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+            LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
+                + className + "': " + e.getMessage() + ". Service will not be functional!");
+        }
+        return result;
     }
 
     // checkstyle: resume parameter number check
