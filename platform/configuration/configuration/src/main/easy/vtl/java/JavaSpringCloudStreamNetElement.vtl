@@ -91,17 +91,17 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     
     // --------------- initial service to obtain a service instance to run with -------------------------
     
-    def initialService(ServiceBase service) {
+    def initialService(ServiceBase service, String serviceType) {
         ''
     }
 
-    def initialService(Service service) {
+    def initialService(Service service, String serviceType) {
         ''
     }
 
-    def initialService(JavaService service) {
+    def initialService(JavaService service, String serviceType) {
         if (service.class.length() > 0) {
-            '// service = new ${service.class}(); use reflection as no dependency'
+            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -109,11 +109,11 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
 
     // TODO connector
 
-    /*def initialService(ServiceFamily family) {
-       initialService(family.members.toSequence().first());
+    /*def initialService(ServiceFamily family, String serviceType) {
+       initialService(family.members.toSequence().first(), serviceType);
     }*/
 
-    def initialService(PythonService service) {
+    def initialService(PythonService service, String serviceType) {
         '// TODO create ServiceStub'
     }
     
@@ -122,6 +122,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
+        String serviceType = "${clsName}Service";
         ServiceBase impl = elt.impl;
         'package ${pkg};
         
@@ -130,6 +131,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         import org.springframework.context.annotation.Bean;
         import org.springframework.cloud.stream.function.StreamBridge;
         import org.springframework.stereotype.Component;
+        import de.iip_ecosphere.platform.services.environment.*;
         import iip.datatypes.*;
         import iip.interfaces.*;
         import iip.stubs.*;
@@ -143,7 +145,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         
             @Autowired
             private StreamBridge streamBridge;
-            private ${clsName}Service service; // TODO create service instance
+            private ${serviceType} service;
             // so far plain delegation, preparation but so far no support for service switching
             // TODO link with administrative service part
         
@@ -151,7 +153,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
              * Creates an instance.
              */
             public ${clsName}() {
-                ${initialService(elt.impl)}
+                ${initialService(elt.impl, serviceType)}
                 attachIngestors();
             }
         
