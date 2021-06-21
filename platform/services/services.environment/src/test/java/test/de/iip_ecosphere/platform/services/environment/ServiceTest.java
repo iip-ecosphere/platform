@@ -30,7 +30,7 @@ public class ServiceTest {
     @Test
     public void testService() {
         Service instance = AbstractService.createInstance(
-            "test.de.iip_ecosphere.platform.services.environment.MyService");
+            "test.de.iip_ecosphere.platform.services.environment.MyService", Service.class);
         Assert.assertNotNull(instance);
     }
     

@@ -70,27 +70,31 @@ public abstract class AbstractService implements Service {
     /**
      * Convenience method for creating class instances using the class loader of this class.
      * 
+     * @param <S> the service type (parent interface of <code>className</code>)
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
      *     constructor)
+     * @param cls the class to cast to
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
-    public static Service createInstance(String className) {
-        return createInstance(AbstractService.class.getClassLoader(), className);
+    public static <S extends Service> S createInstance(String className, Class<S> cls) {
+        return createInstance(AbstractService.class.getClassLoader(), className, cls);
     }
     
     /**
      * Convenience method for creating class instances.
      * 
+     * @param <S> the service type (parent interface of <code>className</code>)
      * @param loader the class loader to load the class with
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
      *     constructor)
+     * @param cls the class to cast to
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
-    public static Service createInstance(ClassLoader loader, String className) {
-        Service result = null;
+    public static <S extends Service> S createInstance(ClassLoader loader, String className, Class<S> cls) {
+        S result = null;
         try {
             Class<?> serviceClass = loader.loadClass(className);
-            result = (Service) serviceClass.newInstance();
+            result = cls.cast(serviceClass.newInstance());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
             LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
                 + className + "': " + e.getMessage() + ". Service will not be functional!");
