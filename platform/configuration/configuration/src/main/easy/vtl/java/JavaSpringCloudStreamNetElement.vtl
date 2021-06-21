@@ -101,7 +101,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
 
     def initialService(JavaService service, String serviceType) {
         if (service.class.length() > 0) {
-            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);'
+            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);
+            Starter.getServiceMapper().mapService(service);'
         } else {
             '// NO service defined, no initialization possible'
         }
