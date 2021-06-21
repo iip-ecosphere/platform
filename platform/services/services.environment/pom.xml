@@ -24,6 +24,11 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors</artifactId>
+     <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
