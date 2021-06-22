@@ -53,7 +53,8 @@ template JavaConnector(Configuration config, FileArtifact target) {
     }
     
     def generateAdapterTranslators(Connector conn) {
-        '${generateMachineInputTranslator(conn)}
+        '
+        ${generateMachineInputTranslator(conn)}
         ${generateMachineOutputTranslator(conn)}'
     }
 
@@ -61,33 +62,34 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.inAdapterClass.length() == 0) {
             String coType = getFirstTypeName(conn.output);
             String oType = conn.machineOutput.type.name;
-            'private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
-            
-                @Override
-                public ${coType} to(${oType} source) throws IOException {
-                    return null; // TODO
-                }
-            
-                @Override
-                public void initializeModelAccess() throws IOException {
-                    //ModelAccess access = getModelAccess();
-                    //access.useNotifications(withNotifications);
-                    //customizer.initializeModelAccess(access, withNotifications);
-                }
-            
-                @Override
-                public Class<? extends ${oType}> getSourceType() {
-                    return ${oType}.class;
-                }
-            
-                @Override
-                public Class<? extends ${coType}> getTargetType() {
-                    return ${coType}.class;
-                }
-            
-            }'
+        '
+        private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
+        
+            @Override
+            public ${coType} to(${oType} source) throws IOException {
+                return null; // TODO
+            }
+        
+            @Override
+            public void initializeModelAccess() throws IOException {
+                //ModelAccess access = getModelAccess();
+                //access.useNotifications(withNotifications);
+                //customizer.initializeModelAccess(access, withNotifications);
+            }
+        
+            @Override
+            public Class<? extends ${oType}> getSourceType() {
+                return ${oType}.class;
+            }
+        
+            @Override
+            public Class<? extends ${coType}> getTargetType() {
+                return ${coType}.class;
+            }
+        
+        }'
         } else {
-            ''
+        ''
         }
     }
 
@@ -95,25 +97,25 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.outAdapterClass.length() == 0) {
             String ciType = getFirstTypeName(conn.input);
             String iType = conn.machineInput.type.name;
-            '
-            private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
-            
-                @Override
-                public ${iType} from(${ciType} data) throws IOException {
-                    return null; // TODO irrelevant?
-                }
-            
-                @Override
-                public Class<? extends ${iType}> getSourceType() {
-                    return ${iType}.class;
-                }
-            
-                @Override
-                public Class<? extends ${ciType}> getTargetType() {
-                    return ${ciType}.class;
-                }
-            
-            }'
+        '
+        private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
+        
+            @Override
+            public ${iType} from(${ciType} data) throws IOException {
+                return null; // TODO irrelevant?
+            }
+        
+            @Override
+            public Class<? extends ${iType}> getSourceType() {
+                return ${iType}.class;
+            }
+        
+            @Override
+            public Class<? extends ${ciType}> getTargetType() {
+                return ${ciType}.class;
+            }
+        
+        }'
         } else {
             ''
         }
