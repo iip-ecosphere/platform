@@ -1,0 +1,30 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaConnector(Configuration config, FileArtifact target) {
+
+    def getConnectorGenerics(Connector conn, boolean withMachine) {
+        String type = "<";
+        if (withMachine) {
+            type = type + conn.machineOutput.type.name;
+            type = type + ",";
+            type = type + conn.machineInput.type.name;
+            type = type + ",";
+        }
+        type = type + getFirstTypeName(conn.output);
+        type = type + ",";
+        type = type + getFirstTypeName(conn.input);
+        type + ">";
+    }
+    
+    def getFirstTypeName(sequenceOf(IOType) types) {
+        if (types.size() > 0) {
+            IOType t = types.get(0);
+            t.type.name;
+        } else {
+            "Object";
+        }    
+    }
+
+}

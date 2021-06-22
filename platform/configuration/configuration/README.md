@@ -8,4 +8,6 @@ As configuration technology, we rely on [EASy-Producer](https://sse.uni-hildeshe
 
 - several details of the variability model / instantiation (in development)
 - AAS-based interfaces for the remaining components 
+- generated Java service instantiation: connector data reception, serializer registration, starter
+- generated Python service instantiation: data connection, serializer registration, ...
 

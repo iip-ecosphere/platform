@@ -50,6 +50,9 @@ project DataTypes {
     PrimitiveType DoubleType = {
         name = "Double"
     };
+    PrimitiveType ObjectType = {
+        name = "Object"
+    };
     
     // freeze all primitives
     freeze {
@@ -59,6 +62,7 @@ project DataTypes {
         BooleanType;
         FloatType;
         DoubleType;
+        ObjectType;
     };
     
 }

@@ -31,6 +31,16 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    def appendArtifact(XmlElement parent, String artifact, String dfltVersion="") {
+        sequenceOf(String) artList = artifact.split(":");
+        if (artList.size() == 2) {
+            appendDependency(parent, artList[0], artList[1], dfltVersion);
+        }
+        if (artList.size() == 3) {
+            appendDependency(parent, artList[0], artList[1], artList[2]);
+        }
+    }
+    
     // creates the Maven attributes for the project itself. The parent is the <project> node as e.g. returned by createMavenRoot
     // name or description may be omitted, packaging is by default "jar"
     def createMavenProjectAttributes(XmlElement project, String artifactId, String name, String description, String packaging="jar") {

@@ -55,6 +55,16 @@ project SerializerConfig1 {
         output = {{type=refBy(StringType)}}
         // TODO parameter
     };
+    
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myConn",
+        name = "myConn example",
+        description = "",
+        version = "0.1.0",
+        
+        input = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(StringType)}} // PRELIMINARY
+    };
 
     Service myAnonymizerService = JavaService {
         id = "myAnonymizer",
@@ -97,7 +107,11 @@ project SerializerConfig1 {
     
     ServiceNet myNet = {
         description = "initial service net",
-        sources = {refBy(mySource)}
+        sources = {refBy(mySource), refBy(myConn)}
+    };
+    
+    NetSource myConn = {
+       impl = refBy(myOpcUaConn)
     };
     
     NetSource mySource = {

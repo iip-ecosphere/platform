@@ -77,7 +77,7 @@ template JavaNetElementInterface(Configuration config, FileArtifact target, NetE
              * @param serviceId the service id of the implementing service
              */
             /*public Abstract${clsName}(String serviceId) { // TODO can be inserted for services but not for families
-                super(YamlArtifact.readFromYamlSafe(${clsName}.class.getResourceAsString("/deployment.yml"))
+                super(YamlArtifact.readFromYamlSafe(${clsName}.class.getResourceAsString("${getDeploymentDescriptorPath()}"))
                     .getServiceSafe(serviceId));
             }*/
             

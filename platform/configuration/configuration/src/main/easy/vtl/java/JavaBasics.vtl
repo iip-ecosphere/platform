@@ -32,4 +32,20 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    def String getArtifact(NetElement elt) {
+        getArtifact(elt.impl);
+    }
+    
+    def String getArtifact(ServiceBase service) {
+        "";
+    }
+
+    def String getArtifact(JavaService service) {
+        service.artifact;
+    }
+
+    def String getArtifact(Connector conn) {
+        conn.artifact;
+    }
+
 }

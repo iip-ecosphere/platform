@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(Configuration config, XmlFileArtifact target) {
+template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts) {
 
-    def main(Configuration config, XmlFileArtifact target) {
+    def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
@@ -17,6 +17,9 @@ template AppMvn(Configuration config, XmlFileArtifact target) {
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
+        for (String art : artifacts) {
+            appendArtifact(dep, art, projectVersion);
+        }
     }
 
 }

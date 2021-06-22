@@ -1,10 +1,13 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
 import NetBasics;
+import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
+
+    Boolean isConnector = false;
 
     // -------------- special case no service allowed for convenience when building up a configuration ------------------
 
@@ -39,6 +42,13 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     
     // called via NetBasics.generateDataMethods for NetSource
     def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateSourceMethod(src, src.impl, type, methodSuffix, methodSuffixWithServiceId);
+    }
+    
+    def generateSourceMethod(NetSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    }
+    
+    def generateSourceMethod(NetSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Creates data to be ingested.
         *
@@ -48,7 +58,23 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         public Supplier<${type}> ${methodSuffixWithServiceId}() {
             return () -> ${fallbackToNull(src, "service.${methodSuffix}()", true)}; 
         }'
-    } 
+    }
+
+    def generateSourceMethod(NetSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        '/**
+        * Called when data arrived that shall be passed on to the connector.
+        *
+        * @return the data consumer functor
+        */
+        @Bean
+        public Consumer<${type}> ${methodSuffixWithServiceId}() {
+            return data -> ${fallbackToNull(src, "service.send(data)", false)};
+        }'    
+    }
+    
+    def Boolean recordSourceIngestor(NetSource elt, IOType type) {
+        not(isConnector); // type(elt.impl) <> Connector
+    }
 
     // called via NetBasics.generateDataMethods for asynch NetProcessor
     def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
@@ -91,15 +117,15 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     
     // --------------- initial service to obtain a service instance to run with -------------------------
     
-    def initialService(ServiceBase service, String serviceType) {
+    def initialService(NetElement elt, ServiceBase service, String serviceType) {
         ''
     }
 
-    def initialService(Service service, String serviceType) {
+    def initialService(NetElement elt, Service service, String serviceType) {
         ''
     }
 
-    def initialService(JavaService service, String serviceType) {
+    def initialService(NetElement elt, JavaService service, String serviceType) {
         if (service.class.length() > 0) {
             'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);
             Starter.getServiceMapper().mapService(service);'
@@ -107,23 +133,52 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             '// NO service defined, no initialization possible'
         }
     }
+    
+    // TODO connector connect
+    // TODO connector protocol adapter
+    //         YamlArtifact.readFromYamlSafe(${clsName}.class
+    //        .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${conn.id}");
+    
+    
+    def initialService(NetElement elt, Connector conn, String serviceType) {
+        String connGen = getConnectorGenerics(conn, false);
+        String clsName = getClsName(elt);
+        '${conn.class}${connGen} conn = new ${conn.class}<>(null);
+        ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
+        service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn);'
+    }
 
-    // TODO connector
+    // TODO family
 
-    /*def initialService(ServiceFamily family, String serviceType) {
+    /*def initialService(NetElement elt, ServiceFamily family, String serviceType) {
        initialService(family.members.toSequence().first(), serviceType);
     }*/
 
-    def initialService(PythonService service, String serviceType) {
+    def initialService(NetElement elt, PythonService service, String serviceType) {
         '// TODO create ServiceStub'
+    }
+
+    // --------------- service type -------------------------
+    
+    def String getClsName(NetElement elt) {
+        asTypeName(elt.name);
+    }
+    
+    def getServiceType(NetElement elt, ServiceBase base) {
+        "${getClsName(elt)}Service";
+    }
+
+    def getServiceType(NetElement elt, Connector conn) {
+        isConnector = true;
+        "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
     }
     
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
     def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
-        String clsName = asTypeName(elt.name);
-        String serviceType = "${clsName}Service";
+        String clsName = getClsName(elt);
+        String serviceType = getServiceType(elt, elt.impl);
         ServiceBase impl = elt.impl;
         'package ${pkg};
         
@@ -148,13 +203,12 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             private StreamBridge streamBridge;
             private ${serviceType} service;
             // so far plain delegation, preparation but so far no support for service switching
-            // TODO link with administrative service part
         
             /**
              * Creates an instance.
              */
             public ${clsName}() {
-                ${initialService(elt.impl, serviceType)}
+                ${initialService(elt, elt.impl, serviceType)}
                 attachIngestors();
             }
         

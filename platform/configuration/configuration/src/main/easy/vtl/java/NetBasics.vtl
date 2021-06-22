@@ -5,12 +5,34 @@ import JavaBasics;
 template NetBasics(Configuration config, FileArtifact target) {
 
     mapOf(String, String) ingestors = {};
+    
+    def String getDeploymentDescriptorPath() {
+        "/deployment.yml";
+    }
+    
+    def String getYamlServiceFragment(String varName, String clsName, String serviceId) {
+        /*'YamlService ${varName};
+        try {
+            ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
+                .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}");
+        } catch (java.io.IOException e) {
+            org.slf4j.LoggerFactory.getLogger(${clsName}.class).error("Cannot read service deployment descriptor "
+                + "for ${serviceId}: " + e.getMessage());
+            ${varName} = new YamlService(); 
+        }'*/
+        'YamlService ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
+            .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}");'
+    }
 
     def getServiceIdSuffix(NetElement elt) {
         "";
     }
 
     def generateDataMethods(NetElement elt) {
+    }
+    
+    def Boolean recordSourceIngestor(NetSource elt, IOType type) {
+        true;
     }
 
     def generateDataMethods(NetSource elt) {
@@ -19,9 +41,19 @@ template NetBasics(Configuration config, FileArtifact target) {
             String type = toTypeName(out.type);
             String methodSuffix = "create" + type.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
-            ingestors.add(methodSuffixId, type);
+            if (recordSourceIngestor(elt, out)) {
+                ingestors.add(methodSuffixId, type);
+            }
             generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
         }
+    }
+
+    def Boolean recordAsyncProcessorIngestor(NetProcessor elt, IOType type) {
+        true;
+    }
+
+    def Boolean recordSyncProcessorIngestor(NetProcessor elt, IOType type) {
+        true;
     }
 
     def generateDataMethods(NetProcessor elt) {
@@ -31,7 +63,9 @@ template NetBasics(Configuration config, FileArtifact target) {
                 String type = toTypeName(in.type);
                 String methodSuffix = "process" + type.firstToUpperCase();
                 String methodSuffixId = methodSuffix + serviceId;
-                ingestors.add(methodSuffixId, type);
+                if (recordAsyncProcessorIngestor(elt, in)) {
+                    ingestors.add(methodSuffixId, type);
+                }
                 generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
             }
         } else {
@@ -44,12 +78,14 @@ template NetBasics(Configuration config, FileArtifact target) {
                 String outType = toTypeName(out.type);
                 String methodSuffix = "transform" + inType.firstToUpperCase() + outType.firstToUpperCase();
                 String methodSuffixId = methodSuffix + serviceId;
-                ingestors.add(methodSuffixId, outType);
+                if (recordSyncProcessorIngestor(elt, out)) {
+                    ingestors.add(methodSuffixId, outType);
+                }
                 generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
             }
         }
     }
-
+    
     def generateDataMethods(NetSink elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {

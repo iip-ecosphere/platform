@@ -82,10 +82,10 @@ project Services {
        // TODO refine parameter
        //sequenceOf(CReversibleProperty) parameters;
 
-       kind == ServiceKind.SOURCE_SERVICE implies output.size() > 0;
-       kind == ServiceKind.SINK_SERVICE implies input.size() > 0;
-       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies input.size() > 0 and output.size() > 0;
-       not(asynchronous) implies input.size() == output.size();
+       kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
+       kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
+       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and input.size() > 0 and isDefined(output) and output.size() > 0;
+       not(asynchronous) implies isDefined(input) and isDefined(output) and input.size() == output.size();
    }
    
    abstract compound Service refines ServiceBase {
@@ -107,8 +107,30 @@ project Services {
    
    // IIP-Ecosphere provided connectors
    compound Connector refines Service {
+       IOType machineInput; // initial only one
+       IOType machineOutput;
+       
+       String class;
+       String artifact;
+
+       output.size() < 2;
+       input.size() < 2;
        kind == ServiceKind.SOURCE_SERVICE;
+       deployable == true;
    }
+   
+   compound OpcUaV1Connector refines Connector {
+        String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
+        String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
+        IOType machineInput = {type = refBy(ObjectType)}; // predefined
+        IOType machineOutput = {type = refBy(OpcUaV1DataItemType)}; // predefined
+   }
+
+    PrimitiveType OpcUaV1DataItemType = {
+        name = "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"
+    };
+   
+   // TODO remaining connectors
    
    // ------------------------ families -----------------
    
@@ -117,5 +139,9 @@ project Services {
         Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
         kind == members.asSequence().first().kind; // propagate
    }
+   
+   freeze {
+       OpcUaV1DataItemType;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
    
 }
