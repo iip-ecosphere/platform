@@ -12,9 +12,12 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 
@@ -50,6 +53,19 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      */
     public Connector<O, I, CO, CI> getConnector() {
         return connector;
+    }
+    
+    /**
+     * Calls {@link Connector#write(Object)} on {@code} data and handles the respective exception.
+     * 
+     * @param data the data to write
+     */
+    public void send(CI data) {
+        try {
+            connector.write(data);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Data loss, cannot send data: " + e.getMessage());
+        }
     }
     
     @Override
