@@ -56,6 +56,26 @@ project SerializerConfig1 {
         // TODO parameter
     };
     
+    RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
+        name = "myConnMachineIn",
+        fields = {
+            Field {
+                name = "dataField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+
+    RecordType myConnMachineOut = { // PRELIMINARY, INITIAL
+        name = "myConnMachineOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
     OpcUaV1Connector myOpcUaConn = {
         id = "myConn",
         name = "myConn example",
@@ -63,7 +83,9 @@ project SerializerConfig1 {
         version = "0.1.0",
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}} // PRELIMINARY
+        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        inInterface = refBy(myConnMachineIn), // PRELIMINARY
+        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
     };
 
     Service myAnonymizerService = JavaService {

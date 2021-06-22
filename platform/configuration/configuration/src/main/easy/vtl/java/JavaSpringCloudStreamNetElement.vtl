@@ -136,14 +136,12 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     
     // TODO connector connect
     // TODO connector protocol adapter
-    //         YamlArtifact.readFromYamlSafe(${clsName}.class
-    //        .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${conn.id}");
-    
     
     def initialService(NetElement elt, Connector conn, String serviceType) {
         String connGen = getConnectorGenerics(conn, false);
         String clsName = getClsName(elt);
-        '${conn.class}${connGen} conn = new ${conn.class}<>(null);
+        '${adapterCreationFragment(conn, "adapter")};
+        ${conn.class}${connGen} conn = new ${conn.class}<>(adapter);
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn);'
     }
@@ -182,12 +180,14 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         ServiceBase impl = elt.impl;
         'package ${pkg};
         
+        import java.io.IOException;
         import java.util.function.*;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.context.annotation.Bean;
         import org.springframework.cloud.stream.function.StreamBridge;
         import org.springframework.stereotype.Component;
         import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.connectors.types.*;
         import iip.datatypes.*;
         import iip.interfaces.*;
         import iip.stubs.*;
@@ -221,6 +221,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
                 ${attachIngestors()}
             }
         
+            ${generateAdapterTranslators(elt)}
+            
         }'
     }
     

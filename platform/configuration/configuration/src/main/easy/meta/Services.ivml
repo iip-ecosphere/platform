@@ -107,11 +107,16 @@ project Services {
    
    // IIP-Ecosphere provided connectors
    compound Connector refines Service {
-       IOType machineInput; // initial only one
-       IOType machineOutput;
+       IOType machineInput; // initial only one, connector not machine representation
+       IOType machineOutput; // initial only one, connector not machine representation
        
        String class;
        String artifact;
+       String inAdapterClass = ""; // if given, use adapter
+       String outAdapterClass = ""; // if given, use adapter
+       // may collapse into one, to be supported by configurable mapping
+       refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
+       refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
 
        output.size() < 2;
        input.size() < 2;

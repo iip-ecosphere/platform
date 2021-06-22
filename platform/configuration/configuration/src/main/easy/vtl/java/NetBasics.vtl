@@ -11,17 +11,8 @@ template NetBasics(Configuration config, FileArtifact target) {
     }
     
     def String getYamlServiceFragment(String varName, String clsName, String serviceId) {
-        /*'YamlService ${varName};
-        try {
-            ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
-                .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}");
-        } catch (java.io.IOException e) {
-            org.slf4j.LoggerFactory.getLogger(${clsName}.class).error("Cannot read service deployment descriptor "
-                + "for ${serviceId}: " + e.getMessage());
-            ${varName} = new YamlService(); 
-        }'*/
         'YamlService ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
-            .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}");'
+            .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}")'
     }
 
     def getServiceIdSuffix(NetElement elt) {

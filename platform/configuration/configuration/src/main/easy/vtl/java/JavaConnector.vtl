@@ -26,5 +26,97 @@ template JavaConnector(Configuration config, FileArtifact target) {
             "Object";
         }    
     }
+    
+    def adapterCreationFragment(Connector conn, String varName) {
+        String inAdapter;
+        String outAdapter;
+        if (conn.inAdapterClass.length() > 0) {
+            inAdapter = "new ${conn.inAdapterClass}()";
+        } else {
+            inAdapter = "new MachineInputTranslator()";
+        }
+        if (conn.outAdapterClass.length() > 0) {
+            outAdapter = "new ${conn.outAdapterClass}()";
+        } else {
+            outAdapter = "new MachineOutputTranslator()"; 
+        }
+        
+        String connGen = getConnectorGenerics(conn, true);
+        'TranslatingProtocolAdapter${connGen} ${varName} = new TranslatingProtocolAdapter${connGen}(${outAdapter}, ${inAdapter})'
+    }
+    
+    def generateAdapterTranslators(NetElement elt) {
+        generateAdapterTranslators(elt.impl);
+    }
+    
+    def generateAdapterTranslators(ServiceBase service) {
+    }
+    
+    def generateAdapterTranslators(Connector conn) {
+        '${generateMachineInputTranslator(conn)}
+        ${generateMachineOutputTranslator(conn)}'
+    }
+
+    def generateMachineOutputTranslator(Connector conn) {
+        if (conn.inAdapterClass.length() == 0) {
+            String coType = getFirstTypeName(conn.output);
+            String oType = conn.machineOutput.type.name;
+            'private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
+            
+                @Override
+                public ${coType} to(${oType} source) throws IOException {
+                    return null; // TODO
+                }
+            
+                @Override
+                public void initializeModelAccess() throws IOException {
+                    //ModelAccess access = getModelAccess();
+                    //access.useNotifications(withNotifications);
+                    //customizer.initializeModelAccess(access, withNotifications);
+                }
+            
+                @Override
+                public Class<? extends ${oType}> getSourceType() {
+                    return ${oType}.class;
+                }
+            
+                @Override
+                public Class<? extends ${coType}> getTargetType() {
+                    return ${coType}.class;
+                }
+            
+            }'
+        } else {
+            ''
+        }
+    }
+
+    def generateMachineInputTranslator(Connector conn) {
+        if (conn.outAdapterClass.length() == 0) {
+            String ciType = getFirstTypeName(conn.input);
+            String iType = conn.machineInput.type.name;
+            '
+            private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
+            
+                @Override
+                public ${iType} from(${ciType} data) throws IOException {
+                    return null; // TODO irrelevant?
+                }
+            
+                @Override
+                public Class<? extends ${iType}> getSourceType() {
+                    return ${iType}.class;
+                }
+            
+                @Override
+                public Class<? extends ${ciType}> getTargetType() {
+                    return ${ciType}.class;
+                }
+            
+            }'
+        } else {
+            ''
+        }
+    }
 
 }
