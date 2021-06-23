@@ -16,10 +16,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
  * Wraps a connector into a service.
@@ -34,6 +37,7 @@ import de.iip_ecosphere.platform.connectors.Connector;
 public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
 
     private Connector<O, I, CO, CI> connector;
+    private Supplier<ConnectorParameter> connParamSupplier;
 
     /**
      * Creates a service wrapper instance.
@@ -41,9 +45,23 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      * @param yaml the service information as read from YAML
      * @param connector the connector instance to wrap
      */
-    public ConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector) {
+    public ConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector) { // TODO remove after build
         super(yaml);
         this.connector = connector;
+    }
+
+    /**
+     * Creates a service wrapper instance.
+     * 
+     * @param yaml the service information as read from YAML
+     * @param connector the connector instance to wrap
+     * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
+     */
+    public ConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
+        Supplier<ConnectorParameter> connParamSupplier) {
+        super(yaml);
+        this.connector = connector;
+        this.connParamSupplier = connParamSupplier; 
     }
 
     /**
@@ -56,7 +74,8 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     }
     
     /**
-     * Calls {@link Connector#write(Object)} on {@code} data and handles the respective exception.
+     * Calls {@link Connector#write(Object)} on {@code} data and handles the respective exception potentially thrown by 
+     * the underlying connector.
      * 
      * @param data the data to write
      */
@@ -65,6 +84,36 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
             connector.write(data);
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Data loss, cannot send data: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Attaches a reception {@code callback} to this connector. The {@code callback}
+     * is called upon a reception. Handles the respective exception potentially thrown by the underlying connector.
+     * 
+     * @param callback the callback to attach
+     */
+    public void setReceptionCallback(ReceptionCallback<CO> callback) {
+        try {
+            connector.setReceptionCallback(null);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Data loss, cannot set reception callback: " + e.getMessage());
+        }
+    }
+    
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        super.setState(state);
+        try {
+            if (ServiceState.STARTING == state) {
+                connector.connect(connParamSupplier.get());
+            } else if (ServiceState.STOPPING == state) {
+                connector.disconnect();
+            } else if (ServiceState.UNDEPLOYING == state) {
+                connector.dispose();
+            }
+        } catch (IOException e) {
+            throw new ExecutionException(e);
         }
     }
     
