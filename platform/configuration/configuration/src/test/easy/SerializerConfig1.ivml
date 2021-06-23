@@ -160,6 +160,7 @@ project SerializerConfig1 {
     };
     
     NetConnector myConnMySourceMyAnonymizer = {
+        name = "MySource->MyAnonymizer",
         next = refBy(myAnonymizer)
     };
 
@@ -169,6 +170,7 @@ project SerializerConfig1 {
     };
 
     NetConnector myConnMyAnonymizerMyKi = {
+        name = "MyAnonymizer->MyKi",
         next = refBy(myKi)
     };
 
