@@ -4,6 +4,19 @@ import JavaMapping;
 @advice(IIPEcosphere)
 template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
 
+    def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
+        XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
+        XmlElement config = appendConfiguration(plugin);
+        new XmlElement(config, "addResources", "false");
+        XmlElement exec = appendExecutions(plugin);
+        appendGoal(exec, "repackage");
+
+        if (mainClass.length() > 0) {
+            XmlElement cfg = appendConfiguration(exec);
+            new XmlElement(cfg, "mainClass", mainClass);
+        }
+    }
+
     def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
@@ -22,7 +35,7 @@ template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) arti
         }
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
-        appendMavenShadePlugin(plugins, "2.3", "${starterCls}");
+        appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
     }
 
 }
