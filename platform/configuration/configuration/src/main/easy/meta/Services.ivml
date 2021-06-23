@@ -124,16 +124,30 @@ project Services {
        deployable == true;
    }
    
+   compound ChannelConnector refines Connector {
+       String inSerializerClass = ""; // if not given, use registry
+       String outSerializerClass = ""; // if not given, use registry
+       String inChannel = "";
+       String outChannel = "";
+       IOType machineInput = {type = refBy(ByteArrayType)};
+       IOType machineOutput = {type = refBy(ByteArrayType)};
+   }
+   
    compound OpcUaV1Connector refines Connector {
         String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
         String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
-        IOType machineInput = {type = refBy(ObjectType)}; // predefined
-        IOType machineOutput = {type = refBy(OpcUaV1DataItemType)}; // predefined
+        IOType machineInput = {type = refBy(ObjectType)};
+        IOType machineOutput = {type = refBy(OpcUaV1DataItemType)};
+   }
+   
+   compound MqttV3Connector refines ChannelConnector {
+        String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
    }
 
-    PrimitiveType OpcUaV1DataItemType = {
-        name = "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"
-    };
+   PrimitiveType OpcUaV1DataItemType = {
+       name = "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"
+   };
    
    // TODO remaining connectors
    

@@ -77,13 +77,27 @@ project SerializerConfig1 {
     };
     
     OpcUaV1Connector myOpcUaConn = {
-        id = "myConn",
-        name = "myConn example",
+        id = "myOpcConn",
+        name = "myOpcConn example",
         description = "",
         version = "0.1.0",
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
         output = {{type=refBy(StringType)}}, // PRELIMINARY
+        inInterface = refBy(myConnMachineIn), // PRELIMINARY
+        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+    };
+    
+    MqttV3Connector myMqttConn = {
+        id = "myMqttConn",
+        name = "myMqttConnExample",
+        description = "",
+        version = "0.1.0",
+        
+        input = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        inChannel = "IN",
+        outChannel = "OUT",
         inInterface = refBy(myConnMachineIn), // PRELIMINARY
         outInterface = refBy(myConnMachineOut)  // PRELIMINARY
     };
@@ -129,11 +143,15 @@ project SerializerConfig1 {
     
     ServiceNet myNet = {
         description = "initial service net",
-        sources = {refBy(mySource), refBy(myConn)}
+        sources = {refBy(mySource), refBy(myOpcConn), refBy(myMqttC)}
     };
     
-    NetSource myConn = {
+    NetSource myOpcConn = {
        impl = refBy(myOpcUaConn)
+    };
+
+    NetSource myMqttC = {
+       impl = refBy(myMqttConn)
     };
     
     NetSource mySource = {

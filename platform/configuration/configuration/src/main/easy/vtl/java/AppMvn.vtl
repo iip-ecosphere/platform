@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts) {
+template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
 
-    def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts) {
+    def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
@@ -20,6 +20,9 @@ template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) arti
         for (String art : artifacts) {
             appendArtifact(dep, art, projectVersion);
         }
+        
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenShadePlugin(plugins, "2.3", "${starterCls}");
     }
 
 }

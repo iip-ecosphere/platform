@@ -53,6 +53,9 @@ project DataTypes {
     PrimitiveType ObjectType = {
         name = "Object"
     };
+    PrimitiveType ByteArrayType = {
+        name = "byte[]"
+    };    
     
     // freeze all primitives
     freeze {
@@ -63,6 +66,7 @@ project DataTypes {
         FloatType;
         DoubleType;
         ObjectType;
+        ByteArrayType;
     };
     
 }

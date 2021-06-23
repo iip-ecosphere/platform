@@ -30,11 +30,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         serviceMgrRoot.mkdir();
         platformRoot.mkdir();
         
+        setOf(String) javaSerializers = {};
         for (RecordType r : RecordType.allInstances()) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
             vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
         };
@@ -42,6 +44,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // TODO individualize paths per application
         for (Application a : Application.allInstances()) {
             setOf(String) artifacts = {};
+            artifacts.add(a.artifact);
             mapOf(NetElement, setOf(NetConnector)) mappedNet = {};
             for (ServiceNet n : a.services) {
                 setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e, mappedNet));
@@ -54,7 +57,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 };
             };
             vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${appRoot}/src/main/resources/application.yml", mappedNet=mappedNet);
-            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts);
+            vilTemplateProcessor("JavaStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
+            // TODO deployment descriptor
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter");
         };
         
         maven("${appRoot}");

@@ -38,24 +38,70 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = "new ${conn.outAdapterClass}()";
         } else {
-            outAdapter = "new MachineOutputTranslator()"; 
+            outAdapter = "new MachineOutputTranslator()";
         }
         
         String connGen = getConnectorGenerics(conn, true);
-        'TranslatingProtocolAdapter${connGen} ${varName} = new TranslatingProtocolAdapter${connGen}(${outAdapter}, ${inAdapter})'
+        'TranslatingProtocolAdapter${connGen} ${varName} = new TranslatingProtocolAdapter${connGen}(
+            ${outAdapter}, 
+            ${inAdapter})'
+    }
+
+    def adapterCreationFragment(ChannelConnector conn, String varName) {
+        String connGen = getConnectorGenerics(conn, true);
+        String inSerializer;
+        String outSerializer;
+        if (conn.inSerializerClass.length() > 0) {
+            inSerializer = "new ${conn.inSerializerClass}()";
+        } else {
+            inSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.input)}.class)";
+        }
+        if (conn.outSerializerClass.length() > 0) {
+            outSerializer = "new ${conn.outSerializerClass}()";
+        } else {
+            outSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.output)}.class)";
+        }
+
+        String inAdapter;
+        String outAdapter;
+        if (conn.inAdapterClass.length() > 0) {
+            inAdapter = "new ${conn.inAdapterClass}()";
+        } else {
+            inAdapter = "new ConnectorInputTypeAdapter<${getFirstTypeName(conn.input)}>(${inSerializer})";
+        }
+        if (conn.outAdapterClass.length() > 0) {
+            outAdapter = "new ${conn.outAdapterClass}()";
+        } else {
+            outAdapter = "new ConnectorOutputTypeAdapter<${getFirstTypeName(conn.output)}>(${outSerializer})";
+        }
+
+        'ChannelTranslatingProtocolAdapter${connGen} ${varName} = new ChannelTranslatingProtocolAdapter${connGen}(
+            "${conn.outChannel}", ${outAdapter}, 
+            "${conn.inChannel}", ${inAdapter})' 
     }
     
+    // ------------------------------------------ generating adapter translator classes ---------------------------
+    // private inner static classes with fixed names for (model) connectors, no classes for channel connectors
+    
+    // generate adapter translator classes, convenience call    
     def generateAdapterTranslators(NetElement elt) {
         generateAdapterTranslators(elt.impl);
     }
     
+    // generate adapter translator classes, dispatch base    
     def generateAdapterTranslators(ServiceBase service) {
     }
-    
+
+    // generate the adaptor translator classes for a generic connector    
     def generateAdapterTranslators(Connector conn) {
         '
         ${generateMachineInputTranslator(conn)}
         ${generateMachineOutputTranslator(conn)}'
+    }
+    
+    // don't generate translator classes for channel connectors    
+    def generateAdapterTranslators(ChannelConnector conn) {
+        ''
     }
 
     def generateMachineOutputTranslator(Connector conn) {

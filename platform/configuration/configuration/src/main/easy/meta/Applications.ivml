@@ -11,6 +11,7 @@ project Applications {
         NonEmptyString name;
         String description;
         IipVersion version;
+        String artifact = "";
         setOf(refTo(ServiceNet)) services;
     }
     
