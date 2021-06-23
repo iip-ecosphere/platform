@@ -65,25 +65,25 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter");
         };
         
-        maven("${appRoot}");
+        //maven("${appRoot}");
         
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
-        maven("${ecsRuntimeRoot}");
+        //maven("${ecsRuntimeRoot}");
         
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
-        maven("${serviceMgrRoot}");
+        //maven("${serviceMgrRoot}");
         
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
-        maven("${platformRoot}");
+        //maven("${platformRoot}");
     }
 
 }

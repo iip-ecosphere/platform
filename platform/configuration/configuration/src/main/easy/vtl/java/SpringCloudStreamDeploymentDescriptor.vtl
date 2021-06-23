@@ -8,7 +8,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     // TODO create relations, relate endpoint to protocol
     def generateServices(sequenceOf(NetElement) elements) {
         for (NetElement elt: elements) {
-            generateService(elt.impl);
+            '${generateService(elt.impl)}'
         }
     }
     
