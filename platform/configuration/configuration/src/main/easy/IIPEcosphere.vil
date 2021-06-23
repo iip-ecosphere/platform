@@ -44,6 +44,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // TODO individualize paths per application
         for (Application a : Application.allInstances()) {
             setOf(String) artifacts = {};
+            sequenceOf(NetElement) elements = {};
             artifacts.add(a.artifact);
             mapOf(NetElement, setOf(NetConnector)) mappedNet = {};
             for (ServiceNet n : a.services) {
@@ -54,11 +55,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     vilTemplateProcessor("JavaNetElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
                     vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage);
                     artifacts.add(getArtifact(no));
+                    elements.add(no);
                 };
             };
             vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${appRoot}/src/main/resources/application.yml", mappedNet=mappedNet);
             vilTemplateProcessor("JavaStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
-            // TODO deployment descriptor
+            vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${appRoot}/src/main/resources/deployment.yml", app=a, elements=elements);
+            // TODO spring app deployment
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter");
         };
         

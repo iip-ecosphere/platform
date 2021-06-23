@@ -90,7 +90,7 @@ project Services {
    
    abstract compound Service refines ServiceBase {
        String description;
-       IipVersion version;
+       IipVersion ver;
        Boolean deployable;
    }
    

@@ -10,7 +10,7 @@ project Applications {
         Id id;
         NonEmptyString name;
         String description;
-        IipVersion version;
+        IipVersion ver;
         String artifact = "";
         setOf(refTo(ServiceNet)) services;
     }

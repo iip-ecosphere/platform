@@ -47,7 +47,7 @@ project SerializerConfig1 {
         id = "mySource",
         name = "mySource example",
         description = "",
-        version = "0.1.0",
+        ver = "0.1.0",
         deployable = true,
         class = "MySourceImpl",
         artifact = "",
@@ -80,7 +80,7 @@ project SerializerConfig1 {
         id = "myOpcConn",
         name = "myOpcConn example",
         description = "",
-        version = "0.1.0",
+        ver = "0.1.0",
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
         output = {{type=refBy(StringType)}}, // PRELIMINARY
@@ -92,7 +92,7 @@ project SerializerConfig1 {
         id = "myMqttConn",
         name = "myMqttConnExample",
         description = "",
-        version = "0.1.0",
+        ver = "0.1.0",
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
         output = {{type=refBy(StringType)}}, // PRELIMINARY
@@ -106,7 +106,7 @@ project SerializerConfig1 {
         id = "myAnonymizer",
         name = "myAnonymizer example",
         description = "",
-        version = "0.1.0",
+        ver = "0.1.0",
         deployable = true,
         class = "MyAnonymizerImpl",
         artifact = "",
@@ -120,7 +120,7 @@ project SerializerConfig1 {
         id = "myKi",
         name = "myKi example",
         description = "",
-        version = "0.1.0",
+        ver = "0.1.0",
         asynchronous = false,
         deployable = true,
         class = "MyKiImpl",
@@ -136,7 +136,7 @@ project SerializerConfig1 {
     Application myApp = {
         id = "myApp",
         name = "myApp example",
-        version = "0.1.0",
+        ver = "0.1.0",
         description = "",
         services = {refBy(myNet)}        
     };

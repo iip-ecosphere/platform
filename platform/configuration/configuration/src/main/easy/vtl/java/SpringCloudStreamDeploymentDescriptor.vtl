@@ -1,0 +1,44 @@
+import MavenBasics;
+import JavaMapping;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifact target, Application app, sequenceOf(NetElement) elements) {
+
+    // TODO create relations, relate endpoint to protocol
+    def generateServices(sequenceOf(NetElement) elements) {
+        for (NetElement elt: elements) {
+            generateService(elt.impl);
+        }
+    }
+    
+    def generateService(ServiceBase service) {
+    }
+    
+    def generateService(Service service) {
+        '-id: ${service.id}
+         name: ${service.name}
+         version: ${service.ver}
+         description: ${service.description}
+         deployable: ${service.deployable}
+         kind: ${service.kind}
+         cmdArg: 
+           - --iip.port=\\${port}
+           - --iip.protocol=\\${protocol}
+         relations:
+           - endpoint:
+             portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
+             hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+           - channel: create-out-0'
+    } 
+
+    def main(Configuration config, FileArtifact target, Application app, sequenceOf(NetElement) elements) {
+        'id: ${app.id}
+        name: ${app.name}
+        version: ${app.ver}
+        services:
+           ${generateServices(elements)}
+        '
+    }
+
+}
