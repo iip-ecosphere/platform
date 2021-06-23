@@ -19,7 +19,7 @@ template Basics(Configuration config, FileArtifact target) {
     
     def setOf(NetInnerElement) mapNext(NetElement elt, setOf(NetConnector) next, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
         for (NetConnector c: next) {
-            setOf(NetConnector) connectors; // TODO could a getAdd(elt, {}) operation help here?
+            setOf(NetConnector) connectors;
             if (mappedNet.containsKey(elt)) {
                 connectors = mappedNet.get(elt);
             } else {
