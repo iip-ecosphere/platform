@@ -81,6 +81,7 @@ project SerializerConfig1 {
         name = "myOpcConn example",
         description = "",
         ver = "0.1.0",
+        port = 1234, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
         output = {{type=refBy(StringType)}}, // PRELIMINARY
@@ -93,6 +94,7 @@ project SerializerConfig1 {
         name = "myMqttConnExample",
         description = "",
         ver = "0.1.0",
+        port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
         output = {{type=refBy(StringType)}}, // PRELIMINARY

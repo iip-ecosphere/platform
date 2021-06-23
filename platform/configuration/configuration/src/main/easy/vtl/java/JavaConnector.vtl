@@ -168,6 +168,8 @@ template JavaConnector(Configuration config, FileArtifact target) {
         }
     }
     
+    // --------------------------------------- reception callback -----------------------------------------
+    
     def generateReceptionCallback(NetElement elt) {
         generateReceptionCallback(elt.impl);
     }
@@ -192,6 +194,30 @@ template JavaConnector(Configuration config, FileArtifact target) {
                 return ${coType}.class;
             }
                 
+        }'
+    }
+
+    // --------------------------------------- connector parameter -----------------------------------------
+    
+    def generateConnectorParameter(NetElement elt, Application app) {
+        generateConnectorParameter(elt.impl, app);
+    }
+
+    def generateConnectorParameter(ServiceBase service, Application app) {
+        ''
+    }
+
+    def generateConnectorParameter(Connector conn, Application app) {
+        '/**
+        * Creates the connector parameter instance.
+        *
+        * @return the instance to be passed to the connector
+        */
+        private ConnectorParameter createConnectorParameter() {
+            return ConnectorParameter.ConnectorParameterBuilder
+                .newBuilder("${conn.host}", ${conn.port})
+                .setApplicationInformation("${app.id}", "${app.description}")
+                .build();
         }'
     }
 

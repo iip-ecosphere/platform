@@ -54,7 +54,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     String clsName = asTypeName(no.name);
                     vilTemplateProcessor("JavaNetElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
                     vilTemplateProcessor("JavaNetElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
-                    vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage);
+                    vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
                 };

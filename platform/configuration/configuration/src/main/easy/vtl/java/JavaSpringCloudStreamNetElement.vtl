@@ -5,7 +5,7 @@ import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
+template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg, Application app) extends NetBasics {
 
     Boolean isConnector = false;
 
@@ -176,7 +176,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
-    def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
+    def main(Configuration config, FileArtifact target, NetElement elt, String pkg, Application app) {
         String clsName = getClsName(elt);
         String serviceType = getServiceType(elt, elt.impl);
         ServiceBase impl = elt.impl;
@@ -218,15 +218,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
             }
         
             ${generateDataMethods(elt)}
-
-            /**
-             * Creates the connector parameter instance.
-             *
-             * @return the instance to be passed to the connector
-             */
-            private ConnectorParameter createConnectorParameter() {
-                return null;
-            }
+            ${generateConnectorParameter(elt, app)}
 
             /**
              * Attaches the ingestors.

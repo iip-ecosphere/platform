@@ -117,6 +117,9 @@ project Services {
        // may collapse into one, to be supported by configurable mapping
        refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       
+       NonEmptyString host = "localhost";
+       Port port;
 
        output.size() < 2;
        input.size() < 2;
