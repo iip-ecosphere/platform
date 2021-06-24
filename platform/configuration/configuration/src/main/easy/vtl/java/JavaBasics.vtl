@@ -48,4 +48,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
         conn.artifact;
     }
 
+    def String toPath(String pkg) {
+        pkg.replace(".", "/");
+    }
+
 }

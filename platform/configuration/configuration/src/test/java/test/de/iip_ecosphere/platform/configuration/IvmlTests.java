@@ -113,7 +113,7 @@ public class IvmlTests {
      * @throws IOException in case that expected files cannot be found or inspected
      */
     private void assertApplication(File gen) throws IOException {
-        File base = new File(gen, "app");
+        File base = new File(gen, "MyAppexample");
         File srcMain = new File(base, "src/main");
         File srcMainJava = new File(srcMain, "java");
         File srcMainPython = new File(srcMain, "python");
@@ -124,7 +124,7 @@ public class IvmlTests {
         assertFile(srcMainPython, "Rec1.py");
         assertFile(srcMainPython, "Rec1Serializer.py");
 
-        assertFileContains(gen, "app/pom.xml", "transport.spring.amqp", "transport.amqp");
+        assertFileContains(base, "pom.xml", "transport.spring.amqp", "transport.amqp");
         
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
         JarUtils.extractZip(zip, srcMainPython.toPath());
@@ -186,8 +186,8 @@ public class IvmlTests {
      */
     private static File assertFile(File base, String name) {
         File f = new File(base, name);
-        Assert.assertTrue(f.exists());
-        Assert.assertTrue(f.length() > 0);
+        Assert.assertTrue("File " + f + " does not exist", f.exists());
+        Assert.assertTrue("File " + f + " is empty", f.length() > 0);
         return f;
     }
 

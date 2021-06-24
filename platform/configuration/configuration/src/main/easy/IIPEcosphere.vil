@@ -6,48 +6,54 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // preliminary!!! make it language-generic
 
-    Path appRoot = "${target}/app";
-    Path javaSrc = "${appRoot}/src/main/java";
-    Path pySrc = "${appRoot}/src/main/python";
-    String javaDatatypesPackage = "iip.datatypes"; // link to javaDatatypesSrc
-    Path javaDatatypesSrc = "${javaSrc}/iip/datatypes";
-    String javaSerializersPackage = "iip.serializers"; // link to javaSerializersSrc
-    Path javaSerializersSrc = "${javaSrc}/iip/serializers";
-    String javaInterfacesPackage = "iip.interfaces"; // link to javaNodesSrc
-    Path javaInterfacesSrc = "${javaSrc}/iip/interfaces";
-    String javaStubsPackage = "iip.stubs"; // link to javaStubsSrc
-    Path javaStubsSrc = "${javaSrc}/iip/stubs";
-    String javaNodesPackage = "iip.nodes"; // link to javaNodesSrc
-    Path javaNodesSrc = "${javaSrc}/iip/nodes";
+    // java packages, turned to paths below
+    String javaDatatypesPackage = "iip.datatypes";
+    String javaSerializersPackage = "iip.serializers";
+    String javaInterfacesPackage = "iip.interfaces";
+    String javaStubsPackage = "iip.stubs";
+    String javaNodesPackage = "iip.nodes";
+
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
     Path platformRoot = "${target}/platform";
     
     main(Project source, Configuration config, Project target) = {
-        javaDatatypesSrc.mkdir();
-        javaSerializersSrc.mkdir();
-        ecsRuntimeRoot.mkdir();
-        serviceMgrRoot.mkdir();
-        platformRoot.mkdir();
         
-        setOf(String) javaSerializers = {};
-        for (RecordType r : RecordType.allInstances()) {
-            // generate for all languages and according to serializer settings
-            String clsName = asTypeName(r.name);
-            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
-            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
-            javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-            vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
-            vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
-        };
-        
-        // TODO individualize paths per application
+        setOf(RecordType) recordTypes = RecordType.allInstances();
+println("HERE " + recordTypes);
         for (Application a : Application.allInstances()) {
+            String appName = asTypeName(a.name);
+            Path appRoot = "${target}/${appName}";
+            appRoot.mkdir();
+            Path javaSrc = "${appRoot}/src/main/java";
+            Path pySrc = "${appRoot}/src/main/python";
+            Path resourcesSrc = "${appRoot}/src/main/resources";
+            Path javaDatatypesSrc = "${javaSrc}/${toPath(javaDatatypesPackage)}";
+            Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
+            Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+            Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
+            Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+
+            javaDatatypesSrc.mkdir();
+            javaSerializersSrc.mkdir();
+            // generate data classes and serializers
+            setOf(String) javaSerializers = {};
+            for (RecordType r : recordTypes) {
+                // generate for all languages and according to serializer settings
+                String clsName = asTypeName(r.name);
+                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
+                vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+                javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+                vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
+                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
+            };
+
+            // generate service classes and service integration
             setOf(String) artifacts = {};
             sequenceOf(NetElement) elements = {};
             artifacts.add(a.artifact);
             mapOf(NetElement, setOf(NetConnector)) mappedNet = {};
-            // filter according to assigned resources, allow for later instantiation
+            // TODO filter according to assigned resources, allow for later instantiation
             for (ServiceNet n : a.services) {
                 setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e, mappedNet));
                 for (NetElement no : nodes) {
@@ -59,27 +65,32 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     elements.add(no);
                 };
             };
-            vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${appRoot}/src/main/resources/application.yml", mappedNet=mappedNet);
+            
             vilTemplateProcessor("JavaStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
-            vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${appRoot}/src/main/resources/deployment.yml", app=a, elements=elements);
-            // TODO spring app deployment
+
+            vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedNet=mappedNet);
+            vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
+
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter");
         };
         
         maven("${appRoot}");
-        
+
+        ecsRuntimeRoot.mkdir();
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
         maven("${ecsRuntimeRoot}");
         
+        serviceMgrRoot.mkdir();
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
         maven("${serviceMgrRoot}");
         
+        platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
