@@ -112,10 +112,12 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def XmlElement appendMavenJarPlugin(XmlElement plugins, String version, Boolean addClassPath, String mainClass="", String goal="") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-jar-plugin", version, false);
-        if (addClassPath and mainClass.length() > 0) {
+        if (addClassPath or mainClass.length() > 0) {
             XmlElement config = appendConfiguration(plugin);
             XmlElement manifest = new XmlElement(new XmlElement(config, "archive"), "manifest");
-            new XmlElement(manifest, "addClasspath", addClassPath);
+            if (addClassPath) {
+                new XmlElement(manifest, "addClasspath", addClassPath);
+            }
             if (mainClass.length() > 0) {
                 new XmlElement(manifest, "mainClass", mainClass);
             }
@@ -123,6 +125,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (goal.length() > 0) {
             appendGoal(appendExecutions(plugin), goal);
         }
+    }    
+    
+    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String version="3.1.2", String jarDir="") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", version, false);
+        if (jarDir.length() > 0) {
+            XmlElement exec = appendExecutions(plugin);
+            new XmlElement(exec, "id", "copy-dependencies");
+            appendGoal(exec, "copy-dependencies");
+            new XmlElement(exec, "phase", "package");
+            XmlElement config = appendConfiguration(exec);
+            new XmlElement(config, "outputDirectory", jarDir);
+            new XmlElement(config, "overWriteReleases", "false");
+            new XmlElement(config, "overWriteSnapshots", "true");
+            new XmlElement(config, "overWriteIfNewer", "true");        
+        }
+        plugin;
     }
 
     def XmlElement appendMavenShadePlugin(XmlElement plugins, String version="2.3", String mainClass="") {

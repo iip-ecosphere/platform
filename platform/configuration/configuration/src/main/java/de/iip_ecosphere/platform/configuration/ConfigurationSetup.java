@@ -156,7 +156,7 @@ public class ConfigurationSetup extends AbstractConfiguration {
     public static ConfigurationSetup getConfiguration() {
         if (null == instance) {
             try {
-                instance = readFromYaml(ConfigurationSetup.class, "/configuration.yml");
+                instance = readFromYaml(ConfigurationSetup.class);
             } catch (IOException e) {
                 LoggerFactory.getLogger(ConfigurationSetup.class).error(e.getMessage(), e);
                 instance = new ConfigurationSetup();
