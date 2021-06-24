@@ -2,15 +2,15 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template EcsRuntimeMvn(Configuration config, XmlFileArtifact target) {
+template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target) {
 
-    def main(Configuration config, XmlFileArtifact target) {
+    def main(IIPEcosphere config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "ecsRuntime.exec", "ConfiguredEcsRuntime", "Configured ECS runtime");
-        createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
 
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);

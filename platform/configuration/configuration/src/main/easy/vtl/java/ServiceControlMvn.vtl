@@ -2,16 +2,16 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template ServiceControlMvn(Configuration config, XmlFileArtifact target) {
+template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target) {
 
-    def main(Configuration config, XmlFileArtifact target) {
+    def main(IIPEcosphere config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "services.exec", "ConfiguredServiceControl", "Configured service control");
-        createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "services", projectVersion);

@@ -2,16 +2,16 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template PlatformMvn(Configuration config, XmlFileArtifact target) {
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target) {
 
-    def main(Configuration config, XmlFileArtifact target) {
+    def main(IIPEcosphere config, XmlFileArtifact target) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "platform.exec", "ConfiguredPlatformInstance", "Configured platform instance");
-        createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
