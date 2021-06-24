@@ -3,5 +3,11 @@ project IIPEcosphere {
     import Applications; 
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    NonEmptyString iipVer = "0.2.0-SNAPSHOT"; // Maven version
+    
+    freeze {
+        iipVer;
+    };
    
 }

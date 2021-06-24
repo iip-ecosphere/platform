@@ -20,7 +20,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     main(Project source, Configuration config, Project target) = {
         
         setOf(RecordType) recordTypes = RecordType.allInstances();
-println("HERE " + recordTypes);
         for (Application a : Application.allInstances()) {
             String appName = asTypeName(a.name);
             Path appRoot = "${target}/${appName}";
@@ -71,11 +70,10 @@ println("HERE " + recordTypes);
             vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedNet=mappedNet);
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
 
-            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter");
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter", app=a, appName=appName);
+            maven("${appRoot}");
         };
-        
-        maven("${appRoot}");
-
+    
         ecsRuntimeRoot.mkdir();
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();

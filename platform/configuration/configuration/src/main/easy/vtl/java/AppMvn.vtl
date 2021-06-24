@@ -2,7 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
+template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -17,12 +17,13 @@ template AppMvn(Configuration config, XmlFileArtifact target, setOf(String) arti
         }
     }
 
-    def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls) {
+    def main(Configuration config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "app.exec", "ConfiguredApp", "Configured Application");
+        createMavenProjectAttributes(project, "${appName}", "ConfiguredApp", "Configured Application");
+        // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "0.2.0-SNAPSHOT");
         
         XmlElement dep = new XmlElement(project, "dependencies");
