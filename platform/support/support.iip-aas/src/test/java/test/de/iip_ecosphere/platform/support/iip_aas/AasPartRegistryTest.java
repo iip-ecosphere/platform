@@ -78,6 +78,11 @@ public class AasPartRegistryTest {
             return Kind.PASSIVE;
         }
         
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+        
     }
 
     /**
@@ -104,6 +109,11 @@ public class AasPartRegistryTest {
         @Override
         public Kind getKind() {
             return Kind.PASSIVE;
+        }
+        
+        @Override
+        public boolean isValid() {
+            return true;
         }
 
     }

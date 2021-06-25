@@ -78,4 +78,12 @@ public interface AasContributor {
      */
     public Kind getKind();
     
+    /**
+     * Allow the AAS contributor to declare itself as invalid.
+     * 
+     * @return {@code true} as prerequisite to execute {@link #contributeTo(ProtocolServerBuilder)} and 
+     *     {@link #contributeTo(AasBuilder, InvocablesCreator)}, {@code false} else
+     */
+    public boolean isValid();
+    
 }

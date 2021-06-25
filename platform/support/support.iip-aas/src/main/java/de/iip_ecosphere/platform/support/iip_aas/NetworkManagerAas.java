@@ -216,4 +216,9 @@ public class NetworkManagerAas implements AasContributor {
         return Kind.ACTIVE;
     }
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
 }

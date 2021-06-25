@@ -375,7 +375,7 @@ public class AasPartRegistry {
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();
-            if (filter.test(contributor)) {
+            if (filter.test(contributor) && contributor.isValid()) {
                 Aas partAas = contributor.contributeTo(aasBuilder, iCreator);
                 contributor.contributeTo(sBuilder);
                 if (null != partAas) {

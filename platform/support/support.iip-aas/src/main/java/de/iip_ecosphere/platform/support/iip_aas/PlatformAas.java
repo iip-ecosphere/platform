@@ -85,4 +85,9 @@ public class PlatformAas implements AasContributor {
         return Kind.PASSIVE;
     }
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
 }
