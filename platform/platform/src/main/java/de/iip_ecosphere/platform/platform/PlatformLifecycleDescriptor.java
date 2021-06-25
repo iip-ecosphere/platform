@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.platform;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
@@ -37,8 +39,10 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor {
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
         PersistenceType pType = rcp.toPersistenceType(cfg.getAas().getPersistence().name());
+        LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
+        LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS server on " + regEndpoint.toUri());
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
         // TODO VAB-Server
