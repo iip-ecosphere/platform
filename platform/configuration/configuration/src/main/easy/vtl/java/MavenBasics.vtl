@@ -127,18 +127,37 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }    
     
-    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String version="3.1.2", String jarDir="") {
+    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String version="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", version, false);
         if (jarDir.length() > 0) {
-            XmlElement exec = appendExecutions(plugin);
+            XmlElement execs = new XmlElement(plugin, "executions");
+            XmlElement exec = new XmlElement(execs, "execution");
+
             new XmlElement(exec, "id", "copy-dependencies");
             appendGoal(exec, "copy-dependencies");
             new XmlElement(exec, "phase", "package");
             XmlElement config = appendConfiguration(exec);
+            new XmlElement(config, "prependGroupId", "${prependGroupId}");
             new XmlElement(config, "outputDirectory", jarDir);
             new XmlElement(config, "overWriteReleases", "false");
             new XmlElement(config, "overWriteSnapshots", "true");
             new XmlElement(config, "overWriteIfNewer", "true");        
+
+            if (copyOwn) {
+                exec = new XmlElement(execs, "execution");
+                new XmlElement(exec, "id", "copy-self");
+                appendGoal(exec, "copy");
+                new XmlElement(exec, "phase", "install");
+                XmlElement config = appendConfiguration(exec);
+                XmlElement arts = new XmlElement(config, "artifactItems");
+                XmlElement art = new XmlElement(arts, "artifactItem");
+                new XmlElement(art, "groupId", "\\${project.groupId}");
+                new XmlElement(art, "artifactId", "\\${project.artifactId}");
+                new XmlElement(art, "version", "\\${project.version}");
+                new XmlElement(art, "type", "\\${project.packaging}");
+                new XmlElement(config, "prependGroupId", "${prependGroupId}");
+                new XmlElement(config, "outputDirectory", jarDir);
+            }
         }
         plugin;
     }
@@ -155,6 +174,19 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlAttribute(t, "implementation", "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer");
             new XmlElement(t, "mainClass", mainClass);
         }
+    }
+    
+    def XmlElement appendAssemblyPlugin(XmlElement plugins, String descriptor, String id, String version="3.1.1", String outputDir="\\${project.build.directory}") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", version, false);
+        XmlElement exec = appendExecutions(plugin);
+        new XmlElement(exec, "id", id);
+        new XmlElement(exec, "phase", "package");
+        appendGoal(exec, "single");
+        XmlElement cfg = appendConfiguration(exec);
+        new XmlElement(new XmlElement(cfg, "descriptors"), "descriptor", descriptor);
+        new XmlElement(cfg, "outputDirectory", outputDir);
+        new XmlElement(cfg, "attach", "false");
+        plugin;
     }
 
 }

@@ -38,6 +38,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         }
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendAssemblyPlugin(plugins, "src/main/assembly/python.xml", "appPython");
         appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
     }
 
