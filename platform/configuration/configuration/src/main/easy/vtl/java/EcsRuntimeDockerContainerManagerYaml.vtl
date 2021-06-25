@@ -4,15 +4,12 @@ import JavaMapping;
 @indent(indentation = 4, additional = 0)
 template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
 
-    def produceAas(IIPEcosphere config, String aasPersistence="") {
+    def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true) {
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
-    'docker:
-        dockerHost: ${containerManager.dockerHost}
-        dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
-        deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}
+    '${produceDocker(config, withDocker)}
     aas:
         server:
             port: ${aasServer.port}
@@ -27,9 +24,21 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         implementation:
             port: ${aasImplServer.port}
             host: ${aasImplServer.host}
-            schema: ${aasImplServer.host}
+            schema: ${aasImplServer.schema}
             protocol: ${aasImplServer.protocol}
         ${produceAasPersistence(aasPersistence)}'
+    }
+    
+    def produceDocker(IIPEcosphere config, Boolean enable) {
+        if (enable) {
+        DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
+        'docker:
+            dockerHost: ${containerManager.dockerHost}
+            dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
+            deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+        } else {
+            ''
+        }
     }
     
     def produceAasPersistence(String aasPersistence) {

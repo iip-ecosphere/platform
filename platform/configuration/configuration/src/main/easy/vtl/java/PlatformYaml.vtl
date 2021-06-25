@@ -6,8 +6,8 @@ import EcsRuntimeDockerContainerManagerYaml;
 template PlatformYaml(IIPEcosphere config, FileArtifact target) {
 
     def main(IIPEcosphere config, FileArtifact target) {
-        String proto = aasProtocolName(config);
-        '${produceAas(config, proto)}'
+        String pers = "${config.aasPersistency}";
+        '${produceAas(config, pers, false)}'
     }
 
 }
