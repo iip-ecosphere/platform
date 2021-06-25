@@ -61,5 +61,10 @@ public class TransportAas implements AasContributor {
     public Kind getKind() {
         return Kind.PASSIVE;
     }
+    
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
 }
