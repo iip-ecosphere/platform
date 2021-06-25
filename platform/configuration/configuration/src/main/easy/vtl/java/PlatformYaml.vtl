@@ -6,16 +6,8 @@ import EcsRuntimeDockerContainerManagerYaml;
 template PlatformYaml(IIPEcosphere config, FileArtifact target) {
 
     def main(IIPEcosphere config, FileArtifact target) {
-        DockerContainerManager mgr = config.containerManager;
-        EndpointAddress aasServer = config.aasServer;
-        EndpointAddress aasRegistryServer = config.aasRegistryServer;
-        ImplAddress aasImplServer = config.aasImplServer;
-        
-        'dockerHost: ${mgr.dockerHost}
-        dockerImageYamlFilename: ${mgr.dockerImageYamlFilename}
-        deleteWhenUndeployed: ${mgr.deleteWhenUndeployed}
-        ${produceAas(config)}
-            persistence: ${config.aasPersistency}'
+        String proto = aasProtocolName(config);
+        '${produceAas(config, proto)}'
     }
 
 }

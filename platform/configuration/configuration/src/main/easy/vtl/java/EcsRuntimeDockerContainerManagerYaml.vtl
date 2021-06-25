@@ -4,31 +4,40 @@ import JavaMapping;
 @indent(indentation = 4, additional = 0)
 template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
 
-    def produceAas(IIPEcosphere config) {
+    def produceAas(IIPEcosphere config, String aasPersistence="") {
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
-        'aas:
-            server:
-                port: ${aasServer.port}
-                host: ${aasServer.host}
-                schema: ${aasServer.schema}
-                path: ${aasServer.path}
-            registry:
-                port: ${aasRegistryServer.port}
-                host: ${aasRegistryServer.host}
-                schema: ${aasRegistryServer.schema}
-                path: ${aasRegistryServer.path}
-            implementation:
-                port: ${aasImplServer.port}
-                host: ${aasImplServer.host}
-                schema: ${aasImplServer.host}
-                protocol: ${aasImplServer.protocol}
-            docker:
-                dockerHost: ${containerManager.dockerHost}
-                dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
-                deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+    'docker:
+        dockerHost: ${containerManager.dockerHost}
+        dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
+        deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}
+    aas:
+        server:
+            port: ${aasServer.port}
+            host: ${aasServer.host}
+            schema: ${aasServer.schema}
+            path: ${aasServer.path}
+        registry:
+            port: ${aasRegistryServer.port}
+            host: ${aasRegistryServer.host}
+            schema: ${aasRegistryServer.schema}
+            path: ${aasRegistryServer.path}
+        implementation:
+            port: ${aasImplServer.port}
+            host: ${aasImplServer.host}
+            schema: ${aasImplServer.host}
+            protocol: ${aasImplServer.protocol}
+        ${produceAasPersistence(aasPersistence)}'
+    }
+    
+    def produceAasPersistence(String aasPersistence) {
+        if (aasPersistence.length() > 0) {
+            'persistence: ${aasPersistence}'
+        } else {
+            ''
+        }
     }
 
     def main(IIPEcosphere config, FileArtifact target) {
