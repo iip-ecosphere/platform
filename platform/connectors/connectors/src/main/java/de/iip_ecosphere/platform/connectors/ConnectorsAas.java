@@ -251,4 +251,9 @@ public class ConnectorsAas implements AasContributor {
         return Kind.DYNAMIC;
     }
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
 }
