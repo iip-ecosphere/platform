@@ -18,7 +18,8 @@ project SerializerConfig1 {
     aasRegistryServer = {
         schema = AasSchema::HTTP,
         port = 9002,
-        host = "127.0.0.1"
+        host = "127.0.0.1",
+        path = "registry"
     };
     aasImplServer = {
         port = 9003,

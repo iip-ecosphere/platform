@@ -21,7 +21,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target) {
         appendDependency(dep, iipGroup, "platform", projectVersion);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
-        appendMavenJarPlugin(plugins, "2.3", true, "de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown");
+        appendMavenJarPlugin(plugins, "2.3", false, "de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown");
         appendMavenDependencyPlugin(plugins, jarDir="../jars", copyOwn=true);
     }
 

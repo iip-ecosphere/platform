@@ -25,7 +25,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             port: ${aasImplServer.port}
             host: ${aasImplServer.host}
             schema: ${aasImplServer.schema}
-            protocol: ${aasImplServer.protocol}
+            protocol: ${aasProtocolName(aasImplServer.protocol)}
         ${produceAasPersistence(aasPersistence)}'
     }
     
