@@ -25,13 +25,14 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationManager;
-import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
-import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+import net.ssehub.easy.varModel.confModel.Configuration;
 
 import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironmentTest.*;
 
@@ -47,7 +48,7 @@ public class IvmlTests {
      * 
      * @return the configuration lifecycle descriptor instance 
      */
-    private ConfigurationLifecycleDescriptor assertLifecycleDescriptor() {
+    private static ConfigurationLifecycleDescriptor assertLifecycleDescriptor() {
         // check that the registration works, but do not execute all descriptors
         ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
         Optional<LifecycleDescriptor> first = ServiceLoaderUtils
@@ -73,6 +74,45 @@ public class IvmlTests {
         EasyExecutor.printReasoningMessages(rRes);
         lcd.shutdown();
     }
+    
+    private static class TestConfigurer extends InstantiationConfigurer {
+
+        /**
+         * Creates a configurer instance.
+         * 
+         * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
+         * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
+         * @param outputFolder the output folder for code generation
+         */
+        public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
+            super(ivmlModelName, modelFolder, outputFolder);
+        }
+
+        /**
+         * Obtains the lifecycle descriptor.
+         * 
+         * @return the descriptor
+         */
+        protected ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+            return assertLifecycleDescriptor();
+        }
+        
+        @Override
+        protected void validateConfiguration(Configuration conf) throws ExecutionException {
+            Assert.assertNotNull(conf);
+        }
+        
+        @Override
+        protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
+            Assert.assertFalse(res.hasConflict());
+        }
+        
+        @Override
+        protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
+            throw ex;
+        }
+
+    }
 
     /**
      * Tests loading, reasoning and instantiating "SerializerConfig1".
@@ -83,22 +123,8 @@ public class IvmlTests {
      */
     @Test
     public void testSerializerConfig1() throws ExecutionException, IOException {
-        ConfigurationSetup setup = ConfigurationSetup.getConfiguration();
-        setup.setIvmlModelName("SerializerConfig1");
-        setup.setIvmlConfigFolder(new File("src/test/easy"));
         File gen = new File("gen/tests/SerializerConfig1");
-        FileUtils.deleteQuietly(gen);
-        gen.mkdirs();
-        setup.setGenTarget(gen);
-        ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
-        lcd.startup(new String[0]); // shall register executor
-        Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
-        ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
-        EasyExecutor.printReasoningMessages(rRes);
-        Assert.assertFalse(rRes.hasConflict());
-        ConfigurationManager.instantiate(); // throws exception if it fails
-        lcd.shutdown();
-        setup.reset();
+        PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
         
         assertApplication(gen);
         assertEcsRuntime(gen);

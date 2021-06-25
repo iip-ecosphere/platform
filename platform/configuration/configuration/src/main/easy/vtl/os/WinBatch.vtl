@@ -1,0 +1,8 @@
+@advice(IIPEcosphere)
+template WinBatch(Configuration config, FileArtifact target) {
+	
+    def main(Configuration config, FileArtifact target) {
+        'java -cp "jars/*" de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown'
+    }
+	
+}
