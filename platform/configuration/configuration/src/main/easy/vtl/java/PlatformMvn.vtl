@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template PlatformMvn(IIPEcosphere config, XmlFileArtifact target) {
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -21,8 +21,8 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target) {
         appendDependency(dep, iipGroup, "platform", projectVersion);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
-        appendMavenJarPlugin(plugins, "2.3", false, "de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown");
-        appendMavenDependencyPlugin(plugins, jarDir="../jars", copyOwn=true);
+        appendMavenJarPlugin(plugins, "2.3", false, main);
+        appendMavenDependencyPlugin(plugins, jarDir="../${dir}", copyOwn=true);
     }
 
 }

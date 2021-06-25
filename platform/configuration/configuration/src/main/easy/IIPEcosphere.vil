@@ -12,6 +12,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     String javaInterfacesPackage = "iip.interfaces";
     String javaStubsPackage = "iip.stubs";
     String javaNodesPackage = "iip.nodes";
+    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarterWithShutdown";
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
@@ -96,9 +97,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
-        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml");
+        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
         maven("${platformRoot}");
-        vilTemplateProcessor("WinBatch", config, "${target}/platform.bat");
+        vilTemplateProcessor("WinBatch", config, "${target}/platform.bat", dir="plJars", main=dfltMain);
     }
 
 }
