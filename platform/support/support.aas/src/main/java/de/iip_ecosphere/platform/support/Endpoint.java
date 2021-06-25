@@ -89,10 +89,13 @@ public class Endpoint extends ServerAddress {
     /**
      * Checks/fixes an endpoint path.
      * 
-     * @param endpoint the endpoint patn
+     * @param endpoint the endpoint path
      * @return the (fixed) endpoint path
      */
     public static String checkEndpoint(String endpoint) {
+        if (null == endpoint) {
+            endpoint = "";
+        }
         if (endpoint.length() > 0 && !endpoint.startsWith("/")) {
             endpoint = "/" + endpoint;
         }
