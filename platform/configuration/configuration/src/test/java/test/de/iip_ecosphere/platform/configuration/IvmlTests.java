@@ -25,7 +25,9 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationManager;
+import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.ConfigurationSetup.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -110,6 +112,12 @@ public class IvmlTests {
         @Override
         protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
             throw ex;
+        }
+
+        @Override
+        protected void configure(ConfigurationSetup setup) {
+            super.configure(setup);
+            setup.setEasyLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
 
     }

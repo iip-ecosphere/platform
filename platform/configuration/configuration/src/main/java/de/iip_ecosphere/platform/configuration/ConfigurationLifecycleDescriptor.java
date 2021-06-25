@@ -15,9 +15,11 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.log4j.lf5.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.configuration.ConfigurationSetup.EasyLogLevel;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.uni_hildesheim.sse.easy.loader.ListLoader;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -34,34 +36,68 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
     private ListLoader loader;
+    private boolean doLogging = true;
+    private boolean doFilterLogs = false;
     
+    /**
+     * SLF4J-to-EASy logging adapter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private class Slf4EasyLogger implements ILogger {
 
         @Override
         public void info(String msg, Class<?> clazz, String bundleName) {
-            getLogger().info("[" + clazz.getName() + "] " + msg);
+            if (allowLogging(msg, clazz, bundleName, LogLevel.INFO)) {
+                getLogger().info("[" + clazz.getName() + "] " + msg);
+            }
         }
 
         @Override
         public void error(String msg, Class<?> clazz, String bundleName) {
-            getLogger().error("[" + clazz.getName() + "] " + msg);
+            if (allowLogging(msg, clazz, bundleName, LogLevel.ERROR)) {
+                getLogger().error("[" + clazz.getName() + "] " + msg);
+            }
         }
 
         @Override
         public void warn(String msg, Class<?> clazz, String bundleName) {
-            getLogger().warn("[" + clazz.getName() + "] " + msg);
+            if (allowLogging(msg, clazz, bundleName, LogLevel.WARN)) {
+                getLogger().warn("[" + clazz.getName() + "] " + msg);
+            }
         }
 
         @Override
         public void debug(String msg, Class<?> clazz, String bundleName) {
-            getLogger().debug("[" + clazz.getName() + "] " + msg);
+            if (allowLogging(msg, clazz, bundleName, LogLevel.DEBUG)) {
+                getLogger().debug("[" + clazz.getName() + "] " + msg);
+            }
         }
 
         @Override
         public void exception(String msg, Class<?> clazz, String bundleName) {
-            getLogger().error("[" + clazz.getName() + "] " + msg);
+            if (allowLogging(msg, clazz, bundleName, LogLevel.FATAL)) {
+                getLogger().error("[" + clazz.getName() + "] " + msg);
+            }
         }
         
+    }
+    
+    /**
+     * Returns whether logging is allowed.
+     * 
+     * @param msg the message
+     * @param clazz the originating class
+     * @param bundleName the originating bundle
+     * @param level the logging level
+     * @return {@code true} for log the message, {@code false} for consume and be quiet
+     */
+    private boolean allowLogging(String msg, Class<?> clazz, String bundleName, LogLevel level) {
+        boolean emit = doLogging;
+        if (doFilterLogs) {
+            emit = clazz == EasyExecutor.class; 
+        }
+        return emit;
     }
     
     @Override
@@ -72,9 +108,12 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getConfiguration();
             loader = new ListLoader(); // file .easyStartup from classloader
-            //loader.setVerbose(true);
+            loader.setVerbose(setup.getEasyLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");
+            doFilterLogs = setup.getEasyLogLevel() == EasyLogLevel.NORMAL;
+            doLogging = !doFilterLogs;
             loader.startup();
+            doLogging = true;
             EasyExecutor exec = new EasyExecutor(
                 setup.getBase(), 
                 setup.getIvmlMetaModelFolder(), 
@@ -116,7 +155,9 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         ConfigurationManager.setExecutor(null);
         if (null != loader) {
             getLogger().info("EASy-Producer is stopping");
+            doLogging = !doFilterLogs;
             loader.shutdown();
+            doLogging = true;
             getLogger().info("EASy-Producer stopped");
         }
     }

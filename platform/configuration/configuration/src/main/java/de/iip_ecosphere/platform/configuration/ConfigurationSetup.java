@@ -34,7 +34,21 @@ public class ConfigurationSetup extends AbstractConfiguration {
     private File ivmlMetaModelFolder; 
     private File ivmlConfigFolder;
     private String ivmlModelName;
+    private EasyLogLevel easyLogLevel = EasyLogLevel.NORMAL;
 
+    /**
+     * Basically, the amount of EASy logging is defined via the Log4J logging configuration. However, we can log
+     * more and even more, in particular during startup. These levels refer to the specific startup logging that
+     * we have under control here.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum EasyLogLevel {
+        NORMAL,
+        VERBOSE,
+        EXTRA_VERBOSE
+    }
+    
     /**
      * Creates an instance.
      */
@@ -145,6 +159,25 @@ public class ConfigurationSetup extends AbstractConfiguration {
         if (null == ivmlConfigFolder || (null != ivmlConfigFolder && !ivmlMetaModelFolder.equals(ivmlConfigFolder))) {
             this.ivmlConfigFolder = ivmlConfigFolder;
         }
+    }
+
+    /**
+     * Returns whether EASy-Producer verbose output, in particular during startup, shall be emitted.
+     * 
+     * @return {@code true} for verbose output, {@code false} else   
+     */
+    public EasyLogLevel getEasyLogLevel() {
+        return easyLogLevel;
+    }
+
+    /**
+     * Defines whether EASy-Producer verbose output, in particular during startup, shall be emitted. 
+     * [required by SnakeYaml]
+     * 
+     * @param easyLogLevel the easy loglevel   
+     */
+    public void setEasyLogLevel(EasyLogLevel easyLogLevel) {
+        this.easyLogLevel = easyLogLevel;
     }
 
     /**
