@@ -278,5 +278,10 @@ public class EcsAas implements AasContributor {
     private static Logger getLogger() {
         return LoggerFactory.getLogger(EcsAas.class);
     }
+    
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
 }

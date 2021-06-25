@@ -105,51 +105,53 @@ public class ServicesAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-
-        // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
-        SubmodelElementCollectionBuilder jB 
-            = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
-    
-        // probably relevant ops only
-        createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
-        createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
-        createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
-        createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
-        createIdOp(jB, NAME_OP_SERVICE_UPDATE, iCreator, "location");
-        createIdOp(jB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
-        createIdOp(jB, NAME_OP_SERVICE_RECONF, iCreator, "values");
-        createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
-        createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
-        createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
-        
-        // probably relevant ops only
-        jB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
-            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
-            .addInputVariable("url", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .build();
-        createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
-        jB.build();
-
-        smB.defer(); // join with ecsRuntime if present, build done by AAS
-
-        // service structures go into own part
         ServiceManager mgr = ServiceFactory.getServiceManager();
-        smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
-        // ensure that these collections do exist
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false).build();
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false).build();
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false).build();
-
-        for (ArtifactDescriptor a : mgr.getArtifacts()) {
-            addArtifact(smB, a);
+        if (null != mgr) { // this shall not be needed, but if the Jar is present, the contributor will be executed 
+            // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
+            SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
+            SubmodelElementCollectionBuilder jB 
+                = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
+        
+            // probably relevant ops only
+            createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
+            createIdOp(jB, NAME_OP_SERVICE_UPDATE, iCreator, "location");
+            createIdOp(jB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
+            createIdOp(jB, NAME_OP_SERVICE_RECONF, iCreator, "values");
+            createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
+            
+            // probably relevant ops only
+            jB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
+                .addInputVariable("url", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .build();
+            createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
+            jB.build();
+    
+            smB.defer(); // join with ecsRuntime if present, build done by AAS
+    
+            // service structures go into own part
+            
+            smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            // ensure that these collections do exist
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false).build();
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false).build();
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false).build();
+    
+            for (ArtifactDescriptor a : mgr.getArtifacts()) {
+                addArtifact(smB, a);
+            }
+            for (ServiceDescriptor s : mgr.getServices()) {
+                addService(smB, s);
+            }
+    
+            smB.build();
         }
-        for (ServiceDescriptor s : mgr.getServices()) {
-            addService(smB, s);
-        }
-
-        smB.build();
         return null;
     }
 
@@ -567,6 +569,12 @@ public class ServicesAas implements AasContributor {
      */
     private static Logger getLogger() {
         return LoggerFactory.getLogger(ServicesAas.class);
+    }
+
+    @Override
+    public boolean isValid() {
+        // if the Jar is present, the contributor will be executed although the factory may not be there (optional)
+        return ServiceFactory.getServiceManager() != null; 
     }
 
 }

@@ -38,5 +38,10 @@ public class ConfigurationAas implements AasContributor {
     public Kind getKind() {
         return Kind.ACTIVE;
     }
+    
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
 }
