@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target) {
+template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
@@ -19,7 +19,8 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target) {
         appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
-        appendMavenShadePlugin(plugins, "2.3", "de.iip_ecosphere.platform.support.LifecycleHandler\\$WaitingStarterWithShutdown");
+        appendMavenJarPlugin(plugins, "2.3", false, main);
+        appendMavenDependencyPlugin(plugins, jarDir="../${dir}", copyOwn=true);
     }
 
 }

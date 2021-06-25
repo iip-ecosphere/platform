@@ -83,15 +83,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
-        vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml");
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
         maven("${ecsRuntimeRoot}");
+        vilTemplateProcessor("WinBatch", config, "${target}/ecs.bat", dir="ecsJars", main=dfltMain);
         
         serviceMgrRoot.mkdir();
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
-        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml");
+        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}");
+        vilTemplateProcessor("WinBatch", config, "${target}/serviceMgr.bat", dir="svcJars", main=dfltMain);
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
