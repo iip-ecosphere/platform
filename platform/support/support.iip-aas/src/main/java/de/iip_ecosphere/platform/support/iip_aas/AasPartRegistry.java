@@ -65,18 +65,13 @@ public class AasPartRegistry {
     public static final Schema DEFAULT_SCHEMA = Schema.HTTP;
     public static final String DEFAULT_HOST = ServerAddress.LOCALHOST;
     public static final int DEFAULT_PORT = 8080;
+    public static final int DEFAULT_REGISTRY_PORT = 8081; // shall also be on 8080; two processes in one needs revision
     public static final int DEFAULT_PROTOCOL_PORT = 9000;
     public static final String DEFAULT_AAS_ENDPOINT = "";
     public static final String DEFAULT_REGISTRY_ENDPOINT = "registry";
     public static final String DEFAULT_PROTOCOL = AasFactory.DEFAULT_PROTOCOL;
     
     private static AasSetup setup = new AasSetup();
-    //public static final Endpoint DEFAULT_EP = new Endpoint(DEFAULT_SCHEMA, DEFAULT_HOST, 
-    //    DEFAULT_PORT, DEFAULT_REGISTRY_ENDPOINT);
-    //private static Endpoint aasEndpoint = DEFAULT_EP;
-    //public static final ServerAddress DEFAULT_IMPL = new ServerAddress(Schema.IGNORE, 
-    //    DEFAULT_HOST, DEFAULT_PROTOCOL_PORT);
-    //private static ServerAddress protocolAddress = DEFAULT_IMPL;
 
     /**
      * The technical setup of the AAS/VAB endpoints as data class to be used with a usual configuration format/YAML 
@@ -92,7 +87,7 @@ public class AasPartRegistry {
             DEFAULT_HOST, DEFAULT_PORT, DEFAULT_AAS_ENDPOINT);
 
         private EndpointHolder registry = new EndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
-            DEFAULT_PORT, DEFAULT_REGISTRY_ENDPOINT);
+            DEFAULT_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
 
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
