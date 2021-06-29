@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.platform.PersistentAasSetup.ConfiguredPersistenceType;
 import de.iip_ecosphere.platform.platform.PlatformConfiguration;
-import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import org.junit.Assert;
