@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.spring;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 
+import de.iip_ecosphere.platform.services.ServiceFactory;
+
 /**
  * Allows bridging the Spring world with components loaded via JSL without that Spring creates the instance. 
  * Must be initialized before use of {@link SpringCloudServiceManager}, e.g., through 
@@ -61,6 +63,7 @@ class SpringInstances {
      */
     static void setConfig(SpringCloudServiceConfiguration cfg) {
         config = cfg;
+        ServiceFactory.setAasSetup(cfg.getAas());
     }
 
 }

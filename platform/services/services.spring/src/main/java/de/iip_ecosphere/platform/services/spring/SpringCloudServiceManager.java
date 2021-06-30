@@ -76,7 +76,8 @@ public class SpringCloudServiceManager
 
         @Override
         public AasSetup getAasSetup() {
-            return SpringInstances.getConfig().getAas();
+            // may not yet have been initialized
+            return null != SpringInstances.getConfig() ? SpringInstances.getConfig().getAas() : null;
         }
         
     }
