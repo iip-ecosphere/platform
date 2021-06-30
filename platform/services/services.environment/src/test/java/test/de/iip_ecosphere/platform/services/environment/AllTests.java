@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.services.environment;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnitTest;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -27,7 +29,9 @@ import org.junit.runners.Suite;
     JavaEnvironmentTest.class,
     PythonEnvironmentTest.class,
     PythonEnvironmentSuiteTest.class,
-    StarterTest.class
+    StarterTest.class,
+    
+    CapacityBaseUnitTest.class
 })
 public class AllTests {
 }
