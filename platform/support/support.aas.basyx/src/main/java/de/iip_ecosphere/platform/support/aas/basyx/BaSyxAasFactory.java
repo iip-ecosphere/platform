@@ -14,9 +14,6 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 
-import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
-
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -65,7 +62,7 @@ public class BaSyxAasFactory extends AasFactory {
 
         @Override
         public InvocablesCreator createInvocablesCreator(String host, int port) {
-            return new VabInvocablesCreator(new BaSyxConnector(host, port)); 
+            return new VabTcpInvocablesCreator(host, port); 
         }
 
         @Override
@@ -84,7 +81,7 @@ public class BaSyxAasFactory extends AasFactory {
 
         @Override
         public InvocablesCreator createInvocablesCreator(String host, int port) {
-            return new VabInvocablesCreator(new HTTPConnector("http://" + host + ":" + port));
+            return new VabHttpInvocablesCreator("http://" + host + ":" + port);
         }
 
         @Override
@@ -103,7 +100,7 @@ public class BaSyxAasFactory extends AasFactory {
 
         @Override
         public InvocablesCreator createInvocablesCreator(String host, int port) {
-            return new VabInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
+            return new VabHttpsInvocablesCreator(new BaSyxHTTPSConnector("https://" + host + ":" + port, 
                 new BaSyxJerseyHttpsClientFactory())); // TODO for now with self-signed
         }
 

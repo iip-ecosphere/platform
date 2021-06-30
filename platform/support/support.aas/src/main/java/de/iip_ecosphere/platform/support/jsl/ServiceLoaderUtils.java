@@ -12,12 +12,13 @@
 
 package de.iip_ecosphere.platform.support.jsl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
-
-import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * Helper functions for Java Service Loading.
@@ -81,7 +82,15 @@ public class ServiceLoaderUtils {
      * @return the stream of descriptor
      */
     public static <D> Stream<D> stream(ServiceLoader<D> loader) {
-        return CollectionUtils.toList(loader.iterator()).stream(); // JDK 1.8
+        List<D> result = new ArrayList<D>();
+        Iterator<D> iterator = loader.iterator();  // JDK 1.8
+        while (iterator.hasNext()) {
+            try {
+                result.add(iterator.next());
+            } catch (ServiceConfigurationError e) {
+            }
+        }
+        return result.stream();
     }
     
     /**
