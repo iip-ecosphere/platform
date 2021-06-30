@@ -26,9 +26,14 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
@@ -69,6 +74,43 @@ public class EcsAasTest {
         
         aasServer.stop(true);
         implServer.stop(true);
+        AasPartRegistry.setAasSetup(oldSetup);
+        ActiveAasBase.setNotificationMode(oldM);
+    }
+
+    /**
+     * Tests the {@link EcsAas} via the lifecycle descriptors.
+     * 
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur 
+     * @throws URISyntaxException shall not occur
+     */
+    @Test
+    public void testLifecycle() throws IOException, ExecutionException, URISyntaxException {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
+        EcsFactory.getConfiguration().setAas(aasSetup);
+
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
+        Server registryServer = rcp
+            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
+            .start();
+        AasServer aasServer = rcp
+            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
+            .start();
+
+        LifecycleHandler.startup(new String[] {});
+
+        EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
+        test(client);
+        
+        LifecycleHandler.shutdown();
+
+        aasServer.stop(true);
+        registryServer.stop(true);
+
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
     }

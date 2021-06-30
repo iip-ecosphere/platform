@@ -30,6 +30,7 @@ public class EcsFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EcsFactory.class.getName());
     private static EcsFactoryDescriptor desc;
     private static ContainerManager manager = null;
+    private static Configuration conf;
 
     /**
      * Initializes this factory.
@@ -42,6 +43,13 @@ public class EcsFactory {
                 desc = first.get();
             } else {
                 LOGGER.error("No Container manager implementation known.");
+            }
+        }
+        if (null == conf) {
+            if (null != desc) {
+                conf = desc.getConfiguration();
+            } else {
+                conf = new Configuration();
             }
         }
     }
@@ -69,15 +77,11 @@ public class EcsFactory {
      * 
      * @return the configuration instance
      */
-    static Configuration getConfiguration() {
-        Configuration result;
-        init();
-        if (null != desc) {
-            result = desc.getConfiguration();
-        } else {
-            result = new Configuration();
+    public static Configuration getConfiguration() {
+        if (null == conf) {
+            init();
         }
-        return result;
+        return conf;
     }
 
 }
