@@ -46,11 +46,6 @@ public class ServiceFactory {
                 LOGGER.error("No Service manager implementation known.");
             }
         }
-        if (null != desc) {
-            setup = desc.getAasSetup();
-        } else {
-            setup = new AasSetup();
-        }
     }
     
     /**
@@ -79,6 +74,12 @@ public class ServiceFactory {
     public static AasSetup getAasSetup() {
         if (null == setup) {
             init();
+            if (null != desc) {
+                setup = desc.getAasSetup();
+            }
+            if (null == setup) {
+                setup = new AasSetup();
+            }
         }
         return setup;
     }
