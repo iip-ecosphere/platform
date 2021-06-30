@@ -1,0 +1,13 @@
+{
+	"name": "valid.name",
+	"description": null,
+	"baseUnit": "bytes",
+	"measurements": [
+		{
+			"statistic": "VALUE",
+			"value": 123.123
+		}
+	],
+	"availableTags": [
+	]
+}
