@@ -1,0 +1,12 @@
+{
+	"name": "valid.name",
+	"description": "Valid description",
+	"measurements": [
+		{
+			"statistic": "VALUE",
+			"value": 123.123
+		}
+	],
+	"availableTags": [
+	]
+}

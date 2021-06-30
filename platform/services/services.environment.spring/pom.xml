@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>services.environment.spring</artifactId>
+  <packaging>jar</packaging>
+  <name>Multi-language service environment (specific additions for Spring Cloud Stream)</name>
+  <description>Multi-language service environment for the IIP-Ecosphere platform to generate services upon (specific additions for Spring Cloud Stream).</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>services.environment</artifactId>
+      <version>${project.version}</version>
+    </dependency>   
+    <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot</artifactId>
+    </dependency>
+    <dependency>
+     <groupId>org.springframework</groupId>
+     <artifactId>spring-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+     </dependency>
+<!--    <dependency>
+      <groupId>javax.json</groupId>
+      <artifactId>javax.json-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.json</artifactId>
+      <version>1.1.4</version>
+    </dependency>-->
+
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>services.environment</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

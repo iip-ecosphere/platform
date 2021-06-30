@@ -1,0 +1,17 @@
+{
+	"name": "custom.gauge",
+	"description": "A sample custom gauge",
+	"baseUnit": "bytes",
+	"measurements": [
+		{
+			"statistic": "VALUE",
+			"value": 0.6245328097098749
+		},
+		{
+			"statistic": "VALUE",
+			"value": 0.6245328097098749
+		}
+	],
+	"availableTags": [
+	]
+}

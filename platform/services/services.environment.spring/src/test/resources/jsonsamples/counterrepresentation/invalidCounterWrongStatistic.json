@@ -1,0 +1,13 @@
+{
+	"name": "custom.counter",
+	"description": "A sample custom counter",
+	"baseUnit": "threads",
+	"measurements": [
+		{
+			"statistic": "VALUE",
+			"value": 139.64683506423114
+		}
+	],
+	"availableTags": [
+	]
+}

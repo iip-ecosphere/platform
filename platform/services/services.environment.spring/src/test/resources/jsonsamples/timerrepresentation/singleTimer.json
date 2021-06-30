@@ -1,0 +1,21 @@
+{
+	"name": "custom.timer",
+	"description": "A sample custom timer",
+	"baseUnit": "seconds",
+	"measurements": [
+		{
+			"statistic": "COUNT",
+			"value": 1
+		},
+		{
+			"statistic": "TOTAL_TIME",
+			"value": 1.0
+		},
+		{
+			"statistic": "MAX",
+			"value": 1.0
+		}
+	],
+	"availableTags": [
+	]
+}
