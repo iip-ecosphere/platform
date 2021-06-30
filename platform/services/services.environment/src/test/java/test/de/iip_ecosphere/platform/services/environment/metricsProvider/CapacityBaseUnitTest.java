@@ -41,7 +41,7 @@ public class CapacityBaseUnitTest {
     private static final String RANDOM = "random";
 
     /**
-     * Tests {@link CapacityBaseUnit#BYTES#byteValue()}.
+     * Tests {@link CapacityBaseUnit#BYTES}.
      */
     @Test
     public void testByteValueOfBytes() {
@@ -49,7 +49,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#KILOBYTES#byteValue()}.
+     * Tests {@link CapacityBaseUnit#KILOBYTES}.
      */
     @Test
     public void testByteValueOfKilobytes() {
@@ -57,7 +57,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#MEGABYTES#byteValue()}.
+     * Tests {@link CapacityBaseUnit#MEGABYTES}.
      */
     @Test
     public void testByteValueOfMegabytes() {
@@ -65,7 +65,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#GIGABYTES#byteValue()}.
+     * Tests {@link CapacityBaseUnit#GIGABYTES}.
      */
     @Test
     public void testByteValueOfGigabytes() {
@@ -73,7 +73,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#TERABYTES#byteValue()}.
+     * Tests {@link CapacityBaseUnit#TERABYTES}.
      */
     @Test
     public void testByteValueOfTerabytes() {
@@ -81,7 +81,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#BYTES#stringValue()}.
+     * Tests {@link CapacityBaseUnit#BYTES}.
      */
     @Test
     public void testStringValueOfBytes() {
@@ -89,7 +89,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#KILOBYTES#stringValue()}.
+     * Tests {@link CapacityBaseUnit#KILOBYTES}.
      */
     @Test
     public void testStringValueOfKilobytes() {
@@ -97,7 +97,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#MEGABYTES#stringValue()}.
+     * Tests {@link CapacityBaseUnit#MEGABYTES}.
      */
     @Test
     public void testStringValueOfMegabytes() {
@@ -105,7 +105,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#GIGABYTES#stringValue()}.
+     * Tests {@link CapacityBaseUnit#GIGABYTES}.
      */
     @Test
     public void testStringValueOfGigabytes() {
@@ -113,7 +113,7 @@ public class CapacityBaseUnitTest {
     }
 
     /**
-     * Tests {@link CapacityBaseUnit#TERABYTES#stringValue()}.
+     * Tests {@link CapacityBaseUnit#TERABYTES}.
      */
     @Test
     public void testStringValueOfTerabytes() {

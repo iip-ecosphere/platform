@@ -3,12 +3,17 @@ package test.de.iip_ecosphere.platform.services.environment.metricsProvider.util
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
+import java.net.URL;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
+import org.junit.Assert;
 
 /**
  * Class to avoid repetition of code in testing environment.<br>
@@ -34,9 +39,22 @@ public class TestUtils {
     public static JsonObject readJsonFromResources(String folder, String filename) throws IOException {
         String rssName = "jsonsamples/" + folder + "/" + filename;
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(
-                new FileReader(Thread.currentThread().getContextClassLoader().getResource(rssName).getFile()));
-
+        Reader reader = null;
+        InputStream is = TestUtils.class.getClassLoader().getResourceAsStream(rssName);
+        if (null != is) {
+            reader = new InputStreamReader(is);
+        } else {
+            // prefer classpath resource
+            URL resource = Thread.currentThread().getContextClassLoader().getResource(rssName);
+            if (resource != null) {
+                reader = new FileReader(resource.getFile());
+            }
+        }
+        if (null == reader) {
+            Assert.fail("Cannot read " + rssName + ", neiter from file system nor from classpath");
+        }
+        
+        BufferedReader br = new BufferedReader(reader);
         while (br.ready()) {
             sb.append(br.readLine());
         }
