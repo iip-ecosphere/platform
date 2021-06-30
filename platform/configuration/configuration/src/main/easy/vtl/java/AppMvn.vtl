@@ -31,6 +31,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
+        appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
         for (String art : artifacts) {

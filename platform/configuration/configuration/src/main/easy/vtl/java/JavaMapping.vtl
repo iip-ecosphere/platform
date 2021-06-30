@@ -17,6 +17,21 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String serviceManagerModule(SpringCloudStream mgr) {
         "services.spring";
     }
+
+
+
+    def String serviceEnvironmentModule(IIPEcosphere cfg) {
+        serviceEnvironmentModule(cfg.serviceManager);
+    }
+    
+    // dispatch basis
+    def String serviceEnvironmentModule(ServiceManager mgr) {
+        "";
+    }
+    
+    def String serviceEnvironmentModule(SpringCloudStream mgr) {
+        "services.environment.spring";
+    }
     
     // --------------------------------------------------------------
     
