@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.services.spring;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.services.spring.metricsProvider.MetricsProviderTests;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -23,7 +25,9 @@ import org.junit.runners.Suite;
     UtilsTest.class,
     TestServiceManager.class,
     ArtifactInfoTest.class,
-    TestLifecycleDescriptor.class
+    TestLifecycleDescriptor.class,
+    
+    MetricsProviderTests.class
 })
 public class AllTests {
 }
