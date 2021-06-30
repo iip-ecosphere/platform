@@ -46,7 +46,6 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor {
         LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS server on " + serverEndpoint.toUri());
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
-        // TODO VAB-Server
     }
 
     @Override
