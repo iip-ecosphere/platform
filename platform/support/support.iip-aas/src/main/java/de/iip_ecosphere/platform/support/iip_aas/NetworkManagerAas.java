@@ -218,7 +218,7 @@ public class NetworkManagerAas implements AasContributor {
 
     @Override
     public boolean isValid() {
-        return true;
+        return NetworkManagerFactory.getInstance() != null;
     }
 
 }

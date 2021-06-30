@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -207,16 +208,31 @@ public class AasPartRegistry {
          */
         @JsonIgnore
         public static AasSetup createLocalEphemeralSetup(AasSetup setup, boolean regPortSame) {
-            AasSetup result = setup;
+            return createLocalEphemeralSetup(setup, regPortSame, () -> new AasSetup());
+        }
+
+        /**
+         * Returns a default setup with all hosts to {@link ServerAddress#LOCALHOST} and all ports to ephemeral.
+         * 
+         * @param <A> the AAS setup type
+         * @param setup the instance to set up (if <b>null</b> a new one is created via {@code supplier})
+         * @param regPortSame shall the registry port be the same as the AAS port
+         * @param supplier a supplier for a new instance
+         * @return the local ephemeral setup
+         */
+        @JsonIgnore
+        public static <A extends AasSetup> A createLocalEphemeralSetup(A setup, boolean regPortSame, 
+            Supplier<A> supplier) {
+            A result = setup;
             if (null == result) {
-                result = new AasSetup();
+                result = supplier.get();
             }
-            result.server.setHost(ServerAddress.LOCALHOST);
-            result.server.setPort(NetUtils.getEphemeralPort());
-            result.registry.setHost(ServerAddress.LOCALHOST);
-            result.registry.setPort(regPortSame ? result.server.getPort() : NetUtils.getEphemeralPort());
-            result.implementation.setHost(ServerAddress.LOCALHOST);
-            result.implementation.setPort(NetUtils.getEphemeralPort()); // could both be the same?
+            result.getServer().setHost(ServerAddress.LOCALHOST);
+            result.getServer().setPort(NetUtils.getEphemeralPort());
+            result.getRegistry().setHost(ServerAddress.LOCALHOST);
+            result.getRegistry().setPort(regPortSame ? result.getServer().getPort() : NetUtils.getEphemeralPort());
+            result.getImplementation().setHost(ServerAddress.LOCALHOST);
+            result.getImplementation().setPort(NetUtils.getEphemeralPort()); // could both be the same?
             return result;
         }
 
