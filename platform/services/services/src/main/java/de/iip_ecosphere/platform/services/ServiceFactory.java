@@ -31,6 +31,7 @@ public class ServiceFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class.getName());
     private static ServiceFactoryDescriptor desc;
     private static ServiceManager manager = null;
+    private static AasSetup setup;
 
     /**
      * Initializes this factory.
@@ -44,6 +45,11 @@ public class ServiceFactory {
             } else {
                 LOGGER.error("No Service manager implementation known.");
             }
+        }
+        if (null != desc) {
+            setup = desc.getAasSetup();
+        } else {
+            setup = new AasSetup();
         }
     }
     
@@ -70,15 +76,20 @@ public class ServiceFactory {
      * 
      * @return the AAS setup
      */
-    static AasSetup getAasSetup() {
-        AasSetup result;
-        init();
-        if (null != desc) {
-            result = desc.getAasSetup();
-        } else {
-            result = new AasSetup();
+    public static AasSetup getAasSetup() {
+        if (null == setup) {
+            init();
         }
-        return result;
+        return setup;
+    }
+    
+    /**
+     * Defines the AAs setup instance [for testing].
+     * 
+     * @param instance the new setup instance
+     */
+    public static void setAasSetup(AasSetup instance) {
+        setup = instance;
     }
 
 }

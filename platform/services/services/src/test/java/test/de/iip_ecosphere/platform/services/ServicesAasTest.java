@@ -33,8 +33,13 @@ import de.iip_ecosphere.platform.services.ServicesAasClient;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
@@ -70,6 +75,60 @@ public class ServicesAasTest {
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
         ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
+        test(client);
+        
+        aasServer.stop(true);
+        implServer.stop(true);
+        AasPartRegistry.setAasSetup(oldSetup);
+        ActiveAasBase.setNotificationMode(oldM);
+    }
+
+    /**
+     * Tests the {@link EcsAas} via the lifecycle descriptors.
+     * 
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur 
+     * @throws URISyntaxException shall not occur
+     */
+    @Test
+    public void testLifecycle() throws IOException, ExecutionException, URISyntaxException {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
+        ServiceFactory.setAasSetup(aasSetup);
+
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
+        Server registryServer = rcp
+            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
+            .start();
+        AasServer aasServer = rcp
+            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
+            .start();
+
+        LifecycleHandler.startup(new String[] {});
+
+        ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
+        test(client);
+        
+        LifecycleHandler.shutdown();
+
+        aasServer.stop(true);
+        registryServer.stop(true);
+
+        AasPartRegistry.setAasSetup(oldSetup);
+        ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * Tests the serivces AAS client.
+     * 
+     * @param client the client
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur 
+     * @throws URISyntaxException shall not occur
+     */
+    private void test(ServicesAasClient client) throws IOException, ExecutionException, URISyntaxException {
         ServiceManager mgr = ServiceFactory.getServiceManager(); // for x-checking
 
         final URI dummy = new URI("file:///dummy");
@@ -121,11 +180,6 @@ public class ServicesAasTest {
         client.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
-        
-        aasServer.stop(true);
-        implServer.stop(true);
-        AasPartRegistry.setAasSetup(oldSetup);
-        ActiveAasBase.setNotificationMode(oldM);
     }
 
 }
