@@ -10,24 +10,25 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.services.environment;
-
-import org.junit.Assert;
-import org.junit.Test;
+package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas;
 
 /**
- * Template test.
+ * Enum used to specify the type of Meter.<br>
+ * This enum is used to aid the
+ * {@link MetricsAasConstructor#addCustomMetric(MetricsAasConstructionBundle, String, MeterType)}
+ * method to create the correct type of custom metric that the user wants to
+ * create.<br>
+ * There are three types of Metric:
+ * <ul>
+ * <li>Counters</li>
+ * <li>Gauges</li>
+ * <li>Timers</li>
+ * </ul>
  * 
- * @author Holger Eichelberger, SSE
+ * @author Miguel Gomez
  */
-public class AppTest {
-    
-    /**
-     * Template test.
-     */
-    @Test
-    public void testApp() {
-        Assert.assertTrue(true);
-    }
-    
+public enum MeterType {
+
+    COUNTER, GAUGE, TIMER;
+
 }
