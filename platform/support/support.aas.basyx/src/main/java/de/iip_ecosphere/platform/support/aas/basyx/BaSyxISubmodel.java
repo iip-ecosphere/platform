@@ -118,10 +118,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
     public BaSyxISubmodel(BaSyxConnectedAas parent, ISubModel submodel) {
         super(submodel);
         this.parent = parent;
-        BaSyxElementTranslator.registerValues(submodel.getValues(), this);
-        BaSyxElementTranslator.registerProperties(submodel.getProperties(), this);
-        BaSyxElementTranslator.registerOperations(submodel.getOperations(), this);
-        BaSyxElementTranslator.registerRemainingSubmodelElements(submodel.getSubmodelElements(), this);
+        BaSyxElementTranslator.registerSubmodelElements(submodel.getSubmodelElements(), this);
     }
 
     @Override

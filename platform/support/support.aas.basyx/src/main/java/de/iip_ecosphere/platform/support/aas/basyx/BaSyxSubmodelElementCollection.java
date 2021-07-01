@@ -12,13 +12,11 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
@@ -46,7 +44,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     SubmodelElementsRegistrar {
     
     private ISubmodelElementCollection collection;
-    private List<SubmodelElement> elements;
+    private Map<String, SubmodelElement> elements;
     private Map<String, Builder<?>> deferred;
     
     /**
@@ -76,7 +74,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             String idShort, boolean ordered, boolean allowDuplicates) {
             this.parentBuilder = parentBuilder;
             this.instance = new BaSyxSubmodelElementCollection();
-            this.instance.elements = new ArrayList<SubmodelElement>();
+            this.instance.elements = new HashMap<String, SubmodelElement>();
             org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll = 
                 new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
             coll.setIdShort(Tools.checkId(idShort));
@@ -234,14 +232,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     /**
-     * Dynamically intializes the elements structure.
+     * Dynamically initializes the elements structure.
      */
     private void initialize() {
         if (null == elements) {
-            elements = new ArrayList<SubmodelElement>();
-            BaSyxElementTranslator.registerProperties(collection.getProperties(), this);
-            BaSyxElementTranslator.registerOperations(collection.getOperations(), this);
-            BaSyxElementTranslator.registerRemainingSubmodelElements(collection.getSubmodelElements(), this);        
+            elements = new HashMap<String, SubmodelElement>();
+            BaSyxElementTranslator.registerSubmodelElements(collection.getSubmodelElements(), this);        
         }
     }
 
@@ -254,7 +250,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public Iterable<SubmodelElement> elements() {
         initialize();
-        return elements;
+        return elements.values();
     }
 
     @Override
@@ -289,19 +285,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
     @Override
     public SubmodelElement getElement(String idShort) {
-        // looping may not be efficient, let's see
         initialize();
-        SubmodelElement found = null;
-        try {
-            for (SubmodelElement se : elements) {
-                if (se.getIdShort().equals(idShort)) {
-                    found = se;
-                    break;
-                }
-            }
-        } catch (ResourceNotFoundException e) {
-        }
-        return found;
+        return elements.get(idShort);
     }
 
     /**
@@ -328,25 +313,25 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
     @Override
     public BaSyxProperty register(BaSyxProperty property) {
-        elements.add(property);
+        elements.put(property.getIdShort(), property);
         return property;
     }
 
     @Override
     public BaSyxOperation register(BaSyxOperation operation) {
-        elements.add(operation);
+        elements.put(operation.getIdShort(), operation);
         return operation;
     }
 
     @Override
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-        elements.add(reference);
+        elements.put(reference.getIdShort(), reference);
         return reference;
     }
 
     @Override
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
-        elements.add(collection);
+        elements.put(collection.getIdShort(), collection);
         return collection;
     }
 
@@ -354,7 +339,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public void accept(AasVisitor visitor) {
         initialize();
         visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement se : elements) {
+        for (SubmodelElement se : elements.values()) {
             se.accept(visitor);
         }
         visitor.endSubmodelElementCollection(this);
@@ -368,7 +353,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void deleteElement(String idShort) {
         initialize();
-        elements.remove(getElement(idShort));
+        elements.remove(idShort);
         collection.deleteSubmodelElement(idShort);
     }
 

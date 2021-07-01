@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 public abstract class VabInvocablesCreator implements InvocablesCreator, Serializable {
 
     private static final long serialVersionUID = -4388430468665656598L;
-    private transient VABElementProxy proxy;
     
     /**
      * Creates the element proxy.
@@ -40,23 +39,11 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      */
     protected abstract VABElementProxy createProxy();
     
-    /**
-     * Returns the element proxy. 
-     * 
-     * @return the element proxy
-     */
-    protected VABElementProxy getProxy() {
-        if (null == proxy) {
-            proxy = createProxy();
-        }
-        return proxy;
-    }
-    
     @SuppressWarnings("unchecked")
     @Override
     public Supplier<Object> createGetter(String name) {
         return (Supplier<Object> & Serializable) () -> {
-            return getProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name);
+            return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name);
         };
     }
 
@@ -64,7 +51,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
     @Override
     public Consumer<Object> createSetter(String name) {
         return (Consumer<Object> & Serializable) (params) -> {
-            getProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name, params);
+            createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name, params);
         };
     }
 
@@ -72,7 +59,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
     @Override
     public Function<Object[], Object> createInvocable(String name) {
         return (Function<Object[], Object> & Serializable) (params) -> {
-            return getProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + name, params);
+            return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + name, params);
         };
     }
 

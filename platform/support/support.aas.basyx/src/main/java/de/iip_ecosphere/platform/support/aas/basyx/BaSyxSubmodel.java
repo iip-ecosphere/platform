@@ -154,10 +154,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
     BaSyxSubmodel(BaSyxSubmodelParent parent, SubModel instance) {
         super(instance);
         this.parent = parent;
-        BaSyxElementTranslator.registerValues(instance.getValues(), this);
-        BaSyxElementTranslator.registerProperties(instance.getProperties(), this);
-        BaSyxElementTranslator.registerOperations(instance.getOperations(), this);
-        BaSyxElementTranslator.registerRemainingSubmodelElements(instance.getSubmodelElements(), this);
+        BaSyxElementTranslator.registerSubmodelElements(instance.getSubmodelElements(), this);
     }
     
     /**

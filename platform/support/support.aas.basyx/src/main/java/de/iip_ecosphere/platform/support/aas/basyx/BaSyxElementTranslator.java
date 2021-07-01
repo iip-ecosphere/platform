@@ -31,11 +31,11 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOpera
 class BaSyxElementTranslator {
 
     /**
-     * Something that can take over/register data elements.
+     * Something that can take over/register submodel elements.
      * 
      * @author Holger Eichelberger, SSE
      */
-    interface DataElementsRegistrar {
+    interface SubmodelElementsRegistrar {
 
         /**
          * Registers a property.
@@ -45,30 +45,6 @@ class BaSyxElementTranslator {
          */
         BaSyxProperty register(BaSyxProperty property);
         
-    }
-
-    /**
-     * Registers the data elements.
-     * 
-     * @param elements the data elements to be processed (as declared by BaSyx)
-     * @param reg the IIP-Ecosphere registrar
-     */
-    static void registerValues(Map<String, Object> elements, DataElementsRegistrar reg) {
-        // unclear by now
-        /*for (Object elt : elements.values()) {
-            if (elt instanceof IProperty) {
-                reg.register(new BaSyxProperty((IProperty) elt));
-            } // TODO else
-        }*/
-    }
-
-    /**
-     * Something that can take over/register operations.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    interface OperationsRegistrar {
-
         /**
          * Registers an operation.
          * 
@@ -76,39 +52,6 @@ class BaSyxElementTranslator {
          * @return {@code operation}
          */
         BaSyxOperation register(BaSyxOperation operation);
-        
-    }
-
-    /**
-     * Registers the operations.
-     * 
-     * @param properties the properties to be processed (as declared by BaSyx)
-     * @param reg the IIP-Ecosphere registrar
-     */
-    static void registerProperties(Map<String, IProperty> properties, DataElementsRegistrar reg) {
-        for (IProperty op : properties.values()) {
-            reg.register(new BaSyxProperty(op));
-        }
-    }
-
-    /**
-     * Registers the operations.
-     * 
-     * @param operations the operations to be processed (as declared by BaSyx)
-     * @param reg the IIP-Ecosphere registrar
-     */
-    static void registerOperations(Map<String, IOperation> operations, OperationsRegistrar reg) {
-        for (IOperation op : operations.values()) {
-            reg.register(new BaSyxOperation(op));
-        }
-    }
-
-    /**
-     * Something that can take over/register (remaining) submodel elements.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    interface RemainingSubmodelElementsRegistrar {
         
         /**
          * Registers a reference element.
@@ -129,29 +72,23 @@ class BaSyxElementTranslator {
     }
     
     /**
-     * Registers the remaining sub-model elements, i.e., none of those handled by the other methods/interfaces.
+     * Registers all sub-model elements, i.e., none of those handled by the other methods/interfaces.
      * 
      * @param elements the elements to be processed (as declared by BaSyx)
-     * @param reg the IIP-Ecosphere registrar
+     * @param reg the remaining registrar
      */
-    static void registerRemainingSubmodelElements(Map<String, ISubmodelElement> elements, 
-        RemainingSubmodelElementsRegistrar reg) {
+    static void registerSubmodelElements(Map<String, ISubmodelElement> elements, SubmodelElementsRegistrar reg) {
         for (ISubmodelElement se : elements.values()) {
-            if (se instanceof IReferenceElement) {
+            if (se instanceof IProperty) {
+                reg.register(new BaSyxProperty((IProperty) se));
+            } else if (se instanceof IOperation) {
+                reg.register(new BaSyxOperation((IOperation) se));
+            } else if (se instanceof IReferenceElement) {
                 reg.register(new BaSyxReferenceElement((IReferenceElement) se));
             } else if (se instanceof ISubmodelElementCollection) {
                 reg.register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
             } // TODO else
-        }
-    }
-
-    /**
-     * Convenience interface for everything that can be registered. 
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    interface SubmodelElementsRegistrar extends DataElementsRegistrar, OperationsRegistrar, 
-        RemainingSubmodelElementsRegistrar {
+        }        
     }
 
 }
