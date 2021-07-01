@@ -24,7 +24,8 @@
      <artifactId>transport</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !! -->
+    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !! 
+        services.environment is ok for metrics -->
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

@@ -24,7 +24,17 @@
      <artifactId>transport</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !! -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services.environment</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !! 
+         services.environment is ok for metrics -->
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
