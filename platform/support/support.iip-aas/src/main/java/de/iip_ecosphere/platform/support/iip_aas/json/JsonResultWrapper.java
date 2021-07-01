@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.iip_aas.json;
 
+import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
@@ -25,8 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class JsonResultWrapper implements Function<Object[], Object> {
+public class JsonResultWrapper implements Function<Object[], Object>, Serializable {
 
+    private static final long serialVersionUID = 6531890963314078947L;
     private ExceptionFunction func;
     
     /**
@@ -43,8 +45,10 @@ public class JsonResultWrapper implements Function<Object[], Object> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Result {
+    public static class Result implements Serializable {
         
+        private static final long serialVersionUID = -4586150559933545643L;
+
         @JsonInclude(Include.NON_NULL)
         private String result;
 
