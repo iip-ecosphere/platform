@@ -45,14 +45,6 @@
 	    <artifactId>byte-buddy</artifactId>
 	</dependency>
     <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish</groupId>
-      <artifactId>javax.json</artifactId>
-    </dependency>    
-    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
      <version>${project.version}</version>
