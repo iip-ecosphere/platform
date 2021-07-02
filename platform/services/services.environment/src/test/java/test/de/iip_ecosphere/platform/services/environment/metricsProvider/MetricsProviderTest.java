@@ -277,5 +277,32 @@ public class MetricsProviderTest {
     public void setDiskBaseUnitNull() {
         assertThrows(IllegalArgumentException.class, () -> provider.setDiskBaseUnit(null));
     }
+    
+    /**
+     * Tests the lists returned by the provider.
+     */
+    @Test
+    public void testLists() {
+        assertList(provider.getCustomCounterList(), provider.getNumberOfCustomCounters() == 0);
+        assertList(provider.getCustomGaugeList(), provider.getNumberOfCustomGauges() == 0);
+        assertList(provider.getCustomTimerList(), provider.getNumberOfCustomTimers() == 0);
+        assertList(provider.getTaggedMeterList(), false);
+        assertList(provider.getSimpleMeterList(), false);
+    }
+    
+    /**
+     * Asserts a List in JsonArray format.
+     * 
+     * @param list the list in textual JsonArray format
+     * @param expectedEmpty whether the list shall be empty or filled with entries
+     */
+    private void assertList(String list, boolean expectedEmpty) {
+        if (expectedEmpty) {
+            assertEquals("[]", list);
+        } else {
+            assertTrue(list.length() > 2);
+            assertTrue(list.matches("\\[(\"\\S+\"(,\\s*\"\\S+\")*)?\\]"));
+        }
+    }
 
 }

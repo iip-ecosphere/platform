@@ -875,7 +875,9 @@ public class MetricsProvider {
         for (Entry<String, ?> entry : map.entrySet()) {
             sb.append("\"").append(entry.getKey()).append("\",");
         }
-        sb.deleteCharAt(sb.length() - 1);
+        if (sb.length() > 1) { // for empty list, we otherwise cut off the lead in 
+            sb.deleteCharAt(sb.length() - 1);
+        }
         sb.append("]");
 
         return sb.toString();
