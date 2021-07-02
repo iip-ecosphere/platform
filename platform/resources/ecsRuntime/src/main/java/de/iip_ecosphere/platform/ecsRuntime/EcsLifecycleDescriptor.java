@@ -32,6 +32,13 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere ECS Runtime.");
         super.startup(args);
+        Monitor.startScheduling();
+    }
+    
+    @Override
+    public void shutdown() {
+        Monitor.stopScheduling();
+        super.shutdown();
     }
     
 }

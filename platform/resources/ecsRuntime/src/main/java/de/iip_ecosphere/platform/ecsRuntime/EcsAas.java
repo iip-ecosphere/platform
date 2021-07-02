@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -63,7 +64,7 @@ public class EcsAas implements AasContributor {
     public static final String NAME_OP_CONTAINER_START = "startContainer";
 
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
-
+    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ContainerManager mgr = EcsFactory.getContainerManager();
@@ -72,7 +73,7 @@ public class EcsAas implements AasContributor {
         SubmodelElementCollectionBuilder jB 
             = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
 
-        // TODO resource/monitoring information
+        MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
 
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, mgr.getContainerSystemName())
@@ -146,6 +147,7 @@ public class EcsAas implements AasContributor {
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
         ));
+        MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
     }
 
     @Override

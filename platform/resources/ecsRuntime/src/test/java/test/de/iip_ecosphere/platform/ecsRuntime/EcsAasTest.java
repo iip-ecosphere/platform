@@ -15,7 +15,10 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,14 +29,19 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
@@ -46,6 +54,15 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
  * @author Holger Eichelberger, SSE
  */
 public class EcsAasTest {
+
+    /**
+     * A predicate testing the value for Double type and whether the value is positive.
+     */
+    private static final Predicate<Object> POSITIVE_METRICS_VALUE = o -> { 
+        Assert.assertTrue(o instanceof Double); 
+        double val = (Double) o; 
+        return val > 0; 
+    };
     
     /**
      * Tests the {@link EcsAas}.
@@ -71,6 +88,11 @@ public class EcsAasTest {
         
         EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
         test(client);
+
+        // no values for provider-defined metrics here as regular update started through lifecycle descriptor, see below
+        Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, null);
+        assertMetrics(expectedMetrics);
         
         aasServer.stop(true);
         implServer.stop(true);
@@ -106,6 +128,10 @@ public class EcsAasTest {
         EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
         test(client);
         
+        Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_METRICS_VALUE);
+        assertMetrics(expectedMetrics);
+        
         LifecycleHandler.shutdown();
 
         aasServer.stop(true);
@@ -113,6 +139,31 @@ public class EcsAasTest {
 
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * Asserts the existence of selected AAS metrics and/or their values.
+     * 
+     * @param expected the expected metrics as key-predicate pairs, whereby the predicate may be <b>null</b> to 
+     *     indicated that the value shall not be tested 
+     * @throws IOException if the AAS cannot be retrieved
+     * @throws ExecutionException if a property cannot be queried
+     */
+    private void assertMetrics(Map<String, Predicate<Object>> expected) throws IOException, ExecutionException {
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        Submodel resources = aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES);
+        Assert.assertNotNull(resources);
+        SubmodelElementCollection resource = resources.getSubmodelElementCollection(Id.getDeviceIdAas());
+        Assert.assertNotNull(resource);
+        for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
+            Property prop = resource.getProperty(ent.getKey());
+            Assert.assertNotNull(prop);
+            Predicate<Object> pred = ent.getValue();
+            if (null != pred) {
+                Object val = prop.getValue();
+                Assert.assertTrue(pred.test(val));
+            }
+        }
     }
 
     /**
