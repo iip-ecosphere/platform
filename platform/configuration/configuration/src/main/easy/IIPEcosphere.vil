@@ -71,6 +71,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
             vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedNet=mappedNet);
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
+            vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
             assemblySrc.mkdir();
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
@@ -83,6 +84,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
         maven("${ecsRuntimeRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/ecs.bat", dir="ecsJars", main=dfltMain);
@@ -91,6 +93,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/serviceMgr.bat", dir="svcJars", main=dfltMain);
@@ -99,6 +102,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
         maven("${platformRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/platform.bat", dir="plJars", main=dfltMain);

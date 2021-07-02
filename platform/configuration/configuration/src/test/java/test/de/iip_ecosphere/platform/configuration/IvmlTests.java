@@ -150,13 +150,29 @@ public class IvmlTests {
         File base = new File(gen, "MyAppexample");
         File srcMain = new File(base, "src/main");
         File srcMainJava = new File(srcMain, "java");
+        File srcMainResources = new File(srcMain, "resources");
         File srcMainPython = new File(srcMain, "python");
+        File srcMainAssembly = new File(srcMain, "assembly");
         
-        assertFile(srcMainJava, "iip/datatypes/Rec1.java");
-        assertFile(srcMainJava, "iip/serializers/Rec1Serializer.java");
+        File srcMainJavaIip = new File(srcMainJava, "iip");
+        assertJavaDatatype(srcMainJavaIip, "Rec1");
+        assertJavaDatatype(srcMainJavaIip, "MyConnMachineIn");
+        assertJavaDatatype(srcMainJavaIip, "MyConnMachineOut");
+        assertJavaNode(srcMainJavaIip, "MyAnonymizerexample");
+        assertJavaNode(srcMainJavaIip, "MyKiexample");
+        assertJavaNode(srcMainJavaIip, "MyMqttConnExample");
+        assertJavaNode(srcMainJavaIip, "MyOpcConnexample");
+        assertJavaNode(srcMainJavaIip, "MySourceexample");
         
-        assertFile(srcMainPython, "Rec1.py");
-        assertFile(srcMainPython, "Rec1Serializer.py");
+        assertFile(srcMainResources, "application.yml");
+        assertFile(srcMainResources, "deployment.yml");
+        assertFile(srcMainResources, "logback.xml");
+        
+        assertPythonDatatype(srcMainPython, "Rec1");
+        assertPythonDatatype(srcMainPython, "MyConnMachineIn");
+        assertPythonDatatype(srcMainPython, "MyConnMachineOut");
+        
+        assertFile(srcMainAssembly, "python.xml");
 
         assertFileContains(base, "pom.xml", "transport.spring.amqp", "transport.amqp");
         
@@ -173,6 +189,51 @@ public class IvmlTests {
             Assert.fail("Python code check shall not be interrupted: " + e.getMessage());
         }
     }
+    
+    /**
+     * Tests for the existence of all files related to a Java Service Mesh Node.
+     * 
+     * @param folder the basic source folder including base package
+     * @param name the name of the service (as identifier)
+     */
+    private void assertJavaNode(File folder, String name) {
+        assertFile(new File(folder, "interfaces"), name + "Service.java");
+        assertFile(new File(folder, "nodes"), name + ".java");
+        assertFile(new File(folder, "stubs"), name + "Stub.java");
+    }
+
+    /**
+     * Tests for the existence of all files related to a Java Data Type.
+     * 
+     * @param folder the basic source folder including base package
+     * @param name the name of the datatype (as identifier)
+     */
+    private void assertJavaDatatype(File folder, String name) {
+        assertDatatype(new File(folder, "datatypes"), new File(folder, "serializers"), name, "java");
+    }
+
+    /**
+     * Tests for the existence of all files related to a Python Data Type.
+     * 
+     * @param folder the basic source folder
+     * @param name the name of the datatype (as identifier)
+     */
+    private void assertPythonDatatype(File folder, String name) {
+        assertDatatype(folder, folder, name, "py");
+    }
+
+    /**
+     * Tests for the existence of all files related to a Data Type.
+     * 
+     * @param typeFolder the folder containing the datatypes
+     * @param serFolder the folder containing the datatypes serializers (may be <code>typeFolder</code>)
+     * @param name the name of the datatype (as identifier)
+     * @param extension the file name extension
+     */
+    private void assertDatatype(File typeFolder, File serFolder, String name, String extension) {
+        assertFile(typeFolder, name + "." + extension);
+        assertFile(serFolder, name + "Serializer." + extension);
+    }
 
     /**
      * Asserts file and contents of the ECS runtime component.
@@ -182,6 +243,12 @@ public class IvmlTests {
      */
     private void assertEcsRuntime(File gen) throws IOException {
         File base = new File(gen, "ecsRuntime");
+        File srcMain = new File(base, "src/main");
+        File srcMainResources = new File(srcMain, "resources");
+
+        assertFile(srcMainResources, "iipecosphere.yml");
+        assertFile(srcMainResources, "logback.xml");
+
         assertFileContains(base, "pom.xml", "ecsRuntime.docker", "transport.amqp", "support.aas.basyx");
         assertFile(base, "src/main/resources/iipecosphere.yml");
     }
@@ -194,6 +261,12 @@ public class IvmlTests {
      */
     private void assertServiceManager(File gen) throws IOException {
         File base = new File(gen, "serviceMgr");
+        File srcMain = new File(base, "src/main");
+        File srcMainResources = new File(srcMain, "resources");
+
+        assertFile(srcMainResources, "iipecosphere.yml");
+        assertFile(srcMainResources, "logback.xml");
+
         assertFileContains(base, "pom.xml", "services.spring", "transport.amqp", "support.aas.basyx");
         assertFile(base, "src/main/resources/iipecosphere.yml");
     }
@@ -206,6 +279,12 @@ public class IvmlTests {
      */
     private void assertPlatform(File gen) throws IOException {
         File base = new File(gen, "platform");
+        File srcMain = new File(base, "src/main");
+        File srcMainResources = new File(srcMain, "resources");
+
+        assertFile(srcMainResources, "iipecosphere.yml");
+        assertFile(srcMainResources, "logback.xml");
+
         assertFileContains(base, "pom.xml", "support.aas.basyx.server", "support.aas.basyx", 
             "configuration.configuration", "transport.amqp");
         assertFile(base, "src/main/resources/iipecosphere.yml");

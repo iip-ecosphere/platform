@@ -51,7 +51,19 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     } 
  
     def main(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
-        'spring:
+        'metricsprovider:
+            schedulerrate: 3000
+            memorybaseunit: kilobytes
+            diskbaseunit: megabytes
+        management:
+            health:
+                binders:
+                    enabled: true
+            endpoints:
+                web:
+                    exposure:
+                        include: "metrics"
+        spring:
             cloud:
                 function:
                     definition: ${function(mappedNet)}
