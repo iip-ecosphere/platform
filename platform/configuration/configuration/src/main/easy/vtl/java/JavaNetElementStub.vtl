@@ -1,9 +1,9 @@
 import JavaBasics;
-import NetBasics;
+import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaNetElementStub(Configuration config, FileArtifact target, NetElement elt, String pkg) extends NetBasics {
+template JavaMeshElementStub(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
     
     def generateIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
@@ -15,37 +15,37 @@ template JavaNetElementStub(Configuration config, FileArtifact target, NetElemen
          }
     }
     
-    // called via NetBasics.generateDataMethods for NetSource
-    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '@Override
         public ${type} ${methodSuffix}() {
             return null; // TODO connect via VAB
         }'
     } 
 
-    // called via NetBasics.generateDataMethods for asynch NetProcessor
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         'public void ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 
 
-    // called via NetBasics.generateDataMethods for synch NetProcessor
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for synch MeshProcessor
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         'public ${outType} ${methodSuffix}(${inType} data) {
             return null; // TODO connect via VAB
         }'
     } 
     
-    // called via NetBasics.generateDataMethods for NetSink
-    def generateSinkMethod(NetSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for MeshSink
+    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '@Override
         public ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 
 
-    def main(Configuration config, FileArtifact target, NetElement elt, String pkg) {
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
         'package ${pkg};
         

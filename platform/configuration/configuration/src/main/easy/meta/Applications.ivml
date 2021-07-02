@@ -12,15 +12,15 @@ project Applications {
         String description;
         IipVersion ver;
         String artifact = "";
-        setOf(refTo(ServiceNet)) services;
+        setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
     }
     
-    compound ServiceNet {
+    compound ServiceMesh {
         String description;
-        setOf(refTo(NetSource)) sources;
+        setOf(refTo(MeshSource)) sources;
     }
     
-    compound NetElement {
+    compound MeshElement {
         NonEmptyString name;
         ServiceKind kind;
         refTo(ServiceBase) impl; // allow for family or service
@@ -30,25 +30,25 @@ project Applications {
     }
     
     // hint to requirements!
-    compound NetConnector refines CConnector {
-        refTo(NetInnerElement) next;
+    compound MeshConnector refines CConnector {
+        refTo(MeshInnerElement) next;
     }
     
     // TODO graph validation -> QM
     
-    compound NetSource refines NetElement {
-        setOf(refTo(NetConnector)) next;
+    compound MeshSource refines MeshElement {
+        setOf(refTo(MeshConnector)) next;
         sequenceOf(IOType) output;
         output == impl.output;
         
         kind == ServiceKind::SOURCE_SERVICE;
     }
     
-    abstract compound NetInnerElement refines NetElement {
-        setOf(refTo(NetConnector)) next;
+    abstract compound MeshInnerElement refines MeshElement {
+        setOf(refTo(MeshConnector)) next;
     }
     
-    compound NetProcessor refines NetInnerElement {
+    compound MeshProcessor refines MeshInnerElement {
         sequenceOf(IOType) input;
         sequenceOf(IOType) output;
         input == impl.input;
@@ -57,7 +57,7 @@ project Applications {
         kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
     }
     
-    compound NetSink refines NetInnerElement {
+    compound MeshSink refines MeshInnerElement {
         sequenceOf(IOType) input;
         input == impl.input;
 

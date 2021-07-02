@@ -1,24 +1,24 @@
 import MavenBasics;
 import JavaMapping;
-import NetBasics;
+import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifact target, Application app, sequenceOf(NetElement) elements) extends NetBasics {
+template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) extends MeshBasics {
 
     Boolean returnType = false;
     Boolean inputType = false;
 
-    def generateServices(sequenceOf(NetElement) elements) {
-        for (NetElement elt: elements) {
+    def generateServices(sequenceOf(MeshElement) elements) {
+        for (MeshElement elt: elements) {
             '${generateService(elt, elt.impl)}'
         }
     }
     
-    def generateService(NetElement elt, ServiceBase service) {
+    def generateService(MeshElement elt, ServiceBase service) {
     }
     
-    def generateService(NetElement elt, Service service) {
+    def generateService(MeshElement elt, Service service) {
         '-id: ${service.id}
          name: ${service.name}
          version: ${service.ver}
@@ -35,18 +35,18 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
            ${generateRelations(elt)}'
     } 
     
-    def generateRelations(NetElement elt) {
+    def generateRelations(MeshElement elt) {
     }
 
-    def generateRelations(NetSource elt) {
+    def generateRelations(MeshSource elt) {
         generateRelations(elt, elt.next);
     }
 
-    def generateRelations(NetInnerElement elt) {
+    def generateRelations(MeshInnerElement elt) {
         generateRelations(elt, elt.next);
     }
     
-    def generateRelations(NetElement elt, setOf(NetConnector) conns) {
+    def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
         String eltMet = generateDataMethods(elt);
         returnType = true;
         inputType = true;
@@ -56,8 +56,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           direction: OUT
           type: ${eltType}
         '
-        for (NetConnector conn : conns) {
-            NetInnerElement next = conn.next;
+        for (MeshConnector conn : conns) {
+            MeshInnerElement next = conn.next;
             String nextMeth = generateDataMethods(next);
             returnType = true;
             inputType = true;
@@ -71,7 +71,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         }
     }
     
-    def main(Configuration config, FileArtifact target, Application app, sequenceOf(NetElement) elements) {
+    def main(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
         'id: ${app.id}
         name: ${app.name}
         version: ${app.ver}
@@ -95,19 +95,19 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         }
     }
 
-    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
 
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
 
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(inType, outType, methodSuffixWithServiceId);
     } 
     
-    def generateSinkMethod(NetSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
 

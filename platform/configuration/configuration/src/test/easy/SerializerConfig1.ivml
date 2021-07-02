@@ -141,43 +141,43 @@ project SerializerConfig1 {
         name = "myApp example",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myNet)}        
+        services = {refBy(myMesh)}        
     };
     
-    ServiceNet myNet = {
+    ServiceMesh myMesh = {
         description = "initial service net",
         sources = {refBy(mySource), refBy(myOpcConn), refBy(myMqttC)}
     };
     
-    NetSource myOpcConn = {
+    MeshSource myOpcConn = {
        impl = refBy(myOpcUaConn)
     };
 
-    NetSource myMqttC = {
+    MeshSource myMqttC = {
        impl = refBy(myMqttConn)
     };
     
-    NetSource mySource = {
+    MeshSource mySource = {
         impl = refBy(mySourceService),
         next = {refBy(myConnMySourceMyAnonymizer)}
     };
     
-    NetConnector myConnMySourceMyAnonymizer = {
+    MeshConnector myConnMySourceMyAnonymizer = {
         name = "MySource->MyAnonymizer",
         next = refBy(myAnonymizer)
     };
 
-    NetProcessor myAnonymizer = {
+    MeshProcessor myAnonymizer = {
         impl = refBy(myAnonymizerService),
         next = {refBy(myConnMyAnonymizerMyKi)}
     };
 
-    NetConnector myConnMyAnonymizerMyKi = {
+    MeshConnector myConnMyAnonymizerMyKi = {
         name = "MyAnonymizer->MyKi",
         next = refBy(myKi)
     };
 
-    NetProcessor myKi = {
+    MeshProcessor myKi = {
         impl = refBy(myKiService)
     };
 

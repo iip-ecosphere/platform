@@ -1,17 +1,17 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
-import NetBasics;
+import MeshBasics;
 import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact target, NetElement elt, String pkg, Application app) extends NetBasics {
+template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) extends MeshBasics {
 
     Boolean isConnector = false;
 
     // -------------- special case no service allowed for convenience when building up a configuration ------------------
 
-    def fallbackToNull(NetElement elt, String text, Boolean func) {
+    def fallbackToNull(MeshElement elt, String text, Boolean func) {
         fallbackToNull(elt.impl, text, func);
     }
 
@@ -31,7 +31,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }
     }
 
-    // ----------------------------- NetBasics refinement/use ----------------------------
+    // ----------------------------- MeshBasics refinement/use ----------------------------
     
     def attachIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
@@ -40,15 +40,15 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
          }
     }
     
-    // called via NetBasics.generateDataMethods for NetSource
-    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSourceMethod(src, src.impl, type, methodSuffix, methodSuffixWithServiceId);
     }
     
-    def generateSourceMethod(NetSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId) {
     }
     
-    def generateSourceMethod(NetSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Creates data to be ingested.
         *
@@ -60,7 +60,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }'
     }
 
-    def generateSourceMethod(NetSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be passed on to the connector.
         *
@@ -72,12 +72,12 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }'    
     }
     
-    def Boolean recordSourceIngestor(NetSource elt, IOType type) {
+    def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
         not(isConnector); // type(elt.impl) <> Connector
     }
 
-    // called via NetBasics.generateDataMethods for asynch NetProcessor
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (asynchronously).
         *
@@ -89,8 +89,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }'
     } 
 
-    // called via NetBasics.generateDataMethods for synch NetProcessor
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for synch MeshProcessor
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (synchronously).
         *
@@ -102,8 +102,8 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
         }'
     } 
     
-    // called via NetBasics.generateDataMethods for NetSink
-    def generateSinkMethod(NetSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    // called via MeshBasics.generateDataMethods for MeshSink
+    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be received (data sink).
         *
@@ -117,15 +117,15 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     
     // --------------- initial service to obtain a service instance to run with -------------------------
     
-    def initialService(NetElement elt, ServiceBase service, String serviceType) {
+    def initialService(MeshElement elt, ServiceBase service, String serviceType) {
         ''
     }
 
-    def initialService(NetElement elt, Service service, String serviceType) {
+    def initialService(MeshElement elt, Service service, String serviceType) {
         ''
     }
 
-    def initialService(NetElement elt, JavaService service, String serviceType) {
+    def initialService(MeshElement elt, JavaService service, String serviceType) {
         if (service.class.length() > 0) {
             'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);
             Starter.getServiceMapper().mapService(service);'
@@ -137,7 +137,7 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
     // TODO connector connect
     // TODO connector protocol adapter
     
-    def initialService(NetElement elt, Connector conn, String serviceType) {
+    def initialService(MeshElement elt, Connector conn, String serviceType) {
         String connGen = getConnectorGenerics(conn, false);
         String clsName = getClsName(elt);
         '${adapterCreationFragment(conn, "adapter")};
@@ -150,33 +150,33 @@ template JavaSpringCloudStreamNetElement(Configuration config, FileArtifact targ
 
     // TODO family
 
-    /*def initialService(NetElement elt, ServiceFamily family, String serviceType) {
+    /*def initialService(MeshElement elt, ServiceFamily family, String serviceType) {
        initialService(family.members.toSequence().first(), serviceType);
     }*/
 
-    def initialService(NetElement elt, PythonService service, String serviceType) {
+    def initialService(MeshElement elt, PythonService service, String serviceType) {
         '// TODO create ServiceStub'
     }
 
     // --------------- service type -------------------------
     
-    def String getClsName(NetElement elt) {
+    def String getClsName(MeshElement elt) {
         asTypeName(elt.name);
     }
     
-    def getServiceType(NetElement elt, ServiceBase base) {
+    def getServiceType(MeshElement elt, ServiceBase base) {
         "${getClsName(elt)}Service";
     }
 
-    def getServiceType(NetElement elt, Connector conn) {
+    def getServiceType(MeshElement elt, Connector conn) {
         isConnector = true;
         "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
     }
     
     // --------------------- main ---------------------------
 
-    // method attachIngestors() is not needed from Java side but allows for NetBasics script reuse
-    def main(Configuration config, FileArtifact target, NetElement elt, String pkg, Application app) {
+    // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) {
         String clsName = getClsName(elt);
         String serviceType = getServiceType(elt, elt.impl);
         ServiceBase impl = elt.impl;

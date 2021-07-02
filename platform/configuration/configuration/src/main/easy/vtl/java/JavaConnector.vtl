@@ -84,7 +84,7 @@ template JavaConnector(Configuration config, FileArtifact target) {
     // private inner static classes with fixed names for (model) connectors, no classes for channel connectors
     
     // generate adapter translator classes, convenience call    
-    def generateAdapterTranslators(NetElement elt) {
+    def generateAdapterTranslators(MeshElement elt) {
         generateAdapterTranslators(elt.impl);
     }
     
@@ -170,7 +170,7 @@ template JavaConnector(Configuration config, FileArtifact target) {
     
     // --------------------------------------- reception callback -----------------------------------------
     
-    def generateReceptionCallback(NetElement elt) {
+    def generateReceptionCallback(MeshElement elt) {
         generateReceptionCallback(elt.impl);
     }
 
@@ -199,7 +199,7 @@ template JavaConnector(Configuration config, FileArtifact target) {
 
     // --------------------------------------- connector parameter -----------------------------------------
     
-    def generateConnectorParameter(NetElement elt, Application app) {
+    def generateConnectorParameter(MeshElement elt, Application app) {
         generateConnectorParameter(elt.impl, app);
     }
 

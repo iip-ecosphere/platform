@@ -2,7 +2,7 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template NetBasics(Configuration config, FileArtifact target) {
+template MeshBasics(Configuration config, FileArtifact target) {
 
     mapOf(String, String) ingestors = {};
     
@@ -15,18 +15,18 @@ template NetBasics(Configuration config, FileArtifact target) {
             .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}")'
     }
 
-    def getServiceIdSuffix(NetElement elt) {
+    def getServiceIdSuffix(MeshElement elt) {
         "";
     }
 
-    def generateDataMethods(NetElement elt) {
+    def generateDataMethods(MeshElement elt) {
     }
     
-    def Boolean recordSourceIngestor(NetSource elt, IOType type) {
+    def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
         true;
     }
 
-    def generateDataMethods(NetSource elt) {
+    def generateDataMethods(MeshSource elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : elt.output) {
             String type = toTypeName(out.type);
@@ -39,15 +39,15 @@ template NetBasics(Configuration config, FileArtifact target) {
         }
     }
 
-    def Boolean recordAsyncProcessorIngestor(NetProcessor elt, IOType type) {
+    def Boolean recordAsyncProcessorIngestor(MeshProcessor elt, IOType type) {
         true;
     }
 
-    def Boolean recordSyncProcessorIngestor(NetProcessor elt, IOType type) {
+    def Boolean recordSyncProcessorIngestor(MeshProcessor elt, IOType type) {
         true;
     }
 
-    def generateDataMethods(NetProcessor elt) {
+    def generateDataMethods(MeshProcessor elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
             for (IOType in : elt.input) {
@@ -77,7 +77,7 @@ template NetBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def generateDataMethods(NetSink elt) {
+    def generateDataMethods(MeshSink elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
@@ -87,19 +87,19 @@ template NetBasics(Configuration config, FileArtifact target) {
         }
     }
 
-    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
 
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
 
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
     
-    def generateSinkMethod(NetSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
     

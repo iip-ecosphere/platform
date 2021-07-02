@@ -51,17 +51,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
             // generate service classes and service integration
             setOf(String) artifacts = {};
-            sequenceOf(NetElement) elements = {};
+            sequenceOf(MeshElement) elements = {};
             artifacts.add(a.artifact);
-            mapOf(NetElement, setOf(NetConnector)) mappedNet = {};
+            mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
             // TODO filter according to assigned resources, allow for later instantiation
-            for (ServiceNet n : a.services) {
-                setOf(NetElement) nodes = n.sources->closure(NetElement e|nextNetNodes(e, mappedNet));
-                for (NetElement no : nodes) {
+            for (ServiceMesh n : a.services) {
+                setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    vilTemplateProcessor("JavaNetElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
-                    vilTemplateProcessor("JavaNetElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
-                    vilTemplateProcessor("JavaSpringCloudStreamNetElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
+                    vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
+                    vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+                    vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
                 };
@@ -69,7 +69,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             vilTemplateProcessor("JavaStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
 
-            vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedNet=mappedNet);
+            vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh);
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 

@@ -10,7 +10,8 @@ So far there is no graphical user interface which shall be located one layer abo
 
 ## missing
 
-- variability model: resources, resource assignment to ServiceNets
+- variability model: resources, resource assignment to ServiceMeshes
+- generation of containers
 - AAS-based interface to the configuration, reasoning, instantiation 
 - generated Java service instantiation: connector adapter type code
 - generated Python service instantiation: data connection, serializer registration, ...

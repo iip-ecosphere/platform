@@ -1,15 +1,15 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
-import NetBasics;
+import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) extends NetBasics {
+template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) extends MeshBasics {
 
     // TODO do we need a sequence here?
-    def function(mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+    def function(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         String result = "";
-        for (NetElement elt: mappedNet.keys()) {
+        for (MeshElement elt: mappedMesh.keys()) {
             if (result.length() > 0) {
                 result = result + ";";
             }
@@ -18,14 +18,14 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         result;
     }
     
-    def bindings(mapOf(NetElement, setOf(NetConnector)) mappedNet) {
-        for (NetElement elt: mappedNet.keys()) {
+    def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+        for (MeshElement elt: mappedMesh.keys()) {
             String eltMet = generateDataMethods(elt);
             '${eltMet}-out-0:
                 destination: ${eltMet}
             '
-            for (NetConnector conn: mappedNet.get(elt)) {
-                NetInnerElement next = conn.next;
+            for (MeshConnector conn: mappedMesh.get(elt)) {
+                MeshInnerElement next = conn.next;
                 String nextMeth = generateDataMethods(next);
                 '${nextMeth}-in-0:
                     destination: ${eltMet}
@@ -34,23 +34,23 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         }
     }
     
-    def generateSourceMethod(NetSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
 
-    def generateAsyncProcessorInMethod(NetProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
 
-    def generateSyncProcessorMethod(NetProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
     
-    def generateSinkMethod(NetSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
  
-    def main(Configuration config, FileArtifact target, mapOf(NetElement, setOf(NetConnector)) mappedNet) {
+    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         'metricsprovider:
             schedulerrate: 3000
             memorybaseunit: kilobytes
@@ -66,10 +66,10 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         spring:
             cloud:
                 function:
-                    definition: ${function(mappedNet)}
+                    definition: ${function(mappedMesh)}
                 stream:
                     bindings:
-                        ${bindings(mappedNet)}'
+                        ${bindings(mappedMesh)}'
     }
 
 }
