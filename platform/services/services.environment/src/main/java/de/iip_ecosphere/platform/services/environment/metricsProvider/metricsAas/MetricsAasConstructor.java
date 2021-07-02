@@ -307,23 +307,23 @@ public class MetricsAasConstructor {
 
         /* System Disk Capacity metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_DISK_FREE), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_DISK_TOTAL), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_DISK_USABLE), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USABLE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_DISK_USED), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USED), null);
 
         /* System Physical Memory metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_MEM_FREE), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), 
-            () -> provider.getGaugeValue(MetricsProvider.SYS_MEM_USED), null);
+            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USED), null);
         
         /* Configuration operations */
     }

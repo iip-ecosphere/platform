@@ -90,6 +90,10 @@ public class MetricsProviderTest {
         assertEquals(1, provider.getNumberOfCustomGauges());
         assertEquals(value2, provider.getGaugeValue(ID_GOOD), 0.0);
 
+        provider.calculateNonNativeSystemMetrics();
+        assertTrue(provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL) > 0);
+        assertEquals(value2, provider.getRegisteredGaugeValue(ID_GOOD), 0.0);
+        
         provider.addGaugeValue(ID_GOOD, negVal);
         assertEquals(1, provider.getNumberOfCustomGauges());
         assertEquals(negVal, provider.getGaugeValue(ID_GOOD), 0.0);
@@ -125,6 +129,7 @@ public class MetricsProviderTest {
         provider.increaseCounter(ID_GOOD);
         assertEquals(1, provider.getNumberOfCustomCounters());
         assertEquals(2.0, provider.getCounterValue(ID_GOOD), 0.0);
+        assertEquals(2.0, provider.getRegisteredCounterValue(ID_GOOD), 0.0); // incomplete, there might not be a pre-reg
 
         provider.increaseCounterBy(ID_OK, value);
         assertEquals(2, provider.getNumberOfCustomCounters());
@@ -147,10 +152,9 @@ public class MetricsProviderTest {
     }
 
     /**
-     * Tests {@link MetricsProvider} Timer CRUD operations.
+     * Prepares the timer test in {@link #testTimerCrudOperations()}.
      */
-    @Test
-    public void testTimerCrudOperations() {
+    private void prepareTimerCrudTest() {
         assertEquals(0, provider.getNumberOfCustomTimers());
         assertThrows(IllegalArgumentException.class, () -> provider.removeTimer(ID_BAD));
         assertThrows(IllegalArgumentException.class, () -> provider.removeTimer(null));
@@ -161,7 +165,15 @@ public class MetricsProviderTest {
                 () -> provider.recordWithTimer(null, () -> TestUtils.oneSecondSupplier()));
         assertThrows(IllegalArgumentException.class, () -> provider.recordWithTimer(ID_GOOD, (Supplier<String>) null));
         assertEquals(0, provider.getNumberOfCustomTimers());
+    }
 
+    /**
+     * Tests {@link MetricsProvider} Timer CRUD operations.
+     */
+    @Test
+    public void testTimerCrudOperations() {
+        prepareTimerCrudTest();
+        
         provider.recordWithTimer(ID_GOOD, () -> TestUtils.oneSecondRunnable());
         assertEquals(1, provider.getNumberOfCustomTimers());
         assertEquals(1.0, provider.getTotalTimeFromTimer(ID_GOOD), 0.5);
@@ -173,6 +185,7 @@ public class MetricsProviderTest {
         assertEquals(4.0, provider.getTotalTimeFromTimer(ID_GOOD), 0.5);
         assertEquals(3.0, provider.getMaxTimeFromTimer(ID_GOOD), 0.5);
         assertEquals(2, provider.getTimerCount(ID_GOOD));
+        assertEquals(2, provider.getRegisteredTimerCount(ID_GOOD)); // incomplete, there might not be a pre-reg one
 
         provider.recordWithTimer(ID_GOOD, () -> TestUtils.twoSecondRunnable());
         assertEquals(1, provider.getNumberOfCustomTimers());

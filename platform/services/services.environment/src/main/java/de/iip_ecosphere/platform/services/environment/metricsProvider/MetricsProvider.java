@@ -288,6 +288,23 @@ public class MetricsProvider {
             return 0.0;
         }
     }
+    
+    /**
+     * Retrieves the value of a registered Gauge, i.e., custom, non-native ones of this provider or 
+     * micrometer/pre-registered ones<br>
+     * If no gauge is found with that identifier, this method will return zero.
+     * 
+     * @param gaugeId identifier of the gauge
+     * @return current value of the gauge or {@code 0.0} if there is no
+     *         gauge with the requested identifier
+     */
+    public double getRegisteredGaugeValue(String gaugeId) {
+        try { // before default ones are registered, the registry request may lead to exception
+            return registry.get(gaugeId).gauge().value();
+        } catch (MeterNotFoundException e) {
+            return getGaugeValue(gaugeId);
+        }
+    }
 
     /**
      * Creates a new counter and registers it in the MeterRegistry.
@@ -354,17 +371,34 @@ public class MetricsProvider {
 
     /**
      * Retrieves the value of a custom Counter.<br>
-     * If no counter is found with that identifier, this method will return zero
+     * If no counter is found with that identifier, this method will return zero.
      * 
      * @param counterId identifier of the custom counter
      * @return current value of the custom counter or {@code 0.0} if there is no
-     *         gauge with the requested identifier
+     *         counter with the requested identifier
      */
     public double getCounterValue(String counterId) {
         if (counters.containsKey(counterId)) {
             return counters.get(counterId).count();
         } else {
             return 0.0;
+        }
+    }
+
+    /**
+     * Retrieves the value of a registered Counter, i.e., custom, non-native ones of this provider or 
+     * micrometer/pre-registered ones<br>
+     * If no counter is found with that identifier, this method will return zero.
+     * 
+     * @param counterId identifier of the counter
+     * @return current value of the counter or {@code 0.0} if there is no
+     *         counter with the requested identifier
+     */
+    public double getRegisteredCounterValue(String counterId) {
+        try { // before default ones are registered, the registry request may lead to exception
+            return registry.get(counterId).counter().count();
+        } catch (MeterNotFoundException e) {
+            return getCounterValue(counterId);
         }
     }
 
@@ -509,6 +543,23 @@ public class MetricsProvider {
             return 0;
         }
     }
+    
+    /**
+     * Retrieves the value of a registered Timer, i.e., custom, non-native ones of this provider or 
+     * micrometer/pre-registered ones<br>
+     * If no timer is found with that identifier, this method will return zero.
+     * 
+     * @param timerId identifier of the timer
+     * @return current value of the timer or {@code 0} if there is no
+     *         timer with the requested identifier
+     */
+    public long getRegisteredTimerCount(String timerId) {
+        try { // before default ones are registered, the registry request may lead to exception
+            return registry.get(timerId).timer().count();
+        } catch (MeterNotFoundException e) {
+            return getTimerCount(timerId);
+        }
+    }
 
     /**
      * This operation calculates the values for the extra system metrics not exposed
@@ -613,7 +664,6 @@ public class MetricsProvider {
         } catch (MeterNotFoundException mnfe) {
             throw new IllegalArgumentException(mnfe.getMessage());
         }
-
     }
 
     /**
