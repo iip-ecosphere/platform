@@ -23,7 +23,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Monitor {
+class Monitor {
     
     private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
     private static Timer timer = new Timer();
