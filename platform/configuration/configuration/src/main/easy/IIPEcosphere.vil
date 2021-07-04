@@ -1,4 +1,5 @@
 import JavaBasics;
+import JavaMapping;
 import Basics;
 
 @advice(IIPEcosphere)
@@ -80,10 +81,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             maven("${appRoot}");
         };
     
+        // cleanup, reuse, ...
         ecsRuntimeRoot.mkdir();
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${ecsRuntimeRoot}/src/test/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
@@ -94,6 +97,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
+        // cfg test requires spring
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
@@ -104,6 +108,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformConfiguration", cfgFile="${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);

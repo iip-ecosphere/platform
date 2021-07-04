@@ -48,6 +48,19 @@ template JavaMapping(Configuration config, FileArtifact target) {
         "ecsRuntime.docker";
     }
     
+    def String containerManagerCfgClass(IIPEcosphere cfg) {
+        containerManagerCfgClass(cfg.containerManager);
+    }
+    
+    // dispatch basis
+    def String containerManagerCfgClass(ContainerManager mgr) {
+        "de.iip_ecosphere.platform.ecsRuntime.Configuration";
+    }
+
+    def String containerManagerCfgClass(DockerContainerManager mgr) {
+        "de.iip_ecosphere.platform.ecsRuntime.docker.DockerConfiguration";
+    }
+    
     // --------------------------------------------------------------
 
     def String transportProtocolModule(IIPEcosphere cfg) {
