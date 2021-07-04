@@ -9,36 +9,34 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
-    '${produceDocker(config, withDocker)}
-    aas:
-        server:
-            port: ${aasServer.port}
-            host: ${aasServer.host}
-            schema: ${aasServer.schema}
-            path: ${aasServer.path}
-        registry:
-            port: ${aasRegistryServer.port}
-            host: ${aasRegistryServer.host}
-            schema: ${aasRegistryServer.schema}
-            path: ${aasRegistryServer.path}
-        implementation:
-            port: ${aasImplServer.port}
-            host: ${aasImplServer.host}
-            schema: ${aasImplServer.schema}
-            protocol: ${aasProtocolName(aasImplServer.protocol)}
-        ${produceAasPersistence(aasPersistence)}'
+        if (withDocker) {
+        '${produceDocker(config)}'
+        }
+        'aas:
+            server:
+                port: ${aasServer.port}
+                host: ${aasServer.host}
+                schema: ${aasServer.schema}
+                path: ${aasServer.path}
+            registry:
+                port: ${aasRegistryServer.port}
+                host: ${aasRegistryServer.host}
+                schema: ${aasRegistryServer.schema}
+                path: ${aasRegistryServer.path}
+            implementation:
+                port: ${aasImplServer.port}
+                host: ${aasImplServer.host}
+                schema: ${aasImplServer.schema}
+                protocol: ${aasProtocolName(aasImplServer.protocol)}
+            ${produceAasPersistence(aasPersistence)}'
     }
     
-    def produceDocker(IIPEcosphere config, Boolean enable) {
-        if (enable) {
+    def produceDocker(IIPEcosphere config) {
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
         'docker:
             dockerHost: ${containerManager.dockerHost}
             dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
             deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
-        } else {
-            ''
-        }
     }
     
     def produceAasPersistence(String aasPersistence) {
@@ -52,10 +50,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     def main(IIPEcosphere config, FileArtifact target) {
         DockerContainerManager mgr = config.containerManager;
         
-        'dockerHost: ${mgr.dockerHost}
-        dockerImageYamlFilename: ${mgr.dockerImageYamlFilename}
-        deleteWhenUndeployed: ${mgr.deleteWhenUndeployed}
-        ${produceAas(config)}'
+        '${produceAas(config)}'
     }
 
 }

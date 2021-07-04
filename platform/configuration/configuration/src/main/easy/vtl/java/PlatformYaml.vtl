@@ -7,7 +7,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
 
     def main(IIPEcosphere config, FileArtifact target) {
         String pers = "${config.aasPersistency}";
-        '${produceAas(config, pers, false)}'
+        produceAas(config, pers, false);
     }
 
 }
