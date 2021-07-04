@@ -1,0 +1,20 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaServices(Configuration config, FileArtifact target, String descriptor="", sequenceOf(String) descriptors={}) {
+
+    def main(Configuration config, FileArtifact target, String descriptor="", sequenceOf(String) descriptors={}) {
+        sequenceOf(String) ds = {};
+        if (descriptor.length() > 0) {
+            ds.add(descriptor);
+        }
+        for (String d : descriptors) {
+            ds.add(d);
+        }
+        for (String d: ds) {
+            '${d}'
+        }
+    }
+    
+}
