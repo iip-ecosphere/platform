@@ -85,6 +85,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
         maven("${ecsRuntimeRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/ecs.bat", dir="ecsJars", main=dfltMain);
@@ -94,6 +95,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p.mkdir();
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/serviceMgr.bat", dir="svcJars", main=dfltMain);
@@ -103,6 +105,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
         maven("${platformRoot}");
         vilTemplateProcessor("WinBatch", config, "${target}/platform.bat", dir="plJars", main=dfltMain);
