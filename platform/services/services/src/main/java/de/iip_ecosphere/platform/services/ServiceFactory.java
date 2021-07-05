@@ -18,6 +18,7 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
@@ -76,9 +77,11 @@ public class ServiceFactory {
             init();
             if (null != desc) {
                 setup = desc.getAasSetup();
+                AasPartRegistry.setAasSetup(setup);
             }
             if (null == setup) {
                 setup = new AasSetup();
+                AasPartRegistry.setAasSetup(setup);
             }
         }
         return setup;
@@ -91,6 +94,7 @@ public class ServiceFactory {
      */
     public static void setAasSetup(AasSetup instance) {
         setup = instance;
+        AasPartRegistry.setAasSetup(setup);
     }
 
 }

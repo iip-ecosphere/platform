@@ -17,7 +17,8 @@ with adequate dependencies.
 ## Configuration
 
 The basic YAML configuration of the services management allows for the following AAS (asset administration shell) 
-settings:
+settings, however, dependent on the implementation component, it might be indented and nested into the configuration 
+tag of the implementation component:
 
     aas:
       server:
