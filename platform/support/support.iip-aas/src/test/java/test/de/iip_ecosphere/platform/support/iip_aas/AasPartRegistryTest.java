@@ -326,16 +326,37 @@ public class AasPartRegistryTest {
         Assert.assertEquals("here.de", setup.getServer().getHost());
         Assert.assertEquals(9994, setup.getServer().getPort());
         Assert.assertEquals("aas", setup.getServer().getPath());
+        Assert.assertEquals(9994, setup.getServer().getServerAddress().getPort()); 
         
         Assert.assertEquals(Schema.HTTP, setup.getRegistry().getSchema());
         Assert.assertEquals("me.de", setup.getRegistry().getHost());
         Assert.assertEquals(9995, setup.getRegistry().getPort());
         Assert.assertEquals("registry", setup.getRegistry().getPath());
+        Assert.assertEquals(9995, setup.getRegistry().getServerAddress().getPort()); 
         
         Assert.assertEquals(Schema.TCP, setup.getImplementation().getSchema());
         Assert.assertEquals("localhost", setup.getImplementation().getHost());
         Assert.assertEquals(10220, setup.getImplementation().getPort());
         Assert.assertEquals("VAB", setup.getImplementation().getProtocol());
+        Assert.assertEquals(10220, setup.getImplementation().getServerAddress().getPort()); 
     }
 
+    /**
+     * Tests configuration for {@link AasSetup}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testConfiguration2() throws IOException {
+        Configuration config = Configuration.readFromYaml(Configuration.class, "/aasPartRegistry_eph.yml");
+
+        AasSetup setup = config.getAas();
+        Assert.assertNotNull(setup);
+        Assert.assertEquals(Schema.TCP, setup.getImplementation().getSchema());
+        Assert.assertEquals("localhost", setup.getImplementation().getHost());
+        Assert.assertTrue(setup.getImplementation().getPort() < 0); // ephemerial
+        Assert.assertEquals("VAB-TCP", setup.getImplementation().getProtocol());
+        Assert.assertTrue(setup.getImplementation().getServerAddress().getPort() > 0); // something selected
+    }
+    
 }

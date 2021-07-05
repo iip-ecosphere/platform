@@ -2,6 +2,7 @@ package de.iip_ecosphere.platform.support.iip_aas.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 
@@ -12,7 +13,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class ServerAddressHolder {
     
-    private int port;
+    private int port; // negative leads to ephemerial
     private String host;
     private Schema schema;
 
@@ -49,7 +50,7 @@ public class ServerAddressHolder {
     /**
      * Returns the port value.
      * 
-     * @return the port
+     * @return the port (may be negative, indicates ephemerial)
      */
     public int getPort() {
         return port;
@@ -58,7 +59,7 @@ public class ServerAddressHolder {
     /**
      * Defines the {@link #port} value.  [required by data mapper]
      * 
-     * @param port the new value of {@link #port}
+     * @param port the new value of {@link #port} (may be negative, indicates ephemerial)
      */
     public void setPort(int port) {
         this.port = port;
@@ -107,7 +108,7 @@ public class ServerAddressHolder {
      */
     @JsonIgnore
     public ServerAddress getServerAddress() {
-        return new ServerAddress(schema, host, port);
+        return new ServerAddress(schema, host, port < 0 ? NetUtils.getEphemeralPort() : port);
     }
     
 }
