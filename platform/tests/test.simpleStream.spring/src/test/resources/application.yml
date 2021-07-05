@@ -1,6 +1,10 @@
 test:
     debug: true
     ingestCount: 150
+metricsprovider:
+    schedulerrate: 3000
+    memorybaseunit: kilobytes
+    diskbaseunit: megabytes
 mqtt:
     port: 8883
     actionTimeout: 2000
@@ -19,6 +23,10 @@ management:
     health:
         binders:
             enabled: true
+    endpoints:
+        web:
+            exposure:
+                include: "metrics"
 spring:
     main:
         banner-mode: off

@@ -10,35 +10,58 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.simpleStream.spring;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
-import de.iip_ecosphere.platform.services.environment.ServiceMapper;
-import de.iip_ecosphere.platform.services.environment.Starter;
-import de.iip_ecosphere.platform.services.environment.YamlArtifact;
+import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 
+import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+
 /**
- * Defines the test stream to be processed. We assume that a MQTT v5 broker is running.
+ * Defines the test stream to be processed. We assume that a broker is running.
  * 
  * @author Holger Eichelberger, SSE
  */
 @SpringBootApplication
-@Import(Configuration.class)
-public class Test {
+public class Test extends Starter {
     
-    private static ConfigurableApplicationContext ctx;
+    private static final String SUPPLIER_TIMER_ID = "suppliercustomtimer";
+    private static final String SUPPLIER_GAUGE_ID = "suppliercustomgauge";
+    private static final String SUPPLIER_COUNTER_ID = "suppliercustomcounter";
+
+    private static final String CONSUMER_TIMER_ID = "consumercustomtimer";
+    private static final String CONSUMER_GAUGE_ID = "consumercustomgauge";
+    private static final String CONSUMER_COUNTER_ID = "consumercustomcounter";
+    private static final String CONSUMER_RECV_ID = "consumerreceptiongauge";
+
+    private static final String REST_GAUGE_ID = "restgauge";
+    private static final String REST_COUNTER_ID = "restcounter";
+    private static final String REST_TIMER_ID = "resttimer";
+    
     @Autowired
     private Configuration config;
     private int ingestCount = 0;
+    @Autowired
+    private MetricsProvider metrics;
+    private boolean first = true;
+    
+    /**
+     * Creates an instance.
+     * 
+     * @param environment the Spring environment
+     */
+    @Autowired
+    public Test(Environment environment) {
+        super(environment);
+    }
     
     /**
      * Creates the data.
@@ -48,15 +71,26 @@ public class Test {
     @Bean
     public Supplier<String> create() {
         return () -> {
-            if (config.isDebug()) {
-                System.out.println("Ingest " + ingestCount);
-            }
-            if (ingestCount > config.getIngestCount()) {
-                ctx.close();
-                System.exit(0);
-            }
-            ingestCount++;
-            return "DATA";
+            return metrics.recordWithTimer(SUPPLIER_TIMER_ID, () -> {
+                if (config.isDebug()) {
+                    System.out.println("Ingest " + ingestCount);
+                }
+                double num = Math.random();
+                metrics.addGaugeValue(SUPPLIER_GAUGE_ID, num);
+                metrics.increaseCounter(SUPPLIER_COUNTER_ID);
+                metrics.increaseCounterBy(SUPPLIER_COUNTER_ID, num);
+                if (first) {
+                    metrics.addGaugeValue(REST_GAUGE_ID, 0);
+                    metrics.increaseCounterBy(REST_COUNTER_ID, 0);
+                    metrics.recordWithTimer(REST_TIMER_ID, 0, TimeUnit.MILLISECONDS);
+                    first = false;
+                } else if (ingestCount > config.getIngestCount()) {
+                    getContext().close();
+                    System.exit(0);
+                }
+                ingestCount++;
+                return String.valueOf(num);
+            });
         };
     }
     
@@ -68,10 +102,22 @@ public class Test {
     @Bean
     public Consumer<String> log() {
         return data -> {
-            if (config.isDebug()) {
-                System.out.println("Received: " + data);
-            }
+            metrics.recordWithTimer(CONSUMER_TIMER_ID, () -> {
+                double num = Math.random();
+                if (config.isDebug()) {
+                    System.out.println("Received: " + data);
+                }
+                metrics.addGaugeValue(CONSUMER_GAUGE_ID, num);
+                metrics.increaseCounter(CONSUMER_COUNTER_ID);
+                metrics.increaseCounterBy(CONSUMER_COUNTER_ID, num);
+                metrics.addGaugeValue(CONSUMER_RECV_ID, Double.valueOf(data));
+            });
         };
+    }
+    
+    @Override
+    protected Service createService(YamlService service) {
+        return new TestService(service);
     }
     
     /**
@@ -80,26 +126,7 @@ public class Test {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        // start the command server
-        try {
-            // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
-            // technical information)
-            YamlArtifact art = YamlArtifact.readFromYaml(
-                Test.class.getClassLoader().getResourceAsStream("/deployment.yml"));
-            Starter.parse(args);
-            // in a real service, this may happen differently
-            ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
-            for (YamlService service : art.getServices()) {
-                mapper.mapService(new TestService(service));
-            }
-            Starter.start();
-        } catch (IOException e) {
-            System.out.println("Cannot find service descriptor/start command server.");
-        }
-
-        // start spring cloud app
-        SpringApplication app = new SpringApplication(Test.class);
-        ctx = app.run(args);
+        Starter.main(Test.class, args);
     }
     
 }
