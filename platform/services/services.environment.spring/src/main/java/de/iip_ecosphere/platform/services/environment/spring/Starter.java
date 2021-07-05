@@ -1,6 +1,8 @@
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -82,6 +84,16 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @return the service instance
      */
     protected abstract Service createService(YamlService service);
+    
+    /**
+     * Creates the relevant services from the given {@code artifact}.
+     * 
+     * @param artifact the artifact
+     * @return the services
+     */
+    protected List<Service> createServices(YamlArtifact artifact) {
+        return new ArrayList<Service>();
+    }
     
     /**
      * Returns the spring environment.
