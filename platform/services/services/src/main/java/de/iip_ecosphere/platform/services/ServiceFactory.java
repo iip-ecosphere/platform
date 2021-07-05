@@ -77,11 +77,9 @@ public class ServiceFactory {
             init();
             if (null != desc) {
                 setup = desc.getAasSetup();
-                AasPartRegistry.setAasSetup(setup);
             }
             if (null == setup) {
                 setup = new AasSetup();
-                AasPartRegistry.setAasSetup(setup);
             }
         }
         return setup;
@@ -94,7 +92,6 @@ public class ServiceFactory {
      */
     public static void setAasSetup(AasSetup instance) {
         setup = instance;
-        AasPartRegistry.setAasSetup(setup);
     }
 
 }
