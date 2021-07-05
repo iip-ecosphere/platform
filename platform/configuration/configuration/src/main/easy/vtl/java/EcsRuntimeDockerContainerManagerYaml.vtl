@@ -4,11 +4,17 @@ import JavaMapping;
 @indent(indentation = 4, additional = 0)
 template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
 
-    def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true) {
+    def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true, Boolean implLocalEphemerial=false) {
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
+        Integer aasImplServerPort = aasImplServer.port;
+        String aasImplServerHost = aasImplServer.host;
+        if (implLocalEphemerial) {
+            aasImplServerPort = -1;
+            aasImplServerHost = "127.0.0.1";
+        }
         if (withDocker) {
         '${produceDocker(config)}'
         }
@@ -24,8 +30,8 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
                 schema: ${aasRegistryServer.schema}
                 path: ${aasRegistryServer.path}
             implementation:
-                port: ${aasImplServer.port}
-                host: ${aasImplServer.host}
+                port: ${aasImplServerPort}
+                host: ${aasImplServerHost}
                 schema: ${aasImplServer.schema}
                 protocol: ${aasProtocolName(aasImplServer.protocol)}
             ${produceAasPersistence(aasPersistence)}'
@@ -48,9 +54,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     }
 
     def main(IIPEcosphere config, FileArtifact target) {
-        DockerContainerManager mgr = config.containerManager;
-        
-        '${produceAas(config)}'
+        '${produceAas(config, implLocalEphemerial=true)}'
     }
 
 }

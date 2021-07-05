@@ -1,4 +1,5 @@
 import JavaMapping;
+import EcsRuntimeDockerContainerManagerYaml;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -25,6 +26,7 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
             availabilityRetryDelay: ${mgr.availabilityRetryDelay}
             serviceProtocol: ${aasProtocolName(config)}
         '
+        '${produceAas(config, implLocalEphemerial=true)}'
         // executables based on target device
     }
 
