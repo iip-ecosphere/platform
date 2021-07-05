@@ -110,8 +110,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(new XmlElement(execution, "goals"), "goal", goal);
     }
     
-    def XmlElement appendMavenJarPlugin(XmlElement plugins, String version, Boolean addClassPath, String mainClass="", String goal="") {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-jar-plugin", version, false);
+    def XmlElement appendMavenJarPlugin(XmlElement plugins, String ver, Boolean addClassPath, String mainClass="", String goal="") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-jar-plugin", ver, false);
         if (addClassPath or mainClass.length() > 0) {
             XmlElement config = appendConfiguration(plugin);
             XmlElement manifest = new XmlElement(new XmlElement(config, "archive"), "manifest");
@@ -127,8 +127,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }    
     
-    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String version="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", version, false);
+    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
         if (jarDir.length() > 0) {
             XmlElement execs = new XmlElement(plugin, "executions");
             XmlElement exec = new XmlElement(execs, "execution");
@@ -162,8 +162,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         plugin;
     }
 
-    def XmlElement appendMavenShadePlugin(XmlElement plugins, String version="2.3", String mainClass="") {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-shade-plugin", version, false);
+    def XmlElement appendMavenShadePlugin(XmlElement plugins, String ver="2.3", String mainClass="") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-shade-plugin", ver, false);
         XmlElement exec = appendExecutions(plugin);
         new XmlElement(exec, "phase", "package");
         appendGoal(exec, "shade");
@@ -176,8 +176,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def XmlElement appendAssemblyPlugin(XmlElement plugins, String descriptor, String id, String version="3.1.1", String outputDir="\\${project.build.directory}") {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", version, false);
+    def XmlElement appendAssemblyPlugin(XmlElement plugins, String descriptor, String id, String ver="3.1.1", String outputDir="\\${project.build.directory}") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", ver, false);
         XmlElement exec = appendExecutions(plugin);
         new XmlElement(exec, "id", id);
         new XmlElement(exec, "phase", "package");
@@ -188,5 +188,27 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(cfg, "attach", "false");
         plugin;
     }
+    
+    def XmlElement appendCompilerPlugin(XmlElement plugins, String ver="3.7.0", String javaVer="1.8", String encoding="Cp1252") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-compiler-plugin", ver, false);
+        XmlElement cfg = appendConfiguration(plugin);
+        new XmlElement(cfg, "source", javaVer);
+        new XmlElement(cfg, "target", javaVer);
+        new XmlElement(cfg, "encoding", encoding);
+    }
+    
+    def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="3.0.0-M3", String include="**/AllTests.class", String depArtifact="surefire-junit47") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-surefire-plugin", ver, false);
+        XmlElement cfg = appendConfiguration(plugin);
+        if (include.length() > 0) {
+            XmlElement includes = new XmlElement(cfg, "includes");
+            new XmlElement(includes, "include", include);
+        }
+        new XmlElement(cfg, "forkCount", "0"); // else it fails with jacoco
+        if (depArtifact.length() > 0) {
+            XmlElement deps = createDependencies(plugin);
+            appendDependency(deps, "org.apache.maven.surefire", depArtifact, ver = ver);
+        }
+    }    
 
 }

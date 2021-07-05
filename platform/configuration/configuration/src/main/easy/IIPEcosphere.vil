@@ -86,7 +86,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path p = "${ecsRuntimeRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml");
-        vilTemplateProcessor("JavaYamlTest", config, "${ecsRuntimeRoot}/src/test/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${ecsRuntimeRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
@@ -108,7 +108,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
-        vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformConfiguration", cfgFile="${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformConfiguration", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
