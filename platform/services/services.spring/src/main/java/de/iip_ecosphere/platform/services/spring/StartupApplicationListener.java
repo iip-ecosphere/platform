@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.context.ApplicationListener;
@@ -35,6 +36,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        LoggerFactory.getLogger(getClass()).debug("Spring context refresh, setting " + deployer + " " + config);
         SpringInstances.setDeployer(deployer);
         SpringInstances.setConfig(config);
     }
