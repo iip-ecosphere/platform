@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Aggregated methods for all known lifecycle descriptors. {@link LifecycleDescriptor} shall be declared via 
  * Java Service Loading. See also {@link TerminatingLifecycleDescriptor}. Descriptors are loaded once so that instances
@@ -96,14 +98,22 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
-        forEach(l -> l.startup(args), false);
+        forEach(l -> {
+            LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
+                + " (" + l.priority() + ")");
+            l.startup(args);
+        }, false);
     }
 
     /**
      * Calls {@link LifecycleDescriptor#shutdown()} on all known descriptors.
      */
     public static void shutdown() {
-        forEach(l -> l.shutdown(), true);
+        forEach(l -> {
+            LoggerFactory.getLogger(LifecycleHandler.class).info("Stopping " + l.getClass().getName() 
+                + " (" + l.priority() + ")");
+            l.shutdown();
+        }, true);
     }
 
     /**
