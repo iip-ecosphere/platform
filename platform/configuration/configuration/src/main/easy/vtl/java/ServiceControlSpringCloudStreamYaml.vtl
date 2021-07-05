@@ -25,8 +25,7 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
             brokerPort: ${mgr.brokerPort}
             availabilityRetryDelay: ${mgr.availabilityRetryDelay}
             serviceProtocol: ${aasProtocolName(config)}
-        '
-        '${produceAas(config, implLocalEphemerial=true)}'
+            ${produceAas(config, implLocalEphemerial=true)}'
         // executables based on target device
     }
 
