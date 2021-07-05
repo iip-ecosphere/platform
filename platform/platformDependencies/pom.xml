@@ -48,6 +48,16 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>casado</id>
+      <name>Miguel Gomez Casado</name>
+      <organization>University of Valladolid/ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>  
   
   <scm>
