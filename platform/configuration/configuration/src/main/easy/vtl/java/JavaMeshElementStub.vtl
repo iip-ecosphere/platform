@@ -40,7 +40,7 @@ template JavaMeshElementStub(Configuration config, FileArtifact target, MeshElem
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '@Override
-        public ${methodSuffix}(${type} data) {
+        public void ${methodSuffix}(${type} data) {
             // TODO connect via VAB
         }'
     } 

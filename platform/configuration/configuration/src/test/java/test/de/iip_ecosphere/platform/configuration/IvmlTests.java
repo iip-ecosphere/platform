@@ -123,8 +123,8 @@ public class IvmlTests {
     }
 
     /**
-     * Tests loading, reasoning and instantiating "SerializerConfig1".
-     * Depending on Maven setup/exclusions, this Test may require Java 11.
+     * Tests loading, reasoning and instantiating "SerializerConfig1" (legacy name, originally only for serializer) and
+     * all relevant steps to instantiate a platform. Depending on Maven setup/exclusions, this Test may require Java 11.
      * 
      * @throws ExecutionException shall not occur
      * @throws IOException shall not occur
@@ -318,6 +318,19 @@ public class IvmlTests {
         for (String s : search) {
             Assert.assertTrue("File " + f + " must contain '" + s + "'", contents.contains(s));
         }
+    }
+
+    /**
+     * Tests loading, reasoning and instantiating "SimpleMesh", a simple, generated service chain for installation
+     * on SSE VMs. Depending on Maven setup/exclusions, this Test may require Java 11.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testSimpleMesh() throws ExecutionException, IOException {
+        File gen = new File("gen/tests/SimpleMesh");
+        PlatformInstantiator.instantiate(new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen));
     }
     
 }
