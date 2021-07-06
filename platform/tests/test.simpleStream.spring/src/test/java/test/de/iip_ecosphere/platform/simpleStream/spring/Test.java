@@ -10,6 +10,8 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.simpleStream.spring;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -20,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 
@@ -114,10 +117,14 @@ public class Test extends Starter {
             });
         };
     }
-    
+
     @Override
-    protected Service createService(YamlService service) {
-        return new TestService(service);
+    protected List<Service> createServices(YamlArtifact artifact) {
+        List<Service> result = new ArrayList<Service>();
+        for (YamlService service : artifact.getServices()) {
+            result.add(new TestService(service));
+        }
+        return result;
     }
     
     /**
