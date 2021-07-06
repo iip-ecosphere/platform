@@ -75,6 +75,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
             assemblySrc.mkdir();
+            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter", app=a, appName=appName);
             

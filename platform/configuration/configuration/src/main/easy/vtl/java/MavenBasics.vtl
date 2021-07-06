@@ -175,18 +175,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlElement(t, "mainClass", mainClass);
         }
     }
-    
-    def XmlElement appendAssemblyPlugin(XmlElement plugins, String descriptor, String id, String ver="3.1.1", String outputDir="\\${project.build.directory}") {
+
+    // use appendAssemblyDescriptor on result    
+    def XmlElement appendAssemblyPlugin(XmlElement plugins, String ver="3.1.1") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", ver, false);
-        XmlElement exec = appendExecutions(plugin);
+        new XmlElement(plugin, "executions");
+    }
+    
+    def XmlElement appendAssemblyDescriptor(XmlElement execs, String id, String descriptor, String outputDir="\\${project.build.directory}", Boolean attach=false) {
+        XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
         new XmlElement(exec, "phase", "package");
         appendGoal(exec, "single");
         XmlElement cfg = appendConfiguration(exec);
         new XmlElement(new XmlElement(cfg, "descriptors"), "descriptor", descriptor);
         new XmlElement(cfg, "outputDirectory", outputDir);
-        new XmlElement(cfg, "attach", "false");
-        plugin;
+        new XmlElement(cfg, "attach", "${attach}");
     }
     
     def XmlElement appendCompilerPlugin(XmlElement plugins, String ver="3.7.0", String javaVer="1.8", String encoding="Cp1252") {
