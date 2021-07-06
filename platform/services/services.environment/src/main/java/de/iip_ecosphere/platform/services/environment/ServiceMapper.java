@@ -130,10 +130,12 @@ public class ServiceMapper {
      * Maps the service metrics into the protocol builder.
      * 
      * @param service the service
-     * @param client the metrics extractor client
+     * @param client the metrics extractor client (may be <b>null</b>, call is ignored then)
      */
     public void mapMetrics(Service service, MetricsExtractorRestClient client) {
-        MetricsAasConstructor.addMetricsProtocols(builder, client, null, s -> getQName(service, s));
+        if (null != client) {
+            MetricsAasConstructor.addMetricsProtocols(builder, client, null, s -> getQName(service, s));
+        }
     }
     
     /**
