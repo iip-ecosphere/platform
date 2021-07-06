@@ -1,7 +1,6 @@
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
-import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 
@@ -60,16 +58,16 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
 
     /**
-     * Maps a service through a given mapper and the default metrics client. [Convenience method for generation]
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
      * 
-     * @param mapper the service mapper instance 
      * @param service the service to be mapped
      * 
+     * @see #getServiceMapper()
      * @see #createMetricsClient()
      * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
      */
-    public static void mapService(ServiceMapper mapper, Service service) {
-        mapService(mapper, service, createMetricsClient());
+    public static void mapService(Service service) {
+        mapService(getServiceMapper(), service, createMetricsClient());
     }
 
     /**
