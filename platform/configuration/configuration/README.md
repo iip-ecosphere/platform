@@ -13,6 +13,6 @@ So far there is no graphical user interface which shall be located one layer abo
 - variability model: resources, resource assignment to ServiceMeshes
 - generation of containers
 - AAS-based interface to the configuration, reasoning, instantiation 
-- generated Java service instantiation: connector adapter type code
+- generated Java service instantiation: connector adapter type code, Spring backwards data paths ("sources")
 - generated Python service instantiation: data connection, serializer registration, ...
 
