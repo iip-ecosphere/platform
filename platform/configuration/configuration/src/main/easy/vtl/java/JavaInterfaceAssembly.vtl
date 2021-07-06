@@ -11,13 +11,13 @@ template JavaInterfaceAssembly(IIPEcosphere config, XmlFileArtifact target) {
                 <format>jar</format>
             </formats>
             <baseDirectory>iip</baseDirectory>
-            <includeBaseDirectory>true</includeBaseDirectory>
+            <includeBaseDirectory>false</includeBaseDirectory>
             <fileSets>
                 <fileSet>
                     <directory>\\${project.build.directory}/classes</directory>
                     <outputDirectory/>
                     <includes>
-                        <include>**/*.class</include>
+                        <include>**/interfaces/*.class</include>
                     </includes>
                     <useDefaultExcludes>true</useDefaultExcludes>
                 </fileSet>
