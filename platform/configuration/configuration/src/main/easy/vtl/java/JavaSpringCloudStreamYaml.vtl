@@ -4,12 +4,12 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) extends MeshBasics {
+template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) extends MeshBasics {
 
-    // TODO do we need a sequence here?
-    def function(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def function(sequenceOf(MeshElement) nodes) {
+        println(nodes);
         String result = "";
-        for (MeshElement elt: mappedMesh.keys()) {
+        for (MeshElement elt: nodes) {
             if (result.length() > 0) {
                 result = result + ";";
             }
@@ -18,12 +18,27 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         result;
     }
     
+    def sources() {
+        if (ingestors.size() > 0) {
+            String sources = "";
+            for (String i: ingestors.keys()) {
+                if (sources.length() > 0) {
+                    sources = sources + ";";
+                }
+                sources = sources + i;
+            }
+            "source: ${sources}"
+        } 
+    }
+    
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         for (MeshElement elt: mappedMesh.keys()) {
             String eltMet = generateDataMethods(elt);
+            if (!sourceIngestors.includes(eltMet)) {
             '${eltMet}-out-0:
                 destination: ${eltMet}
             '
+            }
             for (MeshConnector conn: mappedMesh.get(elt)) {
                 MeshInnerElement next = conn.next;
                 String nextMeth = generateDataMethods(next);
@@ -50,7 +65,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         methodSuffixWithServiceId;
     } 
  
-    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
         'metricsprovider:
             schedulerrate: 3000
             memorybaseunit: kilobytes
@@ -66,7 +81,8 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         spring:
             cloud:
                 function:
-                    definition: ${function(mappedMesh)}
+                    definition: ${function(nodes)}
+                ${sources()}
                 stream:
                     bindings:
                         ${bindings(mappedMesh)}'

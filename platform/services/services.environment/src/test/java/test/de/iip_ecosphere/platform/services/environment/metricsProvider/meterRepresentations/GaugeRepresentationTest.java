@@ -51,6 +51,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTags() throws IOException {
@@ -68,6 +70,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkWithTags() throws IOException {
@@ -87,6 +91,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoMeasurements() throws IOException {
@@ -97,6 +103,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadWrongStatistic() throws IOException {
@@ -107,6 +115,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testGetUpdaterGauge() throws IOException {
@@ -122,6 +132,8 @@ public class GaugeRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#measure()}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testMeasure() throws IOException {

@@ -19,6 +19,10 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.CounterRepresentation;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.GaugeRepresentation;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.TimerRepresentation;
+
 /**
  * Class that implements a REST client to retrieve the Meters from the Metrics
  * Provider.<br>
@@ -591,8 +595,7 @@ public class MetricsExtractorRestClient {
      * This method is "forced" to follow the AAS signature, so there are some
      * constraints. This method expects a single argument of type {@link String}
      * that will represent the body of the HTTP PUT request. Said body corresponds
-     * to the JsonObject provided by {@link de.iip_ecosphere.platform.services.environment.metricsprovider.clientside.
-     * meterrepresentation.GaugeRepresentation#getUpdater()}
+     * to the JsonObject provided by {@link GaugeRepresentation#getUpdater()}
      * 
      * @param args object array containing the body of the PUT request
      * @return NULL, nothing is returned
@@ -641,8 +644,7 @@ public class MetricsExtractorRestClient {
      * This method is "forced" to follow the AAS signature, so there are some
      * constraints. This method expects a single argument of type {@link String}
      * that will represent the body of the HTTP PUT request. Said body corresponds
-     * to the JsonObject provided by {@link de.iip_ecosphere.platform.services.environment.metricsprovider.
-     * clientside.meterrepresentation.CounterRepresentation#getUpdater()}
+     * to the JsonObject provided by {@link CounterRepresentation#getUpdater()}
      * 
      * @param args object array containing the body of the PUT request
      * @return NULL, nothing is returned
@@ -689,8 +691,7 @@ public class MetricsExtractorRestClient {
      * This method is "forced" to follow the AAS signature, so there are some
      * constraints. This method expects a single argument of type {@link String}
      * that will represent the body of the HTTP PUT request. Said body corresponds
-     * to the JsonObject provided by {@link de.iip_ecosphere.platform.services.environment.metricsprovider.clientside.
-     * meterrepresentation.TimerRepresentation#getUpdater()}
+     * to the JsonObject provided by {@link TimerRepresentation#getUpdater()}
      * 
      * @param args object array containing the body of the PUT request
      * @return NULL, nothing is returned

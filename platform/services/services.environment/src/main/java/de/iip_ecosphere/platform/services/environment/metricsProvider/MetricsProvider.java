@@ -143,10 +143,7 @@ public class MetricsProvider {
 
     /**
      * Registers the physical memory metrics except for the usage percentage.<br>
-     * This method has to be callable both by the {@link MetricsProvider} and the
-     * {@link MetricsProviderRestService}. For this reason, this method is protected
-     * and separate from the
-     * {@link MetricsProvider#registerNonNativeSystemMetrics()} method. It can be
+     * It can be
      * called multiple times during execution in order to update the memory base
      * unit.
      */
@@ -161,10 +158,7 @@ public class MetricsProvider {
 
     /**
      * Registers the disk capacity metrics.<br>
-     * This method has to be callable both by the {@link MetricsProvider} and the
-     * {@link MetricsProviderRestService}. For this reason, this method is protected
-     * and separate from the
-     * {@link MetricsProvider#registerNonNativeSystemMetrics()} method. It can be
+     * It can be
      * called multiple times during execution in order to update the disk capacity
      * base unit.
      */
@@ -182,8 +176,7 @@ public class MetricsProvider {
 
     /**
      * Removes the physical memory metrics from the registry.<br>
-     * This method is required by the method
-     * {@link MetricsProviderRestService#changeMemoryBaseUnit(String)} as the
+     * This method is required as the
      * previous memory metrics have to be removed and registered again after
      * changing the base unit in order for the description to update correctly.
      */
@@ -195,8 +188,7 @@ public class MetricsProvider {
 
     /**
      * Removes the disk capacity metrics from the registry.<br>
-     * This method is required by the method
-     * {@link MetricsProviderRestService#changeDiskBaseUnit(String)} as the previous
+     * This method is required as the previous
      * disk capacity metrics have to be removed and registered again after changing
      * the base unit in order for the description to update correctly.
      */
@@ -600,8 +592,7 @@ public class MetricsProvider {
     }
 
     /**
-     * Changes the memory base unit.<br>
-     * This method should only be called by the {@link MetricsProviderRestService}
+     * Changes the memory base unit.
      * 
      * @param memoryBaseUnit new capacity base unit for the memory
      * @throws IllegalArgumentException if the {@code memoryBaseUnit} is null
@@ -623,8 +614,7 @@ public class MetricsProvider {
     }
 
     /**
-     * Changes the disk capacity base unit.<br>
-     * This method should only be called by the {@link MetricsProviderRestService}
+     * Changes the disk capacity base unit.
      * 
      * @param diskBaseUnit new capacity base unit for the disk capacity
      * @throws IllegalArgumentException if the {@code memoryBaseUnit} is null
@@ -648,9 +638,7 @@ public class MetricsProvider {
     /**
      * Retrieves a meter as a JSON object.<br>
      * The requested meter is located and parsed as a JsonObject to be sent via
-     * HTTP.<br>
-     * This method is supposed to only be callable by the
-     * {@link MetricsProviderRestService}.
+     * HTTP.
      * 
      * @param name name of the meter we want to retrieve
      * @param tags tags the meter has
@@ -669,9 +657,7 @@ public class MetricsProvider {
     /**
      * Retrieves a custom gauge as a JSON object.<br>
      * The requested gauge is located within the map and parsed as a JsonObject to
-     * be sent via HTTP.<br>
-     * This method is supposed to only be callable by the
-     * {@link MetricsProviderRestService}.
+     * be sent via HTTP.
      * 
      * @param name name of the custom gauge we want to retrieve
      * @return the JSON object representing the gauge
@@ -688,9 +674,7 @@ public class MetricsProvider {
     /**
      * Retrieves a custom counter as a JSON object.<br>
      * The requested counter is located within the map and parsed as a JsonObject to
-     * be sent via HTTP.<br>
-     * This method is supposed to only be callable by the
-     * {@link MetricsProviderRestService}.
+     * be sent via HTTP.
      * 
      * @param name name of the custom counter we want to retrieve
      * @return the JSON object representing the counter
@@ -707,9 +691,7 @@ public class MetricsProvider {
     /**
      * Retrieves a custom timer as a JSON object.<br>
      * The requested timer is located within the map and parsed as a JsonObject to
-     * be sent via HTTP.<br>
-     * This method is supposed to only be callable by the
-     * {@link MetricsProviderRestService}.
+     * be sent via HTTP.
      * 
      * @param name name of the custom timer we want to retrieve
      * @return the JSON object representing the timer
@@ -732,7 +714,7 @@ public class MetricsProvider {
      * In order to maintain a certain uniformity, the resulting JSON object mimics
      * the structure that Micrometer-API metrics have when exposed by the Spring
      * Boot Actuator.<br>
-     * It is important to add that if the description contais any {@code "}
+     * It is important to add that if the description contains any {@code "}
      * characters, they will be exchanged for {@code ''} due to the limitations we
      * currently have regarding JSON parsing.
      * 
@@ -766,8 +748,7 @@ public class MetricsProvider {
 
     /**
      * Returns a list of the names of the registered custom gauges.<br>
-     * The list is returned as a JsonArray containing Strings.This method is
-     * supposed to only be callable by the {@link MetricsProviderRestService}.
+     * The list is returned as a JsonArray containing Strings.
      * 
      * @return JsonArray with the list of names of all the registered custom gauges
      */
@@ -777,8 +758,7 @@ public class MetricsProvider {
 
     /**
      * Returns a list of the names of the registered custom counters.<br>
-     * The list is returned as a JsonArray containing Strings.This method is
-     * supposed to only be callable by the {@link MetricsProviderRestService}.
+     * The list is returned as a JsonArray containing Strings.
      * 
      * @return JsonArray with the list of names of all the registered custom
      *         counters
@@ -789,8 +769,7 @@ public class MetricsProvider {
 
     /**
      * Returns a list of the names of the registered custom timers.<br>
-     * The list is returned as a JsonArray containing Strings.This method is
-     * supposed to only be callable by the {@link MetricsProviderRestService}.
+     * The list is returned as a JsonArray containing Strings.
      * 
      * @return JsonArray with the list of names of all the registered custom timers
      */

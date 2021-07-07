@@ -127,8 +127,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, JavaService service, String serviceType) {
         if (service.class.length() > 0) {
-            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class);
-            Starter.getServiceMapper().mapService(service);'
+            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class, "${service.id}", "${getDeploymentDescriptorPath()}");
+            Starter.mapService(service);'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -145,7 +145,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
-        service.setReceptionCallback(new ConnectorReceptionCallback());'
+        service.setReceptionCallback(new ConnectorReceptionCallback());
+        Starter.mapService(service);'
     }
 
     // TODO family
@@ -194,6 +195,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
         import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.services.environment.spring.Starter;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter;
         import de.iip_ecosphere.platform.connectors.types.*;

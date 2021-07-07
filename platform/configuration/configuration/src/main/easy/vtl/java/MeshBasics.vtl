@@ -4,6 +4,7 @@ import JavaBasics;
 @indent(indentation = 4, additional = 0)
 template MeshBasics(Configuration config, FileArtifact target) {
 
+    setOf(String) sourceIngestors = {};
     mapOf(String, String) ingestors = {};
     
     def String getDeploymentDescriptorPath() {
@@ -34,6 +35,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
             String methodSuffixId = methodSuffix + serviceId;
             if (recordSourceIngestor(elt, out)) {
                 ingestors.add(methodSuffixId, type);
+                sourceIngestors.add(methodSuffixId);
             }
             generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
         }

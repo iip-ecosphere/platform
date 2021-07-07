@@ -51,6 +51,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTags() throws IOException {
@@ -68,6 +70,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkWithTags() throws IOException {
@@ -87,6 +91,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoMeasurements() throws IOException {
@@ -97,6 +103,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadWrongStatistic() throws IOException {
@@ -107,6 +115,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testIncrementByOne() throws IOException {
@@ -122,6 +132,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testIncrementByZero() throws IOException {
@@ -136,6 +148,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#parseCounter(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testIncrementByNegativeOne() throws IOException {
@@ -147,6 +161,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#getUpdater()}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testGetUpdater() throws IOException {
@@ -163,6 +179,8 @@ public class CounterRepresentationTest {
 
     /**
      * Tests {@link CounterRepresentation#measure()}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testMeasure() throws IOException {

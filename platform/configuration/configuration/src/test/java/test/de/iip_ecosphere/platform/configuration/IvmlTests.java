@@ -321,8 +321,9 @@ public class IvmlTests {
     }
 
     /**
-     * Tests loading, reasoning and instantiating "SimpleMesh", a simple, generated service chain for installation
-     * on SSE VMs. Depending on Maven setup/exclusions, this Test may require Java 11.
+     * Tests loading, reasoning and instantiating "SimpleMesh", a simple, generated service chain for testing. Here, we 
+     * do not instantiate the full platforms rather than only the configured apps. Depending on Maven setup/exclusions, 
+     * this Test may require Java 11.
      * 
      * @throws ExecutionException shall not occur
      * @throws IOException shall not occur
@@ -330,7 +331,9 @@ public class IvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh");
-        PlatformInstantiator.instantiate(new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen));
+        PlatformInstantiator.instantiate(
+            new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen)
+                .setStartRuleName("generateApps"));
     }
     
 }

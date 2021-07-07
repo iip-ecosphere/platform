@@ -1,7 +1,6 @@
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
-import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 
@@ -27,16 +25,16 @@ import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.Met
 public abstract class Starter extends de.iip_ecosphere.platform.services.environment.Starter {
 
     private static ConfigurableApplicationContext ctx;
-    private final Environment environment;
+    private static Environment environment;
 
     /**
      * Creates an instance.
      * 
-     * @param environment the Spring environment
+     * @param env the Spring environment
      */
     @Autowired
-    public Starter(Environment environment) {
-        this.environment = environment;
+    public Starter(Environment env) {
+        environment = env;
 
         // start the command server
         try {
@@ -44,21 +42,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             // technical information)
             YamlArtifact art = YamlArtifact.readFromYaml(
                 getClass().getClassLoader().getResourceAsStream("/deployment.yml"));
-            // in a real service, this may happen differently
-            ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
-            MetricsExtractorRestClient metricsClient = null;
-            String tmp = environment.getProperty("server.port");
-            try {
-                int port = Integer.parseInt(tmp);
-                metricsClient = new MetricsExtractorRestClient("localhost", port);
-            } catch (NumberFormatException e) {
-                System.out.println("Cannot read spring application server port: " + tmp + "; " + e.getMessage());    
-            }
-            for (YamlService service : art.getServices()) {
-                Service s = createService(service);
-                mapper.mapService(s);
-                if (null != metricsClient) {
-                    mapper.mapMetrics(s, metricsClient);
+            List<Service> services = createServices(art);
+            if (null != services) { 
+                ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
+                MetricsExtractorRestClient metricsClient = createMetricsClient(environment);
+                for (Service service : services) {
+                    mapService(mapper, service, metricsClient);
                 }
             }
             Starter.start();
@@ -66,6 +55,61 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             System.out.println("Cannot find service descriptor/start command server.");
         }
         
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * 
+     * @param service the service to be mapped
+     * 
+     * @see #getServiceMapper()
+     * @see #createMetricsClient()
+     * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
+     */
+    public static void mapService(Service service) {
+        mapService(getServiceMapper(), service, createMetricsClient());
+    }
+
+    /**
+     * Maps a service through a given mapper and metrics client.
+     * 
+     * @param mapper the service mapper instance 
+     * @param service the service to be mapped
+     * @param metricsClient the metrics client (may be <b>null</b> for none)
+     */
+    public static void mapService(ServiceMapper mapper, Service service, MetricsExtractorRestClient metricsClient) {
+        mapper.mapService(service);
+        if (null != metricsClient) {
+            mapper.mapMetrics(service, metricsClient);
+        }
+    }
+
+    /**
+     * Creates a metrics client.
+     * 
+     * @param environment the Spring environment
+     * @return the metrics REST client, may be <b>null</b>
+     */
+    public static MetricsExtractorRestClient createMetricsClient(Environment environment) {
+        MetricsExtractorRestClient metricsClient = null;
+        String tmp = environment.getProperty("server.port");
+        try {
+            int port = Integer.parseInt(tmp);
+            metricsClient = new MetricsExtractorRestClient("localhost", port);
+        } catch (NumberFormatException e) {
+            System.out.println("Cannot read spring application server port: " + tmp + "; " + e.getMessage());    
+        }
+        return metricsClient;
+    }
+    
+    /**
+     * Creates a metrics client based on the known Spring environment. Only available after 
+     * {@link #main(Class, String[])}.
+     * 
+     * @return the metrics REST client, may be <b>null</b>
+     */
+    public static MetricsExtractorRestClient createMetricsClient() {
+        return createMetricsClient(environment);
     }
     
     /**
@@ -78,22 +122,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
     
     /**
-     * Creates a service instance.
-     * 
-     * @param service the service description information
-     * @return the service instance
-     */
-    protected abstract Service createService(YamlService service);
-    
-    /**
      * Creates the relevant services from the given {@code artifact}.
      * 
      * @param artifact the artifact
-     * @return the services
+     * @return the services (may be empty or <b>null</b> for none)
      */
-    protected List<Service> createServices(YamlArtifact artifact) {
-        return new ArrayList<Service>();
-    }
+    protected abstract List<Service> createServices(YamlArtifact artifact);
     
     /**
      * Returns the spring environment.

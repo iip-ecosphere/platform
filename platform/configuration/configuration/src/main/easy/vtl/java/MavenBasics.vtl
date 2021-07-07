@@ -13,9 +13,14 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // appends a dependency. parent shall be a <dependencies> node. If groupId or artifactId are empty, nothing is emitted
     // version, type and scope are as in Maven and, by default, empty
     // returns the dependency XML element 
-    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "") {
+    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "", Boolean createDepElt=true) {
         if (groupId.length() > 0 and artifactId.length() > 0) {
-            XmlElement dep = new XmlElement(parent, "dependency");
+            XmlElement dep;
+            if (createDepElt) {
+                dep = new XmlElement(parent, "dependency");
+            } else {
+                dep = parent;
+            }
             new XmlElement(dep, "groupId", groupId);
             new XmlElement(dep, "artifactId", artifactId);
             if (ver.length() > 0) {
@@ -31,13 +36,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def appendArtifact(XmlElement parent, String artifact, String dfltVersion="") {
+    def appendArtifact(XmlElement parent, String artifact, String dfltVersion="", Boolean createDepElt=true) {
         sequenceOf(String) artList = artifact.split(":");
         if (artList.size() == 2) {
-            appendDependency(parent, artList[0], artList[1], dfltVersion);
+            appendDependency(parent, artList[0], artList[1], dfltVersion, createDepElt=createDepElt);
         }
         if (artList.size() == 3) {
-            appendDependency(parent, artList[0], artList[1], artList[2]);
+            appendDependency(parent, artList[0], artList[1], artList[2], createDepElt=createDepElt);
         }
     }
     
@@ -125,10 +130,37 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (goal.length() > 0) {
             appendGoal(appendExecutions(plugin), goal);
         }
-    }    
+    }   
     
-    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
+    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0") {
+        appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
+    } 
+
+    def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
+        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        XmlElement execs = new XmlElement(plugin, "executions");
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "unpack");
+        appendGoal(exec, "unpack");
+        new XmlElement(exec, "phase", phase);
+        XmlElement config = appendConfiguration(exec);
+        XmlElement items = new XmlElement(config, "artifactItems");
+        XmlElement item = new XmlElement(items, "artifactItem");
+        appendArtifact(item, artifact, createDepElt=false);
+        if (type.length() > 0) {
+            new XmlElement(item, "type", type);
+        }
+        if (classifier.length() > 0) {
+            new XmlElement(item, "classifier", classifier);
+        }
+        new XmlElement(item, "overWrite", "true");        
+        new XmlElement(item, "outputDirectory", outputDir);
+        new XmlElement(item, "destFileName", destFileName);
+        execs;
+    }
+    
+    def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
+        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         if (jarDir.length() > 0) {
             XmlElement execs = new XmlElement(plugin, "executions");
             XmlElement exec = new XmlElement(execs, "execution");
@@ -175,18 +207,26 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlElement(t, "mainClass", mainClass);
         }
     }
-    
-    def XmlElement appendAssemblyPlugin(XmlElement plugins, String descriptor, String id, String ver="3.1.1", String outputDir="\\${project.build.directory}") {
+
+    // use appendAssemblyDescriptor on result    
+    def XmlElement appendAssemblyPlugin(XmlElement plugins, String ver="3.1.1") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", ver, false);
-        XmlElement exec = appendExecutions(plugin);
+        new XmlElement(plugin, "executions");
+    }
+    
+    def XmlElement appendAssemblyDescriptor(XmlElement execs, String id, String descriptor, String outputDir="\\${project.build.directory}", Boolean attach=false, String phase="package", String finalName="") {
+        XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
-        new XmlElement(exec, "phase", "package");
+        new XmlElement(exec, "phase", phase);
         appendGoal(exec, "single");
         XmlElement cfg = appendConfiguration(exec);
         new XmlElement(new XmlElement(cfg, "descriptors"), "descriptor", descriptor);
         new XmlElement(cfg, "outputDirectory", outputDir);
-        new XmlElement(cfg, "attach", "false");
-        plugin;
+        new XmlElement(cfg, "attach", "${attach}");
+        if (finalName.length() > 0) {
+            new XmlElement(cfg, "finalName", finalName);
+            new XmlElement(cfg, "appendAssemblyId", "false");
+        }
     }
     
     def XmlElement appendCompilerPlugin(XmlElement plugins, String ver="3.7.0", String javaVer="1.8", String encoding="Cp1252") {
