@@ -54,6 +54,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTags() throws IOException {
@@ -69,6 +71,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkWithTags() throws IOException {
@@ -87,6 +91,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTagsNoBaseUnitValue() throws IOException {
@@ -101,6 +107,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTagsNoDescriptionValue() throws IOException {
@@ -123,6 +131,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testTagNoKey() throws IOException {
@@ -133,6 +143,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testTagNoValue() throws IOException {
@@ -144,6 +156,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testTagRandomString() throws IOException {
@@ -155,6 +169,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInvalidJsonNoName() throws IOException {
@@ -165,6 +181,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInvalidJsonNoNameValue() throws IOException {
@@ -175,6 +193,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInvalidJsonNoBaseUnit() throws IOException {
@@ -185,6 +205,8 @@ public class MeterRepresentationTest {
 
     /**
      * Tests {@link GaugeRepresentation#parseGauge(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInvalidJsonNoDescription() throws IOException {

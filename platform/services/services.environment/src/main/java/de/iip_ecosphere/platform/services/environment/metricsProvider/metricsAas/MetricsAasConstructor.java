@@ -80,7 +80,7 @@ public class MetricsAasConstructor {
 
     /**
      * Adds metrics to the submodel/elements that are also covered by direct provider access in 
-     * {@link #addMetricsProtocols(ProtocolServerBuilder, MetricsProvider, Predicate)}.
+     * {@link #addMetricsProtocols(ProtocolServerBuilder, MetricsProvider, Predicate, Function)}.
      * 
      * @param smBuilder submodel/elements builder of the AAS
      * @param iCreator  invocables creator of the AAS

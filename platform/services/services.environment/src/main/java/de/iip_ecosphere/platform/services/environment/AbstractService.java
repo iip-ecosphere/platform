@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
@@ -19,7 +23,10 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
- * Basic implementation of the service interface (aligned with Python).
+ * Basic implementation of the service interface (aligned with Python). Implementing classes shall at least either
+ * have a no-arg constructor setting up the full service information or {@link #AbstractService(String, InputStream)}.
+ * Both constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
+ * {@link #createInstance(ClassLoader, String, Class, String, String)} to be used from generated service code.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -57,6 +64,8 @@ public abstract class AbstractService implements Service {
         this.state = ServiceState.AVAILABLE;
     }
 
+    // checkstyle: resume parameter number check
+
     /**
      * Creates an abstract service from YAML information.
      * 
@@ -66,9 +75,20 @@ public abstract class AbstractService implements Service {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
             yaml.getKind());
     }
+    
+    /**
+     * Creates an abstract service from a service id and a YAML artifact.
+     * 
+     * @param serviceId the service id
+     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     */
+    protected AbstractService(String serviceId, InputStream ymlFile) {
+        this(YamlArtifact.readFromYamlSafe(ymlFile).getServiceSafe(serviceId));
+    }
 
     /**
-     * Convenience method for creating class instances using the class loader of this class.
+     * Convenience method for creating service instances via the default constructor using the class loader of this 
+     * class.
      * 
      * @param <S> the service type (parent interface of <code>className</code>)
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
@@ -77,24 +97,68 @@ public abstract class AbstractService implements Service {
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
     public static <S extends Service> S createInstance(String className, Class<S> cls) {
-        return createInstance(AbstractService.class.getClassLoader(), className, cls);
+        return createInstance(AbstractService.class.getClassLoader(), className, cls, null, null);
     }
-    
+
     /**
-     * Convenience method for creating class instances.
+     * Convenience method for creating service instances using the class loader of this class.
+     * 
+     * @param <S> the service type (parent interface of <code>className</code>)
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor)
+     * @param cls the class to cast to
+     * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
+     *     default constructor is invoked)
+     * @param deploymentDescFile the resource name of the deployment descriptor containing a YAML artifact with the 
+     *     service description (may be <b>null</b>, then the default constructor is invoked)
+     * @return the service instance (<b>null</b> if the service cannot be found/initialized)
+     */
+    public static <S extends Service> S createInstance(String className, Class<S> cls, String serviceId, 
+        String deploymentDescFile) {
+        return createInstance(AbstractService.class.getClassLoader(), className, cls, serviceId, deploymentDescFile);
+    }
+
+    /**
+     * Convenience method for creating service instances.
      * 
      * @param <S> the service type (parent interface of <code>className</code>)
      * @param loader the class loader to load the class with
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
      *     constructor)
      * @param cls the class to cast to
+     * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
+     *     default constructor is invoked)
+     * @param deploymentDescFile the resource name of the deployment descriptor containing a YAML artifact with the 
+     *     service description (may be <b>null</b>, then the default constructor is invoked)
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
-    public static <S extends Service> S createInstance(ClassLoader loader, String className, Class<S> cls) {
+    public static <S extends Service> S createInstance(ClassLoader loader, String className, Class<S> cls, 
+        String serviceId, String deploymentDescFile) {
         S result = null;
         try {
             Class<?> serviceClass = loader.loadClass(className);
-            result = cls.cast(serviceClass.newInstance());
+            Object instance = null;
+            if (null != serviceId && null != deploymentDescFile) {
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(String.class, InputStream.class);
+                    InputStream desc = loader.getResourceAsStream(deploymentDescFile);
+                    instance = cons.newInstance(serviceId, desc);
+                    if (null != desc) {
+                        desc.close();
+                    }
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (InvocationTargetException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage());
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+            if (null == instance) {
+                instance = serviceClass.newInstance();
+            }
+            result = cls.cast(instance);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
             LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
                 + className + "': " + e.getMessage() + ". Service will not be functional!");
@@ -102,8 +166,6 @@ public abstract class AbstractService implements Service {
         return result;
     }
 
-    // checkstyle: resume parameter number check
-    
     @Override
     public String getId() {
         return id;

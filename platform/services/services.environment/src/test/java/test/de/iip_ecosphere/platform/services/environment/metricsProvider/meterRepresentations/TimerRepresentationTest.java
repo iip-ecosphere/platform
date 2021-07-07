@@ -66,6 +66,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkNoTags() throws IOException {
@@ -85,6 +87,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitOkWithTags() throws IOException {
@@ -106,6 +110,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadInvalidBaseUnit() throws IOException {
@@ -116,6 +122,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoMeasurements() throws IOException {
@@ -126,6 +134,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadFourMeasurements() throws IOException {
@@ -136,6 +146,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadWrongStatistic() throws IOException {
@@ -146,6 +158,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoCount() throws IOException {
@@ -156,6 +170,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoTotal() throws IOException {
@@ -166,6 +182,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#parseTimer(JsonObject, String...)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testInitBadTwoMax() throws IOException {
@@ -176,6 +194,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#takeSnapshot()}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testTakeSnapshot() throws IOException {
@@ -188,6 +208,8 @@ public class TimerRepresentationTest {
     /**
      * Tests {@link TimerRepresentation#count()}, {@link TimerRepresentation#totalTime(TimeUnit)} and 
      * {@link TimerRepresentation#max(TimeUnit)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testRecordLong() throws IOException {
@@ -216,6 +238,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#record(java.util.function.Supplier)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testRecordSupplier() throws IOException {
@@ -246,6 +270,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#recordCallable(java.util.concurrent.Callable)}.
+     * 
+     * @throws Exception shall not occur when test is passed
      */
     @Test
     public void testRecordCallable() throws Exception {
@@ -276,6 +302,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#record(Runnable)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testRecordRunnable() throws IOException {
@@ -304,6 +332,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#totalTime(TimeUnit)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testTotalTimeConversion() throws IOException {
@@ -322,6 +352,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#max(TimeUnit)}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testMaxTimeConversion() throws IOException {
@@ -342,6 +374,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#getUpdater()}.
+     * 
+     * @throws Exception shall not occur when test is passed
      */
     @Test
     public void testGetUpdater() throws Exception {
@@ -369,6 +403,8 @@ public class TimerRepresentationTest {
 
     /**
      * Tests {@link TimerRepresentation#measure()}.
+     * 
+     * @throws IOException shall not occur when test is passed
      */
     @Test
     public void testMeasure() throws IOException {
