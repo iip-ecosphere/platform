@@ -51,7 +51,7 @@ project SimpleMesh {
         ver = "0.1.0",
         deployable = true,
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:0.2.0-SNAPSHOT",
+        //artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:0.2.0-SNAPSHOT",
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}
         // TODO parameter
@@ -64,7 +64,7 @@ project SimpleMesh {
         ver = "0.1.0",
         deployable = true,
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiverImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:0.2.0-SNAPSHOT",
+        //artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:0.2.0-SNAPSHOT",
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec1)}}
         // TODO parameter
