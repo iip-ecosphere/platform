@@ -36,6 +36,7 @@ project Applications {
     
     // TODO graph validation -> QM
     
+    // TODO leave async, no polling so far, source-individual polling in Spring is a bit complicated
     compound MeshSource refines MeshElement {
         setOf(refTo(MeshConnector)) next;
         sequenceOf(IOType) output;
