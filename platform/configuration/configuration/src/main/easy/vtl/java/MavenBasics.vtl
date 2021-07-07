@@ -136,13 +136,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
     } 
 
-    def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar") {
+    def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         XmlElement execs = new XmlElement(plugin, "executions");
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", "unpack");
         appendGoal(exec, "unpack");
-        new XmlElement(exec, "phase", "package");
+        new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);
         XmlElement items = new XmlElement(config, "artifactItems");
         XmlElement item = new XmlElement(items, "artifactItem");
@@ -214,15 +214,19 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(plugin, "executions");
     }
     
-    def XmlElement appendAssemblyDescriptor(XmlElement execs, String id, String descriptor, String outputDir="\\${project.build.directory}", Boolean attach=false) {
+    def XmlElement appendAssemblyDescriptor(XmlElement execs, String id, String descriptor, String outputDir="\\${project.build.directory}", Boolean attach=false, String phase="package", String finalName="") {
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
-        new XmlElement(exec, "phase", "package");
+        new XmlElement(exec, "phase", phase);
         appendGoal(exec, "single");
         XmlElement cfg = appendConfiguration(exec);
         new XmlElement(new XmlElement(cfg, "descriptors"), "descriptor", descriptor);
         new XmlElement(cfg, "outputDirectory", outputDir);
         new XmlElement(cfg, "attach", "${attach}");
+        if (finalName.length() > 0) {
+            new XmlElement(cfg, "finalName", finalName);
+            new XmlElement(cfg, "appendAssemblyId", "false");
+        }
     }
     
     def XmlElement appendCompilerPlugin(XmlElement plugins, String ver="3.7.0", String javaVer="1.8", String encoding="Cp1252") {
