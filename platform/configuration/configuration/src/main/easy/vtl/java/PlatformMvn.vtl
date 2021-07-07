@@ -23,7 +23,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-        appendMavenDependencyPlugin(plugins, jarDir="../${dir}", copyOwn=true);
+        appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins);
     }

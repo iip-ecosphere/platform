@@ -13,9 +13,14 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // appends a dependency. parent shall be a <dependencies> node. If groupId or artifactId are empty, nothing is emitted
     // version, type and scope are as in Maven and, by default, empty
     // returns the dependency XML element 
-    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "") {
+    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "", Boolean createDepElt=true) {
         if (groupId.length() > 0 and artifactId.length() > 0) {
-            XmlElement dep = new XmlElement(parent, "dependency");
+            XmlElement dep;
+            if (createDepElt) {
+                dep = new XmlElement(parent, "dependency");
+            } else {
+                dep = parent;
+            }
             new XmlElement(dep, "groupId", groupId);
             new XmlElement(dep, "artifactId", artifactId);
             if (ver.length() > 0) {
@@ -31,13 +36,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def appendArtifact(XmlElement parent, String artifact, String dfltVersion="") {
+    def appendArtifact(XmlElement parent, String artifact, String dfltVersion="", Boolean createDepElt=true) {
         sequenceOf(String) artList = artifact.split(":");
         if (artList.size() == 2) {
-            appendDependency(parent, artList[0], artList[1], dfltVersion);
+            appendDependency(parent, artList[0], artList[1], dfltVersion, createDepElt=createDepElt);
         }
         if (artList.size() == 3) {
-            appendDependency(parent, artList[0], artList[1], artList[2]);
+            appendDependency(parent, artList[0], artList[1], artList[2], createDepElt=createDepElt);
         }
     }
     
@@ -125,10 +130,37 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (goal.length() > 0) {
             appendGoal(appendExecutions(plugin), goal);
         }
-    }    
+    }   
     
-    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
-        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
+    def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0") {
+        appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
+    } 
+
+    def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar") {
+        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        XmlElement execs = new XmlElement(plugin, "executions");
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "unpack");
+        appendGoal(exec, "unpack");
+        new XmlElement(exec, "phase", "package");
+        XmlElement config = appendConfiguration(exec);
+        XmlElement items = new XmlElement(config, "artifactItems");
+        XmlElement item = new XmlElement(items, "artifactItem");
+        appendArtifact(item, artifact, createDepElt=false);
+        if (type.length() > 0) {
+            new XmlElement(item, "type", type);
+        }
+        if (classifier.length() > 0) {
+            new XmlElement(item, "classifier", classifier);
+        }
+        new XmlElement(item, "overWrite", "true");        
+        new XmlElement(item, "outputDirectory", outputDir);
+        new XmlElement(item, "destFileName", destFileName);
+        execs;
+    }
+    
+    def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
+        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         if (jarDir.length() > 0) {
             XmlElement execs = new XmlElement(plugin, "executions");
             XmlElement exec = new XmlElement(execs, "execution");
