@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 public class WorkerAasJavaK8SProxy {
-
+  
     private static int localPort = 6443;
     private static int vabPort = 5511;
     private static int aasPort = 6611;
