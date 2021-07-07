@@ -20,7 +20,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path platformRoot = "${target}/platform";
     
     main(Project source, Configuration config, Project target) = {
-        
+        generateApps(source, config, target);
+        generatePlatform(source, config, target);
+    }
+    
+    generateApps(Project source, Configuration config, Project target) = {
         setOf(RecordType) recordTypes = RecordType.allInstances();
         for (Application a : Application.allInstances()) {
             String appName = asTypeName(a.name);
@@ -81,7 +85,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             maven("${appRoot}");
         };
+    }
     
+    generatePlatform(Project source, Configuration config, Project target) = {
         // cleanup, reuse, ...
         ecsRuntimeRoot.mkdir();
         Path p = "${ecsRuntimeRoot}/src/main/resources";

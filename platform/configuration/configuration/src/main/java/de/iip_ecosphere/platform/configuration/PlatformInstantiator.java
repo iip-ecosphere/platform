@@ -33,6 +33,7 @@ public class PlatformInstantiator {
         private String ivmlModelName;
         private File outputFolder;
         private File modelFolder;
+        private String startRuleName = "main";
         
         /**
          * Creates a configurer instance.
@@ -45,6 +46,17 @@ public class PlatformInstantiator {
             this.ivmlModelName = ivmlModelName;
             this.modelFolder = modelFolder;
             this.outputFolder = outputFolder;
+        }
+        
+        /**
+         * Optionally sets the start rule name. The default name is "main".
+         * 
+         * @param startRuleName the start rule name
+         * @return <b>this</b> (builder style)
+         */
+        public InstantiationConfigurer setStartRuleName(String startRuleName) {
+            this.startRuleName = null == startRuleName || startRuleName.length() == 0 ? "main" : startRuleName;
+            return this;
         }
 
         /**
@@ -62,6 +74,15 @@ public class PlatformInstantiator {
                 outputFolder.mkdirs();
             }
             setup.setGenTarget(outputFolder);    
+        }
+        
+        /**
+         * Returns the VIL start rule name.
+         * 
+         * @return the VIL start rule name
+         */
+        protected String getStartRuleName() {
+            return startRuleName;
         }
         
         /**
@@ -130,7 +151,7 @@ public class PlatformInstantiator {
         EasyExecutor.printReasoningMessages(rRes);
         configurer.validateReasoningResult(rRes);
         try {
-            ConfigurationManager.instantiate(); // throws exception if it fails
+            ConfigurationManager.instantiate(configurer.getStartRuleName()); // throws exception if it fails
         } catch (ExecutionException e) {
             configurer.handleExecutionException(e);
         } finally {

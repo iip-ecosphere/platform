@@ -89,16 +89,27 @@ public class ConfigurationManager {
         init();
         return executor != null ? executor.propagateOnIvmlModel() : null;
     }
-    
+
     /**
      * Performs a platform instantiation.
      * 
      * @throws ExecutionException if the instantiation fails for some reason
      */
     public static void instantiate() throws ExecutionException {
+        instantiate("main");
+    }
+    
+    /**
+     * Performs a platform instantiation.
+     * 
+     * @param startRuleName the name of the start rule to execute
+     * @throws ExecutionException if the instantiation fails for some reason
+     */
+    public static void instantiate(String startRuleName) throws ExecutionException {
         init();
         if (executor != null) {
             try {
+                executor.setVilStartRuleName(startRuleName);
                 executor.executeVil();
             } catch (ModelManagementException | VilException e) {
                 throw new ExecutionException(e);
