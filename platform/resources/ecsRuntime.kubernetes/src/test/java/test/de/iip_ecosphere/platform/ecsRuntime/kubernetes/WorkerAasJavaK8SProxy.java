@@ -34,7 +34,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 public class WorkerAasJavaK8SProxy {
 
-    private static int localPort = 3311;
+    private static int localPort = 6443;
     private static int vabPort = 5511;
     private static int aasPort = 6611;
     private static String serverIP = "192.168.81.199";
