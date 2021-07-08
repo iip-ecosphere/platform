@@ -73,10 +73,10 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @see #createServices(YamlArtifact)
      */
     public void initialize() {
-        if (null != serverProperties) {
+        if (null != serverProperties && null != serverProperties.getPort()) {
             port = serverProperties.getPort();
             LoggerFactory.getLogger(Starter.class).info("Using spring application server port " + port);
-        } else {
+        } else { // probably the same as server properties
             String tmp = null != environment ? environment.getProperty("server.port") : "";
             if (null != tmp) {
                 try {
