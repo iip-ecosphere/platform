@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.services.environment.spring;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -58,11 +60,20 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     @Autowired
     public Starter(Environment env) {
         environment = env;
+    }
+    
+    /**
+     * Initializes the services (if available), starts the AAS command server.
+     * 
+     * @see #createServices(YamlArtifact)
+     */
+    @PostConstruct
+    public void initialize() {
         if (null != serverProperties) {
             port = serverProperties.getPort();
             LoggerFactory.getLogger(Starter.class).info("Using spring application server port " + port);
         } else {
-            String tmp = env.getProperty("server.port");
+            String tmp = environment.getProperty("server.port");
             if (null != tmp) {
                 try {
                     port = Integer.parseInt(tmp);
@@ -76,15 +87,6 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                     + port);
             }
         }
-        initialize();
-    }
-    
-    /**
-     * Initializes the services (if available), starts the AAS command server.
-     * 
-     * @see #createServices(YamlArtifact)
-     */
-    protected void initialize() {
         // start the command server
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
