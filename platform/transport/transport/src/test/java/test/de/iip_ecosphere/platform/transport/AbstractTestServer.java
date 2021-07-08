@@ -101,5 +101,40 @@ public abstract class AbstractTestServer implements Server {
         String classJar = AbstractTestServer.class.getResource("/" + intlName + ".class").toString();
         return classJar.startsWith("jar:");
     }
+
+    /**
+     * Returns the integer number from the first argument in (command line) {code args}.
+     * 
+     * @param args the arguments
+     * @param dflt the default value if no argument is available
+     * @return the integer number
+     * @see #getInteger(String[], int, int)
+     */
+    public static int getInteger(String[] args, int dflt) {
+        return getInteger(args, 0, dflt);
+    }
+    
+    /**
+     * Returns the integer number given in (command line) {code args} at {@code argIndex}.
+     * 
+     * @param args the arguments
+     * @param argIndex the 0-based argument index to read from 
+     * @param dflt the default value if no argument is available
+     * @return the integer number
+     */
+    public static int getInteger(String[] args, int argIndex, int dflt) {
+        int result = dflt;
+        if (args.length > 0 && argIndex < args.length) {
+            try {
+                result = Integer.parseInt(args[argIndex]);
+            } catch (NumberFormatException e) {
+                System.out.println("Cannot read port number from " + args[0] + ": " + e.getMessage());
+            }
+        } else {
+            System.out.println("No args given to read the port number from (" + (argIndex + 1) + ". argument). "
+                + "Falling back to: " + dflt);
+        }
+        return result;
+    }
     
 }
