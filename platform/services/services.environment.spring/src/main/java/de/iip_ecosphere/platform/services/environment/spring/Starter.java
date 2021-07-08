@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
@@ -18,6 +30,11 @@ import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 
+/**
+ * A specialized starter for Spring Cloud Stream in including the metrics provider.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 @ComponentScan(basePackageClasses = MetricsProvider.class)
 @EnableScheduling
 @Import({MetricsProvider.class})
@@ -35,7 +52,6 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     @Autowired
     public Starter(Environment env) {
         environment = env;
-
         // start the command server
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
@@ -54,7 +70,6 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         } catch (IOException e) {
             System.out.println("Cannot find service descriptor/start command server.");
         }
-        
     }
 
     /**
@@ -78,9 +93,11 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @param metricsClient the metrics client (may be <b>null</b> for none)
      */
     public static void mapService(ServiceMapper mapper, Service service, MetricsExtractorRestClient metricsClient) {
-        mapper.mapService(service);
-        if (null != metricsClient) {
-            mapper.mapMetrics(service, metricsClient);
+        if (null != service) {
+            mapper.mapService(service);
+            if (null != metricsClient) {
+                mapper.mapMetrics(service, metricsClient);
+            }
         }
     }
 
