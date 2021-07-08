@@ -15,7 +15,9 @@ package de.iip_ecosphere.platform.services.environment.spring;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,6 +45,9 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
 
     private static ConfigurableApplicationContext ctx;
     private static Environment environment;
+    private static int port = 8080; // assumed default 
+    @Value("${server.port}")
+    private int serverPort;
 
     /**
      * Creates an instance.
@@ -52,6 +57,18 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     @Autowired
     public Starter(Environment env) {
         environment = env;
+        port = serverPort;
+        LoggerFactory.getLogger(Starter.class).info("@Value-port: " + serverPort);
+        String tmp = env.getProperty("server.port");
+        LoggerFactory.getLogger(Starter.class).info("Env-port: " + tmp);
+        if (null != tmp) {
+            try {
+                port = Integer.parseInt(tmp);
+            } catch (NumberFormatException e) {
+                LoggerFactory.getLogger(Starter.class).error("Cannot read spring application server port: " + tmp 
+                    + "; " + e.getMessage());    
+            }
+        }
         initialize();
     }
     
@@ -119,15 +136,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @return the metrics REST client, may be <b>null</b>
      */
     public static MetricsExtractorRestClient createMetricsClient(Environment environment) {
-        MetricsExtractorRestClient metricsClient = null;
-        String tmp = environment.getProperty("server.port");
-        try {
-            int port = Integer.parseInt(tmp);
-            metricsClient = new MetricsExtractorRestClient("localhost", port);
-        } catch (NumberFormatException e) {
-            System.out.println("Cannot read spring application server port: " + tmp + "; " + e.getMessage());    
-        }
-        return metricsClient;
+        return new MetricsExtractorRestClient("localhost", port);
     }
     
     /**
