@@ -112,6 +112,8 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     definition: ${function(nodes)}
                 ${sources()}
                 stream:
+                    default:
+                        contentType: application/iip
                     bindings:
                         ${bindings(mappedMesh)}'
     }

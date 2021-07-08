@@ -16,11 +16,15 @@ template JavaSpringCloudStreamStarter(Configuration config, FileArtifact target,
         import java.util.*;
         import de.iip_ecosphere.platform.services.environment.Service;
         import de.iip_ecosphere.platform.services.environment.YamlArtifact;
+        import de.iip_ecosphere.platform.services.environment.spring.Constants;
         import de.iip_ecosphere.platform.transport.serialization.*;
+        import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
         import org.springframework.core.env.Environment;
         import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.messaging.converter.MessageConverter;
         import org.springframework.boot.autoconfigure.SpringBootApplication;
         import org.springframework.context.annotation.ComponentScan;
+        import org.springframework.context.annotation.Bean;
         
         /**
          * Service artifact starter.
@@ -43,6 +47,16 @@ template JavaSpringCloudStreamStarter(Configuration config, FileArtifact target,
             @Override
             protected List<Service> createServices(YamlArtifact artifact) {
                 return null; // services do register themselves
+            }
+            
+            /**
+            * Creates a custom message converter and binds it against "application/iip".
+            * 
+            * @return the custom message converter
+            */
+            @Bean
+            public MessageConverter customMessageConverter() {
+                return new SerializerMessageConverter(Constants.MIME_TYPE);
             }
 
             /**
