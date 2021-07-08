@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
@@ -63,6 +64,16 @@ public class TestMoquetteServer extends AbstractTestServer {
     public void stop(boolean dispose) {
         mqttBroker.stopServer();
         mqttBroker = null;
+    }
+
+    /**
+     * Starts the server from the command line.
+     * 
+     * @param args the first argument may be the port number, else 8883 is used
+     */
+    public static void main(String[] args) {
+        TestMoquetteServer server = new TestMoquetteServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.start();
     }
 
 }

@@ -16,6 +16,7 @@ import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
@@ -64,6 +65,16 @@ public class TestHiveMqServer extends AbstractTestServer {
     public void stop(boolean dispose) {
         hiveMQ.stop().join();
         hiveMQ = null;
+    }
+    
+    /**
+     * Starts the server from the command line.
+     * 
+     * @param args the first argument may be the port number, else 8883 is used
+     */
+    public static void main(String[] args) {
+        TestHiveMqServer server = new TestHiveMqServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.start();
     }
 
 }

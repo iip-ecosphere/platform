@@ -1,3 +1,5 @@
 /src/test/extensions/*
 /target/*
 /target/
+/work/
+derby.log

@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.qpid.server.SystemLauncher;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
@@ -69,6 +70,16 @@ public class TestQpidServer extends AbstractTestServer {
     @Override
     public void stop(boolean dispose) {
         systemLauncher.shutdown();
+    }
+
+    /**
+     * Starts the server from the command line.
+     * 
+     * @param args the first argument may be the port number, else 8883 is used
+     */
+    public static void main(String[] args) {
+        TestQpidServer server = new TestQpidServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.start();
     }
 
 }
