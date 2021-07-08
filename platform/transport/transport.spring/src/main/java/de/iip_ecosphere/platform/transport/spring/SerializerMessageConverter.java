@@ -32,8 +32,20 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public class SerializerMessageConverter extends AbstractMessageConverter {
 
+    /**
+     * The default mime type for IIP-Ecosphere serialized data types via the transport layer.
+     */
+    public static final MimeType MIME_TYPE = new MimeType("application", "iip");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerMessageConverter.class);
-    
+
+    /**
+     * Creates an instance for {@link #MIME_TYPE}.
+     */
+    public SerializerMessageConverter() {
+        super(MIME_TYPE);
+    }
+
     /**
      * Creates an instance for a given mime type. The mime type shall be defined based on the used serializers.
      * 
