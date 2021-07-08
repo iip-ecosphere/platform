@@ -84,7 +84,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     /**
      * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
      * 
-     * @param service the service to be mapped
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * 
      * @see #getServiceMapper()
      * @see #createMetricsClient()
@@ -95,14 +95,16 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
 
     /**
-     * Maps a service through a given mapper and metrics client.
+     * Maps a service through a given mapper and metrics client. No mapping will take place if either {@code service},
+     * {@code mapper} or {@link #getProtocolBuilder()} is <b>null</b>. The specific mapping for the metrics will only
+     * take place if {@code metricsClient} is not <b>null</b>.
      * 
-     * @param mapper the service mapper instance 
-     * @param service the service to be mapped
+     * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * @param metricsClient the metrics client (may be <b>null</b> for none)
      */
     public static void mapService(ServiceMapper mapper, Service service, MetricsExtractorRestClient metricsClient) {
-        if (null != service) {
+        if (null != service && null != mapper && null != Starter.getProtocolBuilder()) {
             mapper.mapService(service);
             if (null != metricsClient) {
                 mapper.mapMetrics(service, metricsClient);
