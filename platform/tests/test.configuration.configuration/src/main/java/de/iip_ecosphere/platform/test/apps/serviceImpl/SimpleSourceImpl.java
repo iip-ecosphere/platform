@@ -32,7 +32,6 @@ import iip.interfaces.SimpleDataSourceService;
 public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSourceService {
 
     private Timer timer = new Timer();
-    private DataIngestor<Rec1> ingestor;
     private Random random = new Random();
     
     /**
@@ -50,16 +49,6 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
      */
     public SimpleSourceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
-        timer.schedule(new TimerTask() {
-            
-            @Override
-            public void run() {
-                Rec1 rec = new Rec1();
-                rec.setIntField(random.nextInt());
-                rec.setStringField("STRING " + random.nextFloat());
-                ingestor.ingest(new Rec1());
-            }
-        }, 0, 1000);
     }
 
     @Override
@@ -68,8 +57,19 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
     }
 
     @Override
-    public void attachcreateRec1_SimpleSourceIngestor(DataIngestor<Rec1> ingestor) {
-        this.ingestor = ingestor;
+    public void attachcreateRec1_SimpleSourceIngestor(final DataIngestor<Rec1> ingestor) {
+        if (null != ingestor) {
+            timer.schedule(new TimerTask() {
+                
+                @Override
+                public void run() {
+                    Rec1 rec = new Rec1();
+                    rec.setIntField(random.nextInt());
+                    rec.setStringField("STRING " + random.nextFloat());
+                    ingestor.ingest(new Rec1());
+                }
+            }, 0, 1000);
+        }
     }
 
 }
