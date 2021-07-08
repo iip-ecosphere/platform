@@ -76,7 +76,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
             vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements);
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
-            //vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
+            vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
             assemblySrc.mkdir();
             vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
