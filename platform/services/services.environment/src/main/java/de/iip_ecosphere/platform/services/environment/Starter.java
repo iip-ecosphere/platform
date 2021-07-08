@@ -149,10 +149,13 @@ public class Starter {
      * Starts the server instance(s).
      */
     public static void start() {
-        LoggerFactory.getLogger(Starter.class).info("Starting service command server");
-        server = builder.build();
-        server.start();
-        LoggerFactory.getLogger(Starter.class).info("Started service command server");
+        if (null != builder) {
+            LoggerFactory.getLogger(Starter.class).info("Starting service command server");
+            server = builder.build();
+            server.start();
+        } else {
+            LoggerFactory.getLogger(Starter.class).error("Cannot start service command server as no builder is set.");
+        }
     }
 
     /**
