@@ -152,6 +152,7 @@ public class Starter {
         LoggerFactory.getLogger(Starter.class).info("Starting service command server");
         server = builder.build();
         server.start();
+        LoggerFactory.getLogger(Starter.class).info("Started service command server");
     }
 
     /**

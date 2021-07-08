@@ -152,7 +152,9 @@ public abstract class AbstractService implements Service {
                     LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
                         + e.getMessage());
                 } catch (IOException e) {
-                    // ignore
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + " here "
+                        + "loading descriptor " + deploymentDescFile + ": " + e.getMessage() + ", falling back to "
+                        + "default constructor");
                 }
             }
             if (null == instance) {
