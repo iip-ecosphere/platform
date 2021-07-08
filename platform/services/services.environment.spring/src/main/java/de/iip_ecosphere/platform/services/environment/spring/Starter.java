@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -45,9 +45,10 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
 
     private static ConfigurableApplicationContext ctx;
     private static Environment environment;
-    private static int port = 8080; // assumed default 
-    @Value("${server.port}")
-    private int serverPort;
+    private static int port = 8080; // assumed default
+    
+    @Autowired
+    private ServerProperties serverProperties;
 
     /**
      * Creates an instance.
@@ -57,16 +58,22 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     @Autowired
     public Starter(Environment env) {
         environment = env;
-        port = serverPort;
-        LoggerFactory.getLogger(Starter.class).info("@Value-port: " + serverPort);
-        String tmp = env.getProperty("server.port");
-        LoggerFactory.getLogger(Starter.class).info("Env-port: " + tmp);
-        if (null != tmp) {
-            try {
-                port = Integer.parseInt(tmp);
-            } catch (NumberFormatException e) {
-                LoggerFactory.getLogger(Starter.class).error("Cannot read spring application server port: " + tmp 
-                    + "; " + e.getMessage());    
+        if (null != serverProperties) {
+            port = serverProperties.getPort();
+            LoggerFactory.getLogger(Starter.class).info("Using spring application server port " + port);
+        } else {
+            String tmp = env.getProperty("server.port");
+            if (null != tmp) {
+                try {
+                    port = Integer.parseInt(tmp);
+                    LoggerFactory.getLogger(Starter.class).info("Using spring application server port " + port);
+                } catch (NumberFormatException e) {
+                    LoggerFactory.getLogger(Starter.class).error("Cannot read spring application server port: " + tmp 
+                        + "; " + e.getMessage() + " using assumed default: " + port);    
+                }
+            } else {
+                LoggerFactory.getLogger(Starter.class).info("Using (assumed default) spring application server port " 
+                    + port);
             }
         }
         initialize();
