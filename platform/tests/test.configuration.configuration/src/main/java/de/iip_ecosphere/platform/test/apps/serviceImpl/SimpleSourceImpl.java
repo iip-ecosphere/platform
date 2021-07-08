@@ -53,7 +53,10 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
 
     @Override
     public Rec1 createRec1() {
-        return null;
+        Rec1 rec = new Rec1();
+        rec.setIntField(random.nextInt());
+        rec.setStringField("SYNC");
+        return rec;
     }
 
     @Override
@@ -65,8 +68,8 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
                 public void run() {
                     Rec1 rec = new Rec1();
                     rec.setIntField(random.nextInt());
-                    rec.setStringField("STRING " + random.nextFloat());
-                    ingestor.ingest(new Rec1());
+                    rec.setStringField("ASYNC");
+                    ingestor.ingest(rec);
                 }
             }, 0, 1000);
         }
