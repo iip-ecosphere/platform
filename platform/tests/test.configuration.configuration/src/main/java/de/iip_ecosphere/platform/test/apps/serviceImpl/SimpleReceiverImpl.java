@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl;
 import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
 import iip.interfaces.SimpleDataReceiverService;
 
@@ -25,6 +26,13 @@ import iip.interfaces.SimpleDataReceiverService;
  */
 public class SimpleReceiverImpl extends DefaultServiceImpl implements SimpleDataReceiverService {
 
+    /**
+     * Fallback constructor.
+     */
+    public SimpleReceiverImpl() {
+        super(ServiceKind.SINK_SERVICE);
+    }
+    
     /**
      * Creates a service instance from a service id and a YAML artifact.
      * 

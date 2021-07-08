@@ -19,6 +19,7 @@ import java.util.TimerTask;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
 import iip.interfaces.SimpleDataSourceService;
 
@@ -33,6 +34,13 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
     private Timer timer = new Timer();
     private DataIngestor<Rec1> ingestor;
     private Random random = new Random();
+    
+    /**
+     * Fallback constructor.
+     */
+    public SimpleSourceImpl() {
+        super(ServiceKind.SOURCE_SERVICE);
+    }
     
     /**
      * Creates a service instance from a service id and a YAML artifact.
