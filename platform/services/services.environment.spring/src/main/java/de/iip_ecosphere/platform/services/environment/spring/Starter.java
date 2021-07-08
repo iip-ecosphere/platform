@@ -73,7 +73,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             port = serverProperties.getPort();
             LoggerFactory.getLogger(Starter.class).info("Using spring application server port " + port);
         } else {
-            String tmp = environment.getProperty("server.port");
+            String tmp = null != environment ? environment.getProperty("server.port") : "";
             if (null != tmp) {
                 try {
                     port = Integer.parseInt(tmp);
