@@ -20,7 +20,17 @@ public class DefaultServiceImpl extends AbstractService {
     protected DefaultServiceImpl(ServiceKind kind) {
         super(kind);
     }
-    
+
+    /**
+     * Fallback constructor setting most fields to "empty" default values.
+     * 
+     * @param id the id of the service
+     * @param kind the service kind
+     */
+    protected DefaultServiceImpl(String id, ServiceKind kind) {
+        super(id, kind);
+    }
+
     // checkstyle: stop parameter number check
 
     /**

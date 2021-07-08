@@ -24,8 +24,9 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Basic implementation of the service interface (aligned with Python). Implementing classes shall at least either
- * have a no-arg constructor setting up the full service information or {@link #AbstractService(String, InputStream)}.
- * Both constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
+ * have a no-arg constructor setting up the full/fallback service information, a signle string argument constructor 
+ * taking the service id or a constructor like {@link #AbstractService(String, InputStream)}.
+ * The three types of constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
  * {@link #createInstance(ClassLoader, String, Class, String, String)} to be used from generated service code.
  * 
  * @author Holger Eichelberger, SSE
@@ -46,7 +47,17 @@ public abstract class AbstractService implements Service {
      * @param kind the service kind
      */
     protected AbstractService(ServiceKind kind) {
-        this("", "", new Version(0, 0, 0), "", true, kind);
+        this("", kind);
+    }
+
+    /**
+     * Fallback constructor setting most fields to "empty" default values.
+     * 
+     * @param id the id of the service
+     * @param kind the service kind
+     */
+    protected AbstractService(String id, ServiceKind kind) {
+        this(id, "", new Version(0, 0, 0), "", true, kind);
     }
 
     // checkstyle: stop parameter number check
@@ -158,13 +169,25 @@ public abstract class AbstractService implements Service {
                     // see null == instance
                 } catch (InvocationTargetException e) {
                     LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
-                        + e.getMessage());
+                        + e.getMessage() + ", falling back to default constructor");
                 } catch (IOException e) {
                     LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + " here "
                         + "loading descriptor " + deploymentDescFile + ": " + e.getMessage() + ", falling back to "
                         + "default constructor");
                 }
             }
+            if (null == instance && null != serviceId) {
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(String.class);
+                    instance = cons.newInstance(serviceId);
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (InvocationTargetException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage() + ", falling back to default constructor");
+                }
+            }
+            
             if (null == instance) {
                 instance = serviceClass.newInstance();
             }
