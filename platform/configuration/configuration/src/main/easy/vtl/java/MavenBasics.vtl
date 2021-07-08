@@ -250,5 +250,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
             appendDependency(deps, "org.apache.maven.surefire", depArtifact, ver = ver);
         }
     }    
+    
+    def XmlElement appendCleanPlugin(XmlElement plugins, String ver="2.5", String phase="initialize", String goal="clean", String dir="\\${project.build.directory}", String include="*.jar") {
+        XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-clean-plugin", ver, false);
+        XmlElement exec = appendExecutions(plugin);
+        new XmlElement(exec, "id", "auto-clean");
+        new XmlElement(exec, "phase", phase);
+        appendGoal(exec, goal);
+        XmlElement cfg = appendConfiguration(exec);
+        new XmlElement(cfg, "excludeDefaultDirectories", "true");
+        XmlElement fileset = new XmlElement(new XmlElement(cfg, "filesets"), "fileset");
+        new XmlElement(fileset, "directory", dir); 
+        if (include.length() > 0) {
+            XmlElement includes = new XmlElement(fileset, "includes");
+            new XmlElement(includes, "include", include);
+        }
+        plugin;
+    }
 
 }

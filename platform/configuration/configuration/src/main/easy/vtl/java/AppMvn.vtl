@@ -22,7 +22,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         String projectVersion = config.iipVer;
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "${appName}", "ConfiguredApp", "Configured Application");
+        createMavenProjectAttributes(project, "${appName}", "${appName}", "${app.description}");
         new XmlElement(project, "groupId", "${iipGroup}.apps");
         new XmlElement(project, "version", "${app.ver}");        
         // app version cannot be used with maven parent, use import??
@@ -31,9 +31,16 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
+        // TURN THIS INTO XML
         appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
+        appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
+        appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
+        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+        new XmlElement(ex, "groupId", "javax.el");
+        new XmlElement(ex, "artifactId", "el-api");
         for (String art : artifacts) {
             appendArtifact(dep, art, projectVersion);
         }
@@ -44,6 +51,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendAssemblyDescriptor(assemblyPlugin, "interfaces", "src/main/assembly/javaInterfaces.xml", attach=true);
         appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
         appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
+        //appendCleanPlugin(plugins, include="${appName}*.*");
     }
 
 }

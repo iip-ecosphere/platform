@@ -19,20 +19,20 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def generateService(MeshElement elt, Service service) {
-        '-id: ${service.id}
-         name: ${service.name}
-         version: ${service.ver}
-         description: ${service.description}
-         deployable: ${service.deployable}
-         kind: ${service.kind}
-         cmdArg: 
-           - --iip.port=\\${port}
-           - --iip.protocol=\\${protocol}
-         relations:
-           - endpoint:
-             portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
-             hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-           ${generateRelations(elt)}'
+        '- id: ${service.id}
+          name: ${service.name}
+          version: ${service.ver}
+          description: ${service.description}
+          deployable: ${service.deployable}
+          kind: ${service.kind}
+          cmdArg: 
+            - --iip.port=\\${port}
+            - --iip.protocol=\\${protocol}
+          relations:
+            - endpoint:
+              portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
+              hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+            ${generateRelations(elt)}'
     } 
     
     def generateRelations(MeshElement elt) {
@@ -54,8 +54,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         returnType = false;
         '- channel: ${eltMet}-out-0
           direction: OUT
-          type: ${eltType}
-        '
+          type: ${eltType}'
         for (MeshConnector conn : conns) {
             MeshInnerElement next = conn.next;
             String nextMeth = generateDataMethods(next);
@@ -63,11 +62,11 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             inputType = true;
             String nextType = generateDataMethods(next);
             returnType = false;
-            '- channel: ${nextMeth}-in-0
+            '
+            - channel: ${nextMeth}-in-0
               id: ${conn.name}
               direction: IN
-              type: ${nextType}
-            '
+              type: ${nextType}' <CR>;
         }
     }
     

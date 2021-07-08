@@ -15,6 +15,9 @@ project Transport {
     
     abstract compound TransportProtocol {
     	ProtocolType type;
+    	Port port = 8883; // preliminary, needed for AMQP tests
+    	String user = ""; // preliminary, needed for AMQP tests
+    	String password = ""; // preliminary, needed for AMQP tests
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {

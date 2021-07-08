@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
+import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -165,7 +166,7 @@ public class IvmlTests {
         assertJavaNode(srcMainJavaIip, "MySourceexample");
         
         assertFile(srcMainResources, "application.yml");
-        assertFile(srcMainResources, "deployment.yml");
+        assertDeploymentYaml(srcMainResources, "deployment.yml");
         assertFile(srcMainResources, "logback.xml");
         
         assertPythonDatatype(srcMainPython, "Rec1");
@@ -187,6 +188,22 @@ public class IvmlTests {
             Assert.assertEquals("Source code checking Rec1Serializer.py", 0, res);
         } catch (InterruptedException e) {
             Assert.fail("Python code check shall not be interrupted: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Asserts the structure of a deployment Yaml file (from service.environment perspective).
+     * 
+     * @param base the base folder
+     * @param name the name/path to the file
+     */
+    private void assertDeploymentYaml(File base, String name) {
+        assertFile(base, name);
+        try (FileInputStream in = new FileInputStream(new File(base, name))) {
+            YamlArtifact.readFromYaml(in);
+            in.close();
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
         }
     }
     

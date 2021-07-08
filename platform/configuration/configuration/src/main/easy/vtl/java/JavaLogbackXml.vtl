@@ -15,7 +15,7 @@ template JavaLogbackXml(Configuration config, XmlFileArtifact target) {
         new XmlElement(encoder, "pattern", "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n");
         
         XmlElement root = new XmlElement(cfg, "root");
-        new XmlAttribute(root, "level", "info");
+        new XmlAttribute(root, "level", "debug");
         XmlElement appenderRef = new XmlElement(root, "appender-ref");
         new XmlAttribute(appenderRef, "ref", "STDOUT");
     }

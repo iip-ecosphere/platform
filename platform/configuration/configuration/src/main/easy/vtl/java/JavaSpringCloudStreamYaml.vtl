@@ -64,8 +64,34 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
+
+    def protocolConfig(IIPEcosphere config) {
+        protocolConfig(config.transportProtocol);
+    }
+
+    def protocolConfig(TransportProtocol protocol) {
+        ''
+    }
+
+    def protocolConfig(TransportProtocolAMQP protocol) {
+        'amqp:
+            port: ${protocol.port}
+            user: ${protocol.user}
+            password: ${protocol.password}'
+    }
+
+    def protocolConfig(TransportProtocolMQTTv3 protocol) {
+        'mqtt:
+            port: ${protocol.port}'
+    }
+
+    def protocolConfig(TransportProtocolMQTTv5 protocol) {
+        'mqtt:
+            port: ${protocol.port}'
+    }
  
     def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
+        '${protocolConfig(config)}'
         'metricsprovider:
             schedulerrate: 3000
             memorybaseunit: kilobytes
@@ -79,6 +105,8 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     exposure:
                         include: "metrics"
         spring:
+            main:
+                banner-mode: off
             cloud:
                 function:
                     definition: ${function(nodes)}
