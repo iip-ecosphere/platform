@@ -15,6 +15,8 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.AbstractMessageConverter;
@@ -105,6 +107,30 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
             result = payload;
         }
         return result;
+    }
+
+    /**
+     * "Manual" serialization and sending over a binding with <code>useNativeEncoding=false</code>.
+     * 
+     * @param <T> the type of the payload
+     * @param streamBridge the stream bridge to send to
+     * @param bindingName the binding name to be used as channel
+     * @param payload the payload to send
+     */
+    public static <T> void serializeAndSend(StreamBridge streamBridge, String bindingName, T payload) {
+        @SuppressWarnings("unchecked")
+        Serializer<T> serializer = (Serializer<T>) SerializerRegistry.getSerializer(payload.getClass());
+        if (null != serializer) {
+            try {
+                streamBridge.send(bindingName, MessageBuilder.withPayload(serializer.to(payload)).build());
+            } catch (IOException e) {
+                LOGGER.error("Cannot send instance of " + payload.getClass().getName() 
+                    + ": " + e.getMessage());
+            }
+        } else {
+            LOGGER.error("No serializer found for " + payload.getClass().getName() 
+                + " although type seems to be supported. Cannot send instance.");
+        }
     }
 
 }
