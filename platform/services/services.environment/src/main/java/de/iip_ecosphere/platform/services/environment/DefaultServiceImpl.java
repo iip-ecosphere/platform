@@ -12,10 +12,19 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public class DefaultServiceImpl extends AbstractService {
 
+    /**
+     * Fallback constructor setting most fields to "empty" default values.
+     * 
+     * @param kind the service kind
+     */
+    protected DefaultServiceImpl(ServiceKind kind) {
+        super(kind);
+    }
+    
     // checkstyle: stop parameter number check
 
     /**
-     * Creates an abstract service.
+     * Creates a default service.
      * 
      * @param id the id of the service
      * @param name the name of the service
@@ -32,7 +41,7 @@ public class DefaultServiceImpl extends AbstractService {
     // checkstyle: resume parameter number check
 
     /**
-     * Creates an abstract service from YAML information.
+     * Creates a default service from YAML information.
      * 
      * @param yaml the service information as read from YAML
      */

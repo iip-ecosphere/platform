@@ -39,7 +39,15 @@ public abstract class AbstractService implements Service {
     private boolean isDeployable; 
     private ServiceKind kind;
     private ServiceState state;
-    
+
+    /**
+     * Fallback constructor setting most fields to "empty" default values.
+     * 
+     * @param kind the service kind
+     */
+    protected AbstractService(ServiceKind kind) {
+        this("", "", new Version(0, 0, 0), "", true, kind);
+    }
 
     // checkstyle: stop parameter number check
     
