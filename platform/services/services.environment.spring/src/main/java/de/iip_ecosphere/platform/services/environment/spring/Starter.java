@@ -15,10 +15,9 @@ package de.iip_ecosphere.platform.services.environment.spring;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,7 +42,8 @@ import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.Met
 @EnableScheduling
 @Import({MetricsProvider.class})
 @Component
-public abstract class Starter extends de.iip_ecosphere.platform.services.environment.Starter {
+public abstract class Starter extends de.iip_ecosphere.platform.services.environment.Starter 
+    implements CommandLineRunner {
 
     private static ConfigurableApplicationContext ctx;
     private static Environment environment;
@@ -62,12 +62,16 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         environment = env;
     }
     
+    @Override
+    public void run(String...args) throws Exception {
+        initialize();
+    }
+    
     /**
      * Initializes the services (if available), starts the AAS command server.
      * 
      * @see #createServices(YamlArtifact)
      */
-    @PostConstruct
     public void initialize() {
         if (null != serverProperties) {
             port = serverProperties.getPort();
