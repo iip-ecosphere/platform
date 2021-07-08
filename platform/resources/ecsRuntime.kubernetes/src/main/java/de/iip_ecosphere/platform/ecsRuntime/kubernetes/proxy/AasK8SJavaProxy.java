@@ -15,7 +15,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 /**
- * The Implementation of http apache for the Abstract class AbstractK8SJavaProxy.
+ * The Implementation of AAS for the Abstract class AbstractK8SJavaProxy.
  * K8S (Kubernetes)
  * 
  * @author Ahmad Alamoush, SSE
