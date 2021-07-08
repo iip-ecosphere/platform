@@ -52,6 +52,15 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     @Autowired
     public Starter(Environment env) {
         environment = env;
+        initialize();
+    }
+    
+    /**
+     * Initializes the services (if available), starts the AAS command server.
+     * 
+     * @see #createServices(YamlArtifact)
+     */
+    protected void initialize() {
         // start the command server
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
