@@ -34,11 +34,11 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         for (MeshElement elt: mappedMesh.keys()) {
             String eltMet = generateDataMethods(elt);
-            if (!sourceIngestors.includes(eltMet)) {
+            //if (!sourceIngestors.includes(eltMet)) {
             '${eltMet}-out-0:
                 destination: ${eltMet}
             '
-            }
+            //}
             for (MeshConnector conn: mappedMesh.get(elt)) {
                 MeshInnerElement next = conn.next;
                 String nextMeth = generateDataMethods(next);

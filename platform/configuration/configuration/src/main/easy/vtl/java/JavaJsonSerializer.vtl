@@ -32,7 +32,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public ${clsName} from(byte[] data) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    return objectMapper.readValue(String.valueOf(data), ${clsName}.class);
+                    return objectMapper.readValue(data, ${clsName}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
                 }
@@ -42,7 +42,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public byte[] to(${clsName} source) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    return objectMapper.writeValueAsString(source).getBytes();
+                    return objectMapper.writeValueAsBytes(source);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
                 }
