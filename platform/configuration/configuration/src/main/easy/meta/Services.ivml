@@ -85,7 +85,7 @@ project Services {
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
        kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
        kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and input.size() > 0 and isDefined(output) and output.size() > 0;
-       not(asynchronous) implies isDefined(input) and isDefined(output) and input.size() == output.size();
+       not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and input.size() == output.size();
    }
    
    abstract compound Service refines ServiceBase {

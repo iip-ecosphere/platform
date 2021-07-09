@@ -31,14 +31,30 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         } 
     }
     
+    def nativeEnc() {
+        'producer: 
+            useNativeEncoding: true'
+    }
+    
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         for (MeshElement elt: mappedMesh.keys()) {
             String eltMet = generateDataMethods(elt);
-            //if (!sourceIngestors.includes(eltMet)) {
+            Boolean doOut;
+            if (!asyncIngestors.containsKey(eltMet)) {
+                doOut = true;
+            } else {
+                doOut = !asyncIngestors.get(eltMet); // out for synchronous, in for asynchronous
+            }
+            if (doOut) {
             '${eltMet}-out-0:
-                destination: ${eltMet}
-            '
-            //}
+                    destination: ${eltMet}'
+            ''
+            } else { // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+            '${eltMet}-in-0:
+                    producer:
+                        useNativeEncoding: true'
+            ''
+            }
             for (MeshConnector conn: mappedMesh.get(elt)) {
                 MeshInnerElement next = conn.next;
                 String nextMeth = generateDataMethods(next);

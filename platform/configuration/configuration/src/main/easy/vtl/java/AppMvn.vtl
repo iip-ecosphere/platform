@@ -27,6 +27,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         new XmlElement(project, "version", "${app.ver}");        
         // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        XmlElement properties = new XmlElement(project, "properties");
+        new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
         
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, iipGroup, "transport", projectVersion);
@@ -51,7 +53,6 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendAssemblyDescriptor(assemblyPlugin, "interfaces", "src/main/assembly/javaInterfaces.xml", attach=true);
         appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
         appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
-        //appendCleanPlugin(plugins, include="${appName}*.*");
     }
 
 }

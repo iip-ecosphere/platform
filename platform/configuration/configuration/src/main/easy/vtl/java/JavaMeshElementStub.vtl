@@ -7,20 +7,24 @@ template JavaMeshElementStub(Configuration config, FileArtifact target, MeshElem
     
     def generateIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
+             if (asyncIngestors.get(methodSuffix, false)) {
              String type = ingestors.get(methodSuffix);
              '@Override
              public void attach${methodSuffix}Ingestor(DataIngestor<${type}> ingestor) {
                  // TODO clarify with Python
              }'
+             }
          }
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        if (!src.impl.asynchronous) {
         '@Override
         public ${type} ${methodSuffix}() {
             return null; // TODO connect via VAB
         }'
+        }
     } 
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor

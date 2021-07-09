@@ -58,6 +58,7 @@ project SimpleMesh {
         description = "",
         ver = "0.1.0",
         deployable = true,
+        asynchronous = true,
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,

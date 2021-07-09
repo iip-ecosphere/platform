@@ -7,6 +7,7 @@ template JavaMeshElementInterface(Configuration config, FileArtifact target, Mes
     
     def generateIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
+             if (asyncIngestors.get(methodSuffix, false)) {
              String type = ingestors.get(methodSuffix);
              '/**
              * Called by the platform to attach an asynchronous data ingestor for type "${type}".
@@ -14,17 +15,20 @@ template JavaMeshElementInterface(Configuration config, FileArtifact target, Mes
              * @param ingestor the "${type}" ingestor instance
              */
              public abstract void attach${methodSuffix}Ingestor(DataIngestor<${type}> ingestor);'
+             }
          }
     }
 
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        if (!src.impl.asynchronous) {
         '/**
         * Creates data to be ingested.
         *
         * @return the created data, <b>null</b> for no data
         */
         public abstract ${type} ${methodSuffix}();'
+        }
     } 
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor

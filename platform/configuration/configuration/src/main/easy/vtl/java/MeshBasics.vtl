@@ -4,7 +4,7 @@ import JavaBasics;
 @indent(indentation = 4, additional = 0)
 template MeshBasics(Configuration config, FileArtifact target) {
 
-    setOf(String) sourceIngestors = {};
+    mapOf(String, Boolean) asyncIngestors = {};
     mapOf(String, String) ingestors = {};
     
     def String getDeploymentDescriptorPath() {
@@ -35,7 +35,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
             String methodSuffixId = methodSuffix + serviceId;
             if (recordSourceIngestor(elt, out)) {
                 ingestors.add(methodSuffixId, type);
-                sourceIngestors.add(methodSuffixId);
+                asyncIngestors.add(methodSuffixId, elt.impl.asynchronous);
             }
             generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
         }
@@ -58,6 +58,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 String methodSuffixId = methodSuffix + serviceId;
                 if (recordAsyncProcessorIngestor(elt, in)) {
                     ingestors.add(methodSuffixId, type);
+                    asyncIngestors.add(methodSuffixId, true);
                 }
                 generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
             }
@@ -73,6 +74,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 String methodSuffixId = methodSuffix + serviceId;
                 if (recordSyncProcessorIngestor(elt, out)) {
                     ingestors.add(methodSuffixId, outType);
+                    asyncIngestors.add(methodSuffixId, false);
                 }
                 generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
             }

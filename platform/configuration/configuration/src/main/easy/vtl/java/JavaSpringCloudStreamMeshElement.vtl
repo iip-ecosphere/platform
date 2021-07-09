@@ -35,8 +35,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def attachIngestors() {
          for (String methodSuffix : ingestors.getKeys()) {
-             String type = ingestors.get(methodSuffix);
-             'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${methodSuffix}", data));'
+             // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+             if (asyncIngestors.containsKey(methodSuffix)) {
+                 if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
+                     'service.attach${methodSuffix}Ingestor(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
+                 }
+             } 
+             // no-hack code
+             //'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${methodSuffix}-in-0", data));'
          }
     }
     
@@ -49,15 +55,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        '/**
-        * Creates data to be ingested.
-        *
-        * @return the data supplier functor
-        */
-        @Bean
-        public Supplier<${type}> ${methodSuffixWithServiceId}() {
-            return () -> ${fallbackToNull(src, "service.${methodSuffix}()", true)}; 
-        }'
+        if (!service.asynchronous) {
+            '/**
+            * Creates data to be ingested.
+            *
+            * @return the data supplier functor
+            */
+            @Bean
+            public Supplier<${type}> ${methodSuffixWithServiceId}() {
+                return () -> ${fallbackToNull(src, "service.${methodSuffix}()", true)}; 
+            }'
+        }
     }
 
     def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
@@ -195,6 +203,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import org.springframework.scheduling.annotation.EnableScheduling;
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+        import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
         import de.iip_ecosphere.platform.services.environment.*;
         import de.iip_ecosphere.platform.services.environment.spring.Starter;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
