@@ -94,10 +94,10 @@
 		    <property name="applyToProtected" value="true"/>
 		    <property name="applyToPackage" value="true"/>
 		    <property name="applyToPrivate" value="true"/>
-				<property name="severity" value="error"/>
+		    <property name="severity" value="error"/>
 		</module>
     <module name="MethodName">
-		    <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+		    <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
 				<property name="severity" value="error"/>
 		</module>
     <module name="PackageName">
