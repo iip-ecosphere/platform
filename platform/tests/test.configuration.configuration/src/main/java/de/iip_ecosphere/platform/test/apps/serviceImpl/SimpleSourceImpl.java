@@ -51,7 +51,13 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
         super(serviceId, ymlFile);
     }
 
-    @Override
+    // no override here as createRec1 and attach... are alternatives
+    
+    /**
+    * Creates data to be ingested.
+    *
+    * @return the created data, <b>null</b> for no data
+    */
     public Rec1 createRec1() {
         Rec1 rec = new Rec1();
         rec.setIntField(random.nextInt());
@@ -59,7 +65,11 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
         return rec;
     }
 
-    @Override
+    /**
+     * Called by the platform to attach an asynchronous data ingestor for type "Rec1".
+     *
+     * @param ingestor the "Rec1" ingestor instance
+     */
     public void attachcreateRec1_SimpleSourceIngestor(final DataIngestor<Rec1> ingestor) {
         if (null != ingestor) {
             timer.schedule(new TimerTask() {
