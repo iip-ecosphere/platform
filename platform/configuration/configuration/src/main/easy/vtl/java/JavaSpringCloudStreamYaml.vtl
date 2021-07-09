@@ -105,6 +105,36 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         'mqtt:
             port: ${protocol.port}'
     }
+    
+    def poller(sequenceOf(MeshElement) nodes) {
+        // until Spring Cloud Streams 3.1.1 there is no individual poll setting per source
+        // might be solved with code, but unsure if needed at all as connectors are anyway asynchronous
+        Integer pollInterval = -1;
+        for (MeshElement elt : nodes) {
+            Integer pi = getPollInterval(elt);
+            if (pi > 0) {
+                if (pollInterval < 0 or pi < pollInterval) { // set or minimize
+                    pollInterval = pi;
+                }
+            }
+        }
+        if (pollInterval > 0) {
+            'poller:
+                fixedDelay: ${pollInterval}'
+        }
+    }
+    
+    def Integer getPollInterval(MeshElement elt) {
+        -1;
+    }
+
+    def Integer getPollInterval(MeshSource src) {
+        if (src.impl.asynchronous) {
+            -1;
+        } else {
+            src.pollInterval;
+        }
+    }
  
     def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
         '${protocolConfig(config)}'
@@ -128,6 +158,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     definition: ${function(nodes)}
                 ${sources()}
                 stream:
+                    ${poller(nodes)}
                     default:
                         contentType: application/iip
                     bindings:

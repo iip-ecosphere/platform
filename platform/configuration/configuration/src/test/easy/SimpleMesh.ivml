@@ -95,6 +95,7 @@ project SimpleMesh {
     };
     
     MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
         impl = refBy(mySourceService),
         next = {refBy(myConnMySourceMyReceiver)}
     };

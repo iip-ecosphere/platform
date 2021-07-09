@@ -36,9 +36,9 @@ project Applications {
     
     // TODO graph validation -> QM
     
-    // TODO leave async, no polling so far, source-individual polling in Spring is a bit complicated
     compound MeshSource refines MeshElement {
         setOf(refTo(MeshConnector)) next;
+        Integer pollInterval = 1000; //in ms, ignored if negative or asynchronous
         sequenceOf(IOType) output;
         output == impl.output;
         
