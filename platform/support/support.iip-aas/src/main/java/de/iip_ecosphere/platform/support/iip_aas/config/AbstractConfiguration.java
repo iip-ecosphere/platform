@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -96,6 +97,8 @@ public abstract class AbstractConfiguration {
             }
         }
         if (null == result) {
+            LoggerFactory.getLogger(AbstractConfiguration.class).info("No input YAML file, falling back to "
+                + "default instance for " + cls.getName());
             try {
                 result = cls.getConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException 
