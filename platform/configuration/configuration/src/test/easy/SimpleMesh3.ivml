@@ -1,0 +1,154 @@
+project SimpleMesh3 {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003,
+        host = "127.0.0.1"
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        user = "user",
+        password = "pwd"
+    };
+
+    // ------------ data types ------------------
+    
+    RecordType rec1 = {
+        name = "Rec13",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+        
+    Service mySourceService = JavaService {
+        id = "SimpleSource3",
+        name = "Simple Data Source3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSource3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(rec1)}}
+        // TODO parameter
+    };
+
+    Service myTransformerService = JavaService {
+        id = "SimpleTransformer3",
+        name = "Simple Data Transformer3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleTransformer3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(rec1)}}
+        // TODO parameter
+    };
+    
+    Service myReceiverService = JavaService {
+        id = "SimpleReceiver3",
+        name = "Simple Data Receiver3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiver3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(rec1)}}
+        // TODO parameter
+    };
+
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "SimpleMeshApp3",
+        name = "Simple Mesh Testing App 3",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    ServiceMesh myMesh = {
+        description = "initial service net",
+        sources = {refBy(mySource)}
+    };
+    
+    MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyTransformer)}
+    };
+    
+    MeshConnector myConnMySourceMyTransformer = {
+        name = "Source->Transformer",
+        next = refBy(myTransformer)
+    };
+
+    MeshProcessor myTransformer = {
+        impl = refBy(myTransformerService),
+        next = {refBy(myConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
+    };
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
