@@ -29,6 +29,12 @@
      <version>0.1.0</version>
      <classifier>interfaces</classifier>
     </dependency>
+    <dependency>
+     <artifactId>SimpleMeshTestingApp3</artifactId>
+     <groupId>de.iip-ecosphere.platform.apps</groupId>
+     <version>0.1.0</version>
+     <classifier>interfaces</classifier>
+    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
