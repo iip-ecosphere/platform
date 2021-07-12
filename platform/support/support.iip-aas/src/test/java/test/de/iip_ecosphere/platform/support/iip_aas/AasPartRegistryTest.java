@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
@@ -318,9 +319,11 @@ public class AasPartRegistryTest {
         Assert.assertNotNull(setup.getServer());
         Assert.assertNotNull(setup.getServerEndpoint());
         Assert.assertNotNull(setup.getRegistry());
+        Assert.assertNotNull(setup.getMode());
         Assert.assertNotNull(setup.getRegistryEndpoint());
         Assert.assertEquals("VAB", setup.getImplementationProtocol());
         Assert.assertNotNull(setup.getImplementationServer());
+        Assert.assertEquals(AasMode.REGISTER, setup.getMode());
 
         Assert.assertEquals(Schema.HTTP, setup.getServer().getSchema());
         Assert.assertEquals("here.de", setup.getServer().getHost());

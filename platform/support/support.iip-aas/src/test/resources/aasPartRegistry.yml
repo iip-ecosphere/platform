@@ -5,6 +5,7 @@ aas:
     host: here.de
     port: 9994
     path: aas
+  mode: REGISTER
   registry:
     schema: HTTP
     host: me.de

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 
 /**
@@ -32,6 +33,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     private String name;
     private Supplier<AasSetup> setupSupplier;
     private Server implServer;
+    private Server aasServer;
     
     /**
      * Creates a descriptor instance.
@@ -54,10 +56,20 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             // active AAS require two server instances and a deployment
             implServer = res.getProtocolServerBuilder().build();
             implServer.start();
-            try {
-                AasPartRegistry.remoteDeploy(res.getAas());
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot deploy " + name + "AAS: " + e.getMessage());
+            if (AasMode.REGISTER == setup.getMode()) {
+                try {
+                    aasServer = AasPartRegistry.register(res.getAas(), setup.getRegistryEndpoint()); 
+                    aasServer.start();
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("Cannot register AAS " + name + " with " 
+                        + setup.getRegistryEndpoint().toUri() + ":" + e.getMessage());
+                }
+            } else {
+                try {
+                    AasPartRegistry.remoteDeploy(res.getAas());
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("Cannot deploy AAS " + name + ": " + e.getMessage());
+                }
             }
         } else {
             LoggerFactory.getLogger(getClass()).warn("No full AAS implementation registered. Cannot build up " 
@@ -68,6 +80,9 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void shutdown() {
         if (null != implServer) {
+            implServer.stop(true);
+        }
+        if (null != aasServer) {
             implServer.stop(true);
         }
     }

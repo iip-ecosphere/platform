@@ -75,6 +75,24 @@ public class AasPartRegistry {
     private static AasSetup setup = new AasSetup();
 
     /**
+     * Aas installation/setup modes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static enum AasMode {
+        
+        /**
+         * Deploy to the given registry/server.
+         */
+        REMOTE_DEPLOY,
+        
+        /**
+         * Run a local server and register the AAS with the given registry.
+         */
+        REGISTER
+    }
+    
+    /**
      * The technical setup of the AAS/VAB endpoints as data class to be used with a usual configuration format/YAML 
      * parser. For local server setup/testing, {@link #server} and {@link #registry} shall point to the same server 
      * instance but with different endpoint paths (in memory registry). For a real installation, this information may 
@@ -92,6 +110,8 @@ public class AasPartRegistry {
 
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
+        
+        private AasMode mode = AasMode.REMOTE_DEPLOY;
         
         /**
          * Returns the AAS server information as endpoint.
@@ -159,9 +179,27 @@ public class AasPartRegistry {
         public EndpointHolder getRegistry() {
             return registry;
         }
+        
+        /**
+         * Returns the AAS mode.
+         * 
+         * @return the AAS mode
+         */
+        public AasMode getMode() {
+            return mode;
+        }
 
         /**
-         * Defines the registry information. [required by data mapper]
+         * Defines the AAS mode. [required by data mapper, snakeyaml]
+         * 
+         * @param mode the AAS mode
+         */
+        public void setMode(AasMode mode) {
+            this.mode = mode;
+        }
+        
+        /**
+         * Defines the registry information. [required by data mapper, snakeyaml]
          * 
          * @param registry the registry information
          */
@@ -170,7 +208,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Returns the implementation (server) information. [required by data mapper]
+         * Returns the implementation (server) information. [required by data mapper, snakeyaml]
          * For convenience, the port number may be invalid and is turned then into an ephemeral port.
          * 
          * @return the implementation (server) information
@@ -180,7 +218,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Defines the implementation (server) information. [required by data mapper]
+         * Defines the implementation (server) information. [required by data mapper, snakeyaml]
          * 
          * @param implementation the implementation (server) information
          */
@@ -408,23 +446,47 @@ public class AasPartRegistry {
     public static Aas retrieveIipAas() throws IOException {
         return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(URN_AAS);
     }
-    
+
     /**
      * Deploy the given AAS to a local server. [testing]
      * 
      * @param aas the list of aas, e.g., from {@link #build()}
+     * @param options optional server creation options
      * @return the server instance
      */
-    public static Server deploy(List<Aas> aas) {
+    public static Server deploy(List<Aas> aas, String... options) {
         ImmediateDeploymentRecipe dBuilder = AasFactory.getInstance()
             .createDeploymentRecipe(setup.getServerEndpoint())
             .addInMemoryRegistry(setup.getRegistry().getPath());
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
-        return dBuilder.createServer();
+        return dBuilder.createServer(options);
     }
-    
+
+    /**
+     * Registers the given AAS to a remote registry and creates a local server for the AAS.
+     * 
+     * @param aas the list of aas, e.g., from {@link #build()}
+     * @param registry optional registry endpoint for remote registration, assuming a local in-memory registry 
+     *     if <b>null</b>
+     * @param options optional server creation options
+     * @return the server instance
+     * @throws IOException if access to the AAS registry fails
+     */
+    public static Server register(List<Aas> aas, Endpoint registry, String... options) throws IOException {
+        RegistryDeploymentRecipe dBuilder = AasFactory.getInstance()
+            .createDeploymentRecipe(setup.getServerEndpoint())
+            .setRegistryUrl(registry);
+        Registry reg = dBuilder.obtainRegistry();
+        for (Aas a: aas) {
+            for (Submodel s : a.submodels()) {
+                reg.register(a, s, null);
+            }
+        }
+        return dBuilder.createServer(options);
+    }
+
     /**
      * Performs a remote deployment of the given {@code aas}.
      * 
