@@ -16,6 +16,7 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
         host: <String>
         port: <int>
         path: <String>
+      mode: <REMOTE_DEPLOY|REGISTER>
       registry:
         schema: <HTTP|HTTPS>
         host: <String>
@@ -28,6 +29,7 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
         protocol: <VAB-IIP|>
 
 * The `server` defines the setup of the main AAS server, i.e., the (URL) connection schema, the host name, the port number and the endpoint path on that server. By default, the schema is `HTTP`, the host is `localhost`, the port  is `8080` and the path is empty. The port number may be negative indicating any free (ephemerial) port, but then host shall typically be `localhost`.
+* The `mode` defines whether a local server shall be powered up (`REGISTER`, host in `server` ignored) and the created AAS shall be registered with the `registry`, or whether the created AAS shall be deployed to `server` remotely and registered with `registry` (`REMOTE_DEPLOY`). Default is `REMOTE_DEPLOY`.
 * The `registry` defines the setup of the AAS registry, i.e., the server instance knowing all existing AAS and submodels, their names and uniform resource names. The entries are similar to `server`. By default, the schema  is `HTTP`, the host is `localhost`, the port is `8080` and the path is `registry`, i.e., the default registry is the AAS server, but operating on a specific endpoint path. 
 * The `implementation` is the server counterpart for dynamic/active AAS providing actual property values and serving AAS operation requests. Similar to the entries above, the implementation server has a schema (just for illustrative purposes), a host name, a port (see negative ports above) and a protocol (from `AasFactory`, e.g. empty for the default protocol `VAB-IIP`). By default, the schema is `TCP`, the host is `localhost`, the port is `9000` and the protocol is empty (i.e., the default protocol of the `AasFactory`). As typically a server instance shall be created and started, usually the hostname is `localhost`.          For convenience, the port number may be invalid and is turned then into an ephemeral port.
 
