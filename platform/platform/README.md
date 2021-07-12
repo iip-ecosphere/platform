@@ -24,7 +24,7 @@ The basic YAML configuration of the plattform services (in ``iipecosphere.yml``)
         protocol: <VAB-TCP|>
       persistence: <INMEMORY|MONGO>
     
-The `aas` settings are similar to [ECS (Edge-Cloud-Server) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md). `aas:persistence` defines the AAS persistence mechanism and may require further software installation, e.g. MongoDB.
+The `aas` settings are similar to [ECS (Edge-Cloud-Server) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md), while `mode` is ignored/fixed to `REMOTE_DEPLOY`. `aas:persistence` defines the AAS persistence mechanism and may require further software installation, e.g. MongoDB.
 
 ## Running
 

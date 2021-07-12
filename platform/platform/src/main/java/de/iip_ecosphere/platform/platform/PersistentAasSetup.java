@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.platform;
 
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 
 /**
@@ -34,6 +35,13 @@ public class PersistentAasSetup extends AasSetup {
     private ConfiguredPersistenceType persistence = ConfiguredPersistenceType.INMEMORY;
 
     /**
+     * Creates an instance, ensures initialization.
+     */
+    public PersistentAasSetup() {
+        setMode(AasMode.REMOTE_DEPLOY); // keep this for the server
+    }
+    
+    /**
      * Returns the persistence type.
      * 
      * @return the persistence type
@@ -41,9 +49,19 @@ public class PersistentAasSetup extends AasSetup {
     public ConfiguredPersistenceType getPersistence() {
         return persistence;
     }
+
+    /**
+     * Defines the AAS mode. 
+     * 
+     * @param mode the AAS mode
+     */
+    @Override
+    public void setMode(AasMode mode) {
+        super.setMode(AasMode.REMOTE_DEPLOY); // keep this for the server
+    }
     
     /**
-     * Setting the persistence type.
+     * Setting the persistence type. [required by data mapper, snakeyaml]
      * 
      * @param persistence the persistence type
      */
