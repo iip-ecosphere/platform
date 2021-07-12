@@ -65,7 +65,8 @@ public interface Registry {
      * 
      * @param aas the AAS
      * @param submodel the submodel
-     * @param endpointUrl the endpoint URL denoting the sub-model
+     * @param endpointUrl the endpoint URL denoting the sub-model, if <b>null</b> the default endpoint for 
+     *    the <code>submodel</code> is used
      */
     public void register(Aas aas, Submodel submodel, String endpointUrl);
 
