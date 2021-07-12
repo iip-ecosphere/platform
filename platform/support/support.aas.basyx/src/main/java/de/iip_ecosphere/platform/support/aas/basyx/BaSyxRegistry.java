@@ -113,6 +113,9 @@ public class BaSyxRegistry implements Registry {
             throw new IllegalArgumentException("The submodel must be created by the AasFactory.");
         }
         
+        if (null == endpointUrl) {
+            endpointUrl = AbstractSubmodel.getSubmodelEndpoint(endpoint, aas, submodel);
+        }
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
         registry.register(aasIdentifier, new SubmodelDescriptor(submodel.getIdShort(), 
             ((BaSyxSubmodel) submodel).getSubmodel().getIdentification(), endpointUrl));
