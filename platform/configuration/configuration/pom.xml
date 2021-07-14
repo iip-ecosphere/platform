@@ -160,6 +160,27 @@
           <overWriteSnapshots>true</overWriteSnapshots>
         </configuration>
       </plugin>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-assembly-plugin</artifactId>
+         <version>3.1.1</version>
+         <executions>
+             <execution>
+                 <id>easy</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/main/assembly/easy.xml</descriptor>
+                     </descriptors>
+                     <outputDirectory>${project.build.directory}</outputDirectory>
+                     <attach>false</attach>
+                 </configuration>
+              </execution>
+         </executions>
+        </plugin>
       
     </plugins>
     <pluginManagement>

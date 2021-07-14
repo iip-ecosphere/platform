@@ -159,11 +159,11 @@ public class IvmlTests {
         assertJavaDatatype(srcMainJavaIip, "Rec1");
         assertJavaDatatype(srcMainJavaIip, "MyConnMachineIn");
         assertJavaDatatype(srcMainJavaIip, "MyConnMachineOut");
-        assertJavaNode(srcMainJavaIip, "MyAnonymizerexample");
-        assertJavaNode(srcMainJavaIip, "MyKiexample");
+        assertJavaNode(srcMainJavaIip, "MyAnonymizerExample");
+        assertJavaNode(srcMainJavaIip, "MyKiExample");
         assertJavaNode(srcMainJavaIip, "MyMqttConnExample");
         assertJavaNode(srcMainJavaIip, "MyOpcConnexample");
-        assertJavaNode(srcMainJavaIip, "MySourceexample");
+        assertJavaNode(srcMainJavaIip, "MySourceExample");
         
         assertFile(srcMainResources, "application.yml");
         assertDeploymentYaml(srcMainResources, "deployment.yml");

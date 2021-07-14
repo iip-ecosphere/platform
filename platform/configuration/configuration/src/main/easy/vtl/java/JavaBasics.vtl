@@ -10,7 +10,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String asTypeName(String s) {
-        s.firstToUpperCase().toIdentifier();
+        s.firstToUpperCase().toCamelCaseIdentifier();
     }
     
     def String test(String s) {
