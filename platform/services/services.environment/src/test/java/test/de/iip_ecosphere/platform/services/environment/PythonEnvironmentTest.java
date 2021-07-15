@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -96,7 +97,31 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      */
     @Test
     public void testPythonEnvironment() throws IOException, ExecutionException {
-        testPythonEnvironment(AasFactory.DEFAULT_PROTOCOL);
+        testPythonEnvironment(AasFactory.DEFAULT_PROTOCOL); // currently "VAB-TCP"
+    }
+    
+    /**
+     * Tests the Python implementation.
+     * 
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    @Ignore("VAB-HTTP Server does not yet exist")
+    public void testPythonEnvironmentHttp() throws IOException, ExecutionException {
+        testPythonEnvironment("VAB-HTTP");
+    }
+    
+    /**
+     * Tests the Python implementation.
+     * 
+     * @throws IOException shall not occur
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    @Ignore("VAB-HTTPS Server does not yet exist, certificate use on in support.aas.BaSyx unclear")
+    public void testPythonEnvironmentHttps() throws IOException, ExecutionException {
+        testPythonEnvironment("VAB-HTTPS");
     }
     
     /**
