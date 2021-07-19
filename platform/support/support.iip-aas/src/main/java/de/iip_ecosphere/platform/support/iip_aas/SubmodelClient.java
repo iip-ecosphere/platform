@@ -41,7 +41,7 @@ public class SubmodelClient {
      * 
      * @return the submodel
      */
-    protected Submodel getSubmodel() {
+    public Submodel getSubmodel() {
         return submodel;
     }
     
