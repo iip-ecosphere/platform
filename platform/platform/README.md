@@ -1,10 +1,10 @@
 # IIP-Ecosphere platform
 
-The platform component for configuring and starting platform services.
+The platform component for configuring and starting platform services. The platform component consists of the AAS abstraction as well as the abstract services and the abstract ECSruntime components for the AAS clients. Currently, this component just provides a command line client as basic interfaces to platform functionality.
 
 ## Configuration
 
-The basic YAML configuration of the plattform services (in ``iipecosphere.yml``) provide the following settings:
+The basic YAML configuration of the platform services (in ``iipecosphere.yml``) provide the following settings:
 
     aas:
       server:

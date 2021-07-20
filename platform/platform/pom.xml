@@ -19,6 +19,16 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>ecsRuntime</artifactId>
+     <version>${project.version}</version>
+    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
