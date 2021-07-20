@@ -39,6 +39,48 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  * @author Holger Eichelberger, SSE
  */
 public class Cli {
+
+    /**
+     * The input/shell level.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum Level {
+        TOP(""),
+        SERVICES("services"),
+        CONTAINER("container"),
+        RESOURCES("resources");
+        
+        private String prompt;
+        
+        /**
+         * Creates a level constant with prompt text.
+         * 
+         * @param prompt the prompt text
+         */
+        private Level(String prompt) {
+            this.prompt = prompt;
+        }
+        
+        /**
+         * Returns the prompt text.
+         * 
+         * @return the prompt text
+         */
+        public String getPrompt() {
+            return prompt;
+        }
+        
+        /**
+         * Returns whether this level is top-level.
+         * 
+         * @return {@code true} for top-level, {@code false} else
+         */
+        public boolean isTopLevel() {
+            return TOP == this;
+        }
+        
+    }
     
     /**
      * Provides access to incremental command input.
@@ -90,6 +132,7 @@ public class Cli {
             } else if (pos >= 0) {
                 String line = scanner.nextLine();
                 if (null != line) {
+                    cmds.clear();
                     boolean inQuote = false;
                     line = line.trim();
                     int lastStart = 0;
@@ -97,8 +140,8 @@ public class Cli {
                         char c = line.charAt(i);
                         if ('"' == c) {
                             inQuote = !inQuote;
-                        } else if (' ' == c && !inQuote) {
-                            String cmd = line.substring(lastStart, i).trim(); 
+                        } else if (' ' == c && !inQuote || i + 1 == line.length()) {
+                            String cmd = line.substring(lastStart, i + 1).trim(); 
                             if (cmd.length() > 0) {
                                 cmds.add(cmd);
                             }
@@ -106,7 +149,9 @@ public class Cli {
                         }
                     }
                     pos = 0;
-                    result = cmds.get(0);
+                    if (cmds.size() > 0) {
+                        result = cmds.get(pos++);
+                    }
                 } else {
                     pos = -1;
                 }
@@ -177,21 +222,24 @@ public class Cli {
         CommandProvider provider;
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
+            println("Type \"help\" for help.");
         } else {
             provider = new ArgsCommandProvider(args);
         }
-        interpretFirstLevel(provider);
+        interpretTopLevel(provider);
     }
     
     /**
-     * Interprets the first command line level.
+     * Interprets the first/top command line level.
      * 
      * @param provider the command provider
      */
-    private static void interpretFirstLevel(CommandProvider provider) {
+    private static void interpretTopLevel(CommandProvider provider) {
+        final Level level = Level.TOP;
         String cmd;
         String resourceId;
         do {
+            prompt(level, provider);
             cmd = provider.nextCommand();
             if (null != cmd) {
                 switch (cmd.toLowerCase()) {
@@ -215,11 +263,13 @@ public class Cli {
                     interpretResources(provider);
                     break;
                 case "help":
-                    printHelp(provider);
+                    printHelp(provider, level);
                     break;
-                default:
                 case "exit":
                     cmd = null;
+                    break;
+                default:
+                    println("Unknown command on this level: " + cmd);
                     break;
                 }
             }
@@ -233,10 +283,12 @@ public class Cli {
      * @param resourceId the resourceId of the resource to take the services from
      */
     private static void interpretServices(CommandProvider provider, String resourceId) {
+        final Level level = Level.SERVICES;
         try {
             ServicesAasClient client = new ServicesAasClient(resourceId);
             String cmd;
             do {
+                prompt(level, provider);
                 cmd = provider.nextCommand();
                 if (null != cmd) {
                     try {
@@ -280,9 +332,14 @@ public class Cli {
                             }
                             client.removeArtifact(id);
                             break;
-                        default:
+                        case "help":
+                            printHelp(provider, level);
+                            break;
                         case "back":
                             cmd = null;
+                            break;
+                        default:
+                            println("Unknown command on this level: " + cmd);
                             break;
                         }
                     } catch (ExecutionException | URISyntaxException e) {
@@ -302,10 +359,12 @@ public class Cli {
      * @param resourceId the resourceId of the resource to take the container from
      */
     private static void interpretContainer(CommandProvider provider, String resourceId) {
+        final Level level = Level.CONTAINER;
         try {
             EcsAasClient client = new EcsAasClient(resourceId);
             String cmd;
             do {
+                prompt(level, provider);
                 cmd = provider.nextCommand();
                 if (null != cmd) {
                     try {
@@ -345,9 +404,14 @@ public class Cli {
                             }
                             client.undeployContainer(id);
                             break;
-                        default:
+                        case "help":
+                            printHelp(provider, level);
+                            break;
                         case "back":
                             cmd = null;
+                            break;
+                        default:
+                            println("Unknown command on this level: " + cmd);
                             break;
                         }
                     } catch (ExecutionException | URISyntaxException e) {
@@ -366,17 +430,24 @@ public class Cli {
      * @param provider the command provider
      */
     private static void interpretResources(CommandProvider provider) {
+        final Level level = Level.RESOURCES;
         String cmd;
         do {
+            prompt(level, provider);
             cmd = provider.nextCommand();
             if (null != cmd) {
                 switch (cmd.toLowerCase()) {
                 case "list":
                     listResources();
                     break;
-                default:
+                case "help":
+                    printHelp(provider, level);
+                    break;
                 case "back":
                     cmd = null;
+                    break;
+                default:
+                    println("Unknown command on this level: " + cmd);
                     break;
                 }
             }
@@ -503,29 +574,47 @@ public class Cli {
      * Prints the help.
      * 
      * @param provider the command provider
+     * @param level the actual prompt level
      */
-    private static void printHelp(CommandProvider provider) {
-        println("IIP-Ecosphere simple platform client");
-        println(" services <resourceId>");
-        println("  listServices");
-        println("  listArtifacts");
-        println("  add <URI>");
-        println("  startAll <artifactId>");
-        println("  stopAll <artifactId>");
-        println("  remove <artifactId>");
-        println("  back", provider);
-        println(" container <resourceId>");
-        println("  list");
-        println("  add <URI>");
-        println("  start <containerId>");
-        println("  stop <containerId>");
-        println("  undeploy <containerId>");
-        println("  back", provider);
-        println(" resources");
-        println("  list");
-        println("  back", provider);
-        println(" help");
-        println(" exist", provider);
+    private static void printHelp(CommandProvider provider, Level level) {
+        if (level.isTopLevel()) {
+            println("IIP-Ecosphere simple platform client. Commands (in levels) are:");
+            println(" services <resourceId>");
+        }
+        if (level.isTopLevel() || Level.SERVICES == level) {
+            println("  listServices");
+            println("  listArtifacts");
+            println("  add <URI>");
+            println("  startAll <artifactId>");
+            println("  stopAll <artifactId>");
+            println("  remove <artifactId>");
+            println("  help");
+            println("  back", provider);
+        }
+        if (level.isTopLevel()) {
+            println(" container <resourceId>");
+        }
+        if (level.isTopLevel() || Level.CONTAINER == level) {
+            println("  list");
+            println("  add <URI>");
+            println("  start <containerId>");
+            println("  stop <containerId>");
+            println("  undeploy <containerId>");
+            println("  help");
+            println("  back", provider);
+        }
+        if (level.isTopLevel()) {
+            println(" resources");
+        }
+        if (level.isTopLevel() || Level.RESOURCES == level) {
+            println("  list");
+            println("  help");
+            println("  back", provider);
+        }
+        if (level.isTopLevel()) {
+            println(" help");
+            println(" exit", provider);
+        }
     }
 
     /**
@@ -557,6 +646,7 @@ public class Cli {
      */
     private static void println(Throwable th) {
         println("ERROR: " + th.getMessage());
+        th.printStackTrace();        
     }
     
     /**
@@ -567,5 +657,17 @@ public class Cli {
     private static void println(String text) {
         println(text, true);
     }
-    
+
+    /**
+     * Prints the interactive prompt.
+     * 
+     * @param level the prompt/command level
+     * @param provider the command provider indicating whether we are running in interactive mode
+     */
+    private static void prompt(Level level, CommandProvider provider) {
+        if (provider.isInteractive()) {
+            System.out.print(level.getPrompt() + "> ");
+        }
+    }
+
 }
