@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
@@ -94,6 +95,15 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Co
     @Override
     public String getContainerSystemVersion() {
         return getPropertyStringValue(EcsAas.NAME_PROP_CSYS_VERSION, "");
+    }
+
+    /**
+     * Returns the collection with all containers of the resources this client was created for.
+     * 
+     * @return the containers collection
+     */
+    public SubmodelElementCollection getContainers() {
+        return getSubmodel().getSubmodelElementCollection(EcsAas.NAME_COLL_CONTAINERS);
     }
 
 }
