@@ -180,6 +180,7 @@ public class EcsAasTest {
         String id = client.addContainer(dummy);
         Assert.assertNotNull(id);
         Assert.assertTrue(id.length() > 0);
+        Assert.assertNotNull(client.getContainers());
         
         ContainerDescriptor cnt = mgr.getContainer(id);
         Assert.assertEquals(ContainerState.AVAILABLE, mgr.getState(id));

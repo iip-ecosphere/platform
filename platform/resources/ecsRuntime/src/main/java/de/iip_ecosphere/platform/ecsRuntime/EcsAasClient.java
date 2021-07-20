@@ -100,7 +100,7 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Co
     /**
      * Returns the collection with all containers of the resources this client was created for.
      * 
-     * @return the containers collection
+     * @return the containers collection, may be <b>null</b>
      */
     public SubmodelElementCollection getContainers() {
         return getSubmodel().getSubmodelElementCollection(EcsAas.NAME_COLL_CONTAINERS);
