@@ -162,7 +162,7 @@ public class IvmlTests {
         assertJavaNode(srcMainJavaIip, "MyAnonymizerExample");
         assertJavaNode(srcMainJavaIip, "MyKiExample");
         assertJavaNode(srcMainJavaIip, "MyMqttConnExample");
-        assertJavaNode(srcMainJavaIip, "MyOpcConnexample");
+        assertJavaNode(srcMainJavaIip, "MyOpcConnExample");
         assertJavaNode(srcMainJavaIip, "MySourceExample");
         
         assertFile(srcMainResources, "application.yml");
