@@ -1,0 +1,9 @@
+@advice(IIPEcosphere)
+template LinuxBash(Configuration config, FileArtifact target, String dir, String main) {
+	
+    def main(Configuration config, FileArtifact target, String dir, String main) {
+        '#!/bin/bash
+        java -cp "${dir}/*" ${main}'
+    }
+	
+}

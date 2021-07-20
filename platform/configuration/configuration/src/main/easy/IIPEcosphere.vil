@@ -98,7 +98,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
         maven("${ecsRuntimeRoot}");
-        vilTemplateProcessor("WinBatch", config, "${target}/ecs.bat", dir="ecsJars", main=dfltMain);
+        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain);
         
         serviceMgrRoot.mkdir();
         p = "${serviceMgrRoot}/src/main/resources";
@@ -109,7 +109,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}");
-        vilTemplateProcessor("WinBatch", config, "${target}/serviceMgr.bat", dir="svcJars", main=dfltMain);
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain);
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
@@ -120,7 +120,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
         maven("${platformRoot}");
-        vilTemplateProcessor("WinBatch", config, "${target}/platform.bat", dir="plJars", main=dfltMain);
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain);
+        generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli");
+    }
+    
+    generateOsScripts(Configuration config, String pathName, String dir, String main) = {
+        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main);
+        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main);
     }
 
 }
