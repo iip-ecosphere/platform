@@ -283,7 +283,7 @@ public class EcsAas implements AasContributor {
     
     @Override
     public boolean isValid() {
-        return true;
+        return EcsFactory.getContainerManager() != null; // may happen in platform when this is used as lib only 
     }
 
 }
