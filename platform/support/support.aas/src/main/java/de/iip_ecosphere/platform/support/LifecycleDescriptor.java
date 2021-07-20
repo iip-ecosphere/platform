@@ -19,6 +19,9 @@ package de.iip_ecosphere.platform.support;
  * to {@link LifecycleDescriptor lifecycle descriptors} and executed via {@link LifecycleHandler}. 
  * {@link LifecycleDescriptor} shall be declared via Java Service Loading.
  * 
+ * Optionally, a lifecycle descriptor may be annotated with {@link LifecycleExclude} to prevent other lifecycle 
+ * handlers from execution in certain situations.
+ * 
  * @author Holger Eichelberger, SSE
  */
 public interface LifecycleDescriptor {

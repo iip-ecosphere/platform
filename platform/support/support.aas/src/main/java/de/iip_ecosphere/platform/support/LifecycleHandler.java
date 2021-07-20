@@ -14,9 +14,11 @@ package de.iip_ecosphere.platform.support;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
@@ -136,10 +138,26 @@ public class LifecycleHandler {
      */
     private static void forEach(Consumer<LifecycleDescriptor> consumer, boolean revert) {
         List<LifecycleDescriptor> desc = new ArrayList<>(getDescriptors()); // JDK 1.8
+
+        Set<String> excluded = new HashSet<String>();
+        for (LifecycleDescriptor d : desc) {
+            LifecycleExclude exclude = d.getClass().getAnnotation(LifecycleExclude.class);
+            if (null != exclude) {
+                for (Class<?> c : exclude.value()) {
+                    excluded.add(c.getName());
+                }
+                for (String s : exclude.names()) {
+                    excluded.add(s);
+                }
+            }
+        }
+        
         int factor = revert ? -1 : 1;
         Collections.sort(desc, (d1, d2) -> factor * Integer.compare(d1.priority(), d2.priority()));
         for (LifecycleDescriptor d : desc) {
-            consumer.accept(d);
+            if (!excluded.contains(d.getClass().getName())) {
+                consumer.accept(d);
+            }
         }
     }
     
