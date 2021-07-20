@@ -88,6 +88,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_RESOURCE = "resource";
     public static final String NAME_PROP_FROM = "from";
     public static final String NAME_PROP_TO = "to";
+    public static final String NAME_PROP_ARTIFACT = "artifact";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
@@ -323,6 +324,11 @@ public class ServicesAas implements AasContributor {
         descriptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
+        if (null != desc.getArtifact()) { // defensive
+            descriptorBuilder.createPropertyBuilder(NAME_PROP_ARTIFACT)
+                .setValue(Type.STRING, desc.getArtifact().getId())
+                .build();
+        }
         descriptorBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
             .build();

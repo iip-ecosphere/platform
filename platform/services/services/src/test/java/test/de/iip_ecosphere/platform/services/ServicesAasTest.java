@@ -150,6 +150,20 @@ public class ServicesAasTest {
         Assert.assertTrue(aDesc.getServiceIds().contains(sDesc.getId()));
         Assert.assertTrue(aDesc.getServices().contains(sDesc));
         Assert.assertEquals(ServiceState.AVAILABLE, client.getServiceState(sId));
+        String[] ids = client.getServices(aDesc.getId());
+        Assert.assertEquals(aDesc.getServices().size(), ids.length);
+        boolean foundAll = true;
+        for (ServiceDescriptor s : aDesc.getServices()) {
+            boolean found = false;
+            for (int i = 0; !found && i < ids.length; i++) {
+                found = ids[i].equals(s.getId());
+            }
+            foundAll &= found;
+        }
+        Assert.assertTrue(foundAll);
+        Assert.assertNotNull(client.getArtifacts());
+        Assert.assertNotNull(client.getRelations());
+        Assert.assertNotNull(client.getServices());
         
         Predicate<TypedDataConnectorDescriptor> av = ServicesAas.createAvailabilityPredicate(1000, 200, false);
         Assert.assertFalse(av.test(sDesc.getOutputDataConnectors().get(0))); // not running/connected

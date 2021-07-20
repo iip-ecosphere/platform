@@ -14,12 +14,17 @@ package de.iip_ecosphere.platform.services;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
@@ -117,12 +122,64 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     }
     
     /**
+     * Returns the services associated to a given {@code artifactId}.
+     * 
+     * @param artifactId the artifactId to search for
+     * @return the associated service ids, empty if none was found
+     */
+    public String[] getServices(String artifactId) {
+        List<String> result = new ArrayList<String>();
+        SubmodelElementCollection coll = getServices();
+        if (null != coll) {
+            getServices(coll, artifactId, result);
+        }
+        String[] tmp = new String[result.size()];
+        return result.toArray(tmp);
+    }
+
+    /**
+     * Collects the services associated to a given {@code artifactId}.
+     * 
+     * @param coll the collection containing the services
+     * @param artifactId the artifactId to search for
+     * @param serviceIds the service ids to be modified as a side effect
+     */
+    private void getServices(SubmodelElementCollection coll, String artifactId, List<String> serviceIds) {
+        for (SubmodelElement elt : coll.elements()) {
+            if (elt instanceof SubmodelElementCollection) {
+                SubmodelElementCollection service = (SubmodelElementCollection) elt;
+                Property id = service.getProperty(ServicesAas.NAME_PROP_ID);
+                Property art = service.getProperty(ServicesAas.NAME_PROP_ARTIFACT);
+                if (null != id && null != art) {
+                    try {
+                        Object artId = art.getValue();
+                        if (artifactId.equals(artId)) {
+                            Object serId = id.getValue();
+                            if (null != serId) {
+                                serviceIds.add(serId.toString());
+                            }
+                        }
+                    } catch (ExecutionException e) {
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
      * Returns the collection with all artifacts of the resources this client was created for.
      * 
-     * @return the artifacts collection
+     * @return the artifacts collection, may be <b>null</b>
      */
     public SubmodelElementCollection getArtifacts() {
-        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_ARTIFACTS);
+        SubmodelElementCollection result;
+        try {
+            result = ActiveAasBase.getSubmodel(ServicesAas.NAME_SUBMODEL)
+                .getSubmodelElementCollection(ServicesAas.NAME_COLL_ARTIFACTS);
+        } catch (IOException e) {
+            result = null;
+        }
+        return result;
     }
 
     /**
@@ -131,7 +188,14 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
      * @return the services collection
      */
     public SubmodelElementCollection getServices() {
-        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+        SubmodelElementCollection result;
+        try {
+            result = ActiveAasBase.getSubmodel(ServicesAas.NAME_SUBMODEL)
+                .getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+        } catch (IOException e) {
+            result = null;
+        }
+        return result;
     }
 
     /**
@@ -140,7 +204,14 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
      * @return the relations collection
      */
     public SubmodelElementCollection getRelations() {
-        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_RELATIONS);
+        SubmodelElementCollection result;
+        try {
+            result = ActiveAasBase.getSubmodel(ServicesAas.NAME_SUBMODEL)
+                .getSubmodelElementCollection(ServicesAas.NAME_COLL_RELATIONS);
+        } catch (IOException e) {
+            result = null;
+        }
+        return result;
     }
     
 }
