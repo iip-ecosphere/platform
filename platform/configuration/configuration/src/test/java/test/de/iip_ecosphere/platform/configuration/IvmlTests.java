@@ -148,7 +148,7 @@ public class IvmlTests {
      * @throws IOException in case that expected files cannot be found or inspected
      */
     private void assertApplication(File gen) throws IOException {
-        File base = new File(gen, "MyAppexample");
+        File base = new File(gen, "MyAppExample");
         File srcMain = new File(base, "src/main");
         File srcMainJava = new File(srcMain, "java");
         File srcMainResources = new File(srcMain, "resources");
