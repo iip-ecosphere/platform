@@ -222,6 +222,9 @@ public class Cli {
         CommandProvider provider;
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
+            println("IIP-Ecosphere, interactive platform command line");
+            println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
+            println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
             println("Type \"help\" for help.");
         } else {
             provider = new ArgsCommandProvider(args);
@@ -475,6 +478,7 @@ public class Cli {
         
         private String collPrefix;
         private String indent = "";
+        private boolean emitted;
         
         /**
          * Creates a visitor instance.
@@ -500,7 +504,6 @@ public class Cli {
 
         @Override
         public void visitSubmodel(Submodel submodel) {
-            submodel.accept(this);
         }
 
         @Override
@@ -516,6 +519,7 @@ public class Cli {
                 val = "?";
             }
             println(indent + property.getIdShort() + " " + val);
+            emitted = true; // assuming that collections at least have a property
         }
 
         @Override
@@ -532,12 +536,14 @@ public class Cli {
                 println(collPrefix + collection.getIdShort());
             }
             indent += " ";
-            collection.accept(this);
-            indent = indent.substring(0, indent.length() - 1);
         }
 
         @Override
         public void endSubmodelElementCollection(SubmodelElementCollection collection) {
+            indent = indent.substring(0, indent.length() - 1);
+            if (!emitted) {
+                println(indent + " None.");
+            }
         }
         
     }
@@ -567,6 +573,8 @@ public class Cli {
         if (null != submodel) {
             PrintVisitor vis = new PrintVisitor(collPrefix);
             submodel.accept(vis);
+        } else {
+            println("None.");
         }
     }
 
