@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
@@ -115,6 +116,31 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         return result;
     }
     
-    // getService -> own service descriptor, clone?
+    /**
+     * Returns the collection with all artifacts of the resources this client was created for.
+     * 
+     * @return the artifacts collection
+     */
+    public SubmodelElementCollection getArtifacts() {
+        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_ARTIFACTS);
+    }
 
+    /**
+     * Returns the collection with all services of the resources this client was created for.
+     * 
+     * @return the services collection
+     */
+    public SubmodelElementCollection getServices() {
+        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+    }
+
+    /**
+     * Returns the collection with all relations of the resources this client was created for.
+     * 
+     * @return the relations collection
+     */
+    public SubmodelElementCollection getRelations() {
+        return getSubmodel().getSubmodelElementCollection(ServicesAas.NAME_COLL_RELATIONS);
+    }
+    
 }
