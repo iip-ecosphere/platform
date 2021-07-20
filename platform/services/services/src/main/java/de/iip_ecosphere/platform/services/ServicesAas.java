@@ -580,6 +580,7 @@ public class ServicesAas implements AasContributor {
     @Override
     public boolean isValid() {
         // if the Jar is present, the contributor will be executed although the factory may not be there (optional)
+        // also relevant if used as library only, e.g., in platform
         return ServiceFactory.getServiceManager() != null; 
     }
 
