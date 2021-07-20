@@ -26,6 +26,9 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
  * Implements an abstract invocables creator for the VAB following the naming conventions of 
  * {@link VabOperationsProvider}. Function objects as well as class itself must be serializable for remote deployment.
  * 
+ * Although serializable lambda functions appear feasible, we experienced deserialization problems and rely now on
+ * explicit functor instances.
+ * 
  * @author Holger Eichelberger, SSE
  */
 public abstract class VabInvocablesCreator implements InvocablesCreator, Serializable {
@@ -38,29 +41,149 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      * @return the element proxy
      */
     protected abstract VABElementProxy createProxy();
+
+    /**
+     * Defines an abstract, generic, serializable functor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected abstract static class AbstractFunctor implements Serializable {
+
+        private static final long serialVersionUID = 4104858388150273917L;
+        private VabInvocablesCreator creator;
+        private String name;
+        
+        /**
+         * Creates a functor instance.
+         * 
+         * @param creator the creator instance
+         * @param name the name
+         */
+        protected AbstractFunctor(VabInvocablesCreator creator, String name) {
+            this.creator = creator;
+            this.name = name;
+        }
+
+        /**
+         * Returns the creator instance.
+         * 
+         * @return the creator instance
+         */
+        protected VabInvocablesCreator getCreator() {
+            return creator;
+        }
+
+        /**
+         * Creates the element proxy.
+         * 
+         * @return the element proxy
+         */
+        protected VABElementProxy createProxy() {
+            return creator.createProxy();
+        }
+
+        /**
+         * Returns the name of the implementation element.
+         * 
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+        
+    }
+
+    /**
+     * Defines a generic, serializable getter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class Getter extends AbstractFunctor implements Supplier<Object> {
+
+        private static final long serialVersionUID = -9126944118648742265L;
+
+        /**
+         * Creates a getter instance.
+         * 
+         * @param creator the creator instance
+         * @param name the name
+         */
+        protected Getter(VabInvocablesCreator creator, String name) {
+            super(creator, name);
+        }
+        
+        @Override
+        public Object get() {
+            return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+        }
+        
+    }
     
-    @SuppressWarnings("unchecked")
+    /**
+     * Defines a generic, serializable setter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class Setter extends AbstractFunctor implements Consumer<Object> {
+
+        private static final long serialVersionUID = 2420859918496174956L;
+
+        /**
+         * Creates a setter instance.
+         * 
+         * @param creator the creator instance
+         * @param name the name
+         */
+        protected Setter(VabInvocablesCreator creator, String name) {
+            super(creator, name);
+        }
+
+        @Override
+        public void accept(Object value) {
+            createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+        }
+
+    }
+
+    /**
+     * Defines a generic, serializable operation.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class Operation extends AbstractFunctor implements Function<Object[], Object> {
+
+        private static final long serialVersionUID = -3021593348876711589L;
+
+        /**
+         * Creates an operation instance.
+         * 
+         * @param creator the creator instance
+         * @param name the name
+         */
+        protected Operation(VabInvocablesCreator creator, String name) {
+            super(creator, name);
+        }
+
+        @Override
+        public Object apply(Object[] params) {
+            return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+        }
+
+    }
+    
     @Override
     public Supplier<Object> createGetter(String name) {
-        return (Supplier<Object> & Serializable) () -> {
-            return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name);
-        };
+        return new Getter(this, name);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Consumer<Object> createSetter(String name) {
-        return (Consumer<Object> & Serializable) (params) -> {
-            createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + name, params);
-        };
+        return new Setter(this, name);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Function<Object[], Object> createInvocable(String name) {
-        return (Function<Object[], Object> & Serializable) (params) -> {
-            return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + name, params);
-        };
+        return new Operation(this, name);
     }
 
 }
