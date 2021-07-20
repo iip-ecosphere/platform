@@ -14,8 +14,11 @@ package de.iip_ecosphere.platform.platform;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
+import de.iip_ecosphere.platform.services.ServicesLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.LifecycleExclude;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -27,6 +30,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
+@LifecycleExclude({ServicesLifecycleDescriptor.class, EcsLifecycleDescriptor.class})
 public class PlatformLifecycleDescriptor implements LifecycleDescriptor {
 
     private Server registryServer;

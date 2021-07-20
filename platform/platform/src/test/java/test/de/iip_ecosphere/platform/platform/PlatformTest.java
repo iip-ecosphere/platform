@@ -17,13 +17,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup.ConfiguredPersistenceType;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup;
 import de.iip_ecosphere.platform.platform.PlatformConfiguration;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.AasServer;
-import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -93,23 +88,11 @@ public class PlatformTest {
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
         PlatformConfiguration.getInstance().setAas(aasSetup);
 
-        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
-        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
-        Server registryServer = rcp
-            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
-            .start();
-        AasServer aasServer = rcp
-            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
-            .start();
-
         LifecycleHandler.startup(new String[] {});
 
         // we do not have a client here to test
         
         LifecycleHandler.shutdown();
-
-        aasServer.stop(true);
-        registryServer.stop(true);
 
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
