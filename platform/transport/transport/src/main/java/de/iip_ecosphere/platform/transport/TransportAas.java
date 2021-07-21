@@ -42,13 +42,15 @@ public class TransportAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
-            .setValue(Type.STRING, TransportFactory.getConnectorName())
-            .build();
-        smB.createPropertyBuilder(NAME_VAR_SERIALIZER)
-            .setValue(Type.STRING, SerializerRegistry.getName())
-            .build();
-        smB.build();
+        if (smB.isNew()) {  // incremental remote deployment, avoid double creation
+            smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
+                .setValue(Type.STRING, TransportFactory.getConnectorName())
+                .build();
+            smB.createPropertyBuilder(NAME_VAR_SERIALIZER)
+                .setValue(Type.STRING, SerializerRegistry.getName())
+                .build();
+            smB.build();
+        }
         return null;
     }
 
