@@ -264,7 +264,7 @@ public abstract class AasFactory {
     public abstract String getName();
 
     /**
-     * Creates an AAS builder instance.
+     * Creates an AAS builder instance for a <b>new AAS</b> (not for adding further sub-models).
      * 
      * @param idShort the shortId of the AAS
      * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
@@ -276,7 +276,8 @@ public abstract class AasFactory {
     public abstract AasBuilder createAasBuilder(String idShort, String identifier);
 
     /**
-     * Creates a standalone sub-model without parent AAS.
+     * Creates a standalone sub-model without parent AAS for a <b>new sub-model</b> (not for adding elements to an 
+     * existing sub-model).
      * 
      * @param idShort the short id of the sub-model
      * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 

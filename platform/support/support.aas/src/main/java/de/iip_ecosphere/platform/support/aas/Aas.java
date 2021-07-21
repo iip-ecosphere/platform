@@ -91,6 +91,13 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
     public Submodel getSubmodel(String idShort);
 
     /**
+     * Creates an AAS builder for this AAS.
+     * 
+     * @return the AAS builder
+     */
+    public AasBuilder createAasBuilder();
+    
+    /**
      * Returns a sub-model builder either by providing access to an existing sub-model or by a builder instance to 
      * create a new one (only if finally {@link Builder#build()} is called). However, added sub-models are
      * not automatically deployed as the AAS just maintains a reference to the sub-model (in contrast to initial

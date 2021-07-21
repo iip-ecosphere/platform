@@ -59,7 +59,7 @@ public class FakeAas extends FakeElement implements Aas {
         /**
          * Creates an instance.
          * 
-         * @param instance an axisting instance
+         * @param instance an existing instance
          */
         FakeAasBuilder(FakeAas instance) {
             this.instance = instance;
@@ -231,6 +231,11 @@ public class FakeAas extends FakeElement implements Aas {
      */
     <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
+    }
+
+    @Override
+    public AasBuilder createAasBuilder() {
+        return new FakeAasBuilder(this);
     }
 
 }
