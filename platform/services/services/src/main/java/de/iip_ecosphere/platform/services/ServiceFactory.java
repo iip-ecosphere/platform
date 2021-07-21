@@ -43,7 +43,7 @@ public class ServiceFactory {
             if (first.isPresent()) {
                 desc = first.get();
             } else {
-                LOGGER.error("No Service manager implementation known.");
+                LOGGER.warn("No Service manager implementation known.");
             }
         }
     }
