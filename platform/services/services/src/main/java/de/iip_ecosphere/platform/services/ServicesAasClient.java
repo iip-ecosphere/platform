@@ -169,7 +169,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     /**
      * Returns the collection with all artifacts of the resources this client was created for.
      * 
-     * @return the artifacts collection, may be <b>null</b>
+     * @return the artifacts collection, may be <b>null</b> for none
      */
     public SubmodelElementCollection getArtifacts() {
         SubmodelElementCollection result;
@@ -185,7 +185,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     /**
      * Returns the collection with all services of the resources this client was created for.
      * 
-     * @return the services collection
+     * @return the services collection, may be <b>null</b> for none
      */
     public SubmodelElementCollection getServices() {
         SubmodelElementCollection result;
@@ -201,7 +201,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     /**
      * Returns the collection with all relations of the resources this client was created for.
      * 
-     * @return the relations collection
+     * @return the relations collection, may be <b>null</b> for none
      */
     public SubmodelElementCollection getRelations() {
         SubmodelElementCollection result;
