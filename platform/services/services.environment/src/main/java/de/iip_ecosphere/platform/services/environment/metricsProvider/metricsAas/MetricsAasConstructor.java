@@ -117,7 +117,7 @@ public class MetricsAasConstructor {
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_FREE)), InvocablesCreator.READ_ONLY).build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_TOTAL)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.DOUBLE)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USAGE)), InvocablesCreator.READ_ONLY).build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USED)), InvocablesCreator.READ_ONLY).build();
@@ -276,7 +276,7 @@ public class MetricsAasConstructor {
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
             () -> toInt(client.getSystemMemoryTotal()), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> toInt(client.getSystemMemoryUsage()), null);
+            () -> toDouble(client.getSystemMemoryUsage()), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), () -> toInt(client.getSystemMemoryUsed()), null);
 
         /* Configuration operations */
@@ -323,7 +323,7 @@ public class MetricsAasConstructor {
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
             () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
+            () -> (double) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), 
             () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USED), null);
         
@@ -342,6 +342,27 @@ public class MetricsAasConstructor {
         if (null != value) {
             try {
                 return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                result = null;
+            }
+        } else {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Turns a (JSON) string value into a double object for AAS.
+     * 
+     * @param value the string value
+     * @return the double object, may be <b>null</b> if <code>string</code> was <b>null</b> or cannot be parsed into 
+     * a double
+     */
+    private static Double toDouble(String value) {
+        Double result;
+        if (null != value) {
+            try {
+                return Double.parseDouble(value);
             } catch (NumberFormatException e) {
                 result = null;
             }
