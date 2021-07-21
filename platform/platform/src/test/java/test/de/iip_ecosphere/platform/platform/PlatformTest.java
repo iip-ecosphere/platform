@@ -65,12 +65,8 @@ public class PlatformTest {
         AasSetup.createLocalEphemeralSetup(cfg.getAas(), false);
         cfg.getAas().setPersistence(ConfiguredPersistenceType.INMEMORY);
         
-        //inconsistency, disabled for now
-        //LifecycleHandler.startup(new String[] {});
-        // check server instances
-        //LifecycleHandler.shutdown();
+        //HTTPS not fully setup with certificates, cannot start LifecycleHandler here
     }
-    
     
     /**
      * Tests the platform aAS via the lifecycle descriptors.
