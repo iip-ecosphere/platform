@@ -51,11 +51,9 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         if (AasFactory.isFullInstance()) {
             AasSetup setup = setupSupplier.get();
             AasPartRegistry.setAasSetup(setup);
-            AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
+            AasPartRegistry.AasBuildResult res = AasPartRegistry.build(true); // true due to incremental deployment
+            implServer = res.getProtocolServer();
             
-            // active AAS require two server instances and a deployment
-            implServer = res.getProtocolServerBuilder().build();
-            implServer.start();
             if (AasMode.REGISTER == setup.getMode()) {
                 try {
                     aasServer = AasPartRegistry.register(res.getAas(), setup.getRegistryEndpoint()); 

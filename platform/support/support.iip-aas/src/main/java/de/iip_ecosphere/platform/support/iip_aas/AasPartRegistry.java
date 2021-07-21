@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -364,16 +366,19 @@ public class AasPartRegistry {
         
         private List<Aas> aas;
         private ProtocolServerBuilder sBuilder;
+        private Server protocolServer;
         
         /**
          * Creates an instance.
          * 
          * @param aas the created AAS
          * @param sBuilder the server builder
+         * @param protocolServer the protocol server instance (may be <b>null</b> if not started)
          */
-        private AasBuildResult(List<Aas> aas, ProtocolServerBuilder sBuilder) {
+        private AasBuildResult(List<Aas> aas, ProtocolServerBuilder sBuilder, Server protocolServer) {
             this.aas = aas;
             this.sBuilder = sBuilder;
+            this.protocolServer = protocolServer;
         }
         
         /**
@@ -393,26 +398,63 @@ public class AasPartRegistry {
         public ProtocolServerBuilder getProtocolServerBuilder() {
             return sBuilder;
         }
+        
+        /**
+         * Returns the protocol server instance.
+         * 
+         * @return the protocol server instance (may be <b>null</b> if not started)
+         */
+        public Server getProtocolServer() {
+            return protocolServer;
+        }
+        
+    }
+
+    /**
+     * Build up all AAS of the currently running platform part including all contributors. No implementation server 
+     * is started.  [public for testing]
+     * 
+     * @return the list of AAS
+     */
+    public static AasBuildResult build() {
+        return build(c -> true, false);
     }
 
     /**
      * Build up all AAS of the currently running platform part including all contributors. [public for testing]
      * 
+     * @param startImplServer whether the implementation server shall be started before creating the AAS, this may be 
+     *   required for incremental deployment
      * @return the list of AAS
      */
-    public static AasBuildResult build() {
-        return build(c -> true);
+    public static AasBuildResult build(boolean startImplServer) {
+        return build(c -> true, startImplServer);
+    }
+    
+    /**
+     * Build up all AAS of the currently running platform part. No implementation server is started. 
+     * [public for testing]
+     * 
+     * @param filter filter out contributors, in particular for testing, e.g., active AAS that require an 
+     *   implementation server
+     * 
+     * @return the list of AAS
+     */
+    public static AasBuildResult build(Predicate<AasContributor> filter) {
+        return build(filter, false);
     }
     
     /**
      * Build up all AAS of the currently running platform part. [public for testing]
      * 
      * @param filter filter out contributors, in particular for testing, e.g., active AAS that require an 
-     * implementation server
+     *   implementation server
+     * @param startImplServer whether the implementation server shall be started before creating the AAS, this may be 
+     *   required for incremental deployment
      * 
      * @return the list of AAS
      */
-    public static AasBuildResult build(Predicate<AasContributor> filter) {
+    public static AasBuildResult build(Predicate<AasContributor> filter, boolean startImplServer) {
         List<Aas> aas = new ArrayList<>();
         AasFactory factory = AasFactory.getInstance();
         
@@ -440,8 +482,13 @@ public class AasPartRegistry {
                 }
             }
         }
+        Server protocolServer = null;
+        if (startImplServer) {
+            LoggerFactory.getLogger(AasPartRegistry.class).info("Starting implementation server on " + implPort);
+            protocolServer = sBuilder.build().start();
+        }
         aas.add(0, aasBuilder.build());
-        return new AasBuildResult(aas, sBuilder);
+        return new AasBuildResult(aas, sBuilder, protocolServer);
     }
     
     // checkstyle: stop exception type check
