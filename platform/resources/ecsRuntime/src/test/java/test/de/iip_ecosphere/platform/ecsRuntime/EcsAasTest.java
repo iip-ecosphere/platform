@@ -58,7 +58,6 @@ public class EcsAasTest {
     /**
      * A predicate testing the value for Double type and whether the value is positive.
      */
-    @SuppressWarnings("unused")
     private static final Predicate<Object> POSITIVE_DBL_METRICS_VALUE = o -> { 
         Assert.assertTrue(o instanceof Double); 
         double val = (Double) o; 
@@ -140,6 +139,7 @@ public class EcsAasTest {
         
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_INT_METRICS_VALUE);
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_DBL_METRICS_VALUE);
         assertMetrics(expectedMetrics);
         
         LifecycleHandler.shutdown();
