@@ -28,6 +28,7 @@ import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -62,7 +63,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * @param docBasePath the documents base path (may be empty, otherwise shall start with a "/") 
      */
     BaSyxDeploymentRecipe(String host, int port, String contextPath, String docBasePath) {
-        deploymentSpec = new DeploymentSpec();
+        deploymentSpec = new DeploymentSpec(new Endpoint(Schema.IGNORE, host, port, contextPath), docBasePath);
     }
 
     /**
@@ -165,7 +166,12 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         HttpServlet aasServlet = new VABHTTPInterface<IModelProvider>(fullProvider);
         deploymentSpec.getRegistry().register(aasDescriptor);
         
-        deploymentSpec.getContext().addServletMapping("/" + Tools.idToUrlPath(aas.getIdShort()) + "/*", aasServlet);
+        String ep = deploymentSpec.getEndpoint().getEndpoint();
+        while (ep.length() > 0 && ep.endsWith("/")) {
+            ep = ep.substring(0, ep.length() - 1);
+        }
+        deploymentSpec.getContext().addServletMapping(ep + "/" + Tools.idToUrlPath(aas.getIdShort()) + "/*", 
+            aasServlet);
         deploymentSpec.putDescriptor(aas.getIdShort(), new BaSyxAasDescriptor(fullProvider, aasDescriptor));
     }
 

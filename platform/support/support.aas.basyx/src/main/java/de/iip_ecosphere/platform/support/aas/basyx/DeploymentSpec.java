@@ -36,25 +36,37 @@ class DeploymentSpec {
      * @param endpoint the endpoint
      */
     DeploymentSpec(Endpoint endpoint) {
-        this(endpoint, false, null, null);
+        this(endpoint, "", false, null, null);
+    }
+
+    /**
+     * Creates an unencrypted deployment specification based on a given {@code endpoint}, but without setting the 
+     * registry.
+     * 
+     * @param endpoint the endpoint
+     * @param docPath the document path, may be empty
+     */
+    DeploymentSpec(Endpoint endpoint, String docPath) {
+        this(endpoint, docPath, false, null, null);
     }
 
     /**
      * Creates a deployment specification based on a given {@code endpoint}, but without setting the registry.
      * 
      * @param endpoint the endpoint
+     * @param docPath the document path, may be empty
      * @param isSecuredCon do we need a secure connection, then {@code keyPath} and {@code keyPass} must be given; else 
      *     they are ignored
      * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
      * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
      */
-    DeploymentSpec(Endpoint endpoint, boolean isSecuredCon, String keyPath,  String keyPass) {
+    DeploymentSpec(Endpoint endpoint, String docPath, boolean isSecuredCon, String keyPath,  String keyPass) {
         this.endpoint = endpoint;
         if (isSecuredCon) {
-            this.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort(), true, 
-                keyPath, keyPass);
+            this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort(), 
+                true, keyPath, keyPass);
         } else {
-            this.context = new BaSyxContext(endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort());
+            this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort());
         }
         this.contextConfig = new BaSyxContextConfiguration(
             endpoint.getEndpoint(), "", endpoint.getHost(), endpoint.getPort()) {

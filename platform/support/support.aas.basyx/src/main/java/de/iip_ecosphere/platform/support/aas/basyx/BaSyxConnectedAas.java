@@ -135,7 +135,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         SubmodelBuilder result = getDeferred(idShort, SubmodelBuilder.class);
         if (null == result) {
             Submodel sub =  getSubmodel(idShort);
-            if (null == getSubmodel(idShort)) { // new here
+            if (null == sub) { // new here
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, idShort, identifier);
             } else if (sub instanceof BaSyxSubmodel) { // after add
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, (BaSyxSubmodel) sub);
@@ -149,6 +149,11 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
     @Override
     public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
         return obtainSubmodelBuilder(new BaSyxConnectedAasBuilder(this), idShort, identifier);
+    }
+
+    @Override
+    public AasBuilder createAasBuilder() {
+        return new BaSyxConnectedAasBuilder(this);
     }
 
 }

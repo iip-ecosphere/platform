@@ -43,6 +43,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
      * @author Holger Eichelberger, SSE
      */
     public interface BaSyxSubmodelParent {
+        
         /**
          * Creates an AAS builder on parent level.
          * 
