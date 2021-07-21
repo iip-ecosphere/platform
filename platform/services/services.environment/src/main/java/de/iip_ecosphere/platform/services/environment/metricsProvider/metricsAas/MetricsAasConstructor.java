@@ -103,23 +103,23 @@ public class MetricsAasConstructor {
             .bind(iCreator.createGetter(nameMapper.apply(SIMPLE_METER_LIST)), InvocablesCreator.READ_ONLY).build();
 
         /* System Disk Capacity metrics */
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_FREE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_TOTAL)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_USABLE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_USED)), InvocablesCreator.READ_ONLY).build();
 
         /* System Physical Memory metrics */
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_FREE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_TOTAL)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USAGE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.INTEGER)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USED)), InvocablesCreator.READ_ONLY).build();
     }
     
@@ -266,16 +266,18 @@ public class MetricsAasConstructor {
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_CPU_USAGE), () -> client.getSystemCpuUsage(), null);
 
         /* System Disk Capacity metrics */
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), () -> client.getSystemDiskFree(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), () -> client.getSystemDiskTotal(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), () -> client.getSystemDiskUsable(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), () -> client.getSystemsDiskUsed(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), () -> toInt(client.getSystemDiskFree()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), () -> toInt(client.getSystemDiskTotal()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), () -> toInt(client.getSystemDiskUsable()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), () -> toInt(client.getSystemsDiskUsed()), null);
 
         /* System Physical Memory metrics */
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), () -> client.getSystemMemoryFree(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), () -> client.getSystemMemoryTotal(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), () -> client.getSystemMemoryUsage(), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), () -> client.getSystemMemoryUsed(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), () -> toInt(client.getSystemMemoryFree()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
+            () -> toInt(client.getSystemMemoryTotal()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
+            () -> toInt(client.getSystemMemoryUsage()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), () -> toInt(client.getSystemMemoryUsed()), null);
 
         /* Configuration operations */
         pBuilder.defineOperation(nameMapper.apply(SET_MEMORY_BASE_UNIT), (args) -> client.setMemoryBaseUnit(args));
@@ -307,25 +309,46 @@ public class MetricsAasConstructor {
 
         /* System Disk Capacity metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_FREE), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_TOTAL), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USABLE), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USABLE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USED), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USED), null);
 
         /* System Physical Memory metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_FREE), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), 
-            () -> provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USED), null);
+            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USED), null);
         
         /* Configuration operations */
+    }
+    
+    /**
+     * Turns a (JSON) string value into an integer object for AAS.
+     * 
+     * @param value the string value
+     * @return the integer object, may be <b>null</b> if <code>string</code> was <b>null</b> or cannot be parsed into 
+     * an integer
+     */
+    private static Integer toInt(String value) {
+        Integer result;
+        if (null != value) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                result = null;
+            }
+        } else {
+            result = null;
+        }
+        return result;
     }
 
     /**
