@@ -415,7 +415,15 @@ public class AasPartRegistry {
     public static AasBuildResult build(Predicate<AasContributor> filter) {
         List<Aas> aas = new ArrayList<>();
         AasFactory factory = AasFactory.getInstance();
-        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
+        
+        AasBuilder aasBuilder;
+        try {
+            aasBuilder = retrieveIipAas().createAasBuilder();
+        } catch (IOException e) {
+            // fallback, AAS does not yet exist, top-level
+            aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
+        }
+        
         ProtocolAddressHolder impl = setup.getImplementation();
         int implPort = ServerAddress.validatePort(impl.getPort());
         InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), impl.getHost(), 
@@ -436,6 +444,8 @@ public class AasPartRegistry {
         return new AasBuildResult(aas, sBuilder);
     }
     
+    // checkstyle: stop exception type check
+    
     /**
      * Obtains the IIP-Ecosphere platform AAS. Be careful with the returned instance, as if
      * the AAS is modified in the mean time, you may hold an outdated instance.
@@ -444,9 +454,19 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveIipAas() throws IOException {
-        return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(URN_AAS);
+        Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint());
+        if (null == reg) {
+            throw new IOException("No AAS registry at " + setup.getRegistryEndpoint().toUri());
+        }
+        try {
+            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(URN_AAS);
+        } catch (Throwable t) {
+            throw new IOException(t);
+        }
     }
 
+    // checkstyle: start exception type check
+    
     /**
      * Deploy the given AAS to a local server. [testing]
      * 
@@ -501,9 +521,17 @@ public class AasPartRegistry {
         
         Registry reg = regD.obtainRegistry();
         for (Aas a: aas) {
-            reg.createAas(a, aasEndpoint.toServerUri()); // not the registry URI!
+            try {
+                reg.createAas(a, aasEndpoint.toServerUri()); // not the registry URI!
+            } catch (IllegalArgumentException e) {
+                // well, already there, ignore
+            }
             for (Submodel s : a.submodels()) {
-                reg.createSubmodel(a, s);
+                try {
+                    reg.createSubmodel(a, s);
+                } catch (IllegalArgumentException e) {
+                    // well, already there, ignore
+                }   
             }
         }
     }

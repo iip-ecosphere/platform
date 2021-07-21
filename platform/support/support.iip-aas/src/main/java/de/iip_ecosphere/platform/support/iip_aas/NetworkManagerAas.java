@@ -50,45 +50,47 @@ public class NetworkManagerAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        smB.createOperationBuilder(OP_RESERVE_PORT)
-            .addInputVariable("key", Type.STRING)
-            .addInputVariable("address", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .setInvocable(iCreator.createInvocable(getQName(OP_RESERVE_PORT)))
-            .build();
-        smB.createOperationBuilder(OP_OBTAIN_PORT)
-            .addInputVariable("key", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .setInvocable(iCreator.createInvocable(getQName(OP_OBTAIN_PORT)))
-            .build();
-        smB.createOperationBuilder(OP_GET_PORT)
-            .addInputVariable("key", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .setInvocable(iCreator.createInvocable(getQName(OP_GET_PORT)))
-            .build();
-        smB.createOperationBuilder(OP_IS_IN_USE_PORT)
-            .addInputVariable("port", Type.INTEGER)
-            .addOutputVariable("result", Type.BOOLEAN)
-            .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_PORT)))
-            .build();
-        smB.createOperationBuilder(OP_IS_IN_USE_ADR)
-            .addInputVariable("adr", Type.STRING)
-            .addOutputVariable("result", Type.BOOLEAN)
-            .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_ADR)))
-            .build();
-        smB.createOperationBuilder(OP_RELEASE_PORT)
-            .addInputVariable("key", Type.STRING)
-            .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
-            .build();
-        smB.createPropertyBuilder(PROP_HIGH_PORT)
-            .setType(Type.INTEGER)
-            .bind(iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
-            .build();
-        smB.createPropertyBuilder(PROP_LOW_PORT)
-            .setType(Type.INTEGER)
-            .bind(iCreator.createGetter(getQName(PROP_LOW_PORT)), PropertyBuilder.READ_ONLY)
-            .build();
-        smB.build();
+        if (smB.isNew()) { // incremental remote deployment, avoid double creation
+            smB.createOperationBuilder(OP_RESERVE_PORT)
+                .addInputVariable("key", Type.STRING)
+                .addInputVariable("address", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_RESERVE_PORT)))
+                .build();
+            smB.createOperationBuilder(OP_OBTAIN_PORT)
+                .addInputVariable("key", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_OBTAIN_PORT)))
+                .build();
+            smB.createOperationBuilder(OP_GET_PORT)
+                .addInputVariable("key", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_GET_PORT)))
+                .build();
+            smB.createOperationBuilder(OP_IS_IN_USE_PORT)
+                .addInputVariable("port", Type.INTEGER)
+                .addOutputVariable("result", Type.BOOLEAN)
+                .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_PORT)))
+                .build();
+            smB.createOperationBuilder(OP_IS_IN_USE_ADR)
+                .addInputVariable("adr", Type.STRING)
+                .addOutputVariable("result", Type.BOOLEAN)
+                .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_ADR)))
+                .build();
+            smB.createOperationBuilder(OP_RELEASE_PORT)
+                .addInputVariable("key", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
+                .build();
+            smB.createPropertyBuilder(PROP_HIGH_PORT)
+                .setType(Type.INTEGER)
+                .bind(iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
+                .build();
+            smB.createPropertyBuilder(PROP_LOW_PORT)
+                .setType(Type.INTEGER)
+                .bind(iCreator.createGetter(getQName(PROP_LOW_PORT)), PropertyBuilder.READ_ONLY)
+                .build();
+            smB.build();
+        }
         return null;
     }
 

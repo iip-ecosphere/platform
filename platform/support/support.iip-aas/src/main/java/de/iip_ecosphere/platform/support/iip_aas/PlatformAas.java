@@ -40,38 +40,40 @@ public class PlatformAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        String ver = "??";
-        String buildId = "??";
-        boolean isRelease = false;
-        InputStream is = getClass().getClassLoader().getResourceAsStream("iip-version.properties");
-        if (null != is) {
-            Properties prop = new Properties();
-            try {
-                prop.load(is);
-                is.close();
-            } catch (IOException e) {
+        if (smB.isNew()) { // incremental remote deployment, avoid double creation
+            String ver = "??";
+            String buildId = "??";
+            boolean isRelease = false;
+            InputStream is = getClass().getClassLoader().getResourceAsStream("iip-version.properties");
+            if (null != is) {
+                Properties prop = new Properties();
+                try {
+                    prop.load(is);
+                    is.close();
+                } catch (IOException e) {
+                }
+                ver = prop.getOrDefault("version", ver).toString();
+                if (ver.endsWith(MAVEN_SNAPSHOT_POSTFIX)) {
+                    ver = ver.substring(0, ver.length() - MAVEN_SNAPSHOT_POSTFIX.length());
+                } else {
+                    isRelease = true;
+                }
+                buildId = prop.getOrDefault("buildId", buildId).toString();
             }
-            ver = prop.getOrDefault("version", ver).toString();
-            if (ver.endsWith(MAVEN_SNAPSHOT_POSTFIX)) {
-                ver = ver.substring(0, ver.length() - MAVEN_SNAPSHOT_POSTFIX.length());
-            } else {
-                isRelease = true;
-            }
-            buildId = prop.getOrDefault("buildId", buildId).toString();
+            smB.createPropertyBuilder(NAME_PROPERTY_NAME)
+                .setValue(Type.STRING, "IIP-Ecosphere platform")
+                .build();
+            smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
+                .setValue(Type.STRING, ver)
+                .build();
+            smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
+                .setValue(Type.BOOLEAN, isRelease)
+                .build();
+            smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
+                .setValue(Type.STRING, buildId)
+                .build();
+            smB.build();
         }
-        smB.createPropertyBuilder(NAME_PROPERTY_NAME)
-            .setValue(Type.STRING, "IIP-Ecosphere platform")
-            .build();
-        smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
-            .setValue(Type.STRING, ver)
-            .build();
-        smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
-            .setValue(Type.BOOLEAN, isRelease)
-            .build();
-        smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
-            .setValue(Type.STRING, buildId)
-            .build();
-        smB.build();
         return null;
     }
 
