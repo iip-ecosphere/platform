@@ -241,6 +241,7 @@ public class Cli {
         final Level level = Level.TOP;
         String cmd;
         String resourceId;
+        boolean exit = false;
         do {
             prompt(level, provider);
             cmd = provider.nextCommand();
@@ -252,7 +253,7 @@ public class Cli {
                         System.out.println("No resourceId given.");
                         break;
                     }
-                    interpretServices(provider, resourceId);
+                    exit = interpretServices(provider, resourceId);
                     break;
                 case "container":
                     resourceId = provider.nextCommand();
@@ -260,10 +261,10 @@ public class Cli {
                         System.out.println("No resourceId given.");
                         break;
                     }
-                    interpretContainer(provider, resourceId);
+                    exit = interpretContainer(provider, resourceId);
                     break;
                 case "resources":
-                    interpretResources(provider);
+                    exit = interpretResources(provider);
                     break;
                 case "help":
                     printHelp(provider, level);
@@ -276,7 +277,7 @@ public class Cli {
                     break;
                 }
             }
-        } while (null != cmd);
+        } while (null != cmd && !exit);
     }
 
     /**
@@ -284,8 +285,10 @@ public class Cli {
      * 
      * @param provider the command provider
      * @param resourceId the resourceId of the resource to take the services from
+     * @return {@code true} for exit, {@code false} for continue
      */
-    private static void interpretServices(CommandProvider provider, String resourceId) {
+    private static boolean interpretServices(CommandProvider provider, String resourceId) {
+        boolean exit = false;
         final Level level = Level.SERVICES;
         try {
             ServicesAasClient client = new ServicesAasClient(resourceId);
@@ -297,11 +300,11 @@ public class Cli {
                     try {
                         String id;
                         switch (cmd.toLowerCase()) {
-                        case "listServices":
-                            print(client.getServices(), "- Service ");
+                        case "listservices":
+                            print(client.getServices(), "- Service ", true);
                             break;
-                        case "listArtifacts":
-                            print(client.getArtifacts(), "- Artifact ");
+                        case "listartifacts":
+                            print(client.getArtifacts(), "- Artifact ", true);
                             break;
                         case "add":
                             String uri = provider.nextCommand();
@@ -311,7 +314,7 @@ public class Cli {
                             }
                             client.addArtifact(new URI(uri));
                             break;
-                        case "startAll":
+                        case "startall":
                             id = provider.nextCommand();
                             if (null == id) {
                                 System.out.println("No artifactId given.");
@@ -319,7 +322,7 @@ public class Cli {
                             }
                             client.startService(client.getServices(id));
                             break;
-                        case "stopAll":
+                        case "stopall":
                             id = provider.nextCommand();
                             if (null == id) {
                                 System.out.println("No artifactId given.");
@@ -341,6 +344,10 @@ public class Cli {
                         case "back":
                             cmd = null;
                             break;
+                        case "exit":
+                            exit = true;
+                            cmd = null;
+                            break;
                         default:
                             println("Unknown command on this level: " + cmd);
                             break;
@@ -353,6 +360,7 @@ public class Cli {
         } catch (IOException e) {
             println(e);
         }
+        return exit;
     }
     
     /**
@@ -360,8 +368,10 @@ public class Cli {
      * 
      * @param provider the command provider
      * @param resourceId the resourceId of the resource to take the container from
+     * @return {@code true} for exit, {@code false} for continue
      */
-    private static void interpretContainer(CommandProvider provider, String resourceId) {
+    private static boolean interpretContainer(CommandProvider provider, String resourceId) {
+        boolean exit = false;
         final Level level = Level.CONTAINER;
         try {
             EcsAasClient client = new EcsAasClient(resourceId);
@@ -373,7 +383,7 @@ public class Cli {
                     try {
                         switch (cmd.toLowerCase()) {
                         case "list":
-                            print(client.getContainers(), "- Container ");
+                            print(client.getContainers(), "- Container ", false);
                             break;
                         case "add":
                             String uri = provider.nextCommand();
@@ -410,6 +420,10 @@ public class Cli {
                         case "help":
                             printHelp(provider, level);
                             break;
+                        case "exit":
+                            exit = true;
+                            cmd = null;
+                            break;
                         case "back":
                             cmd = null;
                             break;
@@ -425,14 +439,17 @@ public class Cli {
         } catch (IOException e) {
             println(e);
         }
+        return exit;
     }
 
     /**
      * Interprets the resources commands.
      * 
      * @param provider the command provider
+     * @return {@code true} for exit, {@code false} for continue
      */
-    private static void interpretResources(CommandProvider provider) {
+    private static boolean interpretResources(CommandProvider provider) {
+        boolean exit = false;
         final Level level = Level.RESOURCES;
         String cmd;
         do {
@@ -449,12 +466,17 @@ public class Cli {
                 case "back":
                     cmd = null;
                     break;
+                case "exit":
+                    exit = true;
+                    cmd = null;
+                    break;
                 default:
                     println("Unknown command on this level: " + cmd);
                     break;
                 }
             }
         } while (null != cmd);
+        return exit;
     }
 
     /**
@@ -463,7 +485,7 @@ public class Cli {
     private static void listResources() {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
-            print(aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES), "- Resource ");
+            print(aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES), "- Resource ", false);
         } catch (IOException e) {
             println(e);
         }
@@ -479,15 +501,19 @@ public class Cli {
         private String collPrefix;
         private String indent = "";
         private boolean emitted;
+        private boolean skipFirstCollectionLevel;
+        private int collectionLevel = 0;
         
         /**
          * Creates a visitor instance.
          * 
          * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
          *     printing the collection name
+         * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
          */
-        private PrintVisitor(String collPrefix) {
+        private PrintVisitor(String collPrefix, boolean skipFirstCollectionLevel) {
             this.collPrefix = collPrefix;
+            this.skipFirstCollectionLevel = skipFirstCollectionLevel;
         }
 
         @Override
@@ -532,17 +558,24 @@ public class Cli {
 
         @Override
         public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
-            if (null != collPrefix) {
-                println(collPrefix + collection.getIdShort());
+            if ((skipFirstCollectionLevel && 0 == collectionLevel) || !skipFirstCollectionLevel) {
+                if (null != collPrefix) {
+                    println(collPrefix + collection.getIdShort());
+                }
+                indent += " ";
+                emitted = true; // assuming that collection elements in the first place determine the output
             }
-            indent += " ";
+            collectionLevel++;
         }
 
         @Override
         public void endSubmodelElementCollection(SubmodelElementCollection collection) {
-            indent = indent.substring(0, indent.length() - 1);
-            if (!emitted) {
-                println(indent + " None.");
+            collectionLevel--;
+            if ((skipFirstCollectionLevel && 0 == collectionLevel) || !skipFirstCollectionLevel) {
+                indent = indent.substring(0, indent.length() - 1);
+                if (!emitted) {
+                    println(indent + " None.");
+                }
             }
         }
         
@@ -554,11 +587,14 @@ public class Cli {
      * @param elt the element to print
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
+     * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
      */
-    private static void print(SubmodelElement elt, String collPrefix) {
+    private static void print(SubmodelElement elt, String collPrefix, boolean skipFirstCollectionLevel) {
         if (null != elt) {
-            PrintVisitor vis = new PrintVisitor(collPrefix);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipFirstCollectionLevel);
             elt.accept(vis);
+        } else {
+            println("None.");
         }
     }
 
@@ -568,10 +604,11 @@ public class Cli {
      * @param submodel the sub-model to print
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
+     * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
      */
-    private static void print(Submodel submodel, String collPrefix) {
+    private static void print(Submodel submodel, String collPrefix, boolean skipFirstCollectionLevel) {
         if (null != submodel) {
-            PrintVisitor vis = new PrintVisitor(collPrefix);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipFirstCollectionLevel);
             submodel.accept(vis);
         } else {
             println("None.");
@@ -598,6 +635,7 @@ public class Cli {
             println("  remove <artifactId>");
             println("  help");
             println("  back", provider);
+            println("  exit", provider);
         }
         if (level.isTopLevel()) {
             println(" container <resourceId>");
@@ -610,6 +648,7 @@ public class Cli {
             println("  undeploy <containerId>");
             println("  help");
             println("  back", provider);
+            println("  exit", provider);
         }
         if (level.isTopLevel()) {
             println(" resources");
@@ -618,6 +657,7 @@ public class Cli {
             println("  list");
             println("  help");
             println("  back", provider);
+            println("  exit", provider);
         }
         if (level.isTopLevel()) {
             println(" help");
