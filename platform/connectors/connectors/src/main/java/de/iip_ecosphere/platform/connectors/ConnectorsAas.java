@@ -92,35 +92,36 @@ public class ConnectorsAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
         SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null);
-        tsmB.build();
-        
-        SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null);
-        Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
-        while (iter.hasNext()) {
-            ConnectorDescriptor desc = iter.next();
-            Class<?> cls = desc.getClass();
-            SubmodelElementCollectionBuilder secB = ismB.createSubmodelElementCollectionBuilder(
-                ClassUtility.getName(desc.getType()), false, false);
-            secB.createPropertyBuilder(NAME_DESC_VAR_NAME)
-                .setValue(Type.STRING, desc.getName())
-                .build();
-            addAnnotationInformation(secB, cls);
-            secB.build();
+        if (tsmB.isNew()) { // incremental remote deployment, avoid double creation
+            tsmB.build();
+            
+            SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null);
+            Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
+            while (iter.hasNext()) {
+                ConnectorDescriptor desc = iter.next();
+                Class<?> cls = desc.getClass();
+                SubmodelElementCollectionBuilder secB = ismB.createSubmodelElementCollectionBuilder(
+                    ClassUtility.getName(desc.getType()), false, false);
+                secB.createPropertyBuilder(NAME_DESC_VAR_NAME)
+                    .setValue(Type.STRING, desc.getName())
+                    .build();
+                addAnnotationInformation(secB, cls);
+                secB.build();
+            }
+            Submodel descriptors = ismB.build();
+            
+            SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL, null);
+            Iterator<Connector<?, ?, ?, ?>> iterC = ConnectorRegistry.getRegisteredConnectorInstances();
+            while (iterC.hasNext()) {
+                Connector<?, ?, ?, ?> connector = iterC.next();
+                String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
+                SubmodelElementCollectionBuilder smcb = csmB.createSubmodelElementCollectionBuilder(idShort, 
+                    false, false);
+                addConnector(smcb, connector, descriptors);
+                smcb.build();
+            }
+            csmB.build();
         }
-        Submodel descriptors = ismB.build();
-        
-        SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL, null);
-        Iterator<Connector<?, ?, ?, ?>> iterC = ConnectorRegistry.getRegisteredConnectorInstances();
-        while (iterC.hasNext()) {
-            Connector<?, ?, ?, ?> connector = iterC.next();
-            String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-            SubmodelElementCollectionBuilder smcb = csmB.createSubmodelElementCollectionBuilder(idShort, 
-                false, false);
-            addConnector(smcb, connector, descriptors);
-            smcb.build();
-        }
-        csmB.build();
-        
         return null;
     }
 
