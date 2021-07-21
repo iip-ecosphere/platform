@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Info;
@@ -134,7 +136,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      * Returns a Docker API Client.
      * If there is not running Docker daemon on the host it returns null.
      * 
-     * @return DockerClient/NULL
+     * @return DockerClient or <b>null</b> if no Docker daemon is running or if the docker {@code dockerHost} in the 
+     *     configuration setup cannot be applied, e.g., a Linux socket path on Windows
      */
     public DockerClient getDockerClient() {
         DockerConfiguration config = DockerConfiguration.readFromYaml();
@@ -149,8 +152,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         try {
             dockerClient.infoCmd().exec();
         } catch (Exception e) {
-            System.out.println("DockerContainerManager.getDockerClient() throws: " + e);
-            return null;
+            LoggerFactory.getLogger(DockerContainerManager.class).warn("Obtaining Docker client(): " + e.getMessage());
+            dockerClient = null;
         }
         return dockerClient;
     }
