@@ -18,6 +18,5 @@ supporting MQTT v3 and v5. Dependencies to the json-simple library, Google proto
 only and not required for platform execution.
 
 **Missing**
-- Transport AAS 
 - Authentication/Security
 
