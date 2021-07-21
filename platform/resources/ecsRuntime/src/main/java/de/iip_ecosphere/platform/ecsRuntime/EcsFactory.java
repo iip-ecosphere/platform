@@ -42,7 +42,7 @@ public class EcsFactory {
             if (first.isPresent()) {
                 desc = first.get();
             } else {
-                LOGGER.error("No Container manager implementation known.");
+                LOGGER.warn("No Container manager implementation known.");
             }
         }
         if (null == conf) {
