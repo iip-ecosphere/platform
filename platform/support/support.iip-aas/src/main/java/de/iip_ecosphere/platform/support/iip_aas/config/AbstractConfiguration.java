@@ -93,6 +93,7 @@ public abstract class AbstractConfiguration {
                 result = yaml.load(in);
                 in.close();
             } catch (YAMLException e) {
+                in.close();
                 throw new IOException(e);
             }
         }
