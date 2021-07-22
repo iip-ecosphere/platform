@@ -36,7 +36,8 @@ public class ConfigurationManager {
     
     /**
      * Defines the executor instance. Called from {@link ConfigurationLifecycleDescriptor}.
-     * @param instance
+     * 
+     * @param instance the executor instance
      */
     static void setExecutor(EasyExecutor instance) {
         executor = instance;

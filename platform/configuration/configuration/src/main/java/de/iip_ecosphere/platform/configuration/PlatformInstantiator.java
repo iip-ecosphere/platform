@@ -107,6 +107,7 @@ public class PlatformInstantiator {
          * Validates the configuration after reasoning. May terminate the program or throw an exception.
          * 
          * @param conf the configuration
+         * @throws ExecutionException if the validation fails
          */
         protected void validateConfiguration(Configuration conf) throws ExecutionException {
         }
@@ -115,6 +116,7 @@ public class PlatformInstantiator {
          * Validates the reasoning result. May terminate the program or throw an exception.
          * 
          * @param res the reasoning result
+         * @throws ExecutionException if reasoning fails
          */
         protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
             if (res.hasConflict()) {
@@ -126,7 +128,6 @@ public class PlatformInstantiator {
          * Handles an instantiation exception.
          * 
          * @param ex the exception
-         * 
          * @throws ExecutionException may re-throw the exception
          */
         protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
