@@ -544,7 +544,7 @@ public class Cli {
             } catch (ExecutionException e) {
                 val = "?";
             }
-            println(indent + property.getIdShort() + " " + val);
+            println(indent + property.getIdShort() + ": " + val);
             emitted = true; // assuming that collections at least have a property
         }
 
