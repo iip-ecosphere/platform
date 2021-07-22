@@ -105,6 +105,7 @@ public class LifecycleHandler {
                 + " (" + l.priority() + ")");
             l.startup(args);
         }, false);
+        LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.");
     }
 
     /**
