@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
@@ -216,6 +217,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                     cmdLine.add(Starter.composeArgument(Starter.getServicePortName(getId()), procPort));
                 }
             }
+            LoggerFactory.getLogger(SpringCloudServiceDescriptor.class).info("Creates deployment request for " 
+                + getName() + " " + cmdLine);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -158,12 +159,13 @@ public class SpringCloudServiceManager
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
+        LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Starting services " 
+            + Arrays.toString(serviceIds));
         for (String ids : sortByDependency(serviceIds)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {
                 errors.add("No service for id '" + ids + "' known.");
             } else {
-                // TODO check/wait for dependencies
                 AppDeploymentRequest req = service.createDeploymentRequest(getConfig());
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
@@ -234,6 +236,8 @@ public class SpringCloudServiceManager
     public void stopService(String... serviceIds) throws ExecutionException {
         List<String> errors = new ArrayList<>();
         AppDeployer deployer = getDeployer();
+        LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Stopping services " 
+            + Arrays.toString(serviceIds));
         // TODO add/check causes for failing
         for (String ids : serviceIds) {
             SpringCloudServiceDescriptor service = getService(ids);
