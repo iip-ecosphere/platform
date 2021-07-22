@@ -1,3 +1,4 @@
+import JavaBasics;
 import MavenBasics;
 import JavaMapping;
 import MeshBasics;
@@ -69,18 +70,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
               type: ${nextType}' <CR>;
         }
     }
-    
-    def main(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
-        'id: ${app.id}
-        name: ${app.name}
-        version: ${app.ver}
-        services:
-           ${generateServices(elements)}
-        '
-    }
 
-
-
+    // -------------------------- mesh basics refinement, extract stream names ---------------------------------
 
     def generateSelect(String inType, String outType, String methodSuffixWithServiceId) {
         if (returnType) {
@@ -109,5 +100,85 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
+    
+    // ----------------------------------- types -----------------------------------
+    
+    def generateTypes(sequenceOf(MeshElement) elements) {
+        setOf(DataType) types = {};
+        for (MeshElement elt: elements) {
+            collectTypes(elt, types);
+        }
+        if (types.size() > 0) {
+            'types:
+                ${generateTypes(types)}'
+        }
+    }
+    
+    def generateTypes(setOf(DataType) types) {
+        for (DataType type: types) {
+            '${generateType(type)}'
+        }
+        ''
+    }
+    
+    def generateType(DataType type) {
+    }
+
+    def generateType(RecordType type) {
+        '- name: ${toTypeName(type)}
+          fields:
+            ${generateFields(type.fields)}'
+    }
+    
+    def generateFields(Fields fields) {
+        for (Field f: fields) {
+            '- name: ${f.name}
+              type: ${toTypeName(f.type)}'
+        }
+    }
+    
+    def collectTypes(MeshElement elt, setOf(DataType) types) {
+    }
+
+    def collectTypes(MeshSource elt, setOf(DataType) types) {
+        collectIOTypes(elt.output, types);
+    }
+
+    def collectTypes(MeshProcessor elt, setOf(DataType) types) {
+        collectIOTypes(elt.input, types);
+        collectIOTypes(elt.output, types);
+    }
+
+    def collectTypes(MeshSink elt, setOf(DataType) types) {
+        collectIOTypes(elt.input, types);
+    }
+    
+    def collectIOTypes(sequenceOf(IOType) declTypes, setOf(DataType) types) {
+        for (IOType t: declTypes) {
+            collectType(t.type, types);
+        }        
+    }
+    
+    def collectType(DataType type, setOf(DataType) types) {
+    } 
+
+    def collectType(RecordType type, setOf(DataType) types) {
+        types.add(type);
+        for (Field f: type.fields) {
+            types.add(f.type);
+        }
+    } 
+
+    // ----------------------------------- main -----------------------------------
+    
+    def main(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
+        'id: ${app.id}
+        name: ${app.name}
+        version: ${app.ver}
+        ${generateTypes(elements)}
+        services:
+           ${generateServices(elements)}
+        '
+    }
 
 }

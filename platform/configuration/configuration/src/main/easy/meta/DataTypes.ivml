@@ -19,7 +19,7 @@ project DataTypes {
         NonEmptyString name;
     }
     
-    compound RecordType refines DataType, CDataProperty {
+    compound RecordType refines CDataProperty, DataType { // EASY-Bug
         Fields fields;      
     }
     
