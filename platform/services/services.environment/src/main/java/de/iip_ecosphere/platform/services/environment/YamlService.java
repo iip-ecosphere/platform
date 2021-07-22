@@ -112,10 +112,12 @@ public class YamlService {
     /**
      * Defines the description of the service. [required by SnakeYaml]
      * 
-     * @param description the description
+     * @param description the description (<b>null</b> is ignored, default is empty)
      */
     public void setDescription(String description) {
-        this.description = description;
+        if (null != description) {
+            this.description = description;
+        }
     }
     
     /**
