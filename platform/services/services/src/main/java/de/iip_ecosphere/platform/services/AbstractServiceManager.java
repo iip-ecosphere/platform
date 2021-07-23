@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -274,9 +273,8 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      */
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
-        // must be done before setState (via stub)
-        ServicesAas.notifyServiceStateChanged(old, service, NotificationMode.SYNCHRONOUS); 
         service.setState(state);
+        ServicesAas.notifyServiceStateChanged(old, service); 
     }
     
     @Override
