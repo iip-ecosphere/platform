@@ -63,6 +63,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private List<String> portKeys = new ArrayList<String>();
     private Process process;
     private File processDir;
+    private ManagedServerAddress adminAddr;
     
     /**
      * Creates an instance.
@@ -185,12 +186,12 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
             List<String> cmdLine = new ArrayList<String>();
-            ManagedServerAddress adminAdr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+            adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
             String serviceProtocol = config.getServiceProtocol();
-            cmdLine.addAll(service.getCmdArg(adminAdr.getPort(), serviceProtocol));
-            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
-                adminAdr.getHost(), adminAdr.getPort());
-            setStub(new ServiceStub(iCreator, getId()));
+            cmdLine.addAll(service.getCmdArg(adminAddr.getPort(), serviceProtocol));
+//            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
+//                adminAdr.getHost(), adminAdr.getPort());
+//            setStub(new ServiceStub(iCreator, getId()));
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
@@ -222,6 +223,21 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;
+    }
+    
+    /**
+     * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
+     * {@link #createDeploymentRequest(SpringCloudServiceConfiguration)} before.
+     * 
+     * @param config the service manager configuration instance
+     */
+    void attachStub(SpringCloudServiceConfiguration config) {
+        if (null != adminAddr) {
+            String serviceProtocol = config.getServiceProtocol();
+            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
+                adminAddr.getHost(), adminAddr.getPort());
+            setStub(new ServiceStub(iCreator, getId()));
+        }
     }
     
     /**

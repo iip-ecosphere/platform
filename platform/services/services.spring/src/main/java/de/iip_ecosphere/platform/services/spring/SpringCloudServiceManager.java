@@ -166,13 +166,15 @@ public class SpringCloudServiceManager
             if (null == service) {
                 errors.add("No service for id '" + ids + "' known.");
             } else {
-                AppDeploymentRequest req = service.createDeploymentRequest(getConfig());
+                SpringCloudServiceConfiguration config = getConfig();
+                AppDeploymentRequest req = service.createDeploymentRequest(config);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
                     LOGGER.info("Starting ... ");
                     String id = deployer.deploy(req);
                     waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
                     LOGGER.info("Starting " + id + ": " + deployer.status(id));
+                    service.attachStub(config);
                     AppStatus status = deployer.status(id); 
                     service.setDeploymentId(id);
                     if (DeploymentState.deployed == status.getState()) {
