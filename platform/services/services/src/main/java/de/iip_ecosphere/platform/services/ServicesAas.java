@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
@@ -523,7 +524,7 @@ public class ServicesAas implements AasContributor {
             c.deleteElement(eltId);
         }
     }
-    
+
     /**
      * Is called when a service state changed.
      * 
@@ -531,7 +532,19 @@ public class ServicesAas implements AasContributor {
      * @param desc the service descriptor with the new state
      */
     public static void notifyServiceStateChanged(ServiceState old, ServiceDescriptor desc) {
-        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+        notifyServiceStateChanged(old, desc, null);
+    }
+    
+    /**
+     * Is called when a service state changed.
+     * 
+     * @param old the previous state before the change
+     * @param desc the service descriptor with the new state
+     * @param mode explicit notification mode to be used (if <b>null</b>, use the mode defined 
+     *     in {@link AbstractAasBase})
+     */
+    public static void notifyServiceStateChanged(ServiceState old, ServiceDescriptor desc, NotificationMode mode) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, mode, (sub, aas) -> {
             // other approach... link property against service descriptor while creation and reflect state
             // let's try this one for now
             SubmodelElementCollection elt = sub.getSubmodelElementCollection(NAME_COLL_SERVICES)
