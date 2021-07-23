@@ -87,14 +87,15 @@ public class ActiveAasBase {
      * Processes a notification on a submodel of {@link AasPartRegistry#retrieveIipAas()}.
      * 
      * @param subId the short id of the submodel
-     * @param mode explicit notification mode to be used (if <b>null</b>, use {@link #mode})
+     * @param mode explicit notification mode to be used if {@link #mode} is not {@link NotificationMode#NONE}. If 
+     *     parameter is <b>null</b>, use {@link #mode} instead
      * @param processor the processor to execute
      */
     public static void processNotification(String subId, NotificationMode mode, NotificationProcessor processor) {
-        if (null == mode) {
-            mode = ActiveAasBase.mode;
-        }
-        if (mode != NotificationMode.NONE) {
+        if (ActiveAasBase.mode != NotificationMode.NONE) {
+            if (null == mode) {
+                mode = ActiveAasBase.mode;
+            }
             try {
                 Aas aas = AasPartRegistry.retrieveIipAas();
                 if (null != aas) {
