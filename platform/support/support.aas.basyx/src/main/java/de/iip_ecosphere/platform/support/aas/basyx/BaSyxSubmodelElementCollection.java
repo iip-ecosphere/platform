@@ -190,7 +190,9 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         public BaSyxSubmodelElementCollection build() {
             buildMyDeferred();
             instance.collection = collection;
-            parentBuilder.register(instance);
+            if (isNew) {
+                parentBuilder.register(instance);
+            }
             return instance;
         }
 
