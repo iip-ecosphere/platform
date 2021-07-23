@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 import java.io.Serializable;
 
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 
@@ -112,11 +113,20 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             super(creator, name);
         }
         
+        // checkstyle: stop exception type check
+        
         @Override
         public Object get() {
-            return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+            try {
+                return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(getClass()).info("Getter " + getName() + " failed: " + t.getMessage());
+                return null;
+            }
         }
-        
+
+        // checkstyle: resume exception type check
+
     }
     
     /**
@@ -138,10 +148,18 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             super(creator, name);
         }
 
+        // checkstyle: stop exception type check
+
         @Override
         public void accept(Object value) {
-            createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+            try {
+                createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(getClass()).info("Setter " + getName() + " failed: " + t.getMessage());
+            }
         }
+
+        // checkstyle: resume exception type check
 
     }
 
@@ -164,10 +182,19 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             super(creator, name);
         }
 
+        // checkstyle: stop exception type check
+
         @Override
         public Object apply(Object[] params) {
-            return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+            try {
+                return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " failed: " + t.getMessage());
+                return null;
+            }
         }
+
+        // checkstyle: resume exception type check
 
     }
     
