@@ -29,6 +29,7 @@ import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
 import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -257,13 +258,13 @@ public class VabOperationsProvider extends HashMap<String, Object> {
         @Override
         public ProtocolServerBuilder defineOperation(String name, Function<Object[], Object> function) {
             instance.defineServiceFunction(name, function);
-            return null;
+            return this;
         }
 
         @Override
         public ProtocolServerBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
             instance.defineProperty(name, get, set);
-            return null;
+            return this;
         }
 
         @Override
@@ -383,7 +384,8 @@ public class VabOperationsProvider extends HashMap<String, Object> {
         }
         o.put(name, new Entry(Kind.OPERATION, uName));
         operationFunctions.put(uName, function);
-        
+        LoggerFactory.getLogger(getClass()).info("Operation " + category + "/" 
+            + name + " defined (uname " + uName + ")");
         return this;
     }
 
@@ -417,6 +419,7 @@ public class VabOperationsProvider extends HashMap<String, Object> {
         }
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
+        LoggerFactory.getLogger(getClass()).info("Property " + name + " defined");
         return this;
     }
     
