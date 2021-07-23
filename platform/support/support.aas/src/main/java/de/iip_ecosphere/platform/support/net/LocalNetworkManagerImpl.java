@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.net;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -72,6 +74,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
                     keyToAddress.put(key, address);
                     portToKey.put(port, key);
                     result = new ManagedServerAddress(address, true);
+                    LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Allocated port " + key + " " + port);
                 } else {
                     result = null;
                 }
@@ -125,6 +128,8 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
             keyToAddress.put(key, address);
             portToKey.put(address.getPort(), key);
             result = new ManagedServerAddress(address, true);
+            LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Reserved port " + key 
+                + " " + address.getHost() + " " + address.getPort());
         } 
         return result;
     }
@@ -135,6 +140,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         ServerAddress ex = keyToAddress.remove(key);
         if (null != ex) {
             portToKey.remove(ex.getPort());
+            LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Released port " + key);
         }
     }
 
