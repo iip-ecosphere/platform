@@ -81,6 +81,7 @@ public class AmqpClient {
             try {
                 configuration = config;
                 ConnectionFactory factory = new ConnectionFactory();
+                LOGGER.info("AMQP: Connecting to " + config.getHost() + " " + config.getPort());
                 factory.setHost(config.getHost());
                 factory.setPort(config.getPort());
                 factory.setAutomaticRecoveryEnabled(true);
