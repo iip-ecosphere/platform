@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServicesAas;
@@ -44,6 +45,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
@@ -304,6 +306,14 @@ public class SpringCloudServiceManager
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
+    }
+
+    @Override
+    protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
+        ServiceState old = service.getState();
+        // must be done before setState (via stub)
+        ServicesAas.notifyServiceStateChanged(old, service, NotificationMode.SYNCHRONOUS); 
+        service.setState(state);
     }
 
 }
