@@ -40,4 +40,9 @@ public class VabHttpInvocablesCreator extends VabInvocablesCreator {
         return new VABElementProxy("", new JSONConnector(new HTTPConnector(address)));
     }
 
+    @Override
+    protected String getId() {
+        return address;
+    }
+
 }

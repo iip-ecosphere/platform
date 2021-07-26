@@ -14,7 +14,8 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.eclipse.basyx.vab.protocol.basyx.connector.BaSyxConnector;
+
+import de.iip_ecosphere.platform.support.aas.basyx.basyx.BaSyxConnector;
 
 /**
  * implements an invocables creator for TCP-VAB.
@@ -26,6 +27,7 @@ public class VabTcpInvocablesCreator extends VabInvocablesCreator {
     private static final long serialVersionUID = 4353249016693669189L;
     private String host;
     private int port;
+    private String id;
     
     /**
      * Creates an invocables creator instance.
@@ -36,11 +38,17 @@ public class VabTcpInvocablesCreator extends VabInvocablesCreator {
     VabTcpInvocablesCreator(String host, int port) {
         this.host = host;
         this.port = port;
+        id = host + ":" + port;
     }
     
     @Override
     protected VABElementProxy createProxy() {
         return new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
+    }
+
+    @Override
+    protected String getId() {
+        return id;
     }
 
 }

@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -44,6 +46,13 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
     protected abstract VABElementProxy createProxy();
 
     /**
+     * Returns an identifier for the underlying connection, e.g., host + port.
+     * 
+     * @return the identifier
+     */
+    protected abstract String getId();
+
+    /**
      * Defines an abstract, generic, serializable functor.
      * 
      * @author Holger Eichelberger, SSE
@@ -51,6 +60,8 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
     protected abstract static class AbstractFunctor implements Serializable {
 
         private static final long serialVersionUID = 4104858388150273917L;
+        private static final long TIMEOUT = 60 * 1000; // a minute, preliminary
+        private static Map<String, Long> failed;
         private VabInvocablesCreator creator;
         private String name;
         
@@ -64,7 +75,38 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             this.creator = creator;
             this.name = name;
         }
+        
+        /**
+         * Marks the underlying connection as failed for {@link #TIMEOUT}.
+         */
+        protected void markAsFailed() {
+            if (null == failed) { // lazy due to serialization
+                failed = new HashMap<String, Long>();
+            }
+            failed.put(creator.getId(), System.currentTimeMillis());
+        }
 
+        /**
+         * Returns whether the underlying connection is ok.
+         * 
+         * @return {@code true} for ok, {@code false} for currently failing 
+         */
+        protected boolean isOk() {
+            boolean ok = true;
+            if (null != failed) { // lazy due to serialization
+                String id = creator.getId();
+                Long time = failed.get(id);
+                if (null != time) {
+                    if (System.currentTimeMillis() - time >= TIMEOUT) {
+                        failed.remove(id); // implicitly ok, clean up -> link to networkMgr release
+                    } else {
+                        ok = false; // within timeout, fail
+                    }
+                }
+            }
+            return ok;
+        }
+        
         /**
          * Returns the creator instance.
          * 
@@ -117,12 +159,16 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
         
         @Override
         public Object get() {
+            Object result = null;
             try {
-                return createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+                if (isOk()) {
+                    result = createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+                }
             } catch (Throwable t) {
+                markAsFailed();
                 LoggerFactory.getLogger(getClass()).info("Getter " + getName() + " failed: " + t.getMessage());
-                return null;
             }
+            return result;
         }
 
         // checkstyle: resume exception type check
@@ -153,8 +199,11 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
         @Override
         public void accept(Object value) {
             try {
-                createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+                if (isOk()) {
+                    createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+                }
             } catch (Throwable t) {
+                markAsFailed();
                 LoggerFactory.getLogger(getClass()).info("Setter " + getName() + " failed: " + t.getMessage());
             }
         }
@@ -186,12 +235,16 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
 
         @Override
         public Object apply(Object[] params) {
+            Object result = null;
             try {
-                return createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+                if (isOk()) {
+                    result = createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+                }
             } catch (Throwable t) {
+                markAsFailed();
                 LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " failed: " + t.getMessage());
-                return null;
             }
+            return result;
         }
 
         // checkstyle: resume exception type check

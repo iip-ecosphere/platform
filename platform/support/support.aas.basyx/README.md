@@ -20,6 +20,8 @@ May be, future versions need to switch to lazy loading of deployed AAS instances
 - VAB server for HTTPS (implemented but not functional)
 - Authentication/Security/RBAC
 - Events
+- Improved resilience for failing VAB connections. Currently, failing connections are disabled for 1 minute after the 
+  first failure. Consider an integration with the network manager (port release).
 
 **Upgrading BaSyx (for SSE)**
 
