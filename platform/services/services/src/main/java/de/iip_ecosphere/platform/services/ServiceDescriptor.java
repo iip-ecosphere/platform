@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -122,5 +123,13 @@ public interface ServiceDescriptor {
      * @return all input channels
      */
     public List<TypedDataConnectorDescriptor> getOutputDataConnectors();
+
+    /**
+     * Returns the invocables creator of this services, e.g., to connect metrics access from an AAS via this creator.
+     * Depending on the service manager, there may be prerequisites that this method returns a creator instance.
+     * 
+     * @return the creator, may be <b>null</b>
+     */
+    public InvocablesCreator getInvocablesCreator();
     
 }

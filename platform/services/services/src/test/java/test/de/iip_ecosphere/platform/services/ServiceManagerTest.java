@@ -183,7 +183,7 @@ public class ServiceManagerTest {
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
         
         // no services to sort, no internal services
-        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         Assert.assertTrue(result.isEmpty());
         av.assertTested();
         
@@ -191,7 +191,7 @@ public class ServiceManagerTest {
         MyServiceDescriptor s1 = new MyServiceDescriptor("s1", "s1", "", null);
         services.add(s1);
         new MyArtifactDescriptor("a1", "a1", services);
-        result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertList(result, s1);
         av.assertTested();
         
@@ -202,7 +202,7 @@ public class ServiceManagerTest {
         services.add(s1);
         services.add(s2);
         new MyArtifactDescriptor("a1", "a1", services);
-        result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertCollection(result, s1, s2);
         av.assertTested();
     }
@@ -237,19 +237,22 @@ public class ServiceManagerTest {
         new MyArtifactDescriptor("a2", "a2", services);
         localServices.addAll(services);
         
-        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertList(result, s22, s21);
         av.assertTested("output", "im1"); // all outgoing connections
 
         Collections.reverse(services);
 
         // s1.1 -> s2.1 -> s2.2 -> s1.2 just with reversed input sequence
-        result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertList(result, s22, s21);
         av.assertTested("output", "im1"); // all outgoing connections
 
+        result = AbstractServiceManager.sortByDependency(services, localServices, av, true);
+        assertList(result, s21, s22);
+        
         // pretend that "im1" does not exist
-        result = AbstractServiceManager.sortByDependency(services, localServices, c -> !c.getId().equals("im1"));
+        result = AbstractServiceManager.sortByDependency(services, localServices, c -> !c.getId().equals("im1"), false);
         assertList(result, s22, s21); // same result, but forcibly added to end
     }
 
@@ -288,7 +291,7 @@ public class ServiceManagerTest {
         new MyArtifactDescriptor("a", "a", services);
         localServices.addAll(services);
         
-        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertCollection(result, s12, s21, s22, s11);
         Assert.assertTrue(result.indexOf(s12) < result.indexOf(s11));
         Assert.assertTrue(result.indexOf(s21) < result.indexOf(s22));
@@ -297,7 +300,7 @@ public class ServiceManagerTest {
         Collections.reverse(services);
 
         // ensemble members after ensemble leaders, no further sequence
-        result = AbstractServiceManager.sortByDependency(services, localServices, av);
+        result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertCollection(result, s12, s21, s22, s11);
         Assert.assertTrue(result.indexOf(s12) < result.indexOf(s11));
         Assert.assertTrue(result.indexOf(s21) < result.indexOf(s22));

@@ -274,7 +274,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
         service.setState(state);
-        ServicesAas.notifyServiceStateChanged(old, service); 
+        ServicesAas.notifyServiceStateChanged(old, state, service); 
     }
     
     @Override
@@ -311,14 +311,23 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      * Sorts the given list by the dependencies specified in the deployment descriptor.
      * 
      * @param serviceIds the service ids to sort
+     * @param start sequence for service start
      * @return the sorted service ids
      */
-    protected String[] sortByDependency(String[] serviceIds) {
+    protected String[] sortByDependency(String[] serviceIds, boolean start) {
         List<ServiceDescriptor> services = new ArrayList<ServiceDescriptor>();
         for (String s : serviceIds) {
             services.add(getService(s));
         }
-        return sortByDependency(services, getServices(), getAvailablePredicate())
+        
+        Predicate<TypedDataConnectorDescriptor> available;
+        if (start) {
+            available = getAvailablePredicate();
+        } else {
+            available = d -> true;
+        }
+        
+        return sortByDependency(services, getServices(), available, !start)
             .stream()
             .map(s -> s.getId())
             .toArray(size -> new String[size]);
@@ -330,12 +339,14 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      * 
      * @param <S> the service type
      * @param services the services to sort
-     * @param localServices all known local services incuding {@code services}
+     * @param localServices all known local services including {@code services}
      * @param available the available predicate
+     * @param reverse reverse the order (for stopping)
      * @return the list of sorted services
      */
     public static <S extends ServiceDescriptor> List<S> sortByDependency(List<S> services, 
-        Collection<? extends ServiceDescriptor> localServices, Predicate<TypedDataConnectorDescriptor> available) {
+        Collection<? extends ServiceDescriptor> localServices, Predicate<TypedDataConnectorDescriptor> available, 
+        boolean reverse) {
         List<S> result = new ArrayList<S>();
 
         // idea... sort services by their output connections/dependencies adding first those that have no dependencies.
@@ -397,6 +408,9 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             if (!processed.contains(sd)) {
                 result.add(sd);
             }
+        }
+        if (reverse) {
+            Collections.reverse(result);
         }
         return result;
     }

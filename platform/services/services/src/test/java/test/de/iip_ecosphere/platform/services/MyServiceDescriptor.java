@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataDescriptor;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -76,6 +77,11 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
     @Override
     protected Class<MyArtifactDescriptor> getArtifactDescriptorClass() {
         return MyArtifactDescriptor.class;
+    }
+
+    @Override
+    public InvocablesCreator getInvocablesCreator() {
+        return null;
     }
     
 }

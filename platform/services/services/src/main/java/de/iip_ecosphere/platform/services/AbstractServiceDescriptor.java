@@ -129,12 +129,13 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     @Override
     public ServiceState getState() {
         ServiceState result;
-        ServiceDescriptor leader = getEnsembleLeader();
-        if (null != leader) {
-            result = leader.getState();
-        } else if (null != stub) {
+        if (null != stub) {
             result = stub.getState();
-            this.state = result; // keep the descriptor shadow state up to date
+            if (null == result) {
+                result = state; // if AAS getter fails, e.g., service down
+            } else {
+                this.state = result; // keep the descriptor shadow state up to date
+            }
         } else {
             result = state;
         }
@@ -148,15 +149,10 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
             // and switch back to descriptor shadow state
             stub = null; 
         }
-        if (null != getEnsembleLeader()) {
-            // TODO true for all states?
-            getEnsembleLeader().setState(state);
-        } else {
-            if (null != stub) {
-                stub.setState(state);
-            }
-            this.state = state; // keep the descriptor shadow state up to date
+        if (null != stub) {
+            stub.setState(state);
         }
+        this.state = state; // keep the descriptor shadow state up to date
     }
 
     @Override

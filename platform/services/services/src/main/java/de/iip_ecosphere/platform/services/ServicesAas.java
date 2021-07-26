@@ -12,7 +12,9 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -529,31 +531,34 @@ public class ServicesAas implements AasContributor {
      * Is called when a service state changed.
      * 
      * @param old the previous state before the change
-     * @param desc the service descriptor with the new state
+     * @param act the actual state after the change
+     * @param desc the service descriptor (depending on implementation, may have the new state or not)
      */
-    public static void notifyServiceStateChanged(ServiceState old, ServiceDescriptor desc) {
-        notifyServiceStateChanged(old, desc, null);
+    public static void notifyServiceStateChanged(ServiceState old, ServiceState act, ServiceDescriptor desc) {
+        notifyServiceStateChanged(old, act, desc, null);
     }
     
     /**
      * Is called when a service state changed.
      * 
      * @param old the previous state before the change
-     * @param desc the service descriptor with the new state
+     * @param act the actual state after the change
+     * @param desc the service descriptor (depending on implementation, may have the new state or not)
      * @param mode explicit notification mode to be used (if <b>null</b>, use the mode defined 
      *     in {@link AbstractAasBase})
      */
-    public static void notifyServiceStateChanged(ServiceState old, ServiceDescriptor desc, NotificationMode mode) {
+    public static void notifyServiceStateChanged(ServiceState old, ServiceState act, ServiceDescriptor desc, 
+        NotificationMode mode) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, mode, (sub, aas) -> {
             // other approach... link property against service descriptor while creation and reflect state
             // let's try this one for now
-            SubmodelElementCollection elt = sub.getSubmodelElementCollection(NAME_COLL_SERVICES)
-                .getSubmodelElementCollection(fixId(desc.getId()));
+            SubmodelElementCollection services = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+            SubmodelElementCollection elt = services.getSubmodelElementCollection(fixId(desc.getId()));
             if (null != elt) {
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
                     try {
-                        prop.setValue(desc.getState().toString());
+                        prop.setValue(act.toString());
                     } catch (ExecutionException e) {
                         getLogger().error("Cannot write state for service `" + desc.getId() + "`: " + e.getMessage());
                     }
@@ -564,20 +569,32 @@ public class ServicesAas implements AasContributor {
             } else {
                 getLogger().error("Service state change - cannot find service `" + desc.getId() + "`");
             }
-            
             // synchronous execution needed??
-            if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == desc.getState()) {
+            if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == act) {
                 Reference serviceRef = elt.createReference();
                 SubmodelElementCollectionBuilder connectionBuilder 
                     = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
                 addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
                 addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
                 connectionBuilder.build();
+                InvocablesCreator iCreator = desc.getInvocablesCreator();
+                if (null != iCreator) {
+                    SubmodelElementCollectionBuilder serviceB = 
+                        sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
+                    SubmodelElementCollectionBuilder subB =
+                        serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+                    // this is just the interface side, metricsextractorclient -> Service environment
+                    MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, iCreator, null, 
+                        s -> ServiceMapper.getQName(desc.getId(), s));
+                    subB.build();
+                }
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
-                && ServiceState.STOPPED == desc.getState()) {
+                && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
+            } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
+                && ServiceState.STOPPING == act) {
+                MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
             }
-            
         });
     }
 
