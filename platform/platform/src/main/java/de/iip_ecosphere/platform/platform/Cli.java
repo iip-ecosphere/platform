@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 import de.iip_ecosphere.platform.services.ServicesAasClient;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
@@ -31,6 +32,9 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Meter;
 
 /**
  * A simple (optional interactive) command line client providing initial platform functionality through the various AAS.
@@ -133,21 +137,7 @@ public class Cli {
                 String line = scanner.nextLine();
                 if (null != line) {
                     cmds.clear();
-                    boolean inQuote = false;
-                    line = line.trim();
-                    int lastStart = 0;
-                    for (int i = 0; i < line.length(); i++) {
-                        char c = line.charAt(i);
-                        if ('"' == c) {
-                            inQuote = !inQuote;
-                        } else if (' ' == c && !inQuote || i + 1 == line.length()) {
-                            String cmd = line.substring(lastStart, i + 1).trim(); 
-                            if (cmd.length() > 0) {
-                                cmds.add(cmd);
-                            }
-                            lastStart = i + 1;
-                        }
-                    }
+                    CmdLine.parseToArgs(line, cmds);
                     pos = 0;
                     if (cmds.size() > 0) {
                         result = cmds.get(pos++);
@@ -541,6 +531,17 @@ public class Cli {
             Object val;
             try {
                 val = property.getValue();
+                if (null != val) {
+                    try {
+                        Meter m = MeterRepresentation.parseMeter(val.toString());
+                        if (m instanceof Gauge) {
+                            val = ((Gauge) m).value();
+                            val = String.format("%f", val);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        // ignore
+                    }
+                }
             } catch (ExecutionException e) {
                 val = "?";
             }
