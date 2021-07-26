@@ -7,7 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-		<sysproperty key="iip.services.spring.notification" value="SYNCHRONOUS"/>
+		<script language="javascript">      
+		    java.lang.System.setProperty('iip.services.spring.notification', 'SYNCHRONOUS');
+		</script>
 	    <maven pomFile="pom.xml" goal="package"/>
 		<mvnDeployResolveArtifact folderName="IIP-services-spring" pomFile="pom.xml" jarFolder="target" artifactPattern="services.spring-*.*.*.jar" />
 	</target>
