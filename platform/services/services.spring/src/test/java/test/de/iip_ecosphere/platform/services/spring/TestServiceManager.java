@@ -265,6 +265,7 @@ public class TestServiceManager {
             startFakeServiceCommandServers(mgr, ids);
         }
 
+        System.out.println(mgr+" "+ids);
         mgr.startService(ids);
 
         for (ServiceDescriptor sDesc : aDesc.getServices()) {
