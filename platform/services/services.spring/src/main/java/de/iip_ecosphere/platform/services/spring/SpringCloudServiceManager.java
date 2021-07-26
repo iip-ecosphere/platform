@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
@@ -330,7 +331,16 @@ public class SpringCloudServiceManager
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
         // must be done before setState (via stub), synchronous notify may block startup in failure case
-        ServicesAas.notifyServiceStateChanged(old, state, service); 
+        
+        NotificationMode mode;
+        try {
+            mode = NotificationMode.valueOf(System.getProperty("iip.services.spring.notification", 
+                NotificationMode.ASYNCHRONOUS.name()));
+        } catch (IllegalArgumentException e) {
+            mode = NotificationMode.ASYNCHRONOUS;
+        }
+        
+        ServicesAas.notifyServiceStateChanged(old, state, service, mode); 
         service.setState(state);
     }
 
