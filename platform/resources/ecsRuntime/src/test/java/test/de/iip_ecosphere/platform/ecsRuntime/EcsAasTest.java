@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
@@ -45,6 +46,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Meter;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
@@ -56,21 +59,12 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 public class EcsAasTest {
 
     /**
-     * A predicate testing the value for Double type and whether the value is positive.
+     * A predicate testing whether the value of a JSON gauge is positive.
      */
-    private static final Predicate<Object> POSITIVE_DBL_METRICS_VALUE = o -> { 
-        Assert.assertTrue(o instanceof Double); 
-        double val = (Double) o; 
-        return val > 0; 
-    };
-    
-    /**
-     * A predicate testing the value for Integer type and whether the value is positive.
-     */
-    private static final Predicate<Object> POSITIVE_INT_METRICS_VALUE = o -> { 
-        Assert.assertTrue(o instanceof Integer); 
-        int val = (Integer) o; 
-        return val > 0; 
+    private static final Predicate<Object> POSITIVE_GAUGE_VALUE = o -> { 
+        Meter meter = MeterRepresentation.parseMeter(o.toString());
+        Assert.assertTrue(meter instanceof Gauge); 
+        return ((Gauge) meter).value() > 0; 
     };
     
     /**
@@ -138,8 +132,8 @@ public class EcsAasTest {
         test(client);
         
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
-        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_INT_METRICS_VALUE);
-        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_DBL_METRICS_VALUE);
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
         assertMetrics(expectedMetrics);
         
         LifecycleHandler.shutdown();
