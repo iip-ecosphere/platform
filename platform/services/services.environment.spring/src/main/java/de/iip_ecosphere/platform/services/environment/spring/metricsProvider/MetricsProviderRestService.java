@@ -314,7 +314,7 @@ public class MetricsProviderRestService {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/simple-meter/{name}")
     public String getMeter(@PathVariable String name) {
-        return getMeter(name, new ArrayList<Tag>());
+        return getMeter(name, MetricsProvider.EMPTY_TAGS);
     }
 
     /**
