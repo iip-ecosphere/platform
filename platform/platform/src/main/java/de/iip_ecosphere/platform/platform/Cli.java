@@ -535,8 +535,12 @@ public class Cli {
                     try {
                         Meter m = MeterRepresentation.parseMeter(val.toString());
                         if (m instanceof Gauge) {
-                            val = ((Gauge) m).value();
-                            val = String.format("%f", val);
+                            double value = ((Gauge) m).value();
+                            if (value > 1000) { // heuristic, assumption
+                                val = String.format("%.0f", value);
+                            } else {
+                                val = String.format("%f", value);
+                            }
                         }
                     } catch (IllegalArgumentException e) {
                         // ignore
@@ -559,11 +563,11 @@ public class Cli {
 
         @Override
         public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
-            if ((skipFirstCollectionLevel && 0 == collectionLevel) || !skipFirstCollectionLevel) {
+            if ((skipFirstCollectionLevel && collectionLevel > 0) || !skipFirstCollectionLevel) {
                 if (null != collPrefix) {
                     println(collPrefix + collection.getIdShort());
                 }
-                indent += " ";
+                indent += "  ";
                 emitted = true; // assuming that collection elements in the first place determine the output
             }
             collectionLevel++;
@@ -572,8 +576,8 @@ public class Cli {
         @Override
         public void endSubmodelElementCollection(SubmodelElementCollection collection) {
             collectionLevel--;
-            if ((skipFirstCollectionLevel && 0 == collectionLevel) || !skipFirstCollectionLevel) {
-                indent = indent.substring(0, indent.length() - 1);
+            if ((skipFirstCollectionLevel && collectionLevel > 0) || !skipFirstCollectionLevel) {
+                indent = indent.substring(0, indent.length() - 2);
                 if (!emitted) {
                     println(indent + " None.");
                 }
