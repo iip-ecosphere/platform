@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
  * Information about a single service.
@@ -46,7 +47,7 @@ public class YamlService extends de.iip_ecosphere.platform.services.environment.
         for (String arg : cmdArg) {
             arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
             arg = arg.replace(PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
-            result.add(arg);
+            CmdLine.parseToArgs(arg, result);
         }
         return result;
     }

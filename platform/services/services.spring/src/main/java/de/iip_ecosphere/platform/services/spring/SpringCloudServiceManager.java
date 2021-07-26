@@ -163,7 +163,7 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Starting services " 
             + Arrays.toString(serviceIds));
-        for (String ids : sortByDependency(serviceIds)) {
+        for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {
                 errors.add("No service for id '" + ids + "' known.");
@@ -176,16 +176,26 @@ public class SpringCloudServiceManager
                     String id = deployer.deploy(req);
                     waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
                     LOGGER.info("Starting " + id + ": " + deployer.status(id));
-                    service.attachStub(config);
                     AppStatus status = deployer.status(id); 
                     service.setDeploymentId(id);
                     if (DeploymentState.deployed == status.getState()) {
+                        service.attachStub();
                         setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
                     } else {
                         setState(service, ServiceState.FAILED);
                         errors.add("Starting service id '" + ids + "' failed:\n" + getDeployer().getLog(id));
                     }
-                } // else, this is an ensemble service
+                } else {
+                    ServiceState ensState = service.getEnsembleLeader().getState();
+                    if (ServiceState.RUNNING == ensState) {
+                        service.attachStub();
+                        setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                    } else {
+                        setState(service, ServiceState.FAILED);
+                        errors.add("Starting enselbne service id '" + ids + "' failed: See " 
+                            + service.getEnsembleLeader().getId());
+                    }
+                }
             }
         }
         checkErrors(errors);
@@ -243,9 +253,10 @@ public class SpringCloudServiceManager
         LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Stopping services " 
             + Arrays.toString(serviceIds));
         // TODO add/check causes for failing
-        for (String ids : serviceIds) {
+        for (String ids : sortByDependency(serviceIds, false)) {
             SpringCloudServiceDescriptor service = getService(ids);
             String id = service.getDeploymentId();
+            service.detachStub();
             if (null != id) {
                 AppStatus status = deployer.status(id);
                 if (null != status) {
@@ -265,7 +276,9 @@ public class SpringCloudServiceManager
                         setState(service, ServiceState.STOPPED);
                     }
                 }
-            } 
+            } else {
+                setState(service, ServiceState.STOPPED);
+            }
         }
         checkErrors(errors);
     }
@@ -312,7 +325,7 @@ public class SpringCloudServiceManager
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
         // must be done before setState (via stub)
-        ServicesAas.notifyServiceStateChanged(old, service, NotificationMode.SYNCHRONOUS); 
+        ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
         service.setState(state);
     }
 

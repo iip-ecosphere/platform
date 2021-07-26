@@ -22,12 +22,12 @@ In addition, service deployment properties are given in a separate descriptor, t
     * `relations`: Optional connection informations for individual channels/topics to connect the service to other local services or to external services via brokers. 
       * A relation may have an `id` which identifies relations on the same logical channel. Via `id`, relations can implicitly define service dependencies, i.e., outgoing relations must be fulfilled before the declaring service may start. 
       * The `channel` is the technical name identifying the relation on the service implementation, i.e., it is implementation dependent (see `application.yml`). If no `channel` is given, the settings of this relations apply to all local connections within the resource the service is deployed to. 
-      * `endpoint` defines the port and host command line arguments defining the broker for the respective channel/topic. Within these arguments, `${port}` and `${host}` are substituted by actual values, respectively. `hostArg` is optional - if not given, localhost is used. 
+      * `endpoint` defines the port and host command line arguments defining the broker for the respective channel/topic. Within these arguments, `${port}` and `${host}` are substituted by actual values, respectively. `hostArg` is optional - if not given, localhost is used. Multiple command line arguments can be given separated by whitespaces, double quotes are considered to escape strings/keep strings together.
       * A relation may have an  optional `description`, a qualified Java `type` name either pointing to a Java (primitive) type, a platform type or a type declared in the `types` section of the containing artifact and a `direction` (either `IN` or `OUT`).
       * As the default relation with empty channel declares the endpoint information for all internal process local relations, it must neither have a description, a direction or a type. All internal relations must be declared but must not have an endpoint (as they indicate direction and data type). All external relations must provide all data. `ensembleWith` takes priority over implicit service dependencies stated by `relations`.
     * `process`: Optional structure indicating that the service is not directly implemented in Java rather than in terms of a further process, e.g., in a different programming language. 
       * `artifacts` is the list of files (with path if needed, including trailing slash) to be extracted from the containing service artifact. These files provide the service implementation. At least one must be given. Multiple artifacts may facilitate reuse.
-      * `executable` denotes the program to execute, i.e., either a systeam command (potentially substituted due to the overall setup described below) or a relative path within the `artifact` where the executable/code is located. All files and folders contained in `artifact` will be extracted to a local directory, which is set as home directory for the process.
+      * `executable` denotes the program to execute, i.e., either a system command (potentially substituted due to the overall setup described below) or a relative path within the `artifact` where the executable/code is located. All files and folders contained in `artifact` will be extracted to a local directory, which is set as home directory for the process.
       * `cmdArg` provide the arguments of `executable` in terms of a string list. Aas above, ${port} and ${protocol} are substituted with the command port/protocol. 
       * `streamEndpoint` and `aasEndpoint` denote (akin to `endpoint` above) communication settings to be appended to the command line arguments, here for the data streaming communication (i.e., the service will delegate the data there and receive input from there) and AAS command communication (typically via VAB). 
       * The Boolean property `started` indicates whether the underlying process is already started (default is `false`), e.g., in case of a database.
@@ -118,6 +118,9 @@ The configuration structure is as shown below (the `executables` mapping is indc
         local:
           workingDirectoriesRoot: <Folder>
           deleteFilesOnExit: <Boolean>
+      
+## Hint
+Service startup on slow machines may fail due to Spring timeouts. Might be some deployer settings could help then.      
       
 ## Missing
 * Handling of dependent services

@@ -13,11 +13,14 @@
 package test.de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -51,6 +54,8 @@ import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
@@ -58,16 +63,23 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
@@ -81,6 +93,15 @@ import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 @Import(SpringCloudServiceConfiguration.class)
 @RunWith(SpringRunner.class)
 public class TestServiceManager {
+
+    /**
+     * A predicate testing whether the value of a JSON gauge is positive.
+     */
+    private static final Predicate<Object> POSITIVE_GAUGE_VALUE = o -> { 
+        Meter meter = MeterRepresentation.parseMeter(o.toString());
+        Assert.assertTrue(meter instanceof Gauge); 
+        return ((Gauge) meter).value() > 0; 
+    };
 
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
 
@@ -131,10 +152,11 @@ public class TestServiceManager {
      * an actual version of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact 
      * in the compile phase.
      * 
-     * @throws ExecutionException shall not occur
+     * @throws ExecutionException shall not occur for successful test
+     * @throws IOException shall not occur for successful test
      */
     @Test
-    public void testSimpleStartStop() throws ExecutionException {
+    public void testSimpleStartStop() throws ExecutionException, IOException {
         doTestStartStop("deployment.yml", new ArtifactAsserter() {
 
             /*@Override
@@ -142,17 +164,18 @@ public class TestServiceManager {
                 // more specific tests may go here
             }*/
 
-        });
+        }, false);
     }
 
     /**
      * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager} in one process as an ensemble. As 
      * {@link #testSimpleStartStop()}, this test requires an actual version of {@code test.simpleStream.spring}.
      * 
-     * @throws ExecutionException shall not occur
+     * @throws ExecutionException shall not occur for successful test
+     * @throws IOException shall not occur for successful test
      */
     @Test
-    public void testEnsembleStartStop() throws ExecutionException {
+    public void testEnsembleStartStop() throws ExecutionException, IOException {
         doTestStartStop("deployment1.yml", new ArtifactAsserter() {
 
             /*@Override
@@ -160,7 +183,7 @@ public class TestServiceManager {
                 // more specific tests may go here
             }*/
 
-        });
+        }, false);
     }
 
     /**
@@ -193,9 +216,13 @@ public class TestServiceManager {
      * 
      * @param descriptorName the descriptor name
      * @param asserter the asserter related to descriptor-specific properties
-     * @throws ExecutionException
+     * @param fakeServer fake command servers for services - clashes with services that are based on the 
+     *     service environment
+     * @throws ExecutionException if executing service operations fails
+     * @throws IOException if accessing metrics fails
      */
-    private void doTestStartStop(String descriptorName, ArtifactAsserter asserter) throws ExecutionException {
+    private void doTestStartStop(String descriptorName, ArtifactAsserter asserter, boolean fakeServer) 
+        throws ExecutionException, IOException {
         config.setDescriptorName(descriptorName);
         ServiceManager mgr = ServiceFactory.getServiceManager();
         Assert.assertTrue(mgr instanceof SpringCloudServiceManager);
@@ -234,7 +261,9 @@ public class TestServiceManager {
 
         String[] ids = new String[aDesc.getServices().size()];
         aDesc.getServiceIds().toArray(ids);
-        startFakeServiceCommandServers(mgr, ids);
+        if (fakeServer) {
+            startFakeServiceCommandServers(mgr, ids);
+        }
 
         mgr.startService(ids);
 
@@ -244,6 +273,11 @@ public class TestServiceManager {
         }
         
         TimeUtils.sleep(2000);
+        
+        Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
+        expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
+        assertMetrics(ids, expectedMetrics);
 
         mgr.stopService(ids);
         releaseFakeServiceCommandServers();
@@ -259,6 +293,37 @@ public class TestServiceManager {
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
         Assert.assertNull(mgr.getArtifact(aId));
+    }
+    
+    /**
+     * Asserts the existence of selected AAS metrics and/or their values.
+     * 
+     * @param ids service ids
+     * @param expected the expected metrics as key-predicate pairs, whereby the predicate may be <b>null</b> to 
+     *     indicated that the value shall not be tested 
+     * @throws IOException if the AAS cannot be retrieved
+     * @throws ExecutionException if a property cannot be queried
+     */
+    private void assertMetrics(String[] ids, Map<String, Predicate<Object>> expected) 
+        throws IOException, ExecutionException {
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
+        Assert.assertNotNull(sub);
+        SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+        Assert.assertNotNull(sub);
+        for (String id: ids) {
+            SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
+            Assert.assertNotNull(service);
+            for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
+                Property prop = service .getProperty(ent.getKey());
+                Assert.assertNotNull(prop);
+                Predicate<Object> pred = ent.getValue();
+                if (null != pred) {
+                    Object val = prop.getValue();
+                    Assert.assertTrue(pred.test(val));
+                }
+            }
+        }
     }
     
     /**
@@ -319,7 +384,6 @@ public class TestServiceManager {
             server.start();
             serversToRelease.add(server);
         }
-        
     }
     
     /**

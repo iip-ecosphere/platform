@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -63,6 +64,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private List<String> portKeys = new ArrayList<String>();
     private Process process;
     private File processDir;
+    private String serviceProtocol;
     private ManagedServerAddress adminAddr;
     
     /**
@@ -187,11 +189,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
 
             List<String> cmdLine = new ArrayList<String>();
             adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
-            String serviceProtocol = config.getServiceProtocol();
+            serviceProtocol = config.getServiceProtocol();
             cmdLine.addAll(service.getCmdArg(adminAddr.getPort(), serviceProtocol));
-//            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
-//                adminAdr.getHost(), adminAdr.getPort());
-//            setStub(new ServiceStub(iCreator, getId()));
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
@@ -228,16 +227,40 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     /**
      * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
      * {@link #createDeploymentRequest(SpringCloudServiceConfiguration)} before.
-     * 
-     * @param config the service manager configuration instance
      */
-    void attachStub(SpringCloudServiceConfiguration config) {
-        if (null != adminAddr) {
-            String serviceProtocol = config.getServiceProtocol();
-            InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(serviceProtocol, 
-                adminAddr.getHost(), adminAddr.getPort());
+    void attachStub() {
+        InvocablesCreator iCreator = getInvocablesCreator();
+        if (null != iCreator) {
             setStub(new ServiceStub(iCreator, getId()));
         }
+    }
+    
+    /**
+     * Detaches an attached service stub.
+     */
+    void detachStub() {
+        // force detach on instance?
+        setStub(null);
+    }
+
+    @Override
+    public InvocablesCreator getInvocablesCreator() {
+        InvocablesCreator iCreator = null;
+        ManagedServerAddress addr;
+        String proto;
+        SpringCloudServiceDescriptor leader = getEnsembleLeader();
+        if (null != leader) {
+            addr = leader.adminAddr;
+            proto = leader.serviceProtocol;
+        } else {
+            addr = adminAddr;
+            proto = serviceProtocol;
+        }
+        if (null != addr) {
+            iCreator = AasFactory.getInstance().createInvocablesCreator(proto, 
+                addr.getHost(), addr.getPort());
+        }
+        return iCreator;
     }
     
     /**
@@ -333,10 +356,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @param host the host name (for substitution in results delivered by {@code endpoint})
      */
     private void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, int port, String host) {
-        if (null != endpoint) { // endpoints may be optional
-            cmdLine.add(endpoint.getPortArg(port));
+        if (null != endpoint) { // endpoints are optional
+            CmdLine.parseToArgs(endpoint.getPortArg(port), cmdLine);
             if (endpoint.getHostArg().length() > 0) {
-                cmdLine.add(endpoint.getHostArg(host));
+                CmdLine.parseToArgs(endpoint.getHostArg(host), cmdLine);
             }
         }
     }
