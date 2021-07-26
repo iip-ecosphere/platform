@@ -45,7 +45,6 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
@@ -330,8 +329,8 @@ public class SpringCloudServiceManager
     @Override
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
-        // must be done before setState (via stub)
-        ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
+        // must be done before setState (via stub), synchronous notify may block startup in failure case
+        ServicesAas.notifyServiceStateChanged(old, state, service); 
         service.setState(state);
     }
 
