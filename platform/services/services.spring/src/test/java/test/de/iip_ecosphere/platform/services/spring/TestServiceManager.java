@@ -265,6 +265,7 @@ public class TestServiceManager {
             startFakeServiceCommandServers(mgr, ids);
         }
 
+        System.out.println("STARTING " + mgr + " " + ids); // strange, does not work on Jenkins without...
         mgr.startService(ids);
 
         for (ServiceDescriptor sDesc : aDesc.getServices()) {
