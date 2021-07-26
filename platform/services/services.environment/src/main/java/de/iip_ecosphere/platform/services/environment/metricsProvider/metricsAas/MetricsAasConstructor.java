@@ -364,13 +364,12 @@ public class MetricsAasConstructor {
     private static String getMeter(MetricsProvider provider, String name) {
         String result;
         try {
-            result = provider.getMeter(MetricsProvider.SYS_DISK_FREE, MetricsProvider.EMPTY_TAGS);
+            result = provider.getMeter(name, MetricsProvider.EMPTY_TAGS);
         } catch (IllegalArgumentException e) {
             result = null;
         }
         return result;
     }
-    
 
     /**
      * Adds a custom metric to the AAS submodel.<br>
