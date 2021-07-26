@@ -14,7 +14,10 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +59,8 @@ import com.sun.management.OperatingSystemMXBean;
 @SuppressWarnings("restriction")
 public class MetricsProvider {
 
+    public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
+    
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
     public static final String SYS_MEM_FREE = "system.memory.free";

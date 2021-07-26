@@ -12,14 +12,19 @@
 
 package de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.stream.JsonParsingException;
 
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Statistic;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 
@@ -177,5 +182,62 @@ public abstract class MeterRepresentation implements Meter {
      * @return a JsonObject representing the changes this meter has experienced
      */
     public abstract JsonObject getUpdater();
+
+    /**
+     * Generically parses a meter.
+     * 
+     * @param json   JSON string representation of the meter
+     * @param tags   tags that the counter has following the format
+     *               {@code key:value}
+     * @return a Meter representation of the JsonObject
+     * @throws IllegalArgumentException if the object is {@code null}, or if the
+     *                                  JsonObject doesn't represent a valid meter.
+     */
+    public static Meter parseMeter(String json, String... tags) {
+        try {
+            return parseMeter(Json.createReader(new StringReader(json)).readObject(), tags);
+        } catch (JsonParsingException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+    
+    /**
+     * Generically parses a meter.
+     * 
+     * @param object JsonObject representing the Timer we wish to parse
+     * @param tags   tags that the counter has following the format
+     *               {@code key:value}
+     * @return a Meter representation of the JsonObject
+     * @throws IllegalArgumentException if the object is {@code null}, or if the
+     *                                  JsonObject doesn't represent a valid meter.
+     */
+    public static Meter parseMeter(JsonObject object, String... tags) {
+        Meter result = null;
+        boolean valueFound = false;
+        boolean countFound = false;
+        boolean totalTimeFound = false;
+        JsonArray measurements = object.getJsonArray("measurements");
+        if (null != measurements) {
+            for (int i = 0; i < measurements.size(); i++) {
+                JsonObject measurement = measurements.getJsonObject(i);
+                if (null != measurement) {
+                    String statistics = measurement.getString("statistic");
+                    valueFound = Statistic.VALUE.name().equals(statistics);
+                    countFound = Statistic.COUNT.name().equals(statistics);
+                    totalTimeFound = Statistic.TOTAL_TIME.name().equals(statistics);
+                }
+            }
+        }
+        if (totalTimeFound && countFound) {
+            result = TimerRepresentation.parseTimer(object, tags);
+        } else if (countFound) {
+            result = CounterRepresentation.parseCounter(object, tags);
+        } else if (valueFound) {
+            result = GaugeRepresentation.parseGauge(object, tags);
+        } else {
+            throw new IllegalArgumentException("Invalid meter JSON: " + object);
+        }
+        return result;
+    }
 
 }

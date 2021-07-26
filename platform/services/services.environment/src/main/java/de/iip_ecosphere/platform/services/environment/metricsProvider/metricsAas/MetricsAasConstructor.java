@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAa
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -102,25 +103,51 @@ public class MetricsAasConstructor {
         smBuilder.createPropertyBuilder(SIMPLE_METER_LIST).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SIMPLE_METER_LIST)), InvocablesCreator.READ_ONLY).build();
 
-        /* System Disk Capacity metrics */
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.INTEGER)
+        /* System Disk Capacity metrics, string as JSON meter is transferred  */
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_FREE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_TOTAL)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_USABLE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_DISK_USED)), InvocablesCreator.READ_ONLY).build();
 
-        /* System Physical Memory metrics */
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.INTEGER)
+        /* System Physical Memory metrics, string as JSON meter is transferred  */
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_FREE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_TOTAL)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.DOUBLE)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USAGE)), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.INTEGER)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USED)), InvocablesCreator.READ_ONLY).build();
+    }
+    
+    /**
+     * Removes provider metrics and all related elements from {@code sub}.
+     * 
+     * @param sub the submodel elements collection to remove the elements from
+     */
+    public static void removeProviderMetricsFromAasSubmodel(SubmodelElementCollection sub) {
+        /* Meter lists */
+        sub.deleteElement(GAUGE_LIST);
+        sub.deleteElement(COUNTER_LIST);
+        sub.deleteElement(TIMER_LIST);
+        sub.deleteElement(TAGGED_METER_LIST);
+        sub.deleteElement(SIMPLE_METER_LIST);
+
+        /* System Disk Capacity metrics */
+        sub.deleteElement(SYSTEM_DISK_FREE);
+        sub.deleteElement(SYSTEM_DISK_TOTAL);
+        sub.deleteElement(SYSTEM_DISK_USABLE);
+        sub.deleteElement(SYSTEM_DISK_USED);
+
+        /* System Physical Memory metrics */
+        sub.deleteElement(SYSTEM_MEMORY_FREE);
+        sub.deleteElement(SYSTEM_MEMORY_TOTAL);
+        sub.deleteElement(SYSTEM_MEMORY_USAGE);
+        sub.deleteElement(SYSTEM_MEMORY_USED);
     }
     
     /**
@@ -266,18 +293,16 @@ public class MetricsAasConstructor {
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_CPU_USAGE), () -> client.getSystemCpuUsage(), null);
 
         /* System Disk Capacity metrics */
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), () -> toInt(client.getSystemDiskFree()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), () -> toInt(client.getSystemDiskTotal()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), () -> toInt(client.getSystemDiskUsable()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), () -> toInt(client.getSystemsDiskUsed()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), () -> client.getSystemDiskFree(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), () -> client.getSystemDiskTotal(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), () -> client.getSystemDiskUsable(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), () -> client.getSystemsDiskUsed(), null);
 
         /* System Physical Memory metrics */
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), () -> toInt(client.getSystemMemoryFree()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
-            () -> toInt(client.getSystemMemoryTotal()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> toDouble(client.getSystemMemoryUsage()), null);
-        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), () -> toInt(client.getSystemMemoryUsed()), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), () -> client.getSystemMemoryFree(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), () -> client.getSystemMemoryTotal(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), () -> client.getSystemMemoryUsage(), null);
+        pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), () -> client.getSystemMemoryUsed(), null);
 
         /* Configuration operations */
         pBuilder.defineOperation(nameMapper.apply(SET_MEMORY_BASE_UNIT), (args) -> client.setMemoryBaseUnit(args));
@@ -309,68 +334,43 @@ public class MetricsAasConstructor {
 
         /* System Disk Capacity metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_FREE), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_FREE), null);
+            () -> getMeter(provider, MetricsProvider.SYS_DISK_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_TOTAL), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_TOTAL), null);
+            () -> getMeter(provider, MetricsProvider.SYS_DISK_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USABLE), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USABLE), null);
+            () -> getMeter(provider, MetricsProvider.SYS_DISK_USABLE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_DISK_USED), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_DISK_USED), null);
+            () -> getMeter(provider, MetricsProvider.SYS_DISK_USED), null);
 
         /* System Physical Memory metrics */
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_FREE), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_FREE), null);
+            () -> getMeter(provider, MetricsProvider.SYS_MEM_FREE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_TOTAL), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL), null);
+            () -> getMeter(provider, MetricsProvider.SYS_MEM_TOTAL), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USAGE), 
-            () -> (double) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USAGE), null);
+            () -> getMeter(provider, MetricsProvider.SYS_MEM_USAGE), null);
         pBuilder.defineProperty(nameMapper.apply(SYSTEM_MEMORY_USED), 
-            () -> (int) provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_USED), null);
-        
+            () -> getMeter(provider, MetricsProvider.SYS_MEM_USED), null);
         /* Configuration operations */
     }
     
     /**
-     * Turns a (JSON) string value into an integer object for AAS.
+     * Returns a meter of the {@code provider}.
      * 
-     * @param value the string value
-     * @return the integer object, may be <b>null</b> if <code>string</code> was <b>null</b> or cannot be parsed into 
-     * an integer
+     * @param provider the metrics provider
+     * @param name the meter name
+     * @return <b>null</b> if the meter does not (yet) exist, the meter JSON else
      */
-    private static Integer toInt(String value) {
-        Integer result;
-        if (null != value) {
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                result = null;
-            }
-        } else {
+    private static String getMeter(MetricsProvider provider, String name) {
+        String result;
+        try {
+            result = provider.getMeter(MetricsProvider.SYS_DISK_FREE, MetricsProvider.EMPTY_TAGS);
+        } catch (IllegalArgumentException e) {
             result = null;
         }
         return result;
     }
-
-    /**
-     * Turns a (JSON) string value into a double object for AAS.
-     * 
-     * @param value the string value
-     * @return the double object, may be <b>null</b> if <code>string</code> was <b>null</b> or cannot be parsed into 
-     * a double
-     */
-    private static Double toDouble(String value) {
-        Double result;
-        if (null != value) {
-            try {
-                return Double.parseDouble(value);
-            } catch (NumberFormatException e) {
-                result = null;
-            }
-        } else {
-            result = null;
-        }
-        return result;
-    }
+    
 
     /**
      * Adds a custom metric to the AAS submodel.<br>
