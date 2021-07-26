@@ -307,21 +307,23 @@ public class TestServiceManager {
      */
     private void assertMetrics(String[] ids, Map<String, Predicate<Object>> expected) 
         throws IOException, ExecutionException {
-        Aas aas = AasPartRegistry.retrieveIipAas();
-        Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
-        Assert.assertNotNull(sub);
-        SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
-        Assert.assertNotNull(sub);
-        for (String id: ids) {
-            SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
-            Assert.assertNotNull(service);
-            for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
-                Property prop = service .getProperty(ent.getKey());
-                Assert.assertNotNull(prop);
-                Predicate<Object> pred = ent.getValue();
-                if (null != pred) {
-                    Object val = prop.getValue();
-                    Assert.assertTrue(pred.test(val));
+        if (ServicesAas.ENABLE_SERVICE_MONITORING) {
+            Aas aas = AasPartRegistry.retrieveIipAas();
+            Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
+            Assert.assertNotNull(sub);
+            SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+            Assert.assertNotNull(sub);
+            for (String id: ids) {
+                SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
+                Assert.assertNotNull(service);
+                for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
+                    Property prop = service .getProperty(ent.getKey());
+                    Assert.assertNotNull(prop);
+                    Predicate<Object> pred = ent.getValue();
+                    if (null != pred) {
+                        Object val = prop.getValue();
+                        Assert.assertTrue(pred.test(val));
+                    }
                 }
             }
         }

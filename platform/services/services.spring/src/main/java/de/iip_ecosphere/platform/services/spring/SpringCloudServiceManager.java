@@ -163,16 +163,16 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Starting services " 
             + Arrays.toString(serviceIds));
+        SpringCloudServiceConfiguration config = getConfig();
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {
                 errors.add("No service for id '" + ids + "' known.");
             } else {
-                SpringCloudServiceConfiguration config = getConfig();
                 AppDeploymentRequest req = service.createDeploymentRequest(config);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
-                    LOGGER.info("Starting ... ");
+                    LOGGER.info("Starting " + ids);
                     String id = deployer.deploy(req);
                     waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
                     LOGGER.info("Starting " + id + ": " + deployer.status(id));
@@ -181,20 +181,26 @@ public class SpringCloudServiceManager
                     if (DeploymentState.deployed == status.getState()) {
                         service.attachStub();
                         setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                        LOGGER.info("Starting " + ids + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
                         errors.add("Starting service id '" + ids + "' failed:\n" + getDeployer().getLog(id));
+                        LOGGER.info("Starting " + id + " failed");
                     }
                 } else {
+                    LOGGER.info("Starting ensemble service " + ids);
                     ServiceState ensState = service.getEnsembleLeader().getState();
                     if (ServiceState.RUNNING == ensState) {
                         service.attachStub();
                         setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                        LOGGER.info("Starting ensemble service " + ids + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
-                        errors.add("Starting enselbne service id '" + ids + "' failed: See " 
+                        errors.add("Starting ensemble service id '" + ids + "' failed: See " 
                             + service.getEnsembleLeader().getId());
+                        LOGGER.info("Starting ensemble service " + ids + " failed");
                     }
+                    
                 }
             }
         }
