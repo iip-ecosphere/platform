@@ -330,17 +330,8 @@ public class SpringCloudServiceManager
     @Override
     protected void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
         ServiceState old = service.getState();
-        // must be done before setState (via stub), synchronous notify may block startup in failure case
-        
-        NotificationMode mode;
-        try {
-            mode = NotificationMode.valueOf(System.getProperty("iip.services.spring.notification", 
-                NotificationMode.ASYNCHRONOUS.name()));
-        } catch (IllegalArgumentException e) {
-            mode = NotificationMode.ASYNCHRONOUS;
-        }
-        
-        ServicesAas.notifyServiceStateChanged(old, state, service, mode); 
+        // must be done before setState (via stub), synchronous for now required on Jenkins/Linux
+        ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
         service.setState(state);
     }
 
