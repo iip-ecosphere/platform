@@ -19,7 +19,9 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
@@ -34,6 +36,9 @@ import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.Met
  * @author Holger Eichelberger, SSE
  */
 @SpringBootApplication
+@EnableScheduling
+@ComponentScan({"test.de.iip_ecosphere.platform.simpleStream.spring", 
+    "de.iip_ecosphere.platform.services.environment.spring", "de.iip_ecosphere.platform.transport.spring"})
 public class Test extends Starter {
     
     private static final String SUPPLIER_TIMER_ID = "suppliercustomtimer";
@@ -87,11 +92,15 @@ public class Test extends Starter {
                     metrics.increaseCounterBy(REST_COUNTER_ID, 0);
                     metrics.recordWithTimer(REST_TIMER_ID, 0, TimeUnit.MILLISECONDS);
                     first = false;
-                } else if (ingestCount > config.getIngestCount()) {
-                    getContext().close();
+                } else if (config.getIngestCount() > 0 && ingestCount > config.getIngestCount()) {
+                    if (null != getContext()) {
+                        getContext().close();
+                    }
                     System.exit(0);
                 }
-                ingestCount++;
+                if (config.getIngestCount() > 0) {
+                    ingestCount++;
+                }
                 return String.valueOf(num);
             });
         };

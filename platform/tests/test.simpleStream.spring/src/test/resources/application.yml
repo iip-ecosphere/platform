@@ -1,8 +1,8 @@
 test:
     debug: true
-    ingestCount: 150
+    ingestCount: -1
 metricsprovider:
-    schedulerrate: 3000
+    schedulerrate: 300
     memorybaseunit: kilobytes
     diskbaseunit: megabytes
 mqtt:
