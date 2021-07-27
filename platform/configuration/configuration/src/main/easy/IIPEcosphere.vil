@@ -84,7 +84,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter", app=a, appName=appName);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             
-            maven("${appRoot}");
+            maven("${appRoot}", true);
         };
     }
     
@@ -98,7 +98,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
-        maven("${ecsRuntimeRoot}");
+        maven("${ecsRuntimeRoot}", true);
         generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain);
         
         serviceMgrRoot.mkdir();
@@ -109,7 +109,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
-        maven("${serviceMgrRoot}");
+        maven("${serviceMgrRoot}", true);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain);
         
         platformRoot.mkdir();
@@ -120,7 +120,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
-        maven("${platformRoot}");
+        maven("${platformRoot}", true);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain);
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli");
     }
