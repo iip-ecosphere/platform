@@ -11,6 +11,7 @@ project Applications {
         NonEmptyString name;
         String description;
         IipVersion ver;
+        Boolean snapshot = true;
         String artifact = "";
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
     }

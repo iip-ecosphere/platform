@@ -20,11 +20,15 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
     def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = config.iipVer;
+        String appVersion = "${app.ver}";
+        if (app.snapshot) {
+            appVersion = appVersion + "-SNAPSHOT";
+        }
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "${appName}", "${appName}", "${app.description}");
         new XmlElement(project, "groupId", "${iipGroup}.apps");
-        new XmlElement(project, "version", "${app.ver}");        
+        new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         XmlElement properties = new XmlElement(project, "properties");
