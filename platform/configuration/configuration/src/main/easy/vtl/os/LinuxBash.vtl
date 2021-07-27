@@ -1,9 +1,11 @@
 @advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
 template LinuxBash(Configuration config, FileArtifact target, String dir, String main) {
 	
     def main(Configuration config, FileArtifact target, String dir, String main) {
+        String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '#!/bin/bash
-        java -cp "${dir}/*" ${main}'
+        java -cp "${dir}/*" "${m}"'
     }
 	
 }
