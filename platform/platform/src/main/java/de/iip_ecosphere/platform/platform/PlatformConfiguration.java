@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * Platform configuration.
@@ -37,6 +38,7 @@ public class PlatformConfiguration extends AbstractConfiguration {
     
     private static PlatformConfiguration instance;
     private PersistentAasSetup aas = new PersistentAasSetup();
+    private TransportSetup transport;
     
     /**
      * Returns the AAS setup.
@@ -46,9 +48,27 @@ public class PlatformConfiguration extends AbstractConfiguration {
     public PersistentAasSetup getAas() {
         return aas;
     }
+
+    /**
+     * Returns the transport setup.
+     * 
+     * @return the transport setup
+     */
+    public TransportSetup getTransport() {
+        return transport;
+    }
+
+    /**
+     * Defines the transport setup. [snakeyaml]
+     * 
+     * @param transport the transport setup
+     */
+    public void setTransport(TransportSetup transport) {
+        this.transport = transport;
+    }
     
     /**
-     * Defines the AAS setup.
+     * Defines the AAS setup. [snakeyaml]
      * 
      * @param aas the AAS setup
      */

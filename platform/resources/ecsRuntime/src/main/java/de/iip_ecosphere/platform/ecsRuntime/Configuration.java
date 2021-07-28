@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add
@@ -24,6 +25,26 @@ import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
  * @author Holger Eichelberger, SSE
  */
 public class Configuration extends AasConfiguration {
+    
+    private TransportSetup transport;
+
+    /**
+     * Returns the transport setup.
+     * 
+     * @return the transport setup
+     */
+    public TransportSetup getTransport() {
+        return transport;
+    }
+
+    /**
+     * Defines the transport setup. [snakeyaml]
+     * 
+     * @param transport the transport setup
+     */
+    public void setTransport(TransportSetup transport) {
+        this.transport = transport;
+    }
 
     /**
      * Reads a {@link Configuration} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 

@@ -20,4 +20,8 @@ service-mgr:
   executables:
     perl: /usr/bin/perl
     php: /home/edge/php/active/bin/php
-  
+  transport:
+    host: me.de
+    port: 1234
+    password: pass
+    user: user  

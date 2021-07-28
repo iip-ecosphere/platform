@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * Configures the service manager.
@@ -40,6 +41,7 @@ public class SpringCloudServiceConfiguration {
     private AasSetup aas = new AasSetup();
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
     private HashMap<String, String> executables = new HashMap<String, String>();
+    private TransportSetup transport = new TransportSetup();
 
     /**
      * Returns the name of the broker host.
@@ -138,6 +140,14 @@ public class SpringCloudServiceConfiguration {
         return result;
     }
 
+    /**
+     * Returns the transport setup.
+     * 
+     * @return the transport setup
+     */
+    public TransportSetup getTransport() {
+        return transport;
+    }
 
     /**
      * Defines the name of the broker host. [required by Spring]
@@ -196,7 +206,7 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Changes the delay between two availability checks.
+     * Changes the delay between two availability checks. [required by Spring]
      * 
      * @param availabilityRetryDelay the retry delay in ms
      */
@@ -205,7 +215,7 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Defines the AAS setup.
+     * Defines the AAS setup. [required by Spring]
      * 
      * @param aas the AAS setup
      */
@@ -214,7 +224,7 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Defines the service administration protocol.
+     * Defines the service administration protocol. [required by Spring]
      * 
      * @param serviceProtocol the service administration protocol (see {@link AasFactory#getProtocols()}
      */
@@ -224,7 +234,7 @@ public class SpringCloudServiceConfiguration {
     
     /**
      * Defines the executables mapping, i.e., an optional mapping of OS command names to paths or other command names
-     * that are available on the respective target system.
+     * that are available on the respective target system. [required by Spring]
      * 
      * @param executables the executables mapping
      */
@@ -232,5 +242,13 @@ public class SpringCloudServiceConfiguration {
         this.executables = executables;
     }
 
+    /**
+     * Defines the transport setup. [required by Spring]
+     * 
+     * @param transport the transport setup
+     */
+    public void setTransport(TransportSetup transport) {
+        this.transport = transport;
+    }
 
 }

@@ -14,4 +14,9 @@ aas:
         host: 127.0.0.1
         port: 8082
         protocol: VAB-TCP
-    persistence: MONGO        
+    persistence: MONGO
+transport:
+    host: me.de
+    port: 1234
+    password: pass
+    user: user  
