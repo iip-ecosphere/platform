@@ -137,6 +137,7 @@ public class AmqpMessageBinderTest {
         AmqpClient.stopClient();
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
+        SerializerRegistry.resetDefaults();
     }
     
     /**

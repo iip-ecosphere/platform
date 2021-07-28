@@ -129,6 +129,7 @@ public class HivemqV5MessageBinderTest {
         HivemqV5Client.stopClient();
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
+        SerializerRegistry.resetDefaults();
     }
     
     /**

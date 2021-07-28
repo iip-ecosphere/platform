@@ -93,6 +93,10 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         factory.setHost(params.getHost());
         factory.setPort(params.getPort());
         factory.setAutomaticRecoveryEnabled(true);
+        if (null != params.getUser() && null != params.getPassword()) {
+            factory.setUsername(params.getUser());
+            factory.setPassword(params.getPassword());
+        }
         configureFactory(factory);
         try {
             connection = factory.newConnection();
