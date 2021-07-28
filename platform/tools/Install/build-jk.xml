@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Install" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- build zip -->
+    <target name="maven"> 
+        <zip destFile="install.zip">
+            <fileset dir="." includes="pom.xml README.md"/>
+            <fileset dir="." includes="platformDependencies/**/*.*" />
+            <fileset dir="." includes="broker/**/*.*" />
+            <fileset dir="." includes="src/**/*.*" />
+        </zip>
+    </target>
+</project>

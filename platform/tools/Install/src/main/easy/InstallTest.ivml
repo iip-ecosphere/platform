@@ -5,6 +5,8 @@ project InstallTest {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
+    String serverHost = "147.172.178.145";
+
     // ------------ component setup ------------------
 
     serializer = Serializer::Json;
@@ -13,12 +15,12 @@ project InstallTest {
     aasServer = {
         schema = AasSchema::HTTP,
         port = 9001,
-        host = "147.172.178.145"
+        host = serverHost
     };
     aasRegistryServer = {
         schema = AasSchema::HTTP,
         port = 9002,
-        host = "147.172.178.145",
+        host = serverHost,
         path = "registry"
     };
     aasImplServer = {
@@ -30,6 +32,7 @@ project InstallTest {
     // ------------------ transport --------------------------
     
     transportProtocol = TransportProtocolAMQP {
+        globalHost = serverHost,
         port = 8883,
         user = "user",
         password = "pwd"
