@@ -25,6 +25,17 @@ public class SerializerRegistry {
 
     private static Map<Class<?>, Serializer<?>> serializers = Collections.synchronizedMap(new HashMap<>());
     private static String wireName = "";
+    
+    static {
+        resetDefaults();
+    }
+    
+    /**
+     * Re-registers the default serizalizer types.
+     */
+    public static void resetDefaults() {
+        registerSerializer(StringSerializer.class);
+    }
 
     /**
      * Returns a serializer instance.

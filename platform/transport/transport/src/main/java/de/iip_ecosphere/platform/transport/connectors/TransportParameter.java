@@ -26,6 +26,8 @@ public class TransportParameter {
     private String applicationId = "";
     private boolean autoApplicationId = true;
     private int keepAlive = 2000; 
+    private String user; // preliminary, AMQP
+    private String password; // preliminary, AMQP
 
     // inspired by OPC UA, just an idea for UKL
     //private X509Certificate certificate;
@@ -116,6 +118,19 @@ public class TransportParameter {
         }
 
         /**
+         * Sets plain user information. Preliminary!!!
+         * 
+         * @param user the user name
+         * @param password the password
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setUser(String user, String password) {
+            instance.user = user;
+            instance.password = password;
+            return this;
+        }
+
+        /**
          * Returns the created instance.
          * 
          * @return the created instance
@@ -190,6 +205,24 @@ public class TransportParameter {
      */
     public boolean getAutoApplicationId() {
         return autoApplicationId;
+    }
+    
+    /**
+     * Returns the password. [preliminary]
+     * 
+     * @return the password (may be <b>null</b>, to be ignored then)
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Returns the user name. [preliminary]
+     * 
+     * @return the user name (may be <b>null</b>, to be ignored then)
+     */
+    public String getUser() {
+        return user;
     }
 
     // TODO per stream: authentication, TLS

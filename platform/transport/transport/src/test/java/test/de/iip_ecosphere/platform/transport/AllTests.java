@@ -24,7 +24,8 @@ import org.junit.runners.Suite;
     DirectMemoryTransportConnectorTest.class,
     SerializerRegistryTest.class,
     TransportAasTest.class, 
-    OtherTests.class
+    OtherTests.class,
+    TransportSetupTest.class
 })
 public class AllTests {
 }

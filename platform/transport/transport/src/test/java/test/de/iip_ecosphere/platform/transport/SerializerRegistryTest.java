@@ -21,6 +21,7 @@ public class SerializerRegistryTest {
         String old = SerializerRegistry.setName(name);
         Assert.assertEquals(name, SerializerRegistry.getName());
         SerializerRegistry.setName(old);
+        SerializerRegistry.resetDefaults();
     }
     
 }
