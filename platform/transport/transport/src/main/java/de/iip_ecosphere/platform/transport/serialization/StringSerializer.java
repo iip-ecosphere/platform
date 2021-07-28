@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.transport.serialization;
 
 import java.io.IOException;
-import java.util.Base64;
 
 /**
  * A default serializer for <i>String</i> through Base64 encoding.
@@ -24,12 +23,12 @@ public class StringSerializer implements Serializer<String> {
 
     @Override
     public String from(byte[] data) throws IOException {
-        return Base64.getEncoder().encodeToString(data);
+        return new String(data);
     }
 
     @Override
     public byte[] to(String source) throws IOException {
-        return Base64.getDecoder().decode(source);
+        return source.getBytes();
     }
 
     @Override
