@@ -52,8 +52,18 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             ''
         }
     }
+    
+    def produceTransport(IIPEcosphere config) {
+       TransportProtocol tp = config.transportProtocol;
+       'transport:
+           host: ${tp.globalHost}
+           port: ${tp.port}
+           user: ${tp.user}
+           password: ${tp.password}'
+    }
 
     def main(IIPEcosphere config, FileArtifact target) {
+        '${produceTransport(config)}'
         '${produceAas(config, implLocalEphemerial=true)}'
     }
 

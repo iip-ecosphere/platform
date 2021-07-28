@@ -15,6 +15,7 @@ project Transport {
     
     abstract compound TransportProtocol {
     	ProtocolType type;
+    	String globalHost = "localhost"; // ignored for local, only for global
     	Port port = 8883; // preliminary, needed for AMQP tests
     	String user = ""; // preliminary, needed for AMQP tests
     	String password = ""; // preliminary, needed for AMQP tests
@@ -34,11 +35,13 @@ project Transport {
     
     TransportProtocol transportProtocol = TransportProtocolAMQP {
     };
+
+    // TODO separate local and global?
     
     isDefined(transportProtocol);
     
     // TODO 
-    // - transport protocol playload limitation
+    // - transport protocol payload limitation
     
     freeze {
         // prevent later changes of constraint but make it referencable to .text
