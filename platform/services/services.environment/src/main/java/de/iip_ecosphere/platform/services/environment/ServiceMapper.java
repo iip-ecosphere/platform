@@ -133,9 +133,9 @@ public class ServiceMapper {
      * @param client the metrics extractor client (may be <b>null</b>, call is ignored then)
      */
     public void mapMetrics(Service service, MetricsExtractorRestClient client) {
-        if (null != client) {
+        /*if (null != client) {
             MetricsAasConstructor.addMetricsProtocols(builder, client, null, s -> getQName(service, s));
-        }
+        }*/
     }
     
     /**

@@ -61,6 +61,12 @@ public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
     
+    public static final String GAUGE_LIST = "gaugelist";
+    public static final String COUNTER_LIST = "counterlist";
+    public static final String TIMER_LIST = "timerlist";
+    public static final String TAGGED_METER_LIST = "taggedmeterlist";
+    public static final String SIMPLE_METER_LIST = "simplemeterlist";
+    
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
     public static final String SYS_MEM_FREE = "system.memory.free";
@@ -658,6 +664,55 @@ public class MetricsProvider {
             throw new IllegalArgumentException(mnfe.getMessage());
         }
     }
+    
+    /**
+     * Returns the full provider in Json.
+     * 
+     * @param identifier optional identifier to be added to the structure, no identifier is added if <b>null</b>
+     * @param update is this an update or an initial serialization to Json
+     * @return all meters and their values/structures, all lists
+     */
+    public String toJson(String identifier, boolean update) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        if (null != identifier) {
+            sb.append("\"id\":\"" + identifier + "\",");
+        }
+        sb.append("\"meters\":{");
+        boolean first = true;
+        for (Meter meter: registry.getMeters()) {
+            
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append("\"" + meter.getId().getName() + "\":");
+            sb.append(jsonParser(meter));
+            first = false;
+        }
+        sb.append("},");
+        appendNameValue(sb, GAUGE_LIST, getCustomGaugeList(), true);
+        appendNameValue(sb, COUNTER_LIST, getCustomCounterList(), true);
+        appendNameValue(sb, TIMER_LIST, getCustomTimerList(), true);
+        appendNameValue(sb, TAGGED_METER_LIST, getTaggedMeterList(), true);
+        appendNameValue(sb, SIMPLE_METER_LIST, getSimpleMeterList(), false);
+        sb.append("}");
+        return sb.toString();
+    }
+    
+    /**
+     * Appends a name-value pair, value unquoted.
+     * 
+     * @param sb the string builder to append to
+     * @param name the name of the value
+     * @param value the value (unquoted)
+     * @param separator add a separator or not
+     */
+    private void appendNameValue(StringBuilder sb, String name, String value, boolean separator) {
+        sb.append("\"" + name + "\":" + value);
+        if (separator) {
+            sb.append(",");
+        }
+    }
 
     /**
      * Retrieves a custom gauge as a JSON object.<br>
@@ -741,7 +796,7 @@ public class MetricsProvider {
         for (Measurement m : meter.measure()) {
             sb.append("{");
             sb.append("\"statistic\":\"").append(m.getStatistic().toString()).append("\",");
-            sb.append("\"value\":").append(m.getValue());
+            sb.append("\"value\":").append(String.format("%f", m.getValue()));
             sb.append("},");
         }
 
@@ -866,5 +921,5 @@ public class MetricsProvider {
 
         return sb.toString();
     }
-
+    
 }

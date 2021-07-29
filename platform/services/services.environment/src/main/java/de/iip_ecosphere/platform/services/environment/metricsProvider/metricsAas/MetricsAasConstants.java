@@ -22,6 +22,8 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAa
  * @author Miguel Gomez
  */
 public class MetricsAasConstants {
+    
+    public static final String TRANSPORT_SERVICE_METRICS_CHANNEL = "ServiceMetrics";
 
     /* Java Virtual Machine (JVM) Buffer Metrics */
     public static final String JVM_BUFFER_COUNT = "jvmbuffercount";

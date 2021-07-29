@@ -18,11 +18,28 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 import static de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants.*;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.stream.JsonParsingException;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that provides an AAS the infrastructure to access the metrics
@@ -35,9 +52,28 @@ import java.util.function.Predicate;
  * a class to do so, ensuring that all metrics (custom or not) are accessed in
  * the same way.
  * 
+ * The original approach aimed at attaching metric results through 
+ * {@link InvocablesCreator functor objects} to AAS properties. While this basically works,
+ * it fails when AAS are deployed remotely as the values of all properties are read out 
+ * for AAS serialization. As the BaSyx VAB connector is meant to be stateless,
+ * it re-creates network connections per each request. Also caching the connectors did not 
+ * solve the problem. Ultimately, in parallel access cases the AAS even blocked the 
+ * entire operations of the program. Thus, we turned the approach around and rely now on
+ * attached local functors that access a {@link JsonObjectHolder shared object}. The shared object is 
+ * attached through a {@link MetricsReceptionCallback transport layer callback} to a transport layer 
+ * connector, which is cached/created on demand upon execution of the functors. The functors are serializable, 
+ * and carry all information required to create a transport connector. Updates to the
+ * metric values happen in background to the {@link JsonObjectHolder shared object}, while the AAS just
+ * accesses the values in its own pace (returning nothing if no metrics data was received so far). Shared 
+ * objects shall be {@link #clear() released} when the program shuts down.
+ * 
  * @author Miguel Gomez
+ * @author Holger Eichelberger, SSE
  */
 public class MetricsAasConstructor {
+
+    private static Map<String, TransportConnector> conns = new HashMap<>();
+    private static Map<String, JsonObjectHolder> holders = new HashMap<>();
 
     /**
      * Adds all the Metric Provider's meters as submodel properties and provides
@@ -124,6 +160,283 @@ public class MetricsAasConstructor {
             .bind(iCreator.createGetter(nameMapper.apply(SYSTEM_MEMORY_USED)), InvocablesCreator.READ_ONLY).build();
     }
     
+    /**
+     * Clears temporary data structures.
+     */
+    public static void clear() {
+        for (Map.Entry<String, TransportConnector> ent : conns.entrySet()) {
+            try {
+                ent.getValue().disconnect();
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).error(
+                    "Cannot disconnect transport connector for id " + ent.getKey() + ": " + e.getMessage());
+            }
+        }
+        conns.clear();
+        holders.clear();
+    }
+
+    /**
+     * Returns a transport connector for the given {@code channel} and {@code setup}.
+     * 
+     * @param channel the transport channel
+     * @param setup the transport setup
+     * @return the (cached) transport connector
+     */
+    private static TransportConnector getTransportConnector(String channel, TransportSetup setup) {
+        TransportConnector conn = conns.get(channel);
+        if (null == conn && !conns.containsKey(channel)) {
+            conn = TransportFactory.createConnector();
+            try {
+                conn.connect(setup.createParameter());
+                conn.setReceptionCallback(channel, new MetricsReceptionCallback());
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).error(
+                    "Cannot create connector: " + e.getMessage());
+            }
+            conns.put(channel, conn);
+        }
+        return conn;
+    }
+
+    /**
+     * Holds a received JSON object.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class JsonObjectHolder {
+        
+        private JsonObject obj;
+        
+       /**
+         * Returns a list value.
+         * 
+         * @param name the name of the list, see {@link MetricsProvider}
+         * @return the list value or <b>null</b>
+         */
+        public String getList(String name) {
+            String result = "";
+            if (null != obj) {
+                JsonArray array = obj.getJsonArray(name);
+                if (null != array) {
+                    result = array.toString();
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Returns a meter value.
+         * 
+         * @param name the name of the registered meter, see, e.g., {@link MetricsProvider}
+         * @return the meter value or <b>null</b>
+         */
+        public String getMeter(String name) {
+            String result = "";
+            if (null != obj) {
+                JsonObject meters = obj.getJsonObject("meters");
+                if (null != meters) {
+                    JsonObject meter = meters.getJsonObject(name);
+                    if (null != meter) {
+                        result = meter.toString();
+                    }
+                }
+            }
+            return result;
+        }
+    }
+    
+    // put information into map (metrics provider would be better)
+    /**
+     * Receives monitoring information via the transport layer.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MetricsReceptionCallback implements ReceptionCallback<String> {
+
+        /**
+         * Creates a callback.
+         */
+        public MetricsReceptionCallback() {
+        }
+        
+        @Override
+        public void received(String data) {
+            try {
+                JsonObject obj = Json.createReader(new StringReader(data)).readObject();
+                String id = obj.getString("id");
+                if (null != id) {
+                    JsonObjectHolder holder = holders.get(id);
+                    if (null != holder) {
+                        holder.obj = obj;
+                    }
+                }
+            } catch (JsonParsingException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).error("Cannot parse JSON: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public Class<String> getType() {
+            return String.class;
+        }
+
+    }
+    
+    /**
+     * Implements a list getter based on {@link JsonObjectHolder}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ListGetter implements Supplier<Object>, Serializable {
+
+        private static final long serialVersionUID = -4387599926801687791L;
+        private String name;
+        private String id;
+        private String channel;
+        private TransportSetup setup;
+
+        /**
+         * Creates a list getter instance.
+         * 
+         * @param channel the transport channel
+         * @param id the id to react on
+         * @param setup the transport setup
+         * @param name the list name {@link MetricsProvider}
+         */
+        private ListGetter(String channel, String id, TransportSetup setup, String name) {
+            this.id = id;
+            this.name = name;
+            this.channel = channel;
+            this.setup = setup;
+        }
+        
+        @Override
+        public Object get() {
+            return getHolder(id, channel, setup).getList(name);
+        }
+        
+    }
+
+    /**
+     * Implements a meter getter based on {@link JsonObjectHolder}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MeterGetter implements Supplier<Object>, Serializable {
+
+        private static final long serialVersionUID = 2294254606334816252L;
+        private String name;
+        private String id;
+        private String channel;
+        private TransportSetup setup;
+
+        /**
+         * Creates a meter getter instance.
+         * 
+         * @param channel the transport channel
+         * @param id the id to react on
+         * @param setup the transport setup
+         * @param name the list name {@link MetricsProvider}
+         */
+        private MeterGetter(String channel, String id, TransportSetup setup, String name) {
+            this.id = id;
+            this.name = name;
+            this.channel = channel;
+            this.setup = setup;
+        }
+        
+        @Override
+        public Object get() {
+            return getHolder(id, channel, setup).getMeter(name);
+        }
+        
+    }
+    
+    /**
+     * Returns a JSON object holder associated to a transport connector through {@link MetricsReceptionCallback}.
+     * 
+     * @param channel the transport channel
+     * @param id the id to react on
+     * @param setup the transport setup
+     * @return the (shared) object holder instance
+     */
+    private static JsonObjectHolder getHolder(String id, String channel, TransportSetup setup) {
+        getTransportConnector(channel, setup);
+        JsonObjectHolder result = holders.get(id);
+        if (null == result) {
+            result = new JsonObjectHolder();
+            holders.put(id, result);
+        }
+        return result;
+    }
+    
+    /**
+     * Tests whether metrics properties do exist on {@code sub}.
+     * 
+     * @param sub the submodel elements collection to test
+     * @return {@code true} for metrics, {@code false} else
+     */
+    public static boolean containsMetrics(SubmodelElementCollection sub) {
+        return sub.getElement(SYSTEM_DISK_FREE) != null;
+    }
+
+    /**
+     * Adds metrics to the submodel/elements. Metric values are bound against a transport connector receiver.
+     * 
+     * @param smBuilder submodel/elements builder of the AAS
+     * @param filter    metrics filter, may be <b>null</b> for all (currently ignored)
+     * @param channel   the transport channel to listen to
+     * @param id        the metrics provider id to listen to
+     * @param setup     the transport setup
+     */
+    public static void addProviderMetricsToAasSubmodel(SubmodelElementContainerBuilder smBuilder, 
+        Predicate<String> filter, String channel, String id, TransportSetup setup) {
+        
+        /* Meter lists */
+        smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
+            .bind(new ListGetter(channel, id, setup, MetricsProvider.GAUGE_LIST), InvocablesCreator.READ_ONLY).build();
+        smBuilder.createPropertyBuilder(COUNTER_LIST).setType(Type.STRING)
+            .bind(new ListGetter(channel, id, setup, MetricsProvider.COUNTER_LIST), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(TIMER_LIST).setType(Type.STRING)
+            .bind(new ListGetter(channel, id, setup, MetricsProvider.TIMER_LIST), InvocablesCreator.READ_ONLY).build();
+        smBuilder.createPropertyBuilder(TAGGED_METER_LIST).setType(Type.STRING)
+            .bind(new ListGetter(channel, id, setup, MetricsProvider.TAGGED_METER_LIST), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SIMPLE_METER_LIST).setType(Type.STRING)
+            .bind(new ListGetter(channel, id, setup, MetricsProvider.SIMPLE_METER_LIST), InvocablesCreator.READ_ONLY)
+            .build();
+
+        /* System Disk Capacity metrics, string as JSON meter is transferred  */
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_FREE), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_TOTAL), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USABLE), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USED), InvocablesCreator.READ_ONLY)
+            .build();
+
+        /* System Physical Memory metrics, string as JSON meter is transferred  */
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_FREE), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_TOTAL), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USAGE), InvocablesCreator.READ_ONLY)
+            .build();
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.STRING)
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
+            .build();
+    }
+
     /**
      * Removes provider metrics and all related elements from {@code sub}.
      * 
