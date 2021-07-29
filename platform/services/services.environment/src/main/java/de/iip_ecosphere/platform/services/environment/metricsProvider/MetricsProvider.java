@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -796,7 +797,7 @@ public class MetricsProvider {
         for (Measurement m : meter.measure()) {
             sb.append("{");
             sb.append("\"statistic\":\"").append(m.getStatistic().toString()).append("\",");
-            sb.append("\"value\":").append(String.format("%f", m.getValue()));
+            sb.append("\"value\":").append(String.format(Locale.ROOT, "%f", m.getValue()));
             sb.append("},");
         }
 
