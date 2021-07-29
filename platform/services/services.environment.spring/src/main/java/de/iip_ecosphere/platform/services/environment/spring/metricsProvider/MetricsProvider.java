@@ -12,14 +12,25 @@
 
 package de.iip_ecosphere.platform.services.environment.spring.metricsProvider;
 
+import java.io.IOException;
+
+import javax.annotation.PreDestroy;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.MeterRegistry;
-
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * This class represents an interface to manage the Micrometer-API meters.<br>
@@ -80,6 +91,10 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     /* By default the base unit for disk capacity is kilobytes */
     @Value("${metricsprovider.diskbaseunit:kilobytes}")
     private String diskBaseUnitString;
+    private boolean update = false;
+    private TransportConnector connector;
+    @Autowired
+    private TransportSetup transport;
 
     /**
      * Create a new Metrics Provider Instance.<br>
@@ -119,5 +134,33 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     @Scheduled(fixedRateString = SCHEDULE_RATE)
     private void calculateMetrics() {
         super.calculateNonNativeSystemMetrics();
+        final String id = Id.getDeviceId();
+        if (null == connector && null != transport) {
+            try {
+                connector = TransportFactory.createConnector();
+                connector.connect(transport.createParameter());
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsProvider.class).error(
+                    "Cannot create transport connector: " + e.getMessage());
+            }
+        }
+        if (null != connector) {
+            try {
+                connector.asyncSend(MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, toJson(id, update));
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsProvider.class).error(
+                    "Cannot sent monitoring message: " + e.getMessage());
+            }
+            update = true;
+        }
     }
+
+    /**
+     * Clean up at shutdown.
+     */
+    @PreDestroy
+    public void destroy() {
+        MetricsAasConstructor.clear();
+    }
+    
 }
