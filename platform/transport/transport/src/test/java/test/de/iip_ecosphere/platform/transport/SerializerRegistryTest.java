@@ -18,6 +18,8 @@ public class SerializerRegistryTest {
 
     /**
      * Tests setting/reading the registry name.
+     * 
+     * @throws IOException shall not occur  
      */
     @Test
     public void testName() throws IOException {

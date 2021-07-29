@@ -35,6 +35,8 @@ public class TransportAasTest {
     
     /**
      * Tests the transport AAS.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
     public void testAas() throws ExecutionException {
