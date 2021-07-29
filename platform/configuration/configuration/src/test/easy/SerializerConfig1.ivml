@@ -27,6 +27,14 @@ project SerializerConfig1 {
     };
     aasProtocol = AasProtocolVabTcp{};
 
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        user = "user",
+        password = "pwd"
+    };
+
     // ------------ data types ------------------
     
     RecordType rec1 = {

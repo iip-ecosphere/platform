@@ -18,6 +18,10 @@ template JavaLogbackXml(Configuration config, XmlFileArtifact target) {
         new XmlAttribute(root, "level", "info");
         XmlElement appenderRef = new XmlElement(root, "appender-ref");
         new XmlAttribute(appenderRef, "ref", "STDOUT");
+        
+        XmlElement logger = new XmlElement(cfg, "logger");
+        new XmlAttribute(logger, "name", "org.eclipse.basyx.vab.protocol.basyx.server.VABBaSyxTCPInterface");
+        new XmlAttribute(logger, "level", "INFO");
     }
     
 }

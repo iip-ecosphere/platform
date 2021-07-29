@@ -2,7 +2,7 @@
 template WinBatch(Configuration config, FileArtifact target, String dir, String main) {
 	
     def main(Configuration config, FileArtifact target, String dir, String main) {
-        'java -cp "${dir}/*" ${main} %*'
+        'java -cp "${dir}/*" --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true ${main} %*'
     }
 	
 }
