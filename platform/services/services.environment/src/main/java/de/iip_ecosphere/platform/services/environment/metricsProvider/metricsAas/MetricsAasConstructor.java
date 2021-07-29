@@ -272,7 +272,8 @@ public class MetricsAasConstructor {
                     }
                 }
             } catch (JsonParsingException e) {
-                LoggerFactory.getLogger(MetricsAasConstructor.class).error("Cannot parse JSON: " + e.getMessage());
+                LoggerFactory.getLogger(MetricsAasConstructor.class).error("Cannot parse JSON: " 
+                    + e.getMessage() + " " + data);
             }
         }
 
