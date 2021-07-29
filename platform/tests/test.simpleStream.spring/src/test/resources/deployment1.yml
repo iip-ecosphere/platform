@@ -14,8 +14,8 @@ services:
     ensembleWith: simpleStream-log
     relations:
       - endpoint:
-          portArg: --mqtt.port=${port} --amqp.port=${port}
-          hostArg: --mqtt.host=${host} --amqp.host=${host}
+          portArg: --mqtt.port=${port} --amqp.port=${port} --transport.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host} --transport.host=${host}
       - channel: create-out-0
         id: intern
         type: String
@@ -31,8 +31,8 @@ services:
       - --iip.protocol=${protocol}
     relations:
       - endpoint:
-          portArg: --mqtt.port=${port} --amqp.port=${port}
-          hostArg: --mqtt.host=${host} --amqp.host=${host}
+          portArg: --mqtt.port=${port} --amqp.port=${port} --transport.port=${port}
+          hostArg: --mqtt.host=${host} --amqp.host=${host} --transport.host=${host}
       - channel: log-in-0
         id: intern
         type: String

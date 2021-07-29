@@ -1,0 +1,37 @@
+2021-07-29 04:03:48,227 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2021-07-29 04:03:48,336 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2021-07-29 04:03:48,349 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2021-07-29 04:03:48,362 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2021-07-29 04:03:48,368 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2021-07-29 04:03:48,369 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 26020
+2021-07-29 04:03:48,503 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2021-07-29 04:03:48,505 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\work\default\config\
+2021-07-29 04:03:48,506 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2021-07-29 04:03:48,542 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2021-07-29 04:03:48,568 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2021-07-29 04:03:48,624 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2021-07-29 04:03:48,689 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 65052
+2021-07-29 04:03:48,690 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2021-07-29 04:03:48,743 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\work\default\messages
+2021-07-29 04:03:49,556 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2021-07-29 04:03:49,557 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2021-07-29 04:03:49,558 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2021-07-29 04:03:49,558 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2021-07-29 04:03:49,592 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\work\default\messages
+2021-07-29 04:03:49,686 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2021-07-29 04:03:49,687 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\work\default\messages
+2021-07-29 04:03:49,836 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2021-07-29 04:03:49,855 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2021-07-29 04:03:49,867 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2021-07-29 04:03:49,869 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2021-07-29 04:03:49,870 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2021-07-29 04:03:49,886 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2021-07-29 04:03:59,985 WARN  [main] (d.i.p.s.a.b.Tools) - Tomcat working directory 'W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\.\tomcat.65074' not found for disposal.
+2021-07-29 04:04:03,797 WARN  [main] (d.i.p.s.a.b.Tools) - Tomcat working directory 'W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\.\tomcat.65108' not found for disposal.
+2021-07-29 04:04:03,868 WARN  [main] (d.i.p.s.a.b.Tools) - Tomcat working directory 'W:\offlineFiles\git\IIP-ecosphere\platform\platform\services\services\.\tomcat.65109' not found for disposal.
+2021-07-29 04:04:03,886 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 65052
+2021-07-29 04:04:03,902 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2021-07-29 04:04:03,909 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2021-07-29 04:04:03,920 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2021-07-29 04:04:03,924 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2021-07-29 04:04:04,907 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped

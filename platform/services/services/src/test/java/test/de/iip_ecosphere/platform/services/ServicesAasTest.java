@@ -21,7 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
@@ -35,7 +37,9 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -45,6 +49,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Tests the {@link ServicesAas}.
@@ -53,6 +58,27 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
  */
 public class ServicesAasTest {
 
+    private static Server qpid;
+
+    /**
+     * Initializes the test.
+     */
+    @BeforeClass
+    public static void startup() {
+        ServerAddress broker = new ServerAddress(Schema.IGNORE);
+        qpid = new TestQpidServer(broker);
+        ServiceFactory.getTransport().setPort(broker.getPort());
+        qpid.start();
+    }
+    
+    /**
+     * Shuts down the test.
+     */
+    @AfterClass
+    public static void shutdown() {
+        qpid.stop(true);
+    }
+    
     /**
      * Tests {@link ServicesAas}.
      * 

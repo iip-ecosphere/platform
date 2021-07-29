@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -19,7 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * Provides access to the service manager instance.
@@ -32,6 +35,7 @@ public class ServiceFactory {
     private static ServiceFactoryDescriptor desc;
     private static ServiceManager manager = null;
     private static AasSetup setup;
+    private static TransportSetup transport;
 
     /**
      * Initializes this factory.
@@ -78,12 +82,46 @@ public class ServiceFactory {
                 setup = desc.getAasSetup();
             }
             if (null == setup) {
-                setup = new AasSetup();
+                try {
+                    ServiceConfiguration cfg = AbstractConfiguration.readFromYaml(ServiceConfiguration.class);
+                    setup = cfg.getAas();
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+                }
+                if (null == setup) {
+                    setup = new AasSetup();
+                }
             }
         }
         return setup;
     }
-    
+
+    /**
+     * Returns the actual transport setup for the implementing service manager.
+     * 
+     * @return the AAS setup
+     */
+    public static TransportSetup getTransport() {
+        if (null == transport) {
+            init();
+            if (null != desc) {
+                transport = desc.getTransport();
+            }
+            if (null == transport) {
+                try {
+                    ServiceConfiguration cfg = AbstractConfiguration.readFromYaml(ServiceConfiguration.class);
+                    transport = cfg.getTransport();
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+                }
+                if (null == transport) {
+                    transport = new TransportSetup();
+                }
+            }
+        }
+        return transport;
+    }
+
     /**
      * Defines the AAs setup instance [for testing].
      * 

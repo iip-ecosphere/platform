@@ -56,6 +56,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
@@ -65,6 +66,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -78,6 +80,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
@@ -114,14 +117,20 @@ public class TestServiceManager {
     private SpringCloudServiceConfiguration config;
     private List<String> netKeyToRelease = new ArrayList<>();
     private List<Server> serversToRelease = new ArrayList<>();
-
+    
     /**
      * Initializes the test by starting an embedded AMQP server. Requires the Qpid configuration file in src/test.
-     * We do not rely on MQTT here, because moquette is not stable enough and Hivemq requires JDK 11.
+     * We do not rely on MQTT here, because Moquette is not stable enough and Hivemq requires JDK 11.
      */
     @BeforeClass
     public static void init() {
         server = new TestQpidServer(BROKER); // prescribes protocol for artifacts
+        // spring is too late, AbstractConfiguration does not load it even with modified constructor...
+        TransportSetup setup = ServiceFactory.getTransport();
+        setup.setPort(BROKER.getPort());
+        setup.setHost("localhost");
+        setup.setUser("user");
+        setup.setPassword("pwd");
         server.start();
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
@@ -140,6 +149,7 @@ public class TestServiceManager {
      */
     @AfterClass
     public static void shutdown() {
+        MetricsAasConstructor.clear();
         server.stop(false);
         aasServer.stop(true);
         implServer.stop(true);
@@ -273,7 +283,12 @@ public class TestServiceManager {
                 + sDesc.getState(), ServiceState.RUNNING, sDesc.getState());
         }
         
-        TimeUtils.sleep(2000);
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
+        Assert.assertNotNull(sub);
+        sub.accept(new AasPrintVisitor());
+
+        TimeUtils.sleep(5000);
         
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
@@ -294,6 +309,7 @@ public class TestServiceManager {
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
         Assert.assertNull(mgr.getArtifact(aId));
+        MetricsAasConstructor.clear();
     }
     
     /**
@@ -307,23 +323,22 @@ public class TestServiceManager {
      */
     private void assertMetrics(String[] ids, Map<String, Predicate<Object>> expected) 
         throws IOException, ExecutionException {
-        if (ServicesAas.ENABLE_SERVICE_MONITORING) {
-            Aas aas = AasPartRegistry.retrieveIipAas();
-            Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
-            Assert.assertNotNull(sub);
-            SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
-            Assert.assertNotNull(sub);
-            for (String id: ids) {
-                SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
-                Assert.assertNotNull(service);
-                for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
-                    Property prop = service .getProperty(ent.getKey());
-                    Assert.assertNotNull(prop);
-                    Predicate<Object> pred = ent.getValue();
-                    if (null != pred) {
-                        Object val = prop.getValue();
-                        Assert.assertTrue(pred.test(val));
-                    }
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
+        Assert.assertNotNull(sub);
+        sub.accept(new AasPrintVisitor());
+        SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+        Assert.assertNotNull(sub);
+        for (String id: ids) {
+            SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
+            Assert.assertNotNull(service);
+            for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
+                Property prop = service .getProperty(ent.getKey());
+                Assert.assertNotNull(prop);
+                Predicate<Object> pred = ent.getValue();
+                if (null != pred) {
+                    Object val = prop.getValue();
+                    Assert.assertTrue(pred.test(val));
                 }
             }
         }

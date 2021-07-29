@@ -12,8 +12,8 @@
 
 package de.iip_ecosphere.platform.services;
 
-import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -105,8 +105,6 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
     
-    public static final boolean ENABLE_SERVICE_MONITORING = false;
-
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
     @Override
@@ -579,27 +577,22 @@ public class ServicesAas implements AasContributor {
                 addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
                 addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
                 connectionBuilder.build();
-                if (ENABLE_SERVICE_MONITORING) {
-                    InvocablesCreator iCreator = desc.getInvocablesCreator();
-                    if (null != iCreator) {
-                        SubmodelElementCollectionBuilder serviceB = 
+                if (!MetricsAasConstructor.containsMetrics(elt)) {
+                    SubmodelElementCollectionBuilder serviceB = 
                             sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
-                        SubmodelElementCollectionBuilder subB =
-                            serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
-                        // this is just the interface side, metricsextractorclient -> Service environment
-                        MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, iCreator, null, 
-                            s -> ServiceMapper.getQName(desc.getId(), s));
-                        subB.build();
-                    }
+                    SubmodelElementCollectionBuilder subB =
+                        serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+                    MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
+                        MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, 
+                        Id.getDeviceId(), ServiceFactory.getTransport());
+                    subB.build();
                 }
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {
-                if (ENABLE_SERVICE_MONITORING) {
-                    MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
-                }
+                MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
             }
         });
     }

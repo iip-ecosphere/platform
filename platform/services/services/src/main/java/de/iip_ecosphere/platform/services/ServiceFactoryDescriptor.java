@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * A factory descriptor for Java Service loading.
@@ -34,5 +35,12 @@ public interface ServiceFactoryDescriptor {
      * @return the setup
      */
     public AasSetup getAasSetup();
+    
+    /**
+     * Returns the transport setup.
+     * 
+     * @return the transport setup
+     */
+    public TransportSetup getTransport();
     
 }

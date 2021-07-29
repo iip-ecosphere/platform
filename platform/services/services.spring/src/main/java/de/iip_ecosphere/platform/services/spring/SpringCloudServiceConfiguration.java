@@ -18,9 +18,7 @@ import java.util.HashMap;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
+import de.iip_ecosphere.platform.services.ServiceConfiguration;
 
 /**
  * Configures the service manager.
@@ -29,7 +27,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  */
 @ConfigurationProperties(prefix = "service-mgr")
 @Component
-public class SpringCloudServiceConfiguration {
+public class SpringCloudServiceConfiguration extends ServiceConfiguration {
 
     private String brokerHost = "localhost";
     private int brokerPort = 8883;
@@ -38,10 +36,7 @@ public class SpringCloudServiceConfiguration {
     private String descriptorName = "deployment.yml";
     private int waitingTime = 30000;
     private int availabilityRetryDelay = 500;
-    private AasSetup aas = new AasSetup();
-    private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
     private HashMap<String, String> executables = new HashMap<String, String>();
-    private TransportSetup transport = new TransportSetup();
 
     /**
      * Returns the name of the broker host.
@@ -107,24 +102,6 @@ public class SpringCloudServiceConfiguration {
     }
 
     /**
-     * Returns the AAS setup.
-     * 
-     * @return the AAs setup
-     */
-    public AasSetup getAas() {
-        return aas;
-    }
-    
-    /**
-     * Returns the service administration protocol.
-     * 
-     * @return the service administration protocol (see {@link AasFactory#getProtocols()}
-     */
-    public String getServiceProtocol() {
-        return serviceProtocol;
-    }
-
-    /**
      * Returns the configured value for an executable, i.e., either from the configured executables mapping or the
      * {@code Executable}. The idea here is to allow the configuration to override commands that are available via
      * the OS path in certain cases.
@@ -138,15 +115,6 @@ public class SpringCloudServiceConfiguration {
             result = executable;
         }
         return result;
-    }
-
-    /**
-     * Returns the transport setup.
-     * 
-     * @return the transport setup
-     */
-    public TransportSetup getTransport() {
-        return transport;
     }
 
     /**
@@ -213,24 +181,6 @@ public class SpringCloudServiceConfiguration {
     public void setAvailabilityRetryDelay(int availabilityRetryDelay) {
         this.availabilityRetryDelay = availabilityRetryDelay;
     }
-
-    /**
-     * Defines the AAS setup. [required by Spring]
-     * 
-     * @param aas the AAS setup
-     */
-    public void setAas(AasSetup aas) {
-        this.aas = aas;
-    }
-
-    /**
-     * Defines the service administration protocol. [required by Spring]
-     * 
-     * @param serviceProtocol the service administration protocol (see {@link AasFactory#getProtocols()}
-     */
-    public void setServiceProtocol(String serviceProtocol) {
-        this.serviceProtocol = serviceProtocol;
-    }
     
     /**
      * Defines the executables mapping, i.e., an optional mapping of OS command names to paths or other command names
@@ -240,15 +190,6 @@ public class SpringCloudServiceConfiguration {
      */
     public void setExecutables(HashMap<String, String> executables) {
         this.executables = executables;
-    }
-
-    /**
-     * Defines the transport setup. [required by Spring]
-     * 
-     * @param transport the transport setup
-     */
-    public void setTransport(TransportSetup transport) {
-        this.transport = transport;
     }
 
 }

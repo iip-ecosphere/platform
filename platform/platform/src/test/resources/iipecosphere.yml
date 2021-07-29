@@ -16,7 +16,7 @@ aas:
         protocol: VAB-TCP
     persistence: MONGO
 transport:
-    host: me.de
-    port: 1234
-    password: pass
+    host: localhost
+    port: 8883
+    password: pwd
     user: user  

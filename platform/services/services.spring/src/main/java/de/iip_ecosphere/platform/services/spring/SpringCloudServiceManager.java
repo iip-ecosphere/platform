@@ -47,6 +47,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 
@@ -81,6 +82,11 @@ public class SpringCloudServiceManager
         public AasSetup getAasSetup() {
             // may not yet have been initialized
             return null != SpringInstances.getConfig() ? SpringInstances.getConfig().getAas() : null;
+        }
+
+        @Override
+        public TransportSetup getTransport() {
+            return null != SpringInstances.getConfig() ? SpringInstances.getConfig().getTransport() : null;
         }
         
     }

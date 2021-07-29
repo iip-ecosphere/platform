@@ -70,10 +70,12 @@ public class EcsAas implements AasContributor {
         ContainerManager mgr = EcsFactory.getContainerManager();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
 
-        SubmodelElementCollectionBuilder jB 
-            = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
+        SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), 
+            false, false);
 
-        MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
+        //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
+        MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
+            Id.getDeviceId(), EcsFactory.getConfiguration().getTransport());
 
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, mgr.getContainerSystemName())
@@ -147,7 +149,7 @@ public class EcsAas implements AasContributor {
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
         ));
-        MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
+        //MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
     }
 
     @Override

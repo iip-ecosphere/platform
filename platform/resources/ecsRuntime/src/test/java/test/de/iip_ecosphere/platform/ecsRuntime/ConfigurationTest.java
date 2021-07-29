@@ -42,6 +42,9 @@ public class ConfigurationTest {
         // for now no configuration content
         Configuration cfg = Configuration.readConfiguration();
         Assert.assertNotNull(cfg);
+        Assert.assertTrue(cfg.getMonitoringUpdatePeriod() > 0);
+        Assert.assertNotNull(cfg.getTransport());
+        Assert.assertEquals("localhost", cfg.getTransport().getHost());
     }
 
 }

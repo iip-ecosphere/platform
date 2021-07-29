@@ -26,8 +26,18 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  */
 public class Configuration extends AasConfiguration {
     
-    private TransportSetup transport;
+    private TransportSetup transport = new TransportSetup();
+    private int monitoringUpdatePeriod = 2000;
 
+    /**
+     * Returns the monitoring update period.
+     * 
+     * @return the monitoring update period in ms
+     */
+    public int getMonitoringUpdatePeriod() {
+        return monitoringUpdatePeriod;
+    }
+    
     /**
      * Returns the transport setup.
      * 
@@ -37,6 +47,15 @@ public class Configuration extends AasConfiguration {
         return transport;
     }
 
+    /**
+     * Changes the monitoring update period. [snakeyaml]
+     * 
+     * @param monitoringUpdatePeriod in ms, values below 200 are turned to 200
+     */
+    public void setMonitoringUpdatePeriod(int monitoringUpdatePeriod) {
+        this.monitoringUpdatePeriod = Math.max(200, monitoringUpdatePeriod);
+    }
+    
     /**
      * Defines the transport setup. [snakeyaml]
      * 

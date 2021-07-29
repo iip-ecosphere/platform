@@ -16,6 +16,11 @@ amqp:
     port: 8883
     user: user
     password: pwd
+transport:
+    host: localhost
+    port: 8883
+    user: user
+    password: pwd
 logging:
     level:
         root: INFO
