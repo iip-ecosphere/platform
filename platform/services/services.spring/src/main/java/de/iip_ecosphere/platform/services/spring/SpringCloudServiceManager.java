@@ -278,7 +278,7 @@ public class SpringCloudServiceManager
                         LOGGER.info("Stopping " + id + "... ");
                         deployer.undeploy(id);
                         state = waitFor(id, state, s -> DeploymentState.deployed == s);
-                        LOGGER.info("Stopping " + id + "... " + state);
+                        LOGGER.info("Stopping " + id + "... ");
                         if (null == state || state == DeploymentState.undeployed) {
                             setState(service, ServiceState.STOPPED);
                         } else if (state == DeploymentState.error || state == DeploymentState.failed) {
