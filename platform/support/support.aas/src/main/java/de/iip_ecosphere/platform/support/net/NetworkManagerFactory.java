@@ -46,5 +46,17 @@ public class NetworkManagerFactory {
         }
         return instance;
     }
+    
+    /**
+     * Convenience method to configure the actual network manager instance.
+     * 
+     * @param setup instance containing the configuration (may be <b>null</b>, ignored then)
+     */
+    public static void configure(NetworkManagerSetup setup) {
+        NetworkManager mgr = getInstance();
+        if (null != mgr && null != setup) {
+            mgr.configure(setup);
+        }
+    }
 
 }

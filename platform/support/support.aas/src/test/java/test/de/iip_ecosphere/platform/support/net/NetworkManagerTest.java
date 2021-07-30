@@ -40,6 +40,11 @@ public class NetworkManagerTest {
         NetworkManager nm = NetworkManagerFactory.getInstance();
         Assert.assertTrue(nm instanceof LocalNetworkManagerImpl);
         testNetworkManager(nm, "");
+        NetworkManagerSetup setup = new NetworkManagerSetup();
+        setup.setLowPort(nm.getLowPort());
+        setup.setHighPort(nm.getHighPort());
+        NetworkManagerFactory.configure(setup);
+        testNetworkManagerSetup(nm);
         
         LocalNetworkManagerImpl parent = new LocalNetworkManagerImpl();
         ServerAddress resAdr = new ServerAddress(Schema.IGNORE, "me.here", 1223);
@@ -50,6 +55,7 @@ public class NetworkManagerTest {
         Assert.assertEquals(resAdr.getSchema(), adr.getSchema());
         Assert.assertEquals(resAdr.getHost(), adr.getHost());
         Assert.assertEquals(resAdr.getPort(), adr.getPort());
+        testNetworkManagerSetup(mgr);
         testNetworkManager(mgr, "");
     }
 
@@ -88,7 +94,9 @@ public class NetworkManagerTest {
      * @see #testPortReservation(NetworkManager, String)
      */
     public static void testNetworkManager(NetworkManager manager, String suffix) {
-        testNetworkManagerSetup(manager);
+        Assert.assertTrue(manager.getLowPort() > 0);
+        Assert.assertTrue(manager.getHighPort() > 0);
+        Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
         int port = NetUtils.getEphemeralPort();
         while (port < manager.getLowPort() || port > manager.getHighPort()) {
             port = NetUtils.getEphemeralPort();
