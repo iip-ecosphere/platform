@@ -110,25 +110,52 @@ public class SpringCloudServiceManager
     
     @Override
     public String addArtifact(URI location) throws ExecutionException {
+        LOGGER.info("Adding " + location);
         try {
             File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
             YamlArtifact yamlArtifact = null;
             if (null != jarFile) {
                 yamlArtifact = readFromFile(jarFile);
             } else {
-                throw new ExecutionException("Cannot load " + location + ". Must be a (resolved) file.", null);
+                throwExecutionException("Adding " + location, 
+                    "Cannot load " + location + ". Must be a (resolved) file.");
             }
             Validator val = new Validator();
             val.validate(yamlArtifact);
             if (val.hasMessages()) {
-                throw new ExecutionException("Problems in descriptor:\n" + val.getMessages(), null);
+                throwExecutionException("Adding " + location, "Problems in descriptor:\n" + val.getMessages());
             }
             SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
                 yamlArtifact, jarFile);
             return super.addArtifact(artifact.getId(), artifact);
         } catch (IOException e) {
-            throw new ExecutionException(e);
+            throwExecutionException("Adding " + location, e);
+            return null;
         }
+    }
+    
+    /**
+     * Throws an execution exception for the given throwable.
+     * @param action the actual action to log
+     * @param th the throwable
+     * @throws ExecutionException
+     */
+    private static void throwExecutionException(String action, Throwable th) throws ExecutionException {
+        LOGGER.error(action + ": " + th.getMessage());
+        throw new ExecutionException(th);
+    }
+
+    // checkstyle: stop exception type check
+
+    /**
+     * Throws an execution exception for the given message.
+     * @param action the actual action to log
+     * @param message the message for the exception
+     * @throws ExecutionException
+     */
+    private static void throwExecutionException(String action, String message) throws ExecutionException {
+        LOGGER.error(action + ": " + message);
+        throw new ExecutionException(message, null);
     }
     
     /**
@@ -151,13 +178,13 @@ public class SpringCloudServiceManager
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream); 
                 } else {
-                    throw new ExecutionException(descName + " does not exist in " + file, null);
+                    throwExecutionException("Reading artifact " + file, descName + " does not exist in " + file);
                 }
             } catch (IOException e) {
-                throw new ExecutionException(e);
+                throwExecutionException("Reading artifact " + file, e);
             }
         } else {
-            throw new ExecutionException(file + " is not considered as JAR file", null);
+            throwExecutionException("Reading artifact " + file, file + " is not considered as JAR file");
         }
         return result;
     }
@@ -167,8 +194,7 @@ public class SpringCloudServiceManager
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
-        LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Starting services " 
-            + Arrays.toString(serviceIds));
+        LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceConfiguration config = getConfig();
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
@@ -211,6 +237,7 @@ public class SpringCloudServiceManager
             }
         }
         checkErrors(errors);
+        LOGGER.info("Started services " + Arrays.toString(serviceIds));
     }
     
     /**
@@ -262,8 +289,7 @@ public class SpringCloudServiceManager
     public void stopService(String... serviceIds) throws ExecutionException {
         List<String> errors = new ArrayList<>();
         AppDeployer deployer = getDeployer();
-        LoggerFactory.getLogger(SpringCloudServiceManager.class).info("Stopping services " 
-            + Arrays.toString(serviceIds));
+        LOGGER.info("Stopping services " + Arrays.toString(serviceIds));
         // TODO add/check causes for failing
         for (String ids : sortByDependency(serviceIds, false)) {
             SpringCloudServiceDescriptor service = getService(ids);
@@ -293,6 +319,7 @@ public class SpringCloudServiceManager
             }
         }
         checkErrors(errors);
+        LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
     }
 
     @Override
@@ -303,6 +330,7 @@ public class SpringCloudServiceManager
 
     @Override
     public void removeArtifact(String artifactId) throws ExecutionException {
+        LOGGER.info("Removing artifact " + artifactId);
         checkId(artifactId, "artifactId");
         SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
         super.removeArtifact(artifactId);
@@ -315,6 +343,7 @@ public class SpringCloudServiceManager
                 FileUtils.deleteQuietly(desc.getJar());
             }
         }
+        LOGGER.info("Removed artifact " + artifactId);
     }
 
     @Override
