@@ -49,6 +49,8 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
 
 This component must be bundled with further, e.g., upper layer components which pair themselves via JLS, in particular `LifecycleHandler`. To start this component, please use the functions of the `LifecycleHandler` or the default starter classes defined there.
 
+The command line argument `--iip.port=<int>` allows overriding the AAS implementation server port, i.e., in the Yaml above `aas:implementation:port`.
+
 ## Missing
 * ECS Monitoring
 * AAS discovery, currently we rely on the full IP specification instantiated through the configuration
