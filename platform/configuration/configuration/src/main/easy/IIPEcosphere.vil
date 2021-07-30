@@ -13,7 +13,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     String javaInterfacesPackage = "iip.interfaces";
     String javaStubsPackage = "iip.stubs";
     String javaNodesPackage = "iip.nodes";
-    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarterWithShutdown";
+    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
