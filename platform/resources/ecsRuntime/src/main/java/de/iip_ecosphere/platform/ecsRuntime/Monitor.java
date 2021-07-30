@@ -61,6 +61,7 @@ class Monitor {
                 connector.connect(transport.createParameter());
             } catch (IOException e) {
                 LoggerFactory.getLogger(Monitor.class).error("Cannot create transport connector: " + e.getMessage());
+                connector = null;
             }
         }
         timer.schedule(new TimerTask() {

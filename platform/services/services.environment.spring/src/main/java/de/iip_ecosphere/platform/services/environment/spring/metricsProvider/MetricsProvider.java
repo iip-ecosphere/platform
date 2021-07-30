@@ -93,6 +93,7 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     private String diskBaseUnitString;
     private boolean update = false;
     private TransportConnector connector;
+    private boolean connectorFailed;
     @Autowired
     private TransportSetup transport;
 
@@ -142,9 +143,10 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
             } catch (IOException e) {
                 LoggerFactory.getLogger(MetricsProvider.class).error(
                     "Cannot create transport connector: " + e.getMessage());
+                connectorFailed = true;
             }
         }
-        if (null != connector) {
+        if (null != connector && !connectorFailed) {
             try {
                 connector.asyncSend(MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, toJson(id, update));
             } catch (IOException e) {
@@ -161,6 +163,12 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     @PreDestroy
     public void destroy() {
         MetricsAasConstructor.clear();
+        if (null != connector && !connectorFailed) {
+            try {
+                connector.disconnect();
+            } catch (IOException e) {
+            }
+        }
     }
     
 }
