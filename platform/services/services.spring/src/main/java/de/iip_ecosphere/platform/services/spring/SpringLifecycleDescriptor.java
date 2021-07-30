@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
@@ -41,6 +42,7 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void shutdown() {
+        ServicesAas.notifyManagerRemoved();
     }
 
     @Override
