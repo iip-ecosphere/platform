@@ -9,3 +9,4 @@ env:
 exposedPorts:
   - port: ${port}
     protocol: TCP
+networkMode: host

@@ -10,3 +10,4 @@ exposedPorts:
   - port: ${port}
     protocol: TCP
 dood: true
+networkMode: host
