@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import static de.iip_ecosphere.platform.support.iip_aas.config.CmdLine.*;
 
 /**
  * Service environment starter reading command server information from the command line.
@@ -31,9 +32,6 @@ public class Starter {
     
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
-    public static final String PARAM_PREFIX = "--";
-    public static final String PARAM_ARG_NAME_SEP = ".";
-    public static final String PARAM_VALUE_SEP = "=";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
