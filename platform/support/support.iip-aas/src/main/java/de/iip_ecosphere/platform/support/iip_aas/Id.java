@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +46,25 @@ public class Id {
         try {
             InetAddress localHost = InetAddress.getLocalHost();
             NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-            byte[] hardwareAddress = ni.getHardwareAddress();
-            String[] hexadecimal = new String[hardwareAddress.length];
-            for (int i = 0; i < hardwareAddress.length; i++) {
-                hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+            if (ni == null) { // Ubuntu :(
+                // https://stackoverflow.com/questions/23900172/how-to-get-localhost-network-interface-in-java-or-scala
+                Enumeration<NetworkInterface> ne = NetworkInterface.getNetworkInterfaces();
+                while (ne.hasMoreElements()) {
+                    ni = ne.nextElement();
+                    break;
+                }
+            }
+            if (null != ni) {
+                byte[] hardwareAddress = ni.getHardwareAddress();
+                String[] hexadecimal = new String[hardwareAddress.length];
+                for (int i = 0; i < hardwareAddress.length; i++) {
+                    hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+                }
+                macAddress = String.join("", hexadecimal);
+            } else {
+                macAddress = JVM_NAME;    
             }
             hostName = localHost.getHostName();
-            macAddress = String.join("", hexadecimal);
             ip = localHost.getHostAddress();
         } catch (IOException e) {
             LoggerFactory.getLogger(Id.class).error("Obtaining device ID: " + e.getMessage());
