@@ -118,4 +118,11 @@ public interface NetworkManager {
      */
     public int getHighPort();
 
+    /**
+     * Configures the network manager.
+     * 
+     * @param setup the setup instance
+     */
+    public void configure(NetworkManagerSetup setup);
+    
 }

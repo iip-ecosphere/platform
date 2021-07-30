@@ -15,12 +15,15 @@ package de.iip_ecosphere.platform.support.net;
 import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
- * Basic network manager implementation.
+ * Basic network manager implementation. Default port values are 1024-65535 according to RFC 6056.
  * 
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractNetworkManagerImpl implements NetworkManager {
 
+    private int lowPort = 1024;
+    private int highPort = 65535; 
+    
     /**
      * Checks the key for structural validity.
      * 
@@ -44,5 +47,24 @@ public abstract class AbstractNetworkManagerImpl implements NetworkManager {
             throw new IllegalArgumentException("Address must be given");
         }
     }
+    
+    @Override
+    public int getLowPort() {
+        return lowPort;
+    }
+
+    @Override
+    public int getHighPort() {
+        return highPort;
+    }
+
+    @Override
+    public void configure(NetworkManagerSetup setup) {
+        if (null != setup) {
+            lowPort = setup.getLowPort();
+            highPort = setup.getHighPort();
+        }
+    }
+
 
 }

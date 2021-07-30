@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 
 import org.junit.Assert;
 
@@ -51,6 +52,33 @@ public class NetworkManagerTest {
         Assert.assertEquals(resAdr.getPort(), adr.getPort());
         testNetworkManager(mgr, "");
     }
+
+    /**
+     * Tests setting up the network manager.
+     * 
+     * @param manager the manager instance to test
+     */
+    private static void testNetworkManagerSetup(NetworkManager manager) {
+        Assert.assertTrue(manager.getLowPort() > 0);
+        Assert.assertTrue(manager.getHighPort() > 0);
+        Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
+
+        int low = manager.getLowPort();
+        int high = manager.getHighPort();
+        NetworkManagerSetup setup = new NetworkManagerSetup();
+        setup.setLowPort(1);
+        setup.setHighPort(10);
+        manager.configure(setup);
+        Assert.assertEquals(1, manager.getLowPort());
+        Assert.assertEquals(10, manager.getHighPort());
+        setup.setLowPort(low);
+        setup.setHighPort(high);
+        manager.configure(setup); // reset
+
+        Assert.assertTrue(manager.getLowPort() > 0);
+        Assert.assertTrue(manager.getHighPort() > 0);
+        Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
+    }
     
     /**
      * Tests the given network manager for self-managed addresses.
@@ -60,9 +88,7 @@ public class NetworkManagerTest {
      * @see #testPortReservation(NetworkManager, String)
      */
     public static void testNetworkManager(NetworkManager manager, String suffix) {
-        Assert.assertTrue(manager.getLowPort() > 0);
-        Assert.assertTrue(manager.getHighPort() > 0);
-        Assert.assertTrue(manager.getLowPort() < manager.getHighPort());
+        testNetworkManagerSetup(manager);
         int port = NetUtils.getEphemeralPort();
         while (port < manager.getLowPort() || port > manager.getHighPort()) {
             port = NetUtils.getEphemeralPort();
@@ -234,6 +260,18 @@ public class NetworkManagerTest {
         manager.releasePort("a.");
         Assert.assertNull(manager.getPort("a.b.c"));
         Assert.assertNull(manager.getPort("a.b.c.d"));
+    }
+    
+    /**
+     * Basic test for net manager setup. No yaml here, so just instance based test.
+     */
+    @Test
+    public void testNetMgrSetup() {
+        NetworkManagerSetup setup = new NetworkManagerSetup();
+        setup.setLowPort(1);
+        setup.setHighPort(10);
+        Assert.assertEquals(1, setup.getLowPort());
+        Assert.assertEquals(10, setup.getHighPort());
     }
     
 }

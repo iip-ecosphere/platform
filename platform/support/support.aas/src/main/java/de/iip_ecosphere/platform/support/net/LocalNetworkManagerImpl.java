@@ -155,14 +155,4 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         return host.equals(adr.getHost()) && isInUse(adr.getPort());
     }
 
-    @Override
-    public int getLowPort() {
-        return 1025;
-    }
-
-    @Override
-    public int getHighPort() {
-        return 65535;
-    }
-
 }
