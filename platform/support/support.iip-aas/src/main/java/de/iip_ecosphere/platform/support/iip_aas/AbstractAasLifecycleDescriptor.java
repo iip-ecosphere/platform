@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
  * Implements the generic lifecycle descriptor for the service manager.
@@ -30,6 +31,11 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
  */
 public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
 
+    /**
+     * Explicitly determine the AAS implementation server port. If not given, use an ephemeral one.
+     */
+    public static final String PARAM_IIP_PORT = "iip.port";
+    
     private String name;
     private Supplier<AasSetup> setupSupplier;
     private Server implServer;
@@ -48,6 +54,10 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
     @Override
     public void startup(String[] args) {
+        int port = CmdLine.getIntArg(args, PARAM_IIP_PORT, -1);
+        if (port > 0) {
+            setupSupplier.get().getImplementation().setPort(port);
+        }
         if (AasFactory.isFullInstance()) {
             AasSetup setup = setupSupplier.get();
             AasPartRegistry.setAasSetup(setup);
