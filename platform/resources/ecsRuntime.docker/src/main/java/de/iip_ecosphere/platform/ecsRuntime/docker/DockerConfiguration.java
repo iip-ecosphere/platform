@@ -37,7 +37,7 @@ public class DockerConfiguration extends Configuration {
     }
     
     /**
-     * Defines Docker configuration.
+     * Defines Docker configuration. [required by SnakeYaml]
      * @param docker 
      */
     public void setDocker(Docker docker) {

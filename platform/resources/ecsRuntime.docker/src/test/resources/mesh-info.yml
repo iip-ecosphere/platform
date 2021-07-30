@@ -1,0 +1,14 @@
+!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
+id: test-serviceMgr
+name: Test Service Manager
+version: 1.0
+dockerImageName: iip/serviceMgr
+dockerImageZipfile: serviceMgr.tar.gz
+env:
+  - IIP_PORT=${port}
+exposedPorts:
+  - ${port}/TCP
+  - 22/UDP
+  - 80
+  - 8080/DEFAULT
+  

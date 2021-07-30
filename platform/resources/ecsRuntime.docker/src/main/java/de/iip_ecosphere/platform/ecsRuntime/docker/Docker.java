@@ -22,6 +22,7 @@ public class Docker {
     private String dockerHost;
     private String dockerImageYamlFilename = "image-info.yml";
     private boolean deleteWhenUndeployed = false;
+    private String downloadDirectory;
     
     /**
      * Returns the docker host.
@@ -70,11 +71,32 @@ public class Docker {
     }
     /**
      * Defines if Docker files should be deleted when the corresponding container 
-     * gets undeployed.
+     * gets undeployed. [required by SnakeYaml]
      * 
      * @param deleteWhenUndeployed True or False
      */
     public void setDeleteWhenUndeployed(boolean deleteWhenUndeployed) {
         this.deleteWhenUndeployed = deleteWhenUndeployed;
     }
+
+    /**
+     * Defines the download directory. [required by SnakeYaml]
+     * @param directory
+     */
+    public void setDownloadDirectory(String directory) {
+        this.downloadDirectory = directory;
+    }
+    
+    /**
+     * Returns the download directory. If the configured download directory is <b>null</b> or empty, it returns 
+     * the system temporary directory.
+     * @return directory, the system temporary directory if none is specified
+     */
+    public String getDownloadDirectory() {
+        if (this.downloadDirectory == null || this.downloadDirectory.length() == 0) {
+            return System.getProperty("java.io.tmpdir");
+        }
+        return this.downloadDirectory;
+    }
+    
 }

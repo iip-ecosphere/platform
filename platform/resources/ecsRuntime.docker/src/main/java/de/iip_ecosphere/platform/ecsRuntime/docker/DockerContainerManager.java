@@ -21,13 +21,17 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -42,6 +46,8 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
  * 
@@ -50,6 +56,7 @@ import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 public class DockerContainerManager extends AbstractContainerManager<DockerContainerDescriptor> {
 
     private static DockerConfiguration config = DockerConfiguration.readFromYaml();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockerContainerManager.class);
     
     // don't change name of outer/inner class
     // TODO upon start, scan file-system for containers and add them automatically if applicable
@@ -78,22 +85,27 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String addContainer(URI location) throws ExecutionException {
         String id = null;
         DockerContainerDescriptor container;
+        LOGGER.info("Adding container at " + location + "...");
         try {
             FactoryDescriptor factory = new FactoryDescriptor();
             DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
+            String downloadDirectory = config.getDocker().getDownloadDirectory();
+            File downloadDir = new File(downloadDirectory);
             
             // Getting information about Docker image from image-info.yml
-            String pathToYaml = location.toString() + config.getDocker().getDockerImageYamlFilename();
+            String pathToYaml = location.toString();
+            if (pathToYaml.endsWith("/")) {
+                pathToYaml += config.getDocker().getDockerImageYamlFilename();
+            }
             URI yamlURI = new URI(pathToYaml);
-            File imageInfo = UriResolver.resolveToFile(yamlURI, null);
+            File imageInfo = UriResolver.resolveToFile(yamlURI, downloadDir);
             container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
-                        
+
             // Loading image
             String imageName = container.getDockerImageZipfile();
-            String pathToImage = location.toString() + imageName;
+            int pos = pathToYaml.lastIndexOf('/');
+            String pathToImage = pathToYaml.substring(0, pos + 1) + imageName;
             URI imageURI = new URI(pathToImage);
-            String downloadDirectory = container.getDownloadDirectory();
-            File downloadDir = new File(downloadDirectory);
             File image = UriResolver.resolveToFile(imageURI, downloadDir);
             
             String downloadedImageZipfile = image.getPath();
@@ -101,37 +113,75 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
-                throw new ExecutionException(
-                        "Could not connect with the Docker daemon. Adding a container failed.", null);
+                throwExecutionException("Adding container failed", "Could not connect to the Docker daemon");
             }
             
             InputStream in = new FileInputStream(image);
             dockerClient.loadImageCmd(in).exec();
             
             // Creating Docker container
+            int port = 0;
+            if (container.requiresPort()) {
+                // may be gone until used, limit then netMgr ports in setup
+                NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                port = netMgr.getPort(container.getNetKey()).getPort();
+            }
             String dockerImageName = container.getDockerImageName();
             String containerName = container.getName();
-            dockerClient.createContainerCmd(dockerImageName).withName(containerName).exec(); 
+            CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
+                .withName(containerName);
+            List<String> env = container.instantiateEnv(port);
+            if (env.size() > 0) {
+                cmd.withEnv(env);
+            }
+            List<ExposedPort> exPorts = container.instantiateExposedPorts(port);
+            if (exPorts.size() > 0) {
+                cmd.withExposedPorts(exPorts);
+            }
+            cmd.exec(); 
             
             // Getting Docker id
             String dockerId = getDockerId(containerName);
             if (dockerId == null) {
-                throw new ExecutionException("The Docker container id is null.", null);
+                throwExecutionException("Adding container failed", "The Docker container id is null.");
             }
             container.setDockerId(dockerId);
             container.setState(ContainerState.AVAILABLE);
             
             id = super.addContainer(container.getId(), container);
+            LOGGER.info("Container " + container.getId() + " added");
         } catch (IOException e) {
-            e.printStackTrace();
+            throwExecutionException("Adding container failed", e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            throwExecutionException("Adding container failed", e);
         }
         return id; 
     }
-    
+
+    /**
+     * Throws an execution exception for the given throwable.
+     * @param action the actual action to log
+     * @param th the throwable
+     * @throws ExecutionException
+     */
+    private static void throwExecutionException(String action, Throwable th) throws ExecutionException {
+        LOGGER.error(action + ": " + th.getMessage());
+        throw new ExecutionException(th);
+    }
+
     // checkstyle: stop exception type check
-    
+
+    /**
+     * Throws an execution exception for the given message.
+     * @param action the actual action to log
+     * @param message the message for the exception
+     * @throws ExecutionException
+     */
+    private static void throwExecutionException(String action, String message) throws ExecutionException {
+        LOGGER.error(action + ": " + message);
+        throw new ExecutionException(message, null);
+    }
+
     /**
      * Returns a Docker API Client.
      * If there is not running Docker daemon on the host it returns null.
@@ -152,7 +202,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         try {
             dockerClient.infoCmd().exec();
         } catch (Exception e) {
-            LoggerFactory.getLogger(DockerContainerManager.class).warn("Obtaining Docker client(): " + e.getMessage());
+            LOGGER.warn("Obtaining Docker client(): " + e.getMessage());
             dockerClient = null;
         }
         return dockerClient;
@@ -162,30 +212,34 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public void startContainer(String id) throws ExecutionException {
+        LOGGER.info("Starting container " + id);
         DockerContainerDescriptor container = super.getContainer(id, "id", "start");
         String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
-            throw new ExecutionException("Could not connect with the Docker daemon. Starting container failed.", null);
+            throwExecutionException("Starting container failed", "Could not connect to the Docker daemon.");
         }
         setState(container, ContainerState.DEPLOYING);
         dockerClient.startContainerCmd(dockerId).exec();
         setState(container, ContainerState.DEPLOYED);
+        LOGGER.info("Container " + id + " started");
     }
     
     @Override
     public void stopContainer(String id) throws ExecutionException {
+        LOGGER.info("Stopping container " + id);
         DockerContainerDescriptor container = super.getContainer(id, "id", "stop");
         String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
-            throw new ExecutionException("Could not connect with the Docker daemon. Stoping container failed.", null);
+            throwExecutionException("Stopping container failed", "Could not connect to the Docker daemon.");
         }
         setState(container, ContainerState.STOPPING);
         dockerClient.stopContainerCmd(dockerId).exec();
         setState(container, ContainerState.STOPPED);
+        LOGGER.info("Container " + id + " stopped");
     }
 
     @Override
@@ -196,13 +250,18 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
     @Override
     public void undeployContainer(String id) throws ExecutionException {
+        LOGGER.info("Undeploying container " + id);
         DockerContainerDescriptor container = getContainer(id);
         String dockerId = container.getDockerId();
+
+        if (container.requiresPort()) {
+            NetworkManager netMgr = NetworkManagerFactory.getInstance();
+            netMgr.releasePort(container.getNetKey());
+        }
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
-            throw new ExecutionException(
-                    "Could not connect with the Docker daemon. Undeploying container failed.", null);
+            throwExecutionException("Undeploying container failed", "Could not connect to the Docker daemon.");
         }
         dockerClient.removeContainerCmd(dockerId).exec();
         
@@ -217,6 +276,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         
         super.undeployContainer(id);
+        LOGGER.info("Container " + id + " undeployed");
     }
 
     @Override
@@ -248,8 +308,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public String getDockerId(String name) throws ExecutionException {
         DockerClient dockerClient = this.getDockerClient();
         if (dockerClient == null) {
-            throw new ExecutionException(
-                    "Could not connect with the Docker daemon. Getting container's id failed.", null);
+            throwExecutionException("Getting container's id failed", "Could not connect to the Docker daemon.");
         }
         // Getting list of all container that Docker "knows".
         ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
