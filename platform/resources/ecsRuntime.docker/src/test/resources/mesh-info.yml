@@ -11,4 +11,5 @@ exposedPorts:
   - 22/UDP
   - 80
   - 8080/DEFAULT
-  
+networkMode: host
+dood: true  

@@ -15,11 +15,12 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yaml.snakeyaml.Yaml;
+import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.InternetProtocol;
@@ -28,6 +29,7 @@ import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 
 /**
  * Implements a container descriptor for docker-based container management.
@@ -53,6 +55,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     private boolean attachStdErr = false;
     private boolean privileged = false;
     private boolean withTty = false;
+    private String networkMode;
     private ArrayList<String> exposedPorts = new ArrayList<String>();
     private ArrayList<String> env = new ArrayList<String>();
         
@@ -223,6 +226,15 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     }
     
     /**
+     * Returns the network mode.
+     * 
+     * @return the network mode, may be <b>null</b> for none
+     */
+    public String getNetworkMode() {
+        return networkMode;
+    }
+    
+    /**
      * Returns the plain environment settings to start the container.
      * @return the environment settings, may contain {@link #PORT_PLACEHOLDER}}
      */
@@ -290,6 +302,15 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
         return attachStdOut;
     }
 
+    /**
+     * Defines the network mode. [snakeyaml]
+     * 
+     * @param networkMode the network mode, may be <b>null</b> for none
+     */
+    public void setNetworkMode(String networkMode) {
+        this.networkMode = networkMode;
+    }
+    
     /**
      * Changes whether the container shall run in privileged mode. [snakeyaml]
      * 
@@ -403,7 +424,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
             in = new FileInputStream(file);
             result = readFromYaml(in);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
         }
         return result;
     }
@@ -416,8 +437,11 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     public static DockerContainerDescriptor readFromYaml(InputStream in) {
         DockerContainerDescriptor result = null;
         if (in != null) {
-            Yaml yaml = new Yaml();
-            result = yaml.load(in);
+            try {
+                result = AbstractConfiguration.readFromYaml(DockerContainerDescriptor.class, in);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
+            }
         }
         return result;
     }

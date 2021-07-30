@@ -65,6 +65,14 @@ public class DockerContainerDescriptorTest {
         Assert.assertEquals(8080, exp.get(3).getPort());
         Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(3).getProtocol());
         Assert.assertTrue(desc.requiresPort());
+        Assert.assertTrue(desc.getDood());
+        Assert.assertTrue(desc.getAttachStdIn());
+        Assert.assertTrue(desc.getPrivileged());
+        Assert.assertTrue(desc.getPrivileged());
+        Assert.assertTrue(desc.getWithTty());
+        Assert.assertEquals("host", desc.getNetworkMode());
+        Assert.assertFalse(desc.getAttachStdOut());
+        Assert.assertFalse(desc.getAttachStdErr());
     }
 
 }

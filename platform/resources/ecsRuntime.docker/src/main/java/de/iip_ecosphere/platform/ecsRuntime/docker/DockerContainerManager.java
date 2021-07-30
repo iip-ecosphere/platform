@@ -168,6 +168,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         if (exPorts.size() > 0) {
             cmd.withExposedPorts(exPorts);
         }
+        // use default unless explicitly set
         if (container.getAttachStdIn()) {
             cmd.withAttachStdin(true);
         }
@@ -179,6 +180,9 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         if (container.getWithTty()) {
             cmd.withTty(true);
+        }
+        if (null != container.getNetworkMode()) {
+            cmd.getHostConfig().withNetworkMode(container.getNetworkMode());
         }
         if (container.getDood()) {
             // DooD https://blog.nestybox.com/2019/09/14/dind.html#docker-out-of-docker-dood
