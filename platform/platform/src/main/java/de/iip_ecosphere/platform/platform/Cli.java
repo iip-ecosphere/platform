@@ -281,6 +281,7 @@ public class Cli {
         boolean exit = false;
         final Level level = Level.SERVICES;
         try {
+            println("Services level: Obtaining submodel. Will keep it until level is active. No auto-refresh.");
             ServicesAasClient client = new ServicesAasClient(resourceId);
             String cmd;
             do {
@@ -331,6 +332,7 @@ public class Cli {
                         case "help":
                             printHelp(provider, level);
                             break;
+                        case "..":
                         case "back":
                             cmd = null;
                             break;
@@ -364,6 +366,7 @@ public class Cli {
         boolean exit = false;
         final Level level = Level.CONTAINER;
         try {
+            println("Container level: Obtaining submodel. Will keep it until level is active. No auto-refresh.");
             EcsAasClient client = new EcsAasClient(resourceId);
             String cmd;
             do {
@@ -414,6 +417,7 @@ public class Cli {
                             exit = true;
                             cmd = null;
                             break;
+                        case "..":
                         case "back":
                             cmd = null;
                             break;
@@ -453,6 +457,7 @@ public class Cli {
                 case "help":
                     printHelp(provider, level);
                     break;
+                case "..":
                 case "back":
                     cmd = null;
                     break;
@@ -684,6 +689,7 @@ public class Cli {
             println("  remove <artifactId>");
             println("  help");
             println("  back", provider);
+            println("  ..", provider);
             println("  exit", provider);
         }
         if (level.isTopLevel()) {
@@ -697,6 +703,7 @@ public class Cli {
             println("  undeploy <containerId>");
             println("  help");
             println("  back", provider);
+            println("  ..", provider);
             println("  exit", provider);
         }
         if (level.isTopLevel()) {
@@ -706,6 +713,7 @@ public class Cli {
             println("  list");
             println("  help");
             println("  back", provider);
+            println("  ..", provider);
             println("  exit", provider);
         }
         if (level.isTopLevel()) {
