@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.ecsRuntime;
 
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
 /**
  * The basic ECS lifecycle descriptor for powering up the AAS.
@@ -32,6 +33,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere ECS Runtime.");
         super.startup(args);
+        NetworkManagerFactory.configure(EcsFactory.getConfiguration().getNetMgr());
         Monitor.startScheduling();
     }
     

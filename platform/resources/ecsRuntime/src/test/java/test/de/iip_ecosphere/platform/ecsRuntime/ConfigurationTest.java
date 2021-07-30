@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 
 /**
  * Tests {@link Configuration}.
@@ -45,6 +46,9 @@ public class ConfigurationTest {
         Assert.assertTrue(cfg.getMonitoringUpdatePeriod() > 0);
         Assert.assertNotNull(cfg.getTransport());
         Assert.assertEquals("localhost", cfg.getTransport().getHost());
+        NetworkManagerSetup netMgr = cfg.getNetMgr();
+        Assert.assertEquals(1025, netMgr.getLowPort());
+        Assert.assertEquals(65535, netMgr.getHighPort());
     }
 
 }

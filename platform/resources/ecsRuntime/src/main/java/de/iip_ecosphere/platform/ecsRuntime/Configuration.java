@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -27,6 +28,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 public class Configuration extends AasConfiguration {
     
     private TransportSetup transport = new TransportSetup();
+    private NetworkManagerSetup netMgr = new NetworkManagerSetup();
     private int monitoringUpdatePeriod = 2000;
 
     /**
@@ -46,6 +48,15 @@ public class Configuration extends AasConfiguration {
     public TransportSetup getTransport() {
         return transport;
     }
+    
+    /**
+     * Returns the network manager setup.
+     * 
+     * @return the network manager setup
+     */
+    public NetworkManagerSetup getNetMgr() {
+        return netMgr;
+    }
 
     /**
      * Changes the monitoring update period. [snakeyaml]
@@ -63,6 +74,15 @@ public class Configuration extends AasConfiguration {
      */
     public void setTransport(TransportSetup transport) {
         this.transport = transport;
+    }
+
+    /**
+     * Defines the network manager setup. [snakeyaml]
+     * 
+     * @param netMgr the network manager setup
+     */
+    public void setNetMgr(NetworkManagerSetup netMgr) {
+        this.netMgr = netMgr;
     }
 
     /**
