@@ -476,15 +476,37 @@ public class ServicesAas implements AasContributor {
      */
     public static void notifyArtifactRemoved(ArtifactDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
-            for (String sId : desc.getServiceIds()) {
-                coll.deleteElement(fixId(sId));
-            }
-            coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
-            coll.deleteElement(fixId(desc.getId()));
-            coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
-            for (ServiceDescriptor s : desc.getServices()) {
-                removeRelations(s, sub, coll);
+            removeArtifact(sub, desc);
+        });
+    }
+    
+    /**
+     * Removes the artifact {@code desc} from the submodel {@code sub}. Removes also all services.
+     * 
+     * @param sub the submodel
+     * @param desc the artifact descriptor to remove
+     */
+    private static void removeArtifact(Submodel sub, ArtifactDescriptor desc) {
+        SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+        for (String sId : desc.getServiceIds()) {
+            coll.deleteElement(fixId(sId));
+        }
+        coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
+        coll.deleteElement(fixId(desc.getId()));
+        coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
+        for (ServiceDescriptor s : desc.getServices()) {
+            removeRelations(s, sub, coll);
+        }
+    }
+    
+    /**
+     * Called when the service manager disappears. 
+     */
+    public static void notifyManagerRemoved() {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            ServiceManager mgr = ServiceFactory.getServiceManager();
+            for (ArtifactDescriptor a : mgr.getArtifacts()) {
+                removeArtifact(sub, a);
             }
         });
     }
