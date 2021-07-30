@@ -291,10 +291,10 @@ public class Cli {
                         String id;
                         switch (cmd.toLowerCase()) {
                         case "listservices":
-                            print(client.getServices(), "- Service ", true);
+                            print(client.getServices(), "- Service ", PrintType.NO, PrintType.PREFIX);
                             break;
                         case "listartifacts":
-                            print(client.getArtifacts(), "- Artifact ", true);
+                            print(client.getArtifacts(), "- Artifact ", PrintType.NO, PrintType.PREFIX);
                             break;
                         case "add":
                             String uri = provider.nextCommand();
@@ -373,7 +373,7 @@ public class Cli {
                     try {
                         switch (cmd.toLowerCase()) {
                         case "list":
-                            print(client.getContainers(), "- Container ", false);
+                            print(client.getContainers(), "- Container ", PrintType.PREFIX);
                             break;
                         case "add":
                             String uri = provider.nextCommand();
@@ -475,10 +475,32 @@ public class Cli {
     private static void listResources() {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
-            print(aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES), "- Resource ", false);
+            print(aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES), "- Resource ", PrintType.PREFIX);
         } catch (IOException e) {
             println(e);
         }
+    }
+    
+    /**
+     * Print types for controlling nested collection output.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum PrintType {
+        /**
+         * Don't print, skip.
+         */
+        NO,
+        
+        /**
+         * Print out the short id (default).
+         */
+        ID_SHORT,
+        
+        /**
+         * Print the given prefix.
+         */
+        PREFIX
     }
     
     /**
@@ -491,7 +513,7 @@ public class Cli {
         private String collPrefix;
         private String indent = "";
         private boolean emitted;
-        private boolean skipFirstCollectionLevel;
+        private PrintType[] skipLevel;
         private int collectionLevel = 0;
         
         /**
@@ -499,11 +521,27 @@ public class Cli {
          * 
          * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
          *     printing the collection name
-         * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
+         * @param skipLevel how to handle printout per level, if not given {@link PrintType#ID_SHORT} is used
          */
-        private PrintVisitor(String collPrefix, boolean skipFirstCollectionLevel) {
+        private PrintVisitor(String collPrefix, PrintType... skipLevel) {
             this.collPrefix = collPrefix;
-            this.skipFirstCollectionLevel = skipFirstCollectionLevel;
+            this.skipLevel = skipLevel;
+        }
+        
+        /**
+         * Returns the print/skip type for the specified level.
+         * 
+         * @param level the level to look for
+         * @return the print/skip type
+         */
+        private PrintType getSkipLevel(int level) {
+            PrintType result;
+            if (level < 0 || level >= skipLevel.length) {
+                result = PrintType.ID_SHORT;
+            } else {
+                result = skipLevel[level];
+            }
+            return result;
         }
 
         @Override
@@ -563,9 +601,14 @@ public class Cli {
 
         @Override
         public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
-            if ((skipFirstCollectionLevel && collectionLevel > 0) || !skipFirstCollectionLevel) {
-                if (null != collPrefix) {
-                    println(collPrefix + collection.getIdShort());
+            PrintType type = getSkipLevel(collectionLevel);
+            if (type != PrintType.NO) {
+                if (PrintType.PREFIX == type) {
+                    if (null != collPrefix) {
+                        println(indent + collPrefix + collection.getIdShort());
+                    }
+                } else {
+                    println(indent + "-" + collection.getIdShort());
                 }
                 indent += "  ";
                 emitted = true; // assuming that collection elements in the first place determine the output
@@ -576,7 +619,8 @@ public class Cli {
         @Override
         public void endSubmodelElementCollection(SubmodelElementCollection collection) {
             collectionLevel--;
-            if ((skipFirstCollectionLevel && collectionLevel > 0) || !skipFirstCollectionLevel) {
+            PrintType type = getSkipLevel(collectionLevel);
+            if (type != PrintType.NO) {
                 indent = indent.substring(0, indent.length() - 2);
                 if (!emitted) {
                     println(indent + " None.");
@@ -592,11 +636,11 @@ public class Cli {
      * @param elt the element to print
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
-     * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
+     * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    private static void print(SubmodelElement elt, String collPrefix, boolean skipFirstCollectionLevel) {
+    private static void print(SubmodelElement elt, String collPrefix, PrintType... skipLevel) {
         if (null != elt) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, skipFirstCollectionLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipLevel);
             elt.accept(vis);
         } else {
             println("None.");
@@ -609,11 +653,11 @@ public class Cli {
      * @param submodel the sub-model to print
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
-     * @param skipFirstCollectionLevel whether the first collection level shall not be emitted
+     * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    private static void print(Submodel submodel, String collPrefix, boolean skipFirstCollectionLevel) {
+    private static void print(Submodel submodel, String collPrefix, PrintType... skipLevel) {
         if (null != submodel) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, skipFirstCollectionLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipLevel);
             submodel.accept(vis);
         } else {
             println("None.");
@@ -699,7 +743,7 @@ public class Cli {
      */
     private static void println(Throwable th) {
         println("ERROR: " + th.getMessage());
-        th.printStackTrace();        
+        //th.printStackTrace();        
     }
     
     /**
