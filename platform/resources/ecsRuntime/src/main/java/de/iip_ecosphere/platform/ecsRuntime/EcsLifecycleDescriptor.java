@@ -40,6 +40,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
     @Override
     public void shutdown() {
         Monitor.stopScheduling();
+        EcsAas.notifyResourceRemoved();
         super.shutdown();
     }
     

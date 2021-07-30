@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -33,6 +34,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
@@ -242,6 +244,23 @@ public class EcsAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
             coll.deleteElement(fixId(desc.getId()));
+        });
+    }
+
+    /**
+     * Is called when the entire resource is removed.
+     */
+    public static void notifyResourceRemoved() {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            ContainerManager mgr = EcsFactory.getContainerManager();
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
+            for (ContainerDescriptor desc : mgr.getContainers()) {
+                coll.deleteElement(fixId(desc.getId()));
+            }
+            SubmodelElement elt = sub.getSubmodelElement(fixId(Id.getDeviceIdAas()));
+            if (null != elt) {
+                sub.delete(elt);
+            }
         });
     }
 
