@@ -1,4 +1,3 @@
-!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
 id: test-simpleMesh
 name: Test Simple Mesh App
 version: 0.1

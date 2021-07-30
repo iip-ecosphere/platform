@@ -1,4 +1,3 @@
-!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
 id: test-serviceMgr
 name: Test Service Manager
 version: 1.0

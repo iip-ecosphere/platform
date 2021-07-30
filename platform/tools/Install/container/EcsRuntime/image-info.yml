@@ -1,4 +1,3 @@
-!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
 id: ecsRuntime
 name: IIP-Ecosphere ECS runtime
 version: 0.2

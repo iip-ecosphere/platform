@@ -6,7 +6,6 @@
 
 The container descriptor is an additional file in a docker image identifying the container. Typically, the file is called `ìmage-info.yml` (see below for a different name). The remainder settings look like
 
-    !!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
     id: <String>
     name: <String>
     version: <Version>

@@ -1,4 +1,3 @@
-!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
 id: 01
 name: test-container
 version: 1.0
