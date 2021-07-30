@@ -1,0 +1,11 @@
+!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
+id: ecsRuntime
+name: IIP-Ecosphere ECS runtime
+version: 0.2
+dockerImageName: iip/ecsruntime
+dockerImageZipfile: ecsruntime-0.2.tar.gz
+env:
+  - IIP_PORT=${port}
+exposedPorts:
+  - port: ${port}
+    protocol: TCP

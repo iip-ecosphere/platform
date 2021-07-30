@@ -1,0 +1,11 @@
+!!de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor
+id: test-simpleMesh
+name: Test Simple Mesh App
+version: 0.1
+dockerImageName: iip/simplemesh
+dockerImageZipfile: simplemesh-0.1.tar.gz
+env:
+  - IIP_PORT=${port}
+exposedPorts:
+  - port: ${port}
+    protocol: TCP
