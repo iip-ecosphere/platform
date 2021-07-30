@@ -33,6 +33,7 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Info;
+import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -130,14 +131,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             String containerName = container.getName();
             CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
                 .withName(containerName);
-            List<String> env = container.instantiateEnv(port);
-            if (env.size() > 0) {
-                cmd.withEnv(env);
-            }
-            List<ExposedPort> exPorts = container.instantiateExposedPorts(port);
-            if (exPorts.size() > 0) {
-                cmd.withExposedPorts(exPorts);
-            }
+            configure(cmd, port, container);
             cmd.exec(); 
             
             // Getting Docker id
@@ -156,6 +150,45 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             throwExecutionException("Adding container failed", e);
         }
         return id; 
+    }
+
+    /**
+     * Configures the create container command.
+     * 
+     * @param cmd the command instance
+     * @param port the port number for the AAS implementation server
+     * @param container the container descriptor
+     */
+    private void configure(CreateContainerCmd cmd, int port, DockerContainerDescriptor container) {
+        List<String> env = container.instantiateEnv(port);
+        if (env.size() > 0) {
+            cmd.withEnv(env);
+        }
+        List<ExposedPort> exPorts = container.instantiateExposedPorts(port);
+        if (exPorts.size() > 0) {
+            cmd.withExposedPorts(exPorts);
+        }
+        if (container.getAttachStdIn()) {
+            cmd.withAttachStdin(true);
+        }
+        if (container.getAttachStdOut()) {
+            cmd.withAttachStdout(true);
+        }
+        if (container.getAttachStdErr()) {
+            cmd.withAttachStderr(true);
+        }
+        if (container.getWithTty()) {
+            cmd.withTty(true);
+        }
+        if (container.getDood()) {
+            // DooD https://blog.nestybox.com/2019/09/14/dind.html#docker-out-of-docker-dood
+            String host = config.getDocker().getDockerHost();
+            cmd.withVolumes(new Volume(host + ":" + host));
+        }
+        if (container.getPrivileged()) {
+            // https://www.docker.com/blog/docker-can-now-run-within-docker/
+            cmd.getHostConfig().withPrivileged(true);
+        }
     }
 
     /**

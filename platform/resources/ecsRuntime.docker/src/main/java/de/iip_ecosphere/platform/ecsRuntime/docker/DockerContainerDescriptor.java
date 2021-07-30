@@ -36,56 +36,6 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     
-    /**
-     * Describes an exposed port.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public class ExpPort {
-        
-        private String port = "";
-        private InternetProtocol protocol = InternetProtocol.DEFAULT;
-        
-        /**
-         * Returns the port number. May contain {@link #PORT_PLACEHOLDER} to be replaced by the dynamic port 
-         *    of the AAS implementation server of the service manager
-         * 
-         * @return the port number
-         */
-        public String getPort() {
-            return port;
-        }
-        
-        /**
-         * Defines the port number. [required by SnakeYaml]
-         * 
-         * @param port the port number
-         */
-        public void setPort(String port) {
-            if (null != port) {
-                this.port = port;
-            }
-        }
-        
-        /**
-         * Returns the internet protocol.
-         * 
-         * @return the internet protocol
-         */
-        public InternetProtocol getProtocol() {
-            return protocol;
-        }
-        
-        /**
-         * Defines the internet protocol. [required by SnakeYaml]
-         * 
-         * @param protocol the internet protocol
-         */
-        public void setProtocol(InternetProtocol protocol) {
-            this.protocol = protocol;
-        }
-    }
-    
     public static final String PORT_PLACEHOLDER = "${port}";
     private static int instanceCount = 0;
 
@@ -97,6 +47,12 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     // configurable
     private String dockerImageName;
     private String dockerImageZipfile;
+    private boolean dood = false;
+    private boolean attachStdIn = false;
+    private boolean attachStdOut = false;
+    private boolean attachStdErr = false;
+    private boolean privileged = false;
+    private boolean withTty = false;
     private ArrayList<String> exposedPorts = new ArrayList<String>();
     private ArrayList<String> env = new ArrayList<String>();
         
@@ -273,7 +229,121 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     public ArrayList<String> getEnv() {
         return this.env;
     }
+    
+    /**
+     * Returns whether the container shall allow for managing containers (DooD).
+     * 
+     * @return {@code true} if docker shall be available/mapped, {@code false} else
+     * @see #getWithTty()
+     * @see #getPrivileged()
+     * @see #getAttachStdIn()
+     */
+    public boolean getDood() {
+        return dood;
+    }
 
+    /**
+     * Returns whether the container shall provide an interactive terminal.
+     * 
+     * @return {@code true} if the terminal shall be provided, {@code false} else
+     * @see #getDood()
+     */
+    public boolean getWithTty() {
+        return withTty || dood;
+    }
+
+    /**
+     * Returns whether the container shall run in privileged mode.
+     * 
+     * @return {@code true} if privileged model shall apply, {@code false} else
+     * @see #getDood()
+     */
+    public boolean getPrivileged() {
+        return privileged || dood;
+    }
+
+    /**
+     * Returns whether standard error shall be attached to the container.
+     * 
+     * @return {@code true} to attach, {@code false} else
+     */
+    public boolean getAttachStdErr() {
+        return attachStdErr;
+    }
+
+    /**
+     * Returns whether standard in shall be attached to the container.
+     * 
+     * @return {@code true} to attach, {@code false} else
+     * @see #getDood()
+     */
+    public boolean getAttachStdIn() {
+        return attachStdIn || dood;
+    }
+
+    /**
+     * Returns whether standard out shall be attached to the container.
+     * 
+     * @return {@code true} to attach, {@code false} else
+     */
+    public boolean getAttachStdOut() {
+        return attachStdOut;
+    }
+
+    /**
+     * Changes whether the container shall run in privileged mode. [snakeyaml]
+     * 
+     * @param privileged {@code true} if privileged model shall apply, {@code false} else
+     */
+    public void setPrivileged(boolean privileged) {
+        this.privileged = privileged;
+    }
+
+    /**
+     * Changes whether the container shall allow for managing containers (DooD).
+     * 
+     * @param dood {@code true} if docker shall be available/mapped, {@code false} else
+     */
+    public void setDood(boolean dood) {
+        this.dood = dood;
+    }
+
+    /**
+     * Returns whether the container shall provide an interactive terminal.
+     * 
+     * @param withTty {@code true} if the terminal shall be provided, {@code false} else
+     */
+    public void setWithTty(boolean withTty) {
+        this.withTty = withTty;
+    }
+
+    /**
+     * Changes whether standard out shall be attached to the container.
+     * 
+     * @param attachStdErr {@code true} to attach, {@code false} else
+     */
+    public void setAttachStdErr(boolean attachStdErr) {
+        this.attachStdErr = attachStdErr;
+    }
+
+    /**
+     * Changes whether standard in shall be attached to the container.
+     * 
+     * @param attachStdIn {@code true} to attach, {@code false} else
+     */
+    public void setAttachStdIn(boolean attachStdIn) {
+        this.attachStdIn = attachStdIn;
+    }
+
+    /**
+     * Changes whether standard out shall be attached to the container.
+     * 
+     * @param attachStdOut {@code true} to attach, {@code false} else
+     */
+    public void setAttachStdOut(boolean attachStdOut) {
+        this.attachStdOut = attachStdOut;
+    }
+    
     /**
      * Returns the substituted environment variable settings to start the container.
      * @param port the port to substitute {@link #PORT_PLACEHOLDER} 
