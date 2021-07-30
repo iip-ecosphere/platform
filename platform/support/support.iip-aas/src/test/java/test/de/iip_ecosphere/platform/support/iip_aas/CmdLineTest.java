@@ -60,5 +60,17 @@ public class CmdLineTest {
         Assert.assertEquals("--b=5", result.get(2));
         result.clear();
     }
+    
+    /**
+     * Tests the getArg functions.
+     */
+    @Test
+    public void testGetArg() {
+        String[] args = {"--bli=5", "--bla=6", "--xyz=String", "whatever"};
+        Assert.assertEquals("6", CmdLine.getArg(args, "bla", ""));
+        Assert.assertEquals("5", CmdLine.getArg(args, "bli", ""));
+        Assert.assertEquals("String", CmdLine.getArg(args, "xyz", ""));
+        Assert.assertEquals(5, CmdLine.getIntArg(args, "bli", 0));
+    }
 
 }
