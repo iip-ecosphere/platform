@@ -124,6 +124,15 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
         protected VABElementProxy createProxy() {
             return creator.createProxy();
         }
+        
+        /**
+         * Returns the id of the creator.
+         * 
+         * @return the id
+         */
+        protected String getId() {
+            return creator.getId();
+        }
 
         /**
          * Returns the name of the implementation element.
@@ -166,7 +175,8 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
                 }
             } catch (Throwable t) {
                 markAsFailed();
-                LoggerFactory.getLogger(getClass()).info("Getter " + getName() + " failed: " + t.getMessage());
+                LoggerFactory.getLogger(getClass()).info("Getter " + getName() + " on " + getId() 
+                    + " failed: " + t.getMessage());
             }
             return result;
         }
@@ -204,7 +214,8 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
                 }
             } catch (Throwable t) {
                 markAsFailed();
-                LoggerFactory.getLogger(getClass()).info("Setter " + getName() + " failed: " + t.getMessage());
+                LoggerFactory.getLogger(getClass()).info("Setter " + getName() + " on " + getId() 
+                    + " failed: " + t.getMessage());
             }
         }
 
@@ -242,7 +253,8 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
                 }
             } catch (Throwable t) {
                 markAsFailed();
-                LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " failed: " + t.getMessage());
+                LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " on " + getId() 
+                    + " failed: " + t.getMessage());
             }
             return result;
         }
