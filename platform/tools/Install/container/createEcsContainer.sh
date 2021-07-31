@@ -1,0 +1,1 @@
+docker build -f EcsRuntime/Dockerfile -t iip/ecsruntime:0.2 .

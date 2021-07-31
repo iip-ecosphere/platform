@@ -7,11 +7,22 @@
 	
     <!-- build zip -->
     <target name="maven"> 
+        <chmod dir="." perm="u+x" includes="**/*.sh"/>
         <zip destFile="install.zip">
             <fileset dir="." includes="pom.xml README.md"/>
             <fileset dir="." includes="platformDependencies/**/*.*" />
             <fileset dir="." includes="broker/**/*.*" />
             <fileset dir="." includes="src/**/*.*" />
+            <fileset dir="." includes="gen/**/*.*" />
+            <fileset dir="." includes="container/**/*.*" />
         </zip>
+        <tar destfile="install.tar.gz" compression="gzip">
+            <fileset dir="." includes="pom.xml README.md"/>
+            <fileset dir="." includes="platformDependencies/**/*.*" />
+            <fileset dir="." includes="broker/**/*.*" />
+            <fileset dir="." includes="src/**/*.*" />
+            <fileset dir="." includes="gen/**/*.*" />
+            <fileset dir="." includes="container/**/*.*" />
+        </tar>
     </target>
 </project>
