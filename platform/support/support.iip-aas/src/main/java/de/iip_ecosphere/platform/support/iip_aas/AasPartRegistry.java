@@ -13,8 +13,6 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -472,14 +470,9 @@ public class AasPartRegistry {
         int implPort = ServerAddress.validatePort(impl.getPort());
         String implHost = impl.getHost();
         if (implHost.equals("127.0.0.1")) {
-            try { // implicitly try to make AAS implementation server available
-                implHost = InetAddress.getLocalHost().getHostName();
-                LoggerFactory.getLogger(AasPartRegistry.class).warn("Using hostname " + implHost 
-                    + " for AAS implementation server");
-            } catch (UnknownHostException e) {
-                LoggerFactory.getLogger(AasPartRegistry.class).warn("No hostname found for AAS implementation "
-                    + "server, using 127.0.0.1");
-            }
+            implHost = NetUtils.getOwnIP(); // implicitly try to make AAS implementation server available
+            LoggerFactory.getLogger(AasPartRegistry.class).warn("Using IP " + implHost 
+                + " for AAS implementation server");
         }
         InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, implPort);
         ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort);
