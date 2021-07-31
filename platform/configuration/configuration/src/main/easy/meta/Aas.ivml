@@ -47,6 +47,7 @@ project Aas {
         String path = "";
     }
 
+    // host "127.0.0.1" replaced by host IP if possible
     compound ImplAddress refines EphemeralServerAddress {
         AasProtocol protocol = aasProtocol;
         AasSchema schema = AasSchema::HTTP; // TODO link to protocol
