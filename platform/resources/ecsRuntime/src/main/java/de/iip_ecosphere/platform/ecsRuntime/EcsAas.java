@@ -71,10 +71,13 @@ public class EcsAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ContainerManager mgr = EcsFactory.getContainerManager();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        // ensure that containers collection exists
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false).build(); 
 
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), 
             false, false);
 
+        
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
         MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
             Id.getDeviceId(), EcsFactory.getConfiguration().getTransport());
