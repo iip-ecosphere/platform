@@ -38,7 +38,7 @@ public interface ContainerOperations {
 
     /**
      * Starts a container. The container must be already within the management domain of this instance by
-     * {@link #addContainer(String, String)}. The container shall after some time be in state 
+     * {@link #addContainer(URI)}. The container shall after some time be in state 
      * {@link ContainerState#STARTING}, {@link ContainerState#RUNNING} or {@link ContainerState#FAILED}.
      * 
      * @param id the id of the container

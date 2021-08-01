@@ -28,7 +28,7 @@ import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClien
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsAasClient extends SubmodelElementsCollectionClient implements ContainerOperations {
+public class EcsAasClient extends SubmodelElementsCollectionClient implements EcsClient {
 
     /**
      * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
@@ -98,13 +98,8 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Co
         return getPropertyStringValue(EcsAas.NAME_PROP_CSYS_VERSION, "");
     }
 
-    /**
-     * Returns the collection with all containers of the resources this client was created for.
-     * 
-     * @return the containers collection, may be <b>null</b>
-     */
+    @Override
     public SubmodelElementCollection getContainers() {
-        getSubmodel().accept(new AasPrintVisitor()); // for testing
         return getSubmodel().getSubmodelElementCollection(EcsAas.NAME_COLL_CONTAINERS);
     }
 
