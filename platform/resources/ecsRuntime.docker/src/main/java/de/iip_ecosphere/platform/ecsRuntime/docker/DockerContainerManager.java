@@ -122,15 +122,14 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             dockerClient.loadImageCmd(in).exec();
             
             // Creating Docker container
-            LOGGER.info("Obtaining port");
             int port = 0;
             if (container.requiresPort()) {
                 // may be gone until used, limit then netMgr ports in setup
-                LOGGER.info("OP1");
+                LOGGER.info("Obtaining port");
                 NetworkManager netMgr = NetworkManagerFactory.getInstance();
-                port = netMgr.getPort(container.getNetKey()).getPort();
+                port = netMgr.obtainPort(container.getNetKey()).getPort();
+                LOGGER.info("Using port " + port);
             }
-            LOGGER.info("OP2");
             String dockerImageName = container.getDockerImageName();
             String containerName = container.getName();
             LOGGER.info("Creating container " + dockerImageName + " " + containerName);
