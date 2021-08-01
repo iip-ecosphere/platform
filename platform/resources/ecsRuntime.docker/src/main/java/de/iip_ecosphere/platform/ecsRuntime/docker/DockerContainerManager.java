@@ -130,8 +130,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 port = netMgr.obtainPort(container.getNetKey()).getPort();
                 LOGGER.info("Using port " + port);
             }
-            String dockerImageName = container.getDockerImageName();
-            String containerName = container.getName();
+            String dockerImageName = getImageName(container);
+            String containerName = container.getName().replaceAll("\\D+", "_");
             LOGGER.info("Creating container " + dockerImageName + " " + containerName);
             CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
                 .withName(containerName);
@@ -156,6 +156,21 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         LOGGER.info("Added container at " + location + "...");
         return id; 
+    }
+    
+    /**
+     * Validates and returns the docker image file name.
+     * 
+     * @param desc the descriptor to return the name from
+     * @return the image file name, potentially turned to lower cases and version appended
+     */
+    private String getImageName(DockerContainerDescriptor desc) {
+        String name = desc.getDockerImageName().toLowerCase();
+        int pos = name.lastIndexOf(':');
+        if (pos < 0) {
+            name = name + ":" + desc.getVersion().toString();
+        }
+        return name;
     }
 
     /**
