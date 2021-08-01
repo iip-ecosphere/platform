@@ -35,7 +35,7 @@ import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServicesAasClient extends SubmodelElementsCollectionClient implements ServiceOperations {
+public class ServicesAasClient extends SubmodelElementsCollectionClient implements ServicesClient {
 
     
     /**
@@ -121,12 +121,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         return result;
     }
     
-    /**
-     * Returns the services associated to a given {@code artifactId}.
-     * 
-     * @param artifactId the artifactId to search for
-     * @return the associated service ids, empty if none was found
-     */
+    @Override
     public String[] getServices(String artifactId) {
         List<String> result = new ArrayList<String>();
         SubmodelElementCollection coll = getServices();
@@ -166,11 +161,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         }
     }
     
-    /**
-     * Returns the collection with all artifacts of the resources this client was created for.
-     * 
-     * @return the artifacts collection, may be <b>null</b> for none
-     */
+    @Override
     public SubmodelElementCollection getArtifacts() {
         SubmodelElementCollection result;
         try {
@@ -182,11 +173,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         return result;
     }
 
-    /**
-     * Returns the collection with all services of the resources this client was created for.
-     * 
-     * @return the services collection, may be <b>null</b> for none
-     */
+    @Override
     public SubmodelElementCollection getServices() {
         SubmodelElementCollection result;
         try {

@@ -39,7 +39,7 @@ public interface ServiceOperations {
 
     /**
      * Starts one or multiple service. The service implementation must be already within the management domain of this 
-     * instance by {@link #addService(String, String)}. The service(s) shall after some time be in state 
+     * instance by {@link #addArtifact(URI)}. The service(s) shall after some time be in state 
      * {@link ServiceState#STARTING}, {@link ServiceState#RUNNING} or {@link ServiceState#FAILED}.
      * 
      * @param serviceId the id(s) of the service(s)
