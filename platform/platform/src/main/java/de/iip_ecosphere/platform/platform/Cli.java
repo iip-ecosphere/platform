@@ -400,7 +400,7 @@ public class Cli {
                                 System.out.println("No Id given.");
                                 break;
                             }
-                            client.startContainer(id);
+                            client.stopContainer(id);
                             break;
                         case "undeploy":
                             id = provider.nextCommand();
