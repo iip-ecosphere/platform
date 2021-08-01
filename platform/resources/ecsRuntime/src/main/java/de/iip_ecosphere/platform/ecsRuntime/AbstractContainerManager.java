@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * A basic re-usable implementation of the container manager. Implementations shall override at least 
  * {@link #undeployContainer(String)}, {@link #migrateContainer(String, String)}
@@ -69,7 +71,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     protected String addContainer(String id, C descriptor) throws ExecutionException {
         checkId(id, "id");
         if (containers.containsKey(id)) {
-            throw new ExecutionException("Container id '" + id + "' is already known", null);
+            throwExecutionException(null, "Container id '" + id + "' is already known");
         }
         containers.put(id, descriptor);
         EcsAas.notifyContainerAdded(descriptor);
@@ -80,15 +82,15 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     public void undeployContainer(String id) throws ExecutionException {
         checkId(id, "id");
         if (!containers.containsKey(id)) {
-            throw new ExecutionException("Container id '" + id + "' is not known. Cannot undeploy container.", null);
+            throwExecutionException("Undeploying container " + id, "Container is not known. Cannot migrate container.");
         }
         ContainerDescriptor desc = containers.get(id);
         if (ContainerState.AVAILABLE == desc.getState() || ContainerState.STOPPED == desc.getState()) {
             containers.remove(id);
             EcsAas.notifyContainerRemoved(desc);
         } else {
-            throw new ExecutionException("Container is in state " + desc.getState() 
-                + ". Cannot undeploy container.", null);
+            throwExecutionException("Undeploying container " + id, "Container is in state " + desc.getState() 
+                + ". Cannot undeploy container.");
         }
     }
     
@@ -119,8 +121,8 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
         checkId(id, idText);
         C result = containers.get(id);
         if (null == result) {
-            throw new ExecutionException("Container id '" + id + "' is not known. Cannot " + activityText 
-                + " container.", null);
+            throwExecutionException(null, "Container id '" + id + "' is not known. Cannot " + activityText 
+                + " container.");
         }
         return result;
     }
@@ -134,7 +136,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
      */
     protected void checkId(String id, String text) throws ExecutionException {
         if (null == id || id.length() == 0) {
-            throw new ExecutionException("Container " + text + "must be given (not null or empty)", null);
+            throwExecutionException(null, "Container " + text + "must be given (not null or empty)");
         }
     }
     
@@ -142,15 +144,52 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     public void migrateContainer(String id, String resourceId) throws ExecutionException {
         checkId(id, "id");
         if (!containers.containsKey(id)) {
-            throw new ExecutionException("Container id '" + id + "' is not known. Cannot migrate container.", null);
+            throwExecutionException("Migrating container " + id, "Container is not known. Cannot migrate container.");
         }
         ContainerDescriptor desc = containers.get(id);
         if (ContainerState.DEPLOYED == desc.getState()) {
             stopContainer(id);
         } else {
-            throw new ExecutionException("Container " + id + " is in state " + desc.getState() 
-                + ". Cannot undeploy container.", null);
+            throwExecutionException("Migrating container " + id, "Container is in state " + desc.getState() 
+                + ". Cannot undeploy container.");
         }
     }
+    
+    // checkstyle: stop exception type check
+    
+    /**
+     * Throws an execution exception for the given throwable.
+     * @param action the actual action to log (may be <b>null</b> or empty)
+     * @param th the throwable
+     * @throws ExecutionException
+     */
+    protected void throwExecutionException(String action, Throwable th) throws ExecutionException {
+        if (action != null && action.length() > 0) {
+            action = action + ":";
+        } else {
+            action = "";
+        }
+        LoggerFactory.getLogger(getClass()).error(action + th.getMessage());
+        throw new ExecutionException(th);
+    }
+
+    // checkstyle: resume exception type check
+
+    /**
+     * Throws an execution exception for the given message.
+     * @param action the actual action to log (may be <b>null</b> or empty)
+     * @param message the message for the exception
+     * @throws ExecutionException
+     */
+    protected void throwExecutionException(String action, String message) throws ExecutionException {
+        if (action != null && action.length() > 0) {
+            action = action + ":";
+        } else {
+            action = "";
+        }
+        LoggerFactory.getLogger(getClass()).error(action + message);
+        throw new ExecutionException(message, null);
+    }
+
 
 }
