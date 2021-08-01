@@ -129,7 +129,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 port = netMgr.obtainPort(container.getNetKey()).getPort();
             }
             String dockerImageName = getImageName(container);
-            String containerName = container.getName().replaceAll("\\s", "_");
+            String containerName = container.getName().trim().replaceAll("\\s", "_");
             LOGGER.info("Creating container " + dockerImageName + " " + containerName);
             CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
                 .withName(containerName);
