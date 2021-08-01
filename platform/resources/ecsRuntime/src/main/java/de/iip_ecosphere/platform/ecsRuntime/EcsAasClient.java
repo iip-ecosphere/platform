@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
@@ -103,6 +104,7 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Co
      * @return the containers collection, may be <b>null</b>
      */
     public SubmodelElementCollection getContainers() {
+        getSubmodel().accept(new AasPrintVisitor()); // for testing
         return getSubmodel().getSubmodelElementCollection(EcsAas.NAME_COLL_CONTAINERS);
     }
 
