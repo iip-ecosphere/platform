@@ -117,10 +117,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 throwExecutionException("Adding container failed", "Could not connect to the Docker daemon");
             }
             
+            LOGGER.info("Loading image");
             InputStream in = new FileInputStream(image);
             dockerClient.loadImageCmd(in).exec();
             
             // Creating Docker container
+            LOGGER.info("Obtaining port");
             int port = 0;
             if (container.requiresPort()) {
                 // may be gone until used, limit then netMgr ports in setup
@@ -129,6 +131,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             }
             String dockerImageName = container.getDockerImageName();
             String containerName = container.getName();
+            LOGGER.info("Creating container " + dockerImageName + " " + containerName);
             CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
                 .withName(containerName);
             configure(cmd, port, container);
@@ -139,6 +142,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             if (dockerId == null) {
                 throwExecutionException("Adding container failed", "The Docker container id is null.");
             }
+            LOGGER.info("Container " + dockerId + " is AVAILABLE");
             container.setDockerId(dockerId);
             container.setState(ContainerState.AVAILABLE);
             
@@ -149,6 +153,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         } catch (URISyntaxException e) {
             throwExecutionException("Adding container failed", e);
         }
+        LOGGER.info("Added container at " + location + "...");
         return id; 
     }
 
@@ -195,29 +200,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
     }
 
-    /**
-     * Throws an execution exception for the given throwable.
-     * @param action the actual action to log
-     * @param th the throwable
-     * @throws ExecutionException
-     */
-    private static void throwExecutionException(String action, Throwable th) throws ExecutionException {
-        LOGGER.error(action + ": " + th.getMessage());
-        throw new ExecutionException(th);
-    }
-
     // checkstyle: stop exception type check
-
-    /**
-     * Throws an execution exception for the given message.
-     * @param action the actual action to log
-     * @param message the message for the exception
-     * @throws ExecutionException
-     */
-    private static void throwExecutionException(String action, String message) throws ExecutionException {
-        LOGGER.error(action + ": " + message);
-        throw new ExecutionException(message, null);
-    }
 
     /**
      * Returns a Docker API Client.
