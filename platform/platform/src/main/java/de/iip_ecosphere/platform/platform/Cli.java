@@ -281,7 +281,7 @@ public class Cli {
         boolean exit = false;
         final Level level = Level.SERVICES;
         try {
-            println("Services level: Obtaining submodel. Will keep it until level is active. No auto-refresh.");
+            println("Services level: Obtaining submodel. May not refresh until level is active.");
             ServicesAasClient client = new ServicesAasClient(resourceId);
             String cmd;
             do {
@@ -366,7 +366,7 @@ public class Cli {
         boolean exit = false;
         final Level level = Level.CONTAINER;
         try {
-            println("Container level: Obtaining submodel. Will keep it until level is active. No auto-refresh.");
+            println("Container level: Obtaining submodel. May not refresh until level is active.");
             EcsAasClient client = new EcsAasClient(resourceId);
             String cmd;
             do {
@@ -678,47 +678,47 @@ public class Cli {
     private static void printHelp(CommandProvider provider, Level level) {
         if (level.isTopLevel()) {
             println("IIP-Ecosphere simple platform client. Commands (in levels) are:");
-            println(" services <resourceId>");
+            println(" services <resourceId> - enters service commands for <resourceId>");
         }
         if (level.isTopLevel() || Level.SERVICES == level) {
-            println("  listServices");
-            println("  listArtifacts");
-            println("  add <URI>");
-            println("  startAll <artifactId>");
-            println("  stopAll <artifactId>");
-            println("  remove <artifactId>");
-            println("  help");
-            println("  back", provider);
-            println("  ..", provider);
-            println("  exit", provider);
+            println("  listServices - lists known services");
+            println("  listArtifacts - lists known artifacts");
+            println("  add <URI> - addes an artifact");
+            println("  startAll <artifactId> - starts all services in <artifactId>");
+            println("  stopAll <artifactId> - stops all services in <artifactId>");
+            println("  remove <artifactId> - removes <artifactId>");
+            println("  help - prints help for this level");
+            println("  back - to previous level", provider);
+            println("  ..  - to previous level", provider);
+            println("  exit - exits the program", provider);
         }
         if (level.isTopLevel()) {
-            println(" container <resourceId>");
+            println(" container <resourceId> - enters the container command level for <resourceId>");
         }
         if (level.isTopLevel() || Level.CONTAINER == level) {
-            println("  list");
-            println("  add <URI>");
-            println("  start <containerId>");
-            println("  stop <containerId>");
-            println("  undeploy <containerId>");
-            println("  help");
-            println("  back", provider);
-            println("  ..", provider);
-            println("  exit", provider);
+            println("  list - lists all known container");
+            println("  add <URI> - adds a container via its descriptor");
+            println("  start <containerId> - starts <containerId>");
+            println("  stop <containerId> - stops <containerId>");
+            println("  undeploy <containerId> - removes container <containerId>");
+            println("  help - prints help for this level");
+            println("  back - to previous level", provider);
+            println("  .. - to previous level", provider);
+            println("  exit - exits the program", provider);
         }
         if (level.isTopLevel()) {
-            println(" resources");
+            println(" resources - enters the platform resource command level");
         }
         if (level.isTopLevel() || Level.RESOURCES == level) {
-            println("  list");
-            println("  help");
-            println("  back", provider);
-            println("  ..", provider);
-            println("  exit", provider);
+            println("  list - lists all known resources");
+            println("  help - prints help for this level");
+            println("  back - to previous level", provider);
+            println("  .. - to previous level", provider);
+            println("  exit - exits the program", provider);
         }
         if (level.isTopLevel()) {
-            println(" help");
-            println(" exit", provider);
+            println(" help - prints help for this program");
+            println(" exit - exits the program", provider);
         }
     }
 
