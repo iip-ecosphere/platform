@@ -117,7 +117,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 throwExecutionException("Adding container failed", "Could not connect to the Docker daemon");
             }
             
-            LOGGER.info("Loading image");
+            LOGGER.info("Loading image for " + location + " from " + image);
             InputStream in = new FileInputStream(image);
             dockerClient.loadImageCmd(in).exec();
             
@@ -125,10 +125,8 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             int port = 0;
             if (container.requiresPort()) {
                 // may be gone until used, limit then netMgr ports in setup
-                LOGGER.info("Obtaining port");
                 NetworkManager netMgr = NetworkManagerFactory.getInstance();
                 port = netMgr.obtainPort(container.getNetKey()).getPort();
-                LOGGER.info("Using port " + port);
             }
             String dockerImageName = getImageName(container);
             String containerName = container.getName().replaceAll("\\D+", "_");
@@ -162,15 +160,10 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      * Validates and returns the docker image file name.
      * 
      * @param desc the descriptor to return the name from
-     * @return the image file name, potentially turned to lower cases and version appended
+     * @return the image file name, potentially turned to lower cases
      */
     private String getImageName(DockerContainerDescriptor desc) {
-        String name = desc.getDockerImageName().toLowerCase();
-        int pos = name.lastIndexOf(':');
-        if (pos < 0) {
-            name = name + ":" + desc.getVersion().toString();
-        }
-        return name;
+        return desc.getDockerImageName().toLowerCase(); // dont' add version, must comply with created image
     }
 
     /**
