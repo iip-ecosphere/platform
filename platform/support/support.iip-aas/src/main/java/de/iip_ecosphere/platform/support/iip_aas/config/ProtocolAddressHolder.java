@@ -11,6 +11,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 public class ProtocolAddressHolder extends ServerAddressHolder {
 
     private String protocol;
+    private String netmask = "";
     
     /**
      * Creates an instance (deserialization).
@@ -58,6 +59,24 @@ public class ProtocolAddressHolder extends ServerAddressHolder {
      */
     public void setProtocol(String protocol) {
         this.protocol = protocol;
+    }
+
+    /**
+     * Returns the netmask/network Java regex.
+     * 
+     * @return the netmask/network Java regex
+     */
+    public String getNetmask() {
+        return netmask;
+    }
+
+    /**
+     * Defines the netmask/network Java regex. [required by data mapper]
+     * 
+     * @param netmask the netmask
+     */
+    public void setNetmask(String netmask) {
+        this.netmask = netmask;
     }
 
 }
