@@ -98,7 +98,7 @@ In addition to the basic AAS settings, the following properties can be configure
   * `deleteArtifacts` allows the service manager to delete downloaded artifacts. 
   * The `serviceProtocol` defines the AAS implementation protocol to be used for administrative communication with the services (default is the empty string denoting the default AAS protocol).
   * The `executables` define operating system command mappings for the `executable` used in the `process` structure of the service descriptor. If the `executable` is one of the keys listed in `executables`, the corresponding value is used instead of the value given in `executable`. This is intended that a service manager configuration can override operating system defaults if needed, e.g., because a system Python version cannot be upgrated for some reason and a newer/local version must be used due to service dependencies. Then the local version can be given as value for the key `python` here and the `executable` just mentions `python` which is substituated accordingly.
-  * Please note that global service settings settings such as `aas` occur here in the scope of `service-mgr`.
+  * Please note that global service settings settings such as `aas` or `netMgr` occur here in the scope of `service-mgr`.
 * `cloud.deployer.local` refers to the underlying mechanism of Spring Cloud Stream. Service artifacts and their working directory may be temporary if not configured or in a given folder. These files may be deleted automatically on exit or remain in the folder. Both settings are helpful for debugging.
 
 The configuration structure is as shown below (the `executables` mapping is indcated by a single key-value pair):
@@ -113,6 +113,7 @@ The configuration structure is as shown below (the `executables` mapping is indc
       executables:
         - <String>: <String>
       aas: ...
+      netMgr: ...
     cloud:
       deployer:
         local:
