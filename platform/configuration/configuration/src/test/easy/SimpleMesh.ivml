@@ -22,8 +22,7 @@ project SimpleMesh {
         path = "registry"
     };
     aasImplServer = {
-        port = 9003,
-        host = "127.0.0.1"
+        port = 9003
     };
     aasProtocol = AasProtocolVabTcp{};
     

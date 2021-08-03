@@ -11,6 +11,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
         Integer aasImplServerPort = aasImplServer.port;
         String aasImplServerHost = aasImplServer.host;
+        String aasImplNetmask = aasImplServer.netmask;
         if (implLocalEphemerial) {
             aasImplServerPort = -1;
             aasImplServerHost = "127.0.0.1";
@@ -32,6 +33,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             implementation:
                 port: ${aasImplServerPort}
                 host: ${aasImplServerHost}
+                netmask: ${aasImplNetmask}
                 schema: ${aasImplServer.schema}
                 protocol: ${aasProtocolName(aasImplServer.protocol)}
             ${produceAasPersistence(aasPersistence)}'
@@ -61,10 +63,20 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             user: ${tp.user}
             password: ${tp.password}'
     }
+    
+    def produceNetMgr(IIPEcosphere config) {
+       // take over the AAS netmask for consistency
+       ImplAddress aasImplServer = config.aasImplServer;
+       String aasImplNetmask = aasImplServer.netmask;
+       // we leave out port range for now
+       'netMgr:
+          netmask: ${aasImplNetmask}'
+    }
 
     def main(IIPEcosphere config, FileArtifact target) {
         '${produceTransport(config)}'
         '${produceAas(config, implLocalEphemerial=true)}'
+        '${produceNetMgr(config)}'
     }
 
 }

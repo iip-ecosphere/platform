@@ -51,6 +51,8 @@ project Aas {
     compound ImplAddress refines EphemeralServerAddress {
         AasProtocol protocol = aasProtocol;
         AasSchema schema = AasSchema::HTTP; // TODO link to protocol
+        NonEmptyString host = "127.0.0.1";
+        String netmask = "";
     	isDefined(protocol);
     }
     

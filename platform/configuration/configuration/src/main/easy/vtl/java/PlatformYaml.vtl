@@ -9,6 +9,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
         String pers = "${config.aasPersistency}";
         produceTransport(config);
         produceAas(config, pers, false);
+        produceNetMgr(config);
     }
 
 }
