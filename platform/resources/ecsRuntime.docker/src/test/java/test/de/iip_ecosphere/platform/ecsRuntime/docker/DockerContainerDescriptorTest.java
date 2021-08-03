@@ -67,8 +67,7 @@ public class DockerContainerDescriptorTest {
         Assert.assertTrue(desc.requiresPort());
         Assert.assertTrue(desc.getDood());
         Assert.assertTrue(desc.getAttachStdIn());
-        Assert.assertTrue(desc.getPrivileged());
-        Assert.assertTrue(desc.getPrivileged());
+        Assert.assertFalse(desc.getPrivileged()); // not required
         Assert.assertTrue(desc.getWithTty());
         Assert.assertEquals("host", desc.getNetworkMode());
         Assert.assertFalse(desc.getAttachStdOut());
