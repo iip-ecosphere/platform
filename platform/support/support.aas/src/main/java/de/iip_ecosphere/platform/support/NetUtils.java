@@ -15,9 +15,14 @@ package de.iip_ecosphere.platform.support;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Some network utilities.
@@ -39,6 +44,47 @@ public class NetUtils {
             result = s.getLocalPort();
             s.close(); 
         } catch (IOException e) {
+        }
+        return result;
+    }
+
+    /**
+     * Returns the own IP address filtered by the given decimal netMask/regular expression.
+     * 
+     * @param netMask the net mask, regular expression; if empty or <b>null</b>, return {@link #getOwnIP()}
+     * @return the IP
+     */
+    public static String getOwnIP(String netMask) {
+        String result = "127.0.0.1";
+        if (null == netMask || netMask.length() == 0) {
+            result = getOwnIP();
+        } else {
+            netMask = netMask.replaceAll("255", "\\\\d{1,3}");
+            netMask = netMask.replaceAll("\\.", "\\\\.");
+            if (!netMask.startsWith("^")) {
+                netMask = "^" + netMask;
+            }
+            boolean found = false;
+            try {
+                Pattern pat = Pattern.compile(netMask);
+                Enumeration<NetworkInterface> ifs = NetworkInterface.getNetworkInterfaces();
+                while (ifs.hasMoreElements()) {
+                    NetworkInterface ni = ifs.nextElement();
+                    for (InterfaceAddress addr : ni.getInterfaceAddresses()) {
+                        String tmp = addr.getAddress().getHostAddress();
+                        if (pat.matcher(tmp).matches()) {
+                            result = tmp;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+            } catch (SocketException e) {
+            } catch (PatternSyntaxException e) {
+            }
         }
         return result;
     }

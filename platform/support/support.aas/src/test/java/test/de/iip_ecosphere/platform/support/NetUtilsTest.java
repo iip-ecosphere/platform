@@ -39,6 +39,11 @@ public class NetUtilsTest {
     @Test
     public void testOwnIP() {
         Assert.assertTrue(NetUtils.getOwnIP().length() > 0);
+        
+        Assert.assertTrue(NetUtils.getOwnIP(null).length() > 0);
+        Assert.assertTrue(NetUtils.getOwnIP("").length() > 0);
+        Assert.assertTrue(NetUtils.getOwnIP("255.255.255.255").length() > 0);
+        Assert.assertTrue(NetUtils.getOwnIP("^255.255.255.255").length() > 0);
     }
     
 }
