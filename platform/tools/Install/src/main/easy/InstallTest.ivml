@@ -24,8 +24,9 @@ project InstallTest {
         path = "registry"
     };
     aasImplServer = {
-        port = 9003,
-        host = "127.0.0.1" // replaced by host IP if possible
+        port = 9003 // of central server, ephemeral on devices
+        // default host is 127.0.0.1 to be replaced by host IP if available
+        // default netmask is empty, not selecting any network in case of multiple IP addresses
     };
     aasProtocol = AasProtocolVabTcp{};
     
