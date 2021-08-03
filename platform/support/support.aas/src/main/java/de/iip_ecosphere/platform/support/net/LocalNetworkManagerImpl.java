@@ -154,5 +154,13 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         checkAddress(adr);
         return host.equals(adr.getHost()) && isInUse(adr.getPort());
     }
+    
+    @Override
+    public void configure(NetworkManagerSetup setup) {
+        super.configure(setup);
+        if (null != setup) {
+            host = NetUtils.getOwnIP(getNetmask());
+        }
+    }
 
 }

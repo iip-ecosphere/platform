@@ -21,6 +21,7 @@ public class NetworkManagerSetup {
     
     private int lowPort = 1024;
     private int highPort = 65535;
+    private String netmask = "";
     
     /**
      * Returns the minimum port for automated/ephemeral port assignment.
@@ -39,9 +40,27 @@ public class NetworkManagerSetup {
     public int getHighPort() {
         return highPort;
     }
+    
+    /**
+     * Returns the netmask/network Java regex.
+     * 
+     * @return the netmask/network Java regex
+     */
+    public String getNetmask() {
+        return netmask;
+    }
 
     /**
-     * Returns the minimum port for automated/ephemeral port assignment.
+     * Defines the netmask/network Java regex. [required by data mapper, snakeYaml]
+     * 
+     * @param netmask the netmask
+     */
+    public void setNetmask(String netmask) {
+        this.netmask = netmask;
+    }
+
+    /**
+     * Returns the minimum port for automated/ephemeral port assignment. [required by data mapper, snakeYaml]
      * 
      * @param lowPort the minimum port
      */
@@ -50,7 +69,7 @@ public class NetworkManagerSetup {
     }
 
     /**
-     * Returns the maximum port for automated/ephemeral port assignment.
+     * Returns the maximum port for automated/ephemeral port assignment. [required by data mapper, snakeYaml]
      * 
      * @param highPort the maximum port
      */

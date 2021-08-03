@@ -22,7 +22,8 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 public abstract class AbstractNetworkManagerImpl implements NetworkManager {
 
     private int lowPort = 1024;
-    private int highPort = 65535; 
+    private int highPort = 65535;
+    private String netmask = "";
     
     /**
      * Checks the key for structural validity.
@@ -57,12 +58,22 @@ public abstract class AbstractNetworkManagerImpl implements NetworkManager {
     public int getHighPort() {
         return highPort;
     }
+    
+    /**
+     * Returns the netmask/net Java regex.
+     * 
+     * @return the netmask
+     */
+    protected String getNetmask() {
+        return netmask;
+    }
 
     @Override
     public void configure(NetworkManagerSetup setup) {
         if (null != setup) {
             lowPort = setup.getLowPort();
             highPort = setup.getHighPort();
+            netmask = setup.getNetmask();
         }
     }
 
