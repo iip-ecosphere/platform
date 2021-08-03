@@ -20,6 +20,7 @@ The basic YAML configuration of the platform services (in ``iipecosphere.yml``) 
       implementation:
         schema: <HTTP|HTTPS|TCP|IGNORE>
         host: <String>
+        netmask: <String>
         port: <int>
         protocol: <VAB-TCP|>
       persistence: <INMEMORY|MONGO>
