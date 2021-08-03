@@ -100,9 +100,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             List<Service> services = createServices(art);
             if (null != services) { 
                 ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
-                MetricsExtractorRestClient metricsClient = createMetricsClient(environment);
                 for (Service service : services) {
-                    mapService(mapper, service, metricsClient);
+                    mapService(mapper, service);
                 }
             }
             Starter.start();
@@ -121,7 +120,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
      */
     public static void mapService(Service service) {
-        mapService(getServiceMapper(), service, createMetricsClient());
+        mapService(getServiceMapper(), service);
     }
 
     /**
@@ -131,14 +130,10 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * 
      * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
-     * @param metricsClient the metrics client (may be <b>null</b> for none)
      */
-    public static void mapService(ServiceMapper mapper, Service service, MetricsExtractorRestClient metricsClient) {
+    public static void mapService(ServiceMapper mapper, Service service) {
         if (null != service && null != mapper && null != Starter.getProtocolBuilder()) {
             mapper.mapService(service);
-            if (null != metricsClient) {
-                mapper.mapMetrics(service, metricsClient);
-            }
         }
     }
 
