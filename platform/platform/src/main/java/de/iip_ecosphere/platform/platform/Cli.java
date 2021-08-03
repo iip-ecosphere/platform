@@ -323,7 +323,7 @@ public class Cli {
             switch (cmd.toLowerCase()) {
             case "list":
                 changed = checkReload(client.getContainers(), changed);
-                print(client.getContainers(), "- Container ", PrintType.PREFIX);
+                print(client.getContainers(), "- Container ", PrintType.NO, PrintType.PREFIX);
                 break;
             case "add":
                 String uri = provider.nextCommand();
@@ -414,7 +414,7 @@ public class Cli {
      */
     private static void listResources() {
         try {
-            print(resourcesFactory.create().getResources(), "- Resource ", PrintType.PREFIX);
+            print(resourcesFactory.create().getResources(), "- Resource ", PrintType.NO, PrintType.PREFIX);
         } catch (IOException e) {
             println(e);
         }
