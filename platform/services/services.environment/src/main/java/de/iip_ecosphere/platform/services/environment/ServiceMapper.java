@@ -14,8 +14,6 @@ package de.iip_ecosphere.platform.services.environment;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
@@ -124,18 +122,6 @@ public class ServiceMapper {
                 return null;
             }
         ));
-    }
-    
-    /**
-     * Maps the service metrics into the protocol builder.
-     * 
-     * @param service the service
-     * @param client the metrics extractor client (may be <b>null</b>, call is ignored then)
-     */
-    public void mapMetrics(Service service, MetricsExtractorRestClient client) {
-        /*if (null != client) {
-            MetricsAasConstructor.addMetricsProtocols(builder, client, null, s -> getQName(service, s));
-        }*/
     }
     
     /**
