@@ -247,7 +247,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * 
      * @return {@code true} if docker shall be available/mapped, {@code false} else
      * @see #getWithTty()
-     * @see #getPrivileged()
      * @see #getAttachStdIn()
      */
     public boolean getDood() {
@@ -268,10 +267,9 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * Returns whether the container shall run in privileged mode.
      * 
      * @return {@code true} if privileged model shall apply, {@code false} else
-     * @see #getDood()
      */
     public boolean getPrivileged() {
-        return privileged || dood;
+        return privileged;
     }
 
     /**
