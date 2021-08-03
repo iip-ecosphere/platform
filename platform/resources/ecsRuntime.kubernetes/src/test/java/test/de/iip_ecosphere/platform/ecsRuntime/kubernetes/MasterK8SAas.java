@@ -176,7 +176,11 @@ public class MasterK8SAas {
         K8SJavaProxy aasK8SJavaProxy = new AasK8SJavaProxy(ProxyType.MasterProxy, aasPort, serverIP, serverPort);
         
         K8SRequest request = new K8SRequest();
-        request.convertStringToRequest(requestString);
+        byte[] requestByte = request.convertBase64StringToByte(requestString);
+        
+        request = aasK8SJavaProxy.createK8SRequest(requestByte);
+        
+//        request.convertStringToRequest(requestString);
         //aasK8SJavaProxy.createK8SRequest(requestString.getBytes(StandardCharsets.UTF_8));
         
         String response = null;
