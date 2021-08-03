@@ -96,7 +96,7 @@ public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
             Submodel submodel = aas.getSubmodel(WorkerAasCreator.AAS_SUBMODEL_NAME);
             
             Operation operation = submodel.getOperation(WorkerAasCreator.AAS_SUBMODEL_OPERATION_SEND_TO_AAS);
-            response = (String) operation.invoke(request.convertToString());
+            response = (String) operation.invoke(request.convertToBase64String());
             
         } catch (IOException | ExecutionException e) {
             // TODO Auto-generated catch block

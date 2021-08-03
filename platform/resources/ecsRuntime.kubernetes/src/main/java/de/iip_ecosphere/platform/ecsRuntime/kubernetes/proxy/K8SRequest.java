@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import java.util.Map;
  */
 public class K8SRequest {
 
+    private byte[] requestByte;
     private String method;
     private String path;
     private String protocol;
@@ -21,10 +23,29 @@ public class K8SRequest {
     /**
      * Creates a K8S Request instance.
      * 
+     * 
      */
     public K8SRequest() {
     }
 
+    /**
+     * Returns the request as bytes.
+     * 
+     * @return the request as bytes
+     */
+    public byte[] getRequestByte() {
+        return requestByte;
+    }
+    
+    /**
+     * Set the request as bytes.
+     *
+     * @param requestByte the request as bytes
+     */
+    public void setRequestByte(byte[] requestByte) {
+        this.requestByte = requestByte;
+    }
+    
     /**
      * Returns the method of the request.
      * 
@@ -37,7 +58,7 @@ public class K8SRequest {
     /**
      * Set the method of the request.
      *
-     * @param method the method of the request.
+     * @param method the method of the request
      */
     public void setMethod(String method) {
         this.method = method;
@@ -55,7 +76,7 @@ public class K8SRequest {
     /**
      * Set the path of the request.
      *
-     * @param path the path of the request.
+     * @param path the path of the request
      */
     public void setPath(String path) {
         this.path = path;
@@ -73,7 +94,7 @@ public class K8SRequest {
     /**
      * Set the protocol of the request.
      *
-     * @param protocol the protocol of the request.
+     * @param protocol the protocol of the request
      */
     public void setProtocol(String protocol) {
         this.protocol = protocol;
@@ -91,7 +112,7 @@ public class K8SRequest {
     /**
      * Set the payload of the request.
      *
-     * @param payload the payload of the request.
+     * @param payload the payload of the request
      */
     public void setPayload(byte[] payload) {
         this.payload = payload;
@@ -109,7 +130,7 @@ public class K8SRequest {
     /**
      * Set the headers of the request.
      *
-     * @param headers the headers of the request.
+     * @param headers the headers of the request
      */
     public void setHeaders(Map<String, String[]> headers) {
         this.headers = headers;
@@ -179,6 +200,33 @@ public class K8SRequest {
             
             setPayload(requestPayload);
         }
+        
+    }
+
+    /**
+     * convert the request to base64 String.
+     *
+     * @return the request as base64 String
+     */
+    public String convertToBase64String() {
+        
+        String requestBase64String = Base64.getEncoder().encodeToString(requestByte);
+        
+        return requestBase64String;
+    }
+    
+    /**
+     * convert the request from base64 String to array of bytes.
+     *
+     * @param requestBase64String the request as base64 String
+     *
+     * @return requestString the request as array of bytes
+     */
+    public byte[] convertBase64StringToByte(String requestBase64String) {
+        
+        byte[] newRequestByte = Base64.getDecoder().decode(requestBase64String);        
+        
+        return newRequestByte;
         
     }
 }

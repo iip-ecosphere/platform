@@ -208,6 +208,8 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
 
         String requestString = new String(requestByte);
         K8SRequest request = new K8SRequest();
+        request.setRequestByte(requestByte);
+        
         Map<String, String[]> requestHeaders = new HashMap<String, String[]>();
         int requestLength = 0;
         int count = 0;
