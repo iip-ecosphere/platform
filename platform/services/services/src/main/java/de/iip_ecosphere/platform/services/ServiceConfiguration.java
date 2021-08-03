@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -26,6 +27,7 @@ public class ServiceConfiguration {
     private AasSetup aas = new AasSetup();
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
     private TransportSetup transport = new TransportSetup();
+    private NetworkManagerSetup netMgr = new NetworkManagerSetup();
 
     /**
      * Returns the AAS setup.
@@ -53,6 +55,15 @@ public class ServiceConfiguration {
     public TransportSetup getTransport() {
         return transport;
     }
+    
+    /**
+     * Returns the network manager setup.
+     * 
+     * @return the network manager setup
+     */
+    public NetworkManagerSetup getNetMgr() {
+        return netMgr;
+    }    
 
     /**
      * Defines the AAS setup. [required by snakeyaml]
@@ -82,4 +93,13 @@ public class ServiceConfiguration {
         this.transport = transport;
     }
 
+    
+    /**
+     * Defines the network manager setup. [required snakeyaml]
+     * 
+     * @param netMgr the network manager setup
+     */
+    public void setNetMgr(NetworkManagerSetup netMgr) {
+        this.netMgr = netMgr;
+    }
 }
