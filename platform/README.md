@@ -1,6 +1,22 @@
 # IIP-Ecosphere platform
 
-This is for all code realizing the IIP-Ecosphere platform consisting of:
+The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
+
+The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
+  * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
+  * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.448580)
+  * The IIP-Ecosphere [platform requirements(functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
+  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.5168946) [link may be updated some days after code releases]
+
+All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
+
+## Documentation and release overview
+
+For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md).
+
+## Available components
+
+The following layers and components of the IIP-Ecosphere are available in this platform:
 * Managed [Platform dependencies](https://github.com/iip-ecosphere/platform/tree/main/platform/platformDependencies/README.md) (parent POM)
 * [Support Layer](https://github.com/iip-ecosphere/platform/tree/main/platform/support/README.md) (with links to contained parts)
     * [Asset Administration Shell (AAS) abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basyx/README.md) with Visitor, communication protocol support and useful recipes for deployment and I/O
@@ -33,6 +49,4 @@ This is for all code realizing the IIP-Ecosphere platform consisting of:
     * resource optimization
     * adaptation
 
-For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md).
-
-For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md).
+Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere).
