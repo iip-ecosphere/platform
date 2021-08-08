@@ -16,7 +16,7 @@ For detailed documentation and development hints see [documentation overview](ht
 
 ## Available components
 
-![Architecture Overview](https://github.com/iip-ecosphere/platform/tree/main/platform/ArchitectureOverview.png "IIP-Ecosphere Platform Architecture Overview")
+![Architecture Overview](ArchitectureOverview.png)
 
 
 The following layers and components of the IIP-Ecosphere are available in this platform:
