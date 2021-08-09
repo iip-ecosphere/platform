@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform releases
 
-### Plan for winter release
+### Next release (winter 2021):
 * Python service environment
 * Integrated container management for Kubernetes
 * Automatic creation of containers and their accessibility for devices.

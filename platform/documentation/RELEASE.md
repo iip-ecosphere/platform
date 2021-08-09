@@ -10,7 +10,7 @@ For performing a release...
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
 * Go through all projects and change the (non-SNAPSHOT) version number appropriately, i.e., except for the platform dependencies only changes to the POM parent entry are required. Maven may help you here.
-* Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
+* Temporarily disable `IvmlTests.testSerializerConfig1` for release/first compilation of next snapshot. Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
 * Check the CI that all builds are completed. Generated test-apps will not be released.
 * Create a new version tag on github.
 * Execute the POM in `MavenCentral` so that all artifacts are downloaded.
@@ -20,4 +20,5 @@ For performing a release...
 * Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
 * If required, change back the BaSyx dependencies to the development version that you want to use.
 * If required, change back the EASy-Producer dependencies to the desired snapshot version.
+* Reactivate `IvmlTests.testSerializerConfig1`.
 * Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
