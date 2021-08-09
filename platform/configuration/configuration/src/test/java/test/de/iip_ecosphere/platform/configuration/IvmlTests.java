@@ -132,7 +132,7 @@ public class IvmlTests {
      * @throws IOException shall not occur
      */
     @Test
-    @Ignore("for release, is part of model")
+    //@Ignore("for release, is part of model")
     public void testSerializerConfig1() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
