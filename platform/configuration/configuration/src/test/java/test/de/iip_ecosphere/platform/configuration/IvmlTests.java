@@ -21,6 +21,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
@@ -131,6 +132,7 @@ public class IvmlTests {
      * @throws IOException shall not occur
      */
     @Test
+    @Ignore("for release, is part of model")
     public void testSerializerConfig1() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
