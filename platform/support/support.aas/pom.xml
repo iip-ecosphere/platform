@@ -9,7 +9,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.2.0</version>
+     <version>0.3.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
