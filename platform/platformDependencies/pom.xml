@@ -51,8 +51,18 @@
     <developer>
       <id>casado</id>
       <name>Miguel Gomez Casado</name>
-      <organization>University of Valladolid/ University of Hildesheim</organization>
+      <organization>University of Valladolid/University of Hildesheim</organization>
       <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>alamoush</id>
+      <name>Ahmad Alamoush</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/mitglieder/ahmad-alamoush/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -94,7 +104,7 @@
     <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
     <org.jacoco.maven.jacoco.version>0.8.2</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
-    <net.ssehub.easyProducer.version>1.3.0</net.ssehub.easyProducer.version>
+    <net.ssehub.easyProducer.version>1.3.1-SNAPSHOT</net.ssehub.easyProducer.version>
     <com.google.guava.version>22.0</com.google.guava.version>
 
     <!-- for now due to edge deployment/initial experience -->
