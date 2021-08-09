@@ -19,6 +19,11 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
+
+  <properties>
+    <basyx.version>0.1.0</basyx.version> 
+    <basyx.vab.version>0.0.1</basyx.vab.version>
+  </properties>
   
   <!-- just name all top-level artifacts and alternatives -->
   <dependencies>
@@ -28,7 +33,34 @@
         <version>${project.version}</version>
         <type>pom</type>
     </dependency>
-    
+
+    <!-- Related release until BaSyx provides own releases -->
+    <dependency>
+      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.lib</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
+          <artifactId>basyx.components.registry</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
+          <artifactId>basyx.components.AASServer</artifactId>
+      <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
+          <artifactId>basyx.sdk</artifactId>
+      <version>${basyx.version}</version> 
+    </dependency>
+
+    <dependency>
+        <artifactId>support.aas</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
     <dependency>
         <artifactId>support.aas.basyx</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -39,28 +71,12 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>    
+    <dependency>
+        <artifactId>support.iip-aas</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
     
-    <dependency>
-        <artifactId>connectors.opcuav1</artifactId>
-        <groupId>de.iip-ecosphere.platform</groupId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <artifactId>connectors.mqttv5</artifactId>
-        <groupId>de.iip-ecosphere.platform</groupId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <artifactId>connectors.mqttv3</artifactId>
-        <groupId>de.iip-ecosphere.platform</groupId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <artifactId>connectors.aas</artifactId>
-        <groupId>de.iip-ecosphere.platform</groupId>
-        <version>${project.version}</version>
-    </dependency>
-
     <dependency>
         <artifactId>transport.amqp</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -76,7 +92,7 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-        
+
     <dependency>
         <artifactId>transport.spring.amqp</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -104,7 +120,38 @@
     </dependency>
 
     <dependency>
-        <artifactId>ecsRuntime.docker</artifactId>
+        <artifactId>connectors.opcuav1</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.mqttv5</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.mqttv3</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.aas</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+        <artifactId>services.environment</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>services.environment.spring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>services</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
@@ -113,11 +160,49 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+        <artifactId>ecsRuntime</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>ecsRuntime.docker</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <!-- not part of 0.2 release
+    <dependency>
+        <artifactId>ecsRuntime.kubernetes</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+        <artifactId>deviceMgt</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>monitoring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+     -->
+     
+     <dependency>
+        <artifactId>platform</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    
     <dependency>
         <artifactId>configuration.configuration</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency> 
+    </dependency>
+    
+    <!-- Install shall not be referenced here --> 
 
     <dependency>
         <artifactId>test.mqtt.hivemq</artifactId>
@@ -139,6 +224,13 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <!-- this is test.configuration.configuration -->
+    <dependency>
+        <artifactId>apps.ServiceImpl</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    
   </dependencies>
   
   <build>
@@ -236,6 +328,54 @@
               <overWriteIfNewer>true</overWriteIfNewer>
               <includeGroupIds>de.iip-ecosphere.platform</includeGroupIds>
               <classifier>test-javadoc</classifier>
+            </configuration>
+          </execution>
+          <!-- programmed/generated Python artifacts -->
+          <execution>
+            <id>copy-python</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/jars</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+              <includeGroupIds>de.iip-ecosphere.platform</includeGroupIds>
+              <classifier>python</classifier>
+            </configuration>
+          </execution>
+          <!-- generated interface artifacts (testing only) -->
+          <execution>
+            <id>copy-interfaces</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/jars</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+              <includeGroupIds>de.iip-ecosphere.platform</includeGroupIds>
+              <classifier>interfaces</classifier>
+            </configuration>
+          </execution>
+          <!-- generated EASy model artifacts -->
+          <execution>
+            <id>copy-easy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/jars</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+              <includeGroupIds>de.iip-ecosphere.platform</includeGroupIds>
+              <classifier>easy</classifier>
             </configuration>
           </execution>
         </executions>
