@@ -8,7 +8,7 @@
 * Potentially, an initial version of the device management and the platform monitoring.
 * Integration of initial security/privacy mechanisms
 
-### Upcoming release (July 2021)
+### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
 * Resources/ECS runtime, container management for Docker
 * Initial configuration model and code generation

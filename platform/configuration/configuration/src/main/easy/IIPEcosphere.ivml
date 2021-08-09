@@ -4,7 +4,7 @@ project IIPEcosphere {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    NonEmptyString iipVer = "0.2.0-SNAPSHOT"; // Maven version
+    NonEmptyString iipVer = "0.2.0"; // Maven version of platform
     
     freeze {
         iipVer;
