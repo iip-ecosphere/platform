@@ -31,7 +31,7 @@ def start(services):
         server = BaSyxTCPServer(builder, port)
         # other protocols would go into here
     else:
-        logger.info("Protocol '" + args.protocol + "' unknown. Using default.");
+        logger.info("Protocol '" + args.protocol + "' unknown. Using default.");;
         server = BaSyxTCPServer(builder, port)
 
     server.start()
