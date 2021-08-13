@@ -39,6 +39,12 @@
       <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
       <artifactId>basyx.components.lib</artifactId>
       <version>${basyx.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
+      <artifactId>basyx.components.lib</artifactId>
+      <version>${basyx.version}</version>
     </dependency>
     <dependency>
       <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
