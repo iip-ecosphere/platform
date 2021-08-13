@@ -6,7 +6,7 @@ For performing a release...
 * Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the IIP-Ecosphere github repository.
     * Check the `pom.xml` so that all relevant top-level components are mentioned.
     * Check the `deploy.bat`.
-* Relase the BaSyx component in the desired state with a release version into `de.iip-ecosphere.platform.org.eclipse.basyx`. Change the snapshot versions in the platform to that version.
+* Prepare BaSyx for the release. Use the desired state (if not released to Maven) with a release version into `de.iip-ecosphere.platform.org.eclipse.basyx`. Add the `basxy.fragment` from `MvnCentral` to the BaSyx POM files. Check whether all POM-only files are downloaded into `target/jars`. Release the changes to CI and then using the respective version number, use the script in  `MvnCentral`. Change the snapshot versions in the platform to that version.
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
 * Go through all projects and change the (non-SNAPSHOT) version number appropriately, i.e., except for the platform dependencies only changes to the POM parent entry are required. Maven may help you here.
