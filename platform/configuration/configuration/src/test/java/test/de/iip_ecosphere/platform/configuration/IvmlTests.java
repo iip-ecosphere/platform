@@ -21,7 +21,6 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
