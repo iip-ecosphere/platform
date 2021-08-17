@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.NoOpServer;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
@@ -16,18 +17,7 @@ public class FakeProtocolServerBuilder implements ProtocolServerBuilder {
 
     @Override
     public Server build() {
-        return new Server() {
-
-            @Override
-            public Server start() {
-                return this;
-            }
-
-            @Override
-            public void stop(boolean dispose) {
-            }
-            
-        };
+        return new NoOpServer();
     }
 
     @Override

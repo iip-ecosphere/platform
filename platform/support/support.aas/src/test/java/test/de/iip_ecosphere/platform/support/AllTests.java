@@ -35,7 +35,8 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
     PrintVisitorTest.class,
     NetworkManagerTest.class,
     LifecycleHandlerTest.class, 
-    ServiceLoaderUtilsTest.class
+    ServiceLoaderUtilsTest.class,
+    NoOpServerTest.class
 })
 public class AllTests {
 }
