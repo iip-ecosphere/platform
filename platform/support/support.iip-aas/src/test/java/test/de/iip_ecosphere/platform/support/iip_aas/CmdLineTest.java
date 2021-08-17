@@ -66,11 +66,17 @@ public class CmdLineTest {
      */
     @Test
     public void testGetArg() {
-        String[] args = {"--bli=5", "--bla=6", "--xyz=String", "whatever"};
+        String[] args = {"--bli=5", "--bla=6", "--xyz=String", "whatever", "--bVal=true"};
         Assert.assertEquals("6", CmdLine.getArg(args, "bla", ""));
         Assert.assertEquals("5", CmdLine.getArg(args, "bli", ""));
         Assert.assertEquals("String", CmdLine.getArg(args, "xyz", ""));
+
         Assert.assertEquals(5, CmdLine.getIntArg(args, "bli", 0));
+        Assert.assertEquals(0, CmdLine.getIntArg(args, "blii", 0));
+        
+        Assert.assertEquals(true, CmdLine.getBooleanArg(args, "bVal", false));
+        Assert.assertEquals(false, CmdLine.getBooleanArg(args, "xVal", false));
+        Assert.assertEquals(false, CmdLine.getBooleanArg(args, "bla", false));
     }
 
 }

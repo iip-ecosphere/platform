@@ -101,5 +101,17 @@ public class CmdLine {
         }
         return result;
     }
+    
+    /**
+     * Returns a Boolean command line argument.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code deflt}
+     */
+    public static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
+        return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
+    }    
 
 }
