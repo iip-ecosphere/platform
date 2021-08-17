@@ -390,9 +390,40 @@ public class VabOperationsProvider extends HashMap<String, Object> {
     }
 
     /**
+     * Returns a registered service operation.
+     * 
+     * @param category the category within {@value #OPERATIONS}
+     * @param name the name of the service operation
+     * @return the operation functor, may be <b>null</b>
+     * @see #defineOperation(String, String, Function)
+     */
+    public Function<Object[], Object> getOperation(String category, String name) {
+        Function<Object[], Object> result = null;
+        Map<String, Entry> cat = operations.get(category);
+        if (null != cat) {
+            Entry ent = cat.get(name);
+            if (Kind.OPERATION == ent.kind) {
+                result = operationFunctions.get(ent.uName);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns a registered service operation.
+     * 
+     * @param name the name of the service operation
+     * @return the operation functor, may be <b>null</b>
+     * @see #defineServiceFunction(String, Function)
+     */
+    public Function<Object[], Object> getServiceFunction(String name) {
+        return getOperation(getServicePath(), name);
+    }
+
+    /**
      * Defines a service function (i.e., in {@value #OPERATIONS}/{@value #SERVICE}).
      * 
-     * @param name the name of the operation
+     * @param name the name of the service operation
      * @param function the implementing function
      * @return <b>this</b>
      * @see #defineOperation(String, String, Function)
@@ -421,6 +452,28 @@ public class VabOperationsProvider extends HashMap<String, Object> {
         status.put(name, new Entry(Kind.PROPERTY, name));
         LoggerFactory.getLogger(getClass()).info("Property " + name + " defined");
         return this;
+    }
+
+    /**
+     * Returns the getter for a specified property.
+     * 
+     * @param name the name of the property
+     * @return the getter, may be <b>null</b> for none
+     */
+    public Supplier<Object> getGetter(String name) {
+        Property prop = properties.get(name);
+        return null == prop ? null : prop.get;
+    }
+
+    /**
+     * Returns the setter for a specified property.
+     * 
+     * @param name the name of the property
+     * @return the setter, may be <b>null</b> for none
+     */
+    public Consumer<Object> getSetter(String name) {
+        Property prop = properties.get(name);
+        return null == prop ? null : prop.set;
     }
     
     /**
