@@ -24,8 +24,8 @@ public class BaSyxConnector implements IBaSyxConnector {
     private Logger logger = LoggerFactory.getLogger(BaSyxConnector.class);
     private InetSocketAddress serverSocketAddress;
     private SocketChannel channelToProvider;
-    
-    
+    private boolean keepOpen = false;
+
     /**
      * Constructor that creates a connection. 
      * 
@@ -35,8 +35,22 @@ public class BaSyxConnector implements IBaSyxConnector {
      * @param port the port number
      */
     public BaSyxConnector(String hostName, int port) {
+        this(hostName, port, false);
+    }
+    
+    /**
+     * Constructor that creates a connection. 
+     * 
+     * This constructor connects to port at name.
+     * 
+     * @param hostName the name of the target host
+     * @param port the port number
+     * @param keepOpen whether the connection shall be kept open or terminated per request
+     */
+    public BaSyxConnector(String hostName, int port, boolean keepOpen) {
         // Base constructor
         super();
+        this.keepOpen = keepOpen;
         
         // Exception handling
         try {
@@ -74,11 +88,13 @@ public class BaSyxConnector implements IBaSyxConnector {
             // Send byte array (BaSyx operation) via channel to provider
             ByteBuffer txBuffer = ByteBuffer.wrap(call);
 
-            // Channel to provider
-            channelToProvider = SocketChannel.open();
-            // - Setup channel: set to blocking and connect to provider
-            channelToProvider.configureBlocking(true);
-            channelToProvider.connect(serverSocketAddress);
+            if (!keepOpen || (keepOpen && channelToProvider == null)) {
+                // Channel to provider
+                channelToProvider = SocketChannel.open();
+                // - Setup channel: set to blocking and connect to provider
+                channelToProvider.configureBlocking(true);
+                channelToProvider.connect(serverSocketAddress);
+            }
 
             channelToProvider.write(txBuffer);
 
@@ -111,7 +127,9 @@ public class BaSyxConnector implements IBaSyxConnector {
             String jsonResult = new String(rxFrame, 1 + 4, jsonResultLen);
 
             // Close connection to prevent unused open channels
-            closeConnection();
+            if (!keepOpen) {
+                closeConnection();
+            }
 
             // Return result
             return jsonResult.toString();

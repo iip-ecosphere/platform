@@ -24,6 +24,9 @@ import de.iip_ecosphere.platform.support.aas.basyx.basyx.BaSyxConnector;
  */
 public class VabTcpInvocablesCreator extends VabInvocablesCreator {
 
+    // experimental feature, just keep open if explicitly desired
+    private static final boolean VAB_KEEP_OPEN = Boolean.valueOf(System.getProperty("vab.keep.open", "false"));
+    
     private static final long serialVersionUID = 4353249016693669189L;
     private String host;
     private int port;
@@ -43,7 +46,7 @@ public class VabTcpInvocablesCreator extends VabInvocablesCreator {
     
     @Override
     protected VABElementProxy createProxy() {
-        return new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port)));
+        return new VABElementProxy("", new JSONConnector(new BaSyxConnector(host, port, VAB_KEEP_OPEN)));
     }
 
     @Override
