@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform release guides
+# IIP-Ecosphere platform release guideline
 
 For performing a release...
 * Get gnupgp and obtain a public/private keypair.
@@ -6,7 +6,7 @@ For performing a release...
 * Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the IIP-Ecosphere github repository.
     * Check the `pom.xml` so that all relevant top-level components are mentioned.
     * Check the `deploy.bat`.
-* Prepare BaSyx for the release. Use the desired state (if not released to Maven) with a release version into `de.iip-ecosphere.platform.org.eclipse.basyx`. Add the `basxy.fragment` from `MvnCentral` to the BaSyx POM files. Check whether all POM-only files are downloaded into `target/jars`. Release the changes to CI and then using the respective version number, use the script in  `MvnCentral`. Change the snapshot versions in the platform to that version.
+* Prepare BaSyx for the release (see below). 
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
 * Go through all projects and change the (non-SNAPSHOT) version number appropriately, i.e., except for the platform dependencies only changes to the POM parent entry are required. Maven may help you here.
@@ -22,3 +22,54 @@ For performing a release...
 * If required, change back the EASy-Producer dependencies to the desired snapshot version.
 * Reactivate `IvmlTests.testSerializerConfig1`.
 * Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
+
+# BaSyx release for Maven Central
+
+For a self-contained release of the platform to Maven Central, we need also a release of the used BaSyx version (besides EASy-Producer). The following steps are needed as long as this is not done by BaSyx. Some information to be added to the POMs for Maven Central complience are in the file `basxy.fragment` in `MvnCentral`. 
+
+* Use the desired state (if not released to Maven).
+* Change the POM files in
+
+    * `sdks/java/basyx.sdk`
+    * `components/basys.components`
+
+  by prefixing the `groupId` with `de.iip-ecosphere.platform.`. Add the information sections `description` to `developers` fragment from `basyx.fragments` to the POMs.
+  
+* Change the POM files in  
+
+    * `components/basys.components/components.docker`
+    * `components/basys.components/components.docker/components.AASServer`
+    * `components/basys.components/components.docker/components.registry`
+    * `components/basys.components/components.lib`
+    
+  by prefixing the `groupId` of the `parent` with `de.iip-ecosphere.platform.`.
+
+* Change the BaSyx dependencies in the POM files in  
+
+    * `components/basys.components`
+    * `components/basys.components/components.docker`
+    * `components/basys.components/components.docker/components.AASServer`
+    * `components/basys.components/components.docker/components.registry`
+    * `components/basys.components/components.lib`
+    
+  by prefixing the `groupId` with `de.iip-ecosphere.platform.`.
+  
+* Change the build plugins in the POM files in  
+
+    * `sdks/java/basyx.sdk`
+    * `components/basys.components`
+    * `components/basys.components/components.docker`
+    * `components/basys.components/components.docker/components.AASServer`
+    * `components/basys.components/components.docker/components.registry`
+
+  by adding the `javadoc` fragment from `basyx.fragments`.
+  
+* Rename
+    * `components/basys.components/basyx.components.docker` to `components/basys.components/de.iip-ecosphere.platform.basyx.components.components.docker` and within that folder
+
+       * `components.AASServer` to `de.iip-ecosphere.platform.basyx.components.AASServer`
+       * `components.registry` to `de.iip-ecosphere.platform.basyx.components.registry`
+     
+    * `components/basys.components/basyx.components.lib` to `components/basys.components/de.iip-ecosphere.platform.basyx.components.lib`
+* Run `mvn install -DskipTests` in `sdks/java/basyx.sdk`.
+* Run then `mvn install -DSkipTests` in `components/basys.components`.

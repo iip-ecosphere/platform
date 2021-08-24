@@ -21,6 +21,12 @@ for /r %%f in (%FOLDER%\*%VERSION%.jar) do (
   call :DeployArtifact !an! %VERSION%
 )
 
+REM alternative if matches do not work
+REM call :DeployArtifact basyx.components.AASServer- 1.0.0
+REM call :DeployArtifact basyx.components.lib- 1.0.0
+REM call :DeployArtifact basyx.components.registry- 1.0.2
+REM call :DeployArtifact basyx.sdk- 1.0.0
+
 REM done here, don't go into "sub-program"
 goto :end
 
