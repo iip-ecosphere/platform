@@ -167,7 +167,6 @@ public abstract class AasFactory {
      * @see #accept(ProtocolCreator)
      */
     protected AasFactory() {
-        registerProtocolCreator(LOCAL_PROTOCOL, new SimpleLocalProtocolCreator());
         // load specified first so that refined classes can overwrite protocols on demand later in their constructor
         ServiceLoader<ProtocolDescriptor> loader = ServiceLoader.load(ProtocolDescriptor.class);
         Iterator<ProtocolDescriptor> iter = loader.iterator();
@@ -181,6 +180,7 @@ public abstract class AasFactory {
                 }
             }
         }
+        registerProtocolCreator(LOCAL_PROTOCOL, new SimpleLocalProtocolCreator());
     }
     
     /**
