@@ -188,8 +188,10 @@ public class AasTest {
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
         for (String proto : AasFactory.getInstance().getProtocols()) {
-            System.out.println("Testing VAB protocol: " + proto);
-            testVabQuery(proto);
+            if (!AasFactory.LOCAL_PROTOCOL.equals(proto)) { // VAB only
+                System.out.println("Testing VAB protocol: " + proto);
+                testVabQuery(proto);
+            }
         }
     }
 
