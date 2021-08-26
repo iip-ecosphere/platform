@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -62,7 +63,7 @@ public class BaSyxVABTCPPayloadCodec implements PayloadCodec {
             buffer.put(info.getBytes(charset));
         }
         buffer.put(payload);
-        buffer.flip();
+        ((Buffer) buffer).flip(); // JDK 8, 9, 11 overriding incompatibility
 
         return buffer.array();
     }

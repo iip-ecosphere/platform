@@ -37,21 +37,23 @@ public class BaSyxCodecTest {
     public void testCodecs() {
         AasFactory factory = AasFactory.getInstance();
         for (String protocol : factory.getProtocols()) {
-            ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, 8080); // port is not relevant
-            PayloadCodec codec = builder.createPayloadCodec();
-            if (null != codec) {
-                Assert.assertNotNull(codec.intendedSchema());
-                Charset cs = codec.getCharset();
-                Assert.assertNotNull(cs);
-                codec.setCharset(cs);
-                Assert.assertEquals(cs, codec.getCharset()); // well, called...
-                
-                assertEncodeDecode(codec, "Info", "Hallo");
-                assertEncodeDecode(codec, "Info", "");
-                assertEncodeDecode(codec, "", "Hallo");
-                assertEncodeDecode(codec, "", "");
-                assertEncodeDecode(codec, null, "Hallo");
-                assertEncodeDecode(codec, null, "");
+            if (!AasFactory.LOCAL_PROTOCOL.equals(protocol)) { // only VAB
+                ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, 8080); // port not rel.
+                PayloadCodec codec = builder.createPayloadCodec();
+                if (null != codec) {
+                    Assert.assertNotNull(codec.intendedSchema());
+                    Charset cs = codec.getCharset();
+                    Assert.assertNotNull(cs);
+                    codec.setCharset(cs);
+                    Assert.assertEquals(cs, codec.getCharset()); // well, called...
+                    
+                    assertEncodeDecode(codec, "Info", "Hallo");
+                    assertEncodeDecode(codec, "Info", "");
+                    assertEncodeDecode(codec, "", "Hallo");
+                    assertEncodeDecode(codec, "", "");
+                    assertEncodeDecode(codec, null, "Hallo");
+                    assertEncodeDecode(codec, null, "");
+                }
             }
         }
     }
