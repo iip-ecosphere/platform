@@ -13,6 +13,7 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
 import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
@@ -36,7 +37,8 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
     NetworkManagerTest.class,
     LifecycleHandlerTest.class, 
     ServiceLoaderUtilsTest.class,
-    NoOpServerTest.class
+    NoOpServerTest.class,
+    LocalInvocationTest.class
 })
 public class AllTests {
 }

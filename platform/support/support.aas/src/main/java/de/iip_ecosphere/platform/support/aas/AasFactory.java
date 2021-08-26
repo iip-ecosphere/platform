@@ -33,7 +33,22 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
  */
 public abstract class AasFactory {
 
+    /**
+     * Default communication/implementation protocol for properties and operations. An implementation must
+     * fill this with some protocol.
+     */
     public static final String DEFAULT_PROTOCOL = "";
+    
+    /**
+     * A protocol involving only local calls, no network. Host/port shall be ignored. Created 
+     * {@link InvocablesCreator} and {@link ProtocolServerBuilder} shall refer to the same {@link OperationsProvider} 
+     * instance. {@link #createInvocablesCreator(String, String, int)} creates then the provider instance that is used
+     * for the next {@link #createProtocolServerBuilder(String, int)} calls until the next invocables creator
+     * is requested. Clients may also create the instances directly to take control over the 
+     * {@link OperationsProvider}. No other protocol shall have this name. The default protocol shall not be 
+     * a local protocol.
+     */
+    public static final String LOCAL_PROTOCOL = "local";
     
     /**
      * A dummy AAS factory instance that intentionally does nothing. This is the default implementation,
@@ -152,6 +167,7 @@ public abstract class AasFactory {
      * @see #accept(ProtocolCreator)
      */
     protected AasFactory() {
+        registerProtocolCreator(LOCAL_PROTOCOL, new SimpleLocalProtocolCreator());
         // load specified first so that refined classes can overwrite protocols on demand later in their constructor
         ServiceLoader<ProtocolDescriptor> loader = ServiceLoader.load(ProtocolDescriptor.class);
         Iterator<ProtocolDescriptor> iter = loader.iterator();

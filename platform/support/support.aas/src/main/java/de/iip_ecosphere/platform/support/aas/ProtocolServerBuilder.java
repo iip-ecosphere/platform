@@ -78,7 +78,7 @@ public interface ProtocolServerBuilder extends Builder<Server> {
          * Returns the (usually fixed) number of bytes to read the size of the encoded
          * data.
          * 
-         * @return the number of bytes
+         * @return the number of bytes (may be 0 for none)
          */
         public int getDataBytesLength();
         
@@ -87,7 +87,7 @@ public interface ProtocolServerBuilder extends Builder<Server> {
          * of the following data array.
          * 
          * @param data the data to decode
-         * @return the decoded data length
+         * @return the decoded data length (may be 0 for none)
          */
         public int decodeDataLength(byte[] data);
         
