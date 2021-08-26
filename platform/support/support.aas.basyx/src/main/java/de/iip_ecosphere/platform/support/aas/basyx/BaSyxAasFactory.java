@@ -21,10 +21,12 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -115,6 +117,15 @@ public class BaSyxAasFactory extends AasFactory {
      * Creates an instance.
      */
     public BaSyxAasFactory() {
+        registerProtocolCreator(LOCAL_PROTOCOL, new SimpleLocalProtocolCreator() {
+            
+            @Override
+            protected OperationsProvider createOperationsProvider() {
+                return new VabOperationsProvider();
+            }
+            
+        });
+        
         VabTcpProtocolCreator tcp = new VabTcpProtocolCreator();
         registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
         registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
