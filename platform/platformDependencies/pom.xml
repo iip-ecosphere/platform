@@ -90,6 +90,9 @@
     <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
     <io.moquette.version>0.13</io.moquette.version>
     <org.apache.qpid.version>8.0.2</org.apache.qpid.version>
+    
+    <!-- When updating spring (cloud streams), please check whether the BinderFix in transport.spring is still needed -->
+    
     <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
     <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
     <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
