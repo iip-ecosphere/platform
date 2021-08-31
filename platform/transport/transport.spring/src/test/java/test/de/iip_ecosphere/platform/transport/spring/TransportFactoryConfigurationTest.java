@@ -19,7 +19,7 @@ import de.iip_ecosphere.platform.transport.TransportFactory;
 @SpringBootTest(classes = TransportFactoryConfigurationTest.class)
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
-public class TransportFactoryConfigurationTest {
+public class TransportFactoryConfigurationTest extends AbstractMockingTest {
     
     /**
      * Tests the automatic configuration of the transport factory.

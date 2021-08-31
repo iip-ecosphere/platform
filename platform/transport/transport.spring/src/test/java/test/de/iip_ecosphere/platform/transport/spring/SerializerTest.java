@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 @SpringBootTest(classes = SerializerTest.class)
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
-public class SerializerTest {
+public class SerializerTest extends AbstractMockingTest {
 
     /**
      * Tests the automatic registration of serializes via the given configuration and the 

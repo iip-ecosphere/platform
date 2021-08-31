@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @SpringBootTest(classes = TransportFactoryConfigurationTest.class)
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
-public class BeanHelperTest {
+public class BeanHelperTest extends AbstractMockingTest {
     
     @Autowired
     private ApplicationContext ctx;

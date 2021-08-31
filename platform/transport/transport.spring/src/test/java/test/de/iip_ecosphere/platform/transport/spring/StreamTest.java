@@ -40,7 +40,7 @@ import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
 @SpringBootTest(classes = StreamTest.class)
 @RunWith(SpringRunner.class)
 @ComponentScan(basePackages = "de.iip_ecosphere.platform.transport.spring")
-public class StreamTest {
+public class StreamTest extends AbstractMockingTest {
 
     /**
      * Tests the stream application.
