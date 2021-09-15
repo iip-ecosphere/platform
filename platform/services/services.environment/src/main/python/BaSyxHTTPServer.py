@@ -1,41 +1,41 @@
+import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import logging
+import logging as logger
+
+from JSONProvider import JSONProvider
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 
-
-class BaSyxHTTPServer(HTTPServer):
-
-    def __init__(self, port):
-        super().__init__((HOST, port), BaSyxHTTPRequestHandler)
+class BaSyxHTTPServer():
+    def __init__(self, builder, port):
+        self.port = port
+        self.builder = builder
 
     def start(self):
-        self.serve_forever()
+        handler = HTTPHandlerFactory(self.builder)
+        server = HTTPServer((HOST, self.port), handler)
+        server.serve_forever()
 
 
-class BaSyxHTTPRequestHandler(BaseHTTPRequestHandler):
+def HTTPHandlerFactory(builder):
+    class CustomHandler(BaseHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            self.providerBackend = JSONProvider(builder)
+            super(CustomHandler, self).__init__(*args, **kwargs)
 
-    # TODO maybe remove later
-    def _set_response(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+        def do_GET(self):
+            path = self.path[1:]
+            request = self.request
+            logger.debug('HTTP GET path: %s', path)
+            logger.debug('HTTP GET request: %s', request)
 
-    def do_GET(self):
-        path = self.path
-        logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", path, str(self.headers))
+            value = self.providerBackend.getModelPropertyValue(path)
+            encodedResult = json.dumps(value).encode('UTF-8')
+            logger.debug('HTTP GET response:  %s ', encodedResult)
 
-        # TODO remove later
-        self._set_response()
-        self.wfile.write("GET request for {}".format(self.path).encode('utf-8'))
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(encodedResult)
 
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        path = self.path
-        data = self.rfile.read(content_length).decode('utf-8')
-        logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
-                     path, str(self.headers), data)
-
-
-
-
+    return CustomHandler

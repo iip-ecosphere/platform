@@ -3,7 +3,7 @@ import logging as logger
 logger.basicConfig(level="DEBUG")
 import argparse
 from BaSyxTCPServer import BaSyxTCPServer
-
+from BaSyxHTTPServer import BaSyxHTTPServer
 from VabIipOperationsBuilder import VabIipOperationsBuilder
 from ServiceMapper import mapService
 
@@ -27,11 +27,14 @@ def start(services):
         mapService(builder, service)
 
     port = args.port[0]
+    protocol = args.protocol[0]
     if args.protocol == "" or args.protocol == "VAB-TCP":
         server = BaSyxTCPServer(builder, port)
         # other protocols would go into here
+    elif protocol == "VAB-HTTP":
+        server = BaSyxHTTPServer(builder, port)
     else:
-        logger.info("Protocol '" + args.protocol + "' unknown. Using default.")
+        logger.info("Protocol '" + protocol + "' unknown. Using default.")
         server = BaSyxTCPServer(builder, port)
 
     server.start()
