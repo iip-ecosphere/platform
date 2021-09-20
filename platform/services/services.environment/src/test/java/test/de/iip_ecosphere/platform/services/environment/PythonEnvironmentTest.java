@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
+
 /**
  * Integration test for the Python environment.
  * 
@@ -69,7 +70,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         }
         
         System.out.println("Cmd line: " + tmp);
-        ProcessBuilder processBuilder = new ProcessBuilder(tmp);
+        ProcessBuilder processBuilder = new ProcessBuilder(tmp);        
         processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         Process python = processBuilder.start();
@@ -107,7 +108,6 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws ExecutionException shall not occur
      */
     @Test
-    @Ignore("VAB-HTTP Server does not yet exist")
     public void testPythonEnvironmentHttp() throws IOException, ExecutionException {
         testPythonEnvironment("VAB-HTTP");
     }

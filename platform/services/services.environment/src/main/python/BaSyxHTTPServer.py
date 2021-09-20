@@ -23,7 +23,7 @@ def HTTPHandlerFactory(builder):
             self.providerBackend = JSONProvider(builder)
             super(CustomHandler, self).__init__(*args, **kwargs)
 
-        def do_GET(self):
+        def do_GET(self):           # BaSyx retrieve
             path = self.path[1:]
             request = self.request
             logger.debug('HTTP GET path: %s', path)
@@ -38,4 +38,22 @@ def HTTPHandlerFactory(builder):
             self.end_headers()
             self.wfile.write(encodedResult)
 
+        def do_POST(self):
+            path = self.path[1:]
+            request = self.request
+            logger.debug('HTTP POST path: %s', path)
+            logger.debug('HTTP POST request: %s', request)
+            content_len = int(self.headers['Content-Length'])
+
+            param_json = self.rfile.read(content_len)
+            logger.debug('HTTP POST paramJson: %s', param_json)
+
+            result = self.providerBackend.invoke(path, param_json)
+            encodedResult = json.dumps(result).encode('UTF-8')
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(encodedResult)
+
     return CustomHandler
+
