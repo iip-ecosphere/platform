@@ -1,6 +1,3 @@
-import sys
-assert sys.version_info[0] > 2, 'Python Version needs to be higher than 2.'
-
 import logging as logger
 
 logger.basicConfig(level="DEBUG")
