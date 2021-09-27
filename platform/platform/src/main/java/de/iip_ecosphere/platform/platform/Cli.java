@@ -474,7 +474,7 @@ public class Cli {
         if (level.isTopLevel() || Level.SERVICES == level) {
             println("  listServices - lists known services");
             println("  listArtifacts - lists known artifacts");
-            println("  add <URI> - addes an artifact");
+            println("  add <URI> - adds an artifact");
             println("  startAll <artifactId> - starts all services in <artifactId>");
             println("  stopAll <artifactId> - stops all services in <artifactId>");
             println("  remove <artifactId> - removes <artifactId>");
