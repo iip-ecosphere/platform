@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="security.services.kodex" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- deploy to SSE Mvn repo -->
+	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="package"/>
+		<mvnDeployResolveArtifact folderName="IIP-security.services.kodex" pomFile="pom.xml" jarFolder="target" artifactPattern="security.services.kodex-*.*.*.jar" />
+	</target>
+</project>
