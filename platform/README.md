@@ -45,7 +45,7 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * [Edge Cloud Server (ECS) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md)
     * Default resource management for [Docker](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime.docker/README.md)
    * Upcoming: Resource management for Kubernetes
- * [Security and Data Protection] (https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
+ * [Security and Data Protection](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
  * Reusable Intelligent Services
  * Configuration
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
