@@ -114,7 +114,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         
         try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(file))) {
-            out.putNextEntry(new ZipEntry("[Content Types].xml"));
+            out.putNextEntry(new ZipEntry("[Content_Types].xml"));
             xmlToStream(out, transformerFactory, createContentTypesXML(factory));
 
             out.putNextEntry(new ZipEntry("_rels/.rels"));
