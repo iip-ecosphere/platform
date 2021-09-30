@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServlet;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
-import org.eclipse.basyx.aas.registration.restapi.DirectoryModelProvider;
+import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
 import org.eclipse.basyx.aas.restapi.AASModelProvider;
-import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
+import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
-import org.eclipse.basyx.submodel.restapi.SubModelProvider;
+import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
@@ -89,7 +89,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
     @Override
     public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint) {
         deploymentSpec.setRegistry(new InMemoryRegistry());
-        IModelProvider registryProvider = new DirectoryModelProvider(deploymentSpec.getRegistry());
+        IModelProvider registryProvider = new AASRegistryModelProvider(deploymentSpec.getRegistry());
         HttpServlet registryServlet = new VABHTTPInterface<IModelProvider>(registryProvider);
         deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(regEndpoint) + "/*", registryServlet);
         return new BaSyxImmediateDeploymentRecipe();
@@ -148,7 +148,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         BaSyxAas bAas = (BaSyxAas) aas;
         //Wrapping Submodels in IModelProvider
         AASModelProvider aasProvider = new AASModelProvider(bAas.getAas());
-        VABMultiSubmodelProvider fullProvider = new VABMultiSubmodelProvider();
+        MultiSubmodelProvider fullProvider = new MultiSubmodelProvider();
         fullProvider.setAssetAdministrationShell(aasProvider);
 
         AASDescriptor aasDescriptor = new AASDescriptor(bAas.getAas(), 
@@ -156,7 +156,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         for (Submodel sm: bAas.submodels()) {
             if (sm instanceof BaSyxSubmodel) {
                 BaSyxSubmodel submodel = (BaSyxSubmodel) sm;
-                SubModelProvider subModelProvider = new SubModelProvider(submodel.getSubmodel());
+                SubmodelProvider subModelProvider = new SubmodelProvider(submodel.getSubmodel());
                 fullProvider.addSubmodel(subModelProvider);
                 aasDescriptor.addSubmodelDescriptor(new SubmodelDescriptor(submodel.getSubmodel(), 
                     AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.getEndpoint(), aas, submodel)));

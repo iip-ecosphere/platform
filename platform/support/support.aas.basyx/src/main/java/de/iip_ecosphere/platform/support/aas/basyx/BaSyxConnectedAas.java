@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -61,7 +61,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         @Override
         public Submodel register(BaSyxSubmodel submodel) {
             if (null == instance.getSubmodel(submodel.getIdShort())) {
-                instance.getAas().addSubModel(submodel.getSubmodel());
+                instance.getAas().addSubmodel(submodel.getSubmodel());
                 instance.register(submodel);
             }
             return submodel;
@@ -113,7 +113,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
      */
     BaSyxConnectedAas(ConnectedAssetAdministrationShell aas) {
         super(aas);
-        for (ISubModel sm : aas.getSubModels().values()) {
+        for (ISubmodel sm : aas.getSubmodels().values()) {
             register(new BaSyxISubmodel(this, sm));
         }
     }

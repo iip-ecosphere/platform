@@ -17,20 +17,22 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
+import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 
 /**
  * Basic implementation for a container-based model element. Subclasses must call {@link #buildMyDeferred()} in an 
- * appropriate {@link MethodSignature} and use {@link DeferredBuilder#getDeferred(String, Class)} when potentially 
- * creating a builder that could be deferred.
+ * appropriate method (usually {@link Builder#build()}) and use 
+ * {@link DeferredBuilder#getDeferred(String, Class, java.util.Map)} when potentially creating a builder that could 
+ * be deferred.
  * 
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE
  */
-abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> implements SubmodelElementContainerBuilder {
+abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel> implements SubmodelElementContainerBuilder {
 
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
@@ -70,7 +72,7 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> impleme
      * @return {@code operation}
      */
     BaSyxOperation register(BaSyxOperation operation) {
-        getInstance().getSubmodel().addSubModelElement(operation.getSubmodelElement());
+        getInstance().getSubmodel().addSubmodelElement(operation.getSubmodelElement());
         return getInstance().register(operation);
     }
     
@@ -81,7 +83,7 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> impleme
      * @return {@code property}
      */
     BaSyxProperty register(BaSyxProperty property) {
-        getInstance().getSubmodel().addSubModelElement(property.getSubmodelElement());
+        getInstance().getSubmodel().addSubmodelElement(property.getSubmodelElement());
         return getInstance().register(property);
     }
 
@@ -92,7 +94,7 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> impleme
      * @return {@code reference}
      */
     BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-        getInstance().getSubmodel().addSubModelElement(reference.getSubmodelElement());
+        getInstance().getSubmodel().addSubmodelElement(reference.getSubmodelElement());
         return getInstance().register(reference);
     }
 
@@ -104,7 +106,7 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubModel> impleme
      */
     BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         if (null == getInstance().getSubmodelElementCollection(collection.getIdShort())) {
-            getInstance().getSubmodel().addSubModelElement(collection.getSubmodelElement());
+            getInstance().getSubmodel().addSubmodelElement(collection.getSubmodelElement());
             getInstance().register(collection);
         }
         return collection;

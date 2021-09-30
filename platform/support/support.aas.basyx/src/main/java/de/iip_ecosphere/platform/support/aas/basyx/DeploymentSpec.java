@@ -3,7 +3,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.basyx.aas.registration.api.IAASRegistryService;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
@@ -19,7 +19,7 @@ class DeploymentSpec {
     private Endpoint endpoint;
     private BaSyxContextConfiguration contextConfig;
     private BaSyxContext context;
-    private IAASRegistryService registry;
+    private IAASRegistry registry;
     private Map<String, BaSyxAasDescriptor> descriptors = new HashMap<>();
     
     /**
@@ -131,7 +131,7 @@ class DeploymentSpec {
      * 
      * @return the registry (may be <b>null</b> depending on constructor use)
      */
-    IAASRegistryService getRegistry() {
+    IAASRegistry getRegistry() {
         return registry;
     }
 
@@ -140,7 +140,7 @@ class DeploymentSpec {
      * 
      * @param registry the registry (may be <b>null</b> depending on constructor use)
      */
-    void setRegistry(IAASRegistryService registry) {
+    void setRegistry(IAASRegistry registry) {
         this.registry = registry;
     }
     

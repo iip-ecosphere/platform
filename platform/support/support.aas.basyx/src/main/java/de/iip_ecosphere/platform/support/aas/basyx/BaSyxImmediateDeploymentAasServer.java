@@ -1,6 +1,6 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 
 import de.iip_ecosphere.platform.support.aas.AasServer;
 
@@ -11,7 +11,7 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
  */
 class BaSyxImmediateDeploymentAasServer extends BaSyxAbstractAasServer {
 
-    private AASHTTPServer server;
+    private BaSyxHTTPServer server;
     
     /**
      * Creates a new BaSyx AAS server.
@@ -20,7 +20,7 @@ class BaSyxImmediateDeploymentAasServer extends BaSyxAbstractAasServer {
      */
     BaSyxImmediateDeploymentAasServer(DeploymentSpec deploymentSet) {
         super(deploymentSet);
-        server = new AASHTTPServer(deploymentSet.getContext());
+        server = new BaSyxHTTPServer(deploymentSet.getContext());
     }
     
     @Override

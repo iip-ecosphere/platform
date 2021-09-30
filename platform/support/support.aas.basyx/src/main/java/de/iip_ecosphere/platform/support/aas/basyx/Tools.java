@@ -26,7 +26,7 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AssetKind;
@@ -39,8 +39,8 @@ import de.iip_ecosphere.platform.support.aas.Type;
  */
 public class Tools {
 
-    private static final Map<Type, PropertyValueTypeDef> TYPES2BASYX = new HashMap<>();
-    private static final Map<PropertyValueTypeDef, Type> BASYX2TYPES = new HashMap<>();
+    private static final Map<Type, ValueType> TYPES2BASYX = new HashMap<>();
+    private static final Map<ValueType, Type> BASYX2TYPES = new HashMap<>();
 
     private static final Map<AssetKind, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind> ASSETKINDS2BASYX 
         = new HashMap<>();
@@ -48,51 +48,51 @@ public class Tools {
         = new HashMap<>();
 
     static {
-        mapType(Type.BOOLEAN, PropertyValueTypeDef.Boolean);
-        mapType(Type.DOUBLE, PropertyValueTypeDef.Double);
-        mapType(Type.FLOAT, PropertyValueTypeDef.Float);
-        mapType(Type.INTEGER, PropertyValueTypeDef.Integer);
-        mapType(Type.STRING, PropertyValueTypeDef.String);
+        mapType(Type.BOOLEAN, ValueType.Boolean);
+        mapType(Type.DOUBLE, ValueType.Double);
+        mapType(Type.FLOAT, ValueType.Float);
+        mapType(Type.INTEGER, ValueType.Integer);
+        mapType(Type.STRING, ValueType.String);
 
-        mapType(Type.NON_POSITIVE_INTEGER, PropertyValueTypeDef.NonPositiveInteger);
-        mapType(Type.NON_NEGATIVE_INTEGER, PropertyValueTypeDef.NonNegativeInteger);
-        mapType(Type.POSITIVE_INTEGER, PropertyValueTypeDef.PositiveInteger);
-        mapType(Type.NEGATIVE_INTEGER, PropertyValueTypeDef.NegativeInteger);
+        mapType(Type.NON_POSITIVE_INTEGER, ValueType.NonPositiveInteger);
+        mapType(Type.NON_NEGATIVE_INTEGER, ValueType.NonNegativeInteger);
+        mapType(Type.POSITIVE_INTEGER, ValueType.PositiveInteger);
+        mapType(Type.NEGATIVE_INTEGER, ValueType.NegativeInteger);
         
-        mapType(Type.INT8, PropertyValueTypeDef.Int8);
-        mapType(Type.INT16, PropertyValueTypeDef.Int16);
-        mapType(Type.INT32, PropertyValueTypeDef.Int32);
-        mapType(Type.INT64, PropertyValueTypeDef.Int64);
+        mapType(Type.INT8, ValueType.Int8);
+        mapType(Type.INT16, ValueType.Int16);
+        mapType(Type.INT32, ValueType.Int32);
+        mapType(Type.INT64, ValueType.Int64);
         
-        mapType(Type.UINT8, PropertyValueTypeDef.UInt8);
-        mapType(Type.UINT16, PropertyValueTypeDef.UInt16);
-        mapType(Type.UINT32, PropertyValueTypeDef.UInt32);
-        mapType(Type.UINT64, PropertyValueTypeDef.UInt64);
+        mapType(Type.UINT8, ValueType.UInt8);
+        mapType(Type.UINT16, ValueType.UInt16);
+        mapType(Type.UINT32, ValueType.UInt32);
+        mapType(Type.UINT64, ValueType.UInt64);
         
-        mapType(Type.LANG_STRING, PropertyValueTypeDef.LangString);
-        mapType(Type.ANY_URI, PropertyValueTypeDef.AnyURI);
-        mapType(Type.BASE64_BINARY, PropertyValueTypeDef.Base64Binary);
-        mapType(Type.HEX_BINARY, PropertyValueTypeDef.HexBinary);
-        mapType(Type.NOTATION, PropertyValueTypeDef.NOTATION);
-        mapType(Type.ENTITY, PropertyValueTypeDef.ENTITY);
-        mapType(Type.ID, PropertyValueTypeDef.ID);
-        mapType(Type.IDREF, PropertyValueTypeDef.IDREF);
+        mapType(Type.LANG_STRING, ValueType.LangString);
+        mapType(Type.ANY_URI, ValueType.AnyURI);
+        mapType(Type.BASE64_BINARY, ValueType.Base64Binary);
+        mapType(Type.HEX_BINARY, ValueType.HexBinary);
+        mapType(Type.NOTATION, ValueType.NOTATION);
+        mapType(Type.ENTITY, ValueType.ENTITY);
+        mapType(Type.ID, ValueType.ID);
+        mapType(Type.IDREF, ValueType.IDREF);
         
-        mapType(Type.DURATION, PropertyValueTypeDef.Duration);
-        mapType(Type.DAY_TIME_DURATION, PropertyValueTypeDef.DayTimeDuration); 
-        mapType(Type.YEAR_MONTH_DURATION, PropertyValueTypeDef.YearMonthDuration);
-        mapType(Type.DATE_TIME, PropertyValueTypeDef.DateTime);
-        mapType(Type.DATE_TIME_STAMP, PropertyValueTypeDef.DateTimeStamp);
-        mapType(Type.G_DAY, PropertyValueTypeDef.GDay);
-        mapType(Type.G_MONTH, PropertyValueTypeDef.GMonth); 
-        mapType(Type.G_MONTH_DAY, PropertyValueTypeDef.GMonthDay); 
-        mapType(Type.G_YEAR, PropertyValueTypeDef.GYear);
-        mapType(Type.G_YEAR_MONTH, PropertyValueTypeDef.GYearMonth);
-        mapType(Type.Q_NAME, PropertyValueTypeDef.QName);
-        mapType(Type.NONE, PropertyValueTypeDef.None);
+        mapType(Type.DURATION, ValueType.Duration);
+        mapType(Type.DAY_TIME_DURATION, ValueType.DayTimeDuration); 
+        mapType(Type.YEAR_MONTH_DURATION, ValueType.YearMonthDuration);
+        mapType(Type.DATE_TIME, ValueType.DateTime);
+        mapType(Type.DATE_TIME_STAMP, ValueType.DateTimeStamp);
+        mapType(Type.G_DAY, ValueType.GDay);
+        mapType(Type.G_MONTH, ValueType.GMonth); 
+        mapType(Type.G_MONTH_DAY, ValueType.GMonthDay); 
+        mapType(Type.G_YEAR, ValueType.GYear);
+        mapType(Type.G_YEAR_MONTH, ValueType.GYearMonth);
+        mapType(Type.Q_NAME, ValueType.QName);
+        mapType(Type.NONE, ValueType.None);
         
-        mapType(Type.ANY_TYPE, PropertyValueTypeDef.AnyType); 
-        mapType(Type.ANY_SIMPLE_TYPE, PropertyValueTypeDef.AnySimpleType);
+        mapType(Type.ANY_TYPE, ValueType.AnyType); 
+        mapType(Type.ANY_SIMPLE_TYPE, ValueType.AnySimpleType);
     }
     
     static {
@@ -106,7 +106,7 @@ public class Tools {
      * @param type the implementation-independent type
      * @param basyxType the corresponding BaSyx property-value type
      */
-    private static void mapType(Type type, PropertyValueTypeDef basyxType) {
+    private static void mapType(Type type, ValueType basyxType) {
         TYPES2BASYX.put(type, basyxType);
         BASYX2TYPES.put(basyxType, type);
     }
@@ -167,7 +167,7 @@ public class Tools {
      * @param type the implementation-independent type
      * @return the implementation-specific type
      */
-    public static PropertyValueTypeDef translate(Type type) {
+    public static ValueType translate(Type type) {
         return TYPES2BASYX.get(type);
     }
 
@@ -177,7 +177,7 @@ public class Tools {
      * @param type the implementation-specific type
      * @return the implementation-independent type
      */
-    public static Type translate(PropertyValueTypeDef type) {
+    public static Type translate(ValueType type) {
         return BASYX2TYPES.get(type);
     }
 

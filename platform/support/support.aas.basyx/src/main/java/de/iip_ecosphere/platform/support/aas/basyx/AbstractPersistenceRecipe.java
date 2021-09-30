@@ -24,12 +24,12 @@ import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
-import org.eclipse.basyx.submodel.metamodel.map.SubModel;
+import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 
 import de.iip_ecosphere.platform.support.FileFormat;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -72,14 +72,14 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
      * @param result the resulting {@link Aas} instances (to be modified as a side effect)
      * @throws IOException in case that something goes wrong
      */
-    protected void transform(List<? extends IAssetAdministrationShell> aas, List<? extends ISubModel> submodels, 
+    protected void transform(List<? extends IAssetAdministrationShell> aas, List<? extends ISubmodel> submodels, 
         List<? extends IAsset> assets, List<Aas> result) throws IOException {
-        Map<String, SubModel> subMapping = new HashMap<>();
+        Map<String, Submodel> subMapping = new HashMap<>();
         Map<String, Asset> assetMapping = new HashMap<>();
-        for (ISubModel sm : submodels) { // we do not read back connected AAS 
-            if (sm instanceof SubModel) {
+        for (ISubmodel sm : submodels) { // we do not read back connected AAS 
+            if (sm instanceof Submodel) {
                 IIdentifier id = sm.getIdentification();
-                subMapping.put(id.getIdType() + "/" + id.getId(), (SubModel) sm);
+                subMapping.put(id.getIdType() + "/" + id.getId(), (Submodel) sm);
             }
         }
         for (IAsset asset : assets) {
@@ -93,7 +93,7 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
                 BaSyxAas bAas = new BaSyxAas((AssetAdministrationShell) a);
                 for (IReference r : a.getSubmodelReferences()) {
                     if (!r.getKeys().isEmpty()) {
-                        SubModel submodel = null;
+                        Submodel submodel = null;
                         for (IKey k : r.getKeys()) {
                             if (KeyElements.SUBMODEL == k.getType()) {
                                 submodel = subMapping.get(k.getIdType() + "/" + k.getValue());

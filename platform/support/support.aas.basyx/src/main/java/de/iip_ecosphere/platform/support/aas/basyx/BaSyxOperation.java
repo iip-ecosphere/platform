@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
@@ -92,6 +93,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         private OperationVariable createOperationVariable(String idShort, Type type) {
             Property prop = new Property();
             prop.setIdShort(idShort);
+            prop.setModelingKind(ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
             if (null != type) { // let's see whether this makes sense
                 prop.setValueType(Tools.translate(type));
             }
@@ -127,7 +129,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
 
         @Override
         public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
-            operation.setInvocable(invocable);
+            operation.setInvokable(invocable);
             return this;
         }
 
@@ -135,6 +137,11 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         public Operation build() {
             if (null != inputVariables) {
                 operation.setInputVariables(inputVariables);
+            }
+            // since BaSyx 1.0.0 there must be at least an output variable; from the BaSyx code it looks as if
+            // only output variables are considered, not InOut-Variables
+            if (null == outputVariables) {
+                addOutputVariable("result", Type.NONE);
             }
             if (null != outputVariables) {
                 operation.setOutputVariables(outputVariables);

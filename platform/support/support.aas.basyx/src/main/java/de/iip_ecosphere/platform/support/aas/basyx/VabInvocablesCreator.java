@@ -171,7 +171,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             Object result = null;
             try {
                 if (isOk()) {
-                    result = createProxy().getModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName());
+                    result = createProxy().getValue(VabOperationsProvider.PREFIX_STATUS + getName());
                 }
             } catch (Throwable t) {
                 markAsFailed();
@@ -210,7 +210,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
         public void accept(Object value) {
             try {
                 if (isOk()) {
-                    createProxy().setModelPropertyValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
+                    createProxy().setValue(VabOperationsProvider.PREFIX_STATUS + getName(), value);
                 }
             } catch (Throwable t) {
                 markAsFailed();

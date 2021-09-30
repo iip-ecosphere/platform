@@ -28,7 +28,7 @@ import org.eclipse.basyx.aas.factory.xml.MetamodelToXMLConverter;
 import org.eclipse.basyx.aas.factory.xml.XMLToMetamodelConverter;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
 import org.xml.sax.SAXException;
 
@@ -56,7 +56,7 @@ class XmlPersistenceRecipe extends AbstractPersistenceRecipe {
     @Override
     public void writeTo(List<Aas> aas, File file) throws IOException {
         List<IAssetAdministrationShell> basyxAas = new ArrayList<IAssetAdministrationShell>();
-        List<ISubModel> basyxSubmodels = new ArrayList<ISubModel>();
+        List<ISubmodel> basyxSubmodels = new ArrayList<ISubmodel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
         for (Aas a : aas) {

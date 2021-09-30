@@ -166,7 +166,7 @@ public class BaSyxConnector implements IBaSyxConnector {
     }
     
     @Override
-    public String getModelPropertyValue(String servicePath) {
+    public String getValue(String servicePath) {
 
         byte[] call = createCall(servicePath, VABBaSyxTCPInterface.BASYX_GET);
 
@@ -175,7 +175,7 @@ public class BaSyxConnector implements IBaSyxConnector {
     }
 
     @Override
-    public String setModelPropertyValue(String servicePath, String newValue) {
+    public String setValue(String servicePath, String newValue) {
 
         byte[] call = createCall(servicePath, newValue, VABBaSyxTCPInterface.BASYX_SET);
 

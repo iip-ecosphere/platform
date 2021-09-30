@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.Submod
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractSubmodel<S extends ISubModel> implements Submodel, SubmodelElementsRegistrar {
+public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel, SubmodelElementsRegistrar {
 
     private S submodel;
     private Map<String, Operation> operations = new HashMap<>();

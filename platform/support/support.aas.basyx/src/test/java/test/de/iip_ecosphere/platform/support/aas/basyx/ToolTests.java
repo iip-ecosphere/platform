@@ -20,7 +20,7 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -92,7 +92,7 @@ public class ToolTests {
         for (Type t : Type.values()) {
             assertEquals(t, Tools.translate(t));
         }
-        for (PropertyValueTypeDef t : PropertyValueTypeDef.values()) {
+        for (ValueType t : ValueType.values()) {
             assertEquals(t, Tools.translate(t));
         }
     }

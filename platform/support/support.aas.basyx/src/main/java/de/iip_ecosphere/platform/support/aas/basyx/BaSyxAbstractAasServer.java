@@ -3,7 +3,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.io.IOException;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.submodel.restapi.SubModelProvider;
+import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -45,7 +45,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         }
         
         BaSyxSubmodel sm = (BaSyxSubmodel) submodel;
-        SubModelProvider subModelProvider = new SubModelProvider(sm.getSubmodel());
+        SubmodelProvider subModelProvider = new SubmodelProvider(sm.getSubmodel());
         desc.getFullProvider().addSubmodel(subModelProvider);
         desc.getAasDescriptor().addSubmodelDescriptor(new SubmodelDescriptor(sm.getSubmodel(), 
             AbstractSubmodel.getSubmodelEndpoint(deploymentSpec.getEndpoint(), aas, submodel)));

@@ -13,8 +13,8 @@
   </parent>
   
   <properties>
-    <basyx.version>0.1.0</basyx.version> 
-    <basyx.vab.version>0.0.1</basyx.vab.version>
+    <basyx.version>1.0.0</basyx.version>
+    <basyx.registry.version>1.0.2</basyx.registry.version> 
   </properties>
   
   <dependencies>
@@ -57,7 +57,7 @@
     <dependency>
       <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
       <artifactId>basyx.components.registry</artifactId>
-      <version>${basyx.version}</version>
+      <version>${basyx.registry.version}</version>
       <exclusions>
       	<exclusion>
       		<groupId>org.mongodb</groupId>

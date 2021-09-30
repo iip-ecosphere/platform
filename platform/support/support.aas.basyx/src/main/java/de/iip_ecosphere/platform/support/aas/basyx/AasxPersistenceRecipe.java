@@ -35,11 +35,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.factory.xml.MetamodelToXMLConverter;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
-import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
 import org.eclipse.basyx.support.bundle.AASBundle;
 import org.slf4j.Logger;
@@ -169,7 +170,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
             + "/" + aasName + ".aas.xml"));
 
         List<IAssetAdministrationShell> basyxAas = new ArrayList<IAssetAdministrationShell>();
-        List<ISubModel> basyxSubmodels = new ArrayList<ISubModel>();
+        List<ISubmodel> basyxSubmodels = new ArrayList<ISubmodel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
         IAssetAdministrationShell origAas = ((AbstractAas<?>) aas).getAas();
@@ -287,7 +288,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
             AASXPackageManager apm = new AASXPackageManager(file.getAbsolutePath());
             Set<AASBundle> bundles = apm.retrieveAASBundles();
             List<IAssetAdministrationShell> aas = new ArrayList<>();
-            List<ISubModel> submodels = new ArrayList<>();
+            List<ISubmodel> submodels = new ArrayList<>();
             List<IAsset> assets = new ArrayList<>();
             for (AASBundle b : bundles) {
                 aas.add(b.getAAS());
@@ -297,7 +298,8 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
                 aas.clear();
                 submodels.clear();
             }
-        } catch (SAXException | ParserConfigurationException e) {
+        } catch (SAXException | ParserConfigurationException | InvalidFormatException e) {
+            e.printStackTrace();            
             throw new IOException(e);
         }
         return result;

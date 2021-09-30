@@ -96,7 +96,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         @Override
         public Submodel register(BaSyxSubmodel submodel) {
             if (null == instance.getSubmodel(submodel.getIdShort())) {
-                instance.getAas().addSubModel(submodel.getSubmodel());
+                instance.getAas().addSubmodel(submodel.getSubmodel());
                 instance.register(submodel);
                 if (null != instance.registry) {
                     instance.registry.createSubmodel(instance, submodel);

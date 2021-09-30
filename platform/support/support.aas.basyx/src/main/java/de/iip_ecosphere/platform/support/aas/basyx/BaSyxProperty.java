@@ -18,9 +18,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetypedef.PropertyValueTypeDef;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProviderHelper;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxOperation.class);
-    private IProperty property;
+    private ISubmodelElement property;
 
     // TODO can we distinguish the three types; static, dynamic, ?
     /**
@@ -51,7 +52,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
         private BaSyxProperty instance;
         private org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property property;
-        private PropertyValueTypeDef typeDef;
+        private ValueType typeDef;
 
         /**
          * Creates an instance. Prevents external creation.
@@ -108,17 +109,17 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
         @Override
         public PropertyBuilder setValue(Object value) {
-            property.set(value);
+            property.setValue(value);
             return this;
         }
 
         @Override
         public PropertyBuilder setSemanticId(String refValue) {
             IReference ref = Tools.translateReference(refValue);
-            if (instance.property instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement
-                .dataelement.property.Property && ref != null) {
-                ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property) 
-                    instance.property).setSemanticID(ref);
+            if (instance.property instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement 
+                && ref != null) {
+                ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) 
+                    instance.property).setSemanticId(ref);
             }
             return this;
         }
@@ -172,11 +173,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     
     @Override
     public void setValue(Object value) throws ExecutionException {
-        property.set(value);
+        property.setValue(value);
     }
 
     @Override
-    IProperty getSubmodelElement() {
+    ISubmodelElement getSubmodelElement() {
         return property;
     }
 

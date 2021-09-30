@@ -160,7 +160,7 @@ public class BaSyxAasFactory extends AasFactory {
 
     @Override
     public String getName() {
-        return "AAS/BaSyx v0.1.0-SNAPSHOT (Dec'20)";
+        return "AAS/BaSyx v1.0 (06/2021)";
     }
 
     @Override
