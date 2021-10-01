@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
@@ -64,6 +65,11 @@ public class AasPartRegistry {
      * The URN of the top-level AAS created by this registry in {@link #build()}.
      */
     public static final String URN_AAS = "urn:::AAS:::iipEcosphere#";
+    
+    /**
+     * The URN of the asset of the top-level AAS created by this registry in {@link #build()}.
+     */
+    public static final String URN_AAS_ASSET = "urn:::AAS:::iipEcosphere#asset";
     
     public static final Schema DEFAULT_SCHEMA = Schema.HTTP;
     public static final String DEFAULT_HOST = ServerAddress.LOCALHOST;
@@ -464,6 +470,8 @@ public class AasPartRegistry {
         } catch (IOException e) {
             // fallback, AAS does not yet exist, top-level
             aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
+            // initial asset
+            aasBuilder.createAssetBuilder(NAME_AAS, URN_AAS_ASSET, AssetKind.INSTANCE).build();
         }
         
         ProtocolAddressHolder impl = setup.getImplementation();
