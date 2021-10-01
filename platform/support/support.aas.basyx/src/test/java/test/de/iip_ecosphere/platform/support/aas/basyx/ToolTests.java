@@ -190,6 +190,8 @@ public class ToolTests {
         assertIIdentifier("xyz", IdentifierType.CUSTOM, Tools.translateIdentifier("xyz", "aas"));
         assertIIdentifier("urn:::AAS:::testMachines#", IdentifierType.IRI, 
             Tools.translateIdentifier("urn:::AAS:::testMachines#", "aas"));
+        assertIIdentifier("TEST", IdentifierType.IRI, 
+            Tools.translateIdentifier("urnText:TEST", "aas"));
     }
     
     /**

@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
@@ -44,14 +43,15 @@ public class BaSyxAsset implements Asset {
          * 
          * @param parent the parent builder
          * @param idShort the short id of the asset
-         * @param urn the URN of the asset
+         * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          * @param kind the asset kind
          */
-        BaSyxAssetBuilder(BaSyxAbstractAasBuilder parent, String idShort, String urn, AssetKind kind) {
+        BaSyxAssetBuilder(BaSyxAbstractAasBuilder parent, String idShort, String identifier, AssetKind kind) {
             this.parent = parent;
             this.instance = new BaSyxAsset();
-            this.instance.asset = new org.eclipse.basyx.aas.metamodel.map.parts.Asset(idShort, 
-                new ModelUrn(Tools.checkUrn(urn)), Tools.translate(kind));
+            this.instance.asset = new org.eclipse.basyx.aas.metamodel.map.parts.Asset(idShort,
+                Tools.translateIdentifier(identifier, idShort), Tools.translate(kind));
         }
 
         @Override
