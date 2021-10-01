@@ -51,16 +51,16 @@ public abstract class PersistenceTest {
 
         // we create this here with assets as reading back AAS via BaSyx requires assets from 0.0.1 and asset 
         // references from 0.1.0
-        AasBuilder aasB = factory.createAasBuilder("MyAas", "urn:::AAS:::myAAs#");
-        aasB.createAssetBuilder("asset", "urn:::AAS:::myAAsasset#", AssetKind.INSTANCE).build();
-        SubmodelBuilder smB = aasB.createSubmodelBuilder("MySubModel", "urn:::AAS:::myAAsMySubModel#");
+        AasBuilder aasB = factory.createAasBuilder("MyAas", "urnText:myAAs");
+        aasB.createAssetBuilder("asset", "urnText:myAAsasset", AssetKind.INSTANCE).build();
+        SubmodelBuilder smB = aasB.createSubmodelBuilder("MySubModel", "urnText:myAAsMySubModel");
         smB.createPropertyBuilder("MyP").setValue(Type.BOOLEAN, true).build();
         smB.build();
-        aasB.createSubmodelBuilder("MySubModel1", null).build(); // no URN, custom here
+        aasB.createSubmodelBuilder("MySubModel1", "urnText:myAasMySubModel1").build();
         aas.add(aasB.build());
         
-        aasB = factory.createAasBuilder("MyAas1", "urn:::AAS:::myAAs#1");
-        aasB.createAssetBuilder("asset1", "urn:::AAS:::myAAs#1asset#1", AssetKind.INSTANCE);
+        aasB = factory.createAasBuilder("MyAas1", "urnText:myAAs1");
+        aasB.createAssetBuilder("asset1", "urnText:myAAsAsset1", AssetKind.INSTANCE);
         aas.add(aasB.build());
         
         aas = Collections.unmodifiableList(aas);
