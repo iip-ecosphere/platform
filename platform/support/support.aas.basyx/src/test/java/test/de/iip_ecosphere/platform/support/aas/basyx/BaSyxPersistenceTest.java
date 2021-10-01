@@ -59,7 +59,7 @@ public class BaSyxPersistenceTest extends PersistenceTest {
 
     @Override
     protected boolean assertAsset(File file) {
-        return file == AASX; // TODO it seems that BaSyx does not read back the assets from AASX
+        return file == AASX; // TODO it seems that BaSyx does not always read back the assets
     }
     
     /**
