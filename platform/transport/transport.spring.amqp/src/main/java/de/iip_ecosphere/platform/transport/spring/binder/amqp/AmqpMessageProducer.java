@@ -25,13 +25,17 @@ public class AmqpMessageProducer extends MessageProducerSupport {
 
     private final ConsumerDestination destination;
     
+    private AmqpClient amqpClient;
+    
     /**
      * Creates a message producer instance.
      * 
      * @param destination the consumer destination
+     * @param amqpClient the client instance
      */
-    public AmqpMessageProducer(ConsumerDestination destination) {
+    public AmqpMessageProducer(ConsumerDestination destination, AmqpClient amqpClient) {
         this.destination = destination;
+        this.amqpClient = amqpClient;
     }
     
     /**
@@ -51,12 +55,12 @@ public class AmqpMessageProducer extends MessageProducerSupport {
 
     @Override
     public void doStart() {
-        AmqpClient.subscribeTo(destination.getName(), new Callback());
+        amqpClient.subscribeTo(destination.getName(), new Callback());
     }
 
     @Override
     protected void doStop() {
-        AmqpClient.unsubscribeFrom(destination.getName());
+        amqpClient.unsubscribeFrom(destination.getName());
     }
 
 }

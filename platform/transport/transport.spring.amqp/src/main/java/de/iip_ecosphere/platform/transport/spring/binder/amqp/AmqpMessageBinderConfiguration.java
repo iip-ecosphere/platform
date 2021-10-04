@@ -30,6 +30,9 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @EnableConfigurationProperties(AmqpConfiguration.class)
 public class AmqpMessageBinderConfiguration {
 
+    // binder local, don't register as bean, not accessible from other binder classes
+    private AmqpClient amqpClient = new AmqpClient();
+    
     /**
      * Returns the binder provisioner.
      * 
@@ -38,7 +41,7 @@ public class AmqpMessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AmqpMessageBinderProvisioner amqpBinderProvisioner() {
-        return new AmqpMessageBinderProvisioner();
+        return new AmqpMessageBinderProvisioner(amqpClient);
     }
 
     /**
@@ -50,7 +53,7 @@ public class AmqpMessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AmqpMessageBinder amqpBinder(AmqpMessageBinderProvisioner messageBinderProvisioner) {
-        return new AmqpMessageBinder(null, messageBinderProvisioner);
+        return new AmqpMessageBinder(null, messageBinderProvisioner, amqpClient);
     }
 
     /**

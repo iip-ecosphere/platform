@@ -30,18 +30,28 @@ public class HivemqV5MessageBinderProvisioner implements ProvisioningProvider<Co
 
     @Autowired
     private HivemqV5Configuration options;
+    private HivemqV5Client client;
+    
+    /**
+     * Creates a provisioner instance.
+     * 
+     * @param client the client instance
+     */
+    public HivemqV5MessageBinderProvisioner(HivemqV5Client client) {
+        this.client = client;
+    }
     
     @Override
     public ProducerDestination provisionProducerDestination(String name, ProducerProperties properties)
             throws ProvisioningException {
-        HivemqV5Client.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 
     @Override
     public ConsumerDestination provisionConsumerDestination(String name, String group, ConsumerProperties properties)
             throws ProvisioningException {
-        HivemqV5Client.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 

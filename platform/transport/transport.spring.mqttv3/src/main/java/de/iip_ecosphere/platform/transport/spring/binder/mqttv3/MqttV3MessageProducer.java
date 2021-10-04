@@ -25,14 +25,17 @@ import org.springframework.messaging.Message;
 public class MqttV3MessageProducer extends MessageProducerSupport {
 
     private final ConsumerDestination destination;
+    private MqttClient client;
     
     /**
      * Creates a message producer instance.
      * 
      * @param destination the consumer destination
+     * @param client the client instance
      */
-    public MqttV3MessageProducer(ConsumerDestination destination) {
+    public MqttV3MessageProducer(ConsumerDestination destination, MqttClient client) {
         this.destination = destination;
+        this.client = client;
     }
     
     /**
@@ -53,12 +56,12 @@ public class MqttV3MessageProducer extends MessageProducerSupport {
 
     @Override
     public void doStart() {
-        MqttClient.subscribeTo(destination.getName(), new Callback());
+        client.subscribeTo(destination.getName(), new Callback());
     }
 
     @Override
     protected void doStop() {
-        MqttClient.unsubscribeFrom(destination.getName());
+        client.unsubscribeFrom(destination.getName());
     }
 
 }

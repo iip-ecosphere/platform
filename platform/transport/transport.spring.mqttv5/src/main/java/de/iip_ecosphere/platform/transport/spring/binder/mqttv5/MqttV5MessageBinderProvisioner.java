@@ -30,18 +30,28 @@ public class MqttV5MessageBinderProvisioner implements ProvisioningProvider<Cons
 
     @Autowired
     private MqttConfiguration options;
+    private MqttClient client;
+    
+    /**
+     * Creates a provisioner instance.
+     * 
+     * @param client the client instance
+     */
+    public MqttV5MessageBinderProvisioner(MqttClient client) {
+        this.client = client;
+    }
     
     @Override
     public ProducerDestination provisionProducerDestination(String name, ProducerProperties properties)
             throws ProvisioningException {
-        MqttClient.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 
     @Override
     public ConsumerDestination provisionConsumerDestination(String name, String group, ConsumerProperties properties)
             throws ProvisioningException {
-        MqttClient.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 

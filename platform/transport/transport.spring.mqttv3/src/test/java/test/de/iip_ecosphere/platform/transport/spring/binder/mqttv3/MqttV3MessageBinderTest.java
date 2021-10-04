@@ -126,7 +126,9 @@ public class MqttV3MessageBinderTest {
      */
     @AfterClass
     public static void shutdown() {
-        MqttClient.stopClient();
+        if (null != MqttClient.getLastInstance()) {
+            MqttClient.getLastInstance().stopClient();
+        }
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();

@@ -28,28 +28,33 @@ import org.springframework.messaging.MessageHandler;
 public class HivemqV3MessageBinder extends AbstractMessageChannelBinder<ConsumerProperties, ProducerProperties, 
     HivemqV3MessageBinderProvisioner> {
 
+    private HivemqV3Client client;
+    
     /**
      * Creates a message binder instance.
      * 
      * @param headersToEmbed the headers to embed
      * @param provisioningProvider the provisioning provider including the destination information
+     * @param client the client instance
      */
-    public HivemqV3MessageBinder(String[] headersToEmbed, HivemqV3MessageBinderProvisioner provisioningProvider) {
+    public HivemqV3MessageBinder(String[] headersToEmbed, HivemqV3MessageBinderProvisioner provisioningProvider, 
+        HivemqV3Client client) {
         super(headersToEmbed, provisioningProvider);
+        this.client = client;
     }
 
     @Override
     protected MessageHandler createProducerMessageHandler(ProducerDestination destination,
             ProducerProperties producerProperties, MessageChannel errorChannel) throws Exception {
         return message -> {
-            HivemqV3Client.send(destination.getName(), (byte[]) message.getPayload());
+            client.send(destination.getName(), (byte[]) message.getPayload());
         };
     }
 
     @Override
     protected MessageProducer createConsumerEndpoint(ConsumerDestination destination, String group,
-            ConsumerProperties properties) throws Exception {
-        return new HivemqV3MessageProducer(destination);
+        ConsumerProperties properties) throws Exception {
+        return new HivemqV3MessageProducer(destination, client);
     }
 
 }

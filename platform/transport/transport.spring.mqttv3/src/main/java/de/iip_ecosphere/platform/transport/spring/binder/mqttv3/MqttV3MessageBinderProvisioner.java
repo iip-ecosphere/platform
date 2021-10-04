@@ -28,20 +28,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class MqttV3MessageBinderProvisioner implements ProvisioningProvider<ConsumerProperties, ProducerProperties> {
 
+    private MqttClient client;
+    
     @Autowired
     private MqttConfiguration options;
+    
+    /**
+     * Creates a provisioner instance.
+     * 
+     * @param client the client instance
+     */
+    public MqttV3MessageBinderProvisioner(MqttClient client) {
+        this.client = client;
+    }
     
     @Override
     public ProducerDestination provisionProducerDestination(String name, ProducerProperties properties)
             throws ProvisioningException {
-        MqttClient.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 
     @Override
     public ConsumerDestination provisionConsumerDestination(String name, String group, ConsumerProperties properties)
             throws ProvisioningException {
-        MqttClient.createClient(options);
+        client.createClient(options);
         return new MqttMessageDestination(name);
     }
 

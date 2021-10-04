@@ -28,28 +28,33 @@ import org.springframework.messaging.MessageHandler;
 public class AmqpMessageBinder extends AbstractMessageChannelBinder<ConsumerProperties, ProducerProperties, 
     AmqpMessageBinderProvisioner> {
 
+    private AmqpClient amqpClient;
+    
     /**
      * Creates a message binder instance.
      * 
      * @param headersToEmbed the headers to embed
      * @param provisioningProvider the provisioning provider including the destination information
+     * @param amqpClient the client class
      */
-    public AmqpMessageBinder(String[] headersToEmbed, AmqpMessageBinderProvisioner provisioningProvider) {
+    public AmqpMessageBinder(String[] headersToEmbed, AmqpMessageBinderProvisioner provisioningProvider, 
+        AmqpClient amqpClient) {
         super(headersToEmbed, provisioningProvider);
+        this.amqpClient = amqpClient;
     }
 
     @Override
     protected MessageHandler createProducerMessageHandler(ProducerDestination destination,
             ProducerProperties producerProperties, MessageChannel errorChannel) throws Exception {
         return message -> {
-            AmqpClient.send(destination.getName(), (byte[]) message.getPayload());
+            amqpClient.send(destination.getName(), (byte[]) message.getPayload());
         };
     }
 
     @Override
     protected MessageProducer createConsumerEndpoint(ConsumerDestination destination, String group,
             ConsumerProperties properties) throws Exception {
-        return new AmqpMessageProducer(destination);
+        return new AmqpMessageProducer(destination, amqpClient);
     }
 
 }

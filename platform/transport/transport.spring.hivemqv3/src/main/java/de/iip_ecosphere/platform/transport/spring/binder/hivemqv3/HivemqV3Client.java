@@ -23,7 +23,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
- * A central HiveMq client for all binders to reduce resource usage. Typically, different binders subscribe to different
+ * A HiveMq client for a single binder instance. Typically, different binders subscribe to different
  * topics. 
  * 
  * Partially public for testing. Initial implementation, not optimized.
@@ -33,9 +33,26 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
 public class HivemqV3Client {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HivemqV3MessageBinder.class);
+    private static HivemqV3Client lastInstance;
     private static Mqtt3AsyncClient client;
     private static HivemqV3Configuration configuration;
     private static MqttQos qos = MqttQos.AT_LEAST_ONCE;
+    
+    /**
+     * Creates and registers an instance.
+     */
+    public HivemqV3Client() {
+        lastInstance = this;
+    }
+    
+    /**
+     * Returns the last instance created for this class. [testing]
+     * 
+     * @return the last instance
+     */
+    public static HivemqV3Client getLastInstance() {
+        return lastInstance;
+    }
     
     /**
      * Called when a message for a topic arrives.
@@ -59,7 +76,7 @@ public class HivemqV3Client {
      * 
      * @param config the MQTT configuration to take the connection information from
      */
-    static synchronized void createClient(HivemqV3Configuration config) {
+    synchronized void createClient(HivemqV3Configuration config) {
         if (null == client) {
             configuration = config;
             qos = config.getQos();
@@ -99,7 +116,7 @@ public class HivemqV3Client {
     /**
      * Stops the client.
      */
-    public static void stopClient() {
+    public void stopClient() {
         if (null != client) {
             client.disconnect()
                 .whenComplete((connAck, throwable) -> {
@@ -120,7 +137,7 @@ public class HivemqV3Client {
      * @param arrivedCallback the callback to be called when a message arrived
      * @return {@code true} if done/successful, {@code false} else
      */
-    static boolean subscribeTo(final String topic, final ArrivedCallback arrivedCallback) {
+    boolean subscribeTo(final String topic, final ArrivedCallback arrivedCallback) {
         AtomicBoolean done = new AtomicBoolean(false);
         if (!configuration.isFilteredTopic(topic) && null != client) {
             client.subscribeWith()
@@ -148,7 +165,7 @@ public class HivemqV3Client {
      * @param topic the topic to unsubscribe from
      * @return {@code true} if done/successful, {@code false} else
      */
-    static boolean unsubscribeFrom(String topic) {
+    boolean unsubscribeFrom(String topic) {
         AtomicBoolean done = new AtomicBoolean(false);
         if (!configuration.isFilteredTopic(topic) && null != client) {
             client.unsubscribeWith()
@@ -172,7 +189,7 @@ public class HivemqV3Client {
      * @param topic the topic to send to
      * @param payload the payload to send
      */
-    static void send(String topic, byte[] payload) {
+    void send(String topic, byte[] payload) {
         if (null != client) {
             client.publishWith()
                 .topic(topic)

@@ -31,17 +31,28 @@ public class AmqpMessageBinderProvisioner implements ProvisioningProvider<Consum
     @Autowired
     private AmqpConfiguration options;
     
+    private AmqpClient amqpClient;
+    
+    /**
+     * Creates a provisioner instance.
+     * 
+     * @param amqpClient the client instance
+     */
+    public AmqpMessageBinderProvisioner(AmqpClient amqpClient) {
+        this.amqpClient = amqpClient;
+    }
+    
     @Override
     public ProducerDestination provisionProducerDestination(String name, ProducerProperties properties)
             throws ProvisioningException {
-        AmqpClient.createClient(options);
+        amqpClient.createClient(options);
         return new AmqpMessageDestination(name);
     }
 
     @Override
     public ConsumerDestination provisionConsumerDestination(String name, String group, ConsumerProperties properties)
             throws ProvisioningException {
-        AmqpClient.createClient(options);
+        amqpClient.createClient(options);
         return new AmqpMessageDestination(name);
     }
 

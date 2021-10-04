@@ -126,7 +126,9 @@ public class HivemqV3MessageBinderTest {
      */
     @AfterClass
     public static void shutdown() {
-        HivemqV3Client.stopClient();
+        if (null != HivemqV3Client.getLastInstance()) {
+            HivemqV3Client.getLastInstance().stopClient();
+        }
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();
