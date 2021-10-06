@@ -148,6 +148,7 @@ public class MqttClient {
                 callback = new Callback();
                 cl.setCallback(callback);
                 MqttConnectOptions connOpts = new MqttConnectOptions();
+                connOpts.setMaxInflight(1000); // inbound message limitation, rumor 0 for unlimited does not work
                 connOpts.setCleanSession(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
