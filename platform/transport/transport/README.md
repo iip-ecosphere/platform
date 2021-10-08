@@ -9,7 +9,7 @@ At the moment, we assume homogeneous streams. Heterogeneous streams may be added
 
 For turning objects into their transport representation, we use as serialization interfaces. However, we assume that
 the object classes will be defined in upstream layers, i.e., this component ships without type-specific serialization 
-mechnisms that shall be defined accordingly in upstream layers. Type translators are intended to translate application
+mechanisms that shall be defined accordingly in upstream layers. Type translators are intended to translate application
 specific into more general types required by reusable components, i.e., the translators act as input or output type 
 adapters. Serializers are bidirectional type translators.
 
@@ -17,6 +17,6 @@ For the moment, the regression tests exercise the transport connectors with simp
 supporting MQTT v3 and v5. Dependencies to the json-simple library, Google protobuf and HiveQM are used for testing 
 only and not required for platform execution.
 
-**Missing**
-- Authentication/Security
-
+User/password authentication is currently supported for transport mechanisms that implement such authentication, whereby
+the interpretation of the "password", e.g., as token, depends on the transport mechanism. Transport Layer Security is
+prepared in terms of specifying a keystore (JKS, PCK12) and a keystore password, whereby the validity of the keystore type and the interpretation of the password depends on the implementing transport mechanisms.

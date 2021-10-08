@@ -10,6 +10,8 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport.connectors;
 
+import java.io.File;
+
 import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
@@ -26,12 +28,10 @@ public class TransportParameter {
     private String applicationId = "";
     private boolean autoApplicationId = true;
     private int keepAlive = 2000; 
+    private File keystore;
+    private String keyPassword;
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
-
-    // inspired by OPC UA, just an idea for UKL
-    //private X509Certificate certificate;
-    //private KeyPair keyPair;
 
     /**
      * A builder for transport parameter. Connectors shall indicate the required settings.
@@ -131,6 +131,21 @@ public class TransportParameter {
         }
 
         /**
+         * Sets up optional TLS encryption details.
+         * 
+         * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
+         *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
+         *   implementation, e.g., PKCS12 may not work with all forms
+         * @param password the TLS keystore, may be <b>null</b> for none
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setKeystore(File keystore, String password) {
+            instance.keystore = keystore;
+            instance.keyPassword = password;
+            return this;
+        }
+
+        /**
          * Returns the created instance.
          * 
          * @return the created instance
@@ -224,7 +239,24 @@ public class TransportParameter {
     public String getUser() {
         return user;
     }
+    
+    /**
+     * Returns the optional TLS keystore.
+     * 
+     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
+     *   be <b>null</b> for none
+     */
+    public File getKeystore() {
+        return keystore;
+    }
 
-    // TODO per stream: authentication, TLS
+    /**
+     * Returns the password for the optional TLS keystore.
+     * 
+     * @return the TLS keystore, may be <b>null</b> for none
+     */
+    public String getKeystorePassword() {
+        return keyPassword;
+    }
 
 }

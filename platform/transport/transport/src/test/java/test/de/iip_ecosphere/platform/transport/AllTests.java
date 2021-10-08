@@ -25,7 +25,8 @@ import org.junit.runners.Suite;
     SerializerRegistryTest.class,
     TransportAasTest.class, 
     OtherTests.class,
-    TransportSetupTest.class
+    TransportSetupTest.class,
+    SslUtilsTest.class
 })
 public class AllTests {
 }

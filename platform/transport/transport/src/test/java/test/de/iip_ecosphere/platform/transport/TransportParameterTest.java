@@ -19,6 +19,8 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
+import java.io.File;
+
 import org.junit.Assert;
 
 /**
@@ -47,6 +49,44 @@ public class TransportParameterTest {
         Assert.assertEquals("app", params.getApplicationId());
         Assert.assertEquals(false, params.getAutoApplicationId());
         Assert.assertEquals(1236, params.getKeepAlive());
+        Assert.assertEquals(null, params.getKeystore());
+        Assert.assertEquals(null, params.getKeystorePassword());
+    }
+    
+    /**
+     * Tests the TLS setup.
+     */
+    @Test
+    public void testTransportTlsParameter() {
+        ServerAddress addr = new ServerAddress(Schema.IGNORE, "local", 1234);
+        File keystore = new File("./keystore.jks");
+        String passwd = "abc";
+        TransportParameter params = TransportParameter.TransportParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(null, null)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(null, params.getKeystore());
+        Assert.assertEquals(null, params.getKeystorePassword());
+        
+        params = TransportParameter.TransportParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(keystore, null)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(keystore, params.getKeystore());
+        Assert.assertEquals(null, params.getKeystorePassword());
+
+        params = TransportParameter.TransportParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(keystore, passwd)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(keystore, params.getKeystore());
+        Assert.assertEquals(passwd, params.getKeystorePassword());
     }
 
     /**
