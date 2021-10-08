@@ -11,11 +11,14 @@
 
 package de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 
 /**
  * An AMQP client for a single binder instance. Typically, different binders subscribe to different
@@ -106,6 +111,15 @@ public class AmqpClient {
                 factory.setAutomaticRecoveryEnabled(true);
                 factory.setUsername(config.getUser());
                 factory.setPassword(config.getPassword());
+                try {                
+                    File keystore = config.getKeystore();
+                    SSLContext ctx = SslUtils.createTlsContext(keystore, config.getKeystorePassword());
+                    if (null != ctx) {
+                        factory.useSslProtocol(ctx);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
+                }
                 connection = factory.newConnection();
                 channel = connection.createChannel();
             } catch (IOException | TimeoutException e) {
