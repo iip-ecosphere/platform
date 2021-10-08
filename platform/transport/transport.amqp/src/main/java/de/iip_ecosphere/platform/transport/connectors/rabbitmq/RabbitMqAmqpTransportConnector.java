@@ -10,8 +10,13 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport.connectors.rabbitmq;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -19,6 +24,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
@@ -96,6 +102,16 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         if (null != params.getUser() && null != params.getPassword()) {
             factory.setUsername(params.getUser());
             factory.setPassword(params.getPassword());
+        }
+        try {                
+            File keystore = params.getKeystore();
+            SSLContext ctx = SslUtils.createTlsContext(keystore, params.getKeystorePassword());
+            if (null != ctx) {
+                factory.useSslProtocol(ctx);
+            }
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error(
+                "AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
         }
         configureFactory(factory);
         try {
