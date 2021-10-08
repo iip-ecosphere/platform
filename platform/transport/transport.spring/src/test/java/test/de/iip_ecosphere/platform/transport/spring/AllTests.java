@@ -24,7 +24,8 @@ import org.junit.runners.Suite;
     SerializerTest.class, 
     StreamTest.class,
     TransportFactoryConfigurationTest.class,
-    BeanHelperTest.class
+    BeanHelperTest.class,
+    BasicConfigurationTest.class
 })
 public class AllTests {
 }
