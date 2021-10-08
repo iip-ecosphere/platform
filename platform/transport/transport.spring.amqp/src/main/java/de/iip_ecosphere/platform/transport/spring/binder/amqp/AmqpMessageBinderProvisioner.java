@@ -32,6 +32,12 @@ public class AmqpMessageBinderProvisioner implements ProvisioningProvider<Consum
     private AmqpConfiguration options;
     
     private AmqpClient amqpClient;
+
+    /**
+     * Creates a provisioner instance. [required by Spring]
+     */
+    public AmqpMessageBinderProvisioner() {
+    }
     
     /**
      * Creates a provisioner instance.
