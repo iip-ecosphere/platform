@@ -52,6 +52,10 @@ public class TestQpidServer extends AbstractTestServer {
             Map<String, Object> attributes = new HashMap<String, Object>();
             File f = new File(getConfigDir("./src/test"), "config.json");
             URL initialConfig = f.toURI().toURL();
+            // assume "tls" folder where initialConfig is (even after unpacking). If there is none, config shall
+            // not refer to keystore, i.e., setting the (custom) system property does not matter here
+            File certDir = f.getParentFile();
+            System.setProperty("qpid.cert_dir", certDir.toURI().toURL().toExternalForm());
             // https://qpid.apache.org/releases/qpid-broker-j-8.0.0/book/
             // Java-Broker-Initial-Configuration-Configuration-Properties.html
             attributes.put("type", "Memory");

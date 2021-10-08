@@ -1,0 +1,88 @@
+{
+  "name": "${broker.name}",
+  "modelVersion": "8.0",
+  "authenticationproviders" : [ {
+      "name" : "plain",
+      "secureOnlyMechanisms": [],
+      "type" : "Plain",
+      "users" : [ {
+      "name" : "user",
+      "type" : "managed",
+      "password" : "pwd"
+      } ]
+    } ],
+    "brokerloggers" : [ {
+    "name" : "logfile",
+    "type" : "File",
+    "fileName" : "${qpid.work_dir}${file.separator}log${file.separator}qpid.log",
+    "brokerloginclusionrules" : [ {
+      "name" : "Root",
+      "type" : "NameAndLevel",
+      "level" : "WARN",
+      "loggerName" : "ROOT"
+    }, {
+      "name" : "Qpid",
+      "type" : "NameAndLevel",
+      "level" : "INFO",
+      "loggerName" : "org.apache.qpid.*"
+    }, {
+      "name" : "Operational",
+      "type" : "NameAndLevel",
+      "level" : "INFO",
+      "loggerName" : "qpid.message.*"
+    } ]
+  }, {
+    "name" : "memory",
+    "type" : "Memory",
+    "brokerloginclusionrules" : [ {
+      "name" : "Root",
+      "type" : "NameAndLevel",
+      "level" : "WARN",
+      "loggerName" : "ROOT"
+    }, {
+      "name" : "Qpid",
+      "type" : "NameAndLevel",
+      "level" : "INFO",
+      "loggerName" : "org.apache.qpid.*"
+    }, {
+      "name" : "Operational",
+      "type" : "NameAndLevel",
+      "level" : "INFO",
+      "loggerName" : "qpid.message.*"
+    } ]
+  } ],
+  "ports" : [  {
+    "name" : "AMQP",
+    "port" : "${qpid.amqp_port}",
+    "authenticationProvider" : "plain",
+    "virtualhostaliases" : [ {
+       "name" : "nameAlias",
+       "type" : "nameAlias"
+    }, {
+        "name" : "defaultAlias",
+        "type" : "defaultAlias"
+    }, {
+        "name" : "hostnameAlias",
+        "type" : "hostnameAlias"
+    } ],
+    "keyStore" : "default",
+    "transports" : [ "SSL" ]
+  }],
+  "keystores" : [ {
+       "name" : "default",
+       "password" : "a1234567",
+       "storeUrl" : "${qpid.cert_dir}/keystore.jks",
+       "type" : "FileKeyStore",
+       "certificateAlias" : "qpid"
+   } ],  
+  "virtualhostnodes" : [ {
+    "name" : "default",
+    "type" : "JSON",
+    "defaultVirtualHostNode" : "true",
+    "virtualHostInitialConfiguration" : "{\"type\":\"BDB\",\"nodeAutoCreationPolicies\":[{\"pattern\":\".*\",\"createdOnPublish\":\"true\",\"createdOnConsume\":\"true\",\"nodeType\":\"queue\"}]}"
+  } ],
+  "plugins" : [ {
+    "type" : "MANAGEMENT-HTTP",
+    "name" : "httpManagement"
+  } ]
+}
