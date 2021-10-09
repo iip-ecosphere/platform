@@ -10,6 +10,7 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.transport.connectors.rabbitmq;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Assert;
@@ -22,8 +23,10 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportConnector;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest;
+import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.TransportParameterConfigurer;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.ProductProtobufSerializer;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
@@ -59,6 +62,37 @@ public class RabbitMqAmqpTransportConnectorTest {
      */
     @Test
     public void testRabbitMqConnector() throws IOException {
+        doTest(null);        
+    }
+    
+    /**
+     * Tests the connector through TLS and explicitly setting/resetting the factory
+     * implementation. Builds up a TLS {@link TestQpidServer} so that the test is
+     * self-contained.
+     * 
+     * @throws IOException in case that connection/communication fails
+     */
+    @Test
+    public void testRabbitMqTlsConnector() throws IOException {
+        File secCfg = new File("./src/test/secCfg");
+        TestQpidServer.setConfigDir(secCfg);
+        doTest(new TransportParameterConfigurer() {
+            
+            @Override
+            public void configure(TransportParameterBuilder builder) {
+                builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+            }
+        });        
+        TestQpidServer.setConfigDir(null);
+    }
+    
+    /**
+     * Performs the test.
+     * 
+     * @param configurer the test configurer
+     * @throws IOException in case that connection/communication fails
+     */
+    private void doTest(TransportParameterConfigurer configurer) throws IOException {
         ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 
             @Override
@@ -77,8 +111,8 @@ public class RabbitMqAmqpTransportConnectorTest {
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // ephemeral, localhost
         TestQpidServer server = new TestQpidServer(addr);
         server.start();
-        AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
-        AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
+        AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class, configurer);
+        AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class, configurer);
         server.stop(true);
         TransportFactory.setMainImplementation(old);        
     }
