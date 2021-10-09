@@ -28,6 +28,8 @@ import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
  */
 public class TestHiveMqServer extends AbstractTestServer {
     
+    public static final String KEYSTORE_PASSWORD = "a1234567";
+    public static final String TRUSTSTORE_PASSWORD = "changeme";
     private EmbeddedHiveMQ hiveMQ;
     private ServerAddress addr;
 
@@ -51,6 +53,7 @@ public class TestHiveMqServer extends AbstractTestServer {
             System.setProperty("hivemq.data.folder", hiveTmp.getAbsolutePath()); // sometimes below fails
             
             File cfg = getConfigDir("./src/test");
+            System.setProperty("HIVEMQ_CFG", cfg.getAbsolutePath());
             final EmbeddedHiveMQBuilder embeddedHiveMQBuilder = EmbeddedHiveMQBuilder.builder()
                 .withConfigurationFolder(cfg.toPath())
                 .withDataFolder(hiveTmp.toPath())
