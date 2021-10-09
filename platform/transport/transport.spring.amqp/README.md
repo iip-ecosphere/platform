@@ -11,8 +11,8 @@ The implementation is initial and could be optimized. The following configuratio
  * `amqp.keepAlive`: Time in milliseconds between two AMQP heartbeats (default: `60000`)
  * `amqp.actionTimeout`: Time in milliseconds to wait for an operation to complete (default: `1000`)
  * `amqp.filteredTopics`: List of topic names not to subscribe to.
+ * `amqp.keystore`: Optional file name of TLS keystore (default: null).
+ * `amqp.keyPassword`: Optional plaintext keystore password (default: null).
 
 **Missing**
 - Validation/fixing topic names w.r.t. AMQP specification
-- Authentication/Security
-

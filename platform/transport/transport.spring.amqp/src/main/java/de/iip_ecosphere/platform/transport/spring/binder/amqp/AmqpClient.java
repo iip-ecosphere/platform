@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -96,11 +97,20 @@ public class AmqpClient {
     }
     
     /**
+     * Returns the actual configuration. [for testing]
+     * 
+     * @return the configuration, may be <b>null</b>
+     */
+    public AmqpConfiguration getConfiguration() {
+        return configuration;
+    }
+    
+    /**
      * Creates the client based on a given AMQP client configuration.
      * 
      * @param config the AMQP configuration to take the connection information from
      */
-    synchronized void createClient(AmqpConfiguration config) {
+    public synchronized void createClient(AmqpConfiguration config) {
         if (null == channel) {
             try {
                 configuration = config;
@@ -204,8 +214,8 @@ public class AmqpClient {
             try {
                 ensureTopicQueue(topic);
                 channel.basicPublish("", topic, null, payload);
-            } catch (IOException e) {
-                LOGGER.error("Sending AMQP broker: " + e.getMessage(), e);
+            } catch (AlreadyClosedException | IOException e) {
+                LOGGER.error("Sending to AMQP broker: " + e.getMessage());
             }
         }
     }

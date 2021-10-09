@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AmqpMessageBinderTest.class
+    AmqpMessageBinderTest.class,
+    AmqpMessageBinderTlsTest.class
 })
 public class AllTests {
 }
