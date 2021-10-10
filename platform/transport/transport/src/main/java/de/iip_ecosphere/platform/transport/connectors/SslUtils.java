@@ -15,15 +15,23 @@ package de.iip_ecosphere.platform.transport.connectors;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
 
 /**
  * Some basic SSL helper methods.
@@ -46,6 +54,30 @@ public class SslUtils {
         }
         return keystoreType;
     }
+
+    /**
+     * Opens a keystore {@code store}.
+     * 
+     * @param store the store file (JKS or PKCS12 with file extension ".p12")
+     * @param storePass the password of the store, may be <b>null</b> for none
+     * @return the keystore instance, <b>null</b> if {@code store} is <b>null</b> or does not exist
+     * @throws IOException if the store cannot be opened
+     */
+    public static KeyStore openKeyStore(File store, String storePass) throws IOException {
+        KeyStore tks = null;
+        if (null != store && store.exists()) {
+            try {
+                String keystoreType = getKeystoreType(store);
+                tks = KeyStore.getInstance(keystoreType);
+                FileInputStream stream = new FileInputStream(store); 
+                tks.load(stream, null == storePass ? null : storePass.toCharArray());
+                stream.close();
+            } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
+                throw new IOException(e);
+            }
+        }
+        return tks;
+    }
     
     /**
      * Creates a (SunX509) trust manager factory from the given {@code trustStore}.
@@ -59,15 +91,10 @@ public class SslUtils {
         TrustManagerFactory tmf = null;
         if (null != trustStore && trustStore.exists()) {
             try {
-                String keystoreType = getKeystoreType(trustStore);
-                // may take instance type from file extension
-                KeyStore tks = KeyStore.getInstance(keystoreType);
-                FileInputStream stream = new FileInputStream(trustStore); 
-                tks.load(stream, null == storePass ? null : storePass.toCharArray());
-                stream.close();
+                KeyStore tks = openKeyStore(trustStore, storePass);
                 tmf = TrustManagerFactory.getInstance("SunX509");
                 tmf.init(tks);
-            } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
+            } catch (KeyStoreException | NoSuchAlgorithmException e) {
                 throw new IOException(e);
             }
         }
@@ -84,13 +111,79 @@ public class SslUtils {
      * @see {@link #createTrustMangerFactory(File, String)}
      */
     public static SSLContext createTlsContext(File trustStore, String storePass) throws IOException {
-        SSLContext ctx = null;
+        /*SSLContext ctx = null;
         TrustManagerFactory tmf = createTrustManagerFactory(trustStore, storePass);
         if (null != tmf) {
             try {
                 ctx = SSLContext.getInstance("TLS");
                 ctx.init(null, tmf.getTrustManagers(), null);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new IOException(e);
+            }
+        }
+        return ctx;*/
+        return createTlsContext(trustStore, storePass, null);
+    }
+    
+    /**
+     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias].
+     * 
+     * @param trustStore the truststore (must be a JKS with SunX509)
+     * @param storePass the password of the truststore, may be <b>null</b> for none
+     * @param alias alias of the key to use (may be <b>null</b> for none/first match)
+     * @return the TLS-SSL context, <b>null</b> if {@code trustStore} is <b>null</b> or does not exist
+     * @throws IOException if the SSL context cannot be created
+     * @see {@link #createTrustMangerFactory(File, String)}
+     */
+    public static SSLContext createTlsContext(File trustStore, String storePass, String alias) throws IOException {
+        SSLContext ctx = null;
+        KeyStore ks = openKeyStore(trustStore, storePass);
+        if (null != ks) {
+            try {
+                TrustManagerFactory tmf = createTrustManagerFactory(trustStore, storePass);
+                KeyManager[] kms = null;
+                if (null != alias) {
+                    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                    kmf.init(ks, storePass.toCharArray());
+        
+                    final X509KeyManager origKm = (X509KeyManager) kmf.getKeyManagers()[0];
+        
+                    X509KeyManager km = new X509KeyManager() {
+                        public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+                            return "foo";
+                        }
+        
+                        public X509Certificate[] getCertificateChain(String alias) {
+                            return origKm.getCertificateChain(alias);
+                        }
+        
+                        @Override
+                        public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+                            return origKm.chooseClientAlias(null, issuers, socket);
+                        }
+        
+                        @Override
+                        public String[] getClientAliases(String keyType, Principal[] issuers) {
+                            return origKm.getClientAliases(keyType, issuers);
+                        }
+        
+                        @Override
+                        public PrivateKey getPrivateKey(String alias) {
+                            return origKm.getPrivateKey(alias);
+                        }
+        
+                        @Override
+                        public String[] getServerAliases(String keyType, Principal[] issuers) {
+                            return origKm.getServerAliases(keyType, issuers);
+                        }
+        
+                    };
+                    kms = new KeyManager[] {km};
+                }
+                ctx = SSLContext.getInstance("TLS");
+                ctx.init(kms, tmf.getTrustManagers(), null);
+            } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException 
+                | KeyManagementException e) {
                 throw new IOException(e);
             }
         }
@@ -110,12 +203,12 @@ public class SslUtils {
             result = new Properties();
             result.put("com.ibm.ssl.protocol", "TLS"); // SSL, SSLv3, TLS, TLSv1, SSL_TLS
             // com.ibm.ssl.contextProvider; "IBMJSSE2" or "SunJSSE"
-            result.put("com.ibm.ssl.trustStore", trustStore.getAbsoluteFile());
+            result.put("com.ibm.ssl.keyStore", trustStore.getAbsoluteFile());
             if (null != storePass) {
                 // plaintext or com.ibm.micro.security.Password.obfuscate(char[] password).
-                result.put("com.ibm.ssl.trustStorePassword", storePass); 
+                result.put("com.ibm.ssl.keyStorePassword", storePass); 
             }
-            result.put("com.ibm.ssl.trustStoreTypeType", getKeystoreType(trustStore));
+            result.put("com.ibm.ssl.keyStoreType", getKeystoreType(trustStore));
             // com.ibm.ssl.trustStoreProvider, e.g., "IBMJCE" or "IBMJCEFIPS"
             // com.ibm.ssl.keyStoreProvider, e.g., "IBMJCE" or "IBMJCEFIPS"
             // com.ibm.ssl.keyStore
