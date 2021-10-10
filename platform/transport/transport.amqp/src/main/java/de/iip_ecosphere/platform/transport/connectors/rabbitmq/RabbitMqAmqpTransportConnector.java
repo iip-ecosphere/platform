@@ -105,7 +105,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         }
         try {                
             File keystore = params.getKeystore();
-            SSLContext ctx = SslUtils.createTlsContext(keystore, params.getKeystorePassword());
+            SSLContext ctx = SslUtils.createTlsContext(keystore, params.getKeystorePassword(), params.getKeyAlias());
             if (null != ctx) {
                 factory.useSslProtocol(ctx);
             }
