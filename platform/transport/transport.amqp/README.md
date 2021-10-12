@@ -4,7 +4,7 @@ Extends the transport layer in terms of the AMQP protocol. This extension is opt
 This implementation ships with an [AMQP 1.0](https://www.amqp.org/) client as  transport connectors based on 
 [RabbitMQ](https://www.rabbitmq.com/).  
 
-TLS can be configured via the transport parameters.
+TLS can be configured via the transport parameters. A key alias is currently not supported by this connector, i.e., the underlying implementation takes the first available key.
 
 Akin to the transport component/layer, the regression tests exercise the transport connector with simple JSON and 
 [Google protobuf](https://developers.google.com/protocol-buffers) 
