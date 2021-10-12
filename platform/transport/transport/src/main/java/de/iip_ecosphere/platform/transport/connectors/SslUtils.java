@@ -60,12 +60,12 @@ public class SslUtils {
      * 
      * @param store the store file (JKS or PKCS12 with file extension ".p12")
      * @param storePass the password of the store, may be <b>null</b> for none
-     * @return the keystore instance, <b>null</b> if {@code store} is <b>null</b> or does not exist
+     * @return the keystore instance, <b>null</b> if {@code store} is <b>null</b>
      * @throws IOException if the store cannot be opened
      */
     public static KeyStore openKeyStore(File store, String storePass) throws IOException {
         KeyStore tks = null;
-        if (null != store && store.exists()) {
+        if (null != store) {
             try {
                 String keystoreType = getKeystoreType(store);
                 tks = KeyStore.getInstance(keystoreType);
@@ -84,12 +84,12 @@ public class SslUtils {
      * 
      * @param trustStore the truststore (JKS or PKCS12 with file extension ".p12")
      * @param storePass the password of the truststore, may be <b>null</b> for none
-     * @return the trust manager factory, <b>null</b> if {@code trustStore} is <b>null</b> or does not exist
+     * @return the trust manager factory, <b>null</b> if {@code trustStore} is <b>null</b>
      * @throws IOException if the trust manager factory cannot be created
      */
     public static TrustManagerFactory createTrustManagerFactory(File trustStore, String storePass) throws IOException {
         TrustManagerFactory tmf = null;
-        if (null != trustStore && trustStore.exists()) {
+        if (null != trustStore) {
             try {
                 KeyStore tks = openKeyStore(trustStore, storePass);
                 tmf = TrustManagerFactory.getInstance("SunX509");
@@ -111,17 +111,6 @@ public class SslUtils {
      * @see {@link #createTrustMangerFactory(File, String)}
      */
     public static SSLContext createTlsContext(File trustStore, String storePass) throws IOException {
-        /*SSLContext ctx = null;
-        TrustManagerFactory tmf = createTrustManagerFactory(trustStore, storePass);
-        if (null != tmf) {
-            try {
-                ctx = SSLContext.getInstance("TLS");
-                ctx.init(null, tmf.getTrustManagers(), null);
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                throw new IOException(e);
-            }
-        }
-        return ctx;*/
         return createTlsContext(trustStore, storePass, null);
     }
     

@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.transport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -39,12 +40,22 @@ public class SslUtilsTest {
         String passwd = "a1234567"; // determined on test keystore creation
         try {
             Assert.assertNull(SslUtils.createTrustManagerFactory(null, passwd));
-            Assert.assertNull(SslUtils.createTrustManagerFactory(new File("here.jks"), passwd));
+            try {
+                SslUtils.createTrustManagerFactory(new File("here.jks"), passwd);
+                Assert.fail("No FNF exception");
+            } catch (FileNotFoundException e) {
+                // this is ok
+            }
             
             TrustManagerFactory tmf = SslUtils.createTrustManagerFactory(keystore, passwd);
             Assert.assertNotNull(tmf);
             
-            Assert.assertNull(SslUtils.createTlsContext(new File("here.jks"), passwd));
+            try {
+                SslUtils.createTlsContext(new File("here.jks"), passwd);
+                Assert.fail("No FNF exception");
+            } catch (FileNotFoundException e) {
+                // this is ok
+            }
             Assert.assertNull(SslUtils.createTlsContext(null, passwd));
             SSLContext ctx = SslUtils.createTlsContext(keystore, passwd);
             Assert.assertNotNull(ctx);
