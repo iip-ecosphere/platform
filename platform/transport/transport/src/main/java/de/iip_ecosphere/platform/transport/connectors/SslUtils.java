@@ -113,7 +113,7 @@ public class SslUtils {
     public static SSLContext createTlsContext(File trustStore, String storePass) throws IOException {
         return createTlsContext(trustStore, storePass, null);
     }
-    
+
     /**
      * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias].
      * 
@@ -125,6 +125,22 @@ public class SslUtils {
      * @see {@link #createTrustMangerFactory(File, String)}
      */
     public static SSLContext createTlsContext(File trustStore, String storePass, String alias) throws IOException {
+        return createTlsContext(trustStore, storePass, alias, "TLS");
+    }
+    
+    /**
+     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias].
+     * 
+     * @param trustStore the truststore (must be a JKS with SunX509)
+     * @param storePass the password of the truststore, may be <b>null</b> for none
+     * @param alias alias of the key to use (may be <b>null</b> for none/first match)
+     * @param contextAlg the algorithm to initialize the SSL context with
+     * @return the TLS-SSL context, <b>null</b> if {@code trustStore} is <b>null</b> or does not exist
+     * @throws IOException if the SSL context cannot be created
+     * @see {@link #createTrustMangerFactory(File, String)}
+     */
+    public static SSLContext createTlsContext(File trustStore, String storePass, String alias, 
+        String contextAlg) throws IOException {
         SSLContext ctx = null;
         KeyStore ks = openKeyStore(trustStore, storePass);
         if (null != ks) {
@@ -139,7 +155,7 @@ public class SslUtils {
         
                     X509KeyManager km = new X509KeyManager() {
                         public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
-                            return "foo";
+                            return alias;
                         }
         
                         public X509Certificate[] getCertificateChain(String alias) {
@@ -169,7 +185,7 @@ public class SslUtils {
                     };
                     kms = new KeyManager[] {km};
                 }
-                ctx = SSLContext.getInstance("TLS");
+                ctx = SSLContext.getInstance(contextAlg);
                 ctx.init(kms, tmf.getTrustManagers(), null);
             } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException 
                 | KeyManagementException e) {
