@@ -394,8 +394,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${org.apache.maven.surefire.version}</version>
         <configuration>
-          <includes>
-            <include>**/AllTests.class</include>
+          <reuseForks>false</reuseForks> <!-- run each suite in an own JVM (Spring binders) -->
+          <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
+            <include>**/AllTests*.class</include>
           </includes>
           <forkedProcessTimeoutInSeconds>1800</forkedProcessTimeoutInSeconds>
         </configuration>
