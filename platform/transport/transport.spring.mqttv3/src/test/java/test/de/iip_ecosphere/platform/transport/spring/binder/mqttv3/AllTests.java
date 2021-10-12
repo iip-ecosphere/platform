@@ -15,14 +15,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed.
+ * Defines the non-TLS tests to be executed.
  * 
  * @author Holger Eichelberger, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    //MqttV3MessageBinderTest.class, // needs reset of Spring Cloud Stream for new Binder; TLS extends this test
-    MqttV3MessageBinderTlsTest.class
+    MqttV3MessageBinderTest.class
 })
 public class AllTests {
 }
