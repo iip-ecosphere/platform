@@ -13,8 +13,7 @@ The implementation is initial and could be optimized. The following configuratio
  * `amqp.filteredTopics`: List of topic names not to subscribe to.
  * `amqp.keystore`: Optional file name of TLS keystore (default: null).
  * `amqp.keyPassword`: Optional plaintext keystore password (default: null).
-
-`keyAlias` is currently not supported by this binder, i.e., the underlying implementation takes the first available key.
+ * `amqp.keyAlias`: Optional key alias denoting the key in the keystore to be used (default: null). If no alias is given, the underlying implementation takes the first available key.
 
 **Missing**
 - Validation/fixing topic names w.r.t. AMQP specification

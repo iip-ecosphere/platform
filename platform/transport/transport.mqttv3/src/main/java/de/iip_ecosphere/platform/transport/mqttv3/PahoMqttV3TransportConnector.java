@@ -20,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.SslUtils;
@@ -88,10 +89,15 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             connOpts.setMaxInflight(1000); // preliminary, default 10
-            if (params.getKeystore() != null) {
-                connOpts.setHttpsHostnameVerificationEnabled(false);
-                connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                    params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
+            if (null != params.getKeystore()) {
+                try {                
+                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
+                        params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
+                    connOpts.setHttpsHostnameVerificationEnabled(false);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 
+                        + ". Trying with no TLS.");
+                }
             }
             waitForCompletion(client.connect(connOpts));
         } catch (MqttException e) {
