@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    MqttV3MessageBinderTest.class
+    //MqttV3MessageBinderTest.class, // needs reset of Spring Cloud Stream for new Binder; TLS extends this test
+    MqttV3MessageBinderTlsTest.class
 })
 public class AllTests {
 }

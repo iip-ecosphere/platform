@@ -11,6 +11,7 @@
 
 package de.iip_ecosphere.platform.transport.spring.binder.mqttv3;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
@@ -37,14 +40,15 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
  * 
  * @author Holger Eichelberger, SSE
  */
+@Component
 public class MqttClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttV3MessageBinder.class); // map all to binder
     private static MqttClient lastInstance;
-    private static MqttAsyncClient client;
-    private static MqttConfiguration configuration;
-    private static Callback callback;
-    private static MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
+    private MqttAsyncClient client;
+    private MqttConfiguration configuration;
+    private Callback callback;
+    private MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
     
     /**
      * Creates and registers an instance.
@@ -60,6 +64,15 @@ public class MqttClient {
      */
     public static MqttClient getLastInstance() {
         return lastInstance;
+    }
+    
+    /**
+     * Returns the actual configuration. [for testing]
+     * 
+     * @return the configuration, may be <b>null</b>
+     */
+    public MqttConfiguration getConfiguration() {
+        return configuration;
     }
     
     /**
@@ -136,7 +149,7 @@ public class MqttClient {
      * 
      * @param config the MQTT configuration to take the connection information from
      */
-    synchronized void createClient(MqttConfiguration config) {
+    public synchronized void createClient(MqttConfiguration config) {
         if (null == client) {
             try {
                 configuration = config;
@@ -152,6 +165,15 @@ public class MqttClient {
                 connOpts.setCleanSession(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
+                if (config.getKeystore() != null) {
+                    try {
+                        connOpts.setHttpsHostnameVerificationEnabled(false);
+                        connOpts.setSocketFactory(SslUtils.createTlsContext(config.getKeystore(), 
+                            config.getKeystorePassword(), config.getKeyAlias()).getSocketFactory());
+                    } catch (IOException e) {
+                        LOGGER.error("TLS setup failed " + e.getMessage() + ". Trying plaintext.");
+                    }
+                }
                 waitForCompletion(cl.connect(connOpts));
                 client = cl;
             } catch (MqttException e) {
@@ -243,7 +265,7 @@ public class MqttClient {
      * @param token the token
      * @throws MqttException in case that processing of the token fails
      */
-    static void waitForCompletion(IMqttToken token) throws MqttException {
+    void waitForCompletion(IMqttToken token) throws MqttException {
         token.waitForCompletion(configuration.getActionTimeout());
     }
     
