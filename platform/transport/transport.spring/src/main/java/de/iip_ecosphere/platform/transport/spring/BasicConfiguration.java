@@ -128,10 +128,21 @@ public class BasicConfiguration {
 
     /**
      * Turns the actual configuration into a {@link TransportParameter} instance.
+     * When overriding this method, please consider {@link #createTransportParameterBuilder()} as
+     * default implementation for transferring the settings in this class.
      * 
      * @return the transport parameter instance
      */
     public TransportParameter toTransportParameter() {
+        return createTransportParameterBuilder().build();
+    }
+    
+    /**
+     * Turns the information in this class into a default transport parameter builder.
+     * 
+     * @return <code>builder</code>
+     */
+    protected TransportParameterBuilder createTransportParameterBuilder() {
         TransportParameterBuilder builder = TransportParameterBuilder.newBuilder(getHost(), getPort());
         if (null != getKeystore()) {
             builder.setKeystore(getKeystore(), getKeystorePassword());
@@ -139,7 +150,7 @@ public class BasicConfiguration {
                 builder.setKeyAlias(getKeyAlias());
             }
         }
-        return builder.build();
+        return builder;
     }
 
 }
