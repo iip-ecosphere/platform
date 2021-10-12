@@ -74,6 +74,7 @@ public class PahoMqttV3TransportConnectorTest {
             public void configure(TransportParameterBuilder builder) {
                 builder.setKeystore(new File(secCfg, "keystore.jks"), TestMoquetteServer.KEYSTORE_PASSWORD);
                 builder.setKeyAlias(TestMoquetteServer.KEY_ALIAS);
+                builder.setActionTimeout(3000); // TLS may take a bit longer, on Jenkins
             }
         });
     }
