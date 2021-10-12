@@ -104,6 +104,7 @@ public class AmqpMessageBinderTest {
      * @return the new broker address
      */
     protected static ServerAddress resetAddr() {
+        received = null;
         addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
         return addr;
     }
@@ -120,6 +121,11 @@ public class AmqpMessageBinderTest {
             TestPropertyValues
                 .of("amqp.port=" + addr.getPort())
                 .applyTo(applicationContext);
+            if (null == AmqpClient.getLastInstance() && null != getKeystore()) {
+                TestPropertyValues
+                    .of("amqp.keystore=" + getKeystore(), "amqp.keyPassword=" + getKeystorePassword())
+                    .applyTo(applicationContext);
+            }
         }
         
     }
