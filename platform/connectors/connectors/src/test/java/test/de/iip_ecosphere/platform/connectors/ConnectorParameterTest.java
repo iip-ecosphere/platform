@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -67,6 +68,52 @@ public class ConnectorParameterTest {
         Assert.assertNull(params.getClientCertificate());
         Assert.assertNull(params.getClientKeyPair());
         Assert.assertNull(params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT));
+    }
+    
+    /**
+     * Tests the TLS setup.
+     */
+    @Test
+    public void testTransportTlsParameter() {
+        ServerAddress addr = new ServerAddress(Schema.IGNORE, "local", 1234);
+        File keystore = new File("./keystore.jks");
+        String passwd = "abc";
+        String alias = "alias";
+        ConnectorParameter params = ConnectorParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(null, null)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(null, params.getKeystore());
+        Assert.assertEquals(null, params.getKeystorePassword());
+        Assert.assertEquals(null, params.getKeyAlias());
+        Assert.assertFalse(params.getHostnameVerification());
+        
+        params = ConnectorParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(keystore, null)
+            .setHostnameVerification(false)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(keystore, params.getKeystore());
+        Assert.assertEquals(null, params.getKeystorePassword());
+        Assert.assertEquals(null, params.getKeyAlias());
+        Assert.assertFalse(params.getHostnameVerification());
+
+        params = ConnectorParameterBuilder
+            .newBuilder(addr)
+            .setKeystore(keystore, passwd)
+            .setKeyAlias(alias)
+            .setHostnameVerification(true)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(keystore, params.getKeystore());
+        Assert.assertEquals(passwd, params.getKeystorePassword());
+        Assert.assertEquals(alias, params.getKeyAlias());
+        Assert.assertTrue(params.getHostnameVerification());
     }
     
     /**

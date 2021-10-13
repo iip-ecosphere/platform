@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -46,6 +47,10 @@ public class ConnectorParameter {
     private String applicationDescription = "";
     private int notificationInterval = DEFAULT_NOTIFICATION_INTERVAL;
     private int keepAlive = DEFAULT_KEEP_ALIVE;
+    private File keystore;
+    private String keyPassword;
+    private String keyAlias;
+    private boolean hostnameVerification = false;
     
     /**
      * Builds a connector parameter object.
@@ -202,7 +207,44 @@ public class ConnectorParameter {
             instance.identityToken = identityToken;
             return this;
         }
+
+        /**
+         * Sets up optional TLS encryption details.
+         * 
+         * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
+         *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
+         *   implementation, e.g., PKCS12 may not work with all forms
+         * @param password the TLS keystore, may be <b>null</b> for none
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setKeystore(File keystore, String password) {
+            instance.keystore = keystore;
+            instance.keyPassword = password;
+            return this;
+        }
+
+        /**
+         * Sets up optional TLS key alias.
+         * 
+         * @param alias key alias, may be <b>null</b> for none/first match
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setKeyAlias(String alias) {
+            instance.keyAlias = alias;
+            return this;
+        }
         
+        /**
+         * Returns whether TLS hostname verification shall be performed.
+         * 
+         * @param hostnameVerification {@code false} for no verification, {@code true} else
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setHostnameVerification(boolean hostnameVerification) {
+            instance.hostnameVerification = hostnameVerification;
+            return this;
+        }
+
         /**
          * Creates the instance.
          * 
@@ -373,6 +415,43 @@ public class ConnectorParameter {
      */
     public boolean getAutoApplicationId() {
         return autoApplicationId;
+    }
+
+    /**
+     * Returns the optional TLS keystore.
+     * 
+     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
+     *   be <b>null</b> for none
+     */
+    public File getKeystore() {
+        return keystore;
+    }
+
+    /**
+     * Returns the password for the optional TLS keystore.
+     * 
+     * @return the TLS keystore, may be <b>null</b> for none
+     */
+    public String getKeystorePassword() {
+        return keyPassword;
+    }
+    
+    /**
+     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * 
+     * @return the alias or <b>null</b> for none/first match
+     */
+    public String getKeyAlias() {
+        return keyAlias;
+    }
+    
+    /**
+     * Returns whether TLS hostname verification shall be performed.
+     * 
+     * @return {@code false} for no verification (default), {@code true} else
+     */
+    public boolean getHostnameVerification() {
+        return hostnameVerification;
     }
 
 }
