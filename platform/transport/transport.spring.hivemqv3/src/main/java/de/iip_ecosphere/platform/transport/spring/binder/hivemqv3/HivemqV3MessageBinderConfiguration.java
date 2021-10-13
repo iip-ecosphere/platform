@@ -44,6 +44,17 @@ public class HivemqV3MessageBinderConfiguration {
     }
 
     /**
+     * Returns the client instance.
+     * 
+     * @return the client instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public HivemqV3Client hivemqv3Client() {
+        return client;
+    }
+
+    /**
      * Returns the message binder.
      * 
      * @param messageBinderProvisioner the provisioner with access to the destinations

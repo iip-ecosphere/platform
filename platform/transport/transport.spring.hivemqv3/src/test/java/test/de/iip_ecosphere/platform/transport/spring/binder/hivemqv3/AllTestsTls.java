@@ -15,13 +15,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed.
+ * Defines the TLS tests to be executed.
  * 
  * @author Holger Eichelberger, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    HivemqV3MessageBinderTest.class,
+    HivemqV3MessageBinderTlsTest.class
 })
-public class AllTests {
+public class AllTestsTls {
 }

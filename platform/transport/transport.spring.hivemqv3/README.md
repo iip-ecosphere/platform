@@ -11,10 +11,13 @@ The implementation is initial and could be optimized. The following configuratio
  * `mqtt.keepAlive`: Time in milliseconds between two MQTT heartbeats (default: `60000`)
  * `mqtt.filteredTopics`: List of topic names not to subscribe to (as list, via suffix [0], [1], ...).
  * `mqtt.qos`: Quality of service level, one from `AT_MOST_ONCE`, `AT_LEAST_ONCE` (default), `EXACTLY_ONCE`
+ * `mqtt.keystore`: Optional file name of TLS keystore (default: null).
+ * `mqtt.keyPassword`: Optional plaintext keystore password (default: null).
+ * `mqtt.keyAlias`: Alias of the key top use (default: null). If not set, the best matching key is taken (currently TLS hostname verification is disabled by default).
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification
-- Authentication/Security
 
-**Issues**
+**Issues/Worth considering**
 - This project requires JDK 11 for testing.
+- As testing relies on HiveMQ, minimum SSL key lengths apply (`see test.mqtt.hivemq`).

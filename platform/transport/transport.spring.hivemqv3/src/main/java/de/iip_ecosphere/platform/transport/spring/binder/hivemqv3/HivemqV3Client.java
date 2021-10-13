@@ -11,15 +11,23 @@
 
 package de.iip_ecosphere.platform.transport.spring.binder.hivemqv3;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.hivemq.client.mqtt.MqttClient;
+import com.hivemq.client.mqtt.MqttClientSslConfig;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3ClientBuilder;
 
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
@@ -30,13 +38,14 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
  * 
  * @author Holger Eichelberger, SSE
  */
+@Component
 public class HivemqV3Client {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HivemqV3MessageBinder.class);
     private static HivemqV3Client lastInstance;
-    private static Mqtt3AsyncClient client;
-    private static HivemqV3Configuration configuration;
-    private static MqttQos qos = MqttQos.AT_LEAST_ONCE;
+    private Mqtt3AsyncClient client;
+    private HivemqV3Configuration configuration;
+    private MqttQos qos = MqttQos.AT_LEAST_ONCE;
     
     /**
      * Creates and registers an instance.
@@ -52,6 +61,15 @@ public class HivemqV3Client {
      */
     public static HivemqV3Client getLastInstance() {
         return lastInstance;
+    }
+    
+    /**
+     * Returns the actual configuration. [for testing]
+     * 
+     * @return the configuration, may be <b>null</b>
+     */
+    public HivemqV3Configuration getConfiguration() {
+        return configuration;
     }
     
     /**
@@ -76,7 +94,7 @@ public class HivemqV3Client {
      * 
      * @param config the MQTT configuration to take the connection information from
      */
-    synchronized void createClient(HivemqV3Configuration config) {
+    public synchronized void createClient(HivemqV3Configuration config) {
         if (null == client) {
             configuration = config;
             qos = config.getQos();
@@ -85,14 +103,31 @@ public class HivemqV3Client {
             LOGGER.info("Connecting to " + config.getPort() + "@" + config.getHost() 
                 + " with client id " + clientId);
             
-            Mqtt3AsyncClient cl = MqttClient.builder()
+            Mqtt3ClientBuilder builder = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(clientId)
                 .serverHost(config.getHost())
                 .serverPort(config.getPort())
-                .automaticReconnect().applyAutomaticReconnect()
-                //.useSslWithDefaultConfig()
-                .buildAsync();
+                .automaticReconnect().applyAutomaticReconnect();
+            if (null != config.getKeystore()) {
+                try {
+                    MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
+                        .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
+                             config.getKeyPassword()))
+                        .hostnameVerifier(new HostnameVerifier() {
+                            
+                            @Override
+                            public boolean verify(String hostname, SSLSession session) {
+                                return true;
+                            }
+                        }) // currently by default
+                        .build();
+                    builder.sslConfig(sslConfig);
+                } catch (IOException e) {
+                    LOGGER.info("SSL config error: " + e.getMessage() + " Trying without TLS.");
+                }
+            }
+            Mqtt3AsyncClient cl = builder.buildAsync();
 
             cl.connectWith()
                 //.simpleAuth()
