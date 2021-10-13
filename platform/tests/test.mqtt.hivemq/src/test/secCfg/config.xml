@@ -13,11 +13,7 @@
                     <password>a1234567</password>
                     <private-key-password>a1234567</private-key-password>
                 </keystore>
-                <client-authentication-mode>REQUIRED</client-authentication-mode>
-                <truststore>
-                    <path>${HIVEMQ_CFG}/trust-store.jks</path>
-                    <password>changeme</password>
-               </truststore>
+                <client-authentication-mode>NONE</client-authentication-mode>
             </tls>            
         </tls-tcp-listener>
     </listeners>
