@@ -100,5 +100,20 @@ public interface Connector <O, I, CO, CI> {
      * @return the output type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
      */
     public Class<? extends CO> getConnectorOutputType();
-    
+  
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String supportedEncryption();
+
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance. The result may change when connecting 
+     * the connector.
+     * 
+     * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String enabledEncryption();
+
 }

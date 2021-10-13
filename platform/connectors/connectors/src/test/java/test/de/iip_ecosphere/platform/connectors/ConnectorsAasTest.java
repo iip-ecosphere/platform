@@ -126,6 +126,16 @@ public class ConnectorsAasTest {
         @Override
         protected void error(String message, Throwable th) {
         }
+
+        @Override
+        public String supportedEncryption() {
+            return null;
+        }
+
+        @Override
+        public String enabledEncryption() {
+            return null;
+        }
         
     }
 
@@ -194,6 +204,16 @@ public class ConnectorsAasTest {
 
         @Override
         protected void error(String message, Throwable th) {
+        }
+
+        @Override
+        public String supportedEncryption() {
+            return null;
+        }
+
+        @Override
+        public String enabledEncryption() {
+            return null;
         }
         
     }

@@ -352,6 +352,8 @@ public class ConnectorTest {
         Product outData = new Product("abc", 2.3);
         Command inData = new Command("def");
         MyChannelConnector<Product, Command> instance = new MyChannelConnector<>(adapter);
+        Assert.assertNull(instance.enabledEncryption());
+        Assert.assertNull(instance.supportedEncryption());
         assertConnectorProperties(instance);
         assertInstance(instance, false);
         instance.connect(params);

@@ -138,10 +138,15 @@ public abstract class AbstractSerializingConnectorTest {
      * 
      * @return the test configurer, may be <b>null</b> for none, i.e., no TLS tests 
      */
-    protected /*abstract*/ ConnectorParameterConfigurer getConfigurer() {
-        return null;
-    }
+    protected abstract ConnectorParameterConfigurer getConfigurer();
 
+    /**
+     * Returns whether the connector implementation supports encryption.
+     * 
+     * @return {@code true} for supported, {@code false} for not supported
+     */
+    protected abstract boolean implementsEncryption();
+    
     /**
      * Allows to configure the connector parameters. (orthogonal, in particular for TLS)
      * 
@@ -224,7 +229,9 @@ public abstract class AbstractSerializingConnectorTest {
                 CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)));
         ConnectorTest.assertInstance(mConnector, false);
         ConnectorTest.assertConnectorProperties(mConnector);
+        testEnc(mConnector, configurer, false);
         mConnector.connect(cParams);
+        testEnc(mConnector, configurer, true);
         ConnectorTest.assertInstance(mConnector, true);
         mConnector.setReceptionCallback(new ReceptionCallback<Product>() {
             
@@ -281,6 +288,29 @@ public abstract class AbstractSerializingConnectorTest {
         Assert.assertEquals(2, received.size());
         Assert.assertEquals(prod1.getDescription(), received.get(0).getCommand());
         Assert.assertEquals(prod2.getDescription(), received.get(1).getCommand());
+    }
+
+    /**
+     * Tests encryption statements of {@code connector}, i.e., {@link Connector#supportedEncryption()} 
+     * and {@link Connector#enabledEncryption()}.
+     * 
+     * @param connector the connector instance to test
+     * @param configurer the configurer indicating whether encryption shall be activated if connected
+     * @param connected whether the connector is supposed to be connected
+     */
+    private void testEnc(Connector<?, ?, ?, ?> connector, ConnectorParameterConfigurer configurer, boolean connected) {
+        if (implementsEncryption()) {
+            Assert.assertTrue(connector.supportedEncryption().length() > 0);
+        } else {
+            Assert.assertTrue(connector.supportedEncryption() ==  null 
+                || connector.supportedEncryption().length() == 0);
+        }
+        if (null == configurer || !connected) {
+            Assert.assertTrue(connector.enabledEncryption() ==  null 
+                || connector.enabledEncryption().length() == 0);
+        } else {
+            Assert.assertTrue(connector.enabledEncryption().length() > 0);
+        }
     }
     
 }
