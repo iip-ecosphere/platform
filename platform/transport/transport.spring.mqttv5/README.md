@@ -13,7 +13,7 @@ The following configuration options are supported:
  * `mqtt.actionTimeout`: Time in milliseconds to wait for an operation to complete (default: `1000`)
  * `mqtt.filteredTopics`: List of topic names not to subscribe to (as list, via suffix [0], [1], ...).
  * `mqtt.qos`: Quality of service level, one from `AT_MOST_ONCE`, `AT_LEAST_ONCE` (default), `EXACTLY_ONCE`
- * `mqtt.keystore`: Optional file name of TLS keystore (default: null).
+ * `mqtt.keystore`: Optional file name of TLS keystore (default: null). If used, set `schema` to `ssl`.
  * `mqtt.keyPassword`: Optional plaintext keystore password (default: null).
  * `mqtt.keyAlias`: Alias of the key top use (default: null). If not set, the best matching key is taken (currently TLS hostname verification is disabled by default).
 
