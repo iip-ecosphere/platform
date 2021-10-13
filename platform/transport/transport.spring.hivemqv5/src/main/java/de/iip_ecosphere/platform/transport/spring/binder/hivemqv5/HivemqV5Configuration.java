@@ -19,7 +19,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
-import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.spring.BasicConfiguration;
 
 /**
  * Represents the configuration options of a HiveMq client.
@@ -27,10 +27,8 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
  * @author Holger Eichelberger, SSE
  */
 @ConfigurationProperties(prefix = "mqtt")
-public class HivemqV5Configuration {
+public class HivemqV5Configuration extends BasicConfiguration {
     
-    private String host;
-    private int port; // in test, consider overriding initializer for ephemeral port
     private String clientId;
     private boolean autoClientId = true;
     private int keepAlive = 60000;
@@ -57,24 +55,6 @@ public class HivemqV5Configuration {
         return filteredTopics;
     }
 
-    /**
-     * Returns the broker host name.
-     * 
-     * @return the broker host name
-     */
-    public String getHost() {
-        return host;
-    }
-        
-    /**
-     * Returns the broker port number.
-     * 
-     * @return the broker port number to connect to
-     */
-    public int getPort() {
-        return port;
-    }
-    
     /**
      * Returns the client identification.
      * 
@@ -112,24 +92,6 @@ public class HivemqV5Configuration {
     }
 
     // setters required for @ConfigurationProperties
-
-    /**
-     * Changes the broker host name. [required by Spring]
-     * 
-     * @param host the broker host name
-     */
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    /**
-     * Defines the broker port number. [required by Spring]
-     * 
-     * @param port the broker port number to connect to
-     */
-    public void setPort(int port) {
-        this.port = port;
-    }
 
     /**
      * Changes the client identification. [required by Spring]
@@ -191,8 +153,7 @@ public class HivemqV5Configuration {
      * @return the transport parameter instance
      */
     public TransportParameter toTransportParameter() {
-        return TransportParameterBuilder
-            .newBuilder(getHost(), getPort())
+        return createTransportParameterBuilder()
             .setApplicationId(getClientId())
             .setAutoApplicationId(getAutoClientId())
             .setKeepAlive(getKeepAlive())

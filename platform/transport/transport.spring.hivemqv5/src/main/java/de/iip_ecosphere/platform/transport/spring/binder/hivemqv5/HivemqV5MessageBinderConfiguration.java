@@ -42,6 +42,17 @@ public class HivemqV5MessageBinderConfiguration {
     public HivemqV5MessageBinderProvisioner hivemqv5BinderProvisioner() {
         return new HivemqV5MessageBinderProvisioner(client);
     }
+    
+    /**
+     * Returns the client instance.
+     * 
+     * @return the client instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public HivemqV5Client hivemqv5Client() {
+        return client;
+    }
 
     /**
      * Returns the message binder.
