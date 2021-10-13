@@ -174,7 +174,7 @@ public class SslUtils {
                 KeyManager[] kms = null;
                 if (null != alias) {
                     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-                    kmf.init(ks, storePass.toCharArray());
+                    kmf.init(ks, null == storePass ? null : storePass.toCharArray());
         
                     final X509KeyManager origKm = (X509KeyManager) kmf.getKeyManagers()[0];
         
