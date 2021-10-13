@@ -25,7 +25,6 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -41,6 +40,31 @@ import javax.net.ssl.X509KeyManager;
 public class SslUtils {
 
     /**
+     * Denotes the Java keystore type (outdated, but still used/required in some implementations).
+     */
+    public static final String KEYSTORE_JKS = "JKS";
+
+    /**
+     * Denotes the PCKS12 keystore type.
+     */
+    public static final String KEYSTORE_PCKS12 = "PCKS12";
+    
+    /**
+     * Denotes the Sun X509 trust manager implementation.
+     */
+    public static final String TRUST_MANAGER_SUN_X509 = "SunX509";
+    
+    /**
+     * Generic TLS v1.2 algorithm for {@link #createTlsContext(File, String, String, String)}.
+     */
+    public static final String CONTEXT_ALG_TLS12 = "TLSv1.2";
+
+    /**
+     * Generic TLS algorithm for {@link #createTlsContext(File, String, String, String)}.
+     */
+    public static final String CONTEXT_ALG_TLS = "TLS";
+
+    /**
      * Returns the keystore type based on the file name extension.
      * 
      * @param trustStore the truststore (JKS or PKCS12 with file extension ".p12")
@@ -48,9 +72,9 @@ public class SslUtils {
      */
     public static final String getKeystoreType(File trustStore) {
         String tName = trustStore.getName();
-        String keystoreType = "JKS";
+        String keystoreType = KEYSTORE_JKS;
         if (tName.endsWith(".p12")) {
-            keystoreType = "PKCS12";
+            keystoreType = KEYSTORE_PCKS12;
         }
         return keystoreType;
     }
@@ -92,7 +116,7 @@ public class SslUtils {
         if (null != trustStore) {
             try {
                 KeyStore tks = openKeyStore(trustStore, storePass);
-                tmf = TrustManagerFactory.getInstance("SunX509");
+                tmf = TrustManagerFactory.getInstance(TRUST_MANAGER_SUN_X509);
                 tmf.init(tks);
             } catch (KeyStoreException | NoSuchAlgorithmException e) {
                 throw new IOException(e);
@@ -115,7 +139,8 @@ public class SslUtils {
     }
 
     /**
-     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias].
+     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias} using 
+     * {@link #CONTEXT_ALG_TLS}.
      * 
      * @param trustStore the truststore (must be a JKS with SunX509)
      * @param storePass the password of the truststore, may be <b>null</b> for none
@@ -125,11 +150,11 @@ public class SslUtils {
      * @see {@link #createTrustMangerFactory(File, String)}
      */
     public static SSLContext createTlsContext(File trustStore, String storePass, String alias) throws IOException {
-        return createTlsContext(trustStore, storePass, alias, "TLS");
+        return createTlsContext(trustStore, storePass, alias, CONTEXT_ALG_TLS);
     }
     
     /**
-     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias].
+     * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias}.
      * 
      * @param trustStore the truststore (must be a JKS with SunX509)
      * @param storePass the password of the truststore, may be <b>null</b> for none
@@ -193,37 +218,6 @@ public class SslUtils {
             }
         }
         return ctx;
-    }
-    
-    /**
-     * Creates a properties set for an IBM-based TLS implementation.
-     * 
-     * @param trustStore the truststore (must be a JKS with SunX509)
-     * @param storePass the password of the truststore, may be <b>null</b> for none
-     * @return the properties set or <b>null</b> if {@code trustStore} is <b>null</b> or does not exist
-     */
-    public static Properties createIbmTlsProperties(File trustStore, String storePass) {
-        Properties result = null;
-        if (null != trustStore && trustStore.exists()) {
-            result = new Properties();
-            result.put("com.ibm.ssl.protocol", "TLS"); // SSL, SSLv3, TLS, TLSv1, SSL_TLS
-            // com.ibm.ssl.contextProvider; "IBMJSSE2" or "SunJSSE"
-            result.put("com.ibm.ssl.keyStore", trustStore.getAbsoluteFile());
-            if (null != storePass) {
-                // plaintext or com.ibm.micro.security.Password.obfuscate(char[] password).
-                result.put("com.ibm.ssl.keyStorePassword", storePass); 
-            }
-            result.put("com.ibm.ssl.keyStoreType", getKeystoreType(trustStore));
-            // com.ibm.ssl.trustStoreProvider, e.g., "IBMJCE" or "IBMJCEFIPS"
-            // com.ibm.ssl.keyStoreProvider, e.g., "IBMJCE" or "IBMJCEFIPS"
-            // com.ibm.ssl.keyStore
-            // com.ibm.ssl.keyStorePassword
-            // com.ibm.ssl.keyStoreType
-            // com.ibm.ssl.enabledCipherSuites, e.g., SSL_RSA_WITH_AES_128_CBC_SHA;SSL_RSA_WITH_3DES_EDE_CBC_SHA
-            // com.ibm.ssl.keyManager. e.g., Example values: "IbmX509" or "IBMJ9X509"
-            // com.ibm.ssl.trustManager, "PKIX" or "IBMJ9X509"
-        }
-        return result;
     }
     
 }

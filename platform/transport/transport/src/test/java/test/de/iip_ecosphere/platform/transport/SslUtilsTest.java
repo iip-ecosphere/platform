@@ -15,7 +15,6 @@ package test.de.iip_ecosphere.platform.transport;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -67,26 +66,4 @@ public class SslUtilsTest {
         }
     }
     
-    /**
-     * Tests the creation of keystore properties.
-     */
-    public void testKeystoreProperties() {
-        Assert.assertNull(SslUtils.createIbmTlsProperties(null, null));
-        Assert.assertNull(SslUtils.createIbmTlsProperties(new File("here.jks"), null));
-        
-        File keystore = new File("./src/test/resources/keystore.jks");
-        String passwd = "a1234567"; // determined on test keystore creation
-        Properties prop = SslUtils.createIbmTlsProperties(keystore, passwd);
-        Assert.assertTrue(prop.containsKey("com.ibm.ssl.protocol"));
-        Assert.assertTrue(prop.containsKey("com.ibm.ssl.trustStore"));
-        Assert.assertEquals(prop.get("com.ibm.ssl.trustStore"), keystore.getAbsoluteFile());
-        Assert.assertTrue(prop.containsKey("com.ibm.ssl.trustStorePassword"));
-        Assert.assertEquals(prop.get("com.ibm.ssl.trustStorePassword"), passwd);
-        Assert.assertTrue(prop.containsKey("com.ibm.ssl.trustStoreTypeType"));
-        Assert.assertEquals(prop.get("com.ibm.ssl.trustStoreTypeType"), SslUtils.getKeystoreType(keystore));
-        
-        prop = SslUtils.createIbmTlsProperties(keystore, null);
-        Assert.assertFalse(prop.containsKey("com.ibm.ssl.trustStorePassword"));
-    }
-
 }

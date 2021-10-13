@@ -105,7 +105,7 @@ public class AbstractTransportConnectorTest {
         TransportParameter param1 = tpb1.build();
         TransportConnector cl1 = TransportFactory.createConnector();
         Assert.assertTrue(cl1.getName().length() > 0);
-        System.out.println("Connecting connector 1");
+        System.out.println("Connecting connector 1 to " + addr.toUri());
         cl1.connect(param1);
         final String stream1 = cl1.composeStreamName("", "stream1");
         final String stream2 = cl1.composeStreamName("", "stream2");
@@ -119,7 +119,7 @@ public class AbstractTransportConnectorTest {
         TransportParameter param2 = tpb2.build();
         TransportConnector cl2 = TransportFactory.createConnector();
         Assert.assertTrue(cl2.getName().length() > 0);
-        System.out.println("Connecting connector 2");
+        System.out.println("Connecting connector 2 to " + addr.toUri());
         cl2.connect(param2);
         final Callback cb2 = new Callback();
         cl2.setReceptionCallback(stream1, cb2);
