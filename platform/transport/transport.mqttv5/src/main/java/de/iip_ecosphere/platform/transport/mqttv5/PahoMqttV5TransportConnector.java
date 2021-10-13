@@ -105,7 +105,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
             if (null != params.getKeystore()) {
                 connOpts.setHttpsHostnameVerificationEnabled(false);
                 connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                    params.getKeystorePassword(), params.getKeyAlias(), SslUtils.CONTEXT_ALG_TLS12).getSocketFactory());
+                    params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
             }
             waitForCompletion(client.connect(connOpts));
         } catch (MqttException e) {
