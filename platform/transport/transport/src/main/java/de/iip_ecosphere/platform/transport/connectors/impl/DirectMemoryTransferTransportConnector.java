@@ -119,4 +119,14 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
         subscriptions.clear();
     }
 
+    @Override
+    public String supportedEncryption() {
+        return null;
+    }
+
+    @Override
+    public String enabledEncryption() {
+        return null;
+    }
+
 }

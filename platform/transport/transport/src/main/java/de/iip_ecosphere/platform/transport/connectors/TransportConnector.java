@@ -91,4 +91,19 @@ public interface TransportConnector {
      */
     public String getName();
     
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String supportedEncryption();
+
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance. The result may change when connecting 
+     * the connector.
+     * 
+     * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String enabledEncryption();
+    
 }

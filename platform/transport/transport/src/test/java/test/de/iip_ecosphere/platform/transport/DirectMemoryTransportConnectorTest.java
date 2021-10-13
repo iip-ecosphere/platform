@@ -70,6 +70,16 @@ public class DirectMemoryTransportConnectorTest {
         public String getName() {
             return "Fake";
         }
+
+        @Override
+        public String supportedEncryption() {
+            return null;
+        }
+
+        @Override
+        public String enabledEncryption() {
+            return null;
+        }
         
     }
     
@@ -144,6 +154,8 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertTrue(TransportFactory.createDirectMemoryConnector() == MY_FAKE_CONNECTOR);
         Assert.assertTrue(TransportFactory.createIpcConnector() == MY_FAKE_CONNECTOR);
         Assert.assertEquals(DirectMemoryTransferTransportConnector.NAME, TransportFactory.getConnectorName());
+        Assert.assertNull(MY_FAKE_CONNECTOR.enabledEncryption());
+        Assert.assertNull(MY_FAKE_CONNECTOR.supportedEncryption());
 
         ServerAddress addr = new ServerAddress(Schema.IGNORE, "", 0);
         AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
