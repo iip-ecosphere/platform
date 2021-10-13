@@ -36,6 +36,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     
     private Connection connection;
     private Channel channel;
+    private boolean tlsEnabled = false;
 
     @Override
     public void syncSend(String stream, Object data) throws IOException {
@@ -104,6 +105,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
             try {                
                 factory.useSslProtocol(SslUtils.createTlsContext(params.getKeystore(), params.getKeystorePassword(), 
                     params.getKeyAlias()));
+                tlsEnabled = true;
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error(
                     "AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
@@ -141,6 +143,24 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     @Override
     public String getName() {
         return NAME;
+    }
+    
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms, may be <b>null</b> or empty
+     */
+    public String supportedEncryption() {
+        return SslUtils.CONTEXT_ALG_TLS;
+    }
+
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms, may be <b>null</b> or empty
+     */
+    public String enabledEncryption() {
+        return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
     }
 
 }

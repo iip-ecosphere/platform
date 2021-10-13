@@ -40,6 +40,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
     public static final String NAME = "MQTT v3"; 
     
     private MqttAsyncClient client;
+    private boolean tlsEnabled = false;
 
     /**
      * Creates a connector instance.
@@ -93,7 +94,8 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
                 try {                
                     connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
                         params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
-                    connOpts.setHttpsHostnameVerificationEnabled(false);
+                    connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
+                    tlsEnabled = true;
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 
                         + ". Trying with no TLS.");
@@ -172,4 +174,22 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
         return NAME;
     }
 
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms, may be <b>null</b> or empty
+     */
+    public String supportedEncryption() {
+        return SslUtils.CONTEXT_ALG_TLS;
+    }
+
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms, may be <b>null</b> or empty
+     */
+    public String enabledEncryption() {
+        return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
+    }
+    
 }
