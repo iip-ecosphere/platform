@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
+import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
 
 /**
@@ -66,11 +67,6 @@ public class LifecycleHandlerTest {
             return INIT_PRIORITY;
         }
 
-        @Override
-        public String getPidFileName() {
-            return null;
-        }
-        
     }
 
     /**
@@ -78,7 +74,7 @@ public class LifecycleHandlerTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class LcDesc2 implements TerminatingLifecycleDescriptor {
+    public static class LcDesc2 implements TerminatingLifecycleDescriptor, PidLifecycleDescriptor {
 
         private int waitingCount = 0;
         

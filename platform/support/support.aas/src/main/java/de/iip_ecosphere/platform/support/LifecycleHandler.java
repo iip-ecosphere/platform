@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Aggregated methods for all known lifecycle descriptors. {@link LifecycleDescriptor} shall be declared via 
- * Java Service Loading. See also {@link TerminatingLifecycleDescriptor}. Descriptors are loaded once so that instances
- * can be considered to be singletons. Defines three (tested) default main programs that help avoiding repeated 
- * declaration of nearly empty starter classes.
+ * Java Service Loading. See also {@link TerminatingLifecycleDescriptor} and {@link PidLifecycleDescriptor}. 
+ * Descriptors are loaded once so that instances can be considered to be singletons. Defines three (tested) 
+ * default main programs that help avoiding repeated declaration of nearly empty starter classes.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -107,14 +107,14 @@ public class LifecycleHandler {
             LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
                 + " (" + l.priority() + ")");
             l.startup(args);
-            if (null == pidFile.get()) {
-                pidFile.set(l.getPidFileName());
+            if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
+                pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
             }
         }, false);
         String pidFileName = pidFile.get();
         if (null != pidFileName) {
             try {
-                PidFile.createInTemp(pidFileName, true);
+                PidFile.createInDefaultDir(pidFileName, true);
             } catch (IOException e) {
                 LoggerFactory.getLogger(LifecycleHandler.class).warn("Cannot create PID file in temp: " 
                     + pidFileName + " " + e.getMessage());

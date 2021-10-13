@@ -58,12 +58,4 @@ public interface LifecycleDescriptor {
      */
     public int priority();
     
-    /**
-     * Returns the name of the PID file to create. Shall only be provided by the "main" lifecycle descriptor. 
-     * "First one" is taken for granted.
-     * 
-     * @return the name of the PID file to identify the process/application, may be <b>null</b> for none
-     */
-    public String getPidFileName();
-    
 }

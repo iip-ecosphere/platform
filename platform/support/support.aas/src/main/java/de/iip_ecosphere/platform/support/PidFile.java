@@ -22,6 +22,12 @@ import org.slf4j.LoggerFactory;
  */
 public final class PidFile {
 
+    /**
+     * Denotes the directory where PID files shall be created within. If not specified, 
+     * {@link FileUtils#getTempDirectoryPath() the temporary directory} is used.
+     */
+    public static final String PID_DIR_PROPERTY_NAME = "iip.pid.dir";
+    
     private final long pid;
     private final Path path;
     private final boolean deleteOnExit;
@@ -67,8 +73,8 @@ public final class PidFile {
      * @throws IllegalArgumentException if the parent of {@code path} is not a directory or the denoted file is not 
      *     a regular file
      */
-    public static PidFile createInTemp(String name, boolean deleteOnExit) throws IOException {
-        return createInTemp(name, deleteOnExit, true);
+    public static PidFile createInDefaultDir(String name, boolean deleteOnExit) throws IOException {
+        return createInDefaultDir(name, deleteOnExit, true);
     }
 
     /**
@@ -84,8 +90,9 @@ public final class PidFile {
      * @throws IllegalArgumentException if the parent of {@code path} is not a directory or the denoted file is not 
      *     a regular file
      */
-    public static PidFile createInTemp(String name, boolean deleteOnExit, boolean deleteIfExists) throws IOException {
-        File f = new File(FileUtils.getTempDirectory(), name);
+    public static PidFile createInDefaultDir(String name, boolean deleteOnExit, boolean deleteIfExists) 
+        throws IOException {
+        File f = new File(System.getProperty(PID_DIR_PROPERTY_NAME, FileUtils.getTempDirectoryPath()), name);
         if (deleteIfExists) {
             FileUtils.deleteQuietly(f);
         }

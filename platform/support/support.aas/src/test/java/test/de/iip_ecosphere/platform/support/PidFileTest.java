@@ -37,14 +37,14 @@ public class PidFileTest {
         File file = new File(FileUtils.getTempDirectory(), filename);
         FileUtils.deleteQuietly(file); // if it's still there, get rid of it
         
-        PidFile pid = PidFile.createInTemp(filename, false);
+        PidFile pid = PidFile.createInDefaultDir(filename, false);
         System.out.println("PID file " + pid.getPath() + ": " + pid.getPid());
         Assert.assertEquals(PidFile.getJvmPid(), pid.getPid());
         Assert.assertFalse(pid.isDeleteOnExit());
         Assert.assertEquals(file, pid.getPath().toFile());
         file.delete(); // unusual, but needed for test
         
-        pid = PidFile.createInTemp(filename, true);
+        pid = PidFile.createInDefaultDir(filename, true);
         System.out.println("PID file " + pid.getPath() + ": " + pid.getPid());
         Assert.assertEquals(PidFile.getJvmPid(), pid.getPid());
         Assert.assertTrue(pid.isDeleteOnExit());
