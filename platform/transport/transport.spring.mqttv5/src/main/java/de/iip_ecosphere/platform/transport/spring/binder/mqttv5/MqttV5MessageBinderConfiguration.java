@@ -44,6 +44,17 @@ public class MqttV5MessageBinderConfiguration {
     }
 
     /**
+     * Returns the client instance.
+     * 
+     * @return the client instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public MqttClient mqttClient() {
+        return client;
+    }
+
+    /**
      * Returns the message binder.
      * 
      * @param messageBinderProvisioner the provisioner with access to the destinations
