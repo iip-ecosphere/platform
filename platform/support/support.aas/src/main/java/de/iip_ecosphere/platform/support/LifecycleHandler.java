@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
@@ -100,11 +102,24 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
+        AtomicReference<String> pidFile = new AtomicReference<>();
         forEach(l -> {
             LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
                 + " (" + l.priority() + ")");
             l.startup(args);
+            if (null == pidFile.get()) {
+                pidFile.set(l.getPidFileName());
+            }
         }, false);
+        String pidFileName = pidFile.get();
+        if (null != pidFileName) {
+            try {
+                PidFile.createInTemp(pidFileName, true);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(LifecycleHandler.class).warn("Cannot create PID file in temp: " 
+                    + pidFileName + " " + e.getMessage());
+            }
+        }
         LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.");
     }
 
