@@ -29,6 +29,7 @@ public class BasicConfiguration {
     private File keystore;
     private String keyPassword;
     private String keyAlias;
+    private boolean hostnameVerification = false;
 
     /**
      * Returns the broker host name.
@@ -74,6 +75,15 @@ public class BasicConfiguration {
      */
     public String getKeyAlias() {
         return keyAlias;
+    }
+    
+    /**
+     * Returns whether TLS hostname verification shall be performed.
+     * 
+     * @return {@code false} for no verification (default), {@code true} else
+     */
+    public boolean getHostnameVerification() {
+        return hostnameVerification;
     }
 
     // setters required for @ConfigurationProperties
@@ -123,6 +133,15 @@ public class BasicConfiguration {
     public void setKeyAlias(String alias) {
         this.keyAlias = alias;
     }
+    
+    /**
+     * Returns whether TLS hostname verification shall be performed.
+     * 
+     * @param hostnameVerification {@code false} for no verification, {@code true} else
+     */
+    public void setHostnameVerification(boolean hostnameVerification) {
+        this.hostnameVerification = hostnameVerification;
+    }
 
     // converter
 
@@ -149,6 +168,7 @@ public class BasicConfiguration {
             if (null != getKeyAlias()) {
                 builder.setKeyAlias(getKeyAlias());
             }
+            builder.setHostnameVerification(getHostnameVerification());
         }
         return builder;
     }

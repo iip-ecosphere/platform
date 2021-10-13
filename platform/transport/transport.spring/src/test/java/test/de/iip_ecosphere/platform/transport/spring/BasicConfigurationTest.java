@@ -43,12 +43,14 @@ public class BasicConfigurationTest {
         c.setPort(port);
         c.setKeyPassword(pass);
         c.setKeyAlias(alias);
+        c.setHostnameVerification(true);
         
         Assert.assertEquals(host, c.getHost());
         Assert.assertEquals(keystore, c.getKeystore());
         Assert.assertEquals(port, c.getPort());
         Assert.assertEquals(pass, c.getKeyPassword());
         Assert.assertEquals(alias, c.getKeyAlias());
+        Assert.assertTrue(c.getHostnameVerification());
     }
 
 }
