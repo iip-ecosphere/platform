@@ -61,6 +61,7 @@ public class TransportParameterTest {
         ServerAddress addr = new ServerAddress(Schema.IGNORE, "local", 1234);
         File keystore = new File("./keystore.jks");
         String passwd = "abc";
+        String alias = "alias";
         TransportParameter params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystore(null, null)
@@ -69,24 +70,33 @@ public class TransportParameterTest {
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals(null, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
+        Assert.assertEquals(null, params.getKeyAlias());
+        Assert.assertFalse(params.getHostnameVerification());
         
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystore(keystore, null)
+            .setHostnameVerification(false)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals(keystore, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
+        Assert.assertEquals(null, params.getKeyAlias());
+        Assert.assertFalse(params.getHostnameVerification());
 
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystore(keystore, passwd)
+            .setKeyAlias(alias)
+            .setHostnameVerification(true)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals(keystore, params.getKeystore());
         Assert.assertEquals(passwd, params.getKeystorePassword());
+        Assert.assertEquals(alias, params.getKeyAlias());
+        Assert.assertTrue(params.getHostnameVerification());
     }
 
     /**
