@@ -111,16 +111,20 @@ public class HivemqV3Client {
                 .automaticReconnect().applyAutomaticReconnect();
             if (null != config.getKeystore()) {
                 try {
-                    MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
-                        .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
-                             config.getKeyPassword()))
-                        .hostnameVerifier(new HostnameVerifier() {
+                    HostnameVerifier verifier = null; // use HTTPS
+                    if (!config.getHostnameVerification()) {
+                        verifier = new HostnameVerifier() {
                             
                             @Override
                             public boolean verify(String hostname, SSLSession session) {
                                 return true;
                             }
-                        }) // currently by default
+                        };
+                    }                    
+                    MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
+                        .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
+                             config.getKeyPassword()))
+                        .hostnameVerifier(verifier) // currently by default
                         .build();
                     builder.sslConfig(sslConfig);
                 } catch (IOException e) {

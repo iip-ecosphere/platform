@@ -15,5 +15,7 @@ The implementation is initial and could be optimized. The following configuratio
  * `amqp.keyPassword`: Optional plaintext keystore password (default: null).
  * `amqp.keyAlias`: Optional key alias denoting the key in the keystore to be used (default: null). If no alias is given, the underlying implementation takes the first available key.
 
+`amqp.hostnameVerification` is ignored as the underlying implementation does not support SSL hostname verification.
+
 **Missing**
 - Validation/fixing topic names w.r.t. AMQP specification

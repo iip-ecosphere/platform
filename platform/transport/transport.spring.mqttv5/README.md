@@ -15,7 +15,8 @@ The following configuration options are supported:
  * `mqtt.qos`: Quality of service level, one from `AT_MOST_ONCE`, `AT_LEAST_ONCE` (default), `EXACTLY_ONCE`
  * `mqtt.keystore`: Optional file name of TLS keystore (default: null). If used, set `schema` to `ssl`.
  * `mqtt.keyPassword`: Optional plaintext keystore password (default: null).
- * `mqtt.keyAlias`: Alias of the key top use (default: null). If not set, the best matching key is taken (currently TLS hostname verification is disabled by default).
+ * `mqtt.keyAlias`: Alias of the key top use (default: null). If not set, the best matching key is taken.
+  * `mqtt.hostnameVerification` (default `false`) determines whether the hostname shall be verified against the SSL certificates during SSL handshake.
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification
