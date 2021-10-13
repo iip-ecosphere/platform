@@ -121,7 +121,7 @@ public class AmqpClient {
                 if (null != config.getKeystore()) {
                     try {                
                         factory.useSslProtocol(SslUtils.createTlsContext(config.getKeystore(), 
-                            config.getKeystorePassword(), config.getKeyAlias()));
+                            config.getKeyPassword(), config.getKeyAlias()));
                     } catch (IOException e) {
                         LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
                     }

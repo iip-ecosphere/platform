@@ -40,7 +40,7 @@ public class AmqpMessageBinderTlsTest extends AmqpMessageBinderTest {
             AmqpConfiguration cfg = client.getConfiguration();
             cfg.setPort(addr.getPort());
             cfg.setKeystore(getKeystore());
-            cfg.setKeystorePassword(getKeystorePassword());
+            cfg.setKeyPassword(getKeystorePassword());
             client.createClient(cfg);
         }
     }
