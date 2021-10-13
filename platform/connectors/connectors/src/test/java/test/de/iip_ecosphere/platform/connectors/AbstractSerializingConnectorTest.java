@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
 import test.de.iip_ecosphere.platform.transport.Product;
 import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
+import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.TransportParameterConfigurer;
 
 /**
  * Generic re-usable test for serializing connectors, i.e., internal {@code byte[]} types.
@@ -72,9 +74,10 @@ public abstract class AbstractSerializingConnectorTest {
      * Creates the test server to test against.
      * 
      * @param addr the server address (schema may be ignored)
+     * @param configDir specific configuration directory for this test server, may be <b>null</b> for none
      * @return the server instance
      */
-    protected abstract Server createTestServer(ServerAddress addr);
+    protected abstract Server createTestServer(ServerAddress addr, File configDir);
 
     /**
      * Returns the transport connector to test against behind the test server.
@@ -102,28 +105,113 @@ public abstract class AbstractSerializingConnectorTest {
     @Test(timeout = 180 * 1000)
     public void testConnector() throws IOException {
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
-        Server server = createTestServer(addr);
+        Server server = createTestServer(addr, null);
         server.start();
-        doTest(addr);
+        doTest(addr, null);
         server.stop(true);
     }
     
     /**
+     * Tests the TLS connector through explicitly setting/resetting the factory
+     * implementation. Builds up a {@link Server} based on {@link #createTestServer(ServerAddress)} that the test is
+     * self-contained.
+     * 
+     * @throws IOException in case that connection/communication fails
+     * @see #getConfigurer()
+     */
+    @Test(timeout = 2 * 180 * 1000)
+    public void testTlsConnector() throws IOException {
+        ConnectorParameterConfigurer configurer = getConfigurer();
+        if (null == configurer) {
+            System.out.println("No TLS test performed.");
+        } else {
+            ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
+            Server server = createTestServer(addr, configurer.getConfigDir());
+            server.start();
+            doTest(addr, configurer);
+            server.stop(true);
+        }
+    }
+    
+    /**
+     * Returns the test configurer (for TLS tests).
+     * 
+     * @return the test configurer, may be <b>null</b> for none, i.e., no TLS tests 
+     */
+    protected /*abstract*/ ConnectorParameterConfigurer getConfigurer() {
+        return null;
+    }
+
+    /**
+     * Allows to configure the connector parameters. (orthogonal, in particular for TLS)
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ConnectorParameterConfigurer extends TransportParameterConfigurer {
+
+        /**
+         * Further setup/configuration of the builder.
+         * 
+         * @param builder the builder
+         */
+        public void configure(ConnectorParameterBuilder builder);
+
+        /**
+         * Returns the (specific) server configuration directory.
+         * 
+         * @return the directory, may be <b>null</b> for none
+         */
+        public File getConfigDir();
+        
+    }
+
+    /**
+     * Creates the coonnector parameter instance.
+     * 
+     * @param addr the server address (schema is ignored)
+     * @param configurer the parameter configurer, may be <b>null</b> for none
+     * @return the transport parameter
+     */
+    protected ConnectorParameter createConnectorParameter(ServerAddress addr, ConnectorParameterConfigurer configurer) {
+        ConnectorParameterBuilder cBuilder = ConnectorParameterBuilder
+            .newBuilder(addr.getHost(), addr.getPort()).setApplicationInformation("m1", "");
+        if (null != configurer) {
+            configurer.configure(cBuilder);
+        }
+        return cBuilder.build();
+    }
+
+    /**
+     * Creates the transport parameter instance. Uses {@link #configureTransportParameter(TransportParameterBuilder)} 
+     * for basic, test-wide configuration.
+     * 
+     * @param addr the server address (schema is ignored)
+     * @param configurer the parameter configurer, may be <b>null</b> for none
+     * @return the transport parameter
+     */
+    protected TransportParameter createTransportParameter(ServerAddress addr, TransportParameterConfigurer configurer) {
+        TransportParameterBuilder tBuilder = TransportParameterBuilder.newBuilder(addr.getHost(), addr.getPort());
+        if (null != configurer) {
+            configurer.configure(tBuilder);
+        }
+        return configureTransportParameter(tBuilder).build();
+    }
+
+    /**
      * Implements a MQTT connector test.
      * 
      * @param addr the server address (schema is ignored)
+     * @param configurer the parameter configurer, may be <b>null</b> for none
      * @throws IOException in case that connection/communication fails
      */
-    protected void doTest(ServerAddress addr) throws IOException {
+    protected void doTest(ServerAddress addr, ConnectorParameterConfigurer configurer) throws IOException {
         ConnectorTest.assertDescriptorRegistration(getConnectorDescriptor());
         Product prod1 = new Product("prod1", 10.2);
         Product prod2 = new Product("prod2", 5.1);
 
         System.out.println("Using JSON serializers");
-        ConnectorParameter cParams = ConnectorParameterBuilder
-            .newBuilder(addr.getHost(), addr.getPort()).setApplicationInformation("m1", "").build();
-        TransportParameter tParams = configureTransportParameter(
-            TransportParameterBuilder.newBuilder(addr.getHost(), addr.getPort())).build();
+        ConnectorParameter cParams = createConnectorParameter(addr, configurer);
+        TransportParameter tParams = createTransportParameter(addr, configurer);
 
         Serializer<Product> outSer = new ProductJsonSerializer();
         SerializerRegistry.registerSerializer(outSer);
