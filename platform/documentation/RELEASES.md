@@ -13,7 +13,7 @@
     * Wrong version numbers for platformDependencies/broker in Install package
     * Wrong content types file name when writing an AASX file
     * TLS encryption support for the basic transport connectors.
-    * Spring transport connector instances/binders can be configured individually. TLS encryption support for the AMQP and MQTTV3 Spring transport is available.
+    * Spring transport connector instances/binders can be configured individually. TLS encryption support for the spring transport connectors/binders is available.
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
