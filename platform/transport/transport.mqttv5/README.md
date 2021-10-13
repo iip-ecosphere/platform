@@ -18,5 +18,5 @@ component.
 
 **Issues/Worth considering**
 - This project requires JDK 11 for testing. 
-- As testing relies on HiveMQ, minimum SSL key lengths apply (`see test.mqtt.hivemq`)
+- As testing relies on HiveMQ, minimum SSL key lengths apply (`see test.mqtt.hivemq`).
 
