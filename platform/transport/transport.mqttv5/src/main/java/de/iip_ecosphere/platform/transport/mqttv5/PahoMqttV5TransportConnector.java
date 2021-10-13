@@ -23,6 +23,7 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
@@ -88,13 +89,24 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
     public void connect(TransportParameter params) throws IOException {
         super.connect(params);
         try {
-            String broker = "tcp://" + params.getHost() + ":" + params.getPort();
+            String broker;
+            if (params.getKeystore() != null) {
+                broker = "ssl://";
+            } else {
+                broker = "tcp://";
+            }
+            broker += params.getHost() + ":" + params.getPort();
             client = new MqttAsyncClient(broker, getApplicationId(), new MemoryPersistence());
             client.setCallback(new Callback());
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             connOpts.setCleanStart(false);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
+            if (null != params.getKeystore()) {
+                connOpts.setHttpsHostnameVerificationEnabled(false);
+                connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
+                    params.getKeystorePassword(), params.getKeyAlias(), SslUtils.CONTEXT_ALG_TLS12).getSocketFactory());
+            }
             waitForCompletion(client.connect(connOpts));
         } catch (MqttException e) {
             throw new IOException(e.getMessage(), e);

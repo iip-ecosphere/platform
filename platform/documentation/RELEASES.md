@@ -8,10 +8,12 @@
 * More detailed configuration model with even more code generation.
 * Potentially, an initial version of the device management and the platform monitoring.
 * Integration of initial security/privacy mechanisms
-* Bug fixes:
+* Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package
     * Wrong content types file name when writing an AASX file
+    * TLS encryption support for the basic transport connectors.
+    * Spring transport connector instances/binders can be configured individually. TLS encryption support for the AMQP and MQTTV3 Spring transport is available.
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
