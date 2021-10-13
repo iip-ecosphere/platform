@@ -17,8 +17,13 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
@@ -74,6 +79,7 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 
 /**
  * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -191,11 +197,31 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             .setApplicationUri(params.getApplicationId())
             .setIdentityProvider(getIdentityProvider(params))
             .setRequestTimeout(uint(params.getRequestTimeout()));
-        if (null != params.getClientCertificate()) {
-            configBuilder.setCertificate(params.getClientCertificate());
-        } // unsure whether && with clientKeyPair
-        if (null != params.getClientKeyPair()) {
-            configBuilder.setKeyPair(params.getClientKeyPair());    
+        if (null != params.getKeystore()) {
+            try {
+                KeyStore keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
+                String alias = params.getKeyAlias();
+                if (null == alias) {
+                    try {
+                        alias = keystore.aliases().nextElement();
+                    } catch (NoSuchElementException e) {
+                        // ignore, alias == null
+                    }
+                }
+                if (null != alias) {
+                    Certificate cert = keystore.getCertificate(alias);
+                    if (cert instanceof X509Certificate) {
+                        configBuilder.setCertificate((X509Certificate) cert);
+                    } else {
+                        LOGGER.error("Certificate for alias '{}' is not of type X509. Trying without TLS.", alias);
+                    }
+                } else {
+                    LOGGER.error("No certificate found, no alias given. Trying without TLS.");
+                }
+            } catch (IOException | KeyStoreException e) {
+                LOGGER.error("Cannot read from keystore '{}': {} Trying without TLS.", 
+                    params.getKeystore(), e.getMessage());
+            }
         }
         return configBuilder;
     }

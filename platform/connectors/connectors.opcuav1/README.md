@@ -4,6 +4,6 @@ OPC UA v1 machine/platform for bi-directional access to machines and already ins
 the test. If required, additionally also an AAS server according to the ``AasPartRegistry`` must be initiated.
 
 **Missing**
-- Authentication/Security
+- Authentication/Security (TLS is implemented/prepared but not tested)
 - Unsure: further custom types apart from Structs
 - Create a test against another server than Milo

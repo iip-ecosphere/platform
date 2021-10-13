@@ -17,8 +17,13 @@ import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USE
 import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USER_TOKEN_POLICY_X509;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ExecutionException;
 
@@ -76,6 +81,7 @@ public class SecureSetup extends ServerSetup {
     );
     
     private X509Certificate clientCertificate;
+    @SuppressWarnings("unused")
     private KeyPair clientKeyPair;
     
     /**
@@ -232,12 +238,28 @@ public class SecureSetup extends ServerSetup {
 
     @Override
     public ConnectorParameter getConnectorParameter() {
+        String alias = "opcuaTest";
+        String pw = "abcd1234";
+        File f = new File(FileUtils.getTempDirectory(), "iip-opcua.jks");
+        f.delete();
+        f.deleteOnExit();
+        try {
+            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keystore.setCertificateEntry(alias, clientCertificate);
+            FileOutputStream fos = new FileOutputStream(f);
+            keystore.store(fos, pw.toCharArray());
+            fos.close();
+        } catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
+            System.out.println("Client keystore exception: " + e.getMessage());
+            f = null;
+        }
         //Map<String, IdentityToken> identityToken = new HashMap<String, IdentityToken>();
         return ConnectorParameterBuilder.newBuilder("localhost", getHttpsPort())
             .setEndpointPath(getPath())
             .setApplicationInformation("urn:eclipse:milo:examples:client", "eclipse milo opc-ua client")
             //.setIdentities(identityToken) // unclear, the example also has none. May require creating IdentityTokens
-            .setSecurityInformation(clientCertificate, clientKeyPair)
+            .setKeyAlias(alias)
+            .setKeystore(f, pw)
             .setNotificationInterval(1000) // test waits for that
             .build();
     }
