@@ -24,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
 import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
@@ -31,6 +32,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
+import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
@@ -51,6 +53,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     public static final String NAME = "MQTT v3";
     private static final Logger LOGGER = Logger.getLogger(PahoMqttv3Connector.class.getName());
     private MqttAsyncClient client;
+    private boolean tlsEnabled = false;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -122,7 +125,13 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
         try {
-            String broker = "tcp://" + params.getHost() + ":" + params.getPort();
+            String broker;
+            if (params.getKeystore() != null) {
+                broker = "ssl://";
+            } else {
+                broker = "tcp://";
+            }
+            broker += params.getHost() + ":" + params.getPort();
             String appId = AbstractTransportConnector.getApplicationId(params.getApplicationId(), "conn", 
                 params.getAutoApplicationId());
             client = new MqttAsyncClient(broker, appId, new MemoryPersistence());
@@ -131,6 +140,18 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
             connOpts.setCleanSession(true);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
+            connOpts.setMaxInflight(1000); // preliminary, default 10
+            if (null != params.getKeystore()) {
+                try {                
+                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
+                        params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
+                    connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
+                    tlsEnabled = true;
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 
+                        + ". Trying with no TLS.");
+                }
+            }
             waitForCompletion(client.connect(connOpts));
             for (String out : getOutputChannels()) {
                 try {
@@ -193,6 +214,24 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     @Override
     protected void error(String message, Throwable th) {
         LOGGER.log(Level.SEVERE, message, th);
+    }
+
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String supportedEncryption() {
+        return SslUtils.CONTEXT_ALG_TLS;
+    }
+
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
+    public String enabledEncryption() {
+        return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
     }
 
 }

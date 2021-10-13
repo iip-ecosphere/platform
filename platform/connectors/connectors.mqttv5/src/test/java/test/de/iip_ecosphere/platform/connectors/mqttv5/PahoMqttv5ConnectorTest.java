@@ -12,8 +12,11 @@
 
 package test.de.iip_ecosphere.platform.connectors.mqttv5;
 
+import java.io.File;
+
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.support.Server;
@@ -57,8 +60,35 @@ public class PahoMqttv5ConnectorTest extends AbstractSerializingConnectorTest {
     }
 
     @Override
-    protected Server createTestServer(ServerAddress addr) {
+    protected Server createTestServer(ServerAddress addr, File configDir) {
+        TestHiveMqServer.setConfigDir(configDir);
         return new TestHiveMqServer(addr);
+    }
+
+    @Override
+    protected ConnectorParameterConfigurer getConfigurer() {
+        return new ConnectorParameterConfigurer() {
+            
+            @Override
+            public File getConfigDir() {
+                return new File("./src/test/secCfg");
+            }
+            
+            @Override
+            public void configure(ConnectorParameterBuilder builder) {
+                builder.setKeystore(new File(getConfigDir(), "client-trust-store.jks"), 
+                    TestHiveMqServer.KEYSTORE_PASSWORD);
+                builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+            }
+            
+            @Override
+            public void configure(TransportParameterBuilder builder) {
+                builder.setKeystore(new File(getConfigDir(), "client-trust-store.jks"), 
+                        TestHiveMqServer.KEYSTORE_PASSWORD);
+                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+            }
+
+        };
     }
 
 }
