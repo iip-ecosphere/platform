@@ -284,4 +284,14 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         
     }
 
+    @Override
+    public String supportedEncryption() {
+        return null;
+    }
+
+    @Override
+    public String enabledEncryption() {
+        return null;
+    }
+
 }
