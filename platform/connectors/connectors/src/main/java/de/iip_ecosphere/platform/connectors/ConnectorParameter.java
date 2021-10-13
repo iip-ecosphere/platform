@@ -13,8 +13,6 @@
 package de.iip_ecosphere.platform.connectors;
 
 import java.io.File;
-import java.security.KeyPair;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Schema;
@@ -33,9 +31,6 @@ public class ConnectorParameter {
     public static final int DEFAULT_NOTIFICATION_INTERVAL = 1000;
     public static final int DEFAULT_KEEP_ALIVE = 2000;
     
-    // taken from OPC UA, preliminary
-    private X509Certificate certificate;
-    private KeyPair keyPair;
     private Map<String, IdentityToken> identityToken;
     private Schema schema = DEFAULT_SCHEMA;
     private int port;
@@ -182,19 +177,6 @@ public class ConnectorParameter {
             instance.autoApplicationId = autoApplicationId;
             return this;
         }
-        
-        /**
-         * Sets security information for encryption. Optional, if not called no encryption will be used.
-         * 
-         * @param certificate the client certificate (may be <b>null</b> for no certificate/no TLS)
-         * @param keyPair the client certificate (may be <b>null</b> for no encryption/no TLS)
-         * @return <b>this</b>
-         */
-        public ConnectorParameterBuilder setSecurityInformation(X509Certificate certificate, KeyPair keyPair) {
-            instance.certificate = certificate;
-            instance.keyPair = keyPair;
-            return this;
-        }
 
         /**
          * Sets the endpoint identities. Optional, if not called, anonymous identity is assumed.
@@ -267,24 +249,6 @@ public class ConnectorParameter {
         this.host = host;
     }
     
-    /**
-     * Returns the TSL certificate.
-     * 
-     * @return the certificate (may be <b>null</b> for no encryption)
-     */
-    public X509Certificate getClientCertificate() {
-        return certificate;
-    }
-    
-    /**
-     * Returns the TLS encryption key pair.
-     * 
-     * @return the key pair (may be <b>null</b> for no encryption)
-     */
-    public KeyPair getClientKeyPair() {
-        return keyPair;
-    }
-
     /**
      * Returns the identity token.
      * 
