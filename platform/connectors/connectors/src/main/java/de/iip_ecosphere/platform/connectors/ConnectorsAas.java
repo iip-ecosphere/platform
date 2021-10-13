@@ -85,7 +85,9 @@ public class ConnectorsAas implements AasContributor {
     public static final String NAME_SMC_VAR_OUT = "outType";
     public static final String NAME_SMC_VAR_IN = "inType";
     public static final String NAME_SMC_VAR_DESCRIPTOR = "descriptor";
-
+    public static final String NAME_SMC_VAR_SUPPORTED_ENC = "supportedEncryption";
+    public static final String NAME_SMC_VAR_ENABLED_ENC = "enabledEncryption";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorsAas.class);
 
     @Override
@@ -179,6 +181,14 @@ public class ConnectorsAas implements AasContributor {
         ClassUtility.addTypeSubModelElement(smcb, NAME_SMC_VAR_OUT, connector.getConnectorOutputType());
         ClassUtility.addTypeSubModelElement(smcb, NAME_SMC_VAR_IN, connector.getConnectorInputType());
 
+        smcb.createPropertyBuilder(NAME_SMC_VAR_SUPPORTED_ENC)
+            .setValue(Type.STRING, toValidString(connector.supportedEncryption()))
+            .build();
+        smcb.createPropertyBuilder(NAME_SMC_VAR_ENABLED_ENC)
+            .setType(Type.STRING)
+            .setValue(Type.STRING, toValidString(connector.enabledEncryption())) // may need to be dynamic
+            .build();
+
         String descName = ClassUtility.getName(connector.getClass());
         SubmodelElementCollection descC = descriptors.getSubmodelElementCollection(descName);
         if (null != descC) {
@@ -186,6 +196,16 @@ public class ConnectorsAas implements AasContributor {
         } else {
             LOGGER.warn("Warning while adding connector instance: Descriptor for " + descName + " does not exist.");
         }
+    }
+    
+    /**
+     * Returns a "valid" string turning <b>null</b> into an empty string.
+     * 
+     * @param string the string to be considered
+     * @return the "valid" string
+     */
+    private static String toValidString(String string) {
+        return null == string ? "" : string;
     }
     
     /**
