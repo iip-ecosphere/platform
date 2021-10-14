@@ -1,0 +1,47 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Readme(Configuration config, FileArtifact target) {
+	
+    def main(Configuration config, FileArtifact target) {
+        IIPEcosphere cfg = config;
+        'IIP-Ecosphere platform instance
+        
+        For understanding the components and how to explore the platform, we recommend reading the platform handbook on:
+          - https://www.iip-ecosphere.eu/
+          - https://doi.org/10.5281/zenodo.5168946
+        
+        This is an assembled and instantiated version of the IIP-Ecosphere platform of version ${cfg.iipVer}. 
+        Components that are not configured to be part of the platform are left out. Glue code for services, wire 
+        format serializers for application specific data types, logging configurations etc. are generated and packaged. 
+        IP-Addresses for the central services became part of the binaries during packaging.
+        
+        This folder contains the top-level artifacts that are needed to execute the platform (in the following sequence):
+          - The central platform services, in particular the AAS server
+            - platform.bat for Windows
+            - platform.sh for Linux/Bash
+            - source code in "platform"
+            - binaries in "plJars"
+            - platform.service for Linux/systemd
+          - The ECS runtime
+            - ecs.bat for Windows
+            - ecs.sh for Linux/Bash
+            - source code in "ecsRuntime"
+            - binaries in "ecsJars"
+            - ecs.service (with dependency to platform.service) as well as ecs-noDeps.service (for standalone 
+              device installation) for Linux/systemd
+          - The service manager
+            - serviceMgr.bat for Windows
+            - serviceMgr.sh for Linux/Bash
+            - source code in "serviceMgr"
+            - binaries in "svcJars"
+            - serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
+              device/container installation) for Linux/systemd
+          - The platform command line (so far, the platform does not have an UI but this may change in future ;))
+            - cli.bat for Windows
+            - cli.sh for Linux/Bash
+            - source code also in "platform"
+            - binaries also in "plJars"
+        '
+    }
+	
+}

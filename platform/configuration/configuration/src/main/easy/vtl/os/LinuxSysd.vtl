@@ -1,0 +1,25 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
+	
+    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
+        String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
+        '[Unit]
+        Description=${description}
+        
+        [Service]
+        Type=forking
+        PIDFile=/run/${pidFile}
+        ExecStart=java -cp "\\$IIP_HOME/${dir}/*" --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true -Diip.pid.dir=/run "${m}" \\$*
+        ${requires(requires)}'
+    }
+    
+    def requires(String requires) {
+        if (requires.length() > 0) {
+            '
+            [Install]
+            Requires=${requires}'
+        }
+    }
+	
+}

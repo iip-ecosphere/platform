@@ -99,7 +99,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain);
         maven("${ecsRuntimeRoot}", true);
-        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain);
+        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service");
         
         serviceMgrRoot.mkdir();
         p = "${serviceMgrRoot}/src/main/resources";
@@ -110,7 +110,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}", true);
-        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain);
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service");
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
@@ -121,13 +121,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain);
         maven("${platformRoot}", true);
-        generateOsScripts(config, "${target}/platform", "plJars", dfltMain);
-        generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli");
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "");
+        generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
+        
+        vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }
     
-    generateOsScripts(Configuration config, String pathName, String dir, String main) = {
+    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires) = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main);
         vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main);
+        if (pidName.length() > 0) {
+           vilTemplateProcessor("LinuxSysd", config, "${pathName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires);
+           if (requires.length() > 0) {
+               vilTemplateProcessor("LinuxSysd", config, "${pathName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid");
+           }
+        }
     }
 
 }
