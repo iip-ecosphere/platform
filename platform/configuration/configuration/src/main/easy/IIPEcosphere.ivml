@@ -5,8 +5,10 @@ project IIPEcosphere {
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
     NonEmptyString iipVer = "0.3.0-SNAPSHOT"; // Maven version of platform
+    String javaOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true";
     
     freeze {
+        javaOpts;
         iipVer;
     };
    

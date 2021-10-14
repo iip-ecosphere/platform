@@ -3,6 +3,7 @@
 template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
 	
     def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
+        IIPEcosphere cfg = config;
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '[Unit]
         Description=${description}
@@ -10,7 +11,7 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         [Service]
         Type=forking
         PIDFile=/run/${pidFile}
-        ExecStart=java -cp "\\$IIP_HOME/${dir}/*" --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true -Diip.pid.dir=/run "${m}" \\$*
+        ExecStart=java -cp "\\$IIP_HOME/${dir}/*" ${cfg.javaOpts} -Diip.pid.dir=/run "${m}" \\$*
         ${requires(requires)}'
     }
     
