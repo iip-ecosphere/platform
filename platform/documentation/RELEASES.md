@@ -9,7 +9,8 @@
     * TLS encryption support for the basic transport connectors.
     * Spring transport connector instances/binders can be configured individually. TLS encryption support for the spring transport connectors/binders is available.
     * MQTT machine connectors support optional TLS encryption.
-* Planed improvements:
+    * PID files for the major platform components
+* Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes
     * Automatic creation of containers and their accessibility for devices.

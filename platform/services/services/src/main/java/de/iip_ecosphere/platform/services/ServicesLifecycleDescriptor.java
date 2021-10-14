@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 
 /**
@@ -19,13 +20,18 @@ import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
+public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor implements PidLifecycleDescriptor {
 
     /**
      * Creates an instance for the service manager.
      */
     public ServicesLifecycleDescriptor() {
         super("Services", () -> ServiceFactory.getAasSetup());
+    }
+    
+    @Override
+    public String getPidFileName() {
+        return "iip-serviceMgr.pid";
     }
     
 }

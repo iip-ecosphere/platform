@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
@@ -20,7 +21,7 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
+public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor implements PidLifecycleDescriptor {
 
     /**
      * Creates an instance for the service manager.
@@ -42,6 +43,11 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
         Monitor.stopScheduling();
         EcsAas.notifyResourceRemoved();
         super.shutdown();
+    }
+    
+    @Override
+    public String getPidFileName() {
+        return "iip-ecsRuntime.pid";
     }
     
 }

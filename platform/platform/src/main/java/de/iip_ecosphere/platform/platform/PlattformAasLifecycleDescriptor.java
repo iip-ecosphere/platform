@@ -33,4 +33,5 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         System.out.println("IIP-Ecosphere Platform Server.");
         super.startup(args);
     }
+
 }
