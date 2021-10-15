@@ -1,7 +1,9 @@
-# IIP-Ecosphere platform releases
+# IIP-Ecosphere platform: Releases
 
 ### Next release (winter 2021):
 * BaSyx upgrade to 1.0.0 (from Maven Central)
+* Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
+* Installation summary for Docker containers and platform from scratch on github.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package
