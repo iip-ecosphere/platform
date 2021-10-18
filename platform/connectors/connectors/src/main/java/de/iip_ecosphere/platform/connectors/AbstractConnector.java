@@ -256,7 +256,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      * @return the data from the machine, <b>null</b> for none, i.e., also no call to {@link #callback}
      * @throws IOException in case that reading fails
      */
-    protected abstract O read() throws IOException;
+    public abstract O read() throws IOException;
     
     /**
      * Logs an error.

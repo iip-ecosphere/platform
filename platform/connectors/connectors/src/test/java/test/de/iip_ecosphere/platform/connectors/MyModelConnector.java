@@ -95,7 +95,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
     }
 
     @Override
-    protected Object read() throws IOException {
+    public Object read() throws IOException {
         return offers.pollFirst(); 
     }
 

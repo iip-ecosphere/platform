@@ -37,6 +37,17 @@ public interface Connector <O, I, CO, CI> {
     public void connect(ConnectorParameter params) throws IOException;
     
     /**
+     * Reads data from the underlying machine. If used for polling, this method shall be implemented by returning 
+     * at least a dummy object so that the polling task can initiate a translation request and forward it to the 
+     * receiption callback. In particular, can be a dummy object or the actual changes in the model if 
+     * {@link MachineConnector#hasModel()}. 
+     * 
+     * @return the data from the machine, <b>null</b> for none, i.e., also no call to {@link #callback}
+     * @throws IOException in case that reading fails
+     */
+    public O read() throws IOException;
+    
+    /**
      * Writes the given {@code data} to the underlying machine/platform.
      * 
      * @param data the data to send to {@code stream}
