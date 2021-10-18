@@ -198,7 +198,7 @@ public class ConnectorsAasTest {
         }
 
         @Override
-        public byte[] read() throws IOException {
+        protected byte[] read() throws IOException {
             return null;
         }
 

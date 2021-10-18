@@ -80,7 +80,7 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
     }
 
     @Override
-    public byte[] read() throws IOException {
+    protected byte[] read() throws IOException {
         return offers.pollFirst();
     }
 
