@@ -5,6 +5,7 @@
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/test/resources"/>
     <filter-data value="target/generated-test-sources/protobuf/java/test/de/iip_ecosphere/platform/transport/proto"/>
   </filter>
 </fileset-config>
