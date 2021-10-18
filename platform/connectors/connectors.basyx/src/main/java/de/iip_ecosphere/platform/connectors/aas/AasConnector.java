@@ -151,7 +151,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     }
 
     @Override
-    protected Object read() throws IOException {
+    public Object read() throws IOException {
         return DUMMY; // allow for polling, no change information so far
     }
 

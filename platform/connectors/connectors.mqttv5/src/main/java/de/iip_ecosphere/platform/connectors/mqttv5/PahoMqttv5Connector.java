@@ -220,7 +220,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
     }
 
     @Override
-    protected byte[] read() throws IOException {
+    public byte[] read() throws IOException {
         return null; // no polling at all needed
     }
 
