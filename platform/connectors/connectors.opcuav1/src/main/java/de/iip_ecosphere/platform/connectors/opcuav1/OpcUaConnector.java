@@ -305,7 +305,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     }
 
     @Override
-    public DataItem read() throws IOException {
+    protected DataItem read() throws IOException {
         return DUMMY; // regardless, if we are asked, we do not report the changes; typeTranslator will compose the data
     }
 
