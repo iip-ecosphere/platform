@@ -51,6 +51,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
     private Aas connectedAAS;
     private AasFactory factory;
+    private ConnectorParameter params;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -119,6 +120,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == connectedAAS) {
+            this.params = params;
             Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), params.getEndpointPath());
             connectedAAS = factory.obtainRegistry(regEp).retrieveAas(params.getApplicationId());
             if (null == connectedAAS) {
@@ -283,8 +285,18 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
 
         @Override
-        public void monitor(String... qName) throws IOException {
+        public void monitor(int notificationInterval, String... qName) throws IOException {
             throw new IOException("Event-based monitoring is not supported. Please use polling.");
+        }
+
+        @Override
+        public void monitorModelChanges(int notificationInterval) throws IOException {
+            throw new IOException("Event-based monitoring is not supported. Please use polling.");
+        }
+
+        @Override
+        protected ConnectorParameter getConnectorParameter() {
+            return params;
         }
         
     }
