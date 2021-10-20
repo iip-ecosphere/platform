@@ -40,6 +40,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
     public static final String NAME = "MyModelConnector";
     private Deque<Object> offers = new LinkedBlockingDeque<Object>();
     private Deque<Object> received = new LinkedBlockingDeque<Object>();
+    private ConnectorParameter params;
     
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -68,11 +69,12 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
     @SafeVarargs
     public MyModelConnector(ProtocolAdapter<Object, Object, CO, CI>... adapter) {
         super(adapter);
-        configureModelAccess(new MyModelAccess());
+        configureModelAccess(new MyModelAccess(params));
     }
 
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
+        this.params = params;
     }
 
     @Override
@@ -135,12 +137,16 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         
         private Map<String, Entry> model = new HashMap<>();
         private Map<String, Entry> structs = new HashMap<>();
+        private ConnectorParameter params;
         
         /**
          * Creates an instance.
+         * 
+         * @param params connector params used during connect
          */
-        protected MyModelAccess() {
+        protected MyModelAccess(ConnectorParameter params) {
             super(MyModelConnector.this);
+            this.params = params;
         }
         
         @Override
@@ -234,7 +240,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        public void monitor(String... qName) throws IOException {
+        public void monitor(int notificationInterval, String... qName) throws IOException {
             for (String n : qName) {
                 Entry me = model.get(n);
                 if (null != me) {
@@ -248,6 +254,16 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
                     }
                 }
             }
+        }
+
+        @Override
+        public void monitorModelChanges(int notificationInterval) throws IOException {
+            // more server-sided notifications
+        }
+
+        @Override
+        protected ConnectorParameter getConnectorParameter() {
+            return params;
         }
         
     }

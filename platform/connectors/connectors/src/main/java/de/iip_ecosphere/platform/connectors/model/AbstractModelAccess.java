@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.connectors.model;
 
+import java.io.IOException;
+
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+
 /**
  * Basic implementation of the model access.
  * 
@@ -116,4 +120,21 @@ public abstract class AbstractModelAccess implements ModelAccess {
         return qName(topInstancesQName(), names);
     }
 
+    @Override
+    public void monitor(String... qNames) throws IOException {
+        monitor(getConnectorParameter().getNotificationInterval(), qNames);
+    }
+
+    @Override
+    public void monitorModelChanges() throws IOException {
+        monitorModelChanges(getConnectorParameter().getNotificationInterval());
+    }
+
+    /**
+     * Returns the actual connector parameters that apply for this model instance.
+     * 
+     * @return the connector parameters
+     */
+    protected abstract ConnectorParameter getConnectorParameter();
+    
 }

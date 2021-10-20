@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 
@@ -144,12 +145,43 @@ public interface ModelAccess {
     
     /**
      * Monitors the given {@code qName} element in the server namespace and upon changes, triggers a reception in 
-     * the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}. [monitoring]
+     * the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}. 
+     * {@link ConnectorParameter#getNotificationInterval()} shall be used as default value if applicable. [monitoring]
      *
-     * @param qName the qualified names of the elements to monitor
+     * @param qNames the qualified names of the elements to monitor
      * @throws IOException if creating the monitor fails
      */
-    public void monitor(String... qName) throws IOException;
+    public void monitor(String... qNames) throws IOException;
+
+    /**
+     * Monitors the given {@code qName} element in the server namespace and upon changes, triggers a reception in 
+     * the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}. [monitoring]
+     *
+     * @param qNames the qualified names of the elements to monitor
+     * @param notificationInterval explicit time interval between two notifications (if applicable)
+     * @throws IOException if creating the monitor fails
+     */
+    public void monitor(int notificationInterval, String... qNames) throws IOException;
+
+    /**
+     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...). Triggers a 
+     * reception in the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}.
+     * {@link ConnectorParameter#getNotificationInterval()} shall be used as default value if applicable.
+     * [monitoring]
+     *
+     * @throws IOException if creating the monitor fails
+     */
+    public void monitorModelChanges() throws IOException;
+
+    /**
+     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...). Triggers a 
+     * reception in the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}.
+     * [monitoring]
+     *
+     * @param notificationInterval explicit time interval between two notifications (if applicable)
+     * @throws IOException if creating the monitor fails
+     */
+    public void monitorModelChanges(int notificationInterval) throws IOException;
 
     /**
      * Whether the connector shall send detailed information about monitored changes. Intended to be used in 
