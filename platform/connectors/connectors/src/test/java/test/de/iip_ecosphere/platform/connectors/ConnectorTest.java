@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.ConnectorRegistry;
+import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
@@ -231,6 +232,18 @@ public class ConnectorTest {
             ModelAccess acc = getModelAccess();
             // some testing
             Assert.assertTrue(acc.getQSeparator().length() > 0);
+            Assert.assertEquals("", acc.qName());
+            Assert.assertEquals("", acc.qName(""));
+            Assert.assertEquals("a" + acc.getQSeparator() + "b" + acc.getQSeparator() + "c", 
+                acc.qName("a", "b", "c"));
+            Assert.assertEquals("a" + acc.getQSeparator() + "b" + acc.getQSeparator() + "c", 
+                acc.qName("", "a", "b", "c"));
+            Assert.assertEquals("a" + acc.getQSeparator() + "b" + acc.getQSeparator() + "c", 
+                acc.qName("a", "", "b", "c"));
+            // topQName is empty, see test below
+            Assert.assertEquals("a" + acc.getQSeparator() + "b", acc.iqName("a", "", "b"));
+            Assert.assertEquals("", acc.iqName());
+            Assert.assertEquals("", acc.iqName(""));
             Assert.assertEquals(10, acc.get("iProp"));
             MyStruct s = acc.getStruct("struct", MyStruct.class);
             Assert.assertNotNull(s);
@@ -249,6 +262,61 @@ public class ConnectorTest {
             return Product.class;
         }
 
+    }
+    
+    /**
+     * Tests {@link ModelAccess#iqName(String...)} with a non-empty {@link ModelAccess#topInstancesQName()}.
+     */
+    @Test
+    public void testTopQName() {
+        ModelAccess acc = new AbstractModelAccess(null) {
+            
+            @Override
+            public String topInstancesQName() {
+                return "TOP";
+            }
+            
+            @Override
+            public void setStruct(String qName, Object value) throws IOException {
+            }
+            
+            @Override
+            public void set(String qName, Object value) throws IOException {
+            }
+            
+            @Override
+            public void registerCustomType(Class<?> cls) throws IOException {
+            }
+            
+            @Override
+            public void monitor(String... qName) throws IOException {
+            }
+            
+            @Override
+            public <T> T getStruct(String qName, Class<T> type) throws IOException {
+                return null;
+            }
+            
+            @Override
+            public String getQSeparator() {
+                return "/";
+            }
+            
+            @Override
+            public Object get(String qName) throws IOException {
+                return null;
+            }
+            
+            @Override
+            public Object call(String qName, Object... args) throws IOException {
+                return null;
+            }
+        };
+
+        Assert.assertEquals(acc.topInstancesQName() + acc.getQSeparator() + "a" + acc.getQSeparator() + "b", 
+            acc.iqName("a", "", "b"));
+        Assert.assertEquals("", acc.iqName());
+        Assert.assertEquals("", acc.iqName(""));
     }
 
     /**

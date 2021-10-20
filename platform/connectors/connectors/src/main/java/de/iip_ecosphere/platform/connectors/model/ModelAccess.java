@@ -37,6 +37,13 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 public interface ModelAccess {
     
     /**
+     * Returns the prefix to be used to access the instances within this model.
+     * 
+     * @return the prefix, may be empty for none
+     */
+    public String topInstancesQName();
+    
+    /**
      * Returns the qualified name separator.
      * 
      * @return the qualified name separator, empty if {@link MachineConnector#supportsHierarchicalQNames()} is 
@@ -44,6 +51,23 @@ public interface ModelAccess {
      */
     public String getQSeparator();
     
+    /**
+     * Composes multiple names to a qualified name using {@link #getQSeparator()}.
+     * 
+     * @param names the names (may be empty but shall be ignored then)
+     * @return the composed qualified name, empty if no {@code names} were given
+     */
+    public String qName(String... names);
+
+    /**
+     * Composes multiple names to a qualified instance name starting with {@link #topInstancesQName()} 
+     * using {@link #getQSeparator()}.
+     * 
+     * @param names the names (may be empty but shall be ignored then)
+     * @return the composed qualified name, empty if no {@code names} were given
+     */
+    public String iqName(String... names);
+
     /**
      * Calls an operation on the model.
      *  

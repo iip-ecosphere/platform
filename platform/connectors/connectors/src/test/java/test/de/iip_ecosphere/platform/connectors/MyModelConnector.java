@@ -142,6 +142,11 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         protected MyModelAccess() {
             super(MyModelConnector.this);
         }
+        
+        @Override
+        public String topInstancesQName() {
+            return ""; // none
+        }
 
         @Override
         public String getQSeparator() {

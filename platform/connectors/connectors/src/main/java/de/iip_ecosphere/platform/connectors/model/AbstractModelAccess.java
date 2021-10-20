@@ -81,5 +81,39 @@ public abstract class AbstractModelAccess implements ModelAccess {
             notificationChangedListener.notificationsChanged(useNotifications);
         }
     }
+    
+    /**
+     * Composes a qualified name.
+     * 
+     * @param init the initialization for the result to be used when the first non-empty name shall be appended
+     * @param names the names to be appended
+     * @return the qualified name, empty if there was nothing to compose irrespective of {@code init} 
+     */
+    private String qName(String init, String... names) {
+        String result = "";
+        String sep = getQSeparator();
+        for (int n = 0; n < names.length; n++) {
+            if (names[n].length() > 0) {
+                if (result.length() == 0) {
+                    result = init;
+                }
+                if (result.length() > 0) {
+                    result += sep;
+                }
+                result += names[n];
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public String qName(String... names) {
+        return qName("", names);
+    }
+
+    @Override
+    public String iqName(String... names) {
+        return qName(topInstancesQName(), names);
+    }
 
 }
