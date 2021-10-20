@@ -2,7 +2,7 @@
 
 Extends the transport layer in terms of the AMQP protocol. This extension is optional. 
 This implementation ships with an [AMQP 1.0](https://www.amqp.org/) client as  transport connectors based on 
-[RabbitMQ](https://www.rabbitmq.com/).  
+[RabbitMQ](https://www.rabbitmq.com/). This connector does not consider the specified (MQTT) QoS from the connector parameters rather than it sets the AMQP basic QoS settings to unlimited queues.
 
 TLS can be configured via the transport parameters. If no key alias is specified, the underlying implementation takes the first available key. The underlying implementation does not support SSL hostname verification, i.e., the configuration parameter is ignored.
 
