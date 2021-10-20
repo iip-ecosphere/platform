@@ -176,6 +176,11 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         protected AasModelAccess() {
             super(AasConnector.this);
         }
+        
+        @Override
+        public String topInstancesQName() {
+            return ""; // none
+        }
 
         @Override
         public String getQSeparator() {

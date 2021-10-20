@@ -23,6 +23,8 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +41,7 @@ import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
+import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.Stack;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.serialization.codecs.GenericDataTypeCodec;
@@ -102,7 +105,36 @@ import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 @MachineConnector // default values sufficient
 public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI> {
 
+    /**
+     * The name of this connector.
+     */
     public static final String NAME = "OPC UA v1";
+    
+    /**
+     * Denotes the top-level folder "Objects".
+     */
+    public static final String TOP_OBJECTS = "Objects";
+    
+    /**
+     * Denotes the top-level folder "Types".
+     */
+    public static final String TOP_TYPES = "Types";
+    
+    /**
+     * Denotes the top-level folder "Views".
+     */
+    public static final String TOP_VIEWS = "Views";
+    
+    /**
+     * Denotes the path separator for qualified model names.
+     */
+    public static final char SEPARATOR_CHAR = '/';
+    
+    /**
+     * Denotes the path separator for qualified model names (as String).
+     */
+    public static final String SEPARATOR_STRING = "/";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnector.class);
     private static final DataItem DUMMY = new DataItem(null, null);
     private static final String FIELD_BINARY_ENCODING_ID = "BINARY_ENCODING_ID";
@@ -321,16 +353,18 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      */
     protected class OpcUaModelAccess extends AbstractModelAccess {
 
-        private static final char SEPARATOR_CHAR = '/';
-        private static final String SEPARATOR_STRING = "/";
+        private Map<String, UaNode> nodes = new HashMap<String, UaNode>();
         
-        // TODO cache node ids?
-
         /**
          * Creates the instance and binds the listener to the creating connector instance.
          */
         protected OpcUaModelAccess() {
             super(OpcUaConnector.this);
+        }
+
+        @Override
+        public String topInstancesQName() {
+            return TOP_OBJECTS;
         }
         
         @Override
@@ -347,9 +381,15 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 for (int i = 0; i < args.length; i++) {
                     a[i] = new Variant(args[i]);
                 }
-                CallMethodRequest request = new CallMethodRequest(
-                    new NodeId(2, qName.substring(0, pos)), new NodeId(2, qName), a);    
                 try {
+                    String nodeName = qName.substring(0, pos);
+                    UaNode node = retrieveNode(nodeName);
+                    String methodName = qName.substring(pos + 1);
+                    UaNode methodNode = retrieveNode(node, methodName);
+                    if (null == methodNode) {
+                        throw new IOException("Method " + methodName + " does not exist on " + nodeName);
+                    }
+                    CallMethodRequest request = new CallMethodRequest(node.getNodeId(), methodNode.getNodeId(), a);    
                     Variant cr = client.call(request).thenCompose(result -> {
                         StatusCode statusCode = result.getStatusCode();
     
@@ -373,7 +413,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     } else {
                         callResult = null;
                     }
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (ExecutionException | InterruptedException | UaException e) {
                     throw new IOException(e);
                 }
             } else {
@@ -382,11 +422,109 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             return callResult;
         }
 
+        /* Just for testing
+        private void browseNode(String indent, NodeId browseRoot) {
+            try {
+                List<? extends UaNode> nodes = client.getAddressSpace().browseNodes(browseRoot);
+
+                for (UaNode node : nodes) {
+                    LOGGER.info("{} Node={}", indent, node.getBrowseName().getName());
+
+                    // recursively browse to children
+                    browseNode(indent + "  ", node.getNodeId());
+                }
+            } catch (UaException e) {
+                LOGGER.error("Browsing nodeId={} failed: {}", browseRoot, e.getMessage(), e);
+            }
+        }*/
+
+        /**
+         * Retrieves an OPC UA variable node using {@link #retrieveNode(String)}.
+         * 
+         * @param qName the qualified node name
+         * @return the variable node
+         * @throws IOException if no node can be found for {@code qName} or if the found node is not a variable node 
+         * @throws UaException if accessing/browsing the OPC UA model fails
+         */
+        private UaVariableNode retrieveVariableNode(String qName) throws UaException, IOException {
+            UaVariableNode result = null;
+            UaNode n = retrieveNode(qName);
+            if (n instanceof UaVariableNode) {
+                result = (UaVariableNode) n;
+            } else {
+                throw new IOException("'" + qName + "' does not point to a variable, rather than a " 
+                    + n.getClass().getSimpleName());
+            }
+            return result;
+        }
+
+        /**
+         * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
+         * Takes into account {@link #nodes the nodes cache}.
+         * 
+         * @param qName the qualified node name
+         * @return the node
+         * @throws IOException if no node can be found for {@code qName}
+         * @throws UaException if accessing/browsing the OPC UA model fails
+         */
+        private UaNode retrieveNode(String qName) throws UaException, IOException {
+            UaNode result = nodes.get(qName);
+            if (null == result) {
+                result = retrieveNode(null, qName);
+                if (null == result) {
+                    throw new IOException("No node found for " + qName);
+                } else {
+                    nodes.put(qName, result);
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
+         * 
+         * @param current the current not to start searching for
+         * @param qName the qualified node name
+         * @return the node or <b>null</b> for none found
+         * @throws UaException if accessing/browsing the OPC UA model fails
+         */
+        private UaNode retrieveNode(UaNode current, String qName) throws UaException {
+            UaNode result = null;
+            int pos = qName.indexOf(SEPARATOR_CHAR);
+            String nodeName;
+            String remainder = null;
+            if (pos > 0) {
+                nodeName = qName.substring(0, pos);
+                if (pos + 1 < qName.length()) {
+                    remainder = qName.substring(pos + 1);
+                }
+            } else {
+                nodeName = qName;
+            }
+            List<? extends UaNode> nodes;
+            if (null == current) {
+                nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
+            } else {
+                nodes = current.browseNodes(); // sync for now
+            }
+            for (int n = 0; null == result && n < nodes.size(); n++) {
+                UaNode tmp = nodes.get(n);
+                if (nodeName.equals(tmp.getBrowseName().getName())) {
+                    if (null == remainder) {
+                        result = tmp;
+                    } else {
+                        result = retrieveNode(tmp, remainder);
+                    }
+                }
+            }
+            return result;
+        }
+        
         @Override
         public Object get(String qName) throws IOException {
             Object result;
             try {
-                UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
+                UaVariableNode node = retrieveVariableNode(qName);
                 DataValue value = node.readValue();
                 Variant r = value.getValue();
                 if (null != r) {
@@ -403,7 +541,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public void set(String qName, Object value) throws IOException {
             try {
-                UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
+                UaVariableNode node = retrieveVariableNode(qName);
                 node.writeValue(new DataValue(new Variant(value)));
             } catch (UaException e) {
                 throw new IOException(e);
@@ -413,7 +551,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public <T> T getStruct(String qName, Class<T> type) throws IOException {
             try {
-                UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
+                UaVariableNode node = retrieveVariableNode(qName);
                 DataValue value = node.readValue();
                 Variant variant = value.getValue();
                 ExtensionObject xo = (ExtensionObject) variant.getValue();
@@ -430,7 +568,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         public void setStruct(String qName, Object value) throws IOException {
             try {
                 ExpandedNodeId encodingId = getEncodingId(value.getClass());
-                UaVariableNode node = client.getAddressSpace().getVariableNode(new NodeId(2, qName));
+                UaVariableNode node = retrieveVariableNode(qName);
                 ExtensionObject modifiedXo = ExtensionObject.encode(
                     client.getSerializationContext(),
                     value,
@@ -517,7 +655,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
                 List<MonitoredItemCreateRequest> requests = new ArrayList<MonitoredItemCreateRequest>();
                 for (String n: qName) {
-                    UaNode node = client.getAddressSpace().getNode(new NodeId(2, n));
+                    UaNode node = retrieveNode(n);
                     ReadValueId readValueId = new ReadValueId(
                         node.getNodeId(), AttributeId.Value.uid(), null, QualifiedName.NULL_VALUE
                     );

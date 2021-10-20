@@ -14,6 +14,7 @@
     * PID files for the major platform components
     * Generation of Linux/systemd service descriptions for platform services, ECS runtime and service manager. 
     * Generation of README.txt with brief explanations on the generated files and folders.
+    * Fixed/extended qualified name access for OPC UA connector.
 * Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes

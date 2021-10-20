@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.DataTypeDictionaryManager;
 
@@ -80,13 +81,13 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
     private static final String NAME_METHOD_END = "endMachine";
     
     static {
-        QNAME_TOP_FOLDER = NAME_TOP_FOLDER;
-        QNAME_VAR_LOT_SIZE = QNAME_TOP_FOLDER + "/" + NAME_VAR_LOT_SIZE;
-        QNAME_VAR_POWER_CONSUMPTION = QNAME_TOP_FOLDER + "/" + NAME_VAR_POWER_CONSUMPTION;
-        QNAME_VAR_STRUCT = QNAME_TOP_FOLDER + "/" + NAME_VAR_STRUCT;
+        QNAME_TOP_FOLDER = OpcUaConnector.TOP_OBJECTS + OpcUaConnector.SEPARATOR_CHAR + NAME_TOP_FOLDER;
+        QNAME_VAR_LOT_SIZE = QNAME_TOP_FOLDER + OpcUaConnector.SEPARATOR_CHAR + NAME_VAR_LOT_SIZE;
+        QNAME_VAR_POWER_CONSUMPTION = QNAME_TOP_FOLDER + OpcUaConnector.SEPARATOR_CHAR + NAME_VAR_POWER_CONSUMPTION;
+        QNAME_VAR_STRUCT = QNAME_TOP_FOLDER + OpcUaConnector.SEPARATOR_CHAR + NAME_VAR_STRUCT;
         QNAME_EVENT_NODE = NAME_EVENT_NODE;
-        QNAME_METHOD_START = QNAME_TOP_FOLDER + "/" + NAME_METHOD_START;
-        QNAME_METHOD_END = QNAME_TOP_FOLDER + "/" + NAME_METHOD_END;
+        QNAME_METHOD_START = QNAME_TOP_FOLDER + OpcUaConnector.SEPARATOR_CHAR + NAME_METHOD_START;
+        QNAME_METHOD_END = QNAME_TOP_FOLDER + OpcUaConnector.SEPARATOR_CHAR + NAME_METHOD_END;
     }
 
     /**
