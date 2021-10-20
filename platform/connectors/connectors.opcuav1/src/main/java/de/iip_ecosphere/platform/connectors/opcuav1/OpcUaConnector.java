@@ -200,6 +200,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     configBuilder -> configure(configBuilder).build()
                  );
                 client.connect().get();
+                LOGGER.info("OPC UA connected to " + endpointURL);
             } catch (UaException | InterruptedException | ExecutionException e) { // also for interrupted
                 client = null;
                 throw new IOException(e);
