@@ -164,6 +164,7 @@ public class AmqpClient {
                 ensureTopicQueue(topic);
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     arrivedCallback.messageArrived(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);                    
                 };
                 channel.basicConsume(topic, true, deliverCallback, consumerTag -> { });
                 LOGGER.info("Subscribed to " + topic);

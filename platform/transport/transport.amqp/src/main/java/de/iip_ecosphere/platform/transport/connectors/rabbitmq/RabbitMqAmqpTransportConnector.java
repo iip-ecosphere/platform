@@ -73,7 +73,8 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         }
         super.setReceptionCallback(stream, callback);
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-            notifyCallback(delivery.getEnvelope().getRoutingKey(), delivery.getBody());            
+            notifyCallback(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         };
         channel.basicConsume(stream, true, deliverCallback, consumerTag -> { });
     }
