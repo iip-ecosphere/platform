@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="examples.vdw" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- deploy to SSE Mvn repo -->
+	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="package"/>
+		<mvnDeployResolveArtifact folderName="IIP-examples.vdw" pomFile="pom.xml" jarFolder="target" artifactPattern="examples.vdw-*.*.*.jar" />
+	</target>
+</project>
