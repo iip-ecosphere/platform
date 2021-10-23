@@ -12,6 +12,10 @@
 package de.iip_ecosphere.platform.transport.spring.binder.hivemqv3;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.HostnameVerifier;
@@ -46,6 +50,7 @@ public class HivemqV3Client {
     private Mqtt3AsyncClient client;
     private HivemqV3Configuration configuration;
     private MqttQos qos = MqttQos.AT_LEAST_ONCE;
+    private Set<String> topics = new HashSet<String>();
     
     /**
      * Creates and registers an instance.
@@ -157,6 +162,11 @@ public class HivemqV3Client {
      */
     public void stopClient() {
         if (null != client) {
+            List<String> tpcs = new ArrayList<String>(topics);
+            for (String topic : tpcs) {
+                unsubscribeFrom(topic);
+            }
+            topics.clear();
             client.disconnect()
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
@@ -191,6 +201,7 @@ public class HivemqV3Client {
                     } else {
                         LOGGER.info("Subscribed to " + topic);
                         done.set(true);
+                        topics.add(topic);
                     }
                 }).join();
         }
@@ -218,6 +229,7 @@ public class HivemqV3Client {
                         done.set(true);
                     }
                 }).join();
+            topics.remove(topic);
         }
         return done.get();
     }

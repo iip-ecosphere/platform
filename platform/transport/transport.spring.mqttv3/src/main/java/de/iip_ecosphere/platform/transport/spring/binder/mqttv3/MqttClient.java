@@ -12,8 +12,10 @@
 package de.iip_ecosphere.platform.transport.spring.binder.mqttv3;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -186,6 +188,10 @@ public class MqttClient {
      * Stops the client.
      */
     public void stopClient() {
+        List<String> channels = new ArrayList<>(callback.callbacks.keySet());
+        for (String channel : channels) {
+            unsubscribeFrom(channel);
+        }
         try {
             waitForCompletion(client.disconnect());
             client.close();

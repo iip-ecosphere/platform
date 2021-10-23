@@ -12,9 +12,14 @@
 package de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -46,6 +51,7 @@ public class AmqpClient {
     private Channel channel;
     private AmqpConfiguration configuration;
     private Set<String> topics = Collections.synchronizedSet(new HashSet<>());
+    private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
     
     /**
      * Creates and registers an instance.
@@ -139,6 +145,10 @@ public class AmqpClient {
      */
     public void stopClient() {
         try {
+            List<String> tpcs = new ArrayList<String>(topics);
+            for (String t: tpcs) {
+                unsubscribeFrom(t);
+            }
             channel.close();
             topics.clear();
             channel = null;
@@ -164,9 +174,11 @@ public class AmqpClient {
                 ensureTopicQueue(topic);
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     arrivedCallback.messageArrived(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);                    
+                    //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false); autoack below
                 };
-                channel.basicConsume(topic, true, deliverCallback, consumerTag -> { });
+                String tag = UUID.randomUUID().toString();
+                channel.basicConsume(topic, true, tag, deliverCallback, consumerTag -> { });
+                tags.put(topic, tag);
                 LOGGER.info("Subscribed to " + topic);
                 done = true;
             } catch (IOException e) {
@@ -189,7 +201,10 @@ public class AmqpClient {
             if (!topics.contains(topic)) {
                 try {
                     topics.remove(topic);
-                    channel.basicCancel(topic);
+                    String tag = tags.remove(topic);
+                    if (null != tag) {
+                        channel.basicCancel(tag);
+                    }
                     LOGGER.info("Unsubscribed from " + topic);
                     done = true;
                 } catch (IOException e) {
