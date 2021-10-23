@@ -24,6 +24,10 @@ public class FakeTransportConnector2 implements TransportConnector {
     @Override
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
     }
+    
+    @Override
+    public void unsubscribe(String stream, boolean delete) throws IOException {
+    }
 
     @Override
     public String composeStreamName(String parent, String name) {

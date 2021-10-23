@@ -132,9 +132,20 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
             throw new IOException(e.getMessage(), e);
         }
     }
+    
+    @Override
+    public void unsubscribe(String stream, boolean delete) throws IOException {
+        super.unsubscribe(stream, delete);
+        try {
+            waitForCompletion(client.unsubscribe(stream));
+        } catch (MqttException e) {
+            throw new IOException(e);
+        }
+    }
 
     @Override
     public void disconnect() throws IOException {
+        super.disconnect();
         try {
             waitForCompletion(client.disconnect());
             client.close();

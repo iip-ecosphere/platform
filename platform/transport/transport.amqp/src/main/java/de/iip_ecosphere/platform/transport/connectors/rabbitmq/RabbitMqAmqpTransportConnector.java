@@ -11,6 +11,9 @@
 package de.iip_ecosphere.platform.transport.connectors.rabbitmq;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     private Connection connection;
     private Channel channel;
     private boolean tlsEnabled = false;
+    private Map<String, String> tags = new HashMap<>();
 
     @Override
     public void syncSend(String stream, Object data) throws IOException {
@@ -74,11 +78,25 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         super.setReceptionCallback(stream, callback);
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             notifyCallback(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+            //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false); // autoack below
         };
-        channel.basicConsume(stream, true, deliverCallback, consumerTag -> { });
+        String tag = UUID.randomUUID().toString();
+        channel.basicConsume(stream, true, tag, deliverCallback, consumerTag -> { });
+        tags.put(stream, tag);
     }
 
+    @Override
+    public void unsubscribe(String stream, boolean delete) throws IOException {
+        super.unsubscribe(stream, delete);
+        String tag = tags.remove(stream);
+        if (null != tag) {
+            channel.basicCancel(stream);
+        }
+        if (delete) {
+            channel.queueDeleteNoWait(stream, true, false);
+        }
+    }
+    
     @Override
     public String composeStreamName(String parent, String name) {
         // no real semantics in AMQP
@@ -94,6 +112,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
 
     @Override
     public void connect(TransportParameter params) throws IOException {
+        super.connect(params);
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(params.getHost());
         factory.setPort(params.getPort());
@@ -134,6 +153,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
 
     @Override
     public void disconnect() throws IOException {
+        super.disconnect();
         try {
             channel.close();
         } catch (TimeoutException e) {
