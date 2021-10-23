@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
@@ -49,8 +48,14 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
     }
     
     @Override
-    public void connect(TransportParameter params) throws IOException {
-        super.connect(params);
+    public void unsubscribe(String stream, boolean delete) throws IOException {
+        super.unsubscribe(stream, delete);
+        synchronized (subscriptions) {
+            List<DirectMemoryTransferTransportConnector> list = subscriptions.remove(stream);
+            if (null != list) {
+                list.remove(this);
+            }
+        }
     }
     
     @Override
@@ -96,15 +101,6 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
     @Override
     public String composeStreamName(String parent, String name) {
         return AbstractMqttTransportConnector.composeNames(parent, name); // syntax irrelevant
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        synchronized (subscriptions) {
-            for (List<DirectMemoryTransferTransportConnector> list : subscriptions.values()) {
-                list.remove(this);
-            }
-        }
     }
 
     @Override

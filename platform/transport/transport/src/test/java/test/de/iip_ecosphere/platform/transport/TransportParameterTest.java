@@ -17,6 +17,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.CloseAction;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
@@ -43,7 +44,10 @@ public class TransportParameterTest {
             .setApplicationId("app")
             .setAutoApplicationId(false)
             .setKeepAlive(1236)
+            .setMqttQoS(null) // no effect
             .setMqttQoS(MqttQoS.EXACTLY_ONCE)
+            .setCloseAction(null) // no effect
+            .setCloseAction(CloseAction.NONE) // no effect
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
@@ -54,6 +58,7 @@ public class TransportParameterTest {
         Assert.assertEquals(null, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(MqttQoS.EXACTLY_ONCE, params.getMqttQoS());
+        Assert.assertEquals(CloseAction.NONE, params.getCloseAction());
     }
     
     /**

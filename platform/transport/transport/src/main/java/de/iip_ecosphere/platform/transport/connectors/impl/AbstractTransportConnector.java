@@ -11,13 +11,18 @@
 package de.iip_ecosphere.platform.transport.connectors.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.CloseAction;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
@@ -41,6 +46,26 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         this.params = params;
     }
 
+    @Override
+    public void unsubscribe(String stream, boolean delete) throws IOException {
+        callbacks.remove(stream);
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        if (getCloseAction().doClose()) {
+            List<String> streams = new ArrayList<>(callbacks.keySet());
+            for (String stream : streams) {
+                try {
+                    unsubscribe(stream, getCloseAction().doDelete());
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).warn("While disconnecting/unsubscribing '" 
+                        + stream + "': " + e.getMessage());
+                }
+            }
+        }
+    }
+
     /**
      * Returns the transport parameters.
      * 
@@ -57,6 +82,15 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      */
     protected int getActionTimeout() {
         return params.getActionTimeout();
+    }
+    
+    /**
+     * Returns the close action.
+     * 
+     * @return the close action
+     */
+    protected CloseAction getCloseAction() {
+        return params.getCloseAction();
     }
 
     /**

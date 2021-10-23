@@ -49,7 +49,7 @@ public interface TransportConnector {
 
     /**
      * Attaches a reception {@code callback} to {@code stream}. The {@code callback}
-     * is called upon a reception.
+     * is called upon a reception. Implicitly subscribes to {@code channel].
      * 
      * @param stream   the stream to attach the reception to
      * @param callback the callback to attach
@@ -57,6 +57,16 @@ public interface TransportConnector {
      *                     (e.g., during subscription) happens
      */
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException;
+    
+    /**
+     * Unsubscribes from a channel implicitly subscribed with {@link #setReceptionCallback(String, ReceptionCallback)}.
+     * 
+     * @param stream the stream to unsubscribe from
+     * @param delete if {@code true}, try to delete/clean up the communication side on the server (may not be supported
+     *     by the implementing connector, is ignored then)
+     * @throws IOException if the action fails for some reason
+     */
+    public void unsubscribe(String stream, boolean delete) throws IOException;
 
     /**
      * Composes a hierarchical stream name (in the syntax/semantics of the
@@ -78,7 +88,9 @@ public interface TransportConnector {
     public void connect(TransportParameter params) throws IOException;
 
     /**
-     * Disconnects the underlying connections.
+     * Disconnects the underlying connections. {@link #unsubscribe(String, boolean) Unsubscribes} on all known 
+     * {@link #setReceptionCallback(String, ReceptionCallback) subscribed} depending on 
+     * {@link TransportParameter#getCloseAction()}.
      * 
      * @throws IOException in case that problems during the disconnect happens
      */

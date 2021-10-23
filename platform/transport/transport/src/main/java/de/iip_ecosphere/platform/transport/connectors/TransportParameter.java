@@ -36,6 +36,37 @@ public class TransportParameter {
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
     private MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
+    private CloseAction closeAction = CloseAction.UNSUBSCRIBE;
+    
+    /**
+     * Automatic connector closing actions.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum CloseAction {
+        NONE,
+        UNSUBSCRIBE,
+        DELETE;
+        
+        /**
+         * Returns whether this close action indicates that streams/channels shall be auto-closed at all.
+         * 
+         * @return {@code true} for auto-close, {@code false} else
+         */
+        public boolean doClose() {
+            return NONE != this;
+        }
+
+        /**
+         * Returns whether this close action indicates that streams/channels shall be closed and deleted.
+         * 
+         * @return {@code true} for delete, {@code false} else
+         */
+        public boolean doDelete() {
+            return DELETE == this;
+        }
+
+    }
 
     /**
      * A builder for transport parameter. Connectors shall indicate the required settings.
@@ -178,7 +209,22 @@ public class TransportParameter {
          * @return <b>this</b>
          */
         public TransportParameterBuilder setMqttQoS(MqttQoS qos) {
-            instance.qos = qos;
+            if (null != qos) {
+                instance.qos = qos;
+            }
+            return this;
+        }
+        
+        /**
+         * Defines the close action.
+         * 
+         * @param action the action (default is {@link CloseAction#UNSUBSCRIBE})
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setCloseAction(CloseAction action) {
+            if (null != action) {
+                instance.closeAction = action;
+            }
             return this;
         }
 
@@ -321,6 +367,15 @@ public class TransportParameter {
      */
     public MqttQoS getMqttQoS() {
         return qos;
+    }
+    
+    /**
+     * Returns the close action.
+     * 
+     * @return the close action (default is {@link CloseAction#UNSUBSCRIBE})
+     */
+    public CloseAction getCloseAction() {
+        return closeAction;
     }
 
 }

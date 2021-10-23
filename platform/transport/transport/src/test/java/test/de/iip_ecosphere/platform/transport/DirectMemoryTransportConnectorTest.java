@@ -54,6 +54,10 @@ public class DirectMemoryTransportConnectorTest {
         }
 
         @Override
+        public void unsubscribe(String stream, boolean delete) throws IOException {
+        }
+
+        @Override
         public String composeStreamName(String parent, String name) {
             return null;
         }
