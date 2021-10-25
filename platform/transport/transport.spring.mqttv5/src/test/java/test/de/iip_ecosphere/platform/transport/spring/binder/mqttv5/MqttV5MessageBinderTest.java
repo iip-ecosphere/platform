@@ -154,6 +154,7 @@ public class MqttV5MessageBinderTest {
     
                 @Override
                 public void received(String data) {
+                    System.out.println("Infra received " + data);
                     try {
                         infra.asyncSend("input2", "config " + data);
                     } catch (IOException e) {
@@ -233,7 +234,10 @@ public class MqttV5MessageBinderTest {
          */
         @Bean
         public Function<String, String> transform() {
-            return in -> in + " world";
+            return in -> {
+                System.out.println("TRANSFORM " + in);                
+                return in + " world";
+            };
         }
                 
         /**
@@ -243,7 +247,10 @@ public class MqttV5MessageBinderTest {
          */
         @Bean
         public Consumer<String> receiveInput() {
-            return s -> received = s;
+            return s -> {
+                System.out.println("RECEIVED " + s);
+                received = s;
+            };
         }
         
         /**
