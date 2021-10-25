@@ -42,6 +42,7 @@ public class MqttV5MessageBinderTlsTest extends MqttV5MessageBinderTest {
             cfg.setPort(addr.getPort());
             cfg.setKeystore(getKeystore());
             cfg.setKeyPassword(getKeystorePassword());
+            cfg.setActionTimeout(3000); // may fail on Jenkins at 1s
             client.createClient(cfg);
         }
     }

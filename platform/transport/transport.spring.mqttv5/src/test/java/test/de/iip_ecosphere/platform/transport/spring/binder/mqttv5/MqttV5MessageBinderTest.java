@@ -146,7 +146,7 @@ public class MqttV5MessageBinderTest {
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
-                tpBuilder.setKeystore(new File(secCfg, "client-trust-store.jks"), getKeystorePassword()); 
+                tpBuilder.setKeystore(new File(secCfg, "client-trust-store.jks"), getKeystorePassword());
             }
             infra.connect(tpBuilder.build());
             infra.setReceptionCallback("mqttv5Binder", new ReceptionCallback<String>() {
@@ -198,7 +198,7 @@ public class MqttV5MessageBinderTest {
     @Test(timeout = 180 * 1000)
     public void testMessages() {
         // wait for delivery
-        TimeUtils.sleep(4000);
+        TimeUtils.sleep(2000);
         // and assert composed result
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
 
