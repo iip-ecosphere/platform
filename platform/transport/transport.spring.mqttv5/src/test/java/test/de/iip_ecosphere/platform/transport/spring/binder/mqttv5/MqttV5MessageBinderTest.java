@@ -190,7 +190,7 @@ public class MqttV5MessageBinderTest {
     @Test(timeout = 180 * 1000)
     public void testMessages() {
         // wait for delivery
-        TimeUtils.sleep(2000);
+        TimeUtils.sleep(4000);
         // and assert composed result
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
 
