@@ -116,8 +116,8 @@ public class LifecycleHandler {
             try {
                 PidFile.createInDefaultDir(pidFileName, true);
             } catch (IOException e) {
-                LoggerFactory.getLogger(LifecycleHandler.class).warn("Cannot create PID file in temp: " 
-                    + pidFileName + " " + e.getMessage());
+                LoggerFactory.getLogger(LifecycleHandler.class).warn("Cannot create PID file " 
+                    + pidFileName + ": " + e.getMessage());
             }
         }
         LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.");
