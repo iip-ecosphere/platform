@@ -65,6 +65,7 @@ public class MqttV5MessageBinderTest {
     private static TestHiveMqServer server;
     private static String received;
     private static File secCfg;
+    private static PahoMqttV5TransportConnector infra;
     
     @Autowired
     private TransportParameter params;
@@ -141,7 +142,7 @@ public class MqttV5MessageBinderTest {
         server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
-        final PahoMqttV5TransportConnector infra = new PahoMqttV5TransportConnector();
+        infra = new PahoMqttV5TransportConnector();
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
@@ -152,6 +153,7 @@ public class MqttV5MessageBinderTest {
     
                 @Override
                 public void received(String data) {
+                    System.out.println("Infra received " + data);
                     try {
                         infra.asyncSend("input2", "config " + data);
                     } catch (IOException e) {
@@ -176,6 +178,12 @@ public class MqttV5MessageBinderTest {
      */
     @AfterClass
     public static void shutdown() {
+        System.out.println("Shutting down");
+        try {
+            infra.disconnect();
+        } catch (IOException e) {
+            System.out.println("CONNECTOR PROBLEM " + e.getMessage());
+        }
         if (MqttClient.getLastInstance() != null) {
             MqttClient.getLastInstance().stopClient();
         }
