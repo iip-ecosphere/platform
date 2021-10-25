@@ -147,6 +147,7 @@ public class MqttV5MessageBinderTest {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
                 tpBuilder.setKeystore(new File(secCfg, "client-trust-store.jks"), getKeystorePassword());
+                tpBuilder.setActionTimeout(3000); // Jenkins, 1 ms is not sufficient
             }
             infra.connect(tpBuilder.build());
             infra.setReceptionCallback("mqttv5Binder", new ReceptionCallback<String>() {
