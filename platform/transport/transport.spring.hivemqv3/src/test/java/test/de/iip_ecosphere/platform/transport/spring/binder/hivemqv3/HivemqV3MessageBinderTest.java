@@ -146,7 +146,8 @@ public class HivemqV3MessageBinderTest {
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
-                tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
+                tpBuilder.setKeystore(getKeystore(), getKeystorePassword());
+                tpBuilder.setActionTimeout(3000); // Jenkins, 1 ms is not sufficient
             }
             infra.connect(tpBuilder.build());
             infra.setReceptionCallback("hivemqBinder", new ReceptionCallback<String>() {
