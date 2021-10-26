@@ -21,6 +21,7 @@ import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -142,6 +143,8 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             // only output variables are considered, not InOut-Variables
             if (null == outputVariables) {
                 addOutputVariable("result", Type.NONE);
+                LoggerFactory.getLogger(BaSyxOperation.class).warn("No result output variable specified for "
+                    + "operation '{}'. Creating an implicit variable of type NONE.", operation.getIdShort());
             }
             if (null != outputVariables) {
                 operation.setOutputVariables(outputVariables);
