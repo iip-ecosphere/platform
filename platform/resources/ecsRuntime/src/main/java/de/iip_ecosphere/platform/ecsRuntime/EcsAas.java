@@ -83,28 +83,32 @@ public class EcsAas implements AasContributor {
             Id.getDeviceId(), EcsFactory.getConfiguration().getTransport());
 
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
-            .setValue(Type.STRING, mgr.getContainerSystemName())
+            .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
             .build();
-        jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
-            .setValue(Type.STRING, mgr.getContainerSystemVersion())
-            .build();
-
-        createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
-        createIdOp(jB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
-        createIdOp(jB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
-        createIdOp(jB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
-        createIdOp(jB, NAME_OP_CONTAINER_STOP, iCreator);
-        createIdOp(jB, NAME_OP_GET_STATE, iCreator);
-        jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
-            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
-            .addInputVariable("url", Type.STRING)
-            .addOutputVariable("result", Type.STRING)
-            .build();
+        if (null != mgr) {
+            jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
+                .setValue(Type.STRING, mgr.getContainerSystemVersion())
+                .build();
+    
+            createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
+            createIdOp(jB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
+            createIdOp(jB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
+            createIdOp(jB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
+            createIdOp(jB, NAME_OP_CONTAINER_STOP, iCreator);
+            createIdOp(jB, NAME_OP_GET_STATE, iCreator);
+            jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
+                .addInputVariable("url", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .build();
+        }
 
         jB.build();
 
-        for (ContainerDescriptor desc : mgr.getContainers()) {
-            addContainer(smB, desc);
+        if (null != mgr) {
+            for (ContainerDescriptor desc : mgr.getContainers()) {
+                addContainer(smB, desc);
+            }
         }
 
         smB.defer(); // join with services if present, build done by AAS
@@ -113,6 +117,17 @@ public class EcsAas implements AasContributor {
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
+        if (null != EcsFactory.getContainerManager()) {
+            contributeToImpl(sBuilder);
+        }
+    }
+    
+    /**
+     * Implements the contribution to the implementation server.
+     * 
+     * @param sBuilder the server builder
+     */
+    private void contributeToImpl(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_START), 
             new JsonResultWrapper(p -> {
                 EcsFactory.getContainerManager().startContainer(readString(p)); 
@@ -307,7 +322,7 @@ public class EcsAas implements AasContributor {
     
     @Override
     public boolean isValid() {
-        return EcsFactory.getContainerManager() != null; // may happen in platform when this is used as lib only 
+        return true; // we allow for a null container manager (small resource), but disable the functions in AAS 
     }
 
 }
