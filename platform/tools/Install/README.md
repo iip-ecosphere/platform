@@ -17,3 +17,5 @@ The details are described in the platform handbook. For short:
   * Run `cli` (sh or bat) on the "server" machine to view resources, start/stop container or start/stop services.
   
 Besides the Maven build specifications for the platform dependencies, the test broker and the IIP-Ecosphere platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package. 
+
+This package contains also programs to optimize specific deployments, e.g., to reduce the overlap between JAR folders.
