@@ -6,7 +6,7 @@ template LinuxBash(Configuration config, FileArtifact target, String dir, String
         IIPEcosphere cfg = config;
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '#!/bin/bash
-        PID_DIR=/run
+        PID_DIR=${cfg.pidDir}
         java -cp "${dir}/*" ${cfg.javaOpts} -Diip.pid.dir=\\$PID_DIR "${m}" \\$*'
     }
 	

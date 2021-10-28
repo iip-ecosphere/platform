@@ -5,7 +5,7 @@ import EcsRuntimeDockerContainerManagerYaml;
 @indent(indentation = 4, additional = 0)
 template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target) {
 
-    def main(IIPEcosphere config, FileArtifact target) {
+    def produceServiceControlCfg(IIPEcosphere config, FileArtifact target) {
         SpringCloudStream mgr = config.serviceManager;
         'logging:
         level:
@@ -29,6 +29,10 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
             ${produceAas(config, implLocalEphemerial=true)}
             ${produceNetMgr(config)}'
         // executables based on target device
+    }
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        produceServiceControlCfg(config, target);
     }
 
 }

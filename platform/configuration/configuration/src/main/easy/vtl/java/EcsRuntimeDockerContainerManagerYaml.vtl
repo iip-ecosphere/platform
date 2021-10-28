@@ -72,11 +72,15 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
        'netMgr:
           netmask: ${aasImplNetmask}'
     }
-
-    def main(IIPEcosphere config, FileArtifact target) {
+    
+    def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target) {
         '${produceTransport(config)}'
         '${produceAas(config, implLocalEphemerial=true)}'
         '${produceNetMgr(config)}'
+    }    
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        produceEcsRuntimeCfg(config, target);
     }
 
 }

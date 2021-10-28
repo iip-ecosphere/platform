@@ -17,6 +17,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
+    Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
     Path platformRoot = "${target}/platform";
     
     main(Project source, Configuration config, Project target) = {
@@ -111,6 +112,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain);
         maven("${serviceMgrRoot}", true);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service");
+
+        ecsServiceMgrRoot.mkdir();
+        p = "${ecsServiceMgrRoot}/src/main/resources";
+        p.mkdir();
+        vilTemplateProcessor("EcsServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
+        // cfg test requires spring
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain);
+        maven("${ecsServiceMgrRoot}", true);
+        generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "");
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";

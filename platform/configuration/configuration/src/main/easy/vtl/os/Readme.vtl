@@ -22,7 +22,7 @@ template Readme(Configuration config, FileArtifact target) {
             - source code in "platform"
             - binaries in "plJars"
             - platform.service for Linux/systemd
-          - The ECS runtime
+          - The ECS runtime with container manager
             - ecs.bat for Windows
             - ecs.sh for Linux/Bash
             - source code in "ecsRuntime"
@@ -36,6 +36,12 @@ template Readme(Configuration config, FileArtifact target) {
             - binaries in "svcJars"
             - serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
               device/container installation) for Linux/systemd
+          - For small resouces: ECS runtime without container manager but including service manager
+            - ecsServiceMgr.bat for Windows
+            - ecsServiceMgr.sh for Linux/Bash
+            - source code in "ecsServiceMgr"
+            - binaries in "ecsSvcJars"
+            - ecsServiceMgr.service for Linux/systemd
           - The platform command line (so far, the platform does not have an UI but this may change in future ;))
             - cli.bat for Windows
             - cli.sh for Linux/Bash

@@ -1,0 +1,34 @@
+import MavenBasics;
+import JavaMapping;
+
+@advice(IIPEcosphere)
+template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String springGroup = "org.springframework.boot";
+        String projectVersion = "\\${project.version}";
+        
+        XmlElement project = createMavenRoot(target);
+        createMavenProjectAttributes(project, "ecsServices.exec", "ConfiguredEcsServiceControl", "Configured ECS Runtime for small resources, no container manager, but service control");
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        
+        XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
+        appendDependency(dep, iipGroup, "services", projectVersion);
+        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
+        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+        new XmlElement(ex, "groupId", "javax.el");
+        new XmlElement(ex, "artifactId", "el-api");
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, springGroup, "spring-boot-starter-web");
+        appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        appendDependency(dep, "junit", "junit", "4.12", scope="test");
+        
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenJarPlugin(plugins, "2.3", false, main);
+        appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
+    }
+
+}

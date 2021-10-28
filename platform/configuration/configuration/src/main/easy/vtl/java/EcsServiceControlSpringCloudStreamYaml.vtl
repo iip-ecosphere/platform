@@ -1,0 +1,14 @@
+import JavaMapping;
+import EcsRuntimeDockerContainerManagerYaml;
+import ServiceControlSpringCloudStreamYaml;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template EcsServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target) {
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        produceEcsRuntimeCfg(config, target);
+        produceServiceControlCfg(config, target);
+    }
+
+}
