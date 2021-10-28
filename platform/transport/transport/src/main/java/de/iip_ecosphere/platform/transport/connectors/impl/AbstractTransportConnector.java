@@ -12,6 +12,7 @@ package de.iip_ecosphere.platform.transport.connectors.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public abstract class AbstractTransportConnector implements TransportConnector {
 
-    private Map<String, ReceptionCallback<?>> callbacks = new HashMap<>();
+    private Map<String, ReceptionCallback<?>> callbacks = Collections.synchronizedMap(new HashMap<>());
     private TransportParameter params;
 
     @Override

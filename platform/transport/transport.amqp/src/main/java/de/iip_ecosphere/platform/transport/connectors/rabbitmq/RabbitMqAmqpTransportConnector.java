@@ -11,6 +11,7 @@
 package de.iip_ecosphere.platform.transport.connectors.rabbitmq;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +41,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     private Connection connection;
     private Channel channel;
     private boolean tlsEnabled = false;
-    private Map<String, String> tags = new HashMap<>();
+    private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
 
     @Override
     public void syncSend(String stream, Object data) throws IOException {
@@ -90,7 +91,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         super.unsubscribe(stream, delete);
         String tag = tags.remove(stream);
         if (null != tag) {
-            channel.basicCancel(stream);
+            channel.basicCancel(tag);
         }
         if (delete) {
             channel.queueDeleteNoWait(stream, true, false);
