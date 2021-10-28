@@ -5,7 +5,7 @@ import JavaBasics;
 template JavaSpringCloudStreamStarter(Configuration config, FileArtifact target, String pkg, setOf(String) serializers) {
 
     def generateSerializerRegistration(setOf(String) serializers) {
-        for (String cls : serializers) {
+        for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
             'SerializerRegistry.registerSerializer(${cls}.class);'
         }
     }

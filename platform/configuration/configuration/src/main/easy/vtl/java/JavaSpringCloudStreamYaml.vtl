@@ -22,7 +22,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     def sources() {
         if (ingestors.size() > 0) {
             String sources = "";
-            for (String i: ingestors.keys()) {
+            for (String i: ingestors.keys().toSequence()->sortedBy(s|s)) { // sortedBy for testing
                 if (sources.length() > 0) {
                     sources = sources + ";";
                 }
@@ -38,7 +38,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     }
     
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
-        for (MeshElement elt: mappedMesh.keys()) {
+        for (MeshElement elt: mappedMesh.keys().toSequence()->sortedBy(e|e.name)) { // sortedBy for testing
             String eltMet = generateDataMethods(elt);
             Boolean doOut;
             if (!asyncIngestors.containsKey(eltMet)) {

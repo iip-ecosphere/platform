@@ -47,7 +47,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
         new XmlElement(ex, "groupId", "javax.el");
         new XmlElement(ex, "artifactId", "el-api");
-        for (String art : artifacts) {
+        for (String art : artifacts.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
         
