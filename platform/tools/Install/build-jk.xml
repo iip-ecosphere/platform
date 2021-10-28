@@ -7,6 +7,7 @@
 	
     <!-- build zip -->
     <target name="maven"> 
+    	<maven pomFile="pom.xml" goal="package"/>
         <chmod dir="." perm="u+x" includes="**/*.sh"/>
         <zip destFile="install.zip">
             <fileset dir="." includes="pom.xml README.md"/>
