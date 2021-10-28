@@ -19,6 +19,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path serviceMgrRoot = "${target}/serviceMgr";
     Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
     Path platformRoot = "${target}/platform";
+    Path commonRoot = "${target}/common";
     
     main(Project source, Configuration config, Project target) = {
         generateApps(source, config, target);
@@ -136,6 +137,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         maven("${platformRoot}", true);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "");
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
+ 
+        commonRoot.mkdir();
         
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }

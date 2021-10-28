@@ -11,7 +11,7 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         [Service]
         Type=forking
         PIDFile=${cfg.pidDir}/${pidFile}
-        ExecStart=java -cp "\\$IIP_HOME/${dir}/*" ${cfg.javaOpts} -Diip.pid.dir=${cfg.pidDir} "${m}" \\$*
+        ExecStart=java -cp "\\$IIP_HOME/${dir}/*:\\$IIP_HOME/common/*" ${cfg.javaOpts} -Diip.pid.dir=${cfg.pidDir} "${m}" \\$*
         ${requires(requires)}'
     }
     

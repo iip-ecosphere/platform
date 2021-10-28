@@ -7,7 +7,7 @@ template LinuxBash(Configuration config, FileArtifact target, String dir, String
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '#!/bin/bash
         PID_DIR=${cfg.pidDir}
-        java -cp "${dir}/*" ${cfg.javaOpts} -Diip.pid.dir=\\$PID_DIR "${m}" \\$*'
+        java -cp "${dir}/*:common/*" ${cfg.javaOpts} -Diip.pid.dir=\\$PID_DIR "${m}" \\$*'
     }
 	
 }

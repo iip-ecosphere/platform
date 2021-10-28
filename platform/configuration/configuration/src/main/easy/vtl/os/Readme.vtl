@@ -36,7 +36,7 @@ template Readme(Configuration config, FileArtifact target) {
             - binaries in "svcJars"
             - serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
               device/container installation) for Linux/systemd
-          - For small resouces: ECS runtime without container manager but including service manager
+          - For small resources: ECS runtime without container manager but including service manager
             - ecsServiceMgr.bat for Windows
             - ecsServiceMgr.sh for Linux/Bash
             - source code in "ecsServiceMgr"
@@ -47,6 +47,9 @@ template Readme(Configuration config, FileArtifact target) {
             - cli.sh for Linux/Bash
             - source code also in "platform"
             - binaries also in "plJars"
+          - The folder "common": 
+            - Empty, intended for optimizing installations.
+            - Do not delete, the scripts refer to it in case that JARs are in the folder. 
         '
     }
 	

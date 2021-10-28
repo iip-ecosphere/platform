@@ -3,7 +3,7 @@ template WinBatch(Configuration config, FileArtifact target, String dir, String 
 	
     def main(Configuration config, FileArtifact target, String dir, String main) {
         IIPEcosphere cfg = config;
-        'java -cp "${dir}/*" ${cfg.javaOpts} ${main} %*'
+        'java -cp "${dir}/*;common/*" ${cfg.javaOpts} ${main} %*'
     }
 	
 }
