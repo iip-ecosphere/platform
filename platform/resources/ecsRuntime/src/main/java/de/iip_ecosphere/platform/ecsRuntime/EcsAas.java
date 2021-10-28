@@ -271,13 +271,15 @@ public class EcsAas implements AasContributor {
     public static void notifyResourceRemoved() {
         ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             ContainerManager mgr = EcsFactory.getContainerManager();
-            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
-            for (ContainerDescriptor desc : mgr.getContainers()) {
-                coll.deleteElement(fixId(desc.getId()));
-            }
-            SubmodelElement elt = sub.getSubmodelElement(fixId(Id.getDeviceIdAas()));
-            if (null != elt) {
-                sub.delete(elt);
+            if (null != mgr) {
+                SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
+                for (ContainerDescriptor desc : mgr.getContainers()) {
+                    coll.deleteElement(fixId(desc.getId()));
+                }
+                SubmodelElement elt = sub.getSubmodelElement(fixId(Id.getDeviceIdAas()));
+                if (null != elt) {
+                    sub.delete(elt);
+                }
             }
         });
     }

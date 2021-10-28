@@ -44,7 +44,7 @@ public class EcsFactory {
             if (first.isPresent()) {
                 desc = first.get();
             } else {
-                LOGGER.warn("No Container manager implementation known.");
+                LOGGER.info("No container manager available. No container operations offered in AAS.");
             }
         }
         if (null == conf) {
@@ -64,7 +64,7 @@ public class EcsFactory {
     /**
      * Returns the service manager.
      * 
-     * @return the service manager
+     * @return the service manager (may be <b>null</b> if there is intentionally no container manager)
      */
     public static ContainerManager getContainerManager() {
         if (null == manager) {
