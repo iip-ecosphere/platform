@@ -2,7 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName, Boolean tests) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -17,7 +17,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, String starterCls, Application app, String appName, Boolean tests) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = config.iipVer;
         String appVersion = "${app.ver}";

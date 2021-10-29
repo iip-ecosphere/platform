@@ -237,12 +237,15 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(cfg, "encoding", encoding);
     }
     
-    def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="3.0.0-M3", String include="**/AllTests.class", String depArtifact="surefire-junit47") {
+    def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="3.0.0-M3", String include="**/AllTests.class", String depArtifact="surefire-junit47", Boolean tests=true) {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-surefire-plugin", ver, false);
         XmlElement cfg = appendConfiguration(plugin);
         if (include.length() > 0) {
             XmlElement includes = new XmlElement(cfg, "includes");
             new XmlElement(includes, "include", include);
+        }
+        if (!tests) {
+            new XmlElement(cfg, "skipTests", "true");
         }
         new XmlElement(cfg, "forkCount", "0"); // else it fails with jacoco
         if (depArtifact.length() > 0) {

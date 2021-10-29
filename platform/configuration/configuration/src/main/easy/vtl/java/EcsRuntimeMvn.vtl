@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
@@ -23,7 +23,7 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendMavenJarPlugin(plugins, "2.3", false, main);
         appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
         appendCompilerPlugin(plugins);
-        appendSurefirePlugin(plugins);
+        appendSurefirePlugin(plugins, tests=tests);
     }
 
 }

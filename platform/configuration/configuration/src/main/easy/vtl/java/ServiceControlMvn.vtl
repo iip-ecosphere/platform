@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";

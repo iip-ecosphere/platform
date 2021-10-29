@@ -33,7 +33,7 @@ public class PlatformInstantiator {
         private String ivmlModelName;
         private File outputFolder;
         private File modelFolder;
-        private String startRuleName = "main";
+        private String startRuleName = "mainCli";
         
         /**
          * Creates a configurer instance.

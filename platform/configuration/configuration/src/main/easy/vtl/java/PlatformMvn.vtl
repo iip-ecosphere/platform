@@ -2,9 +2,9 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -25,7 +25,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendMavenJarPlugin(plugins, "2.3", false, main);
         appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
         appendCompilerPlugin(plugins);
-        appendSurefirePlugin(plugins);
+        appendSurefirePlugin(plugins, tests=tests);
     }
 
 }
