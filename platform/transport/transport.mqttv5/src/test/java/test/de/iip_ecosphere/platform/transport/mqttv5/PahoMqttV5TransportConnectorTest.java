@@ -79,9 +79,14 @@ public class PahoMqttV5TransportConnectorTest {
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
         TestHiveMqServer server = new TestHiveMqServer(addr);
         server.start();
-        AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class, configurer);
-        AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class, configurer);
-        server.stop(true);
+        try {
+            AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class, configurer);
+            AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class, configurer);
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            server.stop(true);
+        }
     }
 
 }
