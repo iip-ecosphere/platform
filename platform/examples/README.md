@@ -2,6 +2,7 @@
 
 To demonstrate and validate the IIP-Ecosphere platform, we collect in this folder a set of examples and demo use cases.
 
+* Assembling and executing platform containers on PHOENIX CONTACT AXC 3152 successful. Trying to improve container sizes. Specific code may follow when internal MQTT/OPC UA sources are connected.
 * [VDW OPC-UA](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.vdw/README.md): Utilizing the VDW OPC-UA server through the respective platform connector.
 
 More to come soon.
