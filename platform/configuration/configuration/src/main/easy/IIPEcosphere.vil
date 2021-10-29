@@ -73,7 +73,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     elements.add(no);
                 };
             };
-            elements = elements->sortedBy(n|n.name); // for testing
+            //elements = elements->sortedBy(n|n.name); // for testing
             
             vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
 
