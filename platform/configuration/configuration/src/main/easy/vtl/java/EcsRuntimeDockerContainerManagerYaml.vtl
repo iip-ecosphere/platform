@@ -36,7 +36,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
                 netmask: ${aasImplNetmask}
                 schema: ${aasImplServer.schema}
                 protocol: ${aasProtocolName(aasImplServer.protocol)}
-            ${produceAasPersistence(aasPersistence)}'
+            ${produceAasPersistence(aasPersistence)|e}'
     }
     
     def produceDocker(IIPEcosphere config) {

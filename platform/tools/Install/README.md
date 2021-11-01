@@ -19,3 +19,5 @@ The details are described in the platform handbook. For short:
 Besides the Maven build specifications for the platform dependencies, the test broker and the IIP-Ecosphere platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package. 
 
 This package contains also programs to optimize specific deployments, e.g., to reduce the overlap between JAR folders.
+
+**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on 30.10.2021 or newer is required. Use `mvn -U exec:java ...`
