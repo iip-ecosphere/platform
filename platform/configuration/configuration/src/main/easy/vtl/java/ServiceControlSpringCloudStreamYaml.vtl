@@ -8,8 +8,8 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
     def produceServiceControlCfg(IIPEcosphere config, FileArtifact target) {
         SpringCloudStream mgr = config.serviceManager;
         'logging:
-        level:
-            root: INFO
+            level:
+                root: INFO
         spring:
             main:
                 banner-mode: off
