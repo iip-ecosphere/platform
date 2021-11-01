@@ -160,7 +160,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     definition: ${function(nodes)}
                 ${sources()}
                 stream:
-                    ${poller(nodes)}
+                    ${poller(nodes)|e}
                     default:
                         contentType: application/iip
                     bindings:
