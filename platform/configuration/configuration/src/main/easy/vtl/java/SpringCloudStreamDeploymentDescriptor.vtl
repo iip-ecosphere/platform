@@ -115,13 +115,13 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def generateTypes(setOf(DataType) types) {
-        for (DataType type: types) {
+        for (RecordType type: types->selectByType(RecordType)->sortedBy(t|t.name)) {
             '${generateType(type)}'
         }
-        ''
     }
     
     def generateType(DataType type) {
+        ''
     }
 
     def generateType(RecordType type) {
