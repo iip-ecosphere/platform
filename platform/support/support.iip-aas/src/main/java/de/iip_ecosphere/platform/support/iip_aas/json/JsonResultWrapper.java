@@ -150,7 +150,8 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
     public Object apply(Object[] param) {
         Result result;
         try {
-            result = new Result(func.apply(param).toString());
+            Object funcRes = func.apply(param);
+            result = new Result(null == funcRes ? null : funcRes.toString());
         } catch (Exception e) {
             result = new Result(e);
         }
