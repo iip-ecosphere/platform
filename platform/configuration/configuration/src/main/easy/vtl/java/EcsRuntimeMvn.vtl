@@ -17,7 +17,7 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        appendDependency(dep, "junit", "junit", "4.12", scope="test");
+        appendIipBaseDependencies(dep);
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);

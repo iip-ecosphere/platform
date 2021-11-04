@@ -23,6 +23,7 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, springGroup, "spring-boot-starter-web");
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        appendIipBaseDependencies(dep, includeJUnit=false);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
