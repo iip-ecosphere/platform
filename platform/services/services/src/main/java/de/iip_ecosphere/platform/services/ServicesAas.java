@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
@@ -193,22 +194,20 @@ public class ServicesAas implements AasContributor {
     /**
      * Reads all params as string array.
      * 
-     * @param params the params
+     * @param args the arguments
+     * @param index the index of the argument to read from {@code args}
      * @return the string array
      */
-    private static String[] readStringArray(Object[] params) {
-        String[] args = new String[params.length];
-        for (int a = 0; a < args.length; a++) {
-            args[a] = readString(params, a, "");
-        }
-        return args;
+    private static String[] readStringArray(Object[] args, int index) {
+        Object param = index >= 0 && index < args.length ? args[index] : null;
+        return null == param ? new String[0] : JsonUtils.fromJson(param.toString(), String[].class);
     }
     
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START), 
             new JsonResultWrapper(p -> {
-                ServiceFactory.getServiceManager().startService(readStringArray(p)); 
+                ServiceFactory.getServiceManager().startService(readStringArray(p, 0)); 
                 return null;
             }
         ));
@@ -250,7 +249,7 @@ public class ServicesAas implements AasContributor {
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_STOP), 
             new JsonResultWrapper(p -> { 
-                ServiceFactory.getServiceManager().stopService(readStringArray(p)); 
+                ServiceFactory.getServiceManager().stopService(readStringArray(p, 0)); 
                 return null;
             }
         ));

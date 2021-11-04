@@ -101,6 +101,8 @@ public class ServiceManagerTest {
         assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         
+        
+        
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));

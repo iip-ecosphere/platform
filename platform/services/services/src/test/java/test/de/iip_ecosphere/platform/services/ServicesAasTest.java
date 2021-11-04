@@ -217,6 +217,10 @@ public class ServicesAasTest {
         ServiceManagerTest.assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         
+        // test with multiple ids
+        client.startService(ids);
+        client.stopService(ids);
+        
         client.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));

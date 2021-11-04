@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*;
@@ -82,12 +83,12 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
 
     @Override
     public void startService(String... serviceId) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START).invoke((Object[]) serviceId));
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START).invoke(JsonUtils.toJson(serviceId)));
     }
     
     @Override
     public void stopService(String... serviceId) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP).invoke((Object[]) serviceId));
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP).invoke(JsonUtils.toJson(serviceId)));
     }
     
     @Override
