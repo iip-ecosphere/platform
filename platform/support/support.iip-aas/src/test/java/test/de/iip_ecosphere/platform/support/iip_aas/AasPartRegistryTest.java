@@ -98,7 +98,7 @@ public class AasPartRegistryTest {
             AasBuilder builder = AasFactory.getInstance().createAasBuilder(NAME_MY_AAS, "urn:::AAS:::myAas#");
             SubmodelBuilder smb = builder.createSubmodelBuilder("c2", null);
             smb.createPropertyBuilder("c2prop").setType(Type.STRING).setValue("a").build();
-            smb.createOperationBuilder("c2op").build();
+            smb.createOperationBuilder("c2op").build(Type.NONE);
             smb.build();
             return builder.build();
         }

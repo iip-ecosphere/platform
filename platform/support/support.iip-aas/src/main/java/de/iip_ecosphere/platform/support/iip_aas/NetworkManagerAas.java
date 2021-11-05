@@ -54,33 +54,28 @@ public class NetworkManagerAas implements AasContributor {
             smB.createOperationBuilder(OP_RESERVE_PORT)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("address", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RESERVE_PORT)))
-                .build();
+                .build(Type.STRING);
             smB.createOperationBuilder(OP_OBTAIN_PORT)
                 .addInputVariable("key", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_OBTAIN_PORT)))
-                .build();
+                .build(Type.STRING);
             smB.createOperationBuilder(OP_GET_PORT)
                 .addInputVariable("key", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_GET_PORT)))
-                .build();
+                .build(Type.STRING);
             smB.createOperationBuilder(OP_IS_IN_USE_PORT)
                 .addInputVariable("port", Type.INTEGER)
-                .addOutputVariable("result", Type.BOOLEAN)
                 .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_PORT)))
-                .build();
+                .build(Type.BOOLEAN);
             smB.createOperationBuilder(OP_IS_IN_USE_ADR)
                 .addInputVariable("adr", Type.STRING)
-                .addOutputVariable("result", Type.BOOLEAN)
                 .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_ADR)))
-                .build();
+                .build(Type.BOOLEAN);
             smB.createOperationBuilder(OP_RELEASE_PORT)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
-                .build();
+                .build(Type.NONE);
             smB.createPropertyBuilder(PROP_HIGH_PORT)
                 .setType(Type.INTEGER)
                 .bind(iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
