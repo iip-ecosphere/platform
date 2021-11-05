@@ -68,6 +68,16 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>pidun</id>
+      <name>Dennis Pidun</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>  
   
   <scm>

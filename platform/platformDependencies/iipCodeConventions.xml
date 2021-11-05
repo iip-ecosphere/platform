@@ -40,6 +40,12 @@
       <property name="checkFormat" value="IllegalThrowsCheck"/>
     </module>
 
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="checkstyle: stop boolean complexity check"/>
+      <property name="onCommentFormat" value="checkstyle: resumeboolean complexity  check"/>
+      <property name="checkFormat" value="BooleanExpressionComplexity"/>
+    </module>
+
     <module name="JavadocMethod">
         <property name="excludeScope" value="anoninner"/>
 		<property name="scope" value="private"/>
