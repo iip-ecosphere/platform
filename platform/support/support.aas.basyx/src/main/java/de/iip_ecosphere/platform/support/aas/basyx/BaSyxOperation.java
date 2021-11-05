@@ -142,7 +142,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             // since BaSyx 1.0.0 there must be at least an output variable; from the BaSyx code it looks as if
             // only output variables are considered, not InOut-Variables
             if (null == outputVariables) {
-                addOutputVariable("result", Type.NONE);
+                addOutputVariable(DEFAULT_RETURN_VAR_NAME, Type.NONE);
                 LoggerFactory.getLogger(BaSyxOperation.class).warn("No result output variable specified for "
                     + "operation '{}'. Creating an implicit variable of type NONE.", operation.getIdShort());
             }
