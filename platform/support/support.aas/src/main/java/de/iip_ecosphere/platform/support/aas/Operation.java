@@ -31,6 +31,8 @@ public interface Operation extends Element, SubmodelElement {
      */
     public interface OperationBuilder extends Builder<Operation> {
         
+        public static final String DEFAULT_RETURN_VAR_NAME = "result";
+        
         /**
          * Returns the parent builder.
          * 
@@ -55,7 +57,7 @@ public interface Operation extends Element, SubmodelElement {
          * @return <b>this</b>
          */
         public OperationBuilder addOutputVariable(String idShort, Type type);
-
+        
         /**
          * Adds an input-output variable to the operation.
          * 
@@ -72,6 +74,18 @@ public interface Operation extends Element, SubmodelElement {
          * @return <b>this</b>
          */
         public OperationBuilder setInvocable(Function<Object[], Object> invocable);
+        
+        /**
+         * Convenience method to add the output variable {@value #DEFAULT_RETURN_VAR_NAME} with 
+         * the given type and to call {@link #build()}.
+         * 
+         * @param type the type of the output/return variable
+         * @return return of {@link #build()}.
+         */
+        public default Operation build(Type type) {
+            addOutputVariable(DEFAULT_RETURN_VAR_NAME, type);
+            return build();
+        }
         
     }
     

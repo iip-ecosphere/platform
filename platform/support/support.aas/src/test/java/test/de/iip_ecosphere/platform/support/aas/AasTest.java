@@ -167,14 +167,14 @@ public class AasTest {
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
-            .build();
+            .build(Type.NONE);
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
             .addInputVariable(NAME_VAR_LOTSIZE, Type.INTEGER)
             .setInvocable(invC.createInvocable(NAME_OP_RECONFIGURE))
-            .build();
+            .build(Type.BOOLEAN);
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))
-            .build();
+            .build(Type.NONE);
     }
     
     /**
