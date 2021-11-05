@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>deviceMgt</artifactId>
+  <artifactId>deviceMgt.minio</artifactId>
   <packaging>jar</packaging>
-  <name>Central device management (integration)</name>
-  <description>Central platform component to perform the device management.</description>
+  <name>Central device management (MinIO storage)</name>
+  <description>Central platform component to realize an S3 storage for the device management interface.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -24,41 +24,42 @@
       <artifactId>transport</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>deviceMgt</artifactId>
+     <version>${project.version}</version>
+    </dependency>
 
     <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !!
       services.environment is ok for metrics -->
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>8.3.1</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>okhttp</artifactId>
-    </dependency>
-
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport.amqp</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>  
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <version>4.9.2</version>
     </dependency>
   <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <version>3.12.4</version>
       <scope>test</scope>
   </dependency>
   <dependency>
     <groupId>org.mockito</groupId>
     <artifactId>mockito-inline</artifactId>
+    <version>3.12.4</version>
     <scope>test</scope>
   </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
 </project>
