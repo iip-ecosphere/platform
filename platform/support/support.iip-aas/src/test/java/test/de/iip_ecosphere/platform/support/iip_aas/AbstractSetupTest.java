@@ -16,22 +16,23 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+
 import org.junit.Assert;
 
 /**
- * Tests {@link AbstractConfiguration}.
+ * Tests {@link AbstractSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AbstractConfigurationTest {
+public class AbstractSetupTest {
     
     /**
-     * Test configuration.
+     * Test a setup.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Cfg extends AbstractConfiguration {
+    public static class Cfg extends AbstractSetup {
         
         private int property;
         
@@ -62,11 +63,11 @@ public class AbstractConfigurationTest {
     }
     
     /**
-     * Invalid configuration class.
+     * Invalid setup class.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Cfg2 extends AbstractConfiguration {
+    public static class Cfg2 extends AbstractSetup {
 
         /**
          * No public constructor.
@@ -79,10 +80,10 @@ public class AbstractConfigurationTest {
     }
     
     /**
-     * Tests the configuration (reading).
+     * Tests the setup (reading).
      */
     @Test
-    public void testConfiguration() throws IOException {
+    public void testSetup() throws IOException {
         try {
             Cfg.readFromYaml(Cfg.class, "a");
             Assert.fail("No exception, file does not exist");
@@ -90,14 +91,14 @@ public class AbstractConfigurationTest {
             // ok
         }
         try {
-            Cfg2.readFromYaml(Cfg2.class, AbstractConfiguration.DEFAULT_FNAME);
+            Cfg2.readFromYaml(Cfg2.class, AbstractSetup.DEFAULT_FNAME);
             Assert.fail("No exception, class cannot be instantiated");
         } catch (IOException e) {
             // ok
         }
 
         // readable, without leading /
-        Cfg cfg = Cfg.readFromYaml(Cfg.class, AbstractConfiguration.DEFAULT_FNAME);
+        Cfg cfg = Cfg.readFromYaml(Cfg.class, AbstractSetup.DEFAULT_FNAME);
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
 
@@ -107,7 +108,7 @@ public class AbstractConfigurationTest {
         Assert.assertEquals(42, cfg.getProperty());
 
         // readable, with leading /
-        cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractConfiguration.DEFAULT_FNAME);
+        cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractSetup.DEFAULT_FNAME);
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
     }

@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
     JsonResultWrapperTest.class,
     NetworkManagerAasTest.class,
     PlatformAasTest.class,
-    AbstractConfigurationTest.class,
+    AbstractSetupTest.class,
     CmdLineTest.class
 })
 public class AllTests {
