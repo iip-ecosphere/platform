@@ -12,9 +12,6 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
-
 /**
  * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add
  * their specific configuration settings. Subclasses must have a no-arg constructor and getters/setters for all
@@ -22,26 +19,8 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasConfiguration extends AbstractSetup {
+public class AasBasedSetup extends AasConfiguration {
     
-    private AasSetup aas = new AasSetup();
-    
-    /**
-     * Returns the AAS setup.
-     * 
-     * @return the AAS setup
-     */
-    public AasSetup getAas() {
-        return aas;
-    }
-    
-    /**
-     * Defines the AAS setup.
-     * 
-     * @param aas the AAS setup
-     */
-    public void setAas(AasSetup aas) {
-        this.aas = aas;
-    }
+    // starting to rename configuration to setup
 
 }

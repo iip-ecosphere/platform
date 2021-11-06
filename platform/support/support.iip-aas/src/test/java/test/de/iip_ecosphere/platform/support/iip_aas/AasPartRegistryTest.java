@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -278,7 +278,7 @@ public class AasPartRegistryTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Configuration extends AasConfiguration {
+    public static class TestSetup extends AasBasedSetup {
 
         private String name = "";
 
@@ -303,13 +303,13 @@ public class AasPartRegistryTest {
     }
     
     /**
-     * Tests configuration for {@link AasSetup}.
+     * Tests a setup with {@link AasSetup} using the file "aasPartRegistry.yml".
      * 
      * @throws IOException shall not occur
      */
     @Test
-    public void testConfiguration() throws IOException {
-        Configuration config = Configuration.readFromYaml(Configuration.class, "/aasPartRegistry.yml");
+    public void testSetup_aasPartRegistry() throws IOException {
+        TestSetup config = TestSetup.readFromYaml(TestSetup.class, "/aasPartRegistry.yml");
 
         Assert.assertNotNull(config);
         Assert.assertEquals("test", config.getName());
@@ -345,13 +345,13 @@ public class AasPartRegistryTest {
     }
 
     /**
-     * Tests configuration for {@link AasSetup}.
+     * Tests a setup for {@link AasSetup} using the file "aasPartRegistry_eph.yml".
      * 
      * @throws IOException shall not occur
      */
     @Test
-    public void testConfiguration2() throws IOException {
-        Configuration config = Configuration.readFromYaml(Configuration.class, "/aasPartRegistry_eph.yml");
+    public void testSetup_aasPartRegistry_eph() throws IOException {
+        TestSetup config = TestSetup.readFromYaml(TestSetup.class, "/aasPartRegistry_eph.yml");
 
         AasSetup setup = config.getAas();
         Assert.assertNotNull(setup);
