@@ -51,9 +51,9 @@ public class StorageFactoryDescriptorTest {
         configsStorageSetup.setBucket("bucket");
         configsStorageSetup.setAccessKey("access_key");
         configsStorageSetup.setSecretAccessKey("secret_access_key");
-        packageStorageSetup.setPackageDescriptor("config.yml");
-        packageStorageSetup.setPackageFilename("config.zip");
-        packageStorageSetup.setPrefix("configs/");
+        configsStorageSetup.setPackageDescriptor("config.yml");
+        configsStorageSetup.setPackageFilename("config.zip");
+        configsStorageSetup.setPrefix("configs/");
         configuration.setConfigStorage(configsStorageSetup);
     }
 

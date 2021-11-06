@@ -68,6 +68,7 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
 
         MinioClient minioClient = MinioClient.builder()
             .endpoint(storageSetup.getEndpoint())
+            .region(storageSetup.getRegion())
             .credentials(storageSetup.getAccessKey(),
                 storageSetup.getSecretAccessKey())
             .build();

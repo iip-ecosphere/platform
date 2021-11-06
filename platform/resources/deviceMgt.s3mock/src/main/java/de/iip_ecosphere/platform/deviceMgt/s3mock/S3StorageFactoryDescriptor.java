@@ -73,7 +73,7 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
         }
 
         // TODO make region part of storageSetup
-        EndpointConfiguration endCfg = new EndpointConfiguration(storageSetup.getEndpoint(), "us-west-2");
+        EndpointConfiguration endCfg = new EndpointConfiguration(storageSetup.getEndpoint(), storageSetup.getRegion());
         AmazonS3 client = AmazonS3ClientBuilder
             .standard()
             .withPathStyleAccessEnabled(true)
