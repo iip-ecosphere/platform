@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: central device management (Minio S3 storate extension)
+# IIP-Ecosphere platform: central device management (Minio S3 storage extension)
 
 This component provides a minio S3 storage implementation for the device management.
 

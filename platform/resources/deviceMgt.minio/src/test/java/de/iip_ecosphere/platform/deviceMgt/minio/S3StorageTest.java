@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests the S3 storage.
  * 
- * @author Holger Eichelberger, SSE
+ * @author Dennis Pidun, University of Hildesheim
  */
 @RunWith(MockitoJUnitRunner.class)
 public class S3StorageTest {

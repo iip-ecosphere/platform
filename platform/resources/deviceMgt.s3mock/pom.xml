@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>deviceMgt.minio</artifactId>
+  <artifactId>deviceMgt.s3mock</artifactId>
   <packaging>jar</packaging>
-  <name>Central device management (MinIO storage)</name>
-  <description>Device management storage extension for S3 MinIO.</description>
+  <name>Central device management (S3mock storage)</name>
+  <description>Device management S3 storage extension for S3mock.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -33,9 +33,9 @@
     <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !!
       services.environment is ok for metrics -->
     <dependency>
-      <groupId>io.minio</groupId>
-      <artifactId>minio</artifactId>
-      <version>8.3.1</version>
+      <groupId>io.findify</groupId>
+      <artifactId>s3mock_2.13</artifactId>
+      <version>0.2.6</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
     <dependency>
@@ -43,18 +43,6 @@
       <artifactId>okhttp</artifactId>
       <version>4.9.2</version>
     </dependency>
-  <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>3.12.4</version>
-      <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.mockito</groupId>
-    <artifactId>mockito-inline</artifactId>
-    <version>3.12.4</version>
-    <scope>test</scope>
-  </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
