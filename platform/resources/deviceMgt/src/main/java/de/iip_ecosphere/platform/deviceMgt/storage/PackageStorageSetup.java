@@ -20,6 +20,7 @@ package de.iip_ecosphere.platform.deviceMgt.storage;
 public class PackageStorageSetup {
 
     private String endpoint;
+    private String region = "";
     private String accessKey;
     private String secretAccessKey;
     private String bucket;
@@ -43,7 +44,7 @@ public class PackageStorageSetup {
     }
 
     /**
-     * Set the bucket.
+     * Set the bucket. [required by SnakeYaml]
      *
      * @param bucket the bucket
      */
@@ -59,10 +60,9 @@ public class PackageStorageSetup {
     public String getEndpoint() {
         return endpoint;
     }
-
-
+    
     /**
-     * Set the endpoint.
+     * Set the endpoint. [required by SnakeYaml]
      *
      * @param endpoint the endpoint
      */
@@ -70,6 +70,25 @@ public class PackageStorageSetup {
         this.endpoint = endpoint;
     }
 
+    /**
+     * Get the region. The region interpretation depends on the cloud provider. Irrelevant for local
+     * installations.
+     *
+     * @return the region
+     */
+    public String getRegion() {
+        return region;
+    }
+
+    /**
+     * Returns the region. The region interpretation depends on the cloud provider. Irrelevant for local
+     * installations. [required by SnakeYaml]
+     *
+     * @param region the region (<b>null</b> is turned to into an empty string)
+     */
+    public void setRegion(String region) {
+        this.region = null == region ? "" : region;
+    }
 
     /**
      * Get the accessKey.
@@ -82,7 +101,7 @@ public class PackageStorageSetup {
 
 
     /**
-     * Set the accessKey.
+     * Set the accessKey. [required by SnakeYaml]
      *
      * @param accessKey the accessKey
      */
@@ -101,7 +120,7 @@ public class PackageStorageSetup {
 
 
     /**
-     * Set the secretAccessKey.
+     * Set the secretAccessKey. [required by SnakeYaml]
      *
      * @param secretAccessKey the secretAccessKey
      */
@@ -119,7 +138,7 @@ public class PackageStorageSetup {
     }
 
     /**
-     * Set the prefix.
+     * Set the prefix. [required by SnakeYaml]
      *
      * @param prefix the prefix
      */
@@ -137,7 +156,7 @@ public class PackageStorageSetup {
     }
 
     /**
-     * Set the packageDescriptor.
+     * Set the packageDescriptor. [required by SnakeYaml]
      *
      * @param packageDescriptor the packageDescriptor
      */
@@ -155,7 +174,7 @@ public class PackageStorageSetup {
     }
 
     /**
-     * Set the packageFilename.
+     * Set the packageFilename. [required by SnakeYaml]
      *
      * @param packageFilename the packageFilename
      */
