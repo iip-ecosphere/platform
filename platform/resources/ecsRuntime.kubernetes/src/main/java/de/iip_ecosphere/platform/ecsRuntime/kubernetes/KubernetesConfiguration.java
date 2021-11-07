@@ -16,18 +16,18 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
- * Implements the Kubernetes specific configuration. For configuration prerequisites, see {@link Configuration}.
+ * Implements the Kubernetes specific configuration. For configuration prerequisites, see {@link EcsSetup}.
  * 
  * @author Ahmad Alomosh, SSE
  */
-public class KubernetesConfiguration extends Configuration {
+public class KubernetesConfiguration extends EcsSetup {
 
      /**
-     * Reads a {@link KubernetesConfiguration} instance from a {@link AbstractConfiguration#DEFAULT_FNAME} in the 
+     * Reads a {@link KubernetesConfiguration} instance from a {@link AbstractSetup#DEFAULT_FNAME} in the 
      * root folder of the jar/classpath. 
      *
      * @return configuration instance
@@ -35,7 +35,7 @@ public class KubernetesConfiguration extends Configuration {
     public static KubernetesConfiguration readFromYaml() {
         KubernetesConfiguration result;
         try {
-            return Configuration.readConfiguration(KubernetesConfiguration.class);
+            return EcsSetup.readConfiguration(KubernetesConfiguration.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(KubernetesConfiguration.class).error("Reading configuration: " + e.getMessage());
             result = new KubernetesConfiguration();

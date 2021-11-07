@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
@@ -49,7 +49,7 @@ public class KubernetesContainerManager extends AbstractContainerManager<Kuberne
         }
         
         @Override
-        public Configuration getConfiguration() {
+        public EcsSetup getConfiguration() {
             return config;
         }
         

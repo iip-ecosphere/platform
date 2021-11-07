@@ -29,7 +29,7 @@ import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * Implements a container descriptor for docker-based container management.
@@ -429,14 +429,14 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     
     /**
      * Returns a DockerContainerDescriptor with a information from a yaml file.
-     * @param in an inout stream with yaml contents (may be <b>null</b>)
+     * @param in an inout stream with Yaml contents (may be <b>null</b>)
      * @return DockerContainerDescriptor (may be <b>null</b>)
      */
     public static DockerContainerDescriptor readFromYaml(InputStream in) {
         DockerContainerDescriptor result = null;
         if (in != null) {
             try {
-                result = AbstractConfiguration.readFromYaml(DockerContainerDescriptor.class, in);
+                result = AbstractSetup.readFromYaml(DockerContainerDescriptor.class, in);
             } catch (IOException e) {
                 LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
             }

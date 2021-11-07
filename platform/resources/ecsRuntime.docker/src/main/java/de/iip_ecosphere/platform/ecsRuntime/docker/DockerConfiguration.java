@@ -16,15 +16,15 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
- * Implements the docker specific configuration. For configuration prerequisites, see {@link Configuration}.
+ * Implements the docker specific configuration. For configuration prerequisites, see {@link EcsSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DockerConfiguration extends Configuration {
+public class DockerConfiguration extends EcsSetup {
 
     private Docker docker = new Docker();
 
@@ -45,7 +45,7 @@ public class DockerConfiguration extends Configuration {
     }
     
     /**
-    * Reads a {@link DockerConfiguration} instance from a {@link AbstractConfiguration#DEFAULT_FNAME} in the 
+    * Reads a {@link DockerConfiguration} instance from a {@link AbstractSetup#DEFAULT_FNAME} in the 
     * root folder of the jar/classpath. 
     *
     * @return configuration instance
@@ -53,7 +53,7 @@ public class DockerConfiguration extends Configuration {
     public static DockerConfiguration readFromYaml() {
         DockerConfiguration result;
         try {
-            return Configuration.readConfiguration(DockerConfiguration.class);
+            return EcsSetup.readConfiguration(DockerConfiguration.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(DockerConfiguration.class).error("Reading configuration: " + e.getMessage());
             result = new DockerConfiguration();

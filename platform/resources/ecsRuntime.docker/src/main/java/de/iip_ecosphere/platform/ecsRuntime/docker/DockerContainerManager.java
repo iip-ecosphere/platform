@@ -41,7 +41,7 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
@@ -76,7 +76,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         
         @Override
-        public Configuration getConfiguration() {
+        public EcsSetup getConfiguration() {
             return config;
         }
         
