@@ -1,0 +1,5 @@
+/target/
+/work/
+/.idea/
+*.iml
+docker/minio-data
