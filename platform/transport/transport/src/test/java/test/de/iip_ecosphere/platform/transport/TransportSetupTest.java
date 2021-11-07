@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import org.junit.Assert;
@@ -64,7 +65,7 @@ public class TransportSetupTest {
      */
     @Test
     public void testSetup() throws IOException {
-        Setup setup = AbstractConfiguration.readFromYaml(Setup.class, 
+        Setup setup = AbstractSetup.readFromYaml(Setup.class, 
             TransportSetupTest.class.getResourceAsStream("/test.yml"));
         Assert.assertNotNull(setup);
         
