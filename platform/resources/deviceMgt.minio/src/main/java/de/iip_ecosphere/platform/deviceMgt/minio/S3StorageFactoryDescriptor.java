@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.deviceMgt.minio;
 
-import de.iip_ecosphere.platform.deviceMgt.Configuration;
+import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
@@ -33,7 +33,7 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
      * @param configuration the configuration
      * @return a runtime storage
      */
-    public Storage createRuntimeStorage(Configuration configuration) {
+    public Storage createRuntimeStorage(DeviceMgtSetup configuration) {
         if (null == configuration) {
             return null;
         }
@@ -47,7 +47,7 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
      * @param configuration the configuration
      * @return a runtime storage
      */
-    public Storage createConfigStorage(Configuration configuration) {
+    public Storage createConfigStorage(DeviceMgtSetup configuration) {
         if (null == configuration) {
             return null;
         }

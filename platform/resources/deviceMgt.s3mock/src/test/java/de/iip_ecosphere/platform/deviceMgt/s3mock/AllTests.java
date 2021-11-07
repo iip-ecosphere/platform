@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     S3StorageTest.class,
     S3PackageStorageTest.class,
-    StorageFactoryDescriptorTest.class
+    StorageFactoryDescriptorTest.class,
+    S3StorageLifecycleDescriptorTest.class
 })
 public class AllTests {
 }

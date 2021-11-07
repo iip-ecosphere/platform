@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.deviceMgt.minio;
 
-import de.iip_ecosphere.platform.deviceMgt.Configuration;
+import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
@@ -37,14 +37,14 @@ import static org.mockito.Mockito.when;
  */
 public class StorageFactoryDescriptorTest {
 
-    private Configuration configuration;
+    private DeviceMgtSetup configuration;
 
     /**
      * Configures the test.
      */
     @Before
     public void setUp() {
-        configuration = new Configuration();
+        configuration = new DeviceMgtSetup();
         PackageStorageSetup packageStorageSetup = new PackageStorageSetup();
         packageStorageSetup.setEndpoint("endpoint");
         packageStorageSetup.setRegion("us-west-2");
@@ -114,7 +114,7 @@ public class StorageFactoryDescriptorTest {
     @Test
     public void createStorages_withoutServiceProvider_isJSL() {
         StorageFactory storageFactory = new StorageFactory();
-        storageFactory.setConfiguration(configuration);
+        storageFactory.setSetup(configuration);
         Storage runtimeStorage = storageFactory.createRuntimeStorage();
         Storage configStorage = storageFactory.createConfigStorage();
 
