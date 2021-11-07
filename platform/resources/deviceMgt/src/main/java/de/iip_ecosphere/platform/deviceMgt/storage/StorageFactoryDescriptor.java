@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.deviceMgt.storage;
 
-import de.iip_ecosphere.platform.deviceMgt.Configuration;
+import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 
 /**
  * A service provider interface which can create different kinds of storages.
@@ -27,7 +27,7 @@ public interface StorageFactoryDescriptor {
      * @param configuration the configuration
      * @return the runtime storage
      */
-    Storage createRuntimeStorage(Configuration configuration);
+    Storage createRuntimeStorage(DeviceMgtSetup configuration);
 
     /**
      * Create a config storage.
@@ -35,5 +35,5 @@ public interface StorageFactoryDescriptor {
      * @param configuration the configuration
      * @return the runtime storage
      */
-    Storage createConfigStorage(Configuration configuration);
+    Storage createConfigStorage(DeviceMgtSetup configuration);
 }

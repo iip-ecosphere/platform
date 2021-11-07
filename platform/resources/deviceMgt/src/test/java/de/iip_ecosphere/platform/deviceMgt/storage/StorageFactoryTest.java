@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import de.iip_ecosphere.platform.deviceMgt.Configuration;
+import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -30,14 +30,14 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
  */
 public class StorageFactoryTest {
 
-    private Configuration configuration;
+    private DeviceMgtSetup configuration;
 
     /**
      * Configures the test.
      */
     @Before
     public void setUp() {
-        configuration = new Configuration();
+        configuration = new DeviceMgtSetup();
         PackageStorageSetup packageStorageSetup = new PackageStorageSetup();
         packageStorageSetup.setRegion("us-west-2");
         packageStorageSetup.setEndpoint("endpoint");
@@ -71,7 +71,7 @@ public class StorageFactoryTest {
                 .thenReturn(Optional.empty());
 
         StorageFactory storageFactory = new StorageFactory();
-        storageFactory.setConfiguration(configuration);
+        storageFactory.setSetup(configuration);
         Storage runtimeStorage = storageFactory.createRuntimeStorage();
         Storage configStorage = storageFactory.createConfigStorage();
 

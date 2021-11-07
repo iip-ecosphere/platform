@@ -30,7 +30,7 @@ public class AasDeviceFirmwareOperations implements DeviceFirmwareOperations {
     
     @Override
     public void updateRuntime(String id) throws ExecutionException {
-        Storage runtimeStorage = new StorageFactory().createRuntimeStorage();
+        Storage runtimeStorage = StorageFactory.getInstance().createRuntimeStorage();
         String downloadUrl = null;
         try {
             EcsAasClient ecsAasClient = new EcsAasClient(id);
