@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.platform.PersistentAasSetup.ConfiguredPersistenceType;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup;
-import de.iip_ecosphere.platform.platform.PlatformConfiguration;
+import de.iip_ecosphere.platform.platform.PlatformSetup;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -42,7 +42,7 @@ public class PlatformTest {
      */
     @Test
     public void testPlatform() {
-        PlatformConfiguration cfg = PlatformConfiguration.getInstance();
+        PlatformSetup cfg = PlatformSetup.getInstance();
 
         Assert.assertEquals(8080, cfg.getAas().getServer().getPort());
         Assert.assertEquals(Schema.HTTPS, cfg.getAas().getServer().getSchema());
@@ -82,7 +82,7 @@ public class PlatformTest {
             () -> new PersistentAasSetup());
         aasSetup.setPersistence(ConfiguredPersistenceType.INMEMORY);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
-        PlatformConfiguration.getInstance().setAas(aasSetup);
+        PlatformSetup.getInstance().setAas(aasSetup);
 
         LifecycleHandler.startup(new String[] {});
 

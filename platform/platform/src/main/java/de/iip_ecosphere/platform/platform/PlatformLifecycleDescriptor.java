@@ -39,7 +39,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     
     @Override
     public void startup(String[] args) {
-        PlatformConfiguration cfg = PlatformConfiguration.getInstance();
+        PlatformSetup cfg = PlatformSetup.getInstance();
         AasSetup aasSetup = cfg.getAas();
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();

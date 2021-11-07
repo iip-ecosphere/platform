@@ -79,7 +79,7 @@ public class Cli {
      * @param args interactive mode if no arguments are given, else one shot execution (may be 
      */
     public static void main(String[] args) {
-        PlatformConfiguration setup = PlatformConfiguration.getInstance();
+        PlatformSetup setup = PlatformSetup.getInstance();
         AasPartRegistry.setAasSetup(setup.getAas());
         CommandProvider provider;
         if (0 == args.length) {

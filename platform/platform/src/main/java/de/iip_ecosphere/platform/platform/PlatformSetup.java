@@ -16,15 +16,15 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
- * Platform configuration.
+ * Platform setup from YAML.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlatformConfiguration extends AbstractConfiguration {
+public class PlatformSetup extends AbstractSetup {
 
     /**
      * Common persistence types.
@@ -36,7 +36,7 @@ public class PlatformConfiguration extends AbstractConfiguration {
         MONGO // let's see for other types, may be we need some exclusions on the configuration level
     }
     
-    private static PlatformConfiguration instance;
+    private static PlatformSetup instance;
     private PersistentAasSetup aas = new PersistentAasSetup();
     private TransportSetup transport;
     
@@ -82,14 +82,14 @@ public class PlatformConfiguration extends AbstractConfiguration {
      * @return the configuration instance
      * @see #readFromYaml(Class)
      */
-    public static PlatformConfiguration getInstance() {
+    public static PlatformSetup getInstance() {
         if (null == instance) {
             try {
-                instance = readFromYaml(PlatformConfiguration.class);
+                instance = readFromYaml(PlatformSetup.class);
             } catch (IOException e) {
-                LoggerFactory.getLogger(PlatformConfiguration.class).error(
+                LoggerFactory.getLogger(PlatformSetup.class).error(
                     "Cannot start AAS server: " + e.getMessage());
-                instance = new PlatformConfiguration();
+                instance = new PlatformSetup();
             }
         }
         return instance;

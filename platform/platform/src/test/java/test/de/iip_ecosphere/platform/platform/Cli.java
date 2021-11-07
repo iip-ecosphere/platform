@@ -12,7 +12,7 @@
 
 package test.de.iip_ecosphere.platform.platform;
 
-import de.iip_ecosphere.platform.platform.PlatformConfiguration;
+import de.iip_ecosphere.platform.platform.PlatformSetup;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 
@@ -29,7 +29,7 @@ public class Cli extends de.iip_ecosphere.platform.platform.Cli {
      * @param args interactive mode if no arguments are given, else one shot execution (may be 
      */
     public static void main(String[] args) {
-        PlatformConfiguration setup = PlatformConfiguration.getInstance();
+        PlatformSetup setup = PlatformSetup.getInstance();
         EndpointHolder server = setup.getAas().getServer();
         server.setPort(9001);
         server.setPath("");

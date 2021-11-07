@@ -25,7 +25,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
      * Creates AAS an instance for the service manager.
      */
     public PlattformAasLifecycleDescriptor() {
-        super("Platform", () -> PlatformConfiguration.getInstance().getAas());
+        super("Platform", () -> PlatformSetup.getInstance().getAas());
     }
 
     @Override
