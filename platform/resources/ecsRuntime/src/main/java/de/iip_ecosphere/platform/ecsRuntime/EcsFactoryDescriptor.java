@@ -31,6 +31,6 @@ public interface EcsFactoryDescriptor {
      * 
      * @return the configuration
      */
-    public Configuration getConfiguration();
+    public EcsSetup getConfiguration();
 
 }

@@ -16,9 +16,9 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * A test service factory descriptor.
@@ -35,12 +35,12 @@ public class MyEcsFactoryDescriptor implements EcsFactoryDescriptor {
     }
 
     @Override
-    public Configuration getConfiguration() {
+    public EcsSetup getConfiguration() {
         try {
-            return AbstractConfiguration.readFromYaml(Configuration.class);
+            return AbstractSetup.readFromYaml(EcsSetup.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(MyEcsFactoryDescriptor.class).error("Cannot load config " + e.getMessage());
-            return new Configuration();
+            return new EcsSetup();
         }
     }
 

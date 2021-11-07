@@ -19,7 +19,7 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -32,7 +32,7 @@ public class EcsFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EcsFactory.class.getName());
     private static EcsFactoryDescriptor desc;
     private static ContainerManager manager = null;
-    private static Configuration conf;
+    private static EcsSetup conf;
 
     /**
      * Initializes this factory.
@@ -52,9 +52,9 @@ public class EcsFactory {
                 conf = desc.getConfiguration();
             } else {
                 try {
-                    conf = AbstractConfiguration.readFromYaml(Configuration.class);
+                    conf = AbstractSetup.readFromYaml(EcsSetup.class);
                 } catch (IOException e) {
-                    conf = new Configuration();
+                    conf = new EcsSetup();
                     LOGGER.error("No configuration, falling back to default " + e.getMessage());
                 }
             }
@@ -84,7 +84,7 @@ public class EcsFactory {
      * 
      * @return the configuration instance
      */
-    public static Configuration getConfiguration() {
+    public static EcsSetup getConfiguration() {
         if (null == conf) {
             init();
         }

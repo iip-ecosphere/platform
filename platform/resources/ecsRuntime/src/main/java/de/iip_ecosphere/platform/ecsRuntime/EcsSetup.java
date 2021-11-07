@@ -14,18 +14,18 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.IOException;
 
-import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
- * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add
+ * ECS runtime setup (poor man's spring approach). Implementing components shall extend this class and add
  * their specific configuration settings. Subclasses must have a no-arg constructor and getters/setters for all
  * configuration values.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Configuration extends AasConfiguration {
+public class EcsSetup extends AasBasedSetup {
     
     private TransportSetup transport = new TransportSetup();
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
@@ -86,7 +86,7 @@ public class Configuration extends AasConfiguration {
     }
 
     /**
-     * Reads a {@link Configuration} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * Reads a {@link EcsSetup} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
      * the jar/classpath. This method shall be used by subclasses akin to {@link #readFromYaml()}. 
      *
      * @param <C> the specific type of configuration to read (extended from {@code Configuration}}
@@ -94,19 +94,19 @@ public class Configuration extends AasConfiguration {
      * @return the configuration instance
      * @see #readFromYaml(Class, String)
      */
-    public static <C extends Configuration> C readConfiguration(Class<C> cls) throws IOException {
+    public static <C extends EcsSetup> C readConfiguration(Class<C> cls) throws IOException {
         return readFromYaml(cls);
     }
     
     /**
-     * Reads a {@link Configuration} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * Reads a {@link EcsSetup} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
      * the jar/classpath. 
      *
      * @return the configuration instance
      * @see #readFromYaml(Class)
      */
-    public static Configuration readConfiguration() throws IOException {
-        return readFromYaml(Configuration.class);
+    public static EcsSetup readConfiguration() throws IOException {
+        return readFromYaml(EcsSetup.class);
     }
 
 }

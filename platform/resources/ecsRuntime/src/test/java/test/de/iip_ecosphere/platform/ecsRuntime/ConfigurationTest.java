@@ -17,11 +17,11 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.ecsRuntime.Configuration;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 
 /**
- * Tests {@link Configuration}.
+ * Tests {@link EcsSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -34,14 +34,14 @@ public class ConfigurationTest {
     public void testConfiguration() throws IOException {
         // does not exist
         try {
-            Configuration.readFromYaml(Configuration.class, "me.yml");
+            EcsSetup.readFromYaml(EcsSetup.class, "me.yml");
             Assert.fail("No exception");
         } catch (IOException e) {
             // ok
         }
         
         // for now no configuration content
-        Configuration cfg = Configuration.readConfiguration();
+        EcsSetup cfg = EcsSetup.readConfiguration();
         Assert.assertNotNull(cfg);
         Assert.assertTrue(cfg.getMonitoringUpdatePeriod() > 0);
         Assert.assertNotNull(cfg.getTransport());
