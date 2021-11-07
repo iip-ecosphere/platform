@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * The setup for the configuration component. As there are also EASy-Producer configuration classes with different 
@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConfigurationSetup extends AbstractConfiguration {
+public class ConfigurationSetup extends AbstractSetup {
 
     public static final String PLATFORM_META_MODEL_NAME = "IIPEcosphere";
     private static ConfigurationSetup instance;
