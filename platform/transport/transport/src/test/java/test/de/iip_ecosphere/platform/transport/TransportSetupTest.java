@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
