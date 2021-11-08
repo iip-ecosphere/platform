@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -88,7 +88,7 @@ public class YamlArtifact extends AbstractYamlArtifact {
      * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
-        YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
+        YamlArtifact result = AbstractSetup.readFromYaml(YamlArtifact.class, in);
         if (null == result.services) {
             result.services = new ArrayList<>();
         }
