@@ -7,7 +7,7 @@ template JavaYamlTest(Configuration config, FileArtifact target, String pkg, Str
     def main(Configuration config, FileArtifact target, String pkg, String fqnCls, String cfgFile, String clsName="AllTests") {
         'package ${pkg};
         
-        import static de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration.*;
+        import static de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup.*;
         import org.junit.Test;
         import java.io.*;
 
