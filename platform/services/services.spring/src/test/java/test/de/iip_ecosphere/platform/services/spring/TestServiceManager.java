@@ -125,7 +125,7 @@ public class TestServiceManager {
     @BeforeClass
     public static void init() {
         server = new TestQpidServer(BROKER); // prescribes protocol for artifacts
-        // spring is too late, AbstractConfiguration does not load it even with modified constructor...
+        // spring is too late, AbstractSetup does not load it even with modified constructor...
         TransportSetup setup = ServiceFactory.getTransport();
         setup.setPort(BROKER.getPort());
         setup.setHost("localhost");
