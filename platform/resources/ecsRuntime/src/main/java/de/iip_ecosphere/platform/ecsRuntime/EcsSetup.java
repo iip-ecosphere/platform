@@ -86,7 +86,7 @@ public class EcsSetup extends AasBasedSetup {
     }
 
     /**
-     * Reads a {@link EcsSetup} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder of 
      * the jar/classpath. This method shall be used by subclasses akin to {@link #readFromYaml()}. 
      *
      * @param <C> the specific type of configuration to read (extended from {@code Configuration}}
@@ -99,7 +99,7 @@ public class EcsSetup extends AasBasedSetup {
     }
     
     /**
-     * Reads a {@link EcsSetup} instance from {@link AbstractConfiguration#DEFAULT_FNAME) in the root folder of 
+     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder of 
      * the jar/classpath. 
      *
      * @return the configuration instance
