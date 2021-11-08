@@ -1,0 +1,15 @@
+@advice(IIPEcosphere)
+template JavaOsBasics(Configuration config, FileArtifact target) {
+	
+    def String javaOpts(IIPEcosphere cfg, Boolean withModuleOpts) {
+        String result = cfg.javaOpts;
+        if (withModuleOpts) {
+            if (result.length() > 0) {
+                result = result + " ";
+            }
+            result = result + cfg.javaModuleOpts;
+        }
+        result;
+    }
+	
+}

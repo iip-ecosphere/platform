@@ -12,11 +12,13 @@
     * Spring transport connector instances/binders can be configured individually. TLS encryption support for the spring transport connectors/binders is available.
     * MQTT machine connectors support optional TLS encryption.
     * PID files for the major platform components
-    * Generation of Linux/systemd service descriptions for platform services, ECS runtime and service manager. 
+    * Generation of Linux/systemd service descriptions for platform services, ECS runtime and service manager. Generation of separate scripts for Java 8 (no module system).
     * Generation of README.txt with brief explanations on the generated files and folders.
     * Fixed/extended qualified name access for OPC UA connector.
     * Automated instantiation of a one-process ECS runtime/service manager without container manager for devices with low resources.
     * Platform instantiaton process without Java test execution (may fail depending on JDK/surefire combination).
+    * Initial integration of device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
+    * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
 * Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes
@@ -29,6 +31,7 @@
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
 * Resources/ECS runtime, container management for Docker
 * Initial configuration model and code generation
+* Initial transport-based resource/service monitoring (based on PA Miguel Casado)
 * Maven central deployment script, deployment guideline
 * First central platform server
 * Platform handbook
@@ -42,3 +45,4 @@
 * Dependency management
 * Basic transport component
 * Basic connectors component
+* Basic AAS abstraction (based on PA Monika Staciwa)

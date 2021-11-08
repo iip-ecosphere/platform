@@ -146,7 +146,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests);
         maven("${platformRoot}", true);
-        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "");
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "", withJava8=false);
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
  
         commonRoot.mkdir();
@@ -154,13 +154,25 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }
     
-    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires) = {
+    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true) = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main);
+        if (withJava8) {
+            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false);
+        }
         vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main);
+        if (withJava8) {
+            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false);
+        }
         if (pidName.length() > 0) {
            vilTemplateProcessor("LinuxSysd", config, "${pathName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires);
+           if (withJava8) {
+               vilTemplateProcessor("LinuxSysd", config, "${pathName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, withModuleOpts=false);
+           }
            if (requires.length() > 0) {
                vilTemplateProcessor("LinuxSysd", config, "${pathName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid");
+               if (withJava8) {
+                   vilTemplateProcessor("LinuxSysd", config, "${pathName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false);
+               }
            }
         }
     }

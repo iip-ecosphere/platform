@@ -16,35 +16,37 @@ template Readme(Configuration config, FileArtifact target) {
         IP-Addresses for the central services became part of the binaries during packaging.
         
         This folder contains the top-level artifacts that are needed to execute the platform (in the following sequence):
-          - The central platform services, in particular the AAS server
-            - platform.bat for Windows
-            - platform.sh for Linux/Bash
+          - The central platform services, in particular the AAS server (due to various components, JDK 8 is not 
+            feasible for the central platform services)
+            - platform.bat for Windows and JDK > 8
+            - platform.sh for Linux/Bash and JDK > 8
             - source code in "platform"
             - binaries in "plJars"
-            - platform.service for Linux/systemd
+            - platform.service for Linux/systemd and JDK > 8 
           - The ECS runtime with container manager
-            - ecs.bat for Windows
-            - ecs.sh for Linux/Bash
+            - ecs.bat for Windows and JDK > 8, ecs8.bat for Windows and JDK 8
+            - ecs.sh for Linux/Bash and JDK > 8, ecs8.sh for Linux/Bash and JDK 8
             - source code in "ecsRuntime"
             - binaries in "ecsJars"
             - ecs.service (with dependency to platform.service) as well as ecs-noDeps.service (for standalone 
-              device installation) for Linux/systemd
+              device installation) for Linux/systemd and JDK > 8, ecs8.service for Linux/system and JDK 8
           - The service manager
-            - serviceMgr.bat for Windows
-            - serviceMgr.sh for Linux/Bash
+            - serviceMgr.bat for Windows and JDK > 8, serviceMgr8.bat for Windows and JDK 8
+            - serviceMgr.sh for Linux/Bash and JDK > 8, serviceMgr8.sh for for Linux/Bash and JDK 8
             - source code in "serviceMgr"
             - binaries in "svcJars"
             - serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
-              device/container installation) for Linux/systemd
+              device/container installation) for Linux/systemd and JDK > 8, akin serviceMgr8.service and 
+              serviceMgr8-noDeps.service for JDK 8
           - For small resources: ECS runtime without container manager but including service manager
-            - ecsServiceMgr.bat for Windows
-            - ecsServiceMgr.sh for Linux/Bash
+            - ecsServiceMgr.bat for Windows and JDK > 8, ecsServiceMgr8.bat for Windows and JDK 8
+            - ecsServiceMgr.sh for Linux/Bash and JDK > 8, ecsServiceMgr8.sh for for Linux/Bash and JDK 8
             - source code in "ecsServiceMgr"
             - binaries in "ecsSvcJars"
-            - ecsServiceMgr.service for Linux/systemd
+            - ecsServiceMgr.service for Linux/systemd and JDK > 8, ecsServiceMgr8.service for Linux/system and JDK 8
           - The platform command line (so far, the platform does not have an UI but this may change in future ;))
-            - cli.bat for Windows
-            - cli.sh for Linux/Bash
+            - cli.bat for Windows and JDK > 8, cli8.bat for Windows and JDK 8
+            - cli.sh for Linux/Bash and JDK > 8, cli8.sh for Linux/Bash and JDK 8
             - source code also in "platform"
             - binaries also in "plJars"
           - The folder "common": 

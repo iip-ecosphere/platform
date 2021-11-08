@@ -1,8 +1,10 @@
+import JavaOsBasics;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
+template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true) {
 	
-    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="") {
+    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true) {
         IIPEcosphere cfg = config;
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '[Unit]
@@ -11,7 +13,7 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         [Service]
         Type=forking
         PIDFile=${cfg.pidDir}/${pidFile}
-        ExecStart=java -cp "\\$IIP_HOME/${dir}/*:\\$IIP_HOME/common/*" ${cfg.javaOpts} -Diip.pid.dir=${cfg.pidDir} "${m}" \\$*
+        ExecStart=java -cp "\\$IIP_HOME/${dir}/*:\\$IIP_HOME/common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${m}" \\$*
         ${requires(requires)}'
     }
     
