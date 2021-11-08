@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServiceConfiguration {
+public class ServiceSetup {
 
     private AasSetup aas = new AasSetup();
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;

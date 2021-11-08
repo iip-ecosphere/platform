@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -83,7 +83,7 @@ public class ServiceFactory {
             }
             if (null == setup) {
                 try {
-                    ServiceConfiguration cfg = AbstractConfiguration.readFromYaml(ServiceConfiguration.class);
+                    ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
                     setup = cfg.getAas();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
@@ -109,7 +109,7 @@ public class ServiceFactory {
             }
             if (null == transport) {
                 try {
-                    ServiceConfiguration cfg = AbstractConfiguration.readFromYaml(ServiceConfiguration.class);
+                    ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
                     transport = cfg.getTransport();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
