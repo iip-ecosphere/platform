@@ -46,13 +46,14 @@ The following layers and components of the IIP-Ecosphere are available in this p
  * [Resource management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/README.md) and Monitoring
     * [Edge Cloud Server (ECS) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md)
     * Default resource management for [Docker](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime.docker/README.md)
-   * Upcoming: Resource management for Kubernetes
+    * Upcoming: Resource management for Kubernetes
+    * [Device management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt/README.md) with MinIO, S3Mock and ThingsBoard integrations.
  * [Security and Data Protection](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
  * Reusable Intelligent Services
  * Configuration
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
-    * resource optimization
-    * adaptation
+    * Resource optimization
+    * Adaptation
     
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere).
