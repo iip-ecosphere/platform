@@ -29,6 +29,11 @@
      <artifactId>ecsRuntime</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>deviceMgt</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   
     <dependency>
       <groupId>junit</groupId>

@@ -20,9 +20,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.platform.cli.ArgsCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
+import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
 import de.iip_ecosphere.platform.platform.cli.EcsClientFactory;
 import de.iip_ecosphere.platform.platform.cli.Level;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor;
@@ -48,6 +50,7 @@ public class Cli {
     private static ServicesClientFactory servicesFactory = ServicesClientFactory.DEFAULT;
     private static EcsClientFactory ecsFactory = EcsClientFactory.DEFAULT;
     private static ResourcesClientFactory resourcesFactory = ResourcesClientFactory.DEFAULT;
+    private static DeviceManagementClientFactory deviceManagementFactory = DeviceManagementClientFactory.DEFAULT;
     private static Consumer<String> errorConsumer = DEFAULT_ERROR_CONSUMER;
     
     /**
@@ -56,12 +59,14 @@ public class Cli {
      * @param services the services client factory 
      * @param ecs the ECS client factory
      * @param resources the resources client factory
+     * @param deviceManagement the device management factory
      */
     public static void setFactories(ServicesClientFactory services, EcsClientFactory ecs, 
-        ResourcesClientFactory resources) {
+        ResourcesClientFactory resources, DeviceManagementClientFactory deviceManagement) {
         servicesFactory = services;
         ecsFactory = ecs;
         resourcesFactory = resources;
+        deviceManagementFactory = deviceManagement;
     }
     
     /**
@@ -382,9 +387,18 @@ public class Cli {
         protected boolean interpretFurther(CommandProvider provider, Level level, String cmd) 
             throws ExecutionException, URISyntaxException {
             boolean exit = false;
+            String id;
             switch (cmd.toLowerCase()) {
             case "list":
                 listResources();
+                break;
+            case "createssh":
+                id = provider.nextCommand();
+                if (null == id) {
+                    System.out.println("No Id given.");
+                } else {
+                    createSshServer(id);
+                }
                 break;
             default:
                 exit = super.interpretFurther(provider, level, cmd);
@@ -441,6 +455,24 @@ public class Cli {
         }
     }
 
+    /**
+     * Creates an SSH server on a given resource.
+     * 
+     * @param id the resource id
+     */
+    private static void createSshServer(String id) {
+        try {
+            DeviceRemoteManagementOperations.SSHConnectionDetails sshServer 
+                = deviceManagementFactory.create().establishSsh(id);
+            System.out.println("Use the following line to connect to the edge-ssh-server:");
+            System.out.println("ssh " + sshServer.getUsername() + "@" + sshServer.getHost() 
+                + " -p " + sshServer.getPort());
+            System.out.println("Password: " + sshServer.getPassword());
+        } catch (ExecutionException | IOException e) {
+            println(e);
+        }
+    }
+    
     /**
      * Prints a sub-model using {@link PrintVisitor}.
      * 
@@ -502,6 +534,7 @@ public class Cli {
         }
         if (level.isTopLevel() || Level.RESOURCES == level) {
             println("  list - lists all known resources");
+            println("  createSsh <resourceId> - creates an SSH server at resource <resourceId>");
             println("  help - prints help for this level");
             println("  back - to previous level", provider);
             println("  .. - to previous level", provider);

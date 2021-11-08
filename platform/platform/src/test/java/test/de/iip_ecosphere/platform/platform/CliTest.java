@@ -21,9 +21,12 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.ecsRuntime.ResourcesClient;
+import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
 import de.iip_ecosphere.platform.platform.cli.EcsClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ResourcesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
@@ -67,6 +70,8 @@ public class CliTest {
     private static final String[] RESOURCES_SEQUENCE = new String[] {
         "resources",
         "help",
+        "list",
+        "startSsh",
         "exit"
     };
 
@@ -240,6 +245,21 @@ public class CliTest {
         public SubmodelElementCollection getContainers() {
             return null;
         }
+
+        @Override
+        public Credentials createRemoteConnectionCredentials() throws ExecutionException {
+            return null;
+        }
+
+        @Override
+        public String getRuntimeName() throws ExecutionException {
+            return null;
+        }
+
+        @Override
+        public Integer getRuntimeVersion() throws ExecutionException {
+            return null;
+        }
         
     }
 
@@ -260,6 +280,19 @@ public class CliTest {
             return null;
         }
         
+    }
+
+    /**
+     * Mock device management client/factory for testing.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class DeviceManagementFactory implements DeviceManagementClientFactory {
+
+        @Override
+        public DeviceManagementAasClient create() throws IOException {
+            return null;
+        }
     }
     
     /**
@@ -304,8 +337,10 @@ public class CliTest {
         ServicesFactory servicesFactory = new ServicesFactory();
         EcsFactory ecsFactory = new EcsFactory();
         ResourcesFactory resourcesFactory = new ResourcesFactory();
+        DeviceManagementClientFactory deviceManagementClientFactory = new DeviceManagementFactory();
         ErrorConsumer errorConsumer = new ErrorConsumer();
-        de.iip_ecosphere.platform.platform.Cli.setFactories(servicesFactory, ecsFactory, resourcesFactory);
+        de.iip_ecosphere.platform.platform.Cli.setFactories(servicesFactory, ecsFactory, resourcesFactory, 
+            deviceManagementClientFactory);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(errorConsumer);
         
         test(COMPLETE_SEQUENCE, errorConsumer, 0);
@@ -319,7 +354,7 @@ public class CliTest {
         test(SERVICES_FAIL, errorConsumer, 1);
         
         de.iip_ecosphere.platform.platform.Cli.setFactories(ServicesClientFactory.DEFAULT, EcsClientFactory.DEFAULT, 
-            ResourcesClientFactory.DEFAULT);
+            ResourcesClientFactory.DEFAULT, DeviceManagementClientFactory.DEFAULT);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(
             de.iip_ecosphere.platform.platform.Cli.DEFAULT_ERROR_CONSUMER);
     }
