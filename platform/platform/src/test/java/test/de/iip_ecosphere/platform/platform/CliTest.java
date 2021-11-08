@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
-import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementClient;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.ecsRuntime.ResourcesClient;
@@ -71,7 +71,7 @@ public class CliTest {
         "resources",
         "help",
         "list",
-        "startSsh",
+        "createSsh", "abb0",
         "exit"
     };
 
@@ -287,12 +287,26 @@ public class CliTest {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class DeviceManagementFactory implements DeviceManagementClientFactory {
+    private static class DeviceManagementFactory implements DeviceManagementClientFactory, DeviceManagementClient {
 
         @Override
-        public DeviceManagementAasClient create() throws IOException {
-            return null;
+        public DeviceManagementClient create() throws IOException {
+            return this;
         }
+
+        @Override
+        public void updateRuntime(String id) throws ExecutionException {
+        }
+
+        @Override
+        public SSHConnectionDetails establishSsh(String id) throws ExecutionException {
+            return new SSHConnectionDetails("host", 22, "me", "here");
+        }
+
+        @Override
+        public void setConfig(String id, String configPath) throws ExecutionException {
+        }
+        
     }
     
     /**

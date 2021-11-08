@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.platform.cli;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementClient;
 
 import java.io.IOException;
 
@@ -26,7 +27,14 @@ public interface DeviceManagementClientFactory {
     /**
      * The default factory.
      */
-    public static final DeviceManagementClientFactory DEFAULT = () -> new DeviceManagementAasClient();
+    public static final DeviceManagementClientFactory DEFAULT = new DeviceManagementClientFactory() {
+
+        @Override
+        public DeviceManagementClient create() throws IOException {
+            return new DeviceManagementAasClient();
+        }
+        
+    };
     
     /**
      * Creates a resources client.
@@ -34,6 +42,6 @@ public interface DeviceManagementClientFactory {
      * @return the client instance
      * @throws IOException if the client cannot be created
      */
-    public DeviceManagementAasClient create() throws IOException;
+    public DeviceManagementClient create() throws IOException;
     
 }
