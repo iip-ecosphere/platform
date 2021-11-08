@@ -19,7 +19,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface EcsClient extends ContainerOperations {
+public interface EcsClient extends ContainerOperations, DeviceManagementOperations {
 
     /**
      * Returns the collection with all containers of the resources this client was created for.

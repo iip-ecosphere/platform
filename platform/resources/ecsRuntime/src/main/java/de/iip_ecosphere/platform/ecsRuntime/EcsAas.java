@@ -16,9 +16,14 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
+import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -56,6 +61,8 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_STATE = "state";
     public static final String NAME_PROP_RESOURCE = "resource";
+    public static final String NAME_PROP_RUNTIME_NAME = "runtimeName";
+    public static final String NAME_PROP_RUNTIME_VERSION = "runtimeVersion";
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
@@ -65,6 +72,8 @@ public class EcsAas implements AasContributor {
     public static final String NAME_OP_CONTAINER_STOP = "stopContainer";
     public static final String NAME_OP_CONTAINER_START = "startContainer";
 
+    public static final String NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS = "createRemoteConnectionCredentials";
+    
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
     @Override
@@ -76,7 +85,6 @@ public class EcsAas implements AasContributor {
 
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), 
             false, false);
-
         
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
         MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
@@ -85,6 +93,19 @@ public class EcsAas implements AasContributor {
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
             .build();
+
+        jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
+            .setValue(Type.STRING, "defaultEcsRuntime")
+            .build();
+        jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
+            .setValue(Type.INTEGER, 1)
+            .build();
+        jB.createOperationBuilder(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)))
+            .addOutputVariable("username", Type.STRING)
+            .addOutputVariable("password", Type.STRING)
+            .build();
+        
         if (null != mgr) {
             jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
                 .setValue(Type.STRING, mgr.getContainerSystemVersion())
@@ -169,6 +190,22 @@ public class EcsAas implements AasContributor {
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
         ));
+        
+        sBuilder.defineOperation(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS),
+            p -> {
+                Credentials credentials = RemoteAccessServerFactory.create()
+                    .getCredentialsManager()
+                    .addGeneratedCredentials();
+                ObjectMapper mapper = new ObjectMapper();
+                String result = null;
+                try {
+                    result = mapper.writeValueAsString(credentials);
+                } catch (JsonProcessingException e) {
+                    LoggerFactory.getLogger(EcsAas.class).error(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS 
+                        + ": " + e.getMessage());
+                }
+                return result;
+            });
         //MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
     }
 
