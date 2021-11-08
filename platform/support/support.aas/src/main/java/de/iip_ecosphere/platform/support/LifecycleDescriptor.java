@@ -26,7 +26,19 @@ package de.iip_ecosphere.platform.support;
  */
 public interface LifecycleDescriptor {
 
+    /**
+     * Directly interact with the command line, ability to start/stop the program before internal services come up.
+     */
+    public static final int CMD_LINE_PRIORITY = 0;
+    
+    /**
+     * Initialize the program, e.g., start internal services (after {@link #CMD_LINE_PRIORITY}).
+     */
     public static final int INIT_PRIORITY = 1;
+
+    /**
+     * Initialize the AAS/submodels, in particular after all descriptors with {@link #INIT_PRIORITY}.
+     */
     public static final int AAS_PRIORITY = 100;
     
     // Java Service Loading, do not change class name/package!
