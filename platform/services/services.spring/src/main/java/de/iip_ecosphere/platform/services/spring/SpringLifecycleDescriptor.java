@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
 /**
@@ -36,7 +36,7 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         new SpringApplicationBuilder(SpringLifecycleDescriptor.class)
-            .properties("spring.config.name:" + AbstractConfiguration.DEFAULT_NAME)
+            .properties("spring.config.name:" + AbstractSetup.DEFAULT_NAME)
             .build()
             .run(args);
         NetworkManagerFactory.configure(SpringInstances.getConfig().getNetMgr());

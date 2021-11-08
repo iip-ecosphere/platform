@@ -20,7 +20,7 @@ import java.util.List;
 import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -70,7 +70,7 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
      * @return the artifact info
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
-        YamlArtifact result = AbstractConfiguration.readFromYaml(YamlArtifact.class, in);
+        YamlArtifact result = AbstractSetup.readFromYaml(YamlArtifact.class, in);
         if (null == result.getServices()) {
             result.setServices(new ArrayList<>());
         }

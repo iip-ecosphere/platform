@@ -18,7 +18,7 @@ import java.util.HashMap;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import de.iip_ecosphere.platform.services.ServiceConfiguration;
+import de.iip_ecosphere.platform.services.ServiceSetup;
 
 /**
  * Configures the service manager.
@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.services.ServiceConfiguration;
  */
 @ConfigurationProperties(prefix = "service-mgr")
 @Component
-public class SpringCloudServiceConfiguration extends ServiceConfiguration {
+public class SpringCloudServiceConfiguration extends ServiceSetup {
 
     private String brokerHost = "localhost";
     private int brokerPort = 8883;
