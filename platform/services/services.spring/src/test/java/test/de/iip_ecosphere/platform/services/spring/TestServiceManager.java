@@ -76,7 +76,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractConfiguration;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -91,7 +91,7 @@ import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
  * @author Holger Eichelberger, SSE
  */
 @SpringBootTest(classes = TestServiceManager.Config.class)
-@TestPropertySource(locations = "classpath:" + AbstractConfiguration.DEFAULT_FNAME)
+@TestPropertySource(locations = "classpath:" + AbstractSetup.DEFAULT_FNAME)
 @ContextConfiguration(initializers = TestServiceManager.Initializer.class)
 @Import(SpringCloudServiceConfiguration.class)
 @RunWith(SpringRunner.class)
