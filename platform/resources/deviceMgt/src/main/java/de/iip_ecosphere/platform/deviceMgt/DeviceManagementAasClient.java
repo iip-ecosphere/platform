@@ -26,8 +26,7 @@ import java.util.concurrent.ExecutionException;
  *
  * @author Dennis Pidun, University of Hildesheim
  */
-public class DeviceManagementAasClient extends SubmodelElementsCollectionClient
-        implements DeviceFirmwareOperations, DeviceRemoteManagementOperations, DeviceResourceConfigOperations {
+public class DeviceManagementAasClient extends SubmodelElementsCollectionClient implements DeviceManagementClient {
 
     /**
      * Default constructor.
@@ -61,4 +60,5 @@ public class DeviceManagementAasClient extends SubmodelElementsCollectionClient
     public void setConfig(String id, String configPath) throws ExecutionException {
         getOperation(DeviceManagementAas.NAME_OP_SET_CONFIG).invoke(id, configPath);
     }
+    
 }
