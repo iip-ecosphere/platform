@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-deviceMgt.thingsboard" pomFile="pom.xml" jarFolder="target" artifactPattern="deviceMgt.thingsboard-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-deviceMgt.basicReg" pomFile="pom.xml" jarFolder="target" artifactPattern="deviceMgt.basicRegistry-*.*.*.jar" />
 	</target>
 </project>
