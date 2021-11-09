@@ -82,7 +82,7 @@ public class EcsAasTest {
     public static void startup() {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
         qpid = new TestQpidServer(broker);
-        EcsFactory.getConfiguration().getTransport().setPort(broker.getPort());
+        EcsFactory.getSetup().getTransport().setPort(broker.getPort());
         qpid.start();
     }
     
@@ -143,7 +143,7 @@ public class EcsAasTest {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
-        EcsFactory.getConfiguration().setAas(aasSetup);
+        EcsFactory.getSetup().setAas(aasSetup);
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();

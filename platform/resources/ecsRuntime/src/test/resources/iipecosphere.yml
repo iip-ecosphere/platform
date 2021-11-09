@@ -6,3 +6,4 @@ transport:
 netMgr:
     lowPort: 1025
     highPort: 65535
+autoOnOffboarding: true

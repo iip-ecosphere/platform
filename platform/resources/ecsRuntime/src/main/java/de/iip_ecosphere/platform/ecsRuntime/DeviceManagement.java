@@ -23,8 +23,6 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 /**
  * DeviceManagement lifecycle methods.
  * This class provides easy access to the device registry
@@ -57,38 +55,49 @@ public class DeviceManagement {
     }
 
     /**
-     * Initialization routine for device registration.
+     * Routine for device registration.
+     * 
+     * @param onboard does this operation add the device the first time intentionally to the 
+     *   platform ({@code true}) or is this just the startup registration ({@code false})
      */
-    public static void initializeDevice() {
-        try {
-            DeviceRegistryClient registryClient = DeviceRegistryClientFactory
-                .createDeviceRegistryClient();
-            SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
+    public static void addDevice(boolean onboard) throws ExecutionException {
+        DeviceRegistryClient registryClient = DeviceRegistryClientFactory
+            .createDeviceRegistryClient();
+        SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
 
-            if (null == device) {
+        if (null == device) {
+            if (onboard) {
                 String ip = NetUtils.getOwnIP();
                 registryClient.addDevice(Id.getDeviceIdAas(), ip);
+            } else {
+                throw new ExecutionException("This decvice was not onboarded before. Stopping.", null);
             }
-
-            RemoteAccessServer remoteAccessServer = getRemoteAccessServer();
-            remoteAccessServer.start();
-        } catch (ExecutionException e) {
-            LoggerFactory.getLogger(DeviceManagement.class).error("Initializing Device: " + e.getMessage());
         }
+
+        RemoteAccessServer remoteAccessServer = getRemoteAccessServer();
+        remoteAccessServer.start();
     }
 
     /**
      * Method for device removal.
+     * 
+     * @param offboard does this operation remove the device intentionally from the 
+     *   platform ({@code true}) or is this just a shutdown unregistration ({@code false})
      */
-    public static void removeDevice() {
+    public static void removeDevice(boolean offboard) throws ExecutionException {
         try {
             DeviceRegistryClient registryClient = getRegistryClient();
             SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
             if (null != device) {
-                registryClient.removeDevice(Id.getDeviceIdAas());
+                if (offboard) {
+                    registryClient.removeDevice(Id.getDeviceIdAas());
+                } 
+            } else {
+                throw new ExecutionException("Device was not registered.", null);
             }
         } catch (IOException | ExecutionException e) {
-            LoggerFactory.getLogger(DeviceManagement.class).error("Removing Device: " + e.getMessage());
+            throw new ExecutionException("Removing Device: " + e.getMessage(), null);
         }
     }
+
 }

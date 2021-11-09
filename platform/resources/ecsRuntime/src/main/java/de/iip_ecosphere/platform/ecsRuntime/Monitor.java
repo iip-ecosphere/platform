@@ -53,7 +53,7 @@ class Monitor {
      */
     static void startScheduling() {
         final String id = Id.getDeviceId();
-        EcsSetup config = EcsFactory.getConfiguration();
+        EcsSetup config = EcsFactory.getSetup();
         TransportSetup transport = config.getTransport();
         if (null != transport) {
             try {

@@ -30,6 +30,7 @@ public class EcsSetup extends AasBasedSetup {
     private TransportSetup transport = new TransportSetup();
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
     private int monitoringUpdatePeriod = 2000;
+    private boolean autoOnOffboarding = true;
 
     /**
      * Returns the monitoring update period.
@@ -59,6 +60,15 @@ public class EcsSetup extends AasBasedSetup {
     }
 
     /**
+     * Returns whether automatic on/offboarding is enabled.
+     * 
+     * @return {@code true} on/offboard always, if {@code false} explicit on/offboarding is required
+     */
+    public boolean getAutoOnOffboarding() {
+        return autoOnOffboarding;
+    }
+
+    /**
      * Changes the monitoring update period. [snakeyaml]
      * 
      * @param monitoringUpdatePeriod in ms, values below 200 are turned to 200
@@ -83,6 +93,16 @@ public class EcsSetup extends AasBasedSetup {
      */
     public void setNetMgr(NetworkManagerSetup netMgr) {
         this.netMgr = netMgr;
+    }
+
+    /**
+     * Changes the automatic on/offboarding behavior. [snakeyaml]
+     * 
+     * @param implicitOnOffboarding if {@code true} on/offboard always, if {@code false} explicit on/offboarding 
+     *     is required
+     */
+    public void setAutoOnOffboarding(boolean implicitOnOffboarding) {
+        this.autoOnOffboarding = implicitOnOffboarding;
     }
 
     /**

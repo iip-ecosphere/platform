@@ -80,11 +80,11 @@ public class EcsFactory {
     }
 
     /**
-     * Returns the actual configuration instance for the implementing container manager.
+     * Returns the actual setup instance for the implementing container manager.
      * 
-     * @return the configuration instance
+     * @return the setup instance
      */
-    public static EcsSetup getConfiguration() {
+    public static EcsSetup getSetup() {
         if (null == conf) {
             init();
         }

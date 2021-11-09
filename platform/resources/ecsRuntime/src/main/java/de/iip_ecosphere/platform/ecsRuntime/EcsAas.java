@@ -88,7 +88,7 @@ public class EcsAas implements AasContributor {
         
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
         MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
-            Id.getDeviceId(), EcsFactory.getConfiguration().getTransport());
+            Id.getDeviceId(), EcsFactory.getSetup().getTransport());
 
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
