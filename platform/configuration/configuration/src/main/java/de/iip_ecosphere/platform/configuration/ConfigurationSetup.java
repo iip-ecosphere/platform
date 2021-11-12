@@ -186,7 +186,7 @@ public class ConfigurationSetup extends AbstractSetup {
      *
      * @return the configuration instance
      */
-    public static ConfigurationSetup getConfiguration() {
+    public static ConfigurationSetup getSetup() {
         if (null == instance) {
             try {
                 instance = readFromYaml(ConfigurationSetup.class);

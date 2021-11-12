@@ -143,7 +143,7 @@ public class PlatformInstantiator {
      * @throws ExecutionException in case that the instantiation fails and the configurer re-throws the exception
      */
     public static void instantiate(InstantiationConfigurer configurer) throws ExecutionException {
-        ConfigurationSetup setup = ConfigurationSetup.getConfiguration();
+        ConfigurationSetup setup = ConfigurationSetup.getSetup();
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
