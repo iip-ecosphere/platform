@@ -55,6 +55,8 @@ This component must be bundled with further, e.g., upper layer components which 
 
 The command line argument `--iip.port=<int>` allows overriding the AAS implementation server port, i.e., in the Yaml above `aas:implementation:port`.
 
+The `EcsCmdLineLifecycleDescriptor` is optional and shall only be used by real ECS setups, not in importing projects.
+
 ## Missing
 * ECS Monitoring
 * AAS discovery, currently we rely on the full IP specification instantiated through the configuration
