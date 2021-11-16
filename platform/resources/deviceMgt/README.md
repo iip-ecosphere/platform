@@ -45,7 +45,7 @@ A configuration can look like the following example:
 
 ```yaml
 runtimeStorage:
-  endpoint: <String>"http://localhost:9001"
+  endpoint: "http://localhost:9001"
   region: 
   accessKey: "minio_access_key"
   secretAccessKey: "minio_secret_access_key"
