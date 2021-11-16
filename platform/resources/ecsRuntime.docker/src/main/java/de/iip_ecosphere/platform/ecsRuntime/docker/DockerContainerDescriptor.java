@@ -443,5 +443,19 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
         }
         return result;
     }
+    
+    /**
+     * Tests reading a Docker container file.
+     * 
+     * @param args arguments, first is taken as file name
+     */
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            DockerContainerDescriptor desc = readFromYamlFile(new File(args[0]));
+            System.out.println("Descriptor (may be hash): " + desc);
+        } else {
+            System.out.println("First arg must be file to read");
+        }
+    }
 
 }
