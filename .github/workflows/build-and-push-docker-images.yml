@@ -21,6 +21,7 @@ jobs:
         run: |
           echo $VERSION
           echo ${{ env.VERSION }}
+          ls
       - name: Build and push platform
         uses: docker/build-push-action@v1
         with:
@@ -29,7 +30,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PW }}        
           repository: inoeg/eps
           tag_with_ref: true
-          dockerfile: ./platform/tools/install/container/fullPlatform/platform/Dockerfile
+          dockerfile: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
         uses: docker/build-push-action@v1
         with:
@@ -38,4 +39,4 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PW }}        
           repository: inoeg/sd
           tag_with_ref: true
-          dockerfile: ./platform/tools/install/container/fullPlatform/cli/Dockerfile
+          dockerfile: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
