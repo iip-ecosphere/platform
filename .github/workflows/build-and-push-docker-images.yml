@@ -27,6 +27,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'zulu'
+      - name: Build the test app through tests
+        run: |
+          cd ./platform/configuration/configuration
+          mvn --batch-mode --update-snapshots package
+          cd ../../..
       - name: Instantiate the platform
         run: |
           cd ./platform/tools/Install/platformDependencies
@@ -40,6 +45,7 @@ jobs:
           cat src/main/easy/InstallTest.ivml
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
           cp container/fullPlatform/platform/*.sh gen
+          cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar gen
           echo "Base directory for container creation:"
           ls gen
       - name: Login to DockerHub
@@ -50,14 +56,14 @@ jobs:
       - name: Build and push platform
         uses: docker/build-push-action@v2
         with:
-          build_args: VERSION=${{ env.VERSION }}
+          build-args: VERSION=${{ env.VERSION }}
           tags: iipecosphere/platform/platform:${{ env.VERSION }}
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
         uses: docker/build-push-action@v2
         with:
-          build_args: VERSION=${{ env.VERSION }}
+          build-args: VERSION=${{ env.VERSION }}
           tags: iipecosphere/platform/cli:${{ env.VERSION }}
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
