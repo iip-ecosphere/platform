@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageServerSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
@@ -33,6 +35,8 @@ public class S3StorageLifecycleDescriptor implements LifecycleDescriptor {
         if (null != setup) {
             StorageServerSetup serverSetup = setup.getStorageServer();
             if (null != serverSetup && serverSetup.getPort() > 0) {
+                LoggerFactory.getLogger(S3StorageLifecycleDescriptor.class).info(
+                    "Starting S3 Mock Server on port " + serverSetup.getPort());
                 S3Mock.Builder builder = new S3Mock.Builder().withPort(serverSetup.getPort());
                 if (null == serverSetup.getPath() || serverSetup.getPath().toString().length() == 0) {
                     builder.withInMemoryBackend();
@@ -48,7 +52,11 @@ public class S3StorageLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void shutdown() {
         if (null != api) {
-            api.shutdown();
+            try {
+                api.shutdown();
+            } catch (NullPointerException e) {
+                // occurs when bind on start fails, however in it's own thread
+            }
         }
     }
 
