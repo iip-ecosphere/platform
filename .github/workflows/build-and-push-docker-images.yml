@@ -60,13 +60,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build-args: VERSION=${{ env.VERSION }}
-          tags: iipecosphere/platform/platform:${{ env.VERSION }}
+          push: true
+          tags: iipecosphere/platform-all:latest
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
         uses: docker/build-push-action@v2
         with:
           build-args: VERSION=${{ env.VERSION }}
-          tags: iipecosphere/platform/cli:${{ env.VERSION }}
+          push: true
+          tags: iipecosphere/cli:latest
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
