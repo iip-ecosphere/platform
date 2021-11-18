@@ -6,7 +6,7 @@ project Resources {
 
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
-   compound DeviceRegistry {
+   abstract compound DeviceRegistry {
    }
    
    compound BasicDeviceRegistry refines DeviceRegistry {
@@ -28,7 +28,7 @@ project Resources {
         String packageFilename;
    }
    
-   compound DeviceMgtStorage {
+   abstract compound DeviceMgtStorage {
         NonEmptyString host = "localhost";
         NonEmptyEphemeralPort port = 8884;
         NonEmptyString region = "local";
@@ -60,7 +60,7 @@ project Resources {
    isDefined(deviceMgtStorage);
    
    // only for server side, host above must match this machine
-   compound DeviceMgtStorageServer {
+   abstract compound DeviceMgtStorageServer {
         NonEmptyEphemeralPort port = 8884;
         String path = ""; // in memory for now, TODO temporary
         String accessKey = "";
