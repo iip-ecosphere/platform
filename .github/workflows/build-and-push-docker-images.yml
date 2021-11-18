@@ -42,23 +42,22 @@ jobs:
           cp container/fullPlatform/platform/*.sh gen
           echo "Base directory for container creation:"
           ls gen
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PW }}        
       - name: Build and push platform
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           build_args: VERSION=${{ env.VERSION }}
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PW }}        
-          repository: iipecosphere/platform
-          tag_with_ref: true
+          tags: iipecosphere/platform/platform:${{ env.VERSION }}
           context: ./platform/tools/Install/gen/
-          dockerfile: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
+          file: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           build_args: VERSION=${{ env.VERSION }}
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PW }}        
-          repository: iipecosphere/platform
-          tag_with_ref: true
+          tags: iipecosphere/platform/cli:${{ env.VERSION }}
           context: ./platform/tools/Install/gen/
-          dockerfile: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
+          file: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
