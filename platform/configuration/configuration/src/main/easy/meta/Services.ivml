@@ -3,6 +3,7 @@ project Services {
    import Connectors;
    import MetaConcepts;
    import DataTypes;
+   import Resources;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    

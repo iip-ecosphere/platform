@@ -33,6 +33,22 @@ project SerializerConfig1 {
         user = "user",
         password = "pwd"
     };
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 9005,
+        region = "local"
+    };
+    
+    // go for installed S3 server or cloud
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer {
+        port = 9005
+    };
 
     // ------------ data types ------------------
     
@@ -202,6 +218,12 @@ project SerializerConfig1 {
         serviceManager;
         serviceProtocol;
         containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

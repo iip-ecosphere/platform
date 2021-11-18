@@ -172,4 +172,51 @@ template JavaMapping(Configuration config, FileArtifact target) {
         "VAB-HTTP";
     }
     
+    // ---------------------------------------------------------------
+    
+    def String deviceRegistryModule(IIPEcosphere config) {
+        deviceRegistryModule(config.deviceRegistry);
+    }
+    
+    // dispatch basis
+    def String deviceRegistryModule(DeviceRegistry registry) {
+        "";
+    }
+
+    def String deviceRegistryModule(BasicDeviceRegistry registry) {
+        "deviceMgt.basicRegistry";
+    }
+    
+    def String deviceRegistryModule(ThingsBoardDeviceRegistry registry) {
+        "deviceMgt.thingsboard";
+    }
+    
+    def String deviceMgtStorageModule(IIPEcosphere config) {
+        deviceMgtStorageModule(config.deviceMgtStorage);
+    }
+    
+    // dispatch basis
+    def String deviceMgtStorageModule(DeviceMgtStorage storage) {
+        "";
+    }
+    
+    def String deviceMgtStorageModule(MinIoDeviceMgtStorage storage) {
+        "deviceMgt.minio";
+    }
+    
+    def String deviceMgtStorageModule(S3MockDeviceMgtStorage storage) {
+        "deviceMgt.s3mock";
+    }
+    
+    def String deviceMgtStorageServerModule(IIPEcosphere config) {
+        deviceMgtStorageServerModule(config.deviceMgtStorageServer);
+    }
+    
+    // dispatch basis
+    def String deviceMgtStorageServerModule(DeviceMgtStorageServer server) {
+        "";
+    }
+    
+    // none for S3Mock, comes with S3MockDeviceMgt, requires dependency
+    
 }

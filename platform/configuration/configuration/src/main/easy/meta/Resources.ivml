@@ -1,0 +1,83 @@
+project Resources {
+
+   import Connectors;
+   import MetaConcepts;
+   import DataTypes;
+
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   compound DeviceRegistry {
+   }
+   
+   compound BasicDeviceRegistry refines DeviceRegistry {
+   }
+
+   compound ThingsBoardDeviceRegistry refines DeviceRegistry {
+       // server, port, access
+   }
+
+   DeviceRegistry deviceRegistry = BasicDeviceRegistry {
+   };
+   
+   isDefined(deviceRegistry);
+   
+   compound PackageStore {
+        String bucket;
+        String prefix;
+        String packageDescriptor;
+        String packageFilename;
+   }
+   
+   compound DeviceMgtStorage {
+        NonEmptyString host = "localhost";
+        NonEmptyEphemeralPort port = 8884;
+        NonEmptyString region = "local";
+        String accessKey = "";
+        String secretAccessKey = ""; // preliminary
+        PackageStore runtimeStorage = {
+            bucket = "iip",
+            prefix = "ecs",
+            packageDescriptor = "runtime.yml",
+            packageFilename = "runtime.zip"
+        };
+        PackageStore configStorage = {
+            bucket = "iip",
+            prefix = "config",
+            packageDescriptor = "config.yml",
+            packageFilename = "config.zip"
+        };
+   }
+   
+   compound MinIoDeviceMgtStorage refines DeviceMgtStorage {
+   }
+
+   compound S3MockDeviceMgtStorage refines DeviceMgtStorage {
+   }
+   
+   DeviceMgtStorage deviceMgtStorage = S3MockDeviceMgtStorage {
+   };
+   
+   isDefined(deviceMgtStorage);
+   
+   // only for server side, host above must match this machine
+   compound DeviceMgtStorageServer {
+        NonEmptyEphemeralPort port = 8884;
+        String path = ""; // in memory for now, TODO temporary
+        String accessKey = "";
+        String secretAccessKey = ""; // preliminary
+   }
+   
+   // one default compound to state that there shall be no device mgt server 
+   compound NoDeviceMgtStorageServer refines DeviceMgtStorageServer {
+        NonEmptyEphemeralPort port = -1;
+   }
+   
+   compound S3MockDeviceMgtStorageServer refines DeviceMgtStorageServer {
+       deviceMgtStorage.isKindOf(S3MockDeviceMgtStorage);
+   };
+   
+   DeviceMgtStorageServer deviceMgtStorageServer = S3MockDeviceMgtStorageServer {
+       port = 8884
+   };
+   
+}

@@ -17,6 +17,9 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
+        appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
+        appendDependency(dep, iipGroup, deviceMgtStorageServerModule(config), projectVersion);
         appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
         appendDependency(dep, iipGroup, "platform", projectVersion);
         appendIipBaseDependencies(dep);

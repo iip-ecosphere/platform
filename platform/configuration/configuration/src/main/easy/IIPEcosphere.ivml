@@ -10,10 +10,7 @@ project IIPEcosphere {
     String pidDir = "/run"; // linux only, windows goes to tmp
     
     freeze {
-        javaModuleOpts;
-        javaOpts;
         iipVer;
-        pidDir;
     };
    
 }

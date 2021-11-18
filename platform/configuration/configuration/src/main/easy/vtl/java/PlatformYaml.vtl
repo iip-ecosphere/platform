@@ -5,11 +5,43 @@ import EcsRuntimeDockerContainerManagerYaml;
 @indent(indentation = 4, additional = 0)
 template PlatformYaml(IIPEcosphere config, FileArtifact target) {
 
+    def produceDevMgtServer(IIPEcosphere config) {
+        DeviceMgtStorageServer s = config.deviceMgtStorageServer; 
+        if (s.port > 0) {
+            'storageServer:
+                port: ${s.port}
+                path: "${s.path}"
+                accessKey: ${s.accessKey}
+                secretAccessKey: ${s.secretAccessKey}'
+        } else {
+            ''
+        }
+    }
+    
+    def produceDeviceMgtStorage(String topKey, DeviceMgtStorage s, PackageStore p) {
+        '${topKey}:
+            endpoint: "http://${s.host}:${s.port}"
+            region: ${s.region}
+            accessKey: ${s.accessKey}
+            secretAccessKey: ${s.secretAccessKey}
+            bucket: ${p.bucket}
+            prefix: ${p.prefix}
+            packageDescriptor: ${p.packageDescriptor}
+            packageFilename: ${p.packageFilename}'
+    }
+
+    def produceDevMgt(IIPEcosphere config) {
+        produceDeviceMgtStorage("runtimeStorage", config.deviceMgtStorage, config.deviceMgtStorage.runtimeStorage);
+        produceDeviceMgtStorage("configStorage", config.deviceMgtStorage, config.deviceMgtStorage.configStorage);
+        produceDevMgtServer(config);
+    }
+
     def main(IIPEcosphere config, FileArtifact target) {
         String pers = "${config.aasPersistency}";
         produceTransport(config);
         produceAas(config, pers, false);
         produceNetMgr(config);
+        produceDevMgt(config);
     }
 
 }

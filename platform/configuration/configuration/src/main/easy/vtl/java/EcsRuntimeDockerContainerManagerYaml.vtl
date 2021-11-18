@@ -70,7 +70,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
        String aasImplNetmask = aasImplServer.netmask;
        // we leave out port range for now
        'netMgr:
-          netmask: ${aasImplNetmask}'
+            netmask: ${aasImplNetmask}'
     }
     
     def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target) {
