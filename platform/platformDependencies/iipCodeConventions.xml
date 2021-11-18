@@ -42,8 +42,14 @@
 
     <module name="SuppressionCommentFilter">
       <property name="offCommentFormat" value="checkstyle: stop boolean complexity check"/>
-      <property name="onCommentFormat" value="checkstyle: resumeboolean complexity  check"/>
-      <property name="checkFormat" value="BooleanExpressionComplexity"/>
+      <property name="onCommentFormat" value="checkstyle: resume boolean complexity check"/>
+      <property name="checkFormat" value="BooleanExpressionComplexityCheck"/>
+    </module>
+
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="checkstyle: stop method length check"/>
+      <property name="onCommentFormat" value="checkstyle: resume method length check"/>
+      <property name="checkFormat" value="MethodLengthCheck"/>
     </module>
 
     <module name="JavadocMethod">
