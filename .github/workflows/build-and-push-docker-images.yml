@@ -27,12 +27,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'zulu'
-      - name: Build the test app through tests
-        run: |
-          cd ./platform/configuration/configuration
-          mvn --batch-mode --update-snapshots package
-          cd ../../..
-      - name: Instantiate the platform
+      - name: Install the platform basics
         run: |
           cd ./platform/tools/Install/platformDependencies
           mvn --batch-mode --update-snapshots install
@@ -40,6 +35,14 @@ jobs:
           mvn --batch-mode --update-snapshots package
           cd ..
           mvn --batch-mode --update-snapshots package -DskipTests
+      - name: Build the test app through tests
+        run: |
+          cd ./platform/configuration/configuration
+          mvn --batch-mode --update-snapshots package
+          cd ../../..
+      - name: Instantiate the platform, prepare container building
+        run: |
+          cd ./platform/tools/Install
           sed -i 's/String serverHost = "147.172.178.145";/String serverHost = "172.19.0.22";/' src/main/easy/InstallTest.ivml
           echo "Using configuration:"
           cat src/main/easy/InstallTest.ivml
