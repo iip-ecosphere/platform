@@ -56,6 +56,6 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * Adaptation
     
 
-Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/repository/docker/iipecosphere/platform).
+Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
 ![IIP-Ecosphere](logo.png)
