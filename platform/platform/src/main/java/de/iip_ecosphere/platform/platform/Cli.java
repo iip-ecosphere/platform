@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.platform;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,15 +27,13 @@ import de.iip_ecosphere.platform.platform.cli.CommandProvider;
 import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
 import de.iip_ecosphere.platform.platform.cli.EcsClientFactory;
 import de.iip_ecosphere.platform.platform.cli.Level;
+import de.iip_ecosphere.platform.platform.cli.PlatformClientFactory;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor;
 import de.iip_ecosphere.platform.platform.cli.ResourcesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
-import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -55,6 +52,7 @@ public class Cli {
     private static EcsClientFactory ecsFactory = EcsClientFactory.DEFAULT;
     private static ResourcesClientFactory resourcesFactory = ResourcesClientFactory.DEFAULT;
     private static DeviceManagementClientFactory deviceManagementFactory = DeviceManagementClientFactory.DEFAULT;
+    private static PlatformClientFactory platformFactory = PlatformClientFactory.DEFAULT;
     private static Consumer<String> errorConsumer = DEFAULT_ERROR_CONSUMER;
     
     /**
@@ -64,13 +62,16 @@ public class Cli {
      * @param ecs the ECS client factory
      * @param resources the resources client factory
      * @param deviceManagement the device management factory
+     * @param platform the platform client factory
      */
     public static void setFactories(ServicesClientFactory services, EcsClientFactory ecs, 
-        ResourcesClientFactory resources, DeviceManagementClientFactory deviceManagement) {
+        ResourcesClientFactory resources, DeviceManagementClientFactory deviceManagement, 
+        PlatformClientFactory platform) {
         servicesFactory = services;
         ecsFactory = ecs;
         resourcesFactory = resources;
         deviceManagementFactory = deviceManagement;
+        platformFactory =  platform;
     }
     
     /**
@@ -130,7 +131,7 @@ public class Cli {
                         case "help":
                             printHelp(provider, level);
                             break;
-                        case "store":
+                        case "snapshotaas":
                             store();
                             break;
                         case "exit":
@@ -448,11 +449,9 @@ public class Cli {
      */
     private static void store() {
         try {
-            Aas aas = AasPartRegistry.retrieveIipAas();
-            File target = new File("platform.aasx");
-            AasFactory.getInstance().createPersistenceRecipe().writeTo(CollectionUtils.toList(aas), target);
-            println("Platform AAS written to " + target.getAbsolutePath());
-        } catch (IOException e) {
+            String file = platformFactory.create().snapshotAas("cli");
+            println("Platform AAS written (on server) to " + file);
+        } catch (IOException | ExecutionException e) {
             println(e);
         }
     }
@@ -562,7 +561,7 @@ public class Cli {
             println("  exit - exits the program", provider);
         }
         if (level.isTopLevel()) {
-            //println(" store - stores the AAS of the platform"); // not official, fails in BaSyx
+            println(" snapshotAAS - creates a snapshot of the AAS of the platform");
             println(" help - prints help for this program");
             println(" exit - exits the program", provider);
         }

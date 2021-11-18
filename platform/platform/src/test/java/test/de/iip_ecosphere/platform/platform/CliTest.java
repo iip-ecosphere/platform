@@ -28,12 +28,15 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.ecsRuntime.ResourcesClient;
 import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
 import de.iip_ecosphere.platform.platform.cli.EcsClientFactory;
+import de.iip_ecosphere.platform.platform.cli.PlatformClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ResourcesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
+
 import org.junit.Assert;
 
 /**
@@ -84,6 +87,12 @@ public class CliTest {
     private static final String[] CONTAINER_SEQUENCE = new String[] {
         "container", "ab01",
         "help",
+        "exit"
+    };
+    
+    private static final String[] SNAPSHOT_SEQUENCE = new String[] {
+        "help",
+        "snapshotAAS",
         "exit"
     };
 
@@ -310,6 +319,25 @@ public class CliTest {
     }
     
     /**
+     * Mock platform client/factory for testing.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class PlatformFactory implements PlatformClientFactory, PlatformClient {
+
+        @Override
+        public PlatformClient create() throws IOException {
+            return this;
+        }
+
+        @Override
+        public String snapshotAas(String id) throws ExecutionException {
+            return "";
+        }
+        
+    }
+    
+    /**
      * Accepts and counts error messages.
      * 
      * @author Holger Eichelberger, SSE
@@ -353,14 +381,16 @@ public class CliTest {
         ResourcesFactory resourcesFactory = new ResourcesFactory();
         DeviceManagementClientFactory deviceManagementClientFactory = new DeviceManagementFactory();
         ErrorConsumer errorConsumer = new ErrorConsumer();
+        PlatformClientFactory platformClientFactory = new PlatformFactory();
         de.iip_ecosphere.platform.platform.Cli.setFactories(servicesFactory, ecsFactory, resourcesFactory, 
-            deviceManagementClientFactory);
+            deviceManagementClientFactory, platformClientFactory);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(errorConsumer);
         
         test(COMPLETE_SEQUENCE, errorConsumer, 0);
         test(RESOURCES_SEQUENCE, errorConsumer, 0);
         test(CONTAINER_SEQUENCE, errorConsumer, 0);
         test(SERVICES_SEQUENCE, errorConsumer, 0);
+        test(SNAPSHOT_SEQUENCE, errorConsumer, 0);
 
         test(MAIN_FAIL, errorConsumer, 1);
         test(RESOURCES_FAIL, errorConsumer, 1);
@@ -368,7 +398,7 @@ public class CliTest {
         test(SERVICES_FAIL, errorConsumer, 1);
         
         de.iip_ecosphere.platform.platform.Cli.setFactories(ServicesClientFactory.DEFAULT, EcsClientFactory.DEFAULT, 
-            ResourcesClientFactory.DEFAULT, DeviceManagementClientFactory.DEFAULT);
+            ResourcesClientFactory.DEFAULT, DeviceManagementClientFactory.DEFAULT, PlatformClientFactory.DEFAULT);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(
             de.iip_ecosphere.platform.platform.Cli.DEFAULT_ERROR_CONSUMER);
     }
