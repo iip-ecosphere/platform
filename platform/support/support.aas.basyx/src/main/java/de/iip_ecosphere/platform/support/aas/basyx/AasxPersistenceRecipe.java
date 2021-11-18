@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.factory.aasx.AASXFactory;
+import org.eclipse.basyx.aas.factory.aasx.AASXPackageExplorerConformantHelper;
 import org.eclipse.basyx.aas.factory.aasx.InMemoryFile;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
@@ -58,6 +58,8 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
         super(AASX);
     }
     
+    // checkstyle: stop exception type check
+    
     @Override
     public void writeTo(List<Aas> aas, File file) throws IOException {
         if (aas.size() > 1) {
@@ -86,16 +88,18 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
             }
         }
 
-        try {
-            FileOutputStream out = new FileOutputStream(file);
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            AASXPackageExplorerConformantHelper.adapt(basyxAas, assetList, conceptDescriptionList, basyxSubmodels);
             AASXFactory.buildAASX(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 
                 new ArrayList<InMemoryFile>(), out);
             out.close();
-        } catch (TransformerException | ParserConfigurationException e) {
+        } catch (Throwable e) { // BaSyx may fail with connected AAS. Catch this here.
             throw new IOException(e);
         }
     }
-    
+
+    // checkstyle: resume exception type check
+
     @Override
     public List<Aas> readFrom(File file) throws IOException {
         List<Aas> result = new ArrayList<Aas>();

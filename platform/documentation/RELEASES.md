@@ -1,7 +1,7 @@
 # IIP-Ecosphere platform: Releases
 
 ### Next release (winter 2021):
-* BaSyx upgrade to 1.0.0 (from Maven Central)
+* BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
 * Bug fixes / Improvements:
@@ -19,6 +19,7 @@
     * Platform instantiaton process without Java test execution (may fail depending on JDK/surefire combination).
     * Initial integration of device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
     * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
+    * Automatic build of demo containers on github, deployment to dockerhub.
 * Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes

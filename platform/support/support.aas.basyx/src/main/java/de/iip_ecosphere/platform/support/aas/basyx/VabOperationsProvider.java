@@ -26,7 +26,6 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
-import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.basyx.BaSyxTCPServer;
 
 /**
  * Implements a simple VAB operations provider following a simple status/operations/service structure 
