@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.platform;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,6 +34,9 @@ import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -125,6 +129,9 @@ public class Cli {
                         switch (cmd.toLowerCase()) {
                         case "help":
                             printHelp(provider, level);
+                            break;
+                        case "store":
+                            store();
                             break;
                         case "exit":
                             exit = true;
@@ -437,6 +444,20 @@ public class Cli {
     }
     
     /**
+     * Stores the platform AAS into a file.
+     */
+    private static void store() {
+        try {
+            Aas aas = AasPartRegistry.retrieveIipAas();
+            File target = new File("platform.aasx");
+            AasFactory.getInstance().createPersistenceRecipe().writeTo(CollectionUtils.toList(aas), target);
+            println("Platform AAS written to " + target.getAbsolutePath());
+        } catch (IOException e) {
+            println(e);
+        }
+    }
+    
+    /**
      * Prints a sub-model element using {@link PrintVisitor}.
      * 
      * @param elt the element to print
@@ -541,6 +562,7 @@ public class Cli {
             println("  exit - exits the program", provider);
         }
         if (level.isTopLevel()) {
+            //println(" store - stores the AAS of the platform"); // not official, fails in BaSyx
             println(" help - prints help for this program");
             println(" exit - exits the program", provider);
         }
