@@ -39,7 +39,7 @@ jobs:
           echo "Using configuration:"
           cat src/main/easy/InstallTest.ivml
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
-          cp ./platform/tools/Install/container/fullPlatform/platform/*.sh gen
+          cp container/fullPlatform/platform/*.sh gen
       - name: Build and push platform
         uses: docker/build-push-action@v1
         with:
