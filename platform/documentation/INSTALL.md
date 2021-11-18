@@ -48,11 +48,11 @@ Create a network:
 
 and start the platform parts:
 
-    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 dzikaswinia/platform:platform   
+    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 iipecosphere/platform:platform_all.latest   
 
 and similarly for the CLI
 
-    docker run -i --network platform dzikaswinia/platform:cli
+    docker run -i --network platform iipecosphere/platform:cli.latest
     
 The service artifact that is needed to add/start services is available under the following local URI
 
@@ -146,3 +146,5 @@ If you also want to containerize the ECS runtime (one of the possible edge devic
 Akin to the app container, both steps are available as respective scripts in the install package. Before running the ECS container, it is important that the the app container has been created and stored. As administrative operations for installing Docker into the container are executed, Docker may issue certain warnings during the creation of the container. The default port for the ECS Runtime AAS implementation server in this Dockerfile is `9000`.
 
 For a permanent installation, the instantiation process also generates service specifications for Linux/systemd, for both, integrated installation of platform services, ECS runtime and service manager on a single machine/container and additional no-dependencies service specifications for device/container installation. The service descriptors assume an installation of the generated jars (including containing directory, e.g., `plJars`) in a folder denoted by the global variable `$IIP_HOME`. After completion of the startup process, the respective executable creates a file containing the process identification (PID) in the usual system directory `/run`. These PID files are taken into account by the system service specifications.
+
+If you like to take a look into the AAS, open the repository URL `http://127.0.0.1:9002/registry/api/v1/registry` on the server (please adjust the host/port according to your configuration) and follow the links into the desired AAS submodel.
