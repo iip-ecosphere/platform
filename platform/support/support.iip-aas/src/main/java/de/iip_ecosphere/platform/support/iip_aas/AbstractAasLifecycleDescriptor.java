@@ -64,7 +64,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             AasPartRegistry.setAasSetup(setup);
             AasPartRegistry.AasBuildResult res = AasPartRegistry.build(true); // true due to incremental deployment
             implServer = res.getProtocolServer();
-            
+
+            boolean success = true;
             if (AasMode.REGISTER == setup.getMode()) {
                 try {
                     aasServer = AasPartRegistry.register(res.getAas(), setup.getRegistryEndpoint()); 
@@ -72,13 +73,18 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Cannot register AAS " + name + " with " 
                         + setup.getRegistryEndpoint().toUri() + ":" + e.getMessage());
+                    success = false;
                 }
             } else {
                 try {
                     AasPartRegistry.remoteDeploy(res.getAas());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Cannot deploy AAS " + name + ": " + e.getMessage());
+                    success = false;
                 }
+            }
+            if (success) {
+                AasPartRegistry.setAasSupplier(() -> res.getAas());
             }
         } else {
             LoggerFactory.getLogger(getClass()).warn("No full AAS implementation registered. Cannot build up " 

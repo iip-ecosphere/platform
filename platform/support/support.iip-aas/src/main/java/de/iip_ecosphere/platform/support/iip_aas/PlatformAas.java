@@ -12,19 +12,26 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.io.FileUtils;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
- * The platform typeplate.
+ * The platform name/typeplate.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -35,6 +42,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_VERSION = "version";
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
+    public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
     private static final String MAVEN_SNAPSHOT_POSTFIX = "-SNAPSHOT";
 
     @Override
@@ -72,6 +80,10 @@ public class PlatformAas implements AasContributor {
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
                 .setValue(Type.STRING, buildId)
                 .build();
+            smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS)
+                .addInputVariable("id", Type.STRING)
+                .setInvocable(iCreator.createInvocable(NAME_OPERATION_SNAPSHOTAAS))
+                .build(Type.STRING);
             smB.build();
         }
         return null;
@@ -79,12 +91,44 @@ public class PlatformAas implements AasContributor {
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
-        // no active AAS
+        sBuilder.defineOperation(NAME_OPERATION_SNAPSHOTAAS, new JsonResultWrapper(p -> { 
+            return snapshotAas(AasUtils.readString(p));
+        }));
+    }
+    
+    /**
+     * Snapshots an AAS, i.e., the {@link AasPartRegistry#getIipAasInstance()}.
+     * 
+     * @param id an optional id to be placed into the file name, may be <b>null</b> or empty
+     * @return the name of the file written, may be empty for none 
+     * @throws ExecutionException if there is no IIP AAS instance or writing the instance fails for some reason
+     */
+    static String snapshotAas(String id) throws ExecutionException {
+        String result = "";
+        List<Aas> aas = AasPartRegistry.getIipAasInstance();
+        if (null != aas) {
+            String name = "platform-";
+            if (null != id && id.length() > 0) {
+                name += id + "-";
+            }
+           // for now, we just assume that AASX is supported
+            name += System.currentTimeMillis() + ".aasx";
+            try {
+                File file = new File(FileUtils.getTempDirectory(), name);
+                AasFactory.getInstance().createPersistenceRecipe().writeTo(aas, file);
+                result = file.getAbsolutePath();  
+            } catch (IOException e) {
+                throw new ExecutionException(e);
+            }
+        } else {
+            throw new ExecutionException("No suitable AAS instance available. Cannot write AAS.", null);
+        }
+        return result;
     }
 
     @Override
     public Kind getKind() {
-        return Kind.PASSIVE;
+        return Kind.ACTIVE;
     }
 
     @Override

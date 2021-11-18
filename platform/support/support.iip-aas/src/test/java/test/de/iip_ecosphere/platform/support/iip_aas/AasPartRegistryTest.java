@@ -184,7 +184,8 @@ public class AasPartRegistryTest {
         Assert.assertTrue(cClasses.contains(Contributor1.class));
         Assert.assertTrue(cClasses.contains(Contributor2.class));
         
-        AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c.getKind() != Kind.ACTIVE);
+        AasPartRegistry.AasBuildResult res = AasPartRegistry.build(
+            c -> c.getKind() != Kind.ACTIVE || c instanceof PlatformAas);
         Assert.assertNotNull(res.getAas());
         Assert.assertEquals(2, res.getAas().size());
         Assert.assertNotNull(res.getProtocolServerBuilder());

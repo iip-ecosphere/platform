@@ -81,6 +81,7 @@ public class AasPartRegistry {
     public static final String DEFAULT_PROTOCOL = AasFactory.DEFAULT_PROTOCOL;
     
     private static AasSetup setup = new AasSetup();
+    private static Supplier<List<Aas>> aasSupplier;
 
     /**
      * Aas installation/setup modes.
@@ -282,6 +283,16 @@ public class AasPartRegistry {
             return result;
         }
 
+    }
+    
+    /**
+     * Sets a supplier to provide instance to the real AAS server instance (rather than remote/connected instances via 
+     * {@link #retrieveIipAas()}. The real instance is e.g., needed to persist/store an AAS. Handle with care. 
+     * 
+     * @param supplier the supplier, may be <b>null</b> for none 
+     */
+    public static void setAasSupplier(Supplier<List<Aas>> supplier) {
+        aasSupplier = supplier;
     }
     
     /**
@@ -525,7 +536,19 @@ public class AasPartRegistry {
         }
     }
 
-    // checkstyle: start exception type check
+    /**
+     * Returns the real AAS server instance based on the instances it was initially built. This instance
+     * is only available on server side and shall be used only in cases where a potentially remote/connected
+     * AAS (as it is typically returned by {@link #retrieveIipAas()}) is not sufficient, e.g., for storing/persisting
+     * the AAS. It shall <b>not</b> be used for parallel accesses or for modifying the AAS.  
+     *  
+     * @return the AAS instance, may be <b>null</b>
+     */
+    public static List<Aas> getIipAasInstance() {
+        return null != aasSupplier ? aasSupplier.get() : null;
+    }
+
+    // checkstyle: resume exception type check
     
     /**
      * Deploy the given AAS to a local server. [testing]
