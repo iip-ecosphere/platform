@@ -40,6 +40,8 @@ jobs:
           cat src/main/easy/InstallTest.ivml
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
           cp container/fullPlatform/platform/*.sh gen
+          echo "Base directory for container creation:"
+          ls gen
       - name: Build and push platform
         uses: docker/build-push-action@v1
         with:
@@ -48,7 +50,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PW }}        
           repository: iipecosphere/platform
           tag_with_ref: true
-          context: ./platform/tools/Install/gen
+          context: ./platform/tools/Install/gen/
           dockerfile: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
         uses: docker/build-push-action@v1
@@ -58,5 +60,5 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PW }}        
           repository: iipecosphere/platform
           tag_with_ref: true
-          context: ./platform/tools/Install/gen
+          context: ./platform/tools/Install/gen/
           dockerfile: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
