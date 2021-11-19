@@ -22,6 +22,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
 
 /**
@@ -62,8 +65,18 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
     }
 
     @Override
-    public void addDevice(String id, String ip) throws ExecutionException {
-        fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
+    public DeviceRegistrationResponse addDevice(String id, String ip) throws ExecutionException {
+        String json = fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
+        DeviceRegistrationResponse result = null;
+        if (null != json) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                result = objectMapper.readValue(json.toString(), DeviceRegistrationResponse.class);
+            } catch (JsonProcessingException e) {
+                // result = null;
+            }
+        }
+        return result;        
     }
 
     @Override

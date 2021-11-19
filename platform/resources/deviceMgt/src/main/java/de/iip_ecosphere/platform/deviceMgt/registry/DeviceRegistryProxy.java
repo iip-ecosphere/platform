@@ -46,9 +46,9 @@ class DeviceRegistryProxy extends AbstractDeviceRegistry {
      * @throws ExecutionException if the operation fails
      */
     @Override
-    public void addDevice(String id, String ip) throws ExecutionException {
+    public DeviceRegistrationResponse addDevice(String id, String ip) throws ExecutionException {
         super.addDevice(id, ip);
-        sink.addDevice(id, ip);
+        return sink.addDevice(id, ip);
     }
 
     /**

@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@link DeviceRegistryAas} with the help of {@link DeviceRegistryAasClient}.
@@ -101,7 +102,14 @@ public class DeviceRegistryAasClientTest {
     public void getDevices_withOneDevice_shouldReturnCollectionWithTheOneDevice() 
         throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID, AN_IP);
+        DeviceRegistrationResponse mockResp = new DeviceRegistrationResponse();
+        mockResp.setSuccessful(true);
+        when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().addDevice(A_DEVICE_ID, AN_IP))
+            .thenReturn(mockResp);
+        
+        DeviceRegistrationResponse resp = client.addDevice(A_DEVICE_ID, AN_IP);
+        Assert.assertNotNull(resp);
+        Assert.assertTrue(resp.isSuccessful());        
 
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
 
@@ -128,8 +136,15 @@ public class DeviceRegistryAasClientTest {
      */
     @Test
     public void getDevice_withValidDevice_shouldNotReturnNull() throws ExecutionException, IOException {
+        DeviceRegistrationResponse mockResp = new DeviceRegistrationResponse();
+        mockResp.setSuccessful(true);
+        when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().addDevice(A_DEVICE_ID, AN_IP))
+            .thenReturn(mockResp);
+        
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID, AN_IP);
+        DeviceRegistrationResponse resp = client.addDevice(A_DEVICE_ID, AN_IP);
+        Assert.assertNotNull(resp);
+        Assert.assertTrue(resp.isSuccessful());        
 
         client = new DeviceRegistryAasClient();
         SubmodelElementCollection device = client.getDevice(A_DEVICE_ID);
@@ -146,11 +161,39 @@ public class DeviceRegistryAasClientTest {
     @Test
     public void addDevice_withDevice_shouldAddDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID, AN_IP);
+        DeviceRegistrationResponse mockResp = new DeviceRegistrationResponse();
+        mockResp.setSuccessful(true);
+        when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().addDevice(A_DEVICE_ID, AN_IP))
+            .thenReturn(mockResp);
+        
+        DeviceRegistrationResponse resp = client.addDevice(A_DEVICE_ID, AN_IP);
+        Assert.assertNotNull(resp);
+        Assert.assertTrue(resp.isSuccessful());        
         client = new DeviceRegistryAasClient();
         Assert.assertNotNull(client.getDevice(A_DEVICE_ID));
     }
 
+    /**
+     * Test addDevice and provide a valid device. Should add the device.
+     *
+     * @throws ExecutionException should not be thrown
+     * @throws IOException should not be thrown
+     */
+    @Test
+    public void addDevice_invalidDevice() throws ExecutionException, IOException {
+        DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
+        DeviceRegistrationResponse mockResp = new DeviceRegistrationResponse();
+        mockResp.setSuccessful(false);
+        mockResp.setMessage("FAILED");
+        when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().addDevice(A_DEVICE_ID, AN_IP))
+            .thenReturn(mockResp);
+        
+        DeviceRegistrationResponse resp = client.addDevice(A_DEVICE_ID, AN_IP);
+        Assert.assertNotNull(resp);
+        Assert.assertFalse(resp.isSuccessful());
+        Assert.assertTrue(resp.getMessage().length() > 0);
+    }
+    
     /**
      * Tests sending telemetry leads to telemetry in the registry.
      * 

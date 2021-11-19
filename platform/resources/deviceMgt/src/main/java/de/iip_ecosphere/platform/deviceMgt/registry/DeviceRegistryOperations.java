@@ -29,9 +29,10 @@ public interface DeviceRegistryOperations {
      *
      * @param id the id of the new device
      * @param ip the ip of the new device
+     * @return information about the results of the registration/on-boarding process
      * @throws ExecutionException if the operation fails
      */
-    void addDevice(String id, String ip) throws ExecutionException;
+    DeviceRegistrationResponse addDevice(String id, String ip) throws ExecutionException;
 
     /**
      * Removes a registered device, which can be used for off-boarding.

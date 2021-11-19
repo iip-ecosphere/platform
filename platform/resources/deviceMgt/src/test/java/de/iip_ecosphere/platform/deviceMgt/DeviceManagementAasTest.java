@@ -490,7 +490,7 @@ public class DeviceManagementAasTest {
         // No actual DeviceRegistry is present: make Device visible
         DeviceDescriptor mockDevice = mock(DeviceDescriptor.class);
         when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().getDevice(eq(A_DEVICE_ID)))
-                .thenReturn(mockDevice);
+            .thenReturn(mockDevice);
     }
 
     /**

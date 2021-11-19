@@ -17,6 +17,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 
@@ -98,8 +99,9 @@ public class DeviceRegistryAas implements AasContributor {
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_DEVICE_ADD),
                 new JsonResultWrapper(p -> {
-                    DeviceRegistryFactory.getDeviceRegistry().addDevice(readString(p), readString(p, 1));
-                    return null;
+                    DeviceRegistrationResponse resp = DeviceRegistryFactory.getDeviceRegistry().addDevice(
+                        readString(p), readString(p, 1));
+                    return JsonUtils.toJson(resp);
                 })
         );
 
