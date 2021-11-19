@@ -15,7 +15,14 @@ package de.iip_ecosphere.platform.deviceMgt.minio;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
+import io.minio.ObjectWriteResponse;
 import io.minio.Result;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InsufficientDataException;
+import io.minio.errors.InternalException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.ServerException;
+import io.minio.errors.XmlParserException;
 import io.minio.http.Method;
 import io.minio.messages.Contents;
 import io.minio.messages.Item;
@@ -26,7 +33,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -120,4 +130,60 @@ public class S3StorageTest {
         Storage storage = new S3Storage(A_PREFIX, null, null);
         Assert.assertEquals(A_PREFIX, storage.getPrefix());
     }
+    
+    /**
+     * Tests that uploading a file works. 
+     * 
+     * @throws IOException shall not occur
+     * @throws XmlParserException shall not occur
+     * @throws ServerException shall not occur
+     * @throws NoSuchAlgorithmException shall not occur
+     * @throws IOException shall not occur
+     * @throws InvalidResponseException shall not occur
+     * @throws InvalidKeyException shall not occur
+     * @throws InternalException shall not occur
+     * @throws InsufficientDataException shall not occur
+     * @throws ErrorResponseException shall not occur
+     */
+    @Test
+    public void uploadFile_successful() throws IOException, XmlParserException, ServerException, 
+        NoSuchAlgorithmException, IOException, InvalidResponseException, InvalidKeyException, InternalException, 
+        InsufficientDataException, ErrorResponseException {
+        MinioClient minioMock = mock(MinioClient.class);
+        // String bucket, String region, String object, String etag, String versionId
+        ObjectWriteResponse resp = new ObjectWriteResponse(null, A_BUCKET, "", "", "", "");
+        when(minioMock.uploadObject(any())).thenReturn(resp);
+        Storage storage = new S3Storage(A_PREFIX, minioMock, A_BUCKET);
+        storage.storeFile("upload", new File("./src/test/resources/ExampleUpload.txt"));
+    }
+
+    /**
+     * Tests that uploading a file correctly fails. 
+     * 
+     * @throws IOException shall not occur
+     * @throws XmlParserException shall not occur
+     * @throws ServerException shall not occur
+     * @throws NoSuchAlgorithmException shall not occur
+     * @throws IOException shall not occur
+     * @throws InvalidResponseException shall not occur
+     * @throws InvalidKeyException shall not occur
+     * @throws InternalException shall not occur
+     * @throws InsufficientDataException shall not occur
+     * @throws ErrorResponseException shall not occur
+     */
+    @Test
+    public void uploadFile_fileNotFound() throws XmlParserException, ServerException, NoSuchAlgorithmException, 
+        IOException, InvalidResponseException, InvalidKeyException, InternalException, InsufficientDataException, 
+        ErrorResponseException {
+        MinioClient minioMock = mock(MinioClient.class);
+        // no functional mocking here, caught already in argument builder 
+        try {
+            Storage storage = new S3Storage(A_PREFIX, minioMock, A_BUCKET);
+            storage.storeFile("uploadFnf", new File("./src/test/resources/ExampleUpload1.txt"));
+            Assert.fail("There shall be an IOException");
+        } catch (IOException e) {
+            // this is intended
+        }
+    }
+    
 }

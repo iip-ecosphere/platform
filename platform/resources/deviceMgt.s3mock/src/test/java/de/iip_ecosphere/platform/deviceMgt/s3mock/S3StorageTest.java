@@ -28,6 +28,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.support.NetUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -115,4 +117,32 @@ public class S3StorageTest {
         Storage storage = new S3Storage(A_PREFIX, null, null);
         Assert.assertEquals(A_PREFIX, storage.getPrefix());
     }
+
+    /**
+     * Tests that uploading a file works. 
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void uploadFile_successful() throws IOException {
+        Storage storage = new S3Storage(A_PREFIX, client, A_BUCKET);
+        storage.storeFile("upload", new File("./src/test/resources/ExampleUpload.txt"));
+    }
+
+    /**
+     * Tests that uploading a file correctly fails. 
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void uploadFile_fileNotFound() {
+        try {
+            Storage storage = new S3Storage(A_PREFIX, client, A_BUCKET);
+            storage.storeFile("uploadFnf", new File("./src/test/resources/ExampleUpload1.txt"));
+            Assert.fail("There shall be an IOException");
+        } catch (IOException e) {
+            // this is intended
+        }
+    }
+
 }

@@ -15,9 +15,11 @@ package de.iip_ecosphere.platform.deviceMgt.minio;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
+import io.minio.UploadObjectArgs;
 import io.minio.errors.*;
 import io.minio.http.Method;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -84,8 +86,13 @@ public class S3Storage implements Storage {
     @Override
     public String generateDownloadUrl(String key) {
         try {
-            return this.minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder().object(key).bucket(bucket)
-                    .method(Method.GET).expiry(60).build());
+            return this.minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                    .object(key)
+                    .bucket(bucket)
+                    .method(Method.GET)
+                    .expiry(60)
+                    .build());
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException
                 | InvalidResponseException | IOException | NoSuchAlgorithmException | XmlParserException
                 | ServerException e) {
@@ -93,4 +100,21 @@ public class S3Storage implements Storage {
         }
         return null;
     }
+
+    @Override
+    public void storeFile(String key, File file) throws IOException {
+        try {
+            this.minioClient.uploadObject(
+                UploadObjectArgs.builder()
+                    .object(key)
+                    .bucket(bucket)
+                    .filename(file.getAbsolutePath())
+                    .build());
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException 
+            | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException 
+            | IllegalArgumentException e) {
+            throw new IOException(e);
+        }
+    }
+    
 }

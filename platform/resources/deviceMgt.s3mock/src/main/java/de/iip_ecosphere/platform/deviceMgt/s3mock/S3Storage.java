@@ -12,14 +12,20 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
 
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 
@@ -75,4 +81,18 @@ public class S3Storage implements Storage {
         }
         return result;
     }
+
+    @Override
+    public void storeFile(String key, File file) throws IOException {
+        try {
+            TransferManager tm = TransferManagerBuilder.standard()
+                .withS3Client(client)
+                .build();
+            Upload upload = tm.upload(bucket, key, file);
+            upload.waitForCompletion();
+        } catch (InterruptedException | AmazonClientException e) {
+            throw new IOException(e);
+        }
+    }
+    
 }
