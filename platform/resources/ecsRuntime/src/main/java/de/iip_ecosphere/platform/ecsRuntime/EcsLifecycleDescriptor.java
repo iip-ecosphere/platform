@@ -50,7 +50,9 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
         Monitor.startScheduling();
         boolean autoOnOff = setup.getAutoOnOffboarding();
         try {
+            //DeviceRegistrationResponse resp = 
             DeviceManagement.addDevice(autoOnOff ? true : false);
+            // TODO receive tokens, certificates; store, self-configure
             registered = true;
         }  catch (ExecutionException e) {
             if (!autoOnOff) { // graceful if auto

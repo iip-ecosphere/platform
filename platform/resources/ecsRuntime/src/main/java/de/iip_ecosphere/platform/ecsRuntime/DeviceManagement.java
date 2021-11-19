@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistrationResponse;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClient;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClientFactory;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
@@ -59,8 +60,11 @@ public class DeviceManagement {
      * 
      * @param onboard does this operation add the device the first time intentionally to the 
      *   platform ({@code true}) or is this just the startup registration ({@code false})
+     * @return <b>null</b> if no operation was needed, an instance if a device registration/onboarding (trial) 
+     *   was performed
      */
-    public static void addDevice(boolean onboard) throws ExecutionException {
+    public static DeviceRegistrationResponse addDevice(boolean onboard) throws ExecutionException {
+        DeviceRegistrationResponse result = null;
         DeviceRegistryClient registryClient = DeviceRegistryClientFactory
             .createDeviceRegistryClient();
         SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
@@ -68,7 +72,7 @@ public class DeviceManagement {
         if (null == device) {
             if (onboard) {
                 String ip = NetUtils.getOwnIP();
-                registryClient.addDevice(Id.getDeviceIdAas(), ip);
+                result = registryClient.addDevice(Id.getDeviceIdAas(), ip);
             } else {
                 throw new ExecutionException("This decvice was not onboarded before. Stopping.", null);
             }
@@ -76,6 +80,7 @@ public class DeviceManagement {
 
         RemoteAccessServer remoteAccessServer = getRemoteAccessServer();
         remoteAccessServer.start();
+        return result;
     }
 
     /**
