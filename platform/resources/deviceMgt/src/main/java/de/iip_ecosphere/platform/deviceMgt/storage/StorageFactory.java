@@ -47,18 +47,39 @@ public class StorageFactory {
     }
 
     /**
+     * Creates a storage based on the given setup.
+     * 
+     * @param setup the setup
+     * @return the storage instance, may be <b>null</b> if no storage descriptor is available or 
+     *   {@code setup} is <b>null</b>
+     */
+    public Storage createStorage(PackageStorageSetup setup) {
+        initDesc();
+
+        Storage storage;
+        if (setup != null && desc != null) {
+            storage = desc.createPackageStorage(setup);
+        } else {
+            storage = null;
+        }
+        return storage;
+    }
+
+    /**
      * Creates a runtime storage with the help of the service provider.
      * If no service provider is found, it will fall back to the
      * S3StorageFactoryDescriptor as a default.
      *
-     * @return the runtime storage
+     * @return the runtime storage, may be <b>null</b> if no storage descriptor is available or 
+     *   {@code setup} is <b>null</b>
+     * @see #createStorage(PackageStorageSetup)
      */
     public Storage createRuntimeStorage() {
         loadSetup();
         initDesc();
 
         if (runtimeStorage == null && setup != null && desc != null) {
-            runtimeStorage = desc.createRuntimeStorage(setup);
+            runtimeStorage = createStorage(setup.getRuntimeStorage());
         }
         return runtimeStorage;
     }
@@ -83,14 +104,16 @@ public class StorageFactory {
      * If no service provider is found, it will fall back to the
      * S3StorageFactoryDescriptor as a default.
      *
-     * @return the runtime storage
+     * @return the runtime storage, may be <b>null</b> if no storage descriptor is available or 
+     *   {@code setup} is <b>null</b>
+     * @see #createStorage(PackageStorageSetup)
      */
     public Storage createConfigStorage() {
         loadSetup();
         initDesc();
 
         if (configStorage == null && setup != null && desc != null) {
-            configStorage = desc.createConfigStorage(setup);
+            configStorage = createStorage(setup.getConfigStorage());
         }
         return configStorage;
     }

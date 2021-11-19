@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.deviceMgt.storage;
 
-import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
-
 /**
  * A stub storage factory for testing.
  * 
@@ -21,22 +19,12 @@ import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
  */
 public class StubStorageFactoryDescriptor implements StorageFactoryDescriptor {
 
-    private static Storage runtimeStorage;
-    private static Storage configStorage;
+    private static Storage storage;
 
     @Override
-    public Storage createRuntimeStorage(DeviceMgtSetup configuration) {
-        if (runtimeStorage != null) {
-            return runtimeStorage;
-        }
-
-        return null;
-    }
-
-    @Override
-    public Storage createConfigStorage(DeviceMgtSetup configuration) {
-        if (runtimeStorage != null) {
-            return configStorage;
+    public Storage createPackageStorage(PackageStorageSetup configuration) {
+        if (storage != null) {
+            return storage;
         }
 
         return null;
@@ -48,6 +36,7 @@ public class StubStorageFactoryDescriptor implements StorageFactoryDescriptor {
      * @param storage the storage
      */
     public static void setRuntimeStorage(Storage storage) {
-        StubStorageFactoryDescriptor.runtimeStorage = storage;
+        StubStorageFactoryDescriptor.storage = storage;
     }
+    
 }
