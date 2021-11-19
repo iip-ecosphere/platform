@@ -63,7 +63,7 @@ public class StorageFactoryDescriptorTest {
     @Test
     public void createRuntimeStorage_withConfiguration_createsStorage() {
         S3StorageFactoryDescriptor s3StorageFactoryDescriptor = new S3StorageFactoryDescriptor();
-        Storage storage = s3StorageFactoryDescriptor.createRuntimeStorage(configuration);
+        Storage storage = s3StorageFactoryDescriptor.createPackageStorage(configuration.getRuntimeStorage());
         Assert.assertNotNull(storage);
     }
 
@@ -73,7 +73,7 @@ public class StorageFactoryDescriptorTest {
     @Test
     public void createRuntimeStorage_withInvalidConfiguration_returnsNull() {
         S3StorageFactoryDescriptor s3StorageFactoryDescriptor = new S3StorageFactoryDescriptor();
-        Storage storage = s3StorageFactoryDescriptor.createRuntimeStorage(null);
+        Storage storage = s3StorageFactoryDescriptor.createPackageStorage(null);
         Assert.assertNull(storage);
     }
     

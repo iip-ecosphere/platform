@@ -96,7 +96,7 @@ public class StorageFactoryDescriptorTest {
         MockedStatic<ServiceLoaderUtils> serviceLoaderMock = Mockito.mockStatic(ServiceLoaderUtils.class);
         StorageFactoryDescriptor storageFactoryDescriptor = mock(StorageFactoryDescriptor.class);
         S3Storage storage = new S3Storage(null, null, null);
-        when(storageFactoryDescriptor.createRuntimeStorage(any())).thenReturn(storage);
+        when(storageFactoryDescriptor.createPackageStorage(any())).thenReturn(storage);
 
         serviceLoaderMock.when(() -> ServiceLoaderUtils.findFirst(StorageFactoryDescriptor.class))
                 .thenReturn(Optional.of(storageFactoryDescriptor));
