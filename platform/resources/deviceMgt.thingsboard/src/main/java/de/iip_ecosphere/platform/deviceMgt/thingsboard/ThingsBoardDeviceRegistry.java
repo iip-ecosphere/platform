@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistrationResponse;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import org.thingsboard.rest.client.RestClient;
 import org.thingsboard.server.common.data.Device;
@@ -111,9 +112,12 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
     }
 
     @Override
-    public void addDevice(String id, String ip) {
+    public DeviceRegistrationResponse addDevice(String id, String ip) {
+        DeviceRegistrationResponse result = new DeviceRegistrationResponse();
         if (id == null || id.isEmpty() || ip == null || ip.isEmpty()) {
-            return;
+            result.setSuccessful(false);
+            result.setMessage("No id given");
+            return result;
         }
 
         Device tbDevice = this.restClient.getTenantDevice(id).orElse(null);
@@ -130,7 +134,9 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
             this.restClient.saveDeviceAttributes(tbDevice.getId(), "SERVER_SCOPE", attribute);
         } catch (JsonProcessingException ignore) {
         }
-
+        // TODO add tokens, certificates
+        result.setSuccessful(true);
+        return result;
     }
 
     @Override
@@ -140,7 +146,7 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
         }
 
         this.restClient.getTenantDevice(id)
-                .ifPresent(tbDevice -> this.restClient.deleteDevice(tbDevice.getId()));
+            .ifPresent(tbDevice -> this.restClient.deleteDevice(tbDevice.getId()));
     }
 
     @Override

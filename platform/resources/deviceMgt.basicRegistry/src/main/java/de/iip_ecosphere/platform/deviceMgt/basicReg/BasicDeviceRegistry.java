@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistrationResponse;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 
 import java.util.*;
@@ -64,12 +65,18 @@ public class BasicDeviceRegistry implements DeviceRegistry {
     }
 
     @Override
-    public void addDevice(String id, String ip) {
+    public DeviceRegistrationResponse addDevice(String id, String ip) {
+        DeviceRegistrationResponse result = new DeviceRegistrationResponse();
         if (id == null || id.isEmpty() || ip == null || ip.isEmpty()) {
-            return;
+            result.setSuccessful(false);
+            result.setMessage("No id given");
+            return result;
         }
         
         devices.put(id, new BasicRegistryDeviceDescriptor(id, ip));
+        // TODO add tokens, certificates
+        result.setSuccessful(true);
+        return result;
     }
 
     @Override
