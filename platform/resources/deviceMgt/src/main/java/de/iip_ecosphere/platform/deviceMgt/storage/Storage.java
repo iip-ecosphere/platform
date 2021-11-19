@@ -12,7 +12,11 @@
 
 package de.iip_ecosphere.platform.deviceMgt.storage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
+
+import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 /**
  * A Storage grants access to different files/objects.
@@ -37,11 +41,21 @@ public interface Storage {
     Set<String> list();
 
     /**
-     * Generate a pre-signed url, so one can download (GET) the desired data.
+     * Generate a pre-signed URL, so one can download (GET) the desired data. Use, e.g., {@link UriResolver} to 
+     * transparently download a remote URL.
      * 
-     * @param key the key, comparable with a file in a folder.
+     * @param key the key, mapping to a file in a folder.
      * @return pre-signed Download-URL (http-protocol)
      */
     String generateDownloadUrl(String key);
+    
+    /**
+     * Stores a given file based on a given key.
+     * 
+     * @param key the key to denote the storage location
+     * @param file the file to store
+     * @throws IOException
+     */
+    void storeFile(String key, File file) throws IOException;
 
 }
