@@ -26,8 +26,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
+import de.iip_ecosphere.platform.configuration.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
-import de.iip_ecosphere.platform.configuration.ConfigurationSetup.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
@@ -118,7 +118,7 @@ public class IvmlTests {
         @Override
         protected void configure(ConfigurationSetup setup) {
             super.configure(setup);
-            setup.setEasyLogLevel(EasyLogLevel.VERBOSE); // override for debugging
+            setup.getEasySetup().setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
 
     }

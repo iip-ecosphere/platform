@@ -19,7 +19,6 @@ import org.apache.log4j.lf5.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.configuration.ConfigurationSetup.EasyLogLevel;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.uni_hildesheim.sse.easy.loader.ListLoader;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -108,24 +107,25 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
             loader = new ListLoader(); // file .easyStartup from classloader
-            loader.setVerbose(setup.getEasyLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
+            EasySetup easySetup = setup.getEasySetup();
+            loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");
-            doFilterLogs = setup.getEasyLogLevel() == EasyLogLevel.NORMAL;
+            doFilterLogs = easySetup.getLogLevel() == EasyLogLevel.NORMAL;
             doLogging = !doFilterLogs;
             loader.startup();
             doLogging = true;
             EasyExecutor exec = new EasyExecutor(
-                setup.getBase(), 
-                setup.getIvmlMetaModelFolder(), 
-                setup.getIvmlModelName());
+                easySetup.getBase(), 
+                easySetup.getIvmlMetaModelFolder(), 
+                easySetup.getIvmlModelName());
             // VIL model name is fix, IVML/Configuration name may change
-            exec.setVilModelName(ConfigurationSetup.PLATFORM_META_MODEL_NAME);
+            exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
             // self-instantiation into gen, assumed to be empty, may be cleaned up
             //exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl")); // can be, but not needed
-            exec.setVilSource(setup.getGenTarget());
-            exec.setVilTarget(setup.getGenTarget());
-            File ivmlCfg = setup.getIvmlConfigFolder();
-            if (null != ivmlCfg && !ivmlCfg.equals(setup.getIvmlMetaModelFolder())) {
+            exec.setVilSource(easySetup.getGenTarget());
+            exec.setVilTarget(easySetup.getGenTarget());
+            File ivmlCfg = easySetup.getIvmlConfigFolder();
+            if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
                 exec.addIvmlFolder(ivmlCfg);
             }
             try {

@@ -20,6 +20,11 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
 
+/**
+ * Instantiates the platform using EASy-Producer.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class PlatformInstantiator {
 
     /**
@@ -65,15 +70,16 @@ public class PlatformInstantiator {
          * @param setup the setup instance
          */
         protected void configure(ConfigurationSetup setup) {
-            setup.setIvmlModelName(ivmlModelName);
+            EasySetup easySetup = setup.getEasySetup();
+            easySetup.setIvmlModelName(ivmlModelName);
             if (null != modelFolder) {
-                setup.setIvmlConfigFolder(modelFolder);
+                easySetup.setIvmlConfigFolder(modelFolder);
             }
             if (cleanOutputFolder()) {
                 FileUtils.deleteQuietly(outputFolder);
                 outputFolder.mkdirs();
             }
-            setup.setGenTarget(outputFolder);    
+            easySetup.setGenTarget(outputFolder);    
         }
         
         /**
@@ -157,7 +163,7 @@ public class PlatformInstantiator {
             configurer.handleExecutionException(e);
         } finally {
             lcd.shutdown();
-            setup.reset();
+            setup.getEasySetup().reset();
         }
     }
     

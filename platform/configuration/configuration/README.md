@@ -8,6 +8,37 @@ It is important to understand that the configuration model and the related code 
 
 So far there is no graphical user interface which shall be located one layer above this component, i.e., use the interface the component provides. For initial instantiation, we provide the PlatformInstantiator class which executes the configuration process from command line.
 
+```yaml
+easyProducer:
+  base: <String>
+  genTarget: <String>
+  ivmlMetaModelFolder: <String>
+  ivmlConfigFolder <String>
+  ivmlModelName: <String>
+  easyLogLevel: NORMAL|VERBOSE|EXTRA_VERBOSE
+
+serviceArtifactStorage:
+  endpoint: <String>
+  region: <String>
+  accessKey: <String>
+  secretAccessKey: <String>
+  bucket: <String>
+  prefix: <String>
+  packageDescriptor: <String>
+  packageFilename: <String>
+
+containerImageStorage:
+  endpoint: <String>
+  region: <String>
+  accessKey: <String>
+  secretAccessKey: <String>
+  bucket: <String>
+  prefix: <String>
+  packageDescriptor: <String>
+  packageFilename: <String>
+  
+```
+
 ## missing
 
 - variability model: resources, resource assignment to ServiceMeshes

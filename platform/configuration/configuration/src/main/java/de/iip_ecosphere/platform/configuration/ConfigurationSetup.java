@@ -12,11 +12,11 @@
 
 package de.iip_ecosphere.platform.configuration;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
@@ -27,157 +27,70 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  */
 public class ConfigurationSetup extends AbstractSetup {
 
-    public static final String PLATFORM_META_MODEL_NAME = "IIPEcosphere";
     private static ConfigurationSetup instance;
-    private File base;
-    private File genTarget;
-    private File ivmlMetaModelFolder; 
-    private File ivmlConfigFolder;
-    private String ivmlModelName;
-    private EasyLogLevel easyLogLevel = EasyLogLevel.NORMAL;
+    private EasySetup easyProducer = new EasySetup();
+    private PackageStorageSetup serviceArtifactStorage;
+    private PackageStorageSetup containerImageStorage;
 
-    /**
-     * Basically, the amount of EASy logging is defined via the Log4J logging configuration. However, we can log
-     * more and even more, in particular during startup. These levels refer to the specific startup logging that
-     * we have under control here.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public enum EasyLogLevel {
-        NORMAL,
-        VERBOSE,
-        EXTRA_VERBOSE
-    }
-    
     /**
      * Creates an instance.
      */
     public ConfigurationSetup() {
-        reset();
+        easyProducer.reset();
     }
     
     /**
-     * Resets the setup to default values, e.g., for testing.
+     * Returns the EASy-Producer setup.
+     * 
+     * @return the setup
      */
-    public void reset() {
-        base = new File(".");
-        genTarget = new File("gen");
-        ivmlMetaModelFolder = new File("src/main/easy"); 
-        ivmlConfigFolder = null;
-        ivmlModelName = PLATFORM_META_MODEL_NAME;
+    public EasySetup getEasySetup() {
+        return easyProducer;
+    }
+
+    /**
+     * Returns the EASy-Producer setup. [snakyaml]
+     * 
+     * @param easyProducer the storage setup
+     */
+    public void setEasySetup(EasySetup easyProducer) {
+        this.easyProducer = easyProducer;
     }
     
     /**
-     * Returns the IVML model name.
+     * Returns the EASy-Producer setup.
      * 
-     * @return the IVML model name, by default "IIPEcosphere"
+     * @return the setup
      */
-    public String getIvmlModelName() {
-        return ivmlModelName;
-    }
-    
-    /**
-     * Returns the target base for making relative artifact paths absolute.
-     * 
-     * @return the base folder, by default {@code .}.
-     */
-    public File getBase() {
-        return base;
-    }
-    
-    /**
-     * Returns the target folder for artifact generation. Shall be within {@link #getBase()}.
-     * 
-     * @return the target folder, by default {@code gen}.
-     */
-    public File getGenTarget() {
-        return genTarget;
+    public PackageStorageSetup getServiceArtifactStorage() {
+        return serviceArtifactStorage;
     }
 
     /**
-     * Returns the IVML folder containing the platform meta model.
+     * Returns the EASy-Producer setup. [snakyaml]
      * 
-     * @return the IVML folder folder, by default {@code src/main/easy}.
+     * @param serviceArtifactStorage the storage setup
      */
-    public File getIvmlMetaModelFolder() {
-        return ivmlMetaModelFolder;
+    public void setServiceArtifactStorage(PackageStorageSetup serviceArtifactStorage) {
+        this.serviceArtifactStorage = serviceArtifactStorage;
     }
 
     /**
-     * Returns the IVML configuration folder containing the platform configuration.
+     * Returns the container image storage.
      * 
-     * @return the IVML configuration folder if different from {@link #getIvmlMetaModelFolder()}, 
-     *     by default <b>null</b>.
+     * @return the setup
      */
-    public File getIvmlConfigFolder() {
-        return ivmlConfigFolder;
+    public PackageStorageSetup getContainerImageStorage() {
+        return containerImageStorage;
     }
 
     /**
-     * Returns the IVML model name. [required by SnakeYaml]
+     * Returns the setup for the global container image storage. [snakyaml]
      * 
-     * @param ivmlModelName the IVML model name
+     * @param containerImageStorage the setup
      */
-    public void setIvmlModelName(String ivmlModelName) {
-        this.ivmlModelName = ivmlModelName;
-    }
-    
-    /**
-     * Defines the base folder for making relative paths absolute. [required by SnakeYaml]
-     * 
-     * @param base the base folder.
-     */
-    public void setBase(File base) {
-        this.base = base;
-    }
-
-    /**
-     * Defines the target folder for artifact generation. [required by SnakeYaml]
-     * 
-     * @param genTarget the target folder.
-     */
-    public void setGenTarget(File genTarget) {
-        this.genTarget = genTarget;
-    }
-
-    /**
-     * Defines the IVML meta model folder containing the platform meta model. [required by SnakeYaml]
-     * 
-     * @param ivmlMetaModelFolder the IVML meta model folder
-     */
-    public void setIvmlMetaModelFolder(File ivmlMetaModelFolder) {
-        this.ivmlMetaModelFolder = ivmlMetaModelFolder;
-    }
-
-    /**
-     * Defines the IVML configuration folder containing the platform configuration. [required by SnakeYaml]
-     * 
-     * @param ivmlConfigFolder the IVML configuration folder, shall be <b>null</b> if it is the same 
-     * as {@link #getIvmlMetaModelFolder()}, ignored if given and the same as {@link #getIvmlMetaModelFolder()}   
-     */
-    public void setIvmlConfigFolder(File ivmlConfigFolder) {
-        if (null == ivmlConfigFolder || (null != ivmlConfigFolder && !ivmlMetaModelFolder.equals(ivmlConfigFolder))) {
-            this.ivmlConfigFolder = ivmlConfigFolder;
-        }
-    }
-
-    /**
-     * Returns whether EASy-Producer verbose output, in particular during startup, shall be emitted.
-     * 
-     * @return {@code true} for verbose output, {@code false} else   
-     */
-    public EasyLogLevel getEasyLogLevel() {
-        return easyLogLevel;
-    }
-
-    /**
-     * Defines whether EASy-Producer verbose output, in particular during startup, shall be emitted. 
-     * [required by SnakeYaml]
-     * 
-     * @param easyLogLevel the easy loglevel   
-     */
-    public void setEasyLogLevel(EasyLogLevel easyLogLevel) {
-        this.easyLogLevel = easyLogLevel;
+    public void setContainerImageStorage(PackageStorageSetup containerImageStorage) {
+        this.containerImageStorage = containerImageStorage;
     }
 
     /**

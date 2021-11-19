@@ -1,4 +1,5 @@
-/********************************************************************************
+/**
+ * ******************************************************************************
  * Copyright (c) {2021} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -8,20 +9,28 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.configuration;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.iip_ecosphere.platform.configuration.StorageFactory;
 
 /**
- * Defines the tests to be executed.
+ * Storage factory test.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    IvmlTests.class,
-    StorageFactoryTest.class
-})
-public class AllTests {
+public class StorageFactoryTest {
+    
+    /**
+     * Basic test without setup.
+     */
+    @Test
+    public void testStorageFactory() {
+        Assert.assertNull(StorageFactory.createContainerImageStorage());
+        Assert.assertNull(StorageFactory.createServiceArtifactStorage());
+    }
+
 }
