@@ -32,7 +32,7 @@ project Applications {
     
     // hint to requirements!
     compound MeshConnector refines CConnector {
-        refTo(MeshInnerElement) next;
+        refTo(MeshElement) next;
     }
     
     // TODO graph validation -> QM

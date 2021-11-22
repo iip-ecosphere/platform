@@ -1,23 +1,23 @@
 @advice(IIPEcosphere)
 template Basics(Configuration config, FileArtifact target) {
 	
-	def setOf(MeshInnerElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);
     }
 
-    def setOf(MeshInnerElement) getNextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def setOf(MeshElement) getNextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         {};
     }
     
-    def setOf(MeshInnerElement) getNextMeshNodes(MeshSource source, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def setOf(MeshElement) getNextMeshNodes(MeshSource source, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         mapNext(source, source.next, mappedMesh);
     }
 
-    def setOf(MeshInnerElement) getNextMeshNodes(MeshInnerElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def setOf(MeshElement) getNextMeshNodes(MeshInnerElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         mapNext(elt, elt.next, mappedMesh);
     }
     
-    def setOf(MeshInnerElement) mapNext(MeshElement elt, setOf(MeshConnector) next, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+    def setOf(MeshElement) mapNext(MeshElement elt, setOf(MeshConnector) next, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         for (MeshConnector c: next) {
             setOf(MeshConnector) connectors;
             if (mappedMesh.containsKey(elt)) {
