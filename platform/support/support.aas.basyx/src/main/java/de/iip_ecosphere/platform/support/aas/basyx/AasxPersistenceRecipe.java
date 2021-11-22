@@ -82,9 +82,12 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
                 LOGGER.warn("AAS '" + a.getIdShort() + "' may not be read back correctly as it does not have "
                     + "an Asset Reference.");
             }
+            origAas = ensureLocal(origAas);
             basyxAas.add(origAas);
             for (Submodel s : a.submodels()) {
-                basyxSubmodels.add(((AbstractSubmodel<?>) s).getSubmodel());
+                ISubmodel submodel = ((AbstractSubmodel<?>) s).getSubmodel();
+                submodel = ensureLocal(submodel);
+                basyxSubmodels.add(submodel);
             }
         }
 

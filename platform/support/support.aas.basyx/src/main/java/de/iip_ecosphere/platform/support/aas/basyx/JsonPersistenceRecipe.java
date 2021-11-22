@@ -57,14 +57,9 @@ public class JsonPersistenceRecipe extends AbstractPersistenceRecipe {
         Collection<ConceptDescription> conceptDescriptionList = new ArrayList<ConceptDescription>();
         for (Aas a : aas) {
             if (a instanceof BaSyxAas) {
-                basyxAas.add(((BaSyxAas) a).getAas());
+                basyxAas.add(ensureLocal(((BaSyxAas) a).getAas()));
                 for (Submodel s : a.submodels()) {
-                    if (s instanceof BaSyxSubmodel) {
-                        basyxSubmodels.add(((BaSyxSubmodel) s).getSubmodel());
-                    } else {
-                        throw new IllegalArgumentException("Can only write directly created submodels: " 
-                            + a.getIdShort());
-                    }
+                    basyxSubmodels.add(ensureLocal(((BaSyxSubmodel) s).getSubmodel()));
                 }
                 addAsset(a, assetList, Asset.class);
             } else {

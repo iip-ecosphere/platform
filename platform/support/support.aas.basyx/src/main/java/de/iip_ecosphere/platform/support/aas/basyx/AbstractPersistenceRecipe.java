@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
+import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
@@ -29,6 +30,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
+import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 
 import de.iip_ecosphere.platform.support.FileFormat;
@@ -153,6 +155,43 @@ public abstract class AbstractPersistenceRecipe implements PersistenceRecipe {
      */
     protected static boolean isValidForWriting(IAsset asset) {
         return asset.getIdShort().length() > 0;
+    }
+    
+    /**
+     * Returns that the result is a local AAS, e.g., a connected AAS is turned transparently into a local copy.
+     *  
+     * @param aas the AAS to check
+     * @return the local AAS (<b>null</b> if <code>aas</code> is neither a local nor a connected AAS)
+     */
+    protected static AssetAdministrationShell ensureLocal(IAssetAdministrationShell aas) {
+        AssetAdministrationShell result;
+        if (aas instanceof ConnectedAssetAdministrationShell) {
+            result = ((ConnectedAssetAdministrationShell) aas).getLocalCopy();
+        } else if (aas instanceof AssetAdministrationShell) {
+            result = (AssetAdministrationShell) aas;
+        } else {
+            result = null; // shall not occur
+        }
+        return result;
+    }
+
+    /**
+     * Returns that the result is a local submodel, e.g., a connected submodel is turned transparently into 
+     * a local copy.
+     *  
+     * @param submodel the submodel to check
+     * @return the local submodel (<b>null</b> if <code>submodel</code> is neither a local nor a connected submodel)
+     */
+    protected static Submodel ensureLocal(ISubmodel submodel) {
+        Submodel result;
+        if (submodel instanceof ConnectedSubmodel) {
+            result = ((ConnectedSubmodel) (submodel)).getLocalCopy(); 
+        } else if (submodel instanceof Submodel) {
+            result = (Submodel) submodel;
+        } else {
+            result = null;
+        }
+        return result;
     }
 
 }
