@@ -32,7 +32,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import de.iip_ecosphere.platform.transport.connectors.SslUtils;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 
 /**
  * An AMQP client for a single binder instance. Typically, different binders subscribe to different

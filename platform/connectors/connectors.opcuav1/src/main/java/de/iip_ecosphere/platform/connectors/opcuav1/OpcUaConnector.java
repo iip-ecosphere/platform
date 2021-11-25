@@ -86,7 +86,7 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
-import de.iip_ecosphere.platform.transport.connectors.SslUtils;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 
 /**
  * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.

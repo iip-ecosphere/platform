@@ -23,8 +23,8 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import de.iip_ecosphere.platform.transport.connectors.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
