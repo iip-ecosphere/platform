@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import java.io.File;
+
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -38,6 +40,16 @@ public class FakeServerReceipe implements ServerRecipe {
     @Override
     public PersistenceType toPersistenceType(String type) {
         return LocalPersistenceType.INMEMORY;
+    }
+
+    @Override
+    public String createKeyPathOption(File path) {
+        return ""; // we just ignore this here
+    }
+
+    @Override
+    public String createKeyPassOption(String pass) {
+        return ""; // we just ignore this here
     }
 
 }

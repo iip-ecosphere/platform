@@ -13,8 +13,10 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
+import java.io.File;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -58,12 +60,12 @@ public class FakeAasFactory extends AasFactory {
         registerProtocolCreator(DEFAULT_PROTOCOL, new ProtocolCreator() {
             
             @Override
-            public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+            public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
                 return new FakeProtocolServerBuilder();
             }
             
             @Override
-            public InvocablesCreator createInvocablesCreator(String host, int port) {
+            public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
                 return new FakeInvocablesCreator();
             }
         });
@@ -95,7 +97,17 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
+    public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
+        return null;
+    }
+    
+    @Override
     public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
+        return null;
+    }
+    
+    @Override
+    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
         return null;
     }
 

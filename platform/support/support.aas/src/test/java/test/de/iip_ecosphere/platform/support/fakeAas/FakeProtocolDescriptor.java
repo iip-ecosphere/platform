@@ -13,6 +13,9 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory.ProtocolCreator;
+
+import java.io.File;
+
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolDescriptor;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -33,12 +36,12 @@ public class FakeProtocolDescriptor implements ProtocolDescriptor {
     static final ProtocolCreator CREATOR = new ProtocolCreator() {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port) {
+        public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
             return new FakeInvocablesCreator(); 
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+        public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
             return new FakeProtocolServerBuilder();
         }
         

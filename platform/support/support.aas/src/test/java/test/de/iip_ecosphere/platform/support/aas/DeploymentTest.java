@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
@@ -31,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -243,23 +245,66 @@ public class DeploymentTest {
     }
 
     /**
-     * Tests a remote AAS deployment.
+     * Tests a remote AAS HTTP deployment.
      * 
      * @throws IOException shall not occur if the test works
      */
     @Test
     public void remoteAasDeploymentTest() throws IOException {
+        remoteAasDeploymentTestImpl(Schema.HTTP, null, null);
+    }
+    
+    /**
+     * Tests a remote AAS HTTPS deployment.
+     * 
+     * @throws IOException shall not occur if the test works
+     */
+    @Test
+    public void remoteAasSslDeploymentTest() throws IOException {
+        File keyPath = new File("./src/test/resources/keystore.jks");
+        remoteAasDeploymentTestImpl(Schema.HTTPS, keyPath, "a1234567");
+    }
+    
+    /**
+     * Adapts the registry schema if needed.
+     * 
+     * @param schema the schema
+     * @return {@code schema}
+     */
+    protected Schema adaptRegistrySchema(Schema schema) {
+        return schema;
+    }
+    
+    /**
+     * Tests a remote AAS deployment.
+     * 
+     * @param schema the schema for the servers
+     * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
+     * @param keyPass the password to access the key file/store
+     * 
+     * @throws IOException shall not occur if the test works
+     */
+    private void remoteAasDeploymentTestImpl(Schema schema, File keyPath, String keyPass) throws IOException {
         // adapted from org.eclipse.basyx.examples.scenarios.cloudedgedeployment.CloudEdgeDeploymentScenario
         AasFactory factory = AasFactory.getInstance();
 
+        ServerRecipe srcp = factory.createServerRecipe();
+        String[] options;
+        if (null != keyPath) {
+            options = new String[2];
+            options[0] = srcp.createKeyPathOption(keyPath);
+            options[1] = srcp.createKeyPassOption(keyPass);
+        } else {
+            options = new String[0];
+        }
+        
         // start a registry server
-        Endpoint regEp = new Endpoint(Schema.HTTP, "registry");
-        Server regServer = factory.createServerRecipe()
-            .createRegistryServer(regEp, LocalPersistenceType.INMEMORY).start();
+        Endpoint regEp = new Endpoint(adaptRegistrySchema(schema), "registry");
+        Server regServer = srcp.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, options).start();
         
         // Start target deployment server and connect to the registry
-        Endpoint serverEp = new Endpoint(Schema.HTTP, "cloud");
-        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp)
+        Endpoint serverEp = new Endpoint(schema, "cloud");
+        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp, keyPath, keyPass)
             .setRegistryUrl(regEp);
         Registry reg = regD.obtainRegistry();
         AasServer cloudServer = regD.createServer().start();
@@ -284,8 +329,8 @@ public class DeploymentTest {
         smB.createPropertyBuilder("max_temp").setValue(1000).build();
         smB.build();
         
-        assertRemoteAas(regEp, aasUrn, "oven_doc", smUrn);
-        assertRemoteAas(regEp, aasUrn, "oven_doc2", smUrn2);
+        assertRemoteAas(regEp, aasUrn, "oven_doc", smUrn, serverEp);
+        assertRemoteAas(regEp, aasUrn, "oven_doc2", smUrn2, serverEp);
 
         cloudServer.stop(true);
         regServer.stop(true);
@@ -298,11 +343,13 @@ public class DeploymentTest {
      * @param aasUrn the AAS URN
      * @param submName the name of the submodel to assert for
      * @param smUrn the submodel URN
+     * @param aasEp the endpoint of the AAS server
      * @throws IOException in case that obtaining the registry/receiving the AAS fails
      */
-    private void assertRemoteAas(Endpoint regEp, String aasUrn, String submName, String smUrn) throws IOException {
+    private void assertRemoteAas(Endpoint regEp, String aasUrn, String submName, String smUrn, Endpoint aasEp) 
+        throws IOException {
         // could use reg from above, "simulate" access from other location
-        Registry reg = AasFactory.getInstance().obtainRegistry(regEp);
+        Registry reg = AasFactory.getInstance().obtainRegistry(regEp, aasEp.getSchema());
         Aas aas = reg.retrieveAas(aasUrn);
         Assert.assertNotNull(aas);
         Assert.assertEquals("oven", aas.getIdShort());

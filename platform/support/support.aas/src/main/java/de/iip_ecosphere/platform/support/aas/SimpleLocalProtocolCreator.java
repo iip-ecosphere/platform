@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.io.File;
+
 import de.iip_ecosphere.platform.support.aas.AasFactory.ProtocolCreator;
 
 /**
@@ -25,12 +27,12 @@ public class SimpleLocalProtocolCreator implements ProtocolCreator {
     private OperationsProvider lastProvider;
     
     @Override
-    public ProtocolServerBuilder createProtocolServerBuilder(int port) {
+    public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
         return new LocalProtocolServerBuilder(lastProvider);
     }
     
     @Override
-    public InvocablesCreator createInvocablesCreator(String host, int port) {
+    public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
         lastProvider = createOperationsProvider();
         return new LocalInvocablesCreator(lastProvider);
     }

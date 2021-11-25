@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Assert;
@@ -68,10 +69,20 @@ public class FactoryTest {
             public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
                 return DUMMY.obtainRegistry(regEndpoint);
             }
-            
+
+            @Override
+            public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
+                return DUMMY.obtainRegistry(regEndpoint, aasSchema);
+            }
+
             @Override
             public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
                 return DUMMY.createDeploymentRecipe(endpoint);
+            }
+            
+            @Override
+            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
+                return DUMMY.createDeploymentRecipe(endpoint, keyPath, keyPass);
             }
             
             @Override
@@ -135,6 +146,7 @@ public class FactoryTest {
         Assert.assertNull(serverRecipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, ""));
         Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
         Assert.assertNull(instance.obtainRegistry(ep));
+        Assert.assertNull(instance.obtainRegistry(ep, Schema.HTTPS));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
 
         Assert.assertNull(instance.createPersistenceRecipe());
@@ -175,6 +187,7 @@ public class FactoryTest {
         Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
         assertRegistry(instance.obtainRegistry(ep));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
+        Assert.assertNull(instance.createDeploymentRecipe(ep, new File("."), "xxx"));
 
         Assert.assertNull(instance.createPersistenceRecipe());
 

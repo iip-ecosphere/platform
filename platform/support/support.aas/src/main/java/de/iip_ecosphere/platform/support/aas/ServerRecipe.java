@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.io.File;
+
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 
@@ -82,5 +84,21 @@ public interface ServerRecipe {
      *    instance on client side without the server parts installed
      */
     public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options);
+    
+    /**
+     * Creates an option for a path to a key store.
+     * 
+     * @param path the path
+     * @return the option
+     */
+    public String createKeyPathOption(File path);
+    
+    /**
+     * Creates an option for a key password.
+     * 
+     * @param pass the password
+     * @return the option
+     */
+    public String createKeyPassOption(String pass);
     
 }

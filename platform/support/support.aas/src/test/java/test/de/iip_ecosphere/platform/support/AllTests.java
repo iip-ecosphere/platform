@@ -17,6 +17,7 @@ import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
 import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
+import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
 
 /**
  * Defines the tests to be executed.
@@ -35,6 +36,7 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
     FactoryTest.class, // we do not go for a sub-suite for now as Maven may execute both
     PrintVisitorTest.class,
     NetworkManagerTest.class,
+    SslUtilsTest.class,
     PidFileTest.class,
     LifecycleHandlerTest.class, 
     ServiceLoaderUtilsTest.class,
