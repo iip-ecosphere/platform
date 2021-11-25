@@ -20,7 +20,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -44,15 +44,15 @@ public class BaSyxRegistry implements Registry {
      * Creates a registry recipe.
      * 
      * @param endpoint the registry endpoint
+     * @param connectorFactory connector factory, e.g., HTTP, HTTPS
      * @throws IOException if connecting the registry fails
      */
-    BaSyxRegistry(Endpoint endpoint) throws IOException {
+    BaSyxRegistry(Endpoint endpoint, IConnectorFactory connectorFactory) throws IOException {
         this.endpoint = endpoint;
         try {
             registry = new AASRegistryProxy(this.endpoint.toUri());
-            HTTPConnectorFactory connectorProvider = new HTTPConnectorFactory(); // TODO HTTPS?
             manager = new ConnectedAssetAdministrationShellManager(
-                registry, connectorProvider);
+                registry, connectorFactory);
         } catch (Exception e) {
             throw new IOException(e);
         }

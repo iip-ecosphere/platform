@@ -12,9 +12,10 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
+
 import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
@@ -32,6 +33,9 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
  */
 public class BaSyxServerRecipe implements ServerRecipe {
 
+    private static final String OPT_KEY_PATH = "keyPath=";
+    private static final String OPT_KEY_PASS = "keyPass=";
+    
     // currently this does not allow to run registry and server on the same port...
     
     @Override
@@ -48,18 +52,38 @@ public class BaSyxServerRecipe implements ServerRecipe {
     
     @Override
     public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
-        String...options) {
-        return new BaSyxRegistryDeploymentAasServer(new DeploymentSpec(serverEndpoint), registryEndpoint.toUri(), 
-            translateForServer(persistence), options);
+        String... options) {
+        return new BaSyxRegistryDeploymentAasServer(createDeploymentSpec(serverEndpoint, true, options), 
+            registryEndpoint.toUri(), translateForServer(persistence), options);
+    }
+    
+    /**
+     * Creates a deployment specification taking options into account.
+     * 
+     * @param endpoint the endpoint to create the deployment specification for
+     * @param considerEnc whether encrypting options shall be considered if given
+     * @param options the options
+     * @return the deployment specification
+     */
+    private DeploymentSpec createDeploymentSpec(Endpoint endpoint, boolean considerEnc, String[] options) {
+        File keyPath = null;
+        String keyPass = null;
+        for (int i = 0; i < options.length; i++) {
+            if (considerEnc && options[i].startsWith(OPT_KEY_PATH)) {
+                keyPath = new File(options[i].substring(OPT_KEY_PATH.length()));
+            } else if (considerEnc && options[i].startsWith(OPT_KEY_PASS)) {
+                keyPass = options[i].substring(OPT_KEY_PASS.length());
+            }
+        }
+        return new DeploymentSpec(endpoint, keyPath, keyPass);
     }
 
     @Override
     public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
-        BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(endpoint.getPort(), 
-            endpoint.getEndpoint());
+        DeploymentSpec spec = createDeploymentSpec(endpoint, false, options); // registries are not encrypted in BaSyx
         RegistryBackend backend = Tools.getOption(options, translateForRegistry(persistence), RegistryBackend.class);
         BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(backend);
-        final IComponent component = new RegistryComponent(contextConfig, registryConfig);
+        final IComponent component = new RegistryComponent(spec.getContextConfiguration(), registryConfig);
         return new Server() {
 
             @Override
@@ -113,6 +137,16 @@ public class BaSyxServerRecipe implements ServerRecipe {
                 + "' is not supported as server backend" );
         }
         return result;
+    }
+
+    @Override
+    public String createKeyPathOption(File path) {
+        return OPT_KEY_PATH + path.getAbsolutePath();
+    }
+
+    @Override
+    public String createKeyPassOption(String pass) {
+        return OPT_KEY_PASS + pass; // quote, unqote?
     }
 
 }

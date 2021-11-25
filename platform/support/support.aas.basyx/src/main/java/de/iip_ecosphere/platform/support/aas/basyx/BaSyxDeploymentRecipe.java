@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServlet;
@@ -52,6 +53,17 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      */
     BaSyxDeploymentRecipe(Endpoint endpoint) {
         deploymentSpec = new DeploymentSpec(endpoint);
+    }
+    
+    /**
+     * Creates a deployment builder with root/empty document base path.
+     * 
+     * @param endpoint the endpoint to create the deployment context for
+     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
+     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
+     */
+    BaSyxDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
+        deploymentSpec = new DeploymentSpec(endpoint, keyPath, keyPass);
     }
 
     /**
@@ -115,7 +127,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         
         @Override
         public Registry obtainRegistry() throws IOException {
-            return AasFactory.getInstance().obtainRegistry(endpoint);
+            return AasFactory.getInstance().obtainRegistry(endpoint, deploymentSpec.getEndpoint().getSchema());
         }
 
         @Override

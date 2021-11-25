@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +39,20 @@ class DeploymentSpec {
     DeploymentSpec(Endpoint endpoint) {
         this(endpoint, "", false, null, null);
     }
+    
+    /**
+     * Creates an deployment specification based on a given {@code endpoint}, but without setting the 
+     * registry. The deployment becomes encrypted if {@code keyPath} is not <b>null</b> and the file exists. 
+     * Otherwise, {@code keyPath} and {@code keyPass} are ignored.
+     * 
+     * @param endpoint the endpoint
+     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
+     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
+     */
+    DeploymentSpec(Endpoint endpoint, File keyPath, String keyPass) {
+        this(endpoint, "", null != keyPath && keyPath.exists(), 
+            null == keyPath ? null : keyPath.getAbsolutePath(), keyPass);
+    }
 
     /**
      * Creates an unencrypted deployment specification based on a given {@code endpoint}, but without setting the 
@@ -57,10 +72,10 @@ class DeploymentSpec {
      * @param docPath the document path, may be empty
      * @param isSecuredCon do we need a secure connection, then {@code keyPath} and {@code keyPass} must be given; else 
      *     they are ignored
-     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
      * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
+     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
      */
-    DeploymentSpec(Endpoint endpoint, String docPath, boolean isSecuredCon, String keyPath,  String keyPass) {
+    DeploymentSpec(Endpoint endpoint, String docPath, boolean isSecuredCon, String keyPath, String keyPass) {
         this.endpoint = endpoint;
         if (isSecuredCon) {
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort(), 

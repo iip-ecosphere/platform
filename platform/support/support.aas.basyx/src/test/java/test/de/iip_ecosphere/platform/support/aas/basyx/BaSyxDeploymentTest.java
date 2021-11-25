@@ -12,11 +12,18 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
+import de.iip_ecosphere.platform.support.Schema;
+
 /**
  * Tests deployment scenarios.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class BaSyxDeploymentTest extends test.de.iip_ecosphere.platform.support.aas.DeploymentTest {
+
+    @Override
+    protected Schema adaptRegistrySchema(Schema schema) {
+        return Schema.HTTP; // registries are not encrypted in BaSyx
+    }
     
 }

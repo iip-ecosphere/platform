@@ -14,30 +14,32 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
 
 /**
- * implements an invocables creator for HTTP-based VAB.
+ * implements an invocables creator for HTTPS-based VAB.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class VabHttpInvocablesCreator extends VabInvocablesCreator {
+public class VabHttpsInvocablesCreator extends VabInvocablesCreator {
 
-    private static final long serialVersionUID = 2161996616248269342L;
+    private static final long serialVersionUID = 8021322086051502297L;
     private String address;
+    private BaSyxJerseyHttpsClientFactory factory;
     
     /**
      * Creates an invocables creator instance.
      * 
      * @param address the HTTP address to connect to
+     * @param factory the client factory
      */
-    VabHttpInvocablesCreator(String address) {
+    VabHttpsInvocablesCreator(String address, BaSyxJerseyHttpsClientFactory factory) {
         this.address = address;
+        this.factory = factory;
     }
     
     @Override
     protected VABElementProxy createProxy() {
-        return new VABElementProxy("", new JSONConnector(new HTTPConnector(address)));
+        return new VABElementProxy("", new JSONConnector(new BaSyxHTTPSConnector(address, factory)));
     }
 
     @Override
