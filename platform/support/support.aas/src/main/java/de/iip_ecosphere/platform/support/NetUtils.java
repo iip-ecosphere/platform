@@ -105,5 +105,20 @@ public class NetUtils {
         }
         return ip;
     }
+    
+    /**
+     * Returns the own hostname.
+     * 
+     * @return the hostname, potentially with a fallback to "localhost"
+     */
+    public static String getOwnHostname() {
+        String result; 
+        try {
+            result = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            result = "localhost";
+        }
+        return result;
+    }
 
 }

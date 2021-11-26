@@ -45,5 +45,15 @@ public class NetUtilsTest {
         Assert.assertTrue(NetUtils.getOwnIP("255.255.255.255").length() > 0);
         Assert.assertTrue(NetUtils.getOwnIP("^255.255.255.255").length() > 0);
     }
+
+    /**
+     * Tests {@link NetUtils#getOwnHostname()}.
+     */
+    @Test
+    public void testOwnHostname() {
+        String host = NetUtils.getOwnHostname();
+        Assert.assertNotNull(host);
+        Assert.assertTrue(host.length() > 0);
+    }
     
 }

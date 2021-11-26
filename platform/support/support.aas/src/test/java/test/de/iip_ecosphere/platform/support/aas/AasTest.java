@@ -192,7 +192,7 @@ public class AasTest {
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
         for (String proto : AasFactory.getInstance().getProtocols()) {
-            if (!AasFactory.LOCAL_PROTOCOL.equals(proto)) { // VAB only
+            if (!AasFactory.LOCAL_PROTOCOL.equals(proto) && !excludeProtocol(proto)) { // VAB only
                 System.out.println("Testing VAB protocol: " + proto);
                 testVabQuery(proto);
             }
@@ -207,6 +207,16 @@ public class AasTest {
      */
     protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol) {
         return null;
+    }
+    
+    /**
+     * To be overridden: Exclude the given protocol from testing. 
+     * 
+     * @param protocol the protocol
+     * @return {@code true} for exclusion, {@code false} for inclusion
+     */
+    protected boolean excludeProtocol(String protocol) {
+        return false;
     }
 
     /**
