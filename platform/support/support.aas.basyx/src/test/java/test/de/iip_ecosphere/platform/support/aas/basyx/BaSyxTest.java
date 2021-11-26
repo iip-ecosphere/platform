@@ -17,6 +17,7 @@ import java.io.File;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import test.de.iip_ecosphere.platform.support.TestUtils;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 
 /**
@@ -39,13 +40,13 @@ public class BaSyxTest extends AasTest {
 
     @Override
     protected boolean excludeProtocol(String protocol) {
-        boolean result = false;
+        boolean exclude = false;
         if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
             // currently it's unclear why VAB-HTTPS works on Windows but not on Linux while HTTPS-AAS works
-            result = NetUtils.getOwnHostname().indexOf("jenkins") >= 0;
-            System.out.println("Checking exclusion: " + NetUtils.getOwnHostname() + " " + result);            
+            exclude = TestUtils.isSseCI();
+            System.out.println("Checking exclusion: " + NetUtils.getOwnHostname() + " " + exclude);            
         }
-        return result;
+        return exclude;
     }
 
 }
