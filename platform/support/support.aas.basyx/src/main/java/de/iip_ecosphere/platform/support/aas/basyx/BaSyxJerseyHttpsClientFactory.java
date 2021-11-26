@@ -22,6 +22,17 @@ import java.security.cert.X509Certificate;
  */
 public class BaSyxJerseyHttpsClientFactory {
 
+    public static final String TLS_V1 = "TLSv1";
+    public static final String DEFAULT_PROTOCOL = TLS_V1;
+    public static final HostnameVerifier ALLOW_ALL_HOSTS = new HostnameVerifier() {
+
+        @Override
+        public boolean verify(String hostname, SSLSession sslSession) {
+            return true;
+        }
+        
+    }; 
+    
     private HostnameVerifier hostNameVerifier;
     private TrustManager[] trustManagers;
     private KeyManager[] keyManagers;
@@ -29,18 +40,12 @@ public class BaSyxJerseyHttpsClientFactory {
     private String protocol;
     
     /**
-     * Creates a default HTTPS client factory for self-signed certificates and TSLv1 protocol.
+     * Creates a default HTTPS client factory with {@link #DEFAULT_PROTOCOL}, {@link #ALLOW_ALL_HOSTS}, new 
+     * secure random seed for self-signed certificates and TSLv1 protocol.
      */
     public BaSyxJerseyHttpsClientFactory() {
-        protocol = "TLSv1";
-        hostNameVerifier = new HostnameVerifier() {
-
-            @Override
-            public boolean verify(String hostname, SSLSession sslSession) {
-                return true;
-            }
-            
-        };
+        protocol = DEFAULT_PROTOCOL;
+        hostNameVerifier = ALLOW_ALL_HOSTS;
         X509TrustManager selfTrustManager = new X509TrustManager() {
             @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String authType) {
@@ -58,6 +63,21 @@ public class BaSyxJerseyHttpsClientFactory {
         trustManagers = new TrustManager[] {selfTrustManager};
         keyManagers = null;
         seed = new SecureRandom();
+    }
+    
+    /**
+     * Creates a default HTTPS client factory with {@link #DEFAULT_PROTOCOL}, {@link #ALLOW_ALL_HOSTS} and new 
+     * secure random seed.
+     * 
+     * @param keyManagers the key managers
+     * @param trustManagers the trust managers.
+     */
+    public BaSyxJerseyHttpsClientFactory(KeyManager[] keyManagers, TrustManager[] trustManagers) {
+        this.protocol = DEFAULT_PROTOCOL;
+        this.hostNameVerifier = ALLOW_ALL_HOSTS;
+        this.keyManagers = keyManagers;
+        this.trustManagers = trustManagers;
+        this.seed = new SecureRandom();
     }
     
     /**

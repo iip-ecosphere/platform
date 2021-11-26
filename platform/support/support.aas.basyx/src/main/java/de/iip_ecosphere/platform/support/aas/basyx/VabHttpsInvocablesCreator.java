@@ -14,11 +14,8 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
@@ -59,14 +56,7 @@ public class VabHttpsInvocablesCreator extends VabInvocablesCreator {
                 System.out.println("Creating client factory " + ks + " " + kstore.getAlias());                
                 TrustManagerFactory tmf = SslUtils.createTrustManagerFactory(ks);
                 KeyManager[] kms = SslUtils.createKeyManagers(ks, kstore.getPassword(), kstore.getAlias());
-                factory = new BaSyxJerseyHttpsClientFactory("TLSv1",  new HostnameVerifier() {
-    
-                    @Override
-                    public boolean verify(String hostname, SSLSession sslSession) {
-                        return true;
-                    }
-                    
-                }, kms, new SecureRandom(), tmf.getTrustManagers());
+                factory = new BaSyxJerseyHttpsClientFactory(kms, tmf.getTrustManagers());
             } catch (IOException e) {
                 LoggerFactory.getLogger(VabHttpsInvocablesCreator.class).error(
                     "Creating VAB-HTTPS client factory: " + e.getMessage());

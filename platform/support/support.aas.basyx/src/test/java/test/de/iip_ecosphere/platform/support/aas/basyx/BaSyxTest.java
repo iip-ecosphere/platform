@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.File;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
@@ -35,5 +36,15 @@ public class BaSyxTest extends AasTest {
         }
         return result;
     }
+
+    @Override
+    protected boolean excludeProtocol(String protocol) {
+        boolean result = false;
+        if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
+            result = NetUtils.getOwnHostname().indexOf("jenkins") > 0;
+        }
+        return result;
+    }
+
 
 }
