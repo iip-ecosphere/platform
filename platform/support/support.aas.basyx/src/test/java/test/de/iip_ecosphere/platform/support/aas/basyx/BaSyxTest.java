@@ -41,11 +41,11 @@ public class BaSyxTest extends AasTest {
     protected boolean excludeProtocol(String protocol) {
         boolean result = false;
         if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
-            result = NetUtils.getOwnHostname().indexOf("jenkins") > 0;
-            System.out.println(NetUtils.getOwnHostname() + " " + result);            
+            // currently it's unclear why VAB-HTTPS works on Windows but not on Linux while HTTPS-AAS works
+            result = NetUtils.getOwnHostname().indexOf("jenkins") >= 0;
+            System.out.println("Checking exclusion: " + NetUtils.getOwnHostname() + " " + result);            
         }
         return result;
     }
-
 
 }
