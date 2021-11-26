@@ -56,6 +56,7 @@ public class VabHttpsInvocablesCreator extends VabInvocablesCreator {
         if (null == factory && null != kstore) {
             try {
                 KeyStore ks = SslUtils.openKeyStore(kstore.getPath(), kstore.getPassword());
+                System.out.println("Creating client factory " + ks + " " + kstore.getAlias());                
                 TrustManagerFactory tmf = SslUtils.createTrustManagerFactory(ks);
                 KeyManager[] kms = SslUtils.createKeyManagers(ks, kstore.getPassword(), kstore.getAlias());
                 factory = new BaSyxJerseyHttpsClientFactory("TLSv1",  new HostnameVerifier() {
