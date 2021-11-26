@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
@@ -51,7 +52,6 @@ import test.de.iip_ecosphere.platform.connectors.MachineCommand;
 import test.de.iip_ecosphere.platform.connectors.MachineData;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 import test.de.iip_ecosphere.platform.support.aas.TestMachine;
-import test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTest;
 
 /**
  * Tests {@link AasConnector} with polling and no security.
@@ -100,7 +100,9 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         
         TestMachine machine = new TestMachine();
         // start required here by basyx-0.1.0-SNAPSHOT
-        ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, AasFactory.DEFAULT_PROTOCOL).start(); 
+        KeyStoreDescriptor desc = null;
+        ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, 
+            AasFactory.DEFAULT_PROTOCOL, desc).start(); 
         Aas aas = createAAS(machine);
 
         DeploymentRecipe dBuilder = AasFactory.getInstance()
@@ -142,7 +144,8 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
-        BaSyxTest.createAasOperationsElements(subModelBuilder, VAB_SERVER, AasFactory.DEFAULT_PROTOCOL);
+        AasTest test = new AasTest(); // add KeyStoreDescriptor here
+        test.createAasOperationsElements(subModelBuilder, VAB_SERVER, AasFactory.DEFAULT_PROTOCOL);
         
         subModelBuilder.build();
         return aasBuilder.build();
