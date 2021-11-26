@@ -72,7 +72,10 @@ class DeploymentSpec {
      */
     DeploymentSpec(Endpoint endpoint, String docPath, KeyStoreDescriptor kstore) {
         this.endpoint = endpoint;
+        System.out.println("Creating Deployment spec " + kstore);
         if (null != kstore && null != kstore.getPath()) {
+            System.out.println("Creating Deployment spec " + kstore.getPath() + " "
+                + kstore.getPath().getAbsolutePath() + " " + kstore.getPath().exists());
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort(), 
                 true, kstore.getPath().getAbsolutePath(), kstore.getPassword()); // TODO BaSyx does not take alias
         } else {
