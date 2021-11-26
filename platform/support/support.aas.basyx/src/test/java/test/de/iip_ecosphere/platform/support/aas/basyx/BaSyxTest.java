@@ -27,8 +27,13 @@ public class BaSyxTest extends AasTest {
 
     @Override
     protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol) {
-        return BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol) 
-            ? new KeyStoreDescriptor(new File("./src/test/resources/keystore.jks"), "a1234567", "tomcat") : null;
+        KeyStoreDescriptor result = null;
+        if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
+            File f = new File("./src/test/resources/keystore.jks");
+            System.out.println("Using Keystore: " + f.getAbsolutePath() + " " + f.exists());
+            result = new KeyStoreDescriptor(f, "a1234567", "tomcat"); // tomcat required by BaSyx
+        }
+        return result;
     }
 
 }
