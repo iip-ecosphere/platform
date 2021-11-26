@@ -12,20 +12,11 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.security.SecureRandom;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.https.HTTPSConnectorProvider;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -41,7 +32,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.net.SslUtils;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -50,10 +41,10 @@ import de.iip_ecosphere.platform.support.net.SslUtils;
  */
 public class BaSyxAasFactory extends AasFactory {
 
-    // package local, do not reference from outside
-    static final String PROTOCOL_VAB_TCP = "VAB-TCP";
-    static final String PROTOCOL_VAB_HTTP = "VAB-HTTP";
-    static final String PROTOCOL_VAB_HTTPS = "VAB-HTTPS";
+    // public for testing, do not reference from outside
+    public static final String PROTOCOL_VAB_TCP = "VAB-TCP";
+    public static final String PROTOCOL_VAB_HTTP = "VAB-HTTP";
+    public static final String PROTOCOL_VAB_HTTPS = "VAB-HTTPS";
     
     /**
      * Factory descriptor for Java Service Loader.
@@ -77,12 +68,12 @@ public class BaSyxAasFactory extends AasFactory {
     private static class VabTcpProtocolCreator implements ProtocolCreator {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
+        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
             return new VabTcpInvocablesCreator(host, port); 
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
+        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
             return new VabOperationsProvider.VabTcpOperationsBuilder(port);
         }
         
@@ -96,13 +87,13 @@ public class BaSyxAasFactory extends AasFactory {
     private static class VabHttpProtocolCreator implements ProtocolCreator {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
+        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
             return new VabHttpInvocablesCreator("http://" + host + ":" + port);
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP, null, null);
+        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP, null);
         }
         
     }
@@ -112,38 +103,16 @@ public class BaSyxAasFactory extends AasFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
-    @SuppressWarnings("unused")
     private static class VabHttpsProtocolCreator implements ProtocolCreator {
-
-        private BaSyxJerseyHttpsClientFactory cFactory;
         
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
-            if (null == cFactory) {
-                try {
-                    KeyStore ks = SslUtils.openKeyStore(keyPath, keyPass);
-                    TrustManagerFactory tmf = SslUtils.createTrustManagerFactory(ks);
-                    KeyManager[] kms = SslUtils.createKeyManagers(ks, keyPass, "VAB");
-                    cFactory = new BaSyxJerseyHttpsClientFactory("TLSv1",  new HostnameVerifier() {
-        
-                        @Override
-                        public boolean verify(String hostname, SSLSession sslSession) {
-                            return true;
-                        }
-                        
-                    }, kms, new SecureRandom(), tmf.getTrustManagers());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(BaSyxAasFactory.class).error(
-                        "Creating VAB-HTTPS client factory: " + e.getMessage());
-                }
-            }
-            
-            return new VabHttpsInvocablesCreator("https://" + host + ":" + port, cFactory);
+        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
+            return new VabHttpsInvocablesCreator("https://" + host + ":" + port, kstore);
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS, keyPath, keyPass);
+        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS, kstore);
         }
         
     }
@@ -165,7 +134,7 @@ public class BaSyxAasFactory extends AasFactory {
         registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
         registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
         registerProtocolCreator(PROTOCOL_VAB_HTTP, new VabHttpProtocolCreator());
-        //registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
+        registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
     }
     
     @Override
@@ -205,8 +174,8 @@ public class BaSyxAasFactory extends AasFactory {
     }
     
     @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
-        return new BaSyxDeploymentRecipe(endpoint, keyPath, keyPass);
+    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
+        return new BaSyxDeploymentRecipe(endpoint, kstore);
     }
 
     @Override

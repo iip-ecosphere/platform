@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServlet;
@@ -36,6 +35,7 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * An initial BaSyx-specific deployment builder.
@@ -59,11 +59,10 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * Creates a deployment builder with root/empty document base path.
      * 
      * @param endpoint the endpoint to create the deployment context for
-     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
-     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      */
-    BaSyxDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
-        deploymentSpec = new DeploymentSpec(endpoint, keyPath, keyPass);
+    BaSyxDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
+        deploymentSpec = new DeploymentSpec(endpoint, kstore);
     }
 
     /**

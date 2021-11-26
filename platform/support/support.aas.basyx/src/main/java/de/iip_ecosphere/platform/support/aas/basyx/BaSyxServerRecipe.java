@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.File;
-
 import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.registry.RegistryComponent;
@@ -25,6 +23,7 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * Implements the server recipe for BaSyx.
@@ -33,9 +32,6 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
  */
 public class BaSyxServerRecipe implements ServerRecipe {
 
-    private static final String OPT_KEY_PATH = "keyPath=";
-    private static final String OPT_KEY_PASS = "keyPass=";
-    
     // currently this does not allow to run registry and server on the same port...
     
     @Override
@@ -49,38 +45,29 @@ public class BaSyxServerRecipe implements ServerRecipe {
         }
         return result;
     }
-    
     @Override
     public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
         String... options) {
-        return new BaSyxRegistryDeploymentAasServer(createDeploymentSpec(serverEndpoint, true, options), 
+        return createAasServer(serverEndpoint, persistence, registryEndpoint, null, options);
+    }
+            
+    @Override
+    public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
+        KeyStoreDescriptor kstore, String... options) {
+        return new BaSyxRegistryDeploymentAasServer(new DeploymentSpec(serverEndpoint, kstore), 
             registryEndpoint.toUri(), translateForServer(persistence), options);
     }
     
-    /**
-     * Creates a deployment specification taking options into account.
-     * 
-     * @param endpoint the endpoint to create the deployment specification for
-     * @param considerEnc whether encrypting options shall be considered if given
-     * @param options the options
-     * @return the deployment specification
-     */
-    private DeploymentSpec createDeploymentSpec(Endpoint endpoint, boolean considerEnc, String[] options) {
-        File keyPath = null;
-        String keyPass = null;
-        for (int i = 0; i < options.length; i++) {
-            if (considerEnc && options[i].startsWith(OPT_KEY_PATH)) {
-                keyPath = new File(options[i].substring(OPT_KEY_PATH.length()));
-            } else if (considerEnc && options[i].startsWith(OPT_KEY_PASS)) {
-                keyPass = options[i].substring(OPT_KEY_PASS.length());
-            }
-        }
-        return new DeploymentSpec(endpoint, keyPath, keyPass);
+    @Override
+    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
+        return createRegistryServer(endpoint, persistence, null, options);
     }
 
     @Override
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
-        DeploymentSpec spec = createDeploymentSpec(endpoint, false, options); // registries are not encrypted in BaSyx
+    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
+        String... options) {
+        // registries are not encrypted in BaSyx
+        DeploymentSpec spec = new DeploymentSpec(endpoint, (KeyStoreDescriptor) null);
         RegistryBackend backend = Tools.getOption(options, translateForRegistry(persistence), RegistryBackend.class);
         BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(backend);
         final IComponent component = new RegistryComponent(spec.getContextConfiguration(), registryConfig);
@@ -137,16 +124,6 @@ public class BaSyxServerRecipe implements ServerRecipe {
                 + "' is not supported as server backend" );
         }
         return result;
-    }
-
-    @Override
-    public String createKeyPathOption(File path) {
-        return OPT_KEY_PATH + path.getAbsolutePath();
-    }
-
-    @Override
-    public String createKeyPassOption(String pass) {
-        return OPT_KEY_PASS + pass; // quote, unqote?
     }
 
 }

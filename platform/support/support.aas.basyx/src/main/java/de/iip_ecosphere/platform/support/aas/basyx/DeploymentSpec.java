@@ -1,6 +1,5 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +8,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * Stores basic common deployment information.
@@ -37,7 +37,7 @@ class DeploymentSpec {
      * @param endpoint the endpoint
      */
     DeploymentSpec(Endpoint endpoint) {
-        this(endpoint, "", false, null, null);
+        this(endpoint, "", null);
     }
     
     /**
@@ -46,12 +46,10 @@ class DeploymentSpec {
      * Otherwise, {@code keyPath} and {@code keyPass} are ignored.
      * 
      * @param endpoint the endpoint
-     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
-     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      */
-    DeploymentSpec(Endpoint endpoint, File keyPath, String keyPass) {
-        this(endpoint, "", null != keyPath && keyPath.exists(), 
-            null == keyPath ? null : keyPath.getAbsolutePath(), keyPass);
+    DeploymentSpec(Endpoint endpoint, KeyStoreDescriptor kstore) {
+        this(endpoint, "", kstore);
     }
 
     /**
@@ -62,7 +60,7 @@ class DeploymentSpec {
      * @param docPath the document path, may be empty
      */
     DeploymentSpec(Endpoint endpoint, String docPath) {
-        this(endpoint, docPath, false, null, null);
+        this(endpoint, docPath, null);
     }
 
     /**
@@ -70,16 +68,13 @@ class DeploymentSpec {
      * 
      * @param endpoint the endpoint
      * @param docPath the document path, may be empty
-     * @param isSecuredCon do we need a secure connection, then {@code keyPath} and {@code keyPass} must be given; else 
-     *     they are ignored
-     * @param keyPath path to the SSL certificate (optional if {@code isSecureCon} is {@code false})
-     * @param keyPass password of the SSL key (optional if {@code isSecureCon} is {@code false})
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      */
-    DeploymentSpec(Endpoint endpoint, String docPath, boolean isSecuredCon, String keyPath, String keyPass) {
+    DeploymentSpec(Endpoint endpoint, String docPath, KeyStoreDescriptor kstore) {
         this.endpoint = endpoint;
-        if (isSecuredCon) {
+        if (null != kstore && null != kstore.getPath()) {
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort(), 
-                true, keyPath, keyPass);
+                true, kstore.getPath().getAbsolutePath(), kstore.getPassword()); // TODO BaSyx does not take alias
         } else {
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort());
         }

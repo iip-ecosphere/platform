@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +36,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.basyx.BaSyxTCPServer;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * Implements a simple VAB operations provider following a simple status/operations/service structure 
@@ -245,22 +245,19 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         private int port;
         private Schema schema;
         private VabOperationsProvider instance;
-        private File keyPath;
-        private String keyPass;
+        private KeyStoreDescriptor kstore;
         
         /**
          * Creates a builder instance.
          * 
          * @param port the target communication port
-         * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-         * @param keyPass the password to access the key file/store
+         * @param kstore the key store descriptor, ignored if <b>null</b>
          * @param schema the protocol schema, shall be {@link Schema#HTTP} or {@link Schema#HTTPS}
          */
-        VabHttpOperationsBuilder(int port, Schema schema, File keyPath, String keyPass) {
+        VabHttpOperationsBuilder(int port, Schema schema, KeyStoreDescriptor kstore) {
             this.port = port;
             this.instance = new VabOperationsProvider();
-            this.keyPath = keyPath;
-            this.keyPass = keyPass;
+            this.kstore = kstore;
         }
 
         @Override
@@ -279,7 +276,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         public Server build() {
             Endpoint endpoint = new Endpoint(schema, port, ""); // So far only default endpoints, no prefix
             HttpServlet vabServlet = new VABHTTPInterface<IModelProvider>(instance.createModelProvider());
-            DeploymentSpec deploymentSpec = new DeploymentSpec(endpoint, keyPath, keyPass);
+            DeploymentSpec deploymentSpec = new DeploymentSpec(endpoint, kstore);
             deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(endpoint.getEndpoint()) + "/*", 
                 vabServlet);
             BaSyxHTTPServer server = new BaSyxHTTPServer(deploymentSpec.getContext());

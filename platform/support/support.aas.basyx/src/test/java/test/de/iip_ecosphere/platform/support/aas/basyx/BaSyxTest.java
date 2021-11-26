@@ -12,6 +12,10 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.File;
+
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 
 /**
@@ -20,5 +24,11 @@ import test.de.iip_ecosphere.platform.support.aas.AasTest;
  * @author Holger Eichelberger, SSE
  */
 public class BaSyxTest extends AasTest {
-        
+
+    @Override
+    protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol) {
+        return BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol) 
+            ? new KeyStoreDescriptor(new File("./src/test/resources/keystore.jks"), "a1234567", "tomcat") : null;
+    }
+
 }
