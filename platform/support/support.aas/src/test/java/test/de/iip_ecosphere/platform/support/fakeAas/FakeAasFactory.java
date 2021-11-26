@@ -16,7 +16,6 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
-import java.io.File;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -29,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A faked factory that does nothing - just for testing. Do not rename, this class is referenced in 
@@ -60,12 +60,12 @@ public class FakeAasFactory extends AasFactory {
         registerProtocolCreator(DEFAULT_PROTOCOL, new ProtocolCreator() {
             
             @Override
-            public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass) {
+            public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
                 return new FakeProtocolServerBuilder();
             }
             
             @Override
-            public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass) {
+            public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
                 return new FakeInvocablesCreator();
             }
         });
@@ -107,7 +107,7 @@ public class FakeAasFactory extends AasFactory {
     }
     
     @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
+    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
         return null;
     }
 

@@ -40,6 +40,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 import org.junit.Assert;
@@ -96,11 +97,13 @@ public class AasTest {
      * @param port the server communication port
      * @param machine the machine
      * @param protocol the VAB protocol as used in {@link AasFactory}
+     * @param kstore the keystore descriptor, ignored if <b>null</b>
      * @return the protocol server
      */
-    public static Server createOperationsServer(int port, TestMachine machine, String protocol) {
+    public static Server createOperationsServer(int port, TestMachine machine, String protocol, 
+        KeyStoreDescriptor kstore) {
         AasFactory factory = AasFactory.getInstance();
-        ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, port);
+        ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, port, kstore);
         builder.defineProperty(NAME_VAR_LOTSIZE, () -> {
             return machine.getLotSize(); 
         }, (param) -> {
@@ -135,7 +138,7 @@ public class AasTest {
      * @param addr the server address (schema ignored)
      * @param protocol the VAB protocol as used in {@link AasFactory}
      */
-    public static void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
+    public void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
         ServerAddress addr, String protocol) {
         createAasOperationsElements(subModelBuilder, addr.getHost(), addr.getPort(), protocol);
     }
@@ -148,10 +151,11 @@ public class AasTest {
      * @param port the protocol port
      * @param protocol the VAB protocol as used in {@link AasFactory}
      */
-    public static void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
+    public void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
         String host, int port, String protocol) {
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator invC = factory.createInvocablesCreator(protocol, host, port);
+        InvocablesCreator invC = factory.createInvocablesCreator(protocol, host, port, 
+            getKeyStoreDescriptor(protocol));
         subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
             .setType(Type.INTEGER)
             .bind(invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
@@ -196,6 +200,16 @@ public class AasTest {
     }
 
     /**
+     * To be overridden: descriptor for keystore per protocol.
+     * 
+     * @param protocol the protocol
+     * @return the keystore, may be <b>null</b> for none
+     */
+    protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol) {
+        return null;
+    }
+
+    /**
      * Tests creating/reading an AAS.
      *
      * @param protocol the VAB protocol as used in {@link AasFactory}
@@ -207,7 +221,8 @@ public class AasTest {
     protected void testVabQuery(String protocol) throws SocketException, UnknownHostException, ExecutionException, 
         IOException {
         TestMachine machine = new TestMachine();
-        Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine, protocol);
+        Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine, protocol, 
+            getKeyStoreDescriptor(protocol));
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         Aas aas = createAas(machine, protocol);
         
@@ -232,7 +247,7 @@ public class AasTest {
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    private static Aas createAas(TestMachine machine, String protocol) throws SocketException, UnknownHostException {
+    private Aas createAas(TestMachine machine, String protocol) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);

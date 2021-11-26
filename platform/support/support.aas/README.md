@@ -14,14 +14,14 @@ We apply the following principles (with links also in the package description of
  - The ``AasFactory`` provides top-level access, in particular to the ``AasBuilder``. Actual implementations such as for BaSyx are realized in own projects and hook themselves into via ``AasFactoryDescriptor`` and the Java Service Loader. So far, the factory just takes the "first" implementation. No resolution is implemented if multiple implementations are there (we will think about that when the case occurs).
  - Implementation-specific parts like VAB-based remote method accesses are (so far) not represented by the abstraction rather than provided by the specific implementation. However, the output of these supporting/creation methods shall plugin into the builder mechanism explained above.
  - Identifiers like URNs are stated as strings and, if adequate, shall be parsed by the respective implementation. Expected 
+ - Optional TLS encryption based on keystores can be set up through respective methods of the factory.
  
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
 - Further deployment abstractions (remote)
-- Authentication/Security
+- Authentication/RBAC
 - AAS Events (currently occurring in BaSyx)
 
 **Open questions**
 - How to resolve references to their target?
-- How to correctly store an AAS so that the AASX also can read them back?
 - How to define semantic references, e.g., to eClass.

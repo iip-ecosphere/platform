@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A customizable factory for creating AAS instances independent of the underlying implementation.
@@ -117,7 +117,7 @@ public abstract class AasFactory {
         }
         
         @Override
-        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
+        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor store) {
             return null;
         }
 
@@ -145,13 +145,12 @@ public abstract class AasFactory {
          * 
          * @param host the host name to communicate with
          * @param port the port number to communicate on
-         * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-         * @param keyPass the password to access the key file/store
+         * @param kstore the key store descriptor, ignored if <b>null</b>
          * @return the invocables creator
          * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
          * @see #createProtocolServerBuilder(String, int)
          */
-        public InvocablesCreator createInvocablesCreator(String host, int port, File keyPath, String keyPass);
+        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore);
 
         /**
          * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
@@ -160,13 +159,12 @@ public abstract class AasFactory {
          * {@link #createDeploymentRecipe(Endpoint)}.
          * 
          * @param port the port number to communicate on
-         * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-         * @param keyPass the password to access the key file/store
+         * @param kstore the key store descriptor, ignored if <b>null</b>
          * @return the builder instance
          * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
          * @see #createInvocablesCreator(String, String, int)
          */
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, File keyPath, String keyPass);
+        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore);
         
     }    
     
@@ -376,11 +374,10 @@ public abstract class AasFactory {
      * Creates a deployment recipe for encrypted deployment.
      * 
      * @param endpoint the target host (hostname in particular used for endpoint urls)
-     * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-     * @param keyPass the password to access the key file/store
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass);
+    public abstract DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore);
     
     /**
      * Creates a persistence recipe.
@@ -401,7 +398,7 @@ public abstract class AasFactory {
      * @see #createProtocolServerBuilder(String, int)
      */
     public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        return createInvocablesCreator(protocol, host, port, null, null);
+        return createInvocablesCreator(protocol, host, port, null);
     }
         
     /**
@@ -411,19 +408,18 @@ public abstract class AasFactory {
      *   the default protocol}
      * @param host the host name to communicate with
      * @param port the port number to communicate on
-     * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-     * @param keyPass the password to access the key file/store
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
      * @see #createProtocolServerBuilder(String, int)
      */
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port, File keyPath, 
-        String keyPass) {
+    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port, 
+        KeyStoreDescriptor kstore) {
         ProtocolCreator creator = protocolCreators.get(protocol);
         if (null == creator) {
             throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
         }
-        return creator.createInvocablesCreator(host, port, keyPath, keyPass);
+        return creator.createInvocablesCreator(host, port, kstore);
     }
 
     /**
@@ -440,7 +436,7 @@ public abstract class AasFactory {
      * @see #createInvocablesCreator(String, String, int)
      */
     public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        return createProtocolServerBuilder(protocol, port, null, null);
+        return createProtocolServerBuilder(protocol, port, null);
     }
         
     /**
@@ -452,19 +448,17 @@ public abstract class AasFactory {
      * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
      *   the default protocol}
      * @param port the port number to communicate on
-     * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-     * @param keyPass the password to access the key file/store
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      * @return the builder instance (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
      * @see #createInvocablesCreator(String, String, int)
      */
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port, File keyPath, 
-        String keyPass) {
+    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port, KeyStoreDescriptor kstore) {
         ProtocolCreator creator = protocolCreators.get(protocol);
         if (null == creator) {
             throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
         }
-        return creator.createProtocolServerBuilder(port, keyPath, keyPass);
+        return creator.createProtocolServerBuilder(port, kstore);
     }
     
     /**

@@ -16,6 +16,7 @@ import org.junit.runners.Suite;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
+import test.de.iip_ecosphere.platform.support.net.KeyStoreDescriptorTest;
 import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
 import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
 
@@ -37,6 +38,7 @@ import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
     PrintVisitorTest.class,
     NetworkManagerTest.class,
     SslUtilsTest.class,
+    KeyStoreDescriptorTest.class,
     PidFileTest.class,
     LifecycleHandlerTest.class, 
     ServiceLoaderUtilsTest.class,

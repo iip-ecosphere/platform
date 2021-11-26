@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * Tests deployment scenarios.
@@ -251,7 +252,7 @@ public class DeploymentTest {
      */
     @Test
     public void remoteAasDeploymentTest() throws IOException {
-        remoteAasDeploymentTestImpl(Schema.HTTP, null, null);
+        remoteAasDeploymentTestImpl(Schema.HTTP, null);
     }
     
     /**
@@ -262,7 +263,7 @@ public class DeploymentTest {
     @Test
     public void remoteAasSslDeploymentTest() throws IOException {
         File keyPath = new File("./src/test/resources/keystore.jks");
-        remoteAasDeploymentTestImpl(Schema.HTTPS, keyPath, "a1234567");
+        remoteAasDeploymentTestImpl(Schema.HTTPS, new KeyStoreDescriptor(keyPath, "a1234567", "tomcat"));
     }
     
     /**
@@ -279,32 +280,23 @@ public class DeploymentTest {
      * Tests a remote AAS deployment.
      * 
      * @param schema the schema for the servers
-     * @param keyPath the path to the key file/store, no encryption if <b>null</b> or non-existent
-     * @param keyPass the password to access the key file/store
+     * @param kstore the key store descriptor, ignored if <b>null</b>
      * 
      * @throws IOException shall not occur if the test works
      */
-    private void remoteAasDeploymentTestImpl(Schema schema, File keyPath, String keyPass) throws IOException {
+    private void remoteAasDeploymentTestImpl(Schema schema, KeyStoreDescriptor kstore) throws IOException {
         // adapted from org.eclipse.basyx.examples.scenarios.cloudedgedeployment.CloudEdgeDeploymentScenario
         AasFactory factory = AasFactory.getInstance();
 
         ServerRecipe srcp = factory.createServerRecipe();
-        String[] options;
-        if (null != keyPath) {
-            options = new String[2];
-            options[0] = srcp.createKeyPathOption(keyPath);
-            options[1] = srcp.createKeyPassOption(keyPass);
-        } else {
-            options = new String[0];
-        }
         
         // start a registry server
         Endpoint regEp = new Endpoint(adaptRegistrySchema(schema), "registry");
-        Server regServer = srcp.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, options).start();
+        Server regServer = srcp.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, kstore).start();
         
         // Start target deployment server and connect to the registry
         Endpoint serverEp = new Endpoint(schema, "cloud");
-        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp, keyPath, keyPass)
+        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp, kstore)
             .setRegistryUrl(regEp);
         Registry reg = regD.obtainRegistry();
         AasServer cloudServer = regD.createServer().start();

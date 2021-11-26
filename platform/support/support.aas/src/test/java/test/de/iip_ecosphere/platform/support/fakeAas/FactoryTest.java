@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -81,8 +82,8 @@ public class FactoryTest {
             }
             
             @Override
-            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, File keyPath, String keyPass) {
-                return DUMMY.createDeploymentRecipe(endpoint, keyPath, keyPass);
+            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
+                return DUMMY.createDeploymentRecipe(endpoint, kstore);
             }
             
             @Override
@@ -187,7 +188,7 @@ public class FactoryTest {
         Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
         assertRegistry(instance.obtainRegistry(ep));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
-        Assert.assertNull(instance.createDeploymentRecipe(ep, new File("."), "xxx"));
+        Assert.assertNull(instance.createDeploymentRecipe(ep, new KeyStoreDescriptor(new File("."), "xxx", "xyz")));
 
         Assert.assertNull(instance.createPersistenceRecipe());
 

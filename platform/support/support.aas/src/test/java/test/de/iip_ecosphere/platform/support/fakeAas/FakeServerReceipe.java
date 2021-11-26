@@ -12,12 +12,11 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.io.File;
-
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * Implements a fake server recipe.
@@ -33,23 +32,25 @@ public class FakeServerReceipe implements ServerRecipe {
     }
 
     @Override
+    public AasServer createAasServer(Endpoint endpoint, PersistenceType persistence, Endpoint registry, 
+        KeyStoreDescriptor kstore, String... options) {
+        return null;
+    }
+
+    @Override
     public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
+        return null;
+    }
+
+    @Override
+    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
+        String... options) {
         return null;
     }
 
     @Override
     public PersistenceType toPersistenceType(String type) {
         return LocalPersistenceType.INMEMORY;
-    }
-
-    @Override
-    public String createKeyPathOption(File path) {
-        return ""; // we just ignore this here
-    }
-
-    @Override
-    public String createKeyPassOption(String pass) {
-        return ""; // we just ignore this here
     }
 
 }
