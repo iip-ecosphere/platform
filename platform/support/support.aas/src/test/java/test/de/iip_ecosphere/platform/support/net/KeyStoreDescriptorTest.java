@@ -30,13 +30,21 @@ public class KeyStoreDescriptorTest {
      */
     @Test
     public void testKeyStoreDescriptor() {
-        File f = new File("keystore.jks");
+        File f = new File("./keystore.jks");
         String password = "pw";
         String alias = "xyz";
         KeyStoreDescriptor desc = new KeyStoreDescriptor(f, password, alias);
         Assert.assertEquals(f, desc.getPath());
         Assert.assertEquals(password, desc.getPassword());
         Assert.assertEquals(alias, desc.getAlias());
+        Assert.assertNotNull(desc.getAbsolutePath());
+        Assert.assertTrue(desc.getAbsolutePath().length() > 0);
+        
+        desc = new KeyStoreDescriptor(null, null, null);
+        Assert.assertNull(desc.getPath());
+        Assert.assertNull(desc.getPassword());
+        Assert.assertNull(desc.getAlias());
+        Assert.assertNull(desc.getAbsolutePath());
     }
     
 }

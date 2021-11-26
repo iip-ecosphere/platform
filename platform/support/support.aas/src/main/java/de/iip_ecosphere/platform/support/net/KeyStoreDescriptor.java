@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.net;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -47,6 +48,23 @@ public class KeyStoreDescriptor implements Serializable {
      */
     public File getPath() {
         return path;
+    }
+
+    /**
+     * Returns the absolute path to the key store.
+     * 
+     * @return the absolute path, may be <b>null</b> if the path itself is null; shall be canonical if possible
+     */
+    public String getAbsolutePath() {
+        String result = null;
+        if (null != path) {
+            try {
+                result = path.getCanonicalFile().getAbsolutePath();
+            } catch (IOException e) {
+                result = path.getAbsolutePath();
+            }
+        }
+        return result;
     }
 
     /**
