@@ -27,7 +27,7 @@ public class KodexServiceTest {
      */
     @Test
     public void testApp() {
-        Assert.assertTrue(true);
+        Assert.assertTrue(true); // TODO testing
     }
     
 }

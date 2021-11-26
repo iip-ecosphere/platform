@@ -4,5 +4,9 @@ This component realizes the integration of [KIPROTECT kodex]() as (deployable) g
 
 ## Missing
 
-The implementation (this is currently just a template).
+The implementation (this is currently just the start of the integration).
+
+## Issues
+
+* AGPL (Andreas will provide a paragraph on using AGPL binaries)
 
