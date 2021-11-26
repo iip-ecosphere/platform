@@ -34,6 +34,36 @@ This is a simple trace on how the IIP-Ecosphere platform can be used through the
 
 The trace above illustrates a shell-like interaction of the user with the command line interface. The CLI provides commands for resources, containers and services. Resources are added automatically when an ECS runtime is executed. The trace above shows the properties listing for a resource with identifier `a005056C00008`. Containers and services can be managed by stating the respective resource identifier after the command. Before starting containers/services, the respective item must be added to the platform, i.e., an add command for a container image or a service artifact must be specified. The items are stated in terms of URIs, at the moment usually files on the local file system.
 
+For illustration, we present now a one typical sequence of CLI commands. We assume that in the example installation environment `a005056C00008` is a listed resource and `http://localhost/container.tgz` is a valid container artifact with name `myContainer` as indicated by the associated deployment descriptor. Container `myContainer` has the service manager installed and will executed subsequent services. Moreover, we assume that `http://localhost/simpleMesh.jar` is a valid service artifact with name `simpleMesh` as defined by the included service descriptor. One sequence could be:
+    
+    resources
+      list
+      ..
+    containers a005056C00008
+      add http://localhost/container.tgz
+      list
+      start myContainer
+      ..
+    services a005056C00008
+      add http://localhost/simpleMesh.jar
+      listArtifacts
+      startAll simpleMesh
+      listServices
+      stopAll simpleMesh
+      listServices
+      remove simpleMesh
+      ..
+    containers a005056C00008
+      stop myContainer
+      undeploy myContainer
+      list
+      ..
+    exit
+      
+Please note that for accessing the containers or the services of a certain resource, we need the respective resource identifier. Similarly, for starting and stopping containers or services. 
+
+The more the platform evolves, the more higher level components will take over these lower level management operations. Please note also that all operations shown here are executed through dynamic and active asset administration shells.
+
 ### Pre-packaged Docker containers
 
 We offer two pre-packaged Docker containers on Docker Hub (an IIP-Ecosphere hub space is in preparation), 
@@ -44,11 +74,11 @@ We offer two pre-packaged Docker containers on Docker Hub (an IIP-Ecosphere hub 
 To experiment with the containers, use the following commands.
 Create a network:
 
-    docker network create --subnet=172.19.0.0/16 platform   
+    docker network create --subnet=172.19.0.0/16 platform    
 
 and start the platform parts:
 
-    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 iipecosphere/platform:platform_all.latest   
+    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 iipecosphere/platform:platform_all.latest  
 
 and similarly for the CLI
 
