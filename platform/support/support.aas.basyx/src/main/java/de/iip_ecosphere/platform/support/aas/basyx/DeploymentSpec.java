@@ -78,6 +78,9 @@ class DeploymentSpec {
                 + kstore.getPath().getAbsolutePath() + " " + kstore.getPath().exists());
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort(), 
                 true, kstore.getPath().getAbsolutePath(), kstore.getPassword()); // TODO BaSyx does not take alias
+            System.out.println(this.context.getKeyPassword());
+            System.out.println(this.context.getCertificatePath());
+            System.out.println(this.context.isSecuredConnectionEnabled());
         } else {
             this.context = new BaSyxContext(endpoint.getEndpoint(), docPath, endpoint.getHost(), endpoint.getPort());
         }
