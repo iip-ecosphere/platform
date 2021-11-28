@@ -493,8 +493,10 @@ public class AasPartRegistry {
             LoggerFactory.getLogger(AasPartRegistry.class).warn("Using IP " + implHost 
                 + " for AAS implementation server");
         }
-        InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, implPort);
-        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort);
+        InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, implPort, 
+            impl.getKeystoreDescriptor());
+        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort, 
+            impl.getKeystoreDescriptor());
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();
@@ -525,7 +527,8 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveIipAas() throws IOException {
-        Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint());
+        Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint(), 
+            setup.getServer().getSchema());
         if (null == reg) {
             throw new IOException("No AAS registry at " + setup.getRegistryEndpoint().toUri());
         }
@@ -551,7 +554,8 @@ public class AasPartRegistry {
     // checkstyle: resume exception type check
     
     /**
-     * Deploy the given AAS to a local server. [testing]
+     * Deploy the given AAS to a local server. However, server and registry are created within the same tomcat instance 
+     * and cannot be executed with different TLS settings.[testing]
      * 
      * @param aas the list of aas, e.g., from {@link #build()}
      * @param options optional server creation options
@@ -579,7 +583,7 @@ public class AasPartRegistry {
      */
     public static Server register(List<Aas> aas, Endpoint registry, String... options) throws IOException {
         RegistryDeploymentRecipe dBuilder = AasFactory.getInstance()
-            .createDeploymentRecipe(setup.getServerEndpoint())
+            .createDeploymentRecipe(setup.getServerEndpoint(), setup.getServer().getKeystoreDescriptor())
             .setRegistryUrl(registry);
         Registry reg = dBuilder.obtainRegistry();
         for (Aas a: aas) {
@@ -591,7 +595,7 @@ public class AasPartRegistry {
     }
 
     /**
-     * Performs a remote deployment of the given {@code aas}.
+     * Performs a remote deployment of the given {@code aas}. Assumes that server and registry are up and running.
      * 
      * @param aas the list of AAS, e.g., from {@link #build()}
      * @throws IOException if the deployment of an AAS fails or access to the AAS registry fails
@@ -599,7 +603,7 @@ public class AasPartRegistry {
     public static void remoteDeploy(List<Aas> aas) throws IOException {
         Endpoint aasEndpoint = setup.getServerEndpoint();
         RegistryDeploymentRecipe regD = AasFactory.getInstance()
-            .createDeploymentRecipe(aasEndpoint)
+            .createDeploymentRecipe(aasEndpoint, setup.getServer().getKeystoreDescriptor())
             .setRegistryUrl(setup.getRegistryEndpoint());
         
         Registry reg = regD.obtainRegistry();

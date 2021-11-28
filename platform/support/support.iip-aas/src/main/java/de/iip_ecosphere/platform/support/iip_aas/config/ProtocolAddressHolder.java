@@ -8,7 +8,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ProtocolAddressHolder extends ServerAddressHolder {
+public class ProtocolAddressHolder extends TlsServerAddressHolder {
 
     private String protocol;
     private String netmask = "";

@@ -10,7 +10,7 @@ import de.iip_ecosphere.platform.support.Schema;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EndpointHolder extends ServerAddressHolder {
+public class EndpointHolder extends TlsServerAddressHolder {
 
     private String path = "";
     
