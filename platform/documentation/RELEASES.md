@@ -20,7 +20,7 @@
     * Initial integration of device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
     * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
     * Automatic build of demo containers on github, deployment to dockerhub.
-    * TLS on AAS abstraction level and VAB-HTTPS protocol
+    * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
 * Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes

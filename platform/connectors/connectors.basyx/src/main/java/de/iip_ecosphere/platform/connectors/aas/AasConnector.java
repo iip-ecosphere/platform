@@ -121,8 +121,21 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == connectedAAS) {
             this.params = params;
-            Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), params.getEndpointPath());
-            connectedAAS = factory.obtainRegistry(regEp).retrieveAas(params.getApplicationId());
+            // BaSyx... stays HTTP, no TLS on the registry!!!
+            Schema schema = params.getSchema();
+            String epPath = params.getEndpointPath();
+            int pos = epPath.indexOf(':');
+            if (pos > 0 && pos < epPath.length()) {
+                String tmp = epPath.substring(0, pos);
+                epPath = epPath.substring(pos + 1);
+                try {
+                    schema = Schema.valueOf(tmp);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.warn("Implicit schema in endpoint path '" + tmp + "' unknown. Ignored. Using " + schema);
+                }
+            }
+            Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), epPath);
+            connectedAAS = factory.obtainRegistry(regEp, schema).retrieveAas(params.getApplicationId());
             if (null == connectedAAS) {
                 throw new IOException("No AAS retrieved!");
             }
@@ -194,7 +207,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * 
          * @param qName the qualified name of the property
          * @return the property
-         * @throws IOException if the poperty cannot be found/retrieved
+         * @throws IOException if the property cannot be found/retrieved
          */
         private Property findProperty(String qName) throws IOException {
             Property result = null;
@@ -211,7 +224,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                         result = prop;
                     }
                 } else {
-                    throw new IOException("Submodel " + subModelName + "in " + qName + " does not exist");    
+                    throw new IOException("Submodel " + subModelName + " in " + qName + " does not exist");    
                 }
             } else {
                 throw new IOException("No qualification/submodel given in " + qName);

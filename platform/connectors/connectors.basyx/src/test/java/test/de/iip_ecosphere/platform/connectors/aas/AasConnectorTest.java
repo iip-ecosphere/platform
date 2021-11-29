@@ -34,6 +34,11 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -62,13 +67,15 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
-    private static final ServerAddress AAS_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
+    private static ServerAddress aasServer = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-    private static final Endpoint REGISTRY = new Endpoint(AAS_SERVER, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+    private static final Endpoint REGISTRY = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+    private static KeyStoreDescriptor keyDesc;
     
     private static Server platformAasServer;
     private static Server httpServer;
     private static Server ccServer;
+    private static Server repository;
     private static NotificationMode oldNotificationMode;
     private static AasSetup oldSetup;
     
@@ -77,6 +84,15 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
      */
     public AasConnectorTest() {
         super(Object.class);
+    }
+    
+    /**
+     * Changes the keystore descriptor, e.g., to go for HTTPS/TLS.
+     * 
+     * @param desc the keystore descriptor to use
+     */
+    protected static void setKeystoreDescriptor(KeyStoreDescriptor desc) {
+        keyDesc = desc;
     }
     
     /**
@@ -90,8 +106,8 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         oldNotificationMode = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS); // deterministic testing
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
-        
         oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        
         // we don't start all active AAS here as we do not need them for this test
         AasBuildResult bResult = AasPartRegistry.build(d -> d.getKind() != Kind.ACTIVE);
         Server implServer = bResult.getProtocolServerBuilder().build();
@@ -100,20 +116,39 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         
         TestMachine machine = new TestMachine();
         // start required here by basyx-0.1.0-SNAPSHOT
-        KeyStoreDescriptor desc = null;
         ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, 
-            AasFactory.DEFAULT_PROTOCOL, desc).start(); 
+            AasFactory.DEFAULT_PROTOCOL, null).start(); 
         Aas aas = createAAS(machine);
+        if (null != keyDesc) {
+            // override server with new schema and decouple port from registry (must be HTTP)
+            aasServer = new ServerAddress(Schema.HTTPS);
+            ServerRecipe sRecipe = AasFactory.getInstance().createServerRecipe();
+            repository = sRecipe.createRegistryServer(REGISTRY, LocalPersistenceType.INMEMORY).start();
+            try {
+                Endpoint sEndpoint = new Endpoint(aasServer, "");
+                RegistryDeploymentRecipe drcp = AasFactory.getInstance()
+                    .createDeploymentRecipe(sEndpoint, keyDesc)
+                    .setRegistryUrl(REGISTRY);
+                Registry reg = drcp.obtainRegistry();
+                httpServer = drcp.createServer().start();
+                reg.createAas(aas, sEndpoint.toUri());
+                for (Submodel sm : aas.submodels()) {
+                    reg.createSubmodel(aas, sm);
+                }
+            } catch (IOException e) {
+                Assert.fail("Exception: " + e.getMessage());
+            }
+        } else {
+            DeploymentRecipe dBuilder = AasFactory.getInstance()
+                .createDeploymentRecipe(new Endpoint(aasServer, ""));
+            httpServer = dBuilder
+                .addInMemoryRegistry(REGISTRY.getEndpoint())
+                .deploy(aas)
+                .createServer();
+            httpServer.start();
+        }
 
-        DeploymentRecipe dBuilder = AasFactory.getInstance()
-            .createDeploymentRecipe(new Endpoint(AAS_SERVER, ""));
-        httpServer = dBuilder
-            .addInMemoryRegistry(REGISTRY.getEndpoint())
-            .deploy(aas)
-            .createServer();
-        
         implServer.start();
-        httpServer.start();
 
         LOGGER.info("AAS server started");
     }
@@ -123,6 +158,9 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
      */
     @AfterClass
     public static void shutdown() {
+        if (null != repository) {
+            repository.stop(true);
+        }
         httpServer.stop(true);
         ccServer.stop(true);
         LOGGER.info("Platform/AAS server stopped");
@@ -175,9 +213,10 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     @Override
     protected ConnectorParameter getConnectorParameter() {
         return ConnectorParameterBuilder
-            .newBuilder(AAS_SERVER)
+            .newBuilder(REGISTRY)
             .setApplicationInformation(AAS_URN, "")
-            .setEndpointPath(REGISTRY.getEndpoint())
+            .setEndpointPath(aasServer.getSchema() + ":" + REGISTRY.getEndpoint())
+            // keysettings ingored, registry alyways HTTP
             .build();
     }
 

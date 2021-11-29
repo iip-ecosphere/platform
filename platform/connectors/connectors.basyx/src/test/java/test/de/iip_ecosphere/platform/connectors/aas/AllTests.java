@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AasConnectorTest.class
+    AasConnectorTest.class, 
+    TlsAasConnectorTest.class
 })
 public class AllTests {
 }
