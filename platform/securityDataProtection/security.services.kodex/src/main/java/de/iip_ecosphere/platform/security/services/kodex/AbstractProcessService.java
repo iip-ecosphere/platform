@@ -12,17 +12,23 @@
 
 package de.iip_ecosphere.platform.security.services.kodex;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.SystemUtils;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -41,6 +47,8 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
     private ReceptionCallback<O> callback;
+    private PrintWriter serviceIn;
+    private Process proc;
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -208,4 +216,123 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         }).start();
     }
     
+    @Override
+    public void activate() throws ExecutionException {
+        super.setState(ServiceState.ACTIVATING);
+        stop();
+        super.setState(ServiceState.ACTIVATING);
+    }
+
+    @Override
+    public void passivate() throws ExecutionException {
+        super.setState(ServiceState.PASSIVATING);
+        start();
+        super.setState(ServiceState.PASSIVATED);
+    }
+
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        switch (state) {
+        case STARTING:
+            start();
+            break;
+        case STOPPING:
+            stop();
+            break;
+        default:
+            break;
+        }
+        super.setState(state);
+    }
+
+    /**
+     * Preliminary: Starts the service and the background process.
+     * 
+     * @throws ExecutionException if starting the process fails
+     */
+    protected abstract void start() throws ExecutionException;
+
+    /**
+     * Preliminary: Stops the service and the background process.
+     */
+    protected void stop() {
+        if (null != serviceIn) {
+            serviceIn.flush();
+            serviceIn = null;
+        }
+        if (null != proc) {
+            destroyProcess();
+            proc = null;
+        }
+    }
+
+    /**
+     * Destroys the process.
+     */
+    protected void destroyProcess() {
+        proc.destroy();
+    }
+    
+    /**
+     * Handles the output stream upon process creation.
+     * 
+     * @param out the process output stream
+     */
+    protected void handleOutputStream(OutputStream out) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+        serviceIn = new PrintWriter(writer);
+    }
+
+    /**
+     * Handles the input stream upon process creation.
+     * 
+     * @param in the process input stream
+     */
+    protected abstract void handleInputStream(InputStream in);
+    //BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+    /**
+     * Handles the error stream upon process creation.
+     * 
+     * @param err the process error stream
+     */
+    protected void handleErrorStream(InputStream err) {
+        redirectIO(err, System.err);
+    }
+
+    /**
+     * Creates, configures and starts a command line process.
+     * 
+     * @param exe the executable to run
+     * @param dir the home dir where to execute the process within
+     * @param args the process arguments 
+     * @return the created process instance
+     * 
+     * @throws IOException if process creation fails
+     * @see #handleInputStream(InputStream)
+     * @see #handleErrorStream(InputStream)
+     * @see #handleOutputStream(OutputStream)
+     */
+    protected Process createAndConfigureProcess(File exe, File dir, List<String> args) throws ExecutionException {
+        try {
+            proc = createProcess(exe, dir, args);
+            handleOutputStream(proc.getOutputStream());
+            handleInputStream(proc.getInputStream());
+            handleErrorStream(proc.getErrorStream());
+        } catch (IOException e) {
+            throw new ExecutionException(e);
+        }        
+        return proc;
+    }
+    
+    /**
+     * Returns the print writer wrapping the process service input stream created by 
+     * {@link #handleInputStream(InputStream)}.
+     * 
+     * @return the stream
+     */
+    protected PrintWriter getServiceIn() {
+        return serviceIn;
+    }
+
 }

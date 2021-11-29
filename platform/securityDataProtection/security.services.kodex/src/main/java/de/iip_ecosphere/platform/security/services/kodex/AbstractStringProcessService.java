@@ -73,4 +73,9 @@ public abstract class AbstractStringProcessService<I, O> extends AbstractProcess
         }
     }
 
+    @Override
+    protected void handleInputStream(InputStream in) {
+        redirectIO(in, getReceptionCallback());
+    }
+
 }
