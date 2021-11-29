@@ -1,4 +1,4 @@
-package de.iip_ecosphere.platform.security.services.kodex;
+package test.de.iip_ecosphere.platform.security.services.kodex;
 
 /**
  * ******************************************************************************
@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.security.services.kodex.AbstractProcessService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
@@ -27,7 +28,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class KodexService1 {
+public class TestService {
     
     public static final int WAITING_TIME = 120000; // preliminary
     private static final String VERSION = "0.0.7";
