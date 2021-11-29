@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  */
 public class KodexService1 {
     
+    public static final int WAITING_TIME = 120000; // preliminary
     private static final String VERSION = "0.0.7";
     
     // TODO move up to service environment
@@ -184,7 +185,7 @@ public class KodexService1 {
         w.println("{\"name\": \"test\", \"id\": \"test\"}");
         w.println("{\"name\": \"test\", \"id\": \"test\"}");
         w.flush();
-        TimeUtils.sleep(5000); // preliminary, Andreas will try to fix this
+        TimeUtils.sleep(120000); // preliminary, Andreas will try to fix this
         proc.destroy();
     }
     

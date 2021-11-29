@@ -158,7 +158,7 @@ public class KodexServiceTest {
             try {
                 JSONParser parser = new JSONParser();
                 JSONObject obj = (JSONObject) parser.parse(source);
-                result = new OutData(JsonUtils.readString(obj, "kip"), 
+                result = new OutData(JsonUtils.readString(obj, "_kip"), 
                     JsonUtils.readString(obj, "name"), 
                     JsonUtils.readString(obj, "id"));
             } catch (ParseException e) {
@@ -181,9 +181,9 @@ public class KodexServiceTest {
 
             @Override
             public void received(OutData data) {
-                Assert.assertTrue(data.getId().length() > 0);
-                Assert.assertTrue(data.getName().length() > 0);
-                Assert.assertTrue(data.getKip().length() > 0);
+                Assert.assertTrue(data.getId() != null && data.getId().length() > 0);
+                Assert.assertTrue(data.getName() != null && data.getName().length() > 0);
+                Assert.assertTrue(data.getKip() != null && data.getKip().length() > 0);
                 receivedCount.incrementAndGet();
             }
 

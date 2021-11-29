@@ -36,7 +36,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @author Holger Eichelberger, SSE
  */
 public class KodexService<I, O> extends AbstractProcessService<I, String, String, O>  {
-    
+
+    public static final int WAITING_TIME = 120000; // preliminary
     private static final String VERSION = "0.0.7";
     private static final boolean DEBUG = true;
     private PrintWriter serviceIn;
@@ -82,7 +83,7 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
         //BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
         serviceIn = new PrintWriter(writer);
         
-        redirectIO(proc.getInputStream(), System.out);
+        redirectIO(proc.getInputStream(), getReceptionCallback());
         redirectIO(proc.getErrorStream(), System.err);
     }
     
@@ -95,7 +96,7 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
             serviceIn = null;
         }
         if (null != proc) {
-            TimeUtils.sleep(2000); // preliminary, Andreas will try to fix this
+            TimeUtils.sleep(WAITING_TIME); // preliminary, Andreas will try to fix this
             proc.destroy();
             proc = null;
         }
@@ -161,7 +162,7 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
         w.println("{\"name\": \"test\", \"id\": \"test\"}");
         w.println("{\"name\": \"test\", \"id\": \"test\"}");
         w.flush();
-        TimeUtils.sleep(5000); // preliminary, Andreas will try to fix this
+        TimeUtils.sleep(WAITING_TIME); // preliminary, Andreas will try to fix this
         proc.destroy();
     }
     
