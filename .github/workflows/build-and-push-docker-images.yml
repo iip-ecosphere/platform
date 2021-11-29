@@ -33,6 +33,7 @@ jobs:
           mvn --batch-mode --update-snapshots install
           cd ../broker
           mvn --batch-mode --update-snapshots package
+          echo "HERE"
           ls
           cd ..
           mvn --batch-mode --update-snapshots package -DskipTests
