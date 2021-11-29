@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.simple.JSONObject;
@@ -22,6 +23,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.security.services.kodex.KodexService;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import test.de.iip_ecosphere.platform.transport.JsonUtils;
@@ -173,9 +178,12 @@ public class KodexServiceTest {
     
     /**
      * Tests the KODEX service.
+     * 
+     * @throws ExecutionException in case of service execution failures
+     * @throws IOException in case of I/O related problems
      */
     @Test
-    public void testKodexService() throws IOException {
+    public void testKodexService() throws IOException, ExecutionException {
         AtomicInteger receivedCount = new AtomicInteger(0);
         ReceptionCallback<OutData> rcp = new ReceptionCallback<OutData>() {
 
@@ -193,14 +201,24 @@ public class KodexServiceTest {
             }
         };
         
+        YamlService sDesc = new YamlService();
+        sDesc.setName("KodexTest");
+        sDesc.setVersion(new Version(KodexService.VERSION));
+        sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
+        sDesc.setId("KodexTest");
+        sDesc.setDeployable(true);
+        
         KodexService<InData, OutData> service = new KodexService<>(
-            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp);
-        service.start();
+            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
+        service.setState(ServiceState.STARTING);
         service.process(new InData("test", "test"));
         service.process(new InData("test", "test"));
         service.process(new InData("test", "test"));
-        service.stop();
+        service.setState(ServiceState.STOPPING);
         Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
+
+        service.activate();
+        service.passivate();
     }
     
 }

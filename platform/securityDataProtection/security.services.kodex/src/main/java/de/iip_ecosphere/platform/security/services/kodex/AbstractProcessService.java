@@ -22,15 +22,21 @@ import java.util.Scanner;
 
 import org.apache.commons.lang.SystemUtils;
 
+import de.iip_ecosphere.platform.services.environment.AbstractService;
+import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * Implements an abstract asynchronous process-based service.
  * 
+ * @param <I> the input data type
+ * @param <SI> the service input data type
+ * @param <SO> the service output data type
+ * @param <O> the output data type
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractProcessService<I, SI, SO, O> {
+public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractService {
 
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
@@ -42,9 +48,11 @@ public abstract class AbstractProcessService<I, SI, SO, O> {
      * @param inTrans the input translator
      * @param outTrans the output translator
      * @param callback called when data from the service is available
+     * @param yaml the service description 
      */
     protected AbstractProcessService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
-        ReceptionCallback<O> callback) {
+        ReceptionCallback<O> callback, YamlService yaml) {
+        super(yaml);
         this.inTrans = inTrans;
         this.outTrans = outTrans;
         this.callback = callback;
@@ -83,27 +91,6 @@ public abstract class AbstractProcessService<I, SI, SO, O> {
      */
     protected TypeTranslator<String, O> getOutputTranslator() {
         return outTrans;
-    }
-    
-    // TODO move up to service environment
-
-    /**
-     * Redirects an input stream to another stream (in parallel).
-     * 
-     * @param in the input stream of the spawned process (e.g., input/error)
-     * @param dest the destination stream within this class
-     */
-    public static void redirectIO(final InputStream in, final PrintStream dest) {
-        new Thread(new Runnable() {
-            public void run() {
-                Scanner sc = new Scanner(in);
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    dest.println(line);
-                }
-                sc.close();
-            }
-        }).start();
     }
     
     /**
@@ -200,6 +187,25 @@ public abstract class AbstractProcessService<I, SI, SO, O> {
         processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         return processBuilder.start();
+    }
+    
+    /**
+     * Redirects an input stream to another stream (in parallel).
+     * 
+     * @param in the input stream of the spawned process (e.g., input/error)
+     * @param dest the destination stream within this class
+     */
+    public static void redirectIO(final InputStream in, final PrintStream dest) {
+        new Thread(new Runnable() {
+            public void run() {
+                Scanner sc = new Scanner(in);
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    dest.println(line);
+                }
+                sc.close();
+            }
+        }).start();
     }
     
 }

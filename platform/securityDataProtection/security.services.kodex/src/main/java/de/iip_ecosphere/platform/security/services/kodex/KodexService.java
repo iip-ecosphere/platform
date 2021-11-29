@@ -15,15 +15,16 @@ package de.iip_ecosphere.platform.security.services.kodex;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -35,10 +36,10 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <O> the output type
  * @author Holger Eichelberger, SSE
  */
-public class KodexService<I, O> extends AbstractProcessService<I, String, String, O>  {
+public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
 
     public static final int WAITING_TIME = 120000; // preliminary
-    private static final String VERSION = "0.0.7";
+    public static final String VERSION = "0.0.7";
     private static final boolean DEBUG = true;
     private PrintWriter serviceIn;
     private Process proc;
@@ -48,11 +49,12 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
      * 
      * @param inTrans the input translator
      * @param outTrans the output translator
-     * @param callback called when a processed item is received from the serivce
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description 
      */
     public KodexService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
-        ReceptionCallback<O> callback) {
-        super(inTrans, outTrans, callback);
+        ReceptionCallback<O> callback, YamlService yaml) {
+        super(inTrans, outTrans, callback, yaml);
     }
     
     @Override
@@ -63,9 +65,9 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
     /**
      * Preliminary: Starts the service and the background process.
      * 
-     * @throws IOException if starting the process fails
+     * @throws ExecutionException if starting the process fails
      */
-    public void start() throws IOException {
+    private void start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
         File exe = new File("./src/main/resources/" + executable); // folder fixed? 
         File home = new File("./src/test/resources").getAbsoluteFile();
@@ -77,20 +79,24 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
         }
         a.add("run");
         a.add("example-data.yml");
-        proc = createProcess(exe, home, a);
-        
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
-        //BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        serviceIn = new PrintWriter(writer);
-        
-        redirectIO(proc.getInputStream(), getReceptionCallback());
-        redirectIO(proc.getErrorStream(), System.err);
+        try {
+            proc = createProcess(exe, home, a);
+            
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
+            //BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            serviceIn = new PrintWriter(writer);
+            
+            redirectIO(proc.getInputStream(), getReceptionCallback());
+            redirectIO(proc.getErrorStream(), System.err);
+        } catch (IOException e) {
+            throw new ExecutionException(e);
+        }
     }
     
     /**
      * Preliminary: Stops the service and the background process.
      */
-    public void stop() {
+    private void stop() {
         if (null != serviceIn) {
             serviceIn.flush();
             serviceIn = null;
@@ -102,68 +108,51 @@ public class KodexService<I, O> extends AbstractProcessService<I, String, String
         }
     }
     
-    /**
-     * Redirects an input stream to another stream (in parallel).
-     * 
-     * @param in the input stream of the spawned process (e.g., input/error)
-     * @param callback the callback to inform
-     */
-    public void redirectIO(final InputStream in, ReceptionCallback<O> callback) {
-        if (null != callback) {
-            new Thread(new Runnable() {
-                public void run() {
-                    Scanner sc = new Scanner(in);
-                    while (sc.hasNextLine()) {
-                        String line = sc.nextLine();
-                        try {
-                            callback.received(getOutputTranslator().to(line));
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
-                        }
-                    }
-                    sc.close();
-                }
-            }).start();
+    @Override
+    public void activate() throws ExecutionException {
+        super.setState(ServiceState.ACTIVATING);
+        stop();
+        super.setState(ServiceState.ACTIVATING);
+    }
+
+    @Override
+    public void passivate() throws ExecutionException {
+        super.setState(ServiceState.PASSIVATING);
+        start();
+        super.setState(ServiceState.PASSIVATED);
+    }
+
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        switch (state) {
+        case STARTING:
+            start();
+            break;
+        case STOPPING:
+            stop();
+            break;
+        default:
+            break;
         }
+        super.setState(state);
+    }
+    
+    @Override
+    public void migrate(String resourceId) throws ExecutionException {
+    }
+
+    @Override
+    public void update(URI location) throws ExecutionException {
+    }
+
+    @Override
+    public void switchTo(String targetId) throws ExecutionException {
+    }
+
+    @Override
+    public void reconfigure(Map<String, String> values) throws ExecutionException {
     }
     
     // preliminary, to be removed
-    
-    /**
-     * Test execution of Kodex.
-     * 
-     * @param args command line arguments
-     * @throws IOException in case that the command line streams break
-     * @throws InterruptedException in case that the Kodex process is interrupted unexpectedly 
-     */
-    public static void main(String... args) throws IOException, InterruptedException {
-        String executable = getExecutableName("kodex", VERSION);
-        File exe = new File("./src/main/resources/" + executable); // folder fixed? 
-        File home = new File("./src/test/resources").getAbsoluteFile();
-        boolean debug = true;
-
-        List<String> a = new ArrayList<>();
-        if (debug) {
-            a.add("--level");
-            a.add("debug");
-        }
-        a.add("run");
-        a.add("example-data.yml");
-        Process proc = createProcess(exe, home, a);
-        //PrintStream in = new PrintStream(new ByteArrayOutputStream());
-        
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
-        //BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        PrintWriter w = new PrintWriter(writer);
-        
-        redirectIO(proc.getInputStream(), System.out);
-        redirectIO(proc.getErrorStream(), System.err);
-        w.println("{\"name\": \"test\", \"id\": \"test\"}");
-        w.println("{\"name\": \"test\", \"id\": \"test\"}");
-        w.println("{\"name\": \"test\", \"id\": \"test\"}");
-        w.flush();
-        TimeUtils.sleep(WAITING_TIME); // preliminary, Andreas will try to fix this
-        proc.destroy();
-    }
     
 }
