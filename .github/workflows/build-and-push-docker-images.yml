@@ -33,8 +33,6 @@ jobs:
           mvn --batch-mode --update-snapshots install
           cd ../broker
           mvn --batch-mode --update-snapshots package
-          echo "HERE"
-          ls
           cd ..
           mvn --batch-mode --update-snapshots package -DskipTests
       - name: Build the test app through tests
@@ -51,7 +49,7 @@ jobs:
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
           cp container/fullPlatform/platform/*.sh gen
           cp broker/amqp.sh gen
-          cp broker/brokerJars gen
+          cp -r broker/brokerJars gen
           cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar gen
           echo "Base directory for container creation:"
           ls gen
