@@ -33,6 +33,7 @@ jobs:
           mvn --batch-mode --update-snapshots install
           cd ../broker
           mvn --batch-mode --update-snapshots package
+          ls
           cd ..
           mvn --batch-mode --update-snapshots package -DskipTests
       - name: Build the test app through tests
