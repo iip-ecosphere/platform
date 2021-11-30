@@ -52,6 +52,7 @@ public class AmqpClient {
     private AmqpConfiguration configuration;
     private Set<String> topics = Collections.synchronizedSet(new HashSet<>());
     private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
+    private Map<String, ArrivedCallback> delayedSubscriptions = Collections.synchronizedMap(new HashMap<>()); 
     
     /**
      * Creates and registers an instance.
@@ -134,6 +135,11 @@ public class AmqpClient {
                 }
                 connection = factory.newConnection();
                 channel = connection.createChannel();
+                // now subscriptions shall happen directly
+                for (Map.Entry<String, ArrivedCallback> sub: delayedSubscriptions.entrySet()) {
+                    subscribeTo(sub.getKey(), sub.getValue());
+                }
+                //delayedSubscriptions.clear();
             } catch (IOException | TimeoutException e) {
                 LOGGER.error("Creating AMQP client: " + e.getMessage(), e);
             }                
@@ -169,7 +175,9 @@ public class AmqpClient {
      */
     boolean subscribeTo(String topic, ArrivedCallback arrivedCallback) {
         boolean done = false;
-        if (!configuration.isFilteredTopic(topic) && null != channel) {
+        if (null == channel) { // then there may also not be a configuration
+            delayedSubscriptions.put(topic, arrivedCallback);
+        } else if (!configuration.isFilteredTopic(topic) && null != channel) {
             try {
                 ensureTopicQueue(topic);
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
