@@ -205,7 +205,7 @@ public class AmqpClient {
      */
     boolean unsubscribeFrom(String topic) {
         boolean done = false;
-        if (!configuration.isFilteredTopic(topic) && null != channel) {
+        if (null != channel && (configuration == null || !configuration.isFilteredTopic(topic))) {
             if (!topics.contains(topic)) {
                 try {
                     topics.remove(topic);
