@@ -15,6 +15,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>  
+    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas</artifactId>
       <version>${project.version}</version>
