@@ -363,7 +363,7 @@ public class EcsAas implements AasContributor {
     /**
      * Explicitly enables this AAS. Required when the platform services shall start without ECS runtime.
      */
-    static void enable() {
+    public static void enable() {
         enabled = true;
     }
     

@@ -106,6 +106,7 @@ public class EcsAasTest {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(EcsAas.class));
         
+        EcsAas.enable();
         AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof EcsAas);
         
