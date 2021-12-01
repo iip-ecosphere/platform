@@ -29,17 +29,16 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @Configuration
 @EnableConfigurationProperties(HivemqV3Configuration.class)
 public class HivemqV3MessageBinderConfiguration {
-
-    private HivemqV3Client client = new HivemqV3Client(); // no autowiring, shall stay a local instance
     
     /**
      * Returns the binder provisioner.
      * 
+     * @param client the client instance (autowired)
      * @return the binder provisioner
      */
     @Bean
     @ConditionalOnMissingBean
-    public HivemqV3MessageBinderProvisioner hivemqv3BinderProvisioner() {
+    public HivemqV3MessageBinderProvisioner hivemqv3BinderProvisioner(HivemqV3Client client) {
         return new HivemqV3MessageBinderProvisioner(client);
     }
 
@@ -51,18 +50,20 @@ public class HivemqV3MessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public HivemqV3Client hivemqv3Client() {
-        return client;
+        return new HivemqV3Client();
     }
 
     /**
      * Returns the message binder.
      * 
      * @param messageBinderProvisioner the provisioner with access to the destinations
+     * @param client the client instance (autowired)
      * @return the message binder
      */
     @Bean
     @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
-    public HivemqV3MessageBinder hivemqv3Binder(HivemqV3MessageBinderProvisioner messageBinderProvisioner) {
+    public HivemqV3MessageBinder hivemqv3Binder(HivemqV3MessageBinderProvisioner messageBinderProvisioner, 
+        HivemqV3Client client) {
         return new HivemqV3MessageBinder(null, messageBinderProvisioner, client);
     }
 

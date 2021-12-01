@@ -29,17 +29,16 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @Configuration
 @EnableConfigurationProperties(HivemqV5Configuration.class)
 public class HivemqV5MessageBinderConfiguration {
-
-    private HivemqV5Client client = new HivemqV5Client(); // no autowiring, keep instance local
     
     /**
      * Returns the binder provisioner.
      * 
+     * @param client the client instance (autowired)
      * @return the binder provisioner
      */
     @Bean
     @ConditionalOnMissingBean
-    public HivemqV5MessageBinderProvisioner hivemqv5BinderProvisioner() {
+    public HivemqV5MessageBinderProvisioner hivemqv5BinderProvisioner(HivemqV5Client client) {
         return new HivemqV5MessageBinderProvisioner(client);
     }
     
@@ -51,18 +50,20 @@ public class HivemqV5MessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public HivemqV5Client hivemqv5Client() {
-        return client;
+        return new HivemqV5Client();
     }
 
     /**
      * Returns the message binder.
      * 
      * @param messageBinderProvisioner the provisioner with access to the destinations
+     * @param client the client instance (autowired)
      * @return the message binder
      */
     @Bean
     @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
-    public HivemqV5MessageBinder hivemqv5Binder(HivemqV5MessageBinderProvisioner messageBinderProvisioner) {
+    public HivemqV5MessageBinder hivemqv5Binder(HivemqV5MessageBinderProvisioner messageBinderProvisioner, 
+        HivemqV5Client client) {
         return new HivemqV5MessageBinder(null, messageBinderProvisioner, client);
     }
 

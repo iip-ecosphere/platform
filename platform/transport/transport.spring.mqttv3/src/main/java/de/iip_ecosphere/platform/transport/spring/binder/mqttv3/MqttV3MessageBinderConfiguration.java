@@ -30,16 +30,15 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @EnableConfigurationProperties(MqttConfiguration.class)
 public class MqttV3MessageBinderConfiguration {
     
-    private MqttClient client = new MqttClient(); // client local for a binder, no autowiring
-    
     /**
      * Returns the binder provisioner.
      * 
+     * @param client the client instance (autowired)
      * @return the binder provisioner
      */
     @Bean
     @ConditionalOnMissingBean
-    public MqttV3MessageBinderProvisioner mqttv3BinderProvisioner() {
+    public MqttV3MessageBinderProvisioner mqttv3BinderProvisioner(MqttClient client) {
         return new MqttV3MessageBinderProvisioner(client);
     }
     
@@ -51,18 +50,20 @@ public class MqttV3MessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public MqttClient mqttClient() {
-        return client;
+        return new MqttClient();
     }
 
     /**
      * Returns the message binder.
      * 
      * @param messageBinderProvisioner the provisioner with access to the destinations
+     * @param client the client instance (autowired)
      * @return the message binder
      */
     @Bean
     @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
-    public MqttV3MessageBinder mqttv3Binder(MqttV3MessageBinderProvisioner messageBinderProvisioner) {
+    public MqttV3MessageBinder mqttv3Binder(MqttV3MessageBinderProvisioner messageBinderProvisioner, 
+        MqttClient client) {
         return new MqttV3MessageBinder(null, messageBinderProvisioner, client);
     }
     
