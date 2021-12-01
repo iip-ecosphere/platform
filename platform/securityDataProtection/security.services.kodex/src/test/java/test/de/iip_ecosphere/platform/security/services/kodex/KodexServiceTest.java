@@ -132,6 +132,11 @@ public class KodexServiceTest {
 
     }
     
+    /**
+     * In-data JSON type translator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class InDataJsonTypeTranslator implements TypeTranslator<InData, String> {
 
         @Override
@@ -149,7 +154,12 @@ public class KodexServiceTest {
         }
         
     }
-    
+
+    /**
+     * Out-data JSON type translator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class OutDataJsonTypeTranslator implements TypeTranslator<String, OutData> {
 
         @Override
@@ -200,7 +210,8 @@ public class KodexServiceTest {
                 return OutData.class;
             }
         };
-        
+
+        // mock the YAML service instance, as if read from a descriptor
         YamlService sDesc = new YamlService();
         sDesc.setName("KodexTest");
         sDesc.setVersion(new Version(KodexService.VERSION));

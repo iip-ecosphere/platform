@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -52,11 +51,6 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
     }
     
     @Override
-    public void process(I data) throws IOException {
-        getServiceIn().println(getInputTranslator().to(data));
-    }
-    
-    @Override
     protected void start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
         File exe = new File("./src/main/resources/" + executable); // folder fixed? 
@@ -69,13 +63,12 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         }
         args.add("run");
         args.add("example-data.yml");
-        createAndConfigureProcess(exe, home, args);
+        createAndConfigureProcess(exe, false, home, args);
     }
 
     @Override
-    protected void destroyProcess() {
-        TimeUtils.sleep(WAITING_TIME); // preliminary, Andreas will try to fix this
-        super.destroyProcess();
+    protected int getWaitTimeBeforeDestroy() {
+        return WAITING_TIME; // preliminary, Andreas will try to fix this
     }
     
     @Override

@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.security.services.kodex.AbstractProcessService;
+import de.iip_ecosphere.platform.services.environment.AbstractProcessService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
