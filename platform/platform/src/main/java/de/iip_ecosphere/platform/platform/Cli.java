@@ -106,6 +106,11 @@ public class Cli {
         //interpretTopLevel(provider);
     }
     
+    /**
+     * A basic command interpreter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private abstract static class AbstractCommandInterpreter {
 
         /**
@@ -187,6 +192,8 @@ public class Cli {
          * @param level the level to interpret for
          * @param cmd the command to interpret
          * @return {@code true} for exit, {@code false} for continue
+         * @throws ExecutionException if the execution fails
+         * @throws URISyntaxException if an URI was requested but the syntax is erroneous
          */
         protected boolean interpretFurther(CommandProvider provider, Level level, String cmd) 
             throws ExecutionException, URISyntaxException {
@@ -431,6 +438,18 @@ public class Cli {
         }
         return changed;
     }
+    
+    /**
+     * Determines whether a submodel element collection in the resources submodel shall be 
+     * excluded from listing.
+     *  
+     * @param coll the collection
+     * @return {@code true} for exclude, {@code false} for include
+     */
+    private static boolean resourceExclusion(SubmodelElementCollection coll) {
+        String idShort = coll.getIdShort(); 
+        return idShort.equals("containers") || idShort.equals("deviceRegistry")  || idShort.equals("deviceManager");
+    }
 
     /**
      * Lists the resources available to the platform.
@@ -438,7 +457,7 @@ public class Cli {
     private static void listResources() {
         try {
             print(resourcesFactory.create().getResources(), "- Resource ", 
-                c -> !c.getIdShort().equals("containers"), PrintType.PREFIX);
+                c -> !resourceExclusion(c), PrintType.PREFIX);
         } catch (IOException e) {
             println(e);
         }

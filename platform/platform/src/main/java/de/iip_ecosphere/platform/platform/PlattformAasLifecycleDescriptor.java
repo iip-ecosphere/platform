@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.platform;
 
+import de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.LifecycleExclude;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 
 /**
@@ -19,6 +22,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
+@LifecycleExclude({EcsCmdLineLifecycleDescriptor.class, EcsLifecycleDescriptor.class})
 public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
 
     /**
