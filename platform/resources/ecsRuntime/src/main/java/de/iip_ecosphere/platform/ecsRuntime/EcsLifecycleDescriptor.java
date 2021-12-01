@@ -44,6 +44,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
     @Override
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere ECS Runtime.");
+        EcsAas.enable(); // before super.startup/AAS creation!
         super.startup(args);
         EcsSetup setup = EcsFactory.getSetup();
         NetworkManagerFactory.configure(setup.getNetMgr());

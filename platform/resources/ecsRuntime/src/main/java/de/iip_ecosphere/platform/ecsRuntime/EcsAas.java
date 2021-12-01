@@ -75,6 +75,7 @@ public class EcsAas implements AasContributor {
     public static final String NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS = "createRemoteConnectionCredentials";
     
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
+    private static boolean enabled = false;
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -359,9 +360,16 @@ public class EcsAas implements AasContributor {
         return LoggerFactory.getLogger(EcsAas.class);
     }
     
+    /**
+     * Explicitly enables this AAS. Required when the platform services shall start without ECS runtime.
+     */
+    static void enable() {
+        enabled = true;
+    }
+    
     @Override
     public boolean isValid() {
-        return true; // we allow for a null container manager (small resource), but disable the functions in AAS 
+        return enabled; // we allow for a null container manager (small resource), but disable the functions in AAS 
     }
 
 }
