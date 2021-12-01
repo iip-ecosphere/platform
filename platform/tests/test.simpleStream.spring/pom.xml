@@ -176,10 +176,6 @@
                      <excludeGroupIds>org.jetbrains.xodus,org.rocksdb,org.jetbrains.kotlin,io.dropwizard.metrics,jakarta.xml.bind,org.bouncycastle,org.threeten</excludeGroupIds>
                      <excludes>
                         <dependency>
-                          <groupId>commons-io</groupId>
-                          <artifactId>commons-io</artifactId>
-                        </dependency>
-                        <dependency>
                           <groupId>com.hivemq</groupId>
                           <artifactId>hivemq-community-edition-embedded</artifactId>
                         </dependency>

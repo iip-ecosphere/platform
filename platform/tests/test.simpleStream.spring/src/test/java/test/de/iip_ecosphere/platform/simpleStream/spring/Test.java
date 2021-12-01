@@ -125,9 +125,9 @@ public class Test extends Starter {
         return data -> {
             metrics.recordWithTimer(CONSUMER_TIMER_ID, () -> {
                 double num = Math.random();
-                String content = "Received: " + data;
+                String content = "Received: " + data + "\n";
                 if (config.isDebug()) {
-                    System.out.println("Received: " + data);
+                    System.out.print("Received: " + data);
                 }
                 metrics.addGaugeValue(CONSUMER_GAUGE_ID, num);
                 metrics.increaseCounter(CONSUMER_COUNTER_ID);
