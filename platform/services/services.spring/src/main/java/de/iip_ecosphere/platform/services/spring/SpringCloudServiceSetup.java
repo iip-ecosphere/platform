@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.services.ServiceSetup;
  */
 @ConfigurationProperties(prefix = "service-mgr")
 @Component
-public class SpringCloudServiceConfiguration extends ServiceSetup {
+public class SpringCloudServiceSetup extends ServiceSetup {
 
     private String brokerHost = "localhost";
     private int brokerPort = 8883;

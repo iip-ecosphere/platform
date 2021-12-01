@@ -171,7 +171,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * started individually
      * @throws ExecutionException when preparing the service fails for some reason
      */
-    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceConfiguration config) throws ExecutionException {
+    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config) throws ExecutionException {
         AppDeploymentRequest result = null;
         if (null == ensembleLeader) {
             NetworkManager mgr = NetworkManagerFactory.getInstance();
@@ -181,6 +181,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Map<String, String> deployProps = new HashMap<String, String>();
             Resource res = new FileSystemResource(getArtifact().getJar());
             deployProps.put(AppDeployer.GROUP_PROPERTY_KEY, getGroup());
+            //deployProps.put("spring.cloud.deployer.local.deleteFilesOnExit ", "false"); // does not work
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.COUNT_PROPERTY_KEY, service.getInstances(),  "1");
             deployProps.put(AppDeployer.INDEXED_PROPERTY_KEY, "false"); // index the instances?
             Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.MEMORY_PROPERTY_KEY, service.getMemory(), null);
@@ -226,7 +227,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     
     /**
      * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
-     * {@link #createDeploymentRequest(SpringCloudServiceConfiguration)} before.
+     * {@link #createDeploymentRequest(SpringCloudServiceSetup)} before.
      */
     void attachStub() {
         InvocablesCreator iCreator = getInvocablesCreator();
@@ -271,7 +272,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @return the process port, valid if positive
      * @throws ExecutionException when preparing the service fails for some reason
      */
-    private int startProcess(SpringCloudServiceConfiguration config, ProcessSpec pSpec) throws ExecutionException {
+    private int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
         int result = -1;
         if (!pSpec.isStarted()) {
             NetworkManager mgr = NetworkManagerFactory.getInstance();

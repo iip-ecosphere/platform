@@ -10,13 +10,14 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.services.spring;
+package test.de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 
 /**

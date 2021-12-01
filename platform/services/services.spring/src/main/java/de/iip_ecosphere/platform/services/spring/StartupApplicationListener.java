@@ -32,7 +32,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private AppDeployer deployer;
     
     @Autowired
-    private SpringCloudServiceConfiguration config;
+    private SpringCloudServiceSetup config;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

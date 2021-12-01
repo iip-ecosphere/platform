@@ -27,7 +27,7 @@ class SpringInstances {
 
     private static AppDeployer deployer;
     
-    private static SpringCloudServiceConfiguration config;
+    private static SpringCloudServiceSetup config;
 
     /**
      * Returns the deployer instance.
@@ -43,7 +43,7 @@ class SpringInstances {
      * 
      * @return the configuration instance
      */
-    static SpringCloudServiceConfiguration getConfig() {
+    static SpringCloudServiceSetup getConfig() {
         return config;
     }
 
@@ -61,7 +61,7 @@ class SpringInstances {
      * 
      * @param cfg the configuration instance
      */
-    static void setConfig(SpringCloudServiceConfiguration cfg) {
+    static void setConfig(SpringCloudServiceSetup cfg) {
         config = cfg;
         ServiceFactory.setAasSetup(cfg.getAas());
     }

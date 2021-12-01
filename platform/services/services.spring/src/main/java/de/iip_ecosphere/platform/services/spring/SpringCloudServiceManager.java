@@ -57,7 +57,7 @@ import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
  * @author Holger Eichelberger, SSE
  */
 @Component
-@Import(SpringCloudServiceConfiguration.class)
+@Import(SpringCloudServiceSetup.class)
 public class SpringCloudServiceManager 
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
@@ -165,7 +165,7 @@ public class SpringCloudServiceManager
      * @return the parsed descriptor
      * @throws ExecutionException if reading fails for some reason
      */
-    static YamlArtifact readFromFile(File file) throws ExecutionException {
+    public static YamlArtifact readFromFile(File file) throws ExecutionException {
         YamlArtifact result = null;
         if (file.getName().endsWith(".jar")) {
             try {
@@ -195,7 +195,7 @@ public class SpringCloudServiceManager
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
-        SpringCloudServiceConfiguration config = getConfig();
+        SpringCloudServiceSetup config = getConfig();
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {
@@ -265,7 +265,7 @@ public class SpringCloudServiceManager
      * @param id the service id to wait for
      * @param initState the initial deployment state, may be <b>null</b> for none
      * @param endCond the end condition when to stop waiting, anyway at longest 
-     *   {@link SpringCloudServiceConfiguration#getWaitingTime()}.
+     *   {@link SpringCloudServiceSetup#getWaitingTime()}.
      * @return the service state at the end of waiting
      */
     private DeploymentState waitFor(String id, DeploymentState initState, Predicate<DeploymentState> endCond) {

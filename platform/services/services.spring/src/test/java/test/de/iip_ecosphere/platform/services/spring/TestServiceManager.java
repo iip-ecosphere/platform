@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -57,7 +58,7 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
-import de.iip_ecosphere.platform.services.spring.SpringCloudServiceConfiguration;
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.support.Schema;
@@ -93,7 +94,7 @@ import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 @SpringBootTest(classes = TestServiceManager.Config.class)
 @TestPropertySource(locations = "classpath:" + AbstractSetup.DEFAULT_FNAME)
 @ContextConfiguration(initializers = TestServiceManager.Initializer.class)
-@Import(SpringCloudServiceConfiguration.class)
+@Import(SpringCloudServiceSetup.class)
 @RunWith(SpringRunner.class)
 public class TestServiceManager {
 
@@ -114,7 +115,7 @@ public class TestServiceManager {
     private static Server implServer;
     private static Server aasServer;
     @Autowired
-    private SpringCloudServiceConfiguration config;
+    private SpringCloudServiceSetup config;
     private List<String> netKeyToRelease = new ArrayList<>();
     private List<Server> serversToRelease = new ArrayList<>();
     
@@ -309,7 +310,17 @@ public class TestServiceManager {
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
         Assert.assertNull(mgr.getArtifact(aId));
+        assertReceiverLog();
         MetricsAasConstructor.clear();
+    }
+    
+    /**
+     * Asserts the receiver log.
+     */
+    private static void assertReceiverLog() {
+        File f = new File(FileUtils.getTempDirectoryPath() + "/test.simpleStream.spring.log");
+        Assert.assertTrue("Receiver log does not exist", f.exists());
+        Assert.assertTrue("Receiver log is empty", f.length() > 0);
     }
     
     /**
@@ -417,7 +428,7 @@ public class TestServiceManager {
         }
     }
     
-    @Import(SpringCloudServiceConfiguration.class)
+    @Import(SpringCloudServiceSetup.class)
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         
         @Override
