@@ -4,8 +4,9 @@ A simple (controllable) stream to test the stream-based deployment for the sprin
 
 Control happens via Spring command line parameters/application.yml, in particular
 
-  * `test.debug` enable or disable test output (boolean, default `false`)
-  * `test.ingestCount` maximum number of messages until the JVM is terminated (integer, default `100`)
-  * `mqtt.port` TCP port of the MQTT v5 broker (integer, default `8883`)
-  * `mqtt.host` host of the MQTT v5 broker (string, default `localhost`)
+* `test.debug` enable or disable test output (boolean, default `false`)
+* `test.ingestCount` maximum number of messages until the JVM is terminated (integer, default `100`)
+* `mqtt.port` TCP port of the MQTT v5 broker (integer, default `8883`)
+* `mqtt.host` host of the MQTT v5 broker (string, default `localhost`)
+* `test.log` file where to log information about received data (string, default `test.simpleStream.spring.log` in the temporary folder)
 

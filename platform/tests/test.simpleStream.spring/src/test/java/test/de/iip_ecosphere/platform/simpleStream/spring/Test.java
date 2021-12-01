@@ -10,12 +10,18 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.simpleStream.spring;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +35,7 @@ import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
  * Defines the test stream to be processed. We assume that a broker is running.
@@ -53,6 +60,8 @@ public class Test extends Starter {
     private static final String REST_GAUGE_ID = "restgauge";
     private static final String REST_COUNTER_ID = "restcounter";
     private static final String REST_TIMER_ID = "resttimer";
+    
+    private static String fileName;
     
     @Autowired
     private Configuration config;
@@ -116,6 +125,7 @@ public class Test extends Starter {
         return data -> {
             metrics.recordWithTimer(CONSUMER_TIMER_ID, () -> {
                 double num = Math.random();
+                String content = "Received: " + data;
                 if (config.isDebug()) {
                     System.out.println("Received: " + data);
                 }
@@ -123,6 +133,12 @@ public class Test extends Starter {
                 metrics.increaseCounter(CONSUMER_COUNTER_ID);
                 metrics.increaseCounterBy(CONSUMER_COUNTER_ID, num);
                 metrics.addGaugeValue(CONSUMER_RECV_ID, Double.valueOf(data));
+                try {
+                    Files.write(Paths.get(fileName), content.getBytes(), 
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    System.out.println("Error writing log: " + e.getMessage());
+                }
             });
         };
     }
@@ -142,6 +158,8 @@ public class Test extends Starter {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        fileName = CmdLine.getArg(args, "test.log", FileUtils.getTempDirectoryPath() + "/test.simpleStream.spring.log");
+        FileUtils.deleteQuietly(new File(fileName));
         Starter.main(Test.class, args);
     }
     
