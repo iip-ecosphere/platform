@@ -52,7 +52,7 @@ public class Cli {
     private static EcsClientFactory ecsFactory = EcsClientFactory.DEFAULT;
     private static ResourcesClientFactory resourcesFactory = ResourcesClientFactory.DEFAULT;
     private static DeviceManagementClientFactory deviceManagementFactory = DeviceManagementClientFactory.DEFAULT;
-    private static PlatformClientFactory platformFactory = PlatformClientFactory.DEFAULT;
+    private static PlatformClientFactory platformFactory = PlatformClientFactory.LOCAL;
     private static Consumer<String> errorConsumer = DEFAULT_ERROR_CONSUMER;
     
     /**
@@ -137,7 +137,7 @@ public class Cli {
                             printHelp(provider, level);
                             break;
                         case "snapshotaas":
-                            store();
+                            snapshotAas();
                             break;
                         case "exit":
                             exit = true;
@@ -466,10 +466,14 @@ public class Cli {
     /**
      * Stores the platform AAS into a file.
      */
-    private static void store() {
+    private static void snapshotAas() {
         try {
             String file = platformFactory.create().snapshotAas("cli");
-            println("Platform AAS written (on server) to " + file);
+            if (platformFactory == PlatformClientFactory.LOCAL) {
+                println("Platform AAS written to " + file);
+            } else {
+                println("Platform AAS written (on server) to " + file);
+            }
         } catch (IOException | ExecutionException e) {
             println(e);
         }

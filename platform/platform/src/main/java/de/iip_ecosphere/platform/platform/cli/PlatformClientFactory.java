@@ -12,8 +12,14 @@
 
 package de.iip_ecosphere.platform.platform.cli;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
 
@@ -33,6 +39,29 @@ public interface PlatformClientFactory {
         public PlatformClient create() throws IOException {
             return new PlatformAasClient();
         }
+    };
+    
+    public static final PlatformClientFactory LOCAL = new PlatformClientFactory() {
+
+        @Override
+        public PlatformClient create() throws IOException {
+            return new PlatformClient() {
+                
+                @Override
+                public String snapshotAas(String id) throws ExecutionException {
+                    try {
+                        Aas aas = AasPartRegistry.retrieveIipAas();
+                        File target = new File("platform.aasx");
+                        AasFactory.getInstance().createPersistenceRecipe().writeTo(CollectionUtils.toList(aas), target);
+                        return target.getAbsolutePath();
+                    } catch (IOException e) {
+                        throw new ExecutionException(e);
+                    }
+                }
+                
+            };
+        }
+        
     };
     
     /**
