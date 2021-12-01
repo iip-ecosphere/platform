@@ -97,7 +97,7 @@ public class Cli {
             println("IIP-Ecosphere, interactive platform command line");
             println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
             println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
-            println("Type \"help\" for help.");
+            println("Type \"help\" to see commands and their description.");
         } else {
             provider = new ArgsCommandProvider(args);
         }
@@ -547,8 +547,8 @@ public class Cli {
             println(" services <resourceId> - enters service commands for <resourceId>");
         }
         if (level.isTopLevel() || Level.SERVICES == level) {
-            println("  listServices - lists known services");
             println("  listArtifacts - lists known artifacts");
+            println("  listServices - lists known services");
             println("  add <URI> - adds an artifact");
             println("  startAll <artifactId> - starts all services in <artifactId>");
             println("  stopAll <artifactId> - stops all services in <artifactId>");
