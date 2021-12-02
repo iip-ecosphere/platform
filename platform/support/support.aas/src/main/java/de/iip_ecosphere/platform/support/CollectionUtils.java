@@ -58,6 +58,22 @@ public class CollectionUtils {
     }
     
     /**
+     * Turns given {@code elements} to {@code set}.
+     * 
+     * @param <T> the element type
+     * @param set the set to be modified as a side effect
+     * @param elements the elements
+     * @return the set with all {@code elements} added
+     */
+    @SafeVarargs
+    public static <T> Set<T> addAll(Set<T> set, T... elements) {
+        for (T e : elements) {
+            set.add(e);
+        }
+        return set;
+    }
+    
+    /**
      * Turns the elements in the iterator into a list.
      * 
      * @param <T> the element type

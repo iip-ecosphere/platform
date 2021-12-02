@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.support;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -93,7 +94,7 @@ public class CollectionUtilsTest {
      * Tests {@link CollectionUtils#addAll(List, Object...)}.
      */
     @Test
-    public void testAddAllVarArg() {
+    public void testAddListAllVarArg() {
         List<String> tmp = new ArrayList<String>();
         List<String> res = CollectionUtils.addAll(tmp);
         Assert.assertNotNull(res);
@@ -113,6 +114,31 @@ public class CollectionUtilsTest {
         Assert.assertEquals("a", tmp.get(0));
         Assert.assertEquals("a", tmp.get(1));
         Assert.assertEquals("b", tmp.get(2));
+    }
+
+    /**
+     * Tests {@link CollectionUtils#addAll(Set, Object...)}.
+     */
+    @Test
+    public void testAddSetAllVarArg() {
+        Set<String> tmp = new HashSet<String>();
+        Set<String> res = CollectionUtils.addAll(tmp);
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(0, tmp.size());
+        
+        res = CollectionUtils.addAll(tmp, "a");
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(1, tmp.size());
+        Assert.assertTrue(tmp.contains("a"));
+
+        res = CollectionUtils.addAll(tmp, "a", "b");
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res == tmp);
+        Assert.assertEquals(2, tmp.size()); // "a" is duplicate
+        Assert.assertTrue(tmp.contains("a"));
+        Assert.assertTrue(tmp.contains("b"));
     }
 
 }
