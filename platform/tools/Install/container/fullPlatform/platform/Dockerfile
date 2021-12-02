@@ -1,7 +1,8 @@
 FROM openjdk:16-alpine3.13
 WORKDIR /device
-# Broker
+# Broker (src contains broker configuration)
 COPY brokerJars/ brokerJars
+COPY src/ src
 COPY amqp.sh amqp.sh
 # Platform
 COPY plJars/ plJars
