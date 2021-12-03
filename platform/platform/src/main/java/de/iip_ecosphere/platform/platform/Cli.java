@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.platform;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -295,6 +297,27 @@ public class Cli {
                     changedServices = true;
                 }
                 break;
+            case "start":
+                List<String> sIds = new ArrayList<String>();
+                String tmp; 
+                while (true) {
+                    tmp = provider.nextCommand();
+                    if (null == tmp) {
+                        sIds = null;
+                        error("No serviceId given.");
+                        break;
+                    } else if (!".".equals(tmp)) {
+                        sIds.add(tmp);
+                    } else {
+                        break;
+                    }
+                    if (null != sIds) {
+                        String[] sTmp = new String[sIds.size()];
+                        client.startService(sIds.toArray(sTmp));
+                        changedServices = true;
+                    }
+                }
+                break;
             case "stopall":
                 id = provider.nextCommand();
                 if (null == id) {
@@ -551,6 +574,7 @@ public class Cli {
             println("  listServices - lists known services");
             println("  add <URI> - adds an artifact");
             println("  startAll <artifactId> - starts all services in <artifactId>");
+            println("  start <serviceId>+ . - starts the given services, note the \".\" at the end");
             println("  stopAll <artifactId> - stops all services in <artifactId>");
             println("  remove <artifactId> - removes <artifactId>");
             println("  help - prints help for this level");

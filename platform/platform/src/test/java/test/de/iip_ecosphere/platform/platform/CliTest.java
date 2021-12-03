@@ -83,6 +83,12 @@ public class CliTest {
         "help",
         "exit"
     };
+    
+    private static final String[] SERVICES_START_SEQUENCE = new String[] {
+        "services", "ab01",
+        "start", "s1", "s2", ".",
+        "exit"
+    };
 
     private static final String[] CONTAINER_SEQUENCE = new String[] {
         "container", "ab01",
@@ -110,6 +116,12 @@ public class CliTest {
     private static final String[] SERVICES_FAIL = new String[] {
         "services", "ab01",
         "abx",
+        "exit"
+    };
+
+    private static final String[] SERVICES_START_FAIL = new String[] {
+        "services", "ab01",
+        "start",
         "exit"
     };
 
@@ -390,12 +402,14 @@ public class CliTest {
         test(RESOURCES_SEQUENCE, errorConsumer, 0);
         test(CONTAINER_SEQUENCE, errorConsumer, 0);
         test(SERVICES_SEQUENCE, errorConsumer, 0);
+        test(SERVICES_START_SEQUENCE, errorConsumer, 0);
         test(SNAPSHOT_SEQUENCE, errorConsumer, 0);
 
         test(MAIN_FAIL, errorConsumer, 1);
         test(RESOURCES_FAIL, errorConsumer, 1);
         test(CONTAINER_FAIL, errorConsumer, 1);
         test(SERVICES_FAIL, errorConsumer, 1);
+        test(SERVICES_START_FAIL, errorConsumer, 1);
         
         de.iip_ecosphere.platform.platform.Cli.setFactories(ServicesClientFactory.DEFAULT, EcsClientFactory.DEFAULT, 
             ResourcesClientFactory.DEFAULT, DeviceManagementClientFactory.DEFAULT, PlatformClientFactory.DEFAULT);

@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.platform.cli;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
@@ -31,16 +32,20 @@ public class ScannerCommandProvider implements CommandProvider {
         if (pos >= 0 && pos < cmds.size()) {
             result = cmds.get(pos++);
         } else if (pos >= 0) {
-            String line = scanner.nextLine();
-            if (null != line) {
-                cmds.clear();
-                CmdLine.parseToArgs(line, cmds);
-                pos = 0;
-                if (cmds.size() > 0) {
-                    result = cmds.get(pos++);
+            try {
+                String line = scanner.nextLine();
+                if (null != line) {
+                    cmds.clear();
+                    CmdLine.parseToArgs(line, cmds);
+                    pos = 0;
+                    if (cmds.size() > 0) {
+                        result = cmds.get(pos++);
+                    }
+                } else {
+                    pos = -1;
                 }
-            } else {
-                pos = -1;
+            } catch (NoSuchElementException e) {
+                // result -> null
             }
         } 
         return result;
