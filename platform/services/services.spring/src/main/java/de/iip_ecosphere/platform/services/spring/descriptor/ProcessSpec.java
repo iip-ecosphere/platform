@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
+import java.io.File;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -40,6 +41,21 @@ public interface ProcessSpec {
      * @return the command or relative path
      */
     public String getExecutable();
+    
+    /**
+     * Returns an optional path to be prefixed before the executable. Relevance depends on the execution environment.
+     * 
+     * @return the optional executable path, may be <b>null</b> for none
+     */
+    public File getExecutablePath();
+    
+    /**
+     * Returns the home directory of the process to be executed.
+     * 
+     * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
+     *     define a home path
+     */
+    public File getHome();
     
     /**
      * Returns the command line arguments to start the process. The shell will be executed within the folder where

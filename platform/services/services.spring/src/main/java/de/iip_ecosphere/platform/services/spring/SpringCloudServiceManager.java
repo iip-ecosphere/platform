@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,6 +189,21 @@ public class SpringCloudServiceManager
         }
         return result;
     }
+    
+    /**
+     * Determines the command line arguments to adjust service connections from "internal" to "external" binder.
+     * 
+     * @param serviceIds the services to determine the arguments for
+     * @return the command line arguments
+     * @see #determineExternalConnections(String...)
+     */
+    private List<String> determineExternalServiceArgs(String... serviceIds) {
+        return determineExternalConnections(this, serviceIds)
+            .stream()
+            .filter(c -> isValidId(c.getName()))
+            .map(c -> "--spring.cloud.stream.bindings." + c.getName() + ".binder=external")
+            .collect(Collectors.toList());
+    }
 
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
@@ -196,12 +212,13 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
+        List<String> externalServiceArgs = determineExternalServiceArgs(serviceIds);
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {
                 errors.add("No service for id '" + ids + "' known.");
             } else {
-                AppDeploymentRequest req = service.createDeploymentRequest(config);
+                AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
                     LOGGER.info("Starting " + ids);

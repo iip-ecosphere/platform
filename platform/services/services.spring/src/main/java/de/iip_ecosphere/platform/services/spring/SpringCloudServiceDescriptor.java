@@ -86,10 +86,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         for (Relation r : service.getRelations()) {
             if (Direction.IN == r.getDirection()) {
                 addInputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
-                    r.getDescription(), resolver.resolve(r.getType())));
+                    r.getDescription(), resolver.resolve(r.getType()), r.getService()));
             } else if (Direction.OUT == r.getDirection()) {
                 addOutputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
-                    r.getDescription(), resolver.resolve(r.getType())));
+                    r.getDescription(), resolver.resolve(r.getType()), r.getService()));
             }
         }
     }
@@ -167,11 +167,13 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * Creates the deployment request for the Spring deployer.
      * 
      * @param config the service manager configuration instance
+     * @param cmdArgs further command line arguments to be considered, may be <b>null</b> or empty for none
      * @return the deployment request, may be <b>null</b> if this service is an ensemble follower and should not be 
      * started individually
      * @throws ExecutionException when preparing the service fails for some reason
      */
-    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config) throws ExecutionException {
+    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config, List<String> cmdArgs) 
+        throws ExecutionException {
         AppDeploymentRequest result = null;
         if (null == ensembleLeader) {
             NetworkManager mgr = NetworkManagerFactory.getInstance();
@@ -218,6 +220,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                     cmdLine.add(Starter.composeArgument(Starter.getServicePortName(getId()), procPort));
                 }
             }
+            if (null != cmdArgs) {
+                cmdLine.addAll(cmdArgs);
+            }
+            // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
             LoggerFactory.getLogger(SpringCloudServiceDescriptor.class).info("Creates deployment request for " 
                 + getName() + " " + cmdLine);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);

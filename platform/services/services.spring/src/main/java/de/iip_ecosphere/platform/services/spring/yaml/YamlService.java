@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.spring.yaml;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.services.environment.AbstractYamlService;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
@@ -24,7 +25,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlService extends de.iip_ecosphere.platform.services.environment.YamlService implements Service {
+public class YamlService extends AbstractYamlService implements Service {
     
     private List<String> cmdArg = new ArrayList<>();
     private String ensembleWith;

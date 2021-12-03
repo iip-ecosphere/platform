@@ -23,6 +23,7 @@ public class YamlRelation implements Relation {
 
     private String id;
     private String channel = "";
+    private String service = "";
     private YamlEndpoint endpoint;
     private String description = "";
     private String type;
@@ -36,6 +37,11 @@ public class YamlRelation implements Relation {
     @Override
     public String getChannel() {
         return channel;
+    }
+    
+    @Override
+    public String getService() {
+        return service;
     }
     
     @Override
@@ -61,7 +67,8 @@ public class YamlRelation implements Relation {
     /**
      * Defines the id of this relation. [Required by SnakeYaml]
      * 
-     * @param id the id of this relation
+     * @param id the id of the channel, may be empty if {@link #getChannel() is empty} or in case of an outgoing data
+     * port, must be given for an opposite side data port. 
      */
     public void setId(String id) {
         this.id = id;
@@ -75,6 +82,16 @@ public class YamlRelation implements Relation {
      */
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+    
+    /**
+     * Defines the name of the communication channel this relation is realized by. [Required by SnakeYaml]
+     * 
+     * @param service the id of the service, may be empty if {@link #getChannel() is empty} or in case of an outgoing 
+     * data port, must be given to denote the service holding an opposite side incoming data port. 
+     */
+    public void setService(String service) {
+        this.service = service;
     }
 
     /**

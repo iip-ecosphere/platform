@@ -43,7 +43,7 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
     public List<YamlType> getTypes() {
         return types;
     }
-
+    
     /**
      * Sets the declared types. [required by SnakeYaml]
      * 

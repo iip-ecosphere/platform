@@ -27,11 +27,9 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
  *  
  * @author Holger Eichelberger, SSE
  */
-public class YamlProcess implements ProcessSpec {
+public class YamlProcess extends de.iip_ecosphere.platform.services.environment.YamlProcess implements ProcessSpec {
 
     private List<String> artifacts = new ArrayList<String>();
-    private String executable;
-    private List<String> cmdArg = new ArrayList<>();
     private YamlEndpoint serviceStreamEndpoint;
     private YamlEndpoint streamEndpoint;
     private YamlEndpoint aasEndpoint;
@@ -44,19 +42,9 @@ public class YamlProcess implements ProcessSpec {
     }
     
     @Override
-    public String getExecutable() {
-        return executable;
-    }
-    
-    @Override
-    public List<String> getCmdArg() {
-        return cmdArg;
-    }
-    
-    @Override
     public List<String> getCmdArg(int port, String protocol) {
         List<String> result = new ArrayList<String>();
-        for (String arg : cmdArg) {
+        for (String arg : getCmdArg()) {
             arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
             arg = arg.replace(Service.PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
             result.add(arg);
@@ -97,24 +85,6 @@ public class YamlProcess implements ProcessSpec {
      */
     public void setArtifacts(List<String> artifacts) {
         this.artifacts = artifacts;
-    }
-    
-    /**
-     * Defines the path within the artifact to be extracted. [required by SnakeYaml]
-     * 
-     * @param executable the name/path
-     */
-    public void setExecutable(String executable) {
-        this.executable = executable;
-    }
-    
-    /**
-     * Defines the command line arguments. [required by SnakeYaml]
-     * 
-     * @param cmdArg the command line arguments (may be empty for none)
-     */
-    public void setCmdArg(List<String> cmdArg) {
-        this.cmdArg = cmdArg;
     }
 
     /**

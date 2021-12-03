@@ -15,7 +15,9 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 
 /**
- * Represents a relation/connection between services. [Name taken from usage view]
+ * Represents a relation/connection between services, including the local communication broker/server 
+ * {@link #getEndpoint() endpoint} (no other information given), an outgoing data port (channel, direction, type) 
+ * or an opposite side incoming data port (channel, id, service, direction, type). [Name taken from usage view]
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -47,10 +49,12 @@ public interface Relation {
     }
     
     /**
-     * The id of the relation. Depending on the underlying implementation, id may be the same as {@link #getChannel()}
+     * The id of the relation. All relation entries of all participating services must have the same id. 
+     * Depending on the underlying implementation, id may be the same as {@link #getChannel()}
      * or differ, e.g, if {@link #getChannel()} points to a technical channel name.
      * 
-     * @return the id of the channel
+     * @return the id of the channel, may be empty if {@link #getChannel() is empty} or in case of an outgoing data 
+     * port, must be given for an opposite side data port. 
      */
     public String getId();
     
@@ -61,6 +65,14 @@ public interface Relation {
      * @return the channel name, may be {@link #LOCAL_CHANNEL} referring to all channels used for local communication
      */
     public String getChannel();
+    
+    /**
+     * The id of the service this relation is connecting to.
+     * 
+     * @return the id of the service, may be empty if {@link #getChannel() is empty} or in case of an outgoing data 
+     * port, must be given to denote the service holding an opposite side incoming data port. 
+     */
+    public String getService();
     
     /**
      * Returns communication endpoint (port/host) the service shall communicate with. 

@@ -23,6 +23,7 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
     implements TypedDataConnectorDescriptor {
 
     private String id;
+    private String service;
     
     /**
      * Creates an instance.
@@ -32,15 +33,22 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
      * @param description an optional description of the data (may be empty)
      * @param type the type, either a standard java class or a dynamic proxy for types declared by the services that are
      *   not available in this (execution/platform) environment
+     * @param service the id of the service this connector is pointing to
      */
-    SpringCloudServiceTypedConnectorData(String id, String name, String description, Class<?> type) {
+    SpringCloudServiceTypedConnectorData(String id, String name, String description, Class<?> type, String service) {
         super(name, description, type);
         this.id = id;
+        this.service = service;
     }
 
     @Override
     public String getId() {
         return id;
+    }
+    
+    @Override
+    public String getService() {
+        return service;
     }
     
 }
