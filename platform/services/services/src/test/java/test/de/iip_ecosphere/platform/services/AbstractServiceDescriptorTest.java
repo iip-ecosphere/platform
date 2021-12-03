@@ -3,6 +3,7 @@ package test.de.iip_ecosphere.platform.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
@@ -70,10 +71,13 @@ public class AbstractServiceDescriptorTest {
     public void testConnectorNames() {
         List<TypedDataConnectorDescriptor> conns = new ArrayList<>();
         assertCollection(AbstractServiceDescriptor.connectorIds(conns)); // none
-        conns.add(new MyTypedDataConnectorDescriptor("c1", "conn1", "", Integer.class));
+        conns.add(new MyTypedDataConnectorDescriptor("c1", "conn1", "", Integer.class, null));
         assertCollection(AbstractServiceDescriptor.connectorIds(conns), "c1");
-        conns.add(new MyTypedDataConnectorDescriptor("c2", "conn2", "", Integer.class));
+        conns.add(new MyTypedDataConnectorDescriptor("c2", "conn2", "", Integer.class, "s2"));
         assertCollection(AbstractServiceDescriptor.connectorIds(conns), "c1", "c2");
+        
+        Assert.assertNull(conns.get(0).getService());
+        Assert.assertEquals("s2", conns.get(1).getService());
     }
     
     /**
@@ -85,26 +89,26 @@ public class AbstractServiceDescriptorTest {
         List<MyServiceDescriptor> services = new ArrayList<MyServiceDescriptor>();
 
         MyServiceDescriptor s0 = new MyServiceDescriptor("s0", "s0", "", null);
-        s0.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s0.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s1.1"));
         services.add(s0);
         MyServiceDescriptor s11 = new MyServiceDescriptor("s1.1", "s1.2", "", null);
-        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int1", "int1", "", Integer.class));
+        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int1", "int1", "", Integer.class, "s1.2"));
         MyServiceDescriptor s12 = new MyServiceDescriptor("s1.2", "s1.2", "", null);
-        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("int1", "int1", "", Integer.class));
-        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("int1", "int1", "", Integer.class, null));
+        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s2.1"));
         s11.setEnsembleLeader(s12);
         services.add(s11);
         services.add(s12);
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.1", "", null);
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int20", "int20", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int20", "int20", "", Integer.class, "s2.2"));
         MyServiceDescriptor s22 = new MyServiceDescriptor("s2.2", "s2.2", "", null);
-        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("int20", "int20", "", Integer.class));
-        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int21", "int21", "", Integer.class));
+        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("int20", "int20", "", Integer.class, null));
+        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("int21", "int21", "", Integer.class, "s2.3"));
         s22.setEnsembleLeader(s21);
         MyServiceDescriptor s23 = new MyServiceDescriptor("s2.3", "s2.3", "", null);
-        s23.addInputDataConnector(new MyTypedDataConnectorDescriptor("int21", "int21", "", Integer.class));
-        s23.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s23.addInputDataConnector(new MyTypedDataConnectorDescriptor("int21", "int21", "", Integer.class, null));
+        s23.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, null));
         s23.setEnsembleLeader(s21);
         services.add(s21);
         services.add(s22);

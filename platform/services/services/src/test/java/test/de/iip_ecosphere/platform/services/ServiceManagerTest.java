@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.services;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -101,12 +102,61 @@ public class ServiceManagerTest {
         assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         
-        
-        
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
         ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * Tests {@link AbstractServiceManager#determineExternalConnections(ServiceManager, String...)}.
+     */
+    @Test
+    public void testExternalConnections() throws ExecutionException, URISyntaxException {
+        ServiceManager mgr = new MyServiceManager(false);
+        final URI dummy = new URI("file:///dummy");
+        mgr.addArtifact(dummy);
+        // service_0 - conn-1 -> service_1 -conn-2-> service_2
+        //                                 -conn-3-> service_3
+        
+        Set<TypedDataConnectorDescriptor> conn = AbstractServiceManager.determineExternalConnections(mgr);
+        assertContains(conn);
+        
+        conn = AbstractServiceManager.determineExternalConnections(mgr, "service_0");
+        assertContains(conn, "conn-1");
+        
+        conn = AbstractServiceManager.determineExternalConnections(mgr, "service_2");
+        assertContains(conn, "conn-2");
+
+        conn = AbstractServiceManager.determineExternalConnections(mgr, "service_3");
+        assertContains(conn, "conn-3");
+
+        conn = AbstractServiceManager.determineExternalConnections(mgr, "service_1");
+        assertContains(conn, "conn-1", "conn-2", "conn-3");
+
+        conn = AbstractServiceManager.determineExternalConnections(mgr, "service_0", "service_1");
+        assertContains(conn, "conn-2", "conn-3");
+
+    }
+    
+    /**
+     * Asserts that {@code conn} contains all {@code cIds}.
+     * 
+     * @param conn the connect to check the ids for
+     * @param cIds the connection ids to assert for
+     */
+    private static void assertContains(Set<TypedDataConnectorDescriptor> conn, String... cIds) {
+        Assert.assertTrue(null != conn && conn.size() == cIds.length);
+        if (cIds.length > 0) {
+            Set<String> expected = CollectionUtils.addAll(new HashSet<String>(), cIds);
+            int found = 0;
+            for (TypedDataConnectorDescriptor d : conn) {
+                if (expected.contains(d.getId())) {
+                    found++;
+                }
+            }
+            Assert.assertTrue("Not found all of " + Arrays.toString(cIds) + " in " + conn, found == cIds.length);
+        }
     }
     
     /**
@@ -220,20 +270,20 @@ public class ServiceManagerTest {
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
 
         MyServiceDescriptor s11 = new MyServiceDescriptor("s1.1", "s1.2", "", null);
-        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s1.2"));
         MyServiceDescriptor s12 = new MyServiceDescriptor("s1.2", "s1.2", "", null);
-        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
+        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
         localServices.add(s11);
         localServices.add(s12);
         new MyArtifactDescriptor("a1", "a1", localServices);
 
         // s1.1 -> s2.1 -> s2.2 -> s1.2 
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.2", "", null);
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class, "s2.2"));
         MyServiceDescriptor s22 = new MyServiceDescriptor("s2.2", "s2.2", "", null);
-        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
-        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
+        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class, null));
+        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s1.2"));
         services.add(s21);
         services.add(s22);
         new MyArtifactDescriptor("a2", "a2", services);
@@ -269,24 +319,24 @@ public class ServiceManagerTest {
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
 
         MyServiceDescriptor s11 = new MyServiceDescriptor("s1.1", "s1.2", "", null);
-        s11.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
-        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class));
+        s11.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
+        s11.addOutputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class, "s1.2"));
         MyServiceDescriptor s12 = new MyServiceDescriptor("s1.2", "s1.2", "", null);
-        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
-        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class));
+        s12.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, null));
+        s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("intl1", "intl1", "", Integer.class, null));
         s11.setEnsembleLeader(s12);
         services.add(s11);
         services.add(s12);
 
         // ensemble members after ensemble leaders, no further sequence
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.1", "", null);
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class));
-        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
-        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s2.2"));
+        s21.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class, "s2.2"));
+        s21.addInputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class, null));
         MyServiceDescriptor s22 = new MyServiceDescriptor("s2.2", "s2.2", "", null);
-        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class));
-        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class));
+        s22.addInputDataConnector(new MyTypedDataConnectorDescriptor("im1", "im1", "", Integer.class, null));
+        s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("im2", "im2", "", Integer.class, null));
         s22.setEnsembleLeader(s21);
         services.add(s21);
         services.add(s22);

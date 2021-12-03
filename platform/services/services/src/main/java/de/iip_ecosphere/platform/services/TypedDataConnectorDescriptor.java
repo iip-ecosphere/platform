@@ -27,5 +27,12 @@ public interface TypedDataConnectorDescriptor extends TypedDataDescriptor {
      * @return the id
      */
     public String getId();
+    
+    /**
+     * Returns the id of the service this connector is pointing to.
+     * 
+     * @return the service id, may be <b>null</b> or empty for none
+     */
+    public String getService();
 
 }

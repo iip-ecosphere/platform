@@ -28,7 +28,7 @@ public class MyServiceFactoryDescriptor implements ServiceFactoryDescriptor {
     
     @Override
     public ServiceManager createInstance() {
-        return new MyServiceManager();
+        return new MyServiceManager(true);
     }
 
     @Override

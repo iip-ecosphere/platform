@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -132,15 +133,27 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         ServicesAas.notifyArtifactRemoved(aDesc);
     }
     
+    
+    /**
+     * Returns whether the given {@code id} is structurally valid, i.e., not <b>null</b> and not empty.
+     * 
+     * @param id the id to check
+     * @return {@code true} if {@code id} is valid, {@code false} else
+     */
+    protected static final boolean isValidId(String id) {
+        return null != id && id.length() > 0;
+    }
+    
     /**
      * Checks the given {@code id} for basic validity.
      * 
      * @param id the id to check
      * @param text the text to include into the exception
      * @throws ExecutionException if {@code id} is not considered valid
+     * @see #isValidId(String)
      */
     protected static void checkId(String id, String text) throws ExecutionException {
-        if (null == id || id.length() == 0) {
+        if (!isValidId(id)) {
             throw new ExecutionException(text + "must be given (not null or empty)", null);
         }
     }
@@ -412,6 +425,67 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         if (reverse) {
             Collections.reverse(result);
         }
+        return result;
+    }
+    
+    /**
+     * Returns whether {@code coll} contains {@code id}.
+     * 
+     * @param coll the collection to search within
+     * @param id the id to search for, may be <b>null</b> or empty
+     * @return {@code false} if {@link #isValidId(String) the id is not valid}, whether it is contained in 
+     *     {@code coll} else
+     */
+    private static final boolean containsIdSafe(Collection<String> coll, String id) {
+        boolean result;
+        if (isValidId(id)) {
+            result = coll.contains(id);
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
+    /**
+     * Determines the external connections of the given services.
+     * 
+     * @param mgr the service manager
+     * @param serviceIds the services to determine the arguments for
+     * @return the external connections
+     */
+    public static Set<TypedDataConnectorDescriptor> determineExternalConnections(ServiceManager mgr, 
+        String... serviceIds) {
+        Set<TypedDataConnectorDescriptor> result = new HashSet<TypedDataConnectorDescriptor>();
+        Set<String> ids = CollectionUtils.addAll(new HashSet<>(), serviceIds);
+        
+        // collect artifacts, determine outgoing connections
+        Set<ArtifactDescriptor> artifacts = new HashSet<>();
+        for (String id : serviceIds) {
+            ServiceDescriptor service = mgr.getService(id);
+            if (null != service) {
+                artifacts.add(service.getArtifact());
+                for (TypedDataConnectorDescriptor c: service.getOutputDataConnectors()) {
+                    if (isValidId(c.getService()) && !containsIdSafe(ids, c.getService())) {
+                        result.add(c);
+                    }
+                }
+            }
+        }
+        
+        // determine incoming channels for all services in serviceIds
+        
+        for (ArtifactDescriptor a : artifacts) {
+            for (ServiceDescriptor s: a.getServices()) {
+                if (!containsIdSafe(ids, s.getId())) { // no connections within the given serviceIds
+                    for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
+                        if (containsIdSafe(ids, c.getService())) {
+                            result.add(c);
+                        }
+                    }
+                }
+            }
+        }
+        
         return result;
     }
 

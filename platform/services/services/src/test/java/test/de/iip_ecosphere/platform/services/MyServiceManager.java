@@ -31,15 +31,20 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MyServiceDescriptor> {
 
-    private static int connectorCount = 0;
+    private static int connectorCount;
     
     private int artifactId;
     private int serviceId;
+    private boolean small;
 
     /**
      * Prevents external creation.
+     * 
+     * @param small "small" setup for usual tests or "big" setup for external connection tests
      */
-    MyServiceManager() {
+    MyServiceManager(boolean small) {
+        this.small = small;
+        connectorCount = 0; // reset per test
     }
     
     /**
@@ -68,11 +73,22 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
         String aId = createArtifactId();
         List<MyServiceDescriptor> services = new ArrayList<>();
         String text = location.toString();
-        MyServiceDescriptor sd = 
+        MyServiceDescriptor sd1 = 
              new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 0));
-        services.add(setupData(sd));
-        sd = new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 1));
-        services.add(setupData(sd));
+        MyServiceDescriptor sd2 = 
+             new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 1));
+        services.add(setupData(sd1, sd2));
+        if (small) {
+            services.add(setupData(sd2));
+        } else {
+            MyServiceDescriptor sd3 = 
+                new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 2));
+            MyServiceDescriptor sd4 = 
+                new MyServiceDescriptor(createServiceId(), "name " + text, "desc " + text, new Version(1, 3));
+            services.add(setupData(sd2, sd3, sd4));
+            services.add(setupData(sd3));
+            services.add(setupData(sd4));
+        }
         super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
         return aId;
     }
@@ -81,15 +97,18 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
      * Adds some data to test against.
      * 
      * @param sd the descriptor instance
+     * @param out the outgoing services
      * @return {@code sd}
      */
-    private MyServiceDescriptor setupData(MyServiceDescriptor sd) {
+    private MyServiceDescriptor setupData(MyServiceDescriptor sd, MyServiceDescriptor... out) {
         sd.addParameter(new MyTypedDataDescriptor("NAME", "reconfigures the name", String.class));
         sd.addInputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "conn-" + connectorCount, 
-            "", Integer.TYPE));
-        connectorCount++;
-        sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "conn-" + connectorCount,
-            "", Integer.TYPE));
+            "", Integer.TYPE, null));
+        for (MyServiceDescriptor o: out) {
+            connectorCount++;
+            sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, 
+                "conn-" + connectorCount, "", Integer.TYPE, o.getId()));
+        }
         return sd;
     }
 
@@ -165,5 +184,5 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
         return c-> true;
     }
-
+    
 }
