@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.security.services.kodex;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +26,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.security.services.kodex.KodexService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -218,6 +220,10 @@ public class KodexServiceTest {
         sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
         sDesc.setId("KodexTest");
         sDesc.setDeployable(true);
+        YamlProcess pDesc = new YamlProcess();
+        pDesc.setExecutablePath(new File("./src/main/resources/"));
+        pDesc.setHome(new File("./src/test/resources"));
+        sDesc.setProcess(pDesc);
         
         KodexService<InData, OutData> service = new KodexService<>(
             new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);

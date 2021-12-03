@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang.SystemUtils;
+
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
+import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -33,7 +36,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
 
-    public static final int WAITING_TIME = 120000; // preliminary
+    public static final int WAITING_TIME_WIN = 120000; // preliminary
+    public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = "0.0.7";
     private static final boolean DEBUG = false;
 
@@ -53,9 +57,13 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
     @Override
     protected void start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
-        File exe = new File("./src/main/resources/" + executable); // folder fixed? 
-        File home = new File("./src/test/resources").getAbsoluteFile();
+        YamlProcess sSpec = getProcessSpec();
 
+        File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/")); 
+        File home = selectNotNull(sSpec, s -> s.getHome(), new File("./src/test/resources"));
+        exe = new File(exe, executable); 
+        home = home.getAbsoluteFile();
+        
         List<String> args = new ArrayList<>();
         if (DEBUG) {
             args.add("--level");
@@ -63,12 +71,15 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         }
         args.add("run");
         args.add("example-data.yml");
+        addProcessSpecCmdArg(args);
+        
         createAndConfigureProcess(exe, false, home, args);
     }
 
     @Override
     protected int getWaitTimeBeforeDestroy() {
-        return WAITING_TIME; // preliminary, Andreas will try to fix this
+        // preliminary, Andreas will try to fix this; Win vs. Other -> experimental
+        return SystemUtils.IS_OS_WINDOWS ? WAITING_TIME_WIN : WAITING_TIME_OTHER; 
     }
     
     @Override
