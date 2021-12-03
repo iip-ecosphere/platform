@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.services.environment.AbstractProcessService;
 import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -83,11 +84,13 @@ public class ProcessServiceTest {
 
         @Override
         protected void start() throws ExecutionException {
-            File exe = new File("java");
-            File home = new File("target/test-classes").getAbsoluteFile();
-
+            YamlProcess sSpec = getProcessSpec();
+            File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("java")); 
+            File home = selectNotNull(sSpec, s -> s.getHome(), new File("target/test-classes"));
+            
             List<String> args = new ArrayList<>();
             args.add("test.de.iip_ecosphere.platform.services.environment.ForwardingApp");
+            addProcessSpecCmdArg(args);
             createAndConfigureProcess(exe, true, home, args);
         }
         
@@ -158,6 +161,10 @@ public class ProcessServiceTest {
         sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
         sDesc.setId("Test");
         sDesc.setDeployable(true);
+        YamlProcess pDesc = new YamlProcess();
+        pDesc.setExecutable("java");
+        pDesc.setHome(new File("target/test-classes"));
+        sDesc.setProcess(pDesc);
         
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);
         service.setState(ServiceState.STARTING);

@@ -12,130 +12,31 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
-
 /**
  * Information about a single service.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlService {
+public class YamlService extends AbstractYamlService {
     
-    private String id;
-    private String name;
-    private Version version;
-    private String description = "";
-    private ServiceKind kind;
-    private boolean deployable = false;
-
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Returns the name of the service.
-     * 
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the version of the service.
-     * 
-     * @return the version
-     */
-    public Version getVersion() {
-        return version;
-    }
-
-    /**
-     * Returns the description of the service.
-     * 
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
+    private YamlProcess process;
     
     /**
-     * Sets the service kind.
+     * Returns an optional attached process realizing the service.
      * 
-     * @return the service kind
+     * @return the process information, may be <b>null</b>
      */
-    public ServiceKind getKind() {
-        return kind;
-    }
-    
-    /**
-     * Returns whether this service is decentrally deployable.
-     * 
-     * @return {@code true} for deployable, {@code false} for not deployable 
-     */
-    public boolean isDeployable() {
-        return deployable;
-    }
-    
-    /**
-     * Defines the id of the service. [required by SnakeYaml]
-     * 
-     * @param id the id
-     */
-    public void setId(String id) {
-        this.id = id;
+    public YamlProcess getProcess() {
+        return process;
     }
 
     /**
-     * Defines the name of the service. [required by SnakeYaml]
+     * Defines an optional attached process realizing the service. [required by SnakeYaml]
      * 
-     * @param name the name
+     * @param process the process information, may be <b>null</b>
      */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Defines the version of the service. [required by SnakeYaml]
-     * 
-     * @param version the version
-     */
-    public void setVersion(Version version) {
-        this.version = version;
-    }
-
-    /**
-     * Defines the description of the service. [required by SnakeYaml]
-     * 
-     * @param description the description (<b>null</b> is ignored, default is empty)
-     */
-    public void setDescription(String description) {
-        if (null != description) {
-            this.description = description;
-        }
+    public void setProcess(YamlProcess process) {
+        this.process = process;
     }
     
-    /**
-     * Sets whether this service is decentrally deployable.
-     * 
-     * @param deployable {@code true} for deployable, {@code false} for not deployable 
-     */
-    public void setDeployable(boolean deployable) {
-        this.deployable = deployable;
-    }
-    
-    /**
-     * Sets the service kind. [required by SnakeYaml]
-     * 
-     * @param kind the service kind
-     */
-    public void setKind(ServiceKind kind) {
-        this.kind = kind;
-    }
-
 }

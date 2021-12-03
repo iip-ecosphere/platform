@@ -15,17 +15,20 @@ package de.iip_ecosphere.platform.services.environment;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
- * Basic information about an artifact containing services, abstract because template-based service objects do not
+ * Basic information about a service, abstract because template-based service objects do not
  * work with SnakeYaml. By default, reference types are created based on the attribute definition in the class. As
  * soon as mechanisms are available to handle this, these additional classes may collapse into a more simple hierarchy.
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractYamlArtifact {
+public abstract class AbstractYamlService {
 
     private String id;
     private String name;
     private Version version;
+    private String description = "";
+    private ServiceKind kind;
+    private boolean deployable = false;
 
     /**
      * Returns the name of the service.
@@ -44,7 +47,7 @@ public abstract class AbstractYamlArtifact {
     public String getName() {
         return name;
     }
-    
+
     /**
      * Returns the version of the service.
      * 
@@ -52,6 +55,33 @@ public abstract class AbstractYamlArtifact {
      */
     public Version getVersion() {
         return version;
+    }
+
+    /**
+     * Returns the description of the service.
+     * 
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+    
+    /**
+     * Sets the service kind.
+     * 
+     * @return the service kind
+     */
+    public ServiceKind getKind() {
+        return kind;
+    }
+    
+    /**
+     * Returns whether this service is decentrally deployable.
+     * 
+     * @return {@code true} for deployable, {@code false} for not deployable 
+     */
+    public boolean isDeployable() {
+        return deployable;
     }
     
     /**
@@ -71,7 +101,7 @@ public abstract class AbstractYamlArtifact {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     /**
      * Defines the version of the service. [required by SnakeYaml]
      * 
@@ -80,5 +110,34 @@ public abstract class AbstractYamlArtifact {
     public void setVersion(Version version) {
         this.version = version;
     }
+
+    /**
+     * Defines the description of the service. [required by SnakeYaml]
+     * 
+     * @param description the description (<b>null</b> is ignored, default is empty)
+     */
+    public void setDescription(String description) {
+        if (null != description) {
+            this.description = description;
+        }
+    }
     
+    /**
+     * Sets whether this service is decentrally deployable.
+     * 
+     * @param deployable {@code true} for deployable, {@code false} for not deployable 
+     */
+    public void setDeployable(boolean deployable) {
+        this.deployable = deployable;
+    }
+    
+    /**
+     * Sets the service kind. [required by SnakeYaml]
+     * 
+     * @param kind the service kind
+     */
+    public void setKind(ServiceKind kind) {
+        this.kind = kind;
+    }
+
 }

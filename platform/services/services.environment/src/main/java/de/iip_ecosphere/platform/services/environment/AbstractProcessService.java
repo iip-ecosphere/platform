@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
     private ReceptionCallback<O> callback;
+    private YamlService serviceSpec;
     private PrintWriter serviceIn;
     private Process proc;
 
@@ -55,14 +57,15 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param inTrans the input translator
      * @param outTrans the output translator
      * @param callback called when data from the service is available
-     * @param yaml the service description 
+     * @param serviceSpec the service description 
      */
     protected AbstractProcessService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
-        ReceptionCallback<O> callback, YamlService yaml) {
-        super(yaml);
+        ReceptionCallback<O> callback, YamlService serviceSpec) {
+        super(serviceSpec);
         this.inTrans = inTrans;
         this.outTrans = outTrans;
         this.callback = callback;
+        this.serviceSpec = serviceSpec;
     }
     
     /**
@@ -73,6 +76,36 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      */
     public abstract void process(I data) throws IOException;
 
+    /**
+     * Returns the service specification.
+     * 
+     * @return the service specification
+     */
+    protected YamlService getServiceSpec() {
+        return serviceSpec;
+    }
+    
+    /**
+     * Returns the process specification within {@link #getServiceSpec()}.
+     * 
+     * @return the process specification, may be <b>null</b>
+     */
+    protected YamlProcess getProcessSpec() {
+        return null == serviceSpec ? null : serviceSpec.getProcess();
+    }
+    
+    /**
+     * Adds the command line arguments from {@code #getProcessSpec()} to {@code args}.
+     * 
+     * @param args the arguments to be modified as a side effect
+     */
+    protected void addProcessSpecCmdArg(List<String> args) {
+        YamlProcess pSpec = getProcessSpec();
+        if (null != pSpec && null != pSpec.getCmdArg()) {
+            args.addAll(pSpec.getCmdArg());
+        }            
+    }
+    
     /**
      * Returns the reception callback.
      * 
@@ -344,6 +377,39 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      */
     protected PrintWriter getServiceIn() {
         return serviceIn;
+    }
+    
+    /**
+     * Selects between {@code value} and {@code dflt}, if {@code value} is <b>null</b> use {@code dflt}, else 
+     * the value of {@code value}.  
+     * 
+     * @param <T> the value type
+     * @param value the primary value
+     * @param dflt the default value to use if {@code value} is <b>null</b>
+     * @return either {@code value} or {@code dflt}
+     */
+    protected static <T> T selectNotNull(T value, T dflt) {
+        T result = value;
+        if (null == result) {
+            result = dflt;
+        } 
+        return result;
+    }
+
+    /**
+     * Selects between a value of {@code object} determined by {@code valueFunc} and {@code dflt},  
+     * if {@code object} is <b>null</b> or the result of {@code valueFunc} is <b>null</b> use {@code dflt}, else 
+     * the value of {@code valueFunc}.
+     * 
+     * @param <O> the object type
+     * @param <T> the value type
+     * @param object the object to take the value from
+     * @param valueFunc the function to apply on {@code object}
+     * @param dflt the default value to use if {@code object} or the result of {@code valueFunc} is <b>null</b>
+     * @return either the result of {@code valueFunc} or {@code dflt}
+     */
+    protected static <O, T> T selectNotNull(O object, Function<O, T> valueFunc, T dflt) {
+        return selectNotNull(object != null ? valueFunc.apply(object) : null, dflt);
     }
 
 }
