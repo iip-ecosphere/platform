@@ -19,6 +19,7 @@ services:
       - channel: create-out-0
         id: intern
         type: String
+        service: simpleStream-log
         direction: OUT        
   - id: simpleStream-log
     name: log

@@ -21,6 +21,34 @@ transport:
     port: 8883
     user: user
     password: pwd
+binders:
+    properties:
+        internal:
+            type: amqpBinder
+            environment:
+                mqtt:
+                    host: localhost
+                    clientId: internal
+                    port: 8883
+                amqp:
+                    host: localhost
+                    user: user
+                    password: pwd
+                    clientId: internal
+                    port: 8883
+        external:
+            type: amqpBinder
+            environment:
+                mqtt:
+                    host: localhost
+                    clientId: external
+                    port: 8883
+                amqp:
+                    host: localhost
+                    user: user
+                    password: pwd
+                    clientId: external
+                    port: 8883
 logging:
     level:
         root: INFO
@@ -45,10 +73,38 @@ spring:
             bindings:
                 create-out-0:
                     destination: ingest
+                    binder: internal
                 log-in-0:
                     destination: ingest
-            defaultBinder: amqpBinder
-
+                    binder: internal
+            binders:
+                properties:
+                    internal:
+                        type: amqpBinder
+                        environment:
+                            mqtt:
+                                host: localhost
+                                clientId: internal
+                                port: 8883
+                            amqp:
+                                host: localhost
+                                clientId: internal
+                                user: user
+                                password: pwd
+                                port: 8883
+                    external:
+                        type: amqpBinder
+                        environment:
+                            mqtt:
+                                host: localhost
+                                clientId: external
+                                port: 8883
+                            amqp:
+                                host: localhost
+                                clientId: external
+                                user: user
+                                password: pwd
+                                port: 8883
 ---
 
 spring:
