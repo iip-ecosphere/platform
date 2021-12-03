@@ -84,6 +84,31 @@ template JavaMapping(Configuration config, FileArtifact target) {
         "transport.mqttv5";
     }
     
+        // convenience function
+    def binderName(IIPEcosphere config) {
+        binderName(config.transportProtocol);
+    }
+    
+    // dispatch base
+    def binderName(TransportProtocol proto) {
+        ''
+    }
+    
+    // dispatch base
+    def binderName(TransportProtocolAMQP proto) {
+        'amqpBinder'
+    }
+
+    // dispatch base
+    def binderName(TransportProtocolMQTTv3 proto) {
+        'mqttv3Binder' // depends on transportProtocolModule
+    }
+
+    // dispatch base
+    def binderName(TransportProtocolMQTTv5 proto) {
+        'mqttv5Binder' // depends on transportProtocolModule
+    }
+    
     // --------------------------------------------------------------
     
     def String serviceProtocolModulePrefix(IIPEcosphere cfg) {

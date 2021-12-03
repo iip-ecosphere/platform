@@ -1,4 +1,5 @@
 import JavaBasics;
+import JavaMapping;
 import SpringCloudStreamBasics;
 import MeshBasics;
 import EcsRuntimeDockerContainerManagerYaml;
@@ -80,32 +81,50 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
+    }
+    
+    // ----------------------------- creates a protocol setup --------------------------
+    
+    // what is the protocol host, if not global -> "localhost", else initially the global protocol host in the cfg
+    def protocolHost(TransportProtocol protocol, Boolean global) {
+        if (global) {
+            protocol.globalHost;
+        } else {
+            "localhost";
+        }
     } 
 
-    def protocolConfig(IIPEcosphere config) {
-        protocolConfig(config.transportProtocol);
+    // convenience function
+    def protocolConfig(IIPEcosphere config, Boolean global) {
+        protocolConfig(config.transportProtocol, global);
     }
 
-    def protocolConfig(TransportProtocol protocol) {
+    // dispatch base
+    def protocolConfig(TransportProtocol protocol, Boolean global) {
         ''
     }
 
-    def protocolConfig(TransportProtocolAMQP protocol) {
+    def protocolConfig(TransportProtocolAMQP protocol, Boolean global) {
         'amqp:
+            host: ${protocolHost(protocol, global)}
             port: ${protocol.port}
             user: ${protocol.user}
             password: ${protocol.password}'
     }
 
-    def protocolConfig(TransportProtocolMQTTv3 protocol) {
+    def protocolConfig(TransportProtocolMQTTv3 protocol, Boolean global) {
         'mqtt:
+            host: ${protocolHost(protocol, global)}
             port: ${protocol.port}'
     }
 
-    def protocolConfig(TransportProtocolMQTTv5 protocol) {
+    def protocolConfig(TransportProtocolMQTTv5 protocol, Boolean global) {
         'mqtt:
+            host: ${protocolHost(protocol, global)}
             port: ${protocol.port}'
     }
+    
+    // --------------------------- spring poller(s) ---------------------------------------------
     
     def poller(sequenceOf(MeshElement) nodes) {
         // until Spring Cloud Streams 3.1.1 there is no individual poll setting per source
@@ -136,10 +155,32 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
             src.pollInterval;
         }
     }
+    
+    // ------------------------------------- binders ------------------------------------
+    
+    // produce the official, but also our work-around binder structure
+    // internal binder is for internal, localhost communication
+    // external could be a global broker, that may dynamically be selected by the platform 
+    def produceBinders(IIPEcosphere config) {
+        String binder = binderName(config);
+        'binders:
+            properties:
+               internal:
+                   type: ${binder}
+                   environment:
+                       ${protocolConfig(config, false)}
+               external:
+                   type: ${binder}
+                   environment:
+                       ${protocolConfig(config, true)}'
+    }
+    
+    // ----------------------------------------- main -------------------------------------
  
     def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
-        '${protocolConfig(config)}'
+        '${protocolConfig(config, false)}'
         '${produceTransport(config)}'
+        '${produceBinders(config)}'
         'metricsprovider:
             schedulerrate: 3000
             memorybaseunit: kilobytes
@@ -164,7 +205,8 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     default:
                         contentType: application/iip
                     bindings:
-                        ${bindings(mappedMesh)}'
+                        ${bindings(mappedMesh)}
+                    ${produceBinders(config)}'
     }
 
 }

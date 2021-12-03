@@ -66,6 +66,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             '
             - channel: ${nextMeth}-in-0
               id: ${conn.name}
+              service: ${next.impl.id}
               direction: IN
               type: ${nextType}' <CR>;
         }
