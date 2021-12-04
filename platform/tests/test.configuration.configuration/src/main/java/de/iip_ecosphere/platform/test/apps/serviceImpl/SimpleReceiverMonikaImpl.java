@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.test.apps.serviceImpl;
 
 import java.io.File;
@@ -11,12 +23,17 @@ import java.time.LocalDate;
 
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.Rec1;
-import iip.interfaces.SimpleDataReceiverService;
+import iip.datatypes.Rec13;
+import iip.interfaces.SimpleDataReceiver3Service;
 
-public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements SimpleDataReceiverService{
-	
-	 /**
+/**
+ * A simple receiver implementation just printing out the received data.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements SimpleDataReceiver3Service {
+
+    /**
      * Fallback constructor.
      */
     public SimpleReceiverMonikaImpl() {
@@ -34,7 +51,7 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     }
 
     @Override
-    public void receiveRec1(Rec1 data) {
+    public void receiveRec13(Rec13 data) {
         System.out.println("TestApp03 RECEIVED " + data.getStringField() + " " + data.getIntField());
         
     	String fileName = "/testapp03_logs.txt";
@@ -50,8 +67,6 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     			e1.printStackTrace();
     		} 
     	}
-
-    	
     	// Appending data and miliseconds to the file. 
     	long timestamp = System.currentTimeMillis();
     	String date = LocalDate.now().toString();    	
@@ -66,8 +81,6 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-    }  	
-	
-	
+    }
+
 }
