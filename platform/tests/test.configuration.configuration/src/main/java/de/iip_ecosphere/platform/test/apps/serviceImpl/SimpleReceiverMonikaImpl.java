@@ -53,10 +53,9 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     @Override
     public void receiveRec13(Rec13 data) {
         System.out.println("TestApp03 RECEIVED " + data.getStringField() + " " + data.getIntField());
-        
-    	String fileName = "/testapp03_logs.txt";
-    	
-    	// Creating new file it there is none.
+            	
+    	// Creating new file
+        String fileName = System.getProperty("user.home") + "/testapp03_logs.txt";
     	File file = new File(fileName);
     	
     	if (Files.notExists(Paths.get(fileName))) {
@@ -81,6 +80,5 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
-
+    }    
 }
