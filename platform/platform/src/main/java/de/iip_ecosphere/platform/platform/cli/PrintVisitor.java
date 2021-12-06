@@ -8,6 +8,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepre
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
@@ -215,6 +216,10 @@ public class PrintVisitor implements AasVisitor {
             }
         }
         collectionLevel.pop();
+    }
+
+    @Override
+    public void visitDataElement(DataElement dataElement) {
     }
     
 }

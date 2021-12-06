@@ -4,6 +4,9 @@
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
+* Initial integration of KODEX as platform service for anonymization/pseudonymization.
+* Initial mapping of the AAS product name/typeplate into the AAS abstraction and the default BaSyx implementation.
+* Initial version of service execution with multiple brokers and data paths between multiple devices.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package
@@ -16,12 +19,11 @@
     * Generation of README.txt with brief explanations on the generated files and folders.
     * Fixed/extended qualified name access for OPC UA connector.
     * Automated instantiation of a one-process ECS runtime/service manager without container manager for devices with low resources.
-    * Platform instantiaton process without Java test execution (may fail depending on JDK/surefire combination).
+    * Platform instantiation process without Java test execution (may fail depending on JDK/surefire combination).
     * Initial integration of device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
     * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
     * Automatic build of demo containers on github, deployment to dockerhub.
     * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
-    * Initial integration of KODEX as platform service for anonymization/pseudonymization.
 * Planned improvements:
     * Python service execution environment
     * Integrated container management for Kubernetes
