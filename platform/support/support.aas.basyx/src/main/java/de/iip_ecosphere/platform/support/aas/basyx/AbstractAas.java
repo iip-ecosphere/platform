@@ -26,6 +26,8 @@ import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata.BaSyxTechnicalDataSubmodel;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel;
 
 /**
  * Abstract implementation of the {@link Aas} interface.
@@ -58,7 +60,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
      * 
      * @author Holger Eichelberger, SSE
      */
-    abstract static class BaSyxAbstractAasBuilder implements AasBuilder {
+    public abstract static class BaSyxAbstractAasBuilder implements AasBuilder {
         
         /**
          * Registers a sub-model.
@@ -255,4 +257,9 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 
+    @Override
+    public TechnicalDataSubmodel getTechnicalDataSubmodel() {
+        return (TechnicalDataSubmodel) getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT);
+    }
+    
 }

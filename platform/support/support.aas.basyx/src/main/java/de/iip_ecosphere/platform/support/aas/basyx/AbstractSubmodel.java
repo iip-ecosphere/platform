@@ -76,12 +76,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         LoggerFactory.getLogger(getClass()).warn(msg);
     }
     
-    /**
-     * Registers an operation.
-     * 
-     * @param operation the operation
-     * @return {@code operation}
-     */
+    @Override
     public BaSyxOperation register(BaSyxOperation operation) {
         String id = operation.getIdShort();
         if (operations.containsKey(id) || submodelElements.containsKey(id)) {
@@ -93,12 +88,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         return operation;
     }
     
-    /**
-     * Registers a property.
-     * 
-     * @param property the property
-     * @return {@code property}
-     */
+    @Override
     public BaSyxProperty register(BaSyxProperty property) {
         String id = property.getIdShort();
         if (properties.containsKey(id) || submodelElements.containsKey(id)) {
@@ -110,12 +100,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         return property;
     }
     
-    /**
-     * Registers a reference element.
-     * 
-     * @param reference the reference element
-     * @return {@code reference}
-     */
+    @Override
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
         String id = reference.getIdShort();
         if (submodelElements.containsKey(id)) {
@@ -140,6 +125,18 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         }
         submodelElements.put(id, collection);
         return collection;
+    }
+    
+    @Override
+    public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
+        BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
+        String id = dataElement.getIdShort();
+        if (dataElements.containsKey(id)) {
+            warn("There is already a data element with short id '" + id + "'. "
+                + "The data element may be redefined.");
+        }
+        dataElements.put(id, dataElement);
+        return dataElement;
     }
 
     @Override
@@ -311,7 +308,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
      * @param cls the builder type
      * @return the builder or <b>null</b> if no builder for {@code shortId} with the respective type is registered
      */
-    <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
+    public <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 

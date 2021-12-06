@@ -13,7 +13,10 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
@@ -70,26 +73,44 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * @param allowDuplicates whether the collection allows duplicates
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
-        BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
             String idShort, boolean ordered, boolean allowDuplicates) {
-            this.parentBuilder = parentBuilder;
-            this.instance = new BaSyxSubmodelElementCollection();
-            this.instance.elements = new HashMap<String, SubmodelElement>();
-            org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll = 
-                new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection();
-            coll.setIdShort(Tools.checkId(idShort));
-            coll.setOrdered(ordered);
-            coll.setAllowDuplicates(allowDuplicates);
-            this.collection = coll;
+            this(parentBuilder, idShort, () -> new BaSyxSubmodelElementCollection(), () -> {
+                org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll 
+                    = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection(); 
+                coll.setIdShort(Tools.checkId(idShort));
+                coll.setOrdered(ordered);
+                coll.setAllowDuplicates(allowDuplicates);
+                return coll;
+            });
         }
-        
+
+        /**
+         * Creates a sub-model element collection builder. The parent builder must be set by the calling
+         * constructor.
+         * 
+         * @param parentBuilder the parent builder
+         * @param idShort the short name of the sub-model element
+         * @param wCreator creates a wrapper instance, subclass of the containing class
+         * @param bCreator creates a BaSyx instance
+         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
+         */
+        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+            String idShort, Supplier<BaSyxSubmodelElementCollection> wCreator, 
+            Supplier<org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection> bCreator) {
+            this.parentBuilder = parentBuilder;
+            this.instance = wCreator.get();
+            this.instance.elements = new HashMap<String, SubmodelElement>();
+            this.collection = bCreator.get();
+        }
+
         /**
          * Creates an instance from an existing BaSyx instance.
          * 
          * @param parentBuilder the parent builder
          * @param instance the BaSyx instance
          */
-        BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
             BaSyxSubmodelElementCollection instance) {
             this.parentBuilder = parentBuilder;
             this.instance = instance;
@@ -101,6 +122,24 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
                     + instance.collection.getClass().getSimpleName());
             }
             this.instance.initialize();
+        }
+        
+        /**
+         * Returns the BaSyx collection created by this instance.
+         * 
+         * @return the collection
+         */
+        protected ISubmodelElementCollection getCollection() {
+            return collection;
+        }
+        
+        /**
+         * Returns the collection instance being created.
+         * 
+         * @return the collection instance
+         */
+        protected BaSyxSubmodelElementCollection getCollectionInstance() {
+            return instance;
         }
 
         @Override
@@ -142,26 +181,26 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
-        BaSyxOperation register(BaSyxOperation operation) {
+        protected BaSyxOperation register(BaSyxOperation operation) {
             this.collection.addSubmodelElement(operation.getSubmodelElement());
             return instance.register(operation);
         }
         
         @Override
-        BaSyxProperty register(BaSyxProperty property) {
+        protected BaSyxProperty register(BaSyxProperty property) {
             this.collection.addSubmodelElement(property.getSubmodelElement());
             BaSyxProperty p = instance.register(property);
             return p;
         }
 
         @Override
-        BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+        protected BaSyxReferenceElement register(BaSyxReferenceElement reference) {
             this.collection.addSubmodelElement(reference.getSubmodelElement());
             return instance.register(reference);
         }
 
         @Override
-        BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+        protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
             this.collection.addSubmodelElement(collection.getSubmodelElement());
             return instance.register(collection);
         }
@@ -221,7 +260,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     /**
      * Creates an instance. Prevents external creation.
      */
-    private BaSyxSubmodelElementCollection() {
+    protected BaSyxSubmodelElementCollection() {
     }
  
     /**
@@ -229,7 +268,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @param collection the collection instance
      */
-    BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
+    protected BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
         this.collection = collection;
     }
 
@@ -254,6 +293,74 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         initialize();
         return elements.values();
     }
+    
+    /**
+     * Returns an iterable of submodel elements complying to a given predicate.
+     * 
+     * @param filter the filter
+     * @return the iterable
+     */
+    protected Iterable<SubmodelElement> getElements(Predicate<SubmodelElement> filter) {
+        return new Iterable<SubmodelElement>() {
+            
+            @Override
+            public Iterator<SubmodelElement> iterator() {
+                return elements
+                    .values()
+                    .stream()
+                    .filter(filter)
+                    .iterator();
+            }
+        };
+    }
+    
+    /**
+     * Returns an iterable of submodel elements complying to a given predicate and a given target cast type.
+     * 
+     * @param <E> the type of submodel element
+     * @param filter the filter
+     * @param castType the type to filter for and cast to
+     * @return the iterable
+     */
+    protected <E extends SubmodelElement> Iterable<E> getElements(Predicate<SubmodelElement> filter, 
+        Class<E> castType) {
+        return new Iterable<E>() {
+            
+            @Override
+            public Iterator<E> iterator() {
+                return elements
+                    .values()
+                    .stream()
+                    .filter(e -> castType.isInstance(e))
+                    .filter(filter)
+                    .map(e -> castType.cast(e))
+                    .iterator();
+            }
+        };
+    }
+
+    /**
+     * Returns an iterable of submodel element collections complying to a given predicate.
+     * 
+     * @param filter the filter
+     * @return the iterable
+     */
+    protected Iterable<SubmodelElementCollection> getSubmodelElementCollections(
+        Predicate<SubmodelElementCollection> filter) {
+        return new Iterable<SubmodelElementCollection>() {
+            
+            @Override
+            public Iterator<SubmodelElementCollection> iterator() {
+                return elements
+                    .values()
+                    .stream()
+                    .filter(e -> e instanceof SubmodelElementCollection)
+                    .map(SubmodelElementCollection.class::cast)
+                    .filter(filter)
+                    .iterator();
+            }
+        };
+    }
 
     @Override
     public String getIdShort() {
@@ -261,7 +368,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
-    ISubmodelElementCollection getSubmodelElement() {
+    public ISubmodelElementCollection getSubmodelElement() {
         return collection;
     }
 
@@ -335,6 +442,13 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         elements.put(collection.getIdShort(), collection);
         return collection;
+    }
+    
+    @Override
+    public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
+        BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
+        elements.put(dataElement.getIdShort(),  dataElement);
+        return dataElement;
     }
 
     @Override

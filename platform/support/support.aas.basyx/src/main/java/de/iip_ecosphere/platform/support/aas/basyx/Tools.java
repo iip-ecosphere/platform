@@ -24,6 +24,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
+import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangString;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
@@ -296,6 +297,26 @@ public class Tools {
             LoggerFactory.getLogger(Tools.class).warn("Tomcat working directory '" + workDir.getAbsolutePath() 
                 + "' not found for disposal.");
         }
+    }
+    
+    /**
+     * Translates an AAS to a BaSyx lang string.
+     * 
+     * @param ls the AAS lang string
+     * @return the BaSyx lang string
+     */
+    public static LangString translate(de.iip_ecosphere.platform.support.aas.LangString ls) {
+        return new LangString(ls.getLanguage(), ls.getDescription());
+    }
+
+    /**
+     * Translates BaSyx lang string to an AAS lang string.
+     * 
+     * @param ls the BaSyx lang string
+     * @return the AAS lang string
+     */
+    public static de.iip_ecosphere.platform.support.aas.LangString translate(LangString ls) {
+        return new de.iip_ecosphere.platform.support.aas.LangString(ls.getLanguage(), ls.getDescription());
     }
 
 }

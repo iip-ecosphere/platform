@@ -38,12 +38,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class BaSyxSubmodelBuilder extends BaSyxSubmodelElementContainerBuilder
+    protected static class BaSyxSubmodelBuilder extends BaSyxSubmodelElementContainerBuilder
         <org.eclipse.basyx.submodel.metamodel.map.Submodel> implements SubmodelBuilder {
 
         private BaSyxAbstractAasBuilder parentBuilder;
         private BaSyxSubmodel instance;
-        private org.eclipse.basyx.submodel.metamodel.map.Submodel submodel;
         private boolean isNew = true;
 
         /**
@@ -67,23 +66,44 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
          * @param identifier the identifier of the model
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
-        BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort, IIdentifier identifier) {
+        protected BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort, IIdentifier identifier) {
+            this(parentBuilder);
+            org.eclipse.basyx.submodel.metamodel.map.Submodel sub 
+                = new org.eclipse.basyx.submodel.metamodel.map.Submodel(Tools.checkId(idShort), identifier);
+            setInstance(new BaSyxSubmodel(sub));
+        }
+
+        /**
+         * Creates an uninitialized instance, e.g., for delayed creation. Use 
+         * {@link #setInstance(BaSyxSubmodel, org.eclipse.basyx.submodel.metamodel.map.Submodel)}.
+         * 
+         * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
+         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
+         */
+        protected BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder) {
             this.parentBuilder = parentBuilder;
-            submodel = new org.eclipse.basyx.submodel.metamodel.map.Submodel(Tools.checkId(idShort), identifier);
-            instance = new BaSyxSubmodel(submodel);
-            instance.parent = null == parentBuilder ? null : parentBuilder.getSubmodelParent();
         }
         
         /**
          * Creates an instance from an existing BaSyx instance.
          * 
          * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
-         * @param instance the BaSyx instance
+         * @param instance the BaSyx instance wrapper
          */
-        BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, BaSyxSubmodel instance) {
+        protected BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, BaSyxSubmodel instance) {
             this.parentBuilder = parentBuilder;
             this.instance = instance;
             this.isNew = false;
+        }
+
+        /**
+         * Sets the instance.
+         * 
+         * @param instance the wrapped instance
+         */
+        protected void setInstance(BaSyxSubmodel instance) {
+            this.instance = instance;
+            instance.parent = null == parentBuilder ? null : parentBuilder.getSubmodelParent();
         }
 
         @Override
@@ -140,7 +160,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * 
      * @param subModel the sub-model instance
      */
-    private BaSyxSubmodel(org.eclipse.basyx.submodel.metamodel.map.Submodel subModel) {
+    protected BaSyxSubmodel(org.eclipse.basyx.submodel.metamodel.map.Submodel subModel) {
         super(subModel);
     }
     
@@ -150,7 +170,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * @param parent the parent instance
      * @param instance the BaSyx submodel instance
      */
-    BaSyxSubmodel(BaSyxSubmodelParent parent, org.eclipse.basyx.submodel.metamodel.map.Submodel instance) {
+    protected BaSyxSubmodel(BaSyxSubmodelParent parent, org.eclipse.basyx.submodel.metamodel.map.Submodel instance) {
         super(instance);
         this.parent = parent;
         BaSyxElementTranslator.registerSubmodelElements(instance.getSubmodelElements(), this);

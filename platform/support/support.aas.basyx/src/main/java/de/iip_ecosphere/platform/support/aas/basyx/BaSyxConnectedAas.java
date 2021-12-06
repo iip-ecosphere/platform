@@ -21,6 +21,8 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata.BaSyxTechnicalDataSubmodel;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 
 /**
  * Represents a connected AAS.
@@ -56,6 +58,11 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         @Override
         public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
             return instance.obtainSubmodelBuilder(this, idShort, identifier);
+        }
+        
+        @Override
+        public TechnicalDataSubmodelBuilder createTechnicalDataSubmodelBuilder(String identifier) {
+            return instance.obtainTechnicalDataSubmodelBuilder(this, identifier);
         }
         
         @Override
@@ -141,6 +148,33 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(builder, (BaSyxSubmodel) sub);
             } else { // connected
                 result = new BaSyxISubmodel.BaSyxISubmodelBuilder(builder, (BaSyxISubmodel) sub);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Obtains a sub-model builder.
+     *
+     * @param builder the AAS builder
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+     * @return the created sub-model builder
+     */
+    private TechnicalDataSubmodelBuilder obtainTechnicalDataSubmodelBuilder(BaSyxConnectedAasBuilder builder, 
+        String identifier) {
+        TechnicalDataSubmodelBuilder result = getDeferred(BaSyxTechnicalDataSubmodel.ID_SHORT, 
+            TechnicalDataSubmodelBuilder.class);
+        if (null == result) {
+            Submodel sub =  getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT);
+            if (null == sub) { // new here
+                result = new BaSyxTechnicalDataSubmodel.BaSyxTechnicalDataSubmodelBuilder(builder, identifier);
+            } else if (sub instanceof BaSyxSubmodel) { // after add
+                result = new BaSyxTechnicalDataSubmodel.BaSyxTechnicalDataSubmodelBuilder(builder, 
+                    (BaSyxTechnicalDataSubmodel) sub);
+            } else { // connected
+                throw new IllegalArgumentException("Technical data builders for deployed AAS "
+                    + "are currently not supported"); // preliminary
             }
         }
         return result;

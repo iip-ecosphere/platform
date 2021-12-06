@@ -32,7 +32,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
  * @param <S> the BaSyx type implementing the sub-model
  * @author Holger Eichelberger, SSE
  */
-abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel> implements SubmodelElementContainerBuilder {
+public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel> 
+    implements SubmodelElementContainerBuilder {
 
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
@@ -104,7 +105,7 @@ abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel> impleme
      * @param collection the collection
      * @return {@code collection}
      */
-    BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+    protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         if (null == getInstance().getSubmodelElementCollection(collection.getIdShort())) {
             getInstance().getSubmodel().addSubmodelElement(collection.getSubmodelElement());
             getInstance().register(collection);

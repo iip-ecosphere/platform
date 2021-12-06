@@ -143,7 +143,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
      * 
      * @param property the property
      */
-    BaSyxProperty(IProperty property) {
+    public BaSyxProperty(IProperty property) {
         this.property = property;
     }
 

@@ -25,6 +25,8 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
+import de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata.BaSyxTechnicalDataSubmodel;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 
 /**
  * Wraps a BaSyx AAS.
@@ -88,6 +90,22 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
                     result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, idShort, identifier);
                 } else { // no connected here
                     result = new BaSyxSubmodel.BaSyxSubmodelBuilder(this, (BaSyxSubmodel) sub);
+                }
+            }
+            return result;
+        }
+        
+        @Override
+        public TechnicalDataSubmodelBuilder createTechnicalDataSubmodelBuilder(String identifier) {
+            TechnicalDataSubmodelBuilder result = instance.getDeferred(BaSyxTechnicalDataSubmodel.ID_SHORT, 
+                TechnicalDataSubmodelBuilder.class);
+            if (null == result) {
+                Submodel sub =  instance.getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT);
+                if (null == instance.getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT)) {
+                    result = new BaSyxTechnicalDataSubmodel.BaSyxTechnicalDataSubmodelBuilder(this, identifier);
+                } else { // no connected here
+                    result = new BaSyxTechnicalDataSubmodel.BaSyxTechnicalDataSubmodelBuilder(this, 
+                        (BaSyxTechnicalDataSubmodel) sub);
                 }
             }
             return result;

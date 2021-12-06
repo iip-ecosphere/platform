@@ -19,6 +19,8 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 
 /**
  * Bridges between arbitrary BaSyx instances and instances of the IIP-Ecosphere AAS abstraction.
@@ -28,7 +30,7 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOpera
  * 
  * @author Holger Eichelberger, SSE
  */
-class BaSyxElementTranslator {
+public class BaSyxElementTranslator {
 
     /**
      * Something that can take over/register submodel elements.
@@ -68,6 +70,15 @@ class BaSyxElementTranslator {
          * @return {@code collection}
          */
         BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection);
+        
+        /**
+         * Registers a data element.
+         * 
+         * @param <D> the element type
+         * @param dataElement the element to register
+         * @return {@code dataElement}
+         */
+        <D extends DataElement> BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement);
 
     }
     
@@ -87,6 +98,8 @@ class BaSyxElementTranslator {
                 reg.register(new BaSyxReferenceElement((IReferenceElement) se));
             } else if (se instanceof ISubmodelElementCollection) {
                 reg.register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
+            } else if (se instanceof File) {
+                reg.register(new BaSyxFile((File) se));
             } // TODO else
         }        
     }
