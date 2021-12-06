@@ -43,7 +43,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class FakeSubmodelElementCollectionBuilder extends FakeSubmodelElementContainerBuilder 
+    protected static class FakeSubmodelElementCollectionBuilder extends FakeSubmodelElementContainerBuilder 
         implements SubmodelElementCollectionBuilder {
 
         private FakeSubmodelElementContainerBuilder parent;
@@ -58,10 +58,10 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
          * @param ordered whether the collection shall be ordered
          * @param allowDuplicates whether duplicates shall be allowed
          */
-        FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, String idShort, 
+        protected FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, String idShort, 
             boolean ordered, boolean allowDuplicates) { // fake, forget ordered, allowDuplicates
             this.parent = parent;
-            this.instance = new FakeSubmodelElementCollection(idShort);
+            this.instance = createInstance(idShort);
         }
 
         /**
@@ -70,13 +70,23 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
          * @param parent the parent builder
          * @param instance the instance
          */
-        FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, 
+        protected FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, 
             FakeSubmodelElementCollection instance) {
             this.parent = parent;
             this.instance = instance;
             this.isNew = false;
         }
         
+        /**
+         * Creates the instance.
+         * 
+         * @param idShort the short id
+         * @return the instance
+         */
+        protected FakeSubmodelElementCollection createInstance(String idShort) {
+            return new FakeSubmodelElementCollection(idShort);
+        }
+
         @Override
         public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
             boolean allowDuplicates) {
@@ -177,6 +187,15 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             sm.accept(visitor);
         }
         visitor.endSubmodelElementCollection(this);
+    }
+
+    /**
+     * Returns the elements.
+     *
+     * @return the elements
+     */
+    protected Map<String, SubmodelElement> elts() {
+        return elements;
     }
 
     @Override

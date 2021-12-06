@@ -96,6 +96,8 @@ public class LifecycleHandler {
     
     private static List<LifecycleDescriptor> descriptors;
     
+    // checkstyle: stop exception type check
+    
     /**
      * Calls {@link LifecycleDescriptor#startup(String[])} on all known descriptors.
      * 
@@ -104,11 +106,16 @@ public class LifecycleHandler {
     public static void startup(String[] args) {
         AtomicReference<String> pidFile = new AtomicReference<>();
         forEach(l -> {
-            LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
-                + " (" + l.priority() + ")");
-            l.startup(args);
-            if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
-                pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
+            try {
+                LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
+                    + " (" + l.priority() + ")");
+                l.startup(args);
+                if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
+                    pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
+                }
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(LifecycleHandler.class).error("Startup failure in " 
+                    + l.getClass().getName() + " with " + t.getMessage(), t);
             }
         }, false);
         String pidFileName = pidFile.get();
@@ -122,17 +129,25 @@ public class LifecycleHandler {
         }
         LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.");
     }
-
+    
     /**
      * Calls {@link LifecycleDescriptor#shutdown()} on all known descriptors.
      */
     public static void shutdown() {
         forEach(l -> {
-            LoggerFactory.getLogger(LifecycleHandler.class).info("Stopping " + l.getClass().getName() 
-                + " (" + l.priority() + ")");
-            l.shutdown();
+            try {            
+                LoggerFactory.getLogger(LifecycleHandler.class).info("Stopping " + l.getClass().getName() 
+                    + " (" + l.priority() + ")");
+                l.shutdown();
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(LifecycleHandler.class).error("Shutdown failure in " 
+                        + l.getClass().getName() + " with " + t.getMessage(), t);
+                
+            }
         }, true);
     }
+
+    // checkstyle: start exception type check
 
     /**
      * Collects and attaches the shutdown hooks of all known descriptors. 

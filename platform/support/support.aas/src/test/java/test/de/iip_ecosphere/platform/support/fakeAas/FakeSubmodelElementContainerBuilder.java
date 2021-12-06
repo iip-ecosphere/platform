@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
  * 
  * @author Holger Eichelberger, SSE
  */
-abstract class FakeSubmodelElementContainerBuilder implements SubmodelElementContainerBuilder {
+public abstract class FakeSubmodelElementContainerBuilder implements SubmodelElementContainerBuilder {
     
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {

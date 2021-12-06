@@ -110,4 +110,9 @@ public class AasPrintVisitor implements AasVisitor {
         decreaseIndentation();
     }
 
+    @Override
+    public void visitDataElement(DataElement dataElement) {
+        log("DATAELT " + dataElement.getIdShort());
+    }
+
 }

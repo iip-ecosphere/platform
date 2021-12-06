@@ -116,4 +116,11 @@ public interface AasVisitor {
      */
     public void endSubmodelElementCollection(SubmodelElementCollection collection);
 
+    /**
+     * Visits a data element.
+     * 
+     * @param dataElement the reference element
+     */
+    public void visitDataElement(DataElement dataElement);
+    
 }

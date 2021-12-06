@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.aas;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 
 /**
  * Represents an AAS.
@@ -65,6 +67,17 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
          *     work
          */
         public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind);
+        
+        /**
+         * Creates a builder for a technical data submodel.
+         * 
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+         * @return the builder
+         * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty; or if 
+         *   modification is not possible
+         */
+        public TechnicalDataSubmodelBuilder createTechnicalDataSubmodelBuilder(String identifier);
         
     }
     
@@ -132,5 +145,13 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
      * @param submodel the sub-model to delete
      */
     public void delete(Submodel submodel);
-    
+
+    /**
+     * Returns the technical data submodel.
+     * 
+     * @return the submodel if it was created via {@link AasBuilder#createTechnicalDataSubmodelBuilder(String)}, 
+     *     may be <b>null</b> if there is none
+     */
+    public TechnicalDataSubmodel getTechnicalDataSubmodel();
+
 }

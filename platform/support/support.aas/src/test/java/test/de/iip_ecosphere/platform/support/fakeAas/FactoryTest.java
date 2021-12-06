@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolDescriptor;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -226,6 +227,23 @@ public class FactoryTest {
         for (AssetKind k : AssetKind.values()) {
             Assert.assertNotNull(k);
         }
+    }
+
+    /**
+     * Tests the {@link LangString}.
+     */
+    @Test
+    public void langStringTest() {
+        LangString ls = new LangString("EN", "Desig");
+        Assert.assertEquals("EN", ls.getLanguage());
+        Assert.assertEquals("Desig", ls.getDescription());
+        Assert.assertTrue(ls.toString().length() > 0);
+        ls.hashCode(); // shall not be null but overflow
+        
+        LangString ls2 = new LangString("DE", "Desig");
+        Assert.assertFalse(ls.equals(ls2));
+        LangString ls3 = new LangString("EN", "Desig");
+        Assert.assertTrue(ls.equals(ls3));
     }
 
 }

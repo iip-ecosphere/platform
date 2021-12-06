@@ -132,6 +132,7 @@ public final class PidFile {
             StandardOpenOption.TRUNCATE_EXISTING)) {
             stream.write(Long.toString(pid).getBytes(StandardCharsets.UTF_8));
         }
+        LoggerFactory.getLogger(PidFile.class).info("Created PID file " + path);
 
         if (deleteOnExit) {
             addShutdownHook(path);

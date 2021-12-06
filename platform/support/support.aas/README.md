@@ -14,7 +14,8 @@ We apply the following principles (with links also in the package description of
  - The ``AasFactory`` provides top-level access, in particular to the ``AasBuilder``. Actual implementations such as for BaSyx are realized in own projects and hook themselves into via ``AasFactoryDescriptor`` and the Java Service Loader. So far, the factory just takes the "first" implementation. No resolution is implemented if multiple implementations are there (we will think about that when the case occurs).
  - Implementation-specific parts like VAB-based remote method accesses are (so far) not represented by the abstraction rather than provided by the specific implementation. However, the output of these supporting/creation methods shall plugin into the builder mechanism explained above.
  - Identifiers like URNs are stated as strings and, if adequate, shall be parsed by the respective implementation. Expected 
- - Optional TLS encryption based on keystores can be set up through respective methods of the factory.
+ - Optional TLS encryption based on keystores can be set up through respective methods of the factory. With a BaSyx implementation backend, the AAS registry will not be encrypted, while the AAS will be encrypted.
+ - Agreed and standardized AAS structures can be integrated into the AAS frontend. One example is the product nameplate (see [ZVEI specification](https://www.zvei.org/fileadmin/user_upload/Presse_und_Medien/Publikationen/2020/Dezember/Submodel_Templates_of_the_Asset_Administration_Shell/201117_I40_ZVEI_SG2_Submodel_Spec_ZVEI_Technical_Data_Version_1_1.pdf)).
  
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)

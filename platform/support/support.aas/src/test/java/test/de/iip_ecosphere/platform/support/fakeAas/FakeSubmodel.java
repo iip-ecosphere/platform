@@ -49,7 +49,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class FakeSubmodelBuilder extends FakeSubmodelElementContainerBuilder implements SubmodelBuilder {
+    protected static class FakeSubmodelBuilder extends FakeSubmodelElementContainerBuilder implements SubmodelBuilder {
 
         private FakeAasBuilder parent;
         private FakeSubmodel instance;
@@ -61,7 +61,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          * @param parent the parent builder
          * @param idShort the short id
          */
-        FakeSubmodelBuilder(FakeAasBuilder parent, String idShort) {
+        protected FakeSubmodelBuilder(FakeAasBuilder parent, String idShort) {
             this(parent, idShort, null);
         }
 
@@ -75,7 +75,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          */
         FakeSubmodelBuilder(FakeAasBuilder parent, String idShort, String identifier) {
             this.parent = parent;
-            this.instance = new FakeSubmodel(idShort);
+            this.instance = createInstance(idShort);
             this.instance.parent = null != parent ? parent.getInstance() : null;
         }
 
@@ -85,10 +85,20 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          * @param parent the parent
          * @param instance the instance
          */
-        FakeSubmodelBuilder(FakeAasBuilder parent, FakeSubmodel instance) {
+        public FakeSubmodelBuilder(FakeAasBuilder parent, FakeSubmodel instance) {
             this.parent = parent;
             this.instance = instance;
             this.isNew = false;
+        }
+        
+        /**
+         * Creates the instance.
+         * 
+         * @param idShort the short id
+         * @return the instance
+         */
+        protected FakeSubmodel createInstance(String idShort) {
+            return new FakeSubmodel(idShort);
         }
         
         @Override

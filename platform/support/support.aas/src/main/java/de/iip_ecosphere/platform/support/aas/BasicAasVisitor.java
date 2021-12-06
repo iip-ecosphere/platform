@@ -61,4 +61,8 @@ public class BasicAasVisitor implements AasVisitor {
     public void visitAsset(Asset asset) {
     }
 
+    @Override
+    public void visitDataElement(DataElement dataElement) {
+    }
+
 }
