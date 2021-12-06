@@ -29,7 +29,7 @@ import iip.interfaces.SimpleDataReceiver3Service;
 /**
  * A simple receiver implementation just printing out the received data.
  * 
- * @author Holger Eichelberger, SSE
+ * @author Monika Staciwa, SSE
  */
 public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements SimpleDataReceiver3Service {
 
@@ -39,12 +39,13 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     public SimpleReceiverMonikaImpl() {
         super(ServiceKind.SINK_SERVICE);
     }
-    
+
     /**
      * Creates a service instance from a service id and a YAML artifact.
      * 
      * @param serviceId the service id
-     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     * @param ymlFile   the YML file containing the YAML artifact with the service
+     *                  descriptor
      */
     public SimpleReceiverMonikaImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
@@ -53,32 +54,29 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     @Override
     public void receiveRec13(Rec13 data) {
         System.out.println("TestApp03 RECEIVED " + data.getStringField() + " " + data.getIntField());
-            	
-    	// Creating new file
+
+        // Creating new file
         String fileName = System.getProperty("user.home") + "/testapp03_logs.txt";
-    	File file = new File(fileName);
-    	
-    	if (Files.notExists(Paths.get(fileName))) {
-        	try {
-    			file.createNewFile();
-    			FileOutputStream oFile = new FileOutputStream(file, false); 
-    		} catch (IOException e1) {
-    			e1.printStackTrace();
-    		} 
-    	}
-    	// Appending data and miliseconds to the file. 
-    	long timestamp = System.currentTimeMillis();
-    	String date = LocalDate.now().toString();    	
-    	String contentToAppend = "\nReceivered data on: " + date + ", " + String.valueOf(timestamp);
-    	
-	    try {
-			Files.write(
-			  Paths.get(fileName), 
-			  contentToAppend.getBytes(), 
-			  StandardOpenOption.APPEND);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }    
+        File file = new File(fileName);
+
+        if (Files.notExists(Paths.get(fileName))) {
+            try {
+                file.createNewFile();
+                FileOutputStream oFile = new FileOutputStream(file, false);
+                oFile.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        // Appending data and miliseconds to the file.
+        long timestamp = System.currentTimeMillis();
+        String date = LocalDate.now().toString();
+        String contentToAppend = "\nReceivered data on: " + date + ", " + String.valueOf(timestamp);
+
+        try {
+            Files.write(Paths.get(fileName), contentToAppend.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
