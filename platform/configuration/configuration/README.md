@@ -39,6 +39,10 @@ containerImageStorage:
   
 ```
 
+## hint
+
+For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
+
 ## missing
 
 - variability model: resources, resource assignment to ServiceMeshes
