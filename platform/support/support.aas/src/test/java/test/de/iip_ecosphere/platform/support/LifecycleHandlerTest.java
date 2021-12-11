@@ -39,6 +39,17 @@ public class LifecycleHandlerTest {
     private static int countDescriptors = 0;
 
     /**
+     * Changes the command line arguments used in {@link LcDesc1} and {@link LcDesc2} for asserting expected
+     * command line arguments. May be used by other tests if {@link LcDesc1} or {@link LcDesc2} are linked into
+     * the test execution via 
+     * 
+     * @param args the command line arguments to use for assertions
+     */
+    public static void setCmdArgs(String[] args) {
+        cmdArgs = args;
+    }
+    
+    /**
      * A test handler without shutdown hook.
      * 
      * @author Holger Eichelberger, SSE
@@ -117,7 +128,7 @@ public class LifecycleHandlerTest {
      */
     @Test
     public void testLifecycleHandler() {
-        cmdArgs = new String[] {"arg1", "arg2"};
+        setCmdArgs(new String[] {"arg1", "arg2"});
         startupCount = 0;
         shutdownCount = 0;
         shutdownHookCount = 0;

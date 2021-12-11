@@ -287,10 +287,10 @@ public class LifecycleHandler {
     /**
      * Returns the command line arguments as originally passed to the {@link LifecycleHandler}.
      * 
-     * @return the command line arguments
+     * @return the command line arguments (may be <b>null</b> for none)
      */
     public static String[] getCmdArgs() {
-        return cmdArgs.clone();
+        return null == cmdArgs ? null : cmdArgs.clone();
     }
 
 }
