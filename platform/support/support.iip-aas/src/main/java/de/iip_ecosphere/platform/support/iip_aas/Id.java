@@ -17,10 +17,13 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
+import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.LifecycleHandler;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Generic IDs for different purposes. For now, the IDs are determined upon startup, but they may be also determined
@@ -40,40 +43,45 @@ public class Id {
     private static final String DEVICE_IP_AAS;
     
     static {
+        IdProvider provider;
+        Optional<IdProviderDescriptor> desc = ServiceLoaderUtils.findFirst(IdProviderDescriptor.class);
+        if (desc.isPresent()) {
+            provider = desc.get().createProvider();
+        } else {
+            provider = new MacIdProvider(); // fallback
+        }
+        String deviceId = null;
         String hostName = null;
-        String macAddress = null;
         String ip = null;
         try {
             InetAddress localHost = InetAddress.getLocalHost();
-            NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-            if (ni == null) { // Ubuntu :(
-                // https://stackoverflow.com/questions/23900172/how-to-get-localhost-network-interface-in-java-or-scala
-                Enumeration<NetworkInterface> ne = NetworkInterface.getNetworkInterfaces();
-                while (ne.hasMoreElements()) {
-                    ni = ne.nextElement();
-                    break;
-                }
-            }
-            if (null != ni) {
-                byte[] hardwareAddress = ni.getHardwareAddress();
-                String[] hexadecimal = new String[hardwareAddress.length];
-                for (int i = 0; i < hardwareAddress.length; i++) {
-                    hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
-                }
-                macAddress = String.join("", hexadecimal);
-            } else {
-                macAddress = JVM_NAME;    
-            }
             hostName = localHost.getHostName();
             ip = localHost.getHostAddress();
         } catch (IOException e) {
             LoggerFactory.getLogger(Id.class).error("Obtaining device ID: " + e.getMessage());
             hostName = JVM_NAME;
-            macAddress = JVM_NAME;
             ip = "";
         }
-        DEVICE_ID = macAddress;
-        DEVICE_ID_AAS = fixId(macAddress);
+        String providerName = "?";
+        if (provider.allowsConsoleOverride() && null != LifecycleHandler.getCmdArgs()) {
+            String overrideId = CmdLine.getArg(LifecycleHandler.getCmdArgs(), IdProvider.ID_PARAM_NAME, null);
+            if (null != overrideId) {
+                deviceId = overrideId;
+                providerName = "command line";
+            }
+        }
+        if (null == deviceId) {
+            deviceId = provider.provideId();
+            providerName = provider.getClass().getName();
+        }
+        if (null == deviceId) {
+            deviceId = JVM_NAME;
+            providerName = "fallback";
+        }
+        LoggerFactory.getLogger(Id.class).info("USING id " + deviceId + " from " + providerName);
+        
+        DEVICE_ID = deviceId;
+        DEVICE_ID_AAS = fixId(deviceId);
         DEVICE_NAME = hostName;
         DEVICE_NAME_AAS = fixId(hostName);
         DEVICE_IP = ip;
