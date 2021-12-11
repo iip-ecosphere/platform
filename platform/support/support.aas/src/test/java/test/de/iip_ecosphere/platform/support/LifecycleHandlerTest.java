@@ -133,6 +133,7 @@ public class LifecycleHandlerTest {
         LifecycleHandler.attachShutdownHooks();
         Assert.assertEquals(2, shutdownHookCount);
         LifecycleHandler.startup(cmdArgs);
+        Assert.assertArrayEquals(cmdArgs, LifecycleHandler.getCmdArgs());
         Assert.assertEquals(2, startupCount);
         LifecycleHandler.shutdown();
         Assert.assertEquals(2, shutdownCount);

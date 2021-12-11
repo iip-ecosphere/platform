@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
  */
 public class LifecycleHandler {
 
+    private static String[] cmdArgs;
+    
     /**
      * Default main program performing the steps, i.e., {@link LifecycleHandler#attachShutdownHooks()}, 
      * {@link LifecycleHandler#startup(String[])} and {@link LifecycleHandler#shutdown()} assuming
@@ -104,6 +106,7 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
+        cmdArgs = args.clone();
         AtomicReference<String> pidFile = new AtomicReference<>();
         forEach(l -> {
             try {
@@ -279,6 +282,15 @@ public class LifecycleHandler {
             .filter(d -> cls.isInstance(d))
             .map(d -> cls.cast(d))
             .findAny();
+    }
+    
+    /**
+     * Returns the command line arguments as originally passed to the {@link LifecycleHandler}.
+     * 
+     * @return the command line arguments
+     */
+    public static String[] getCmdArgs() {
+        return cmdArgs.clone();
     }
 
 }
