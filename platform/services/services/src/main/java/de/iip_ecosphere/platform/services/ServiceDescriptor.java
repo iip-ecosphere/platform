@@ -113,16 +113,28 @@ public interface ServiceDescriptor {
     /**
      * Returns all (asynchronous) input connectors into this service.
      * 
-     * @return all input channels
+     * @return all input channels, may contain other-sided connectors where 
+     *     {@link TypedDataConnectorDescriptor#getService()} is not {@link #getId()}
      */
     public List<TypedDataConnectorDescriptor> getInputDataConnectors();
 
     /**
      * Returns all (asynchronous) output connectors from this service.
      * 
-     * @return all input channels
+     * @return all input channels, may contain other-sided connectors where 
+     *     {@link TypedDataConnectorDescriptor#getService()} is not {@link #getId()}
      */
     public List<TypedDataConnectorDescriptor> getOutputDataConnectors();
+
+    /**
+     * Returns all (asynchronous) connectors from this service.
+     * 
+     * @return all channels, may contain other-sided connectors where 
+     *     {@link TypedDataConnectorDescriptor#getService()} is not {@link #getId()}
+     * @see #getInputDataConnectors()
+     * @see #getOutputDataConnectors()
+     */
+    public List<TypedDataConnectorDescriptor> getDataConnectors();
 
     /**
      * Returns the invocables creator of this services, e.g., to connect metrics access from an AAS via this creator.

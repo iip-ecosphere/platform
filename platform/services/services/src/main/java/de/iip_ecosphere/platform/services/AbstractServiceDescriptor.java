@@ -185,6 +185,14 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         return Collections.unmodifiableList(output); 
     }
     
+    @Override
+    public List<TypedDataConnectorDescriptor> getDataConnectors() {
+        List<TypedDataConnectorDescriptor> result = new ArrayList<>();
+        result.addAll(input);
+        result.addAll(output);
+        return result; 
+    }
+    
     /**
      * Returns a service stub to control the service when it is running.
      *  

@@ -156,7 +156,19 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     protected static final boolean isValidId(String id) {
         return null != id && id.length() > 0;
     }
-    
+
+    /**
+     * Returns whether the given {@code id} is structurally valid, i.e., not <b>null</b> and not empty, but not 
+     * {@code butId}.
+     * 
+     * @param id the id to check
+     * @param butId the id to exclude
+     * @return {@code true} if {@code id} is valid, {@code false} else
+     */
+    protected static final boolean isValidIdBut(String id, String butId) {
+        return isValidId(id) && !id.equals(butId);
+    }
+
     /**
      * Checks the given {@code id} for basic validity.
      * 
@@ -460,6 +472,56 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         }
         return result;
     }
+    
+    /**
+     * Wraps a {@link TypedDataConnectorDescriptor} to adjust the service (depending from the direction of 
+     * traversal/creation).
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TypedDataConnection implements TypedDataConnectorDescriptor {
+        
+        private TypedDataConnectorDescriptor connector;
+        private String service;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param connector the connector to be wrapped
+         * @param service the service id to override the service id in {@code connector}, may be <b>null</b> for the 
+         *     result of {@link TypedDataConnectorDescriptor#getService()}
+         */
+        public TypedDataConnection(TypedDataConnectorDescriptor connector, String service) {
+            this.connector = connector;
+            this.service = service;
+        }
+        
+        @Override
+        public String getName() {
+            return connector.getName();
+        }
+        
+        @Override
+        public String getService() {
+            return null == service ? connector.getService() : service;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return connector.getType();
+        }
+
+        @Override
+        public String getDescription() {
+            return connector.getDescription();
+        }
+
+        @Override
+        public String getId() {
+            return connector.getId();
+        }
+        
+    }
 
     /**
      * Determines the external connections of the given services.
@@ -468,9 +530,9 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      * @param serviceIds the services to determine the arguments for
      * @return the external connections
      */
-    public static Set<TypedDataConnectorDescriptor> determineExternalConnections(ServiceManager mgr, 
+    public static Set<TypedDataConnection> determineExternalConnections(ServiceManager mgr, 
         String... serviceIds) {
-        Set<TypedDataConnectorDescriptor> result = new HashSet<TypedDataConnectorDescriptor>();
+        Set<TypedDataConnection> result = new HashSet<TypedDataConnection>();
         Set<String> ids = CollectionUtils.addAll(new HashSet<>(), serviceIds);
         
         // collect artifacts, determine outgoing connections
@@ -479,9 +541,9 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             ServiceDescriptor service = mgr.getService(id);
             if (null != service) {
                 artifacts.add(service.getArtifact());
-                for (TypedDataConnectorDescriptor c: service.getOutputDataConnectors()) {
-                    if (isValidId(c.getService()) && !containsIdSafe(ids, c.getService())) {
-                        result.add(c);
+                for (TypedDataConnectorDescriptor c: service.getDataConnectors()) {
+                    if (isValidIdBut(c.getService(), id) && !containsIdSafe(ids, c.getService())) {
+                        result.add(new TypedDataConnection(c, null));
                     }
                 }
             }
@@ -492,9 +554,9 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         for (ArtifactDescriptor a : artifacts) {
             for (ServiceDescriptor s: a.getServices()) {
                 if (!containsIdSafe(ids, s.getId())) { // no connections within the given serviceIds
-                    for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
-                        if (containsIdSafe(ids, c.getService())) {
-                            result.add(c);
+                    for (TypedDataConnectorDescriptor c: s.getDataConnectors()) {
+                        if (!s.getId().equals(c.getService()) && containsIdSafe(ids, c.getService())) {
+                            result.add(new TypedDataConnection(c, s.getId()));
                         }
                     }
                 }

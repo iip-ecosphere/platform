@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
+import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactory;
@@ -120,7 +121,7 @@ public class ServiceManagerTest {
         // service_0 - conn-1 -> service_1 -conn-2-> service_2
         //                                 -conn-3-> service_3
         
-        Set<TypedDataConnectorDescriptor> conn = AbstractServiceManager.determineExternalConnections(mgr);
+        Set<TypedDataConnection> conn = AbstractServiceManager.determineExternalConnections(mgr);
         assertContains(conn);
         
         conn = AbstractServiceManager.determineExternalConnections(mgr, "service_0");
@@ -146,7 +147,7 @@ public class ServiceManagerTest {
      * @param conn the connect to check the ids for
      * @param cIds the connection ids to assert for
      */
-    private static void assertContains(Set<TypedDataConnectorDescriptor> conn, String... cIds) {
+    private static void assertContains(Set<TypedDataConnection> conn, String... cIds) {
         Assert.assertTrue(null != conn && conn.size() == cIds.length);
         if (cIds.length > 0) {
             Set<String> expected = CollectionUtils.addAll(new HashSet<String>(), cIds);
