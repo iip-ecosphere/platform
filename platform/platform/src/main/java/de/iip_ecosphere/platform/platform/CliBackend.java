@@ -50,12 +50,12 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 
 /**
- * The low-level part of the command line interface providing initial platform functionality through the various AAS.
+ * The backend part of the command line interface providing initial platform functionality through the various AAS.
  * Just initial rather than all potential commands are provided.
  * 
  * @author Holger Eichelberger, SSE
  */
-class CliFunctions {
+class CliBackend {
 
     public static final Consumer<String> DEFAULT_ERROR_CONSUMER = s -> { };
     private static ServicesClientFactory servicesFactory = ServicesClientFactory.DEFAULT;

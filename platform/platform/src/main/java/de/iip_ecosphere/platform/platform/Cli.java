@@ -34,7 +34,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Cli extends CliFunctions {
+public class Cli extends CliBackend {
 
     /**
      * The command line main function.
