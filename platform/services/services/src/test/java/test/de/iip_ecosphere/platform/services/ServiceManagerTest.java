@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -242,7 +243,7 @@ public class ServiceManagerTest {
         // one service to sort, no internal services
         MyServiceDescriptor s1 = new MyServiceDescriptor("s1", "s1", "", null);
         services.add(s1);
-        new MyArtifactDescriptor("a1", "a1", services);
+        new MyArtifactDescriptor("a1", "a1", new File("a1.jar").toURI(), services);
         result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertList(result, s1);
         av.assertTested();
@@ -253,7 +254,7 @@ public class ServiceManagerTest {
         MyServiceDescriptor s2 = new MyServiceDescriptor("s2", "s2", "", null);
         services.add(s1);
         services.add(s2);
-        new MyArtifactDescriptor("a1", "a1", services);
+        new MyArtifactDescriptor("a1", "a1", new File("a1.jar").toURI(), services);
         result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
         assertCollection(result, s1, s2);
         av.assertTested();
@@ -264,7 +265,7 @@ public class ServiceManagerTest {
      * java.util.function.Predicate)} with other services.
      */
     @Test
-    public void testSortByDependency() {
+    public void testSortByDependency() throws URISyntaxException {
         AvailableTrue av = new AvailableTrue();
         List<MyServiceDescriptor> services = new ArrayList<MyServiceDescriptor>();
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
@@ -275,7 +276,7 @@ public class ServiceManagerTest {
         s12.addInputDataConnector(new MyTypedDataConnectorDescriptor("input", "input", "", Integer.class, null));
         localServices.add(s11);
         localServices.add(s12);
-        new MyArtifactDescriptor("a1", "a1", localServices);
+        new MyArtifactDescriptor("a1", "a1", new File("a1.jar").toURI(), localServices);
 
         // s1.1 -> s2.1 -> s2.2 -> s1.2 
         MyServiceDescriptor s21 = new MyServiceDescriptor("s2.1", "s2.2", "", null);
@@ -286,7 +287,7 @@ public class ServiceManagerTest {
         s22.addOutputDataConnector(new MyTypedDataConnectorDescriptor("output", "output", "", Integer.class, "s1.2"));
         services.add(s21);
         services.add(s22);
-        new MyArtifactDescriptor("a2", "a2", services);
+        new MyArtifactDescriptor("a2", "a2", new File("a2.jar").toURI(), services);
         localServices.addAll(services);
         
         List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av, false);
@@ -311,9 +312,11 @@ public class ServiceManagerTest {
     /**
      * Tests for {@link AbstractServiceManager#sortByDependency(List, java.util.Collection, 
      * java.util.function.Predicate)} for ensembles.
+     * 
+     * @throws URISyntaxException shall not occur
      */
     @Test
-    public void testSortByDependencyEnsemble() {
+    public void testSortByDependencyEnsemble() throws URISyntaxException {
         AvailableTrue av = new AvailableTrue();
         List<MyServiceDescriptor> services = new ArrayList<MyServiceDescriptor>();
         List<MyServiceDescriptor> localServices = new ArrayList<MyServiceDescriptor>();
@@ -340,7 +343,7 @@ public class ServiceManagerTest {
         s22.setEnsembleLeader(s21);
         services.add(s21);
         services.add(s22);
-        new MyArtifactDescriptor("a", "a", services);
+        new MyArtifactDescriptor("a", "a", new File("a.jar").toURI(), services);
         localServices.addAll(services);
         
         List<MyServiceDescriptor> result = AbstractServiceManager.sortByDependency(services, localServices, av, false);

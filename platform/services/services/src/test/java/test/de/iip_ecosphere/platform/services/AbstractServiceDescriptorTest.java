@@ -1,5 +1,6 @@
 package test.de.iip_ecosphere.platform.services;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class AbstractServiceDescriptorTest {
         services.add(s23);
 
         // artifact needed as common structure to identify related services
-        new MyArtifactDescriptor("a", "a", services);
+        new MyArtifactDescriptor("a", "a", new File("a.jar").toURI(), services);
         
         assertCollection(AbstractServiceDescriptor.ensemble(s0), s0);
         assertCollection(AbstractServiceDescriptor.ensemble(s11), s11, s12);
@@ -115,7 +116,7 @@ public class AbstractServiceDescriptorTest {
         services.add(s23);
 
         // artifact needed as common structure to identify related services
-        new MyArtifactDescriptor("a", "a", services);
+        new MyArtifactDescriptor("a", "a", new File("a.jar").toURI(), services);
 
         assertCollection(AbstractServiceDescriptor.ensembleConnectorNames(s0)); // none
         assertCollection(AbstractServiceDescriptor.ensembleConnectorNames(s11), "int1");

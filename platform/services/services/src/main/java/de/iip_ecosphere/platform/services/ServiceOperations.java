@@ -70,7 +70,7 @@ public interface ServiceOperations {
      * {@link ServiceState#UNDEPLOYING} and ultimately the service(s) shall be removed and their descriptors (including 
      * the artifact descriptor) shall not be available anymore.
      * 
-     * @param artifactId the id of the artifact to remove
+     * @param artifactId the id of the artifact to remove, or as fallback the canonical URI of the artifact
      * @throws ExecutionException if removing the service fails, e.g., because it is still running
      */
     public void removeArtifact(String artifactId) throws ExecutionException;

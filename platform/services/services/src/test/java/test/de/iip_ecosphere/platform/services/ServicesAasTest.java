@@ -167,6 +167,7 @@ public class ServicesAasTest {
 
         Assert.assertEquals(aId, aDesc.getId());
         Assert.assertTrue(aDesc.getName().length() > 0);
+        Assert.assertNotNull(aDesc.getUri());
         Assert.assertTrue(aDesc.getServiceIds().size() > 0);
         List<String> sIds = CollectionUtils.toList(aDesc.getServiceIds().iterator());
         String sId = sIds.get(0);

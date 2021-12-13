@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
 
     private String id;
     private String name;
+    private URI uri;
     private Map<String, S> services = Collections.synchronizedMap(new HashMap<>());
     
     /**
@@ -36,11 +38,13 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
      * 
      * @param id the artifact id
      * @param name the (file) name
+     * @param uri the URI the artifact was loaded from
      * @param services the contained services
      */
-    protected AbstractArtifactDescriptor(String id, String name, List<S> services) {
+    protected AbstractArtifactDescriptor(String id, String name, URI uri, List<S> services) {
         this.id = id;
         this.name = name;
+        this.uri = null == uri ? null : uri.normalize();
         this.services = createMapping(services);
     }
     
@@ -67,6 +71,11 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public URI getUri() {
+        return uri;
     }
 
     @Override

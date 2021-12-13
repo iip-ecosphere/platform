@@ -19,9 +19,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
@@ -125,6 +128,16 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     @Override
     public void removeArtifact(String artifactId) throws ExecutionException {
         checkId(artifactId, "artifactId");
+        if (!artifacts.containsKey(artifactId)) {
+            final String aId = artifactId;
+            Optional<A> fallback = artifacts.values()
+                .stream()
+                .filter(a -> aId.equals(a.getUri().toString()))
+                .findAny();
+            if (fallback.isPresent()) {
+                artifactId = fallback.get().getId();
+            }
+        }
         if (!artifacts.containsKey(artifactId)) {
             throw new ExecutionException("Artifact id '" + artifactId 
                 + "' is not known. Cannot remove artifact.", null);
@@ -404,6 +417,8 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                             if (ok) {
                                 avail.add(outName);
                             } else {
+                                LoggerFactory.getLogger(AbstractServiceManager.class).warn("Service prerequisite " 
+                                    + out + " not available from service " + sd.getId());
                                 break;
                             }
                         }             

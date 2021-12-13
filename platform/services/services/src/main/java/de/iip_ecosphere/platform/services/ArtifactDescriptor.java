@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
 
@@ -42,6 +43,13 @@ public interface ArtifactDescriptor {
      * @return the ids
      */
     public Set<String> getServiceIds();
+    
+    /**
+     * Returns the URI the artifact was loaded from.
+     * 
+     * @return the URI
+     */
+    public URI getUri();
     
     /**
      * Returns the services provided by the artifact independent of their state.

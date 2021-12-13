@@ -89,7 +89,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
             services.add(setupData(sd3));
             services.add(setupData(sd4));
         }
-        super.addArtifact(aId, new MyArtifactDescriptor(aId, text, services));
+        super.addArtifact(aId, new MyArtifactDescriptor(aId, text, location, services));
         return aId;
     }
     

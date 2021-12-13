@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services;
 
+import java.net.URI;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.AbstractArtifactDescriptor;
@@ -28,10 +29,11 @@ public class MyArtifactDescriptor extends AbstractArtifactDescriptor<MyServiceDe
      * 
      * @param id the artifact id
      * @param name the (file) name
+     * @param uri the URI the artifact was loaded from
      * @param services the contained services
      */
-    MyArtifactDescriptor(String id, String name, List<MyServiceDescriptor> services) {
-        super(id, name, services);
+    MyArtifactDescriptor(String id, String name, URI uri, List<MyServiceDescriptor> services) {
+        super(id, name, uri, services);
     }
 
 }
