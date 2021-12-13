@@ -15,9 +15,11 @@ package de.iip_ecosphere.platform.ecsRuntime.ssh;
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.support.Server;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.shell.ProcessShellFactory;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,24 +56,30 @@ public class RemoteAccessServer implements Server {
     @Override
     public Server start() {
         if (server != null && server.isStarted()) {
-            throw new RuntimeException("Server already started");
-        }
-
-        server = org.apache.sshd.server.SshServer.setUpDefaultServer();
-        server.setHost(SSH_HOST);
-        server.setPort(SSH_PORT);
-        server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("file.ser").toPath()));
-        server.setPasswordAuthenticator((username, password, session)
-                -> credentialsManager.authenticate(username, password));
-        // only works for Linux-like environments
-        server.setShellFactory(new ProcessShellFactory("/bin/sh -i -l", "/bin/sh", "-i", "-l"));
-        try {
-            server.start();
-            this.started = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            server = null;
-            return null;
+            server = org.apache.sshd.server.SshServer.setUpDefaultServer();
+            server.setHost(SSH_HOST);
+            server.setPort(SSH_PORT);
+            server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("file.ser").toPath()));
+            server.setPasswordAuthenticator((username, password, session)
+                    -> credentialsManager.authenticate(username, password));
+            // only works for Linux-like environments
+            if (SystemUtils.IS_OS_WINDOWS) {
+                LoggerFactory.getLogger(RemoteAccessServer.class).error("Cannot start Device Management SSH "
+                    + "server on Windows.");
+                server = null;
+                return null;
+            } else {
+                server.setShellFactory(new ProcessShellFactory("/bin/sh -i -l", "/bin/sh", "-i", "-l"));
+                try {
+                    server.start();
+                    this.started = true;
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(RemoteAccessServer.class).error("Cannot start Device Management "
+                        + "SSH server: " + e.getMessage());
+                    server = null;
+                    return null;
+                }
+            }
         }
         return this;
     }
@@ -88,7 +96,8 @@ public class RemoteAccessServer implements Server {
                 this.server.stop(immediately);
                 this.started = false;
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger(RemoteAccessServer.class).error("Stopping Device Management "
+                    + "SSH server: " + e.getMessage());
             }
         }
     }
