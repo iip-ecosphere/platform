@@ -35,6 +35,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
         
         XmlElement dep = new XmlElement(project, "dependencies");
+        appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
+        appendDependency(dep, "org.apache.logging.log4j", "log4j-core", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
         // TURN THIS INTO XML
