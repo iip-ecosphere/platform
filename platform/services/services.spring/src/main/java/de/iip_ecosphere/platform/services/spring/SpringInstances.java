@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.services.ServiceFactory;
  * 
  * @author Holger Eichelberger, SSE
  */
-class SpringInstances {
+public class SpringInstances {
 
     private static AppDeployer deployer;
     
@@ -61,7 +61,7 @@ class SpringInstances {
      * 
      * @param cfg the configuration instance
      */
-    static void setConfig(SpringCloudServiceSetup cfg) {
+    public static void setConfig(SpringCloudServiceSetup cfg) {
         config = cfg;
         ServiceFactory.setAasSetup(cfg.getAas());
     }
