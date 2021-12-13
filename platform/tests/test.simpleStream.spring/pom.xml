@@ -18,6 +18,12 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
     </dependency>
+<!--  -->    
+    <dependency> <!-- override due to CVE-2021-44228 -->
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>    
+      <version>2.15.0</version><!--$NO-MVN-MAN-VER$-->
+    </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>transport</artifactId>
