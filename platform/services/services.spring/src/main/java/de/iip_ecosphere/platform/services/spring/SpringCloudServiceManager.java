@@ -127,7 +127,7 @@ public class SpringCloudServiceManager
                 throwExecutionException("Adding " + location, "Problems in descriptor:\n" + val.getMessages());
             }
             SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
-                yamlArtifact, jarFile);
+                yamlArtifact, location, jarFile);
             return super.addArtifact(artifact.getId(), artifact);
         } catch (IOException e) {
             throwExecutionException("Adding " + location, e);
@@ -249,7 +249,6 @@ public class SpringCloudServiceManager
                             + service.getEnsembleLeader().getId());
                         LOGGER.info("Starting ensemble service " + ids + " failed");
                     }
-                    
                 }
             }
         }

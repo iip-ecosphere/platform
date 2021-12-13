@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +38,13 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
      * 
      * @param id the artifact id
      * @param name the (file) name
+     * @param uri the URI the descriptor was loaded from ({@code jar} may be a local file instead)
      * @param jar the underlying jar artifact 
      * @param services the associated services
      */
-    SpringCloudArtifactDescriptor(String id, String name, File jar, 
+    SpringCloudArtifactDescriptor(String id, String name, URI uri, File jar, 
         List<SpringCloudServiceDescriptor> services) {
-        super(id, name, services);
+        super(id, name, uri, services);
         this.jar = jar;
     }
     
@@ -59,10 +61,11 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
      * Creates a descriptor instance for a given YAML {@code artifact} and containing {@code jarFile}.
      * 
      * @param artifact the artifact parsed from a YAML descriptor
+     * @param uri the URI the {@code jarFile} was loaded from ({@code jarFile} may be a local file)
      * @param jarFile the JAR file containing the artifact
      * @return the spring-specific descriptor
      */
-    public static SpringCloudArtifactDescriptor createInstance(YamlArtifact artifact, File jarFile) {
+    public static SpringCloudArtifactDescriptor createInstance(YamlArtifact artifact, URI uri, File jarFile) {
         List<SpringCloudServiceDescriptor> services = new ArrayList<>();
         
         TypeResolver resolver = new TypeResolver(artifact.getTypes());
@@ -83,7 +86,7 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
             }
         }
         
-        return new SpringCloudArtifactDescriptor(artifact.getId(), artifact.getName(), jarFile, services);        
+        return new SpringCloudArtifactDescriptor(artifact.getId(), artifact.getName(), uri, jarFile, services);        
     }
     
 }

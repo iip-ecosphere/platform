@@ -113,7 +113,8 @@ public class ArtifactInfoTest {
 
         Validator val = new Validator();
         val.validate(info);
-        SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(info, null);
+        SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(info, 
+            new File("test.yml").toURI(), null); // file URI not relevant here
         Assert.assertNotNull(aDesc);
         ServiceDescriptor sDesc = aDesc.getService("id-0");
         TypedDataDescriptor param = sDesc.getParameters().get(0);
