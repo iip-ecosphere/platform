@@ -1,0 +1,10 @@
+artifact: test.jar
+assignments:
+  - resource: a1234
+    services:
+      - Start
+      - Transform
+  - resource: a1235
+    services:
+      - AI
+      - End

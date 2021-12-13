@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     PlatformTest.class,
-    CliTest.class
+    CliTest.class,
+    ServiceDeploymentPlanTest.class
 })
 public class AllTests {
 }

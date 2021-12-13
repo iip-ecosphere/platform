@@ -7,6 +7,8 @@
 * Initial integration of KODEX as platform service for anonymization/pseudonymization.
 * Initial mapping of the AAS product name/typeplate into the AAS abstraction and the default BaSyx implementation.
 * Initial version of service execution with multiple brokers and data paths between multiple devices.
+* More flexible device ids via IdProvider and, if permitted, overriding the device id via command line parameter `--iip.id`.
+* Simple deployment plans for the CLI.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package

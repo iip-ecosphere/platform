@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.platform;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
@@ -46,6 +47,9 @@ import org.junit.Assert;
  */
 public class CliTest {
 
+    /**
+     * Successful nested command sequence. 
+     */
     private static final String[] COMPLETE_SEQUENCE = new String[] {
         "help",
         "resources",
@@ -70,6 +74,9 @@ public class CliTest {
         "exit"
     };
 
+    /**
+     * Successful command sequence within resources level. 
+     */
     private static final String[] RESOURCES_SEQUENCE = new String[] {
         "resources",
         "help",
@@ -78,56 +85,98 @@ public class CliTest {
         "exit"
     };
 
+    /**
+     * Successful command sequence within services level. 
+     */
     private static final String[] SERVICES_SEQUENCE = new String[] {
         "services", "ab01",
         "help",
         "exit"
     };
-    
+
+    /**
+     * Successful service start command sequence within services level. 
+     */
     private static final String[] SERVICES_START_SEQUENCE = new String[] {
         "services", "ab01",
         "start", "s1", "s2", ".",
         "exit"
     };
 
+    /**
+     * Successful command sequence within container level. 
+     */
     private static final String[] CONTAINER_SEQUENCE = new String[] {
         "container", "ab01",
         "help",
         "exit"
     };
-    
+
+    /**
+     * Successful command sequence to create an AAS snapshot. 
+     */
     private static final String[] SNAPSHOT_SEQUENCE = new String[] {
         "help",
         "snapshotAAS",
         "exit"
     };
 
+    /**
+     * Fails with unknown command within main level. 
+     */
     private static final String[] MAIN_FAIL = new String[] {
         "ccd",
         "exit"
     };
 
+    /**
+     * Fails with unknown command within resources level. 
+     */
     private static final String[] RESOURCES_FAIL = new String[] {
         "resources", 
         "abx",
         "exit"
     };
 
+    /**
+     * Fails with unknown command within service level. 
+     */
     private static final String[] SERVICES_FAIL = new String[] {
         "services", "ab01",
         "abx",
         "exit"
     };
 
+    /**
+     * Fails with missing service ids within service level. 
+     */
     private static final String[] SERVICES_START_FAIL = new String[] {
         "services", "ab01",
         "start",
         "exit"
     };
 
+    /**
+     * Fails with unknown command within container level. 
+     */
     private static final String[] CONTAINER_FAIL = new String[] {
         "container", "ab01",
         "abx",
+        "exit"
+    };
+
+    /**
+     * The absolute URI of the test deployment plan.
+     */
+    private static final String DEPLOYMENT_PLAN_URI = new File("./src/test/resources/plan.yml")
+        .getAbsoluteFile().toURI().toString();
+    
+    /**
+     * Successful sequence for deployment plan execution.
+     */
+    private static final String[] DEPLOY_SEQUENCE = new String[] {
+        "deploy", DEPLOYMENT_PLAN_URI,
+        "undeploy", DEPLOYMENT_PLAN_URI,
         "exit"
     };
 
@@ -404,6 +453,7 @@ public class CliTest {
         test(SERVICES_SEQUENCE, errorConsumer, 0);
         test(SERVICES_START_SEQUENCE, errorConsumer, 0);
         test(SNAPSHOT_SEQUENCE, errorConsumer, 0);
+        test(DEPLOY_SEQUENCE, errorConsumer, 0);
 
         test(MAIN_FAIL, errorConsumer, 1);
         test(RESOURCES_FAIL, errorConsumer, 1);

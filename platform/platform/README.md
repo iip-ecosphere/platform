@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform
 
-The platform component for configuring and starting platform services. The platform component consists of the AAS abstraction as well as the abstract services and the abstract ECSruntime components for the AAS clients. Currently, this component just provides a command line client as basic interfaces to platform functionality.
+The platform component for configuring and starting platform services. The platform component consists of the AAS abstraction as well as the abstract services and the abstract ECSruntime components for the AAS clients. Currently, this component just provides a command line interface (CLI) as basic access to platform functionality.
 
 ## Configuration
 
@@ -27,9 +27,35 @@ The basic YAML configuration of the platform services (in ``iipecosphere.yml``) 
     
 The `aas` settings are similar to [ECS (Edge-Cloud-Server) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md), while `mode` is ignored/fixed to `REMOTE_DEPLOY`. `aas:persistence` defines the AAS persistence mechanism and may require further software installation, e.g. MongoDB.
 
-## Running
+## Running the services
 
 This component must be bundled with further, e.g., upper layer components which pair themselves via JLS, in particular `LifecycleHandler`. To start this component, please use the functions of the `LifecycleHandler` or the default starter classes defined there.
 
+## Running the CLI
+
+The command line interface can be started calling it's main class `de.iip_ecosphere.platform.platform.Cli`. The CLI is configured as indicated above and requires running platform services. Currently, the CLI offers mostly low-level commands to test and explore the platform. The more high-level components occur, the more the CLI may change and, if somehow possible, ultimately turn into a Web UI.
+
+Main functionality of the CLI:
+* List all available resources on which an ECS-Runtime is being executed. Resources are addressed via their identifier, which is either determined via the `IdProvider` in the service layer, or, if permitted via the command line parameter `--iip.id=<id>`, particularly for testing. The default `IdProvider` creates a device ID based on the (first enumerated) MAC address of the device and allows for overriding the ID via command line. Optionally, an SSH-Server for the device management can be started on a resource given by its id.
+* Access to the containers running on a device. After entering that level based on the device id of the target device, containers can be added (via their local or remote URI), started, stopped and removed.
+* Access to the services running on a device. After entering that level based on the device id of the target device, service implementation artifacts can be added (via their local or remote URI) or removed. Services determined by their ID can be started or stopped.
+* On the global level, a service deployment plan can be executed, resembling all the individual operations mentioned above into a simple plan script (see below). The same script can be used to undeploy previously deployed services.
+* Also a snapshot of the actual platform AAS can be taken (currently in terms of the AASX Package Explorer format with fixed name `platform.aasx` stored in the folder where the CLI was started within).
+
+Deploying multiple services, in particular across devices, can be tedious and error-prone using just the low level commands mentioned above. Therefore, the CLI offers the execution of simple deployment plans given as YAML files.
+
+    artifact: <path/URI>
+    parallelize: <Boolean>
+    onUndeployRemoveArtifact: <Boolean>
+    assignments:
+      - resource: <ResourceId>
+        services:
+          - <ServiceId>
+          - <ServiceId>
+      - ...
+
+A deployment plan specifies the service implementation `artifact` containing the services, either as local path or as URI. The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services from `artifact` to be started with their respective service ids must be given. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required.
+
 ## Missing
 - AAS discovery, currently we rely on the full IP specification instantiated through the configuration
+- Higher level commands for higher level components
