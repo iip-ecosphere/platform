@@ -22,7 +22,7 @@
     * Fixed/extended qualified name access for OPC UA connector.
     * Automated instantiation of a one-process ECS runtime/service manager without container manager for devices with low resources.
     * Platform instantiation process without Java test execution (may fail depending on JDK/surefire combination).
-    * Initial integration of device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
+    * Integration of initial device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
     * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
     * Automatic build of demo containers on github, deployment to dockerhub.
     * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector

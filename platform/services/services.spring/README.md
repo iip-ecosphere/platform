@@ -94,14 +94,15 @@ In addition to the basic AAS settings, the following properties can be configure
 * `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. 
   * The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000` ms).
   * `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms).
-  * `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker, e.g., a MQTT broker. 
+  * `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker that serves for local service communication, e.g., a MQTT broker. 
   * `deleteArtifacts` allows the service manager to delete downloaded artifacts. 
   * The `serviceProtocol` defines the AAS implementation protocol to be used for administrative communication with the services (default is the empty string denoting the default AAS protocol).
-  * The `executables` define operating system command mappings for the `executable` used in the `process` structure of the service descriptor. If the `executable` is one of the keys listed in `executables`, the corresponding value is used instead of the value given in `executable`. This is intended that a service manager configuration can override operating system defaults if needed, e.g., because a system Python version cannot be upgrated for some reason and a newer/local version must be used due to service dependencies. Then the local version can be given as value for the key `python` here and the `executable` just mentions `python` which is substituated accordingly.
+  * The `executables` define operating system command mappings for the `executable` used in the `process` structure of the service descriptor. If the `executable` is one of the keys listed in `executables`, the corresponding value is used instead of the value given in `executable`. This is intended that a service manager configuration can override operating system defaults if needed, e.g., because a system Python version cannot be upgrated for some reason and a newer/local version must be used due to service dependencies. Then the local version can be given as value for the key `python` here and the `executable` just mentions `python` which is substituted accordingly.
+  * `javaOpts` additional Java options to be appended to the command line of service JVMs to be started, default: `–Dlog4j2.formatMsgNoLookups=True` due to  [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228).
   * Please note that global service settings settings such as `aas` or `netMgr` occur here in the scope of `service-mgr`.
 * `cloud.deployer.local` refers to the underlying mechanism of Spring Cloud Stream. Service artifacts and their working directory may be temporary if not configured or in a given folder. These files may be deleted automatically on exit or remain in the folder. Both settings are helpful for debugging.
 
-The configuration structure is as shown below (the `executables` mapping is indcated by a single key-value pair):
+The configuration structure is as shown below (the `executables` mapping is indicated by a single key-value pair):
 
     service-mgr:
       waitingTime: <Integer>
@@ -112,8 +113,12 @@ The configuration structure is as shown below (the `executables` mapping is indc
       serviceProtocol: <|VAB-TCP|...>
       executables:
         - <String>: <String>
+        - ...
       aas: ...
       netMgr: ...
+      javaOpts:
+        - <String>
+        - ...
     cloud:
       deployer:
         local:
