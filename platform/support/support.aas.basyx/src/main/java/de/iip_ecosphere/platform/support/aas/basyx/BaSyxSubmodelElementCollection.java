@@ -469,8 +469,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void deleteElement(String idShort) {
         initialize();
-        elements.remove(idShort);
-        collection.deleteSubmodelElement(idShort);
+        if (elements.containsKey(idShort)) {
+            elements.remove(idShort);
+            collection.deleteSubmodelElement(idShort);
+        }
     }
 
     @Override
