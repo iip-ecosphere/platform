@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import org.apache.commons.lang.ArrayUtils;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
@@ -438,12 +441,16 @@ class CliBackend {
         try {
             String uri = toUri(p.getArtifact()).normalize().toString();
             Map<String, ServicesClient> serviceClients = new HashMap<>();
-            for (ServiceResourceAssignment a: p.getAssignments()) {
+            List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
+            Collections.reverse(assignments);
+            for (ServiceResourceAssignment a: assignments) {
                 if (a.getServices().size() > 0) {
                     ServicesClient client = getServicesFactory().create(a.getResource());
                     serviceClients.put(a.getResource(), client);
-                    println("Stopping services " + a.getServices() + " on " + a.getResource());
-                    client.stopService(a.getServicesAsArray());
+                    String[] services = a.getServicesAsArray();
+                    ArrayUtils.reverse(services);
+                    println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
+                    client.stopService(services);
                 }
             }
             if (p.isOnUndeployRemoveArtifact()) {

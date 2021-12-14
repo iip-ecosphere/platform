@@ -62,7 +62,7 @@ For illustration, we present now a one typical sequence of CLI commands. We assu
       
 Please note that for accessing the containers or the services of a certain resource, we need the respective resource identifier. Similarly, for starting and stopping containers or services. When exiting the CLI, the CLI container will end. The platform container will continue operating until you stop it explicitly, e.g., using `docker ps` to obtain the container identifier of the running container and `docker stop <id>` to ultimately stop the container.
 
-The more the platform evolves, the more higher level components will take over these lower level management operations. Please note also that all operations shown here are executed through dynamic and active asset administration shells.
+The more the platform evolves, the more higher level components will take over these lower level management operations. Two of these commands are `deploy <path/URI>` and `undeploy <path/URI>`, both taking a simple Yaml script defining which services from a given service artifact shall be executed on which resource (cf. the documentation of the [CLI](https://github.com/iip-ecosphere/platform/tree/main/platform/platform/README.md)). Please note also that all operations shown here are executed through dynamic and active asset administration shells.
 
 ### Pre-packaged Docker containers
 
