@@ -191,6 +191,9 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
             List<String> cmdLine = new ArrayList<String>();
+            if (null != config.getJavaOpts()) {
+                cmdLine.addAll(config.getJavaOpts());
+            }
             adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
             serviceProtocol = config.getServiceProtocol();
             cmdLine.addAll(service.getCmdArg(adminAddr.getPort(), serviceProtocol));

@@ -14,11 +14,13 @@ package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.ServiceSetup;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * Configures the service manager.
@@ -37,6 +39,7 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     private int waitingTime = 30000;
     private int availabilityRetryDelay = 500;
     private HashMap<String, String> executables = new HashMap<String, String>();
+    private List<String> javaOpts = CollectionUtils.toList("–Dlog4j2.formatMsgNoLookups=True"); 
 
     /**
      * Returns the name of the broker host.
@@ -116,6 +119,15 @@ public class SpringCloudServiceSetup extends ServiceSetup {
         }
         return result;
     }
+    
+    /**
+     * Returns the Java command line options.
+     * 
+     * @return the command line options (disables by default log4j format lookups)
+     */
+    public List<String> getJavaOpts() {
+        return javaOpts;
+    }
 
     /**
      * Defines the name of the broker host. [required by Spring]
@@ -190,6 +202,15 @@ public class SpringCloudServiceSetup extends ServiceSetup {
      */
     public void setExecutables(HashMap<String, String> executables) {
         this.executables = executables;
+    }
+    
+    /**
+     * Sets the Java command line options. [required by Spring]
+     * 
+     * @param javaOpts the command line options
+     */
+    public void setJavaOpts(List<String> javaOpts) {
+        this.javaOpts = javaOpts;
     }
 
 }

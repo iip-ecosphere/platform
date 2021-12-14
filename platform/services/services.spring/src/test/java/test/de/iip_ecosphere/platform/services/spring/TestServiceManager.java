@@ -466,4 +466,13 @@ public class TestServiceManager {
         
     }
     
+    /**
+     * Tests known/default values in setup.
+     */
+    @Test
+    public void testSetup() {
+        Assert.assertNotNull(config.getJavaOpts());
+        Assert.assertTrue(config.getJavaOpts().size() > 0);
+    }
+    
 }
