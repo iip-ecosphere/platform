@@ -10,6 +10,13 @@ The platform concepts and realization are developed by the IIP-Ecosphere consort
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
+## News
+
+* Initial device management
+* Distributed service execution via CLI scripts
+* Pre-built containers to experiment with the platform on Dockerhub.
+* Security fixes for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228)
+
 ## Documentation
 
 For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md). 
