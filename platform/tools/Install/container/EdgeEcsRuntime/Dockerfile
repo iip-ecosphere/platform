@@ -3,8 +3,6 @@ ENV IIP_PORT=9000
 EXPOSE 9000/TCP
 COPY common/ common
 COPY ecsJars/ ecsJars
-COPY ecsSvcJars/ ecsSvcJars
-COPY ecsServiceMgr/ ecsServiceMgr
 COPY ecs8.sh ecs8.sh
 COPY edgeServiceMgr.image-info.yml image-info.yml
 
