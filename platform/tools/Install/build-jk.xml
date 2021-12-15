@@ -24,7 +24,7 @@
             <fileset dir="." includes="src/**/*.*" />
             <fileset dir="." includes="gen/**/*.*" />
             <fileset dir="." includes="container/**/*.*" excludes="*.sh" />
-        	<fileset dir="." filemode="755" includes="container/**/*.sh" />
+        	<tarfileset dir="." filemode="755" includes="container/**/*.sh" />
         </tar>
     </target>
 </project>
