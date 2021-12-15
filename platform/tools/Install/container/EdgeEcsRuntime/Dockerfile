@@ -6,7 +6,7 @@ COPY ecsJars/ ecsJars
 COPY ecsSvcJars/ ecsSvcJars
 COPY ecsServiceMgr/ ecsServiceMgr
 COPY ecs8.sh ecs8.sh
-COPY image-info.yml image-info.yml
+COPY edgeServiceMgr.image-info.yml image-info.yml
 
 # Installing Docker
 ARG DEBIAN_FRONTEND=noninteractive

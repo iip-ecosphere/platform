@@ -5,7 +5,7 @@ ENV IIP_PORT=9000
 EXPOSE 9000/TCP
 COPY ecsJars/* /ecsJars/
 COPY ecs.sh /
-COPY EcsRuntime/image-info.yml /
+COPY ecsRuntime.image-info.yml /image-info.yml
 RUN ["chmod", "+x", "/ecs.sh"]
 
 # install docker

@@ -1,7 +1,7 @@
 FROM openjdk:16-alpine3.13
 WORKDIR /device
 # App
-COPY SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+COPY SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
 # Service Manger
 COPY svcJars/ svcJars
 COPY serviceMgr.sh serviceMgr.sh
