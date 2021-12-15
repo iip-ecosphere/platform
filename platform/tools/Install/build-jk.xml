@@ -23,8 +23,8 @@
             <fileset dir="." includes="broker/**/*.*" />
             <fileset dir="." includes="src/**/*.*" />
             <fileset dir="." includes="gen/**/*.*" />
-            <fileset dir="." includes="container/**/*.*" excludes="*.sh" />
-        	<tarfileset dir="." filemode="755" includes="container/**/*.sh" />
+            <tarfileset dir="." filemode="755" includes="container/**/*.sh" />
+            <fileset dir="." includes="container/**/*.*" excludes="**/*.sh" />
         </tar>
     </target>
 </project>
