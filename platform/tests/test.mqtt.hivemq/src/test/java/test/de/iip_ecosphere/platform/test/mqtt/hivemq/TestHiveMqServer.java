@@ -67,8 +67,10 @@ public class TestHiveMqServer extends AbstractTestServer {
     
     @Override
     public void stop(boolean dispose) {
-        hiveMQ.stop().join();
-        hiveMQ = null;
+        if (null != hiveMQ) {
+            hiveMQ.stop().join();
+            hiveMQ = null;
+        }
     }
     
     /**
