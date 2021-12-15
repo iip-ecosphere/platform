@@ -100,8 +100,10 @@ public class TestMoquetteServer extends AbstractTestServer {
     
     @Override
     public void stop(boolean dispose) {
-        mqttBroker.stopServer();
-        mqttBroker = null;
+        if (null != mqttBroker) {
+            mqttBroker.stopServer();
+            mqttBroker = null;
+        }
     }
 
     /**

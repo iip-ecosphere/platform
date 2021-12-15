@@ -75,7 +75,9 @@ public class TestQpidServer extends AbstractTestServer {
 
     @Override
     public void stop(boolean dispose) {
-        systemLauncher.shutdown();
+        if (null != systemLauncher) {
+            systemLauncher.shutdown();
+        }
     }
 
     /**
