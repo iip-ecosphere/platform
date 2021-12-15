@@ -1,0 +1,11 @@
+id: 01
+name: testuje
+version: 0.1
+dockerImageName: plc-sm:v1_192.168.2.107
+dockerImageZipfile: serviceMgr.tar.gz
+env:
+  - IIP_PORT=${port}
+exposedPorts:
+  - port: ${port}
+    protocol: TCP
+networkMode: host
