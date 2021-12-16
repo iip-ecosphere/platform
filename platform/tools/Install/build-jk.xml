@@ -19,12 +19,11 @@
         </zip>
         <tar destfile="install.tar.gz" compression="gzip">
             <fileset dir="." includes="pom.xml README.md"/>
+            <tarfileset dir="." filemode="755" includes="**/*.sh" />
             <fileset dir="." includes="platformDependencies/**/*.*" />
-            <fileset dir="." includes="broker/**/*.*" />
+            <fileset dir="." includes="broker/**/*.*" excludes="**/*.sh" />
             <fileset dir="." includes="src/**/*.*" />
-            <tarfileset dir="." filemode="755" includes="gen/**/*.*" />
-            <tarfileset dir="." filemode="755" includes="container/**/*.sh" />
-        	<tarfileset dir="." includes="container/**/*" excludes="container/**/*.sh" />
+        	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh" />
         </tar>
     </target>
 </project>
