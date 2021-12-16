@@ -39,7 +39,7 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     private int waitingTime = 30000;
     private int availabilityRetryDelay = 500;
     private HashMap<String, String> executables = new HashMap<String, String>();
-    private List<String> javaOpts = CollectionUtils.toList("–Dlog4j2.formatMsgNoLookups=True"); 
+    private List<String> javaOpts = CollectionUtils.toList("-Dlog4j2.formatMsgNoLookups=true"); 
 
     /**
      * Returns the name of the broker host.
