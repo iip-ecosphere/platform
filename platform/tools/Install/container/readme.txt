@@ -13,6 +13,7 @@ Edge*: Experimental edge containers by Monika.
     add file:/device/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
   - EdgeEcsSvn: Combined ECS runtime with service manager.
     /usr/bin/docker run -P --network=host -it iip/edgeecssvc:0.3
+    add file:/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
   
-  Preliminary start (to be adjusted):
-  /usr/bin/docker run -v /var/run/docker.sock:/var/run/docker. -P --network=host --mount type=bind,source="$(pwd)"/serviceMgr_buildcontext,target=/serviceMgr_buildcontext -it <ImageName>
+  Further start:
+  /usr/bin/docker run -v /var/run/docker.sock:/var/run/docker.sock -P --network=host --mount type=bind,source="$(pwd)"/container,target=/container -it iip/edgeecruntime:0.3
