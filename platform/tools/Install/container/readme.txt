@@ -11,7 +11,7 @@ Edge*: Experimental edge containers by Monika.
   - EdgeEcsRuntime: Standalone edge ECS runtime with docker. 
     - For just representing the device without starting container.
       /usr/bin/docker run -P --network=host -it iip/edgeecsruntime:0.3
-    - For starting container under control of ECS runtime:
+    - For starting container under control of ECS runtime, execute within "container" folder:
       /usr/bin/docker run -v /var/run/docker.sock:/var/run/docker.sock -P --network=host --mount type=bind,source="$(pwd)"/EdgeServiceMgr,target=/container -it iip/edgeecsruntime:0.3
       add file:/container/image-info.yml
       Then continue below with EdgeServiceMgr... 
