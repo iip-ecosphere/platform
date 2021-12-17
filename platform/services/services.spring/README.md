@@ -92,7 +92,7 @@ Also the service manager itself can be configured via the ``iipecosphere.yml``, 
 
 In addition to the basic AAS settings, the following properties can be configured:
 * `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. 
-  * The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `30000` ms).
+  * The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `60000` ms).
   * `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms).
   * `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker that serves for local service communication, e.g., a MQTT broker. 
   * `deleteArtifacts` allows the service manager to delete downloaded artifacts. 

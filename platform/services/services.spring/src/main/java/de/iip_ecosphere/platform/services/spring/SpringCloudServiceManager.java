@@ -350,13 +350,13 @@ public class SpringCloudServiceManager
         checkId(artifactId, "artifactId");
         SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
         super.removeArtifact(artifactId);
-        // desc cannot be null otherwise exception by parent method
-        // proper construction shall not leave jar null
-        File jar = desc.getJar();
-        File downloadDir = getConfig().getDownloadDir();
-        if (null != downloadDir && jar.toPath().startsWith(downloadDir.toPath())) {
-            if (getConfig().getDeleteArtifacts()) {
-                FileUtils.deleteQuietly(desc.getJar());
+        if (null != desc) {
+            File jar = desc.getJar();
+            File downloadDir = getConfig().getDownloadDir();
+            if (null != jar && null != downloadDir && jar.toPath().startsWith(downloadDir.toPath())) {
+                if (getConfig().getDeleteArtifacts()) {
+                    FileUtils.deleteQuietly(desc.getJar());
+                }
             }
         }
         LOGGER.info("Removed artifact " + artifactId);
