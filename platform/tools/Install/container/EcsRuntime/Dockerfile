@@ -12,8 +12,8 @@ RUN ["chmod", "+x", "/ecs.sh"]
 ARG DEBIAN_FRONTEND=noninteractive
 RUN curl -sSL https://get.docker.com/ | sh
 USER root
-# this container sets the socket to group 116 that does not exist...
-RUN groupadd -g 116 dockerd
+# this container sets the socket to group 117 that does not exist...
+RUN groupadd -g 117 dockerd
 RUN useradd iip && usermod -aG docker iip && usermod -aG dockerd iip
 USER iip
 
