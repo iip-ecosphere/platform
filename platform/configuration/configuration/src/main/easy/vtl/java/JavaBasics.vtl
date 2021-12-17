@@ -51,5 +51,13 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String toPath(String pkg) {
         pkg.replace(".", "/");
     }
+    
+    def String toJvmMemLimitOpt(Integer limit) {
+        if (limit > 0) {
+            "-Xmx${limit}M"
+        } else {
+            ""
+        }
+    }
 
 }

@@ -6,6 +6,7 @@ project Devices {
     annotate BindingTime bindingTime = BindingTime::compile to .;
         
     abstract compound ContainerManager {
+       Integer memLimit = 0; // e.g., JVM memory limit in MBytes     
          // - globally allocated hosts/ports
          // - global AAS location/URN/URI
     };

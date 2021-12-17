@@ -10,7 +10,8 @@ project Services {
    
    // -------------------- service manager ------------------
    
-   abstract compound ServiceManager { 
+   abstract compound ServiceManager {
+       Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
    };
    
    compound SpringCloudStream refines ServiceManager {
@@ -75,6 +76,7 @@ project Services {
    // in some situations while in others it is important to have a service not being a family avoiding potential
    // instance recursions
    abstract compound ServiceBase refines CDataComponent {
+       Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
        Id id; // forward declaration
        NonEmptyString name; // forward declaration
        ServiceKind kind;

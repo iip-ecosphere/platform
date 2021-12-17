@@ -103,6 +103,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // called from tests, don't change signature
     generatePlatform(Project source, Configuration config, Project target) = {
+        IIPEcosphere cfg = config;
+        
         // cleanup, reuse, ...
         ecsRuntimeRoot.mkdir();
         Path p = "${ecsRuntimeRoot}/src/main/resources";
@@ -114,7 +116,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
         maven("${ecsRuntimeRoot}", true);
-        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service");
+        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, cfg.containerManager.memLimit)));
         
         serviceMgrRoot.mkdir();
         p = "${serviceMgrRoot}/src/main/resources";
@@ -125,7 +127,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
         maven("${serviceMgrRoot}", true);
-        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service");
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service", addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit));
 
         ecsServiceMgrRoot.mkdir();
         p = "${ecsServiceMgrRoot}/src/main/resources";
@@ -137,7 +139,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests);
         maven("${ecsServiceMgrRoot}", true);
-        generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "");
+        generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit));
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
@@ -156,28 +158,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }
     
-    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true) = {
-        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main);
+    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="") = {
+        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
         if (withJava8) {
-            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false);
+            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
         }
-        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main);
+        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
         FileArtifact f = "${pathName}.sh";
         f.setExecutable(false);
         if (withJava8) {
-            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false);
+            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
             f = "${pathName}8.sh";
             f.setExecutable(false);
         }
         if (pidName.length() > 0) {
-           vilTemplateProcessor("LinuxSysd", config, "${pathName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires);
+           vilTemplateProcessor("LinuxSysd", config, "${pathName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, addJavaOpts=addJavaOpts);
            if (withJava8) {
-               vilTemplateProcessor("LinuxSysd", config, "${pathName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, withModuleOpts=false);
+               vilTemplateProcessor("LinuxSysd", config, "${pathName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
            }
            if (requires.length() > 0) {
-               vilTemplateProcessor("LinuxSysd", config, "${pathName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid");
+               vilTemplateProcessor("LinuxSysd", config, "${pathName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);
                if (withJava8) {
-                   vilTemplateProcessor("LinuxSysd", config, "${pathName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false);
+                   vilTemplateProcessor("LinuxSysd", config, "${pathName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false, addJavaOpts=addJavaOpts);
                }
            }
         }

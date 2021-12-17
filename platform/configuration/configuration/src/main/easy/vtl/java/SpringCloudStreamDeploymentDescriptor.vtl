@@ -29,12 +29,22 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           cmdArg: 
             - --iip.port=\\${port}
             - --iip.protocol=\\${protocol}
+            ${generateMemLimitOpt(service)|e}
           relations:
             - endpoint:
               portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
               hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
             ${generateRelations(elt)}'
-    } 
+    }
+    
+    def generateMemLimitOpt(Service service) {
+        String opt = toJvmMemLimitOpt(service.memLimit);
+        if (opt.length() > 0) {
+            "- ${opt}"
+        } else {
+            "";
+        }
+    }
     
     def generateRelations(MeshElement elt) {
     }

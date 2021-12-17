@@ -2,9 +2,9 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true) {
+template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true, String addJavaOpts="") {
 	
-    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true) {
+    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true, String addJavaOpts="") {
         IIPEcosphere cfg = config;
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '[Unit]
