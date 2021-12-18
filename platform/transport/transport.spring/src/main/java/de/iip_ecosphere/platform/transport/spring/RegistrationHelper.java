@@ -40,7 +40,7 @@ public class RegistrationHelper {
      */
     public static void registerSerializers(SerializerConfiguration cfg) {
         for (String s: cfg.getSerializers()) {
-            Serializer<?> ser = obtainInstance(s, "Serializer registration:", Serializer.class);
+            Serializer<?> ser = obtainInstance(s, "Serializer registration", Serializer.class);
             if (null != ser) {
                 SerializerRegistry.registerSerializer(ser);
                 LOGGER.info("Registered Serializer " + s);
@@ -133,7 +133,8 @@ public class RegistrationHelper {
                 | InvocationTargetException | NoSuchMethodException | SecurityException
                 | ClassNotFoundException e) {
             result = null;
-            LOGGER.error(context + ": class " + className + " cannot be created: " + e.getMessage());
+            LOGGER.error(context + ": class " + className + " cannot be created: " + e.getClass().getName()
+                + " " + e.getMessage());
         }
         return result;
     }
