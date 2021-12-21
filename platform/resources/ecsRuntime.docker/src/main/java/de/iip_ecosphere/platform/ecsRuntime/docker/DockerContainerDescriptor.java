@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,10 +72,12 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      * @param id the container id
      * @param name the (file) name of the container
      * @param version the version of the container
-     * @throws IllegalArgumentException if id, name or version is invalid, i.e., null or empty
+     * @param uri the URI where the descriptor was loaded from
+     * @throws IllegalArgumentException if {@code id}, {@code name}, {@code version} or {@code uri} is invalid, e.g., 
+     *     <b>null</b> or empty
      */
-    protected DockerContainerDescriptor(String id, String name, Version version) {
-        super(id, name, version);
+    protected DockerContainerDescriptor(String id, String name, Version version, URI uri) {
+        super(id, name, version, uri);
     }
     
     // [required by SnakeYaml]
@@ -420,7 +423,7 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
         InputStream in;
         try {
             in = new FileInputStream(file);
-            result = readFromYaml(in);
+            result = readFromYaml(in, file.toURI());
         } catch (FileNotFoundException e) {
             LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
         }
@@ -430,13 +433,15 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
     /**
      * Returns a DockerContainerDescriptor with a information from a yaml file.
      * @param in an inout stream with Yaml contents (may be <b>null</b>)
+     * @param uri the URI the descriptor was read from
      * @return DockerContainerDescriptor (may be <b>null</b>)
      */
-    public static DockerContainerDescriptor readFromYaml(InputStream in) {
+    public static DockerContainerDescriptor readFromYaml(InputStream in, URI uri) {
         DockerContainerDescriptor result = null;
         if (in != null) {
             try {
                 result = AbstractSetup.readFromYaml(DockerContainerDescriptor.class, in);
+                result.setUri(uri);
             } catch (IOException e) {
                 LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
             }

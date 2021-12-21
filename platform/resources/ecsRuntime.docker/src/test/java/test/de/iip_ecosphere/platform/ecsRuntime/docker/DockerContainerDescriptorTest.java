@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime.docker;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.Assert;
@@ -34,10 +35,11 @@ public class DockerContainerDescriptorTest {
      */
     @Test
     public void testDescriptor() {
-        Assert.assertNull(DockerContainerDescriptor.readFromYaml(getClass().getResourceAsStream("/xyz.yml")));
+        Assert.assertNull(DockerContainerDescriptor.readFromYaml(getClass().getResourceAsStream("/xyz.yml"), 
+            new File("xyz.yml").toURI()));
         
         DockerContainerDescriptor desc = DockerContainerDescriptor.readFromYaml(
-            getClass().getResourceAsStream("/mesh-info.yml"));
+            getClass().getResourceAsStream("/mesh-info.yml"), new File("mesh-info.yml").toURI());
         Assert.assertNotNull(desc);
         
         Assert.assertEquals("test-serviceMgr", desc.getId());
@@ -72,6 +74,7 @@ public class DockerContainerDescriptorTest {
         Assert.assertEquals("host", desc.getNetworkMode());
         Assert.assertFalse(desc.getAttachStdOut());
         Assert.assertFalse(desc.getAttachStdErr());
+        Assert.assertNotNull(desc.getUri());
     }
 
 }

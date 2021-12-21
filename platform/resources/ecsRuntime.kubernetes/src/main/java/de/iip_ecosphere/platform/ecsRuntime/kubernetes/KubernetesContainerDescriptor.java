@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
+import java.net.URI;
+
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
@@ -35,10 +37,12 @@ public class KubernetesContainerDescriptor extends AbstractContainerDescriptor {
      * @param id the container id
      * @param name the (file) name of the container
      * @param version the version of the container
-     * @throws IllegalArgumentException if id, name or version is invalid, i.e., null or empty
+     * @param uri the URI where the descriptor was loaded from
+     * @throws IllegalArgumentException if {@code id}, {@code name}, {@code version} or {@code uri} is invalid, e.g., 
+     *     <b>null</b> or empty
      */
-    protected KubernetesContainerDescriptor(String id, String name, Version version) {
-        super(id, name, version);
+    protected KubernetesContainerDescriptor(String id, String name, Version version, URI uri) {
+        super(id, name, version, uri);
     }
     
     @Override

@@ -20,9 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -49,6 +47,7 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+
 /**
  * Implements a docker-based container manager for IIP-Ecosphere.
  * 
@@ -242,7 +241,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void startContainer(String id) throws ExecutionException {
         LOGGER.info("Starting container " + id);
-        DockerContainerDescriptor container = super.getContainer(id, "id", "start");
+        DockerContainerDescriptor container = getContainer(id, "id", "start");
         String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
@@ -258,7 +257,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void stopContainer(String id) throws ExecutionException {
         LOGGER.info("Stopping container " + id);
-        DockerContainerDescriptor container = super.getContainer(id, "id", "stop");
+        DockerContainerDescriptor container = getContainer(id, "id", "stop");
         String dockerId = container.getDockerId();
         
         DockerClient dockerClient = getDockerClient();
@@ -280,7 +279,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void undeployContainer(String id) throws ExecutionException {
         LOGGER.info("Undeploying container " + id);
-        DockerContainerDescriptor container = getContainer(id);
+        DockerContainerDescriptor container = getContainer(id, "id", "undeploy");
         String dockerId = container.getDockerId();
 
         if (container.requiresPort()) {
@@ -311,21 +310,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     @Override
     public void updateContainer(String id, URI location) throws ExecutionException {
         // TODO implement (compare version)
-    }
-
-    @Override
-    public ContainerState getState(String id) {
-        return super.getState(id);
-    }
-
-    @Override
-    public Set<String> getIds() {
-        return super.getIds();
-    }
-    
-    @Override
-    public Collection<DockerContainerDescriptor> getContainers() {
-        return super.getContainers();
     }
     
     /** 
@@ -359,11 +343,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             }
         }
         return null;
-    }
-
-    @Override
-    public DockerContainerDescriptor getContainer(String id) {
-        return super.getContainer(id);
     }
 
     @Override
