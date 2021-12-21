@@ -1,19 +1,56 @@
 import unittest
 import subprocess
+import queue
+import time
+import sys
 from subprocess import PIPE
+from IOThread import WriteThread, ReadThread
+
 
 class ForwardingAppTest(unittest.TestCase):
-    """Tests if send value equals received value."""
+    """Tests ForwardingApp"""
 
     def test_forwardingapp(self):
-        test_value = 'test'
-        # Sending test value to ForwardingApp
-        process = subprocess.Popen(['python3', 'ForwardingApp.py'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-        test_value_as_byte = test_value.encode()
-        output_as_byte = process.communicate(input=test_value_as_byte)[0]
-        # Converting received byte value to string
-        output = output_as_byte.decode('utf-8').rstrip() # removing newline
-        assert output == test_value
+        # Does the app echos received values?
+        test_value = 'test\n'
+        process = subprocess.Popen(['python3', 'ForwardingApp.py'], bufsize=0, stdout=PIPE, stdin=PIPE)
+
+        source_queue = queue.Queue()
+        target_queue = queue.Queue()
+
+        # input thread
+        writer = WriteThread(process.stdin, source_queue)
+        writer.setDaemon(True)
+        writer.start()
+        # output thread
+        reader = ReadThread(process.stdout, target_queue)
+        reader.setDaemon(True)
+        reader.start()
+
+        # populate queue
+        number_of_sended_values = 3
+        for i in range(number_of_sended_values):
+            source_queue.put(test_value)
+        source_queue.put('')
+
+        time.sleep(2)  # expect some output from reader thread
+
+        source_queue.join()  # wait until all items in source_queue are processed
+
+
+        received_values_list = reader.get_target()
+        number_of_received_values = len(received_values_list)
+        received_value = received_values_list.pop(0).decode('utf-8')
+        print(number_of_received_values)
+
+        # Senden value equals received value
+        assert received_value == test_value
+
+        # Repeated sending and receiving
+        assert number_of_sended_values == number_of_received_values
+
+        process.terminate()
+        process.wait()
 
 
 if __name__ == '__main__':
