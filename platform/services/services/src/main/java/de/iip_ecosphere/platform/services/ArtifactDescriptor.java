@@ -45,9 +45,9 @@ public interface ArtifactDescriptor {
     public Set<String> getServiceIds();
     
     /**
-     * Returns the URI the artifact was loaded from.
+     * Returns the canonical URI the artifact was loaded from.
      * 
-     * @return the URI
+     * @return the canonical URI
      */
     public URI getUri();
     
