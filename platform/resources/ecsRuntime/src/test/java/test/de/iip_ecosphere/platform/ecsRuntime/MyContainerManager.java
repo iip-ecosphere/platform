@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
+import java.io.File;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
@@ -40,7 +41,8 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     @Override
     public String addContainer(URI location) throws ExecutionException {
         String sId = createId();
-        return super.addContainer(sId, new MyContainerDesciptor(sId, "cName", new Version(0, 1)));
+        return super.addContainer(sId, new MyContainerDesciptor(sId, "cName", new Version(0, 1), 
+            new File("test.yml").toURI()));
     }
 
     @Override
@@ -74,7 +76,7 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
         MyContainerDesciptor cnt = getContainer(containerId, "containerId", "migrate");
         // on "target machine"
         String targetId = createId();
-        MyContainerDesciptor tCnt = new MyContainerDesciptor(targetId, cnt.getName(), cnt.getVersion());
+        MyContainerDesciptor tCnt = new MyContainerDesciptor(targetId, cnt.getName(), cnt.getVersion(), cnt.getUri());
         super.addContainer(targetId, tCnt);
         // get rid of container here
         super.migrateContainer(containerId, resourceId);

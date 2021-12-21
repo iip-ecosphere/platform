@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
+
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -48,5 +50,12 @@ public interface ContainerDescriptor {
      * @return the state
      */
     public ContainerState getState();
+    
+    /**
+     * Returns the canonical URI the descriptor was loaded from.
+     * 
+     * @return the canonical URI
+     */
+    public URI getUri();
 
 }

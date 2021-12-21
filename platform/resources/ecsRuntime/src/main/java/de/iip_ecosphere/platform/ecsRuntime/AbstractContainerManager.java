@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -109,17 +110,26 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     /**
      * Returns a service descriptor.
      * 
-     * @param id the service id
+     * @param id the service id, or the URI used to add the container as fallback
      * @param idText the id text to be passed to {@link #checkId(String, String)}
      * @param activityText a description of the activity the service is requested for to construct an exception if 
      *   the service does not exist
      * @return the service (not <b>null</b>)
-     * @throws ExecutionException if id is invalid or the service is unkown
+     * @throws ExecutionException if id is invalid or the service is unknown
      */
-    protected C getContainer(String id, String idText, String activityText) 
+    protected C getContainer(final String id, String idText, String activityText) 
         throws ExecutionException {
         checkId(id, idText);
         C result = containers.get(id);
+        if (null == result) {
+            Optional<C> fallback = containers.values()
+                .stream()
+                .filter(c -> id.equals(c.getUri().toString()))
+                .findAny();
+            if (fallback.isPresent()) {
+                result = fallback.get();
+            }
+        }
         if (null == result) {
             throwExecutionException(null, "Container id '" + id + "' is not known. Cannot " + activityText 
                 + " container.");

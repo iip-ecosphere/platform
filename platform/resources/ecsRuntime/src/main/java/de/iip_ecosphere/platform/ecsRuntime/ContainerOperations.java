@@ -49,7 +49,8 @@ public interface ContainerOperations {
     /**
      * Stops the container. The container shall afterwards be in state {@link ContainerState#STOPPED}.
      * 
-     * @param id the id of the container to stop
+     * @param id the id of the container to stop, or as fallback the canonical URI of the container descriptor used 
+     *     for adding
      * @throws ExecutionException if stopping the container fails
      */
     public void stopContainer(String id) throws ExecutionException;
@@ -69,7 +70,8 @@ public interface ContainerOperations {
      * {@link ContainerState#UNDEPLOYING} and ultimately the container shall be removed and its descriptor shall not
      * be available anymore.
      * 
-     * @param id the id of the container to remove
+     * @param id the id of the container to remove, or as fallback the canonical URI of the container descriptor used 
+     *     for adding
      * @throws ExecutionException if undeploying the container fails, e.g., because it is still running
      */
     public void undeployContainer(String id) throws ExecutionException;
