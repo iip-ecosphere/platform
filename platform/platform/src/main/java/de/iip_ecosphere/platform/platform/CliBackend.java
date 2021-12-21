@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang.ArrayUtils;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
+import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
 import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
 import de.iip_ecosphere.platform.platform.cli.EcsClientFactory;
@@ -43,6 +44,7 @@ import de.iip_ecosphere.platform.platform.cli.PlatformClientFactory;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor;
 import de.iip_ecosphere.platform.platform.cli.ResourcesClientFactory;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
+import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ContainerResourceAssignment;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ServiceResourceAssignment;
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.services.ServicesClient;
@@ -377,6 +379,16 @@ class CliBackend {
     protected static void deployPlan(URI plan) throws ExecutionException {
         ServiceDeploymentPlan p = loadPlan(plan);
         try {
+            for (ContainerResourceAssignment c : p.getContainer()) {
+                EcsClient client = getEcsFactory().create(c.getResource());
+                println("Adding container '" + c.getContainerDesc() + "' to resource " + c.getResource());
+                String cId = client.addContainer(toUri(c.getContainerDesc()));
+                printlnDone();
+                println("Starting container '" + c.getContainerDesc() + "'(" + cId + ") on resource " 
+                    + c.getResource());
+                client.startContainer(cId);
+                printlnDone();
+            }
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
@@ -464,6 +476,21 @@ class CliBackend {
                     }
                 }
             }
+            List<ContainerResourceAssignment> container = new ArrayList<>(p.getContainer());
+            Collections.reverse(container);
+            for (ContainerResourceAssignment c : container) {
+                EcsClient client = getEcsFactory().create(c.getResource());
+                String cDescUri = toUri(c.getContainerDesc()).normalize().toString();
+                println("Stopping container '" + c.getContainerDesc() + " on resource " + c.getResource());
+                client.stopContainer(cDescUri);
+                printlnDone();
+                
+                if (p.isOnUndeployRemoveArtifact()) {
+                    println("Removing container '" + c.getContainerDesc() + "' from resource " + c.getResource());
+                    client.undeployContainer(cDescUri);
+                    printlnDone();
+                }
+            }            
         } catch (URISyntaxException | IOException e) {
             throw new ExecutionException(e);
         }

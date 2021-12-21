@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.platform.cli;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
@@ -25,16 +26,15 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * @author Holger Eichelberger, SSE
  */
 public class ServiceDeploymentPlan extends AbstractSetup {
-    
+
     /**
-     * Assigns one or multiple services to a resource.
+     * Base class for something that shall be assigned to a resource.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class ServiceResourceAssignment {
-        
+    public abstract static class ResourceAssignment {
+
         private String resource;
-        private List<String> services;
 
         /**
          * Returns the name/id of the resource.
@@ -53,6 +53,48 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         public void setResource(String resource) {
             this.resource = resource;
         }
+
+    }
+    
+    /**
+     * Assigns a container to a resource as prerequisite for starting services on the resource.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ContainerResourceAssignment extends ResourceAssignment {
+        
+        private String containerDesc;
+
+        /**
+         * Returns the path/URI of the container (information) descriptor. The referenced container image must be 
+         * located in the same folder.
+         * 
+         * @return the path/URI
+         */
+        public String getContainerDesc() {
+            return containerDesc;
+        }
+        
+        /**
+         * Sets the path/URI of the container (information) descriptor. The referenced container image must be 
+         * located in the same folder. [required by SnakeYaml]
+         * 
+         * @param containerDesc the path/URI to the descriptor file
+         */
+        public void setContainerDesc(String containerDesc) {
+            this.containerDesc = containerDesc;
+        }
+
+    }
+    
+    /**
+     * Assigns one or multiple services to a resource.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ServiceResourceAssignment extends ResourceAssignment {
+        
+        private List<String> services;
 
         /**
          * Returns the assigned service names.
@@ -73,7 +115,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         }
 
         /**
-         * Defines the assigned service names.
+         * Defines the assigned service names. [required by SnakeYaml]
          * 
          * @param services the service names names
          */
@@ -84,7 +126,9 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
     
     private String artifact;
-    private List<ServiceResourceAssignment> assignments;
+    private List<ContainerResourceAssignment> container = new ArrayList<>();
+    // naming: initially only for services without container!
+    private List<ServiceResourceAssignment> assignments  = new ArrayList<>();
     private boolean parallelize = false;
     private boolean onUndeployRemoveArtifact = true;
     
@@ -125,6 +169,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
     
     /**
+     * Returns the container-resource-assignments.
+     * 
+     * @return the container
+     */
+    public List<ContainerResourceAssignment> getContainer() {
+        return container;
+    }
+    
+    /**
      * Defines the path/URI of the artifact. [required by SnakeYaml]
      * 
      * @param artifact the path/URI
@@ -140,6 +193,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public void setAssignments(List<ServiceResourceAssignment> assignments) {
         this.assignments = assignments;
+    }
+    
+    /**
+     * Changes the container-resource-assignments. [required by SnakeYaml]
+     * 
+     * @param container the container
+     */
+    public void setContainer(List<ContainerResourceAssignment> container) {
+        this.container = container;
     }
 
     /**
