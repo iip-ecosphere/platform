@@ -22,8 +22,13 @@ project Devices {
     };
     isDefined(containerManager);
     
+    enum CpuArchitecture {x86, ARM};
+    enum CpuBits {bit32, bit64};
+    
     compound EcsDevice refines CComputer {
         String id;
+        CpuArchitecture cpu;
+        CpuBits bits;
     }
 
 }
