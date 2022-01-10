@@ -1,7 +1,7 @@
 class Serializer:
     """Transport serializer interface."""
 
-    def readFrom(data: bytes):
+    def readFrom(self, data: bytes):
         """Turns bytes into an object.
         
         Parameters:
@@ -12,7 +12,7 @@ class Serializer:
         """
         raise NotImplementedError
 
-    def writeTo(source) -> bytes:
+    def writeTo(self, source) -> bytes:
         """Turns an object into bytes.
         
         Parameters:
