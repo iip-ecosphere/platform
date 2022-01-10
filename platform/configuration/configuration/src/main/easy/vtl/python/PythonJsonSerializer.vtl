@@ -35,7 +35,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
             
             ${encoder(clsName)}
             
-            def readFrom(data: bytes) -> ${clsName}:
+            def readFrom(self, data: bytes) -> ${clsName}:
                 """Turns bytes into an object.
                 
                 Parameters:
@@ -49,7 +49,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 result.__dict__ = json.loads(data)
                 return result
 
-            def writeTo(source: ${clsName}) -> bytes:
+            def writeTo(self, source: ${clsName}) -> bytes:
                 """Turns an object into bytes.
                 
                 Parameters:
@@ -59,7 +59,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                     the serialized data bytes
                 """
                 
-                return ${clsName}Encoder().encode(employee).encode("UTF-8")
+                return ${clsName}Encoder().encode(source).encode("UTF-8")
         '
     }
     
