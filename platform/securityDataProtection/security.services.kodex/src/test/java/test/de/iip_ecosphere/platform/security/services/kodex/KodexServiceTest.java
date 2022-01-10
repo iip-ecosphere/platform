@@ -22,6 +22,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.security.services.kodex.KodexService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -189,6 +190,19 @@ public class KodexServiceTest {
     }
     
     /**
+     * Processes {@code data} on {@code service} and logs the sent input.
+     * 
+     * @param service the service instance
+     * @param data the input data
+     * @throws IOException if processing/serializing the input data fails
+     */
+    private static void process(KodexService<InData, OutData> service, InData data) throws IOException {
+        LoggerFactory.getLogger(KodexServiceTest.class).info("Input: {"
+            + "id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
+        service.process(data);
+    }
+    
+    /**
      * Tests the KODEX service.
      * 
      * @throws ExecutionException in case of service execution failures
@@ -205,6 +219,8 @@ public class KodexServiceTest {
                 Assert.assertTrue(data.getName() != null && data.getName().length() > 0);
                 Assert.assertTrue(data.getKip() != null && data.getKip().length() > 0);
                 receivedCount.incrementAndGet();
+                LoggerFactory.getLogger(KodexServiceTest.class).info("Received result: {kip=\"" + data.getKip() 
+                    + "\" id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
             }
 
             @Override
@@ -228,9 +244,9 @@ public class KodexServiceTest {
         KodexService<InData, OutData> service = new KodexService<>(
             new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
         service.setState(ServiceState.STARTING);
-        service.process(new InData("test", "test"));
-        service.process(new InData("test", "test"));
-        service.process(new InData("test", "test"));
+        process(service, new InData("test", "test"));
+        process(service, new InData("test", "test"));
+        process(service, new InData("test", "test"));
         service.setState(ServiceState.STOPPING);
         Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
 

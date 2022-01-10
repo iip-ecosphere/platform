@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
 
-    public static final int WAITING_TIME_WIN = 120000; // preliminary
+    public static final int WAITING_TIME_WIN = 20000; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = "0.0.7";
     private static final boolean DEBUG = false;
