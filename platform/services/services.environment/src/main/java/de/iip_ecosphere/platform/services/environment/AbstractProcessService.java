@@ -34,7 +34,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Implements an abstract asynchronous process-based service.
+ * Implements an abstract asynchronous process-based service. A created service/process is stopped on JVM shutdown. 
  * 
  * @param <I> the input data type
  * @param <SI> the service input data type
@@ -363,6 +363,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             handleOutputStream(proc.getOutputStream());
             handleInputStream(proc.getInputStream());
             handleErrorStream(proc.getErrorStream());
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
         } catch (IOException e) {
             throw new ExecutionException(e);
         }        
