@@ -4,7 +4,7 @@
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
-* Initial integration of KODEX as platform service for anonymization/pseudonymization.
+* Model-based of KODEX as platform service for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
 * Initial mapping of the AAS product name/typeplate into the AAS abstraction and the default BaSyx implementation.
 * Initial version of service execution with multiple brokers and data paths between multiple devices.
 * More flexible device ids via IdProvider and, if permitted, overriding the device id via command line parameter `--iip.id`.
@@ -28,12 +28,10 @@
     * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
     * Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
 * Planned improvements:
-    * Python service execution environment
+    * Python service execution environment (started).
     * Integrated container management for Kubernetes
-    * Automatic creation of containers and their accessibility for devices.
-    * More detailed configuration model with even more code generation.
+    * Automatic creation of containers and their accessibility for devices (started).
     * Potentially, an initial version of the platform monitoring.
-
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
