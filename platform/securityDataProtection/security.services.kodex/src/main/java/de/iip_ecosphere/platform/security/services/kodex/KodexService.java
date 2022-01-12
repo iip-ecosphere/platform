@@ -36,13 +36,16 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
 
-    public static final int WAITING_TIME_WIN = 20000; // preliminary
+    public static final int WAITING_TIME_WIN = 120000; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = "0.0.7";
     private static final boolean DEBUG = false;
+    
+    private String dataSpec;
 
     /**
-     * Creates an instance of the service with the required type translators to/from JSON.
+     * Creates an instance of the service with the required type translators to/from JSON. Data file is 
+     * "data.yml".
      * 
      * @param inTrans the input translator
      * @param outTrans the output translator
@@ -51,7 +54,23 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
      */
     public KodexService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
         ReceptionCallback<O> callback, YamlService yaml) {
+        this(inTrans, outTrans, callback, yaml, "data.yml");
+    }
+    
+    /**
+     * Creates an instance of the service with the required type translators to/from JSON.
+     * 
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param dataSpec name of the data spec file (within the process home path) to pass to KODEX; related files such 
+     *     as api or actions must be there as well and referenced from the data spec file 
+     */
+    public KodexService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
+        ReceptionCallback<O> callback, YamlService yaml, String dataSpec) {
         super(inTrans, outTrans, callback, yaml);
+        this.dataSpec = dataSpec;
     }
     
     @Override
@@ -70,7 +89,7 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
             args.add("debug");
         }
         args.add("run");
-        args.add("example-data.yml");
+        args.add(dataSpec);
         addProcessSpecCmdArg(args);
         
         createAndConfigureProcess(exe, false, home, args);

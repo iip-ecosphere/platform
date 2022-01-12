@@ -241,16 +241,22 @@ public class KodexServiceTest {
         pDesc.setHome(new File("./src/test/resources"));
         sDesc.setProcess(pDesc);
         
+        // just that the constructor is called, throw away
+        new KodexService<>(new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
+        // test implementation
         KodexService<InData, OutData> service = new KodexService<>(
-            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
+            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc, "example-data.yml");
         service.setState(ServiceState.STARTING);
         process(service, new InData("test", "test"));
         process(service, new InData("test", "test"));
         process(service, new InData("test", "test"));
+        LoggerFactory.getLogger(KodexServiceTest.class).info("Stopping service, may take two minutes on Windows");
         service.setState(ServiceState.STOPPING);
         Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
 
+        LoggerFactory.getLogger(KodexServiceTest.class).info("Activating/Passivating");
         service.activate();
+        LoggerFactory.getLogger(KodexServiceTest.class).info("Passivating service, may take two minutes on Windows");
         service.passivate();
     }
     
