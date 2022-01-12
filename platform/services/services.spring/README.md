@@ -25,10 +25,12 @@ In addition, service deployment properties are given in a separate descriptor, t
       * `endpoint` defines the port and host command line arguments defining the broker for the respective channel/topic. Within these arguments, `${port}` and `${host}` are substituted by actual values, respectively. `hostArg` is optional - if not given, localhost is used. Multiple command line arguments can be given separated by whitespaces, double quotes are considered to escape strings/keep strings together.
       * A relation may have an  optional `description`, a qualified Java `type` name either pointing to a Java (primitive) type, a platform type or a type declared in the `types` section of the containing artifact and a `direction` (either `IN` or `OUT`).
       * As the default relation with empty channel declares the endpoint information for all internal process local relations, it must neither have a description, a direction or a type. All internal relations must be declared but must not have an endpoint (as they indicate direction and data type). All external relations must provide all data. `ensembleWith` takes priority over implicit service dependencies stated by `relations`.
-    * `process`: Optional structure indicating that the service is not directly implemented in Java rather than in terms of a further process, e.g., in a different programming language. 
-      * `artifacts` is the list of files (with path if needed, including trailing slash) to be extracted from the containing service artifact. These files provide the service implementation. At least one must be given. Multiple artifacts may facilitate reuse.
+    * `process`: Optional structure indicating that the service is not directly implemented in Java rather than in terms of a further process, e.g., in a different programming language. A process may already be `started` or it might be started implicitly if realized as a platform service. In this case, the process information can be used to configure the ports of a running service or the home path/artifacts to be extracted for a service to be started implicitly.
+      * `home` path in which the process shall be executed. If given, `${tmp}` will be replaced by the system temporary directory, `${user}` by the user home directory path. If not given, a temporary one will be created. (default is empty)
+      * `artifacts` is a list of files (with path if needed, including trailing slash) to be extracted from the containing service artifact. These files provide the service implementation. At least one must be given. Multiple artifacts may facilitate reuse.
       * `executable` denotes the program to execute, i.e., either a system command (potentially substituted due to the overall setup described below) or a relative path within the `artifact` where the executable/code is located. All files and folders contained in `artifact` will be extracted to a local directory, which is set as home directory for the process.
-      * `cmdArg` provide the arguments of `executable` in terms of a string list. Aas above, ${port} and ${protocol} are substituted with the command port/protocol. 
+      * `executablePath` additional path to be prepended before `executable` (default is empty). 
+      * `cmdArg` provide the arguments of `executable` in terms of a string list. Aa above, ${port} and ${protocol} are substituted with the command port/protocol. 
       * `streamEndpoint` and `aasEndpoint` denote (akin to `endpoint` above) communication settings to be appended to the command line arguments, here for the data streaming communication (i.e., the service will delegate the data there and receive input from there) and AAS command communication (typically via VAB). 
       * The Boolean property `started` indicates whether the underlying process is already started (default is `false`), e.g., in case of a database.
       *  `waitTime` defines a time to wait until the process is supposed to be ready before continuing service start activities (default `0`, positive values denote milliseconds to wait).
@@ -72,9 +74,11 @@ The schematic descriptor structure looks as given below (lists are indicates by 
             type: <QString>
             direction: <IN|OUT>
         process:
+          home: <String>
           artifacts: 
             - <String>
           executable: <String>
+          executablePath: <String>
           cmdArg:
             - <String>
           streamEndpoint:

@@ -29,7 +29,8 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 public interface ProcessSpec {
 
     /**
-     * Returns the process implementing artifacts within the containing artifact to be extracted.
+     * Returns the process implementing artifacts within the containing artifact to be extracted into the 
+     * {@link #getHome() process home directory}.
      * 
      * @return the relative paths to the artifacts, shall start with "/" as part of ZIP/JAR
      */
@@ -102,7 +103,10 @@ public interface ProcessSpec {
     public Endpoint getAasEndpoint();
     
     /**
-     * Returns whether the underlying process is already started when firing up the service.
+     * Returns whether the underlying process is already started when firing up the service or it will be started 
+     * through the service implementation. If specified, {@link #getArtifacts() artifacts} will be extracted anyway
+     * into the {@link #getHome() process home directory}, assuming that a pre-installed executable will not specify
+     * artifacts to be extracted.
      * 
      * @return {@code true} for started, {@code false} else (default)
      */

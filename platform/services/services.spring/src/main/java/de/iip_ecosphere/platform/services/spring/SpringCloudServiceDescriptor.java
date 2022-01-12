@@ -283,30 +283,35 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     private int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
         int result = -1;
-        if (!pSpec.isStarted()) {
-            NetworkManager mgr = NetworkManagerFactory.getInstance();
-            String serviceProtocol = config.getServiceProtocol();
-            try {
-                // create process home dir
+        try {
+            // take over / create process home dir
+            processDir = pSpec.getHome();
+            if (null == processDir) {
                 processDir = new File(SpringInstances.getConfig().getDownloadDir(), 
-                        Starter.normalizeServiceId(getId()) + "-" + System.currentTimeMillis());
+                    Starter.normalizeServiceId(getId()) + "-" + System.currentTimeMillis());
+            }
+            if (!pSpec.isStarted()) {
                 FileUtils.deleteQuietly(processDir); // unlikely, just to be sure
-                processDir.mkdirs();
+            }
+            processDir.mkdirs();
 
-                    // unpack artifact
-                for (String artPath : pSpec.getArtifacts()) {
-                    if (!artPath.startsWith("/")) {
-                        artPath = "/" + artPath;
-                    }
-                    InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
-                    if (null == artifact) {
-                        throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
-                    }
-                    JarUtils.extractZip(artifact, processDir.toPath());
-                    artifact.close();
+            // unpack artifacts to home
+            for (String artPath : pSpec.getArtifacts()) {
+                if (!artPath.startsWith("/")) {
+                    artPath = "/" + artPath;
                 }
+                InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
+                if (null == artifact) {
+                    throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
+                }
+                JarUtils.extractZip(artifact, processDir.toPath());
+                artifact.close();
+            }
 
+            if (!pSpec.isStarted()) {
                 // compose start arguments and start service implementation
+                NetworkManager mgr = NetworkManagerFactory.getInstance();
+                String serviceProtocol = config.getServiceProtocol();
                 ManagedServerAddress procAdr = registerPort(mgr, Starter.getServiceProcessNetworkMgrKey(getId()));
                 List<String> args = new ArrayList<String>();
                 args.add(config.getExecutable(pSpec.getExecutable()));
@@ -319,10 +324,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                     TimeUtils.sleep(pSpec.getWaitTime());
                 }
                 result = procAdr.getPort();
-            } catch (IOException e) {
-                release();
-                throw new ExecutionException(e);
             }
+        } catch (IOException e) {
+            release();
+            throw new ExecutionException(e);
         }
         return result;
     }
