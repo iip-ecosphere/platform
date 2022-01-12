@@ -35,6 +35,12 @@
      <version>0.1.0-SNAPSHOT</version>
      <classifier>interfaces</classifier>
     </dependency>
+    <dependency>
+     <artifactId>SimpleKodexTestingApp</artifactId>
+     <groupId>de.iip-ecosphere.platform.apps</groupId>
+     <version>0.1.0-SNAPSHOT</version>
+     <classifier>interfaces</classifier>
+    </dependency>    
   
     <dependency>
       <groupId>junit</groupId>
