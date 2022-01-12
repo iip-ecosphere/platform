@@ -47,6 +47,8 @@ REM param2: version of the artifact to deploy
     SET TESTJAVADOC=%ARTIFACTPREFIX%-test-javadoc.jar
     SET PYTHON=%ARTIFACTPREFIX%-python.jar
     SET EASY=%ARTIFACTPREFIX%-easy.jar
+    SET INTERFACES=%ARTIFACTPREFIX%-interfaces.jar
+    SET BINS=%ARTIFACTPREFIX%-bins.jar
     
     REM deploy to central
     if EXIST %FOLDER%\%JAR% (
@@ -75,6 +77,14 @@ REM param2: version of the artifact to deploy
         if EXIST %FOLDER%\%EASY% (
           echo "EASY %FOLDER%\%EASY%"
           call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%EASY% -Dclassifier=easy
+        )
+        if EXIST %FOLDER%\%INTERFACES% (
+          echo "EASY %FOLDER%\%INTERFACES%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%INTERFACES% -Dclassifier=interfaces
+        )
+        if EXIST %FOLDER%\%BINS% (
+          echo "EASY %FOLDER%\%BINS%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINS% -Dclassifier=bin
         )
     ) else (
         echo "POM %FOLDER%\%POM%"
