@@ -148,7 +148,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, JavaService service) {
         if (service.class.length() > 0) {
             String serviceType = getServiceType(elt, service);
-            'service = AbstractService.createInstance("${service.class}", ${serviceType}.class, "${service.id}", "${getDeploymentDescriptorPath()}");
+            'service = AbstractService.createInstance("${service.class}", 
+                ${serviceType}.class, 
+                "${service.id}", 
+                "${getDeploymentDescriptorPath()}");
             Starter.mapService(service);'
         } else {
             '// NO service defined, no initialization possible'

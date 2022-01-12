@@ -113,7 +113,7 @@ project KodexMesh {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiver3Impl",
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.KodexReceiverImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec2)}}

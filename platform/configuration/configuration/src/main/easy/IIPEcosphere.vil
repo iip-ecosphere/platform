@@ -97,11 +97,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             assemblySrc.mkdir();
             vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
+            
+            // partition according to container strategy
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
+            generateServiceContainer(appRoot, config, a, elements);
             
             maven("${appRoot}", true);
         };
+    }
+    
+    // initial, depends on container strategies
+    generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
     }
 
     // dispatch basis    
