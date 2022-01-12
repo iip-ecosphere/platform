@@ -68,6 +68,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
             // generate service classes and service integration
             setOf(String) artifacts = {};
+            setOf(String) bins = {}; 
             sequenceOf(MeshElement) elements = {};
             artifacts.add(a.artifact);
             mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
@@ -83,7 +84,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
-                    generateServiceResources(no, no.impl, resourcesSrc);
+                    generateServiceResources(no, no.impl, resourcesSrc, bins);
                 };
             };
             elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -99,7 +100,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
             
             // partition according to container strategy
-            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
@@ -112,16 +113,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
 
     // dispatch basis    
-    generateServiceResources(MeshElement no, ServiceBase base, String folder) = {
+    generateServiceResources(MeshElement no, ServiceBase base, String folder, setOf(String) bins) = {
     }
     
     // KODEX (preliminary)    
-    generateServiceResources(MeshElement no, KodexService service, String folder) = {
+    generateServiceResources(MeshElement no, KodexService service, String folder, setOf(String) bins) = {
+        IIPEcosphere cfg = config;
         Path path = folder + "/" + toFolderName(no.impl.id);
         path.mkdir();
         vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
+        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip");
     }
     
     // called from tests, don't change signature

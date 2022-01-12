@@ -139,12 +139,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         XmlElement execs = new XmlElement(plugin, "executions");
+        appendMavenDependencyPluginExecution(execs, "unpack", artifact, classifier, outputDir, destFileName, type=type, phase=phase);
+        execs;
+    }
+    
+    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
         XmlElement exec = new XmlElement(execs, "execution");
-        new XmlElement(exec, "id", "unpack");
-        appendGoal(exec, "unpack");
+        new XmlElement(exec, "id", goal);
+        appendGoal(exec, goal);
         new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);
         XmlElement items = new XmlElement(config, "artifactItems");
+        appendMavenDependencyPluginArtifactItem(items, artifact, classifier, outputDir, destFileName, type=type);        
+        items;
+    }
+    
+    def XmlElement appendMavenDependencyPluginArtifactItem(XmlElement items, String artifact, String classifier, String outputDir, String destFileName, String type="jar") {
         XmlElement item = new XmlElement(items, "artifactItem");
         appendArtifact(item, artifact, createDepElt=false);
         if (type.length() > 0) {
@@ -156,7 +166,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(item, "overWrite", "true");        
         new XmlElement(item, "outputDirectory", outputDir);
         new XmlElement(item, "destFileName", destFileName);
-        execs;
+        item;    
     }
     
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
