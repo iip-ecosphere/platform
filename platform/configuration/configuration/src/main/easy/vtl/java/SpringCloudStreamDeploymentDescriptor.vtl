@@ -1,3 +1,4 @@
+import Basics;
 import JavaBasics;
 import MavenBasics;
 import JavaMapping;
@@ -34,7 +35,23 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - endpoint:
               portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
               hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-            ${generateRelations(elt)}'
+            ${generateRelations(elt)}
+          ${generateProcess(elt, service)|e}'
+    }
+    
+    def generateProcess(MeshElement elt, Service service) {
+        ''
+    }
+    
+    def generateProcess(MeshElement elt, KodexService service) {
+        String id = toFolderName(service.id);
+        'process: 
+            artifacts:
+              - /kodex.zip
+              - /${id}.zip
+            home: \\${tmp}/${id}/kodex
+            executablePath: \\${tmp}/${id}/kodex 
+            started: true'
     }
     
     def generateMemLimitOpt(Service service) {

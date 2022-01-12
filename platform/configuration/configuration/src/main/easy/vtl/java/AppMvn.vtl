@@ -2,7 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, String starterCls, Application app, String appName, Boolean tests) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, Application app, String appName, Boolean tests) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -17,7 +17,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, String starterCls, Application app, String appName, Boolean tests) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, Application app, String appName, Boolean tests) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = config.iipVer;
         String appVersion = "${app.ver}";
@@ -57,6 +57,12 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         appendAssemblyDescriptor(assemblyPlugin, "appPython", "src/main/assembly/python.xml", outputDir="\\${project.build.directory}/classes", phase="test", finalName="python");
         appendAssemblyDescriptor(assemblyPlugin, "interfaces", "src/main/assembly/javaInterfaces.xml", attach=true);
+        for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
+            sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
+            String id = tmp[0];
+            String path = tmp[1];
+            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir="\\${project.build.directory}/classes", finalName=id, phase="process-sources");
+        }
         appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
 
         XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
