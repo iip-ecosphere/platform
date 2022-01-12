@@ -163,7 +163,7 @@ public class ProcessServiceTest {
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
         pDesc.setExecutable("java");
-        pDesc.setHome(new File("target/test-classes"));
+        pDesc.setHome("target/test-classes");
         sDesc.setProcess(pDesc);
         
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);

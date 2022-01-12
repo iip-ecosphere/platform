@@ -16,6 +16,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service.
@@ -26,7 +28,7 @@ public class YamlProcess {
 
     private String executable;
     private File executablePath;
-    private File home;
+    private String home;
     private List<String> cmdArg = new ArrayList<>();
     
     /**
@@ -48,13 +50,22 @@ public class YamlProcess {
     }
 
     /**
-     * Returns the home directory of the process to be executed.
+     * Returns the home directory of the process to be executed. Replaces "${tmp}" by the system temporary directory 
+     * path and "${user}" by the user directory path.
      * 
      * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
      *     define a home path
      */
     public File getHome() {
-        return home;
+        File result;
+        if (null == home || home.length() == 0) {
+            result = null;
+        } else {
+            String tmp = home.replace("${tmp}", FileUtils.getTempDirectoryPath());
+            tmp = tmp.replace("${user}", FileUtils.getUserDirectoryPath());
+            result = new File(tmp);
+        }
+        return result;
     }
     
     /**
@@ -87,11 +98,13 @@ public class YamlProcess {
     
     /**
      * Changes the home directory of the process to be executed. [required by SnakeYaml]
+     * May contain "${tmp}" for the system temporary directory path
+     * and "${user}" for the user directory path.
      * 
      * @param home the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
      *     define a home path
      */
-    public void setHome(File home) {
+    public void setHome(String home) {
         this.home = home;
     }
 
