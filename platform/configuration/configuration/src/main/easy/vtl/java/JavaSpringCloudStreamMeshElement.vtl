@@ -33,17 +33,21 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
-    def attachIngestors() {
+    def attachIngestors(ServiceBase base) {
          for (String methodSuffix : ingestors.getKeys()) {
              // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
              if (asyncIngestors.containsKey(methodSuffix)) {
                  if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
-                     'service.attach${methodSuffix}Ingestor(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
+                     '${generateIngestor(base, methodSuffix)}'
                  }
-             } 
+             }
              // no-hack code
              //'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${methodSuffix}-in-0", data));'
          }
+    }
+    
+    def generateIngestor(ServiceBase base, String methodSuffix) {
+        'service.attach${methodSuffix}Ingestor(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -86,6 +90,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateAsyncProcessorInMethod(proc, proc.impl, type, methodSuffix, methodSuffixWithServiceId);
+    } 
+    
+    def generateAsyncProcessorInMethod(MeshProcessor proc, ServiceBase base, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (asynchronously).
         *
@@ -93,9 +101,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         @Bean
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", false)};
+            ${generateAsyncProcessorBody(proc, base, methodSuffix, type)}
         }'
-    } 
+    }
+
+    def generateAsyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String type) {
+        'return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", false)};'
+    }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
@@ -125,16 +137,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // --------------- initial service to obtain a service instance to run with -------------------------
     
-    def initialService(MeshElement elt, ServiceBase service, String serviceType) {
+    def initialService(MeshElement elt, ServiceBase service) {
         ''
     }
 
-    def initialService(MeshElement elt, Service service, String serviceType) {
+    def initialService(MeshElement elt, Service service) {
         ''
     }
 
-    def initialService(MeshElement elt, JavaService service, String serviceType) {
+    def initialService(MeshElement elt, JavaService service) {
         if (service.class.length() > 0) {
+            String serviceType = getServiceType(elt, service);
             'service = AbstractService.createInstance("${service.class}", ${serviceType}.class, "${service.id}", "${getDeploymentDescriptorPath()}");
             Starter.mapService(service);'
         } else {
@@ -145,7 +158,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // TODO connector connect
     // TODO connector protocol adapter
     
-    def initialService(MeshElement elt, Connector conn, String serviceType) {
+    def initialService(MeshElement elt, Connector conn) {
         String connGen = getConnectorGenerics(conn, false);
         String clsName = getClsName(elt);
         '${adapterCreationFragment(conn, "adapter")};
@@ -159,14 +172,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     // TODO family
 
-    /*def initialService(MeshElement elt, ServiceFamily family, String serviceType) {
-       initialService(family.members.toSequence().first(), serviceType);
+    /*def initialService(MeshElement elt, ServiceFamily family) {
+       initialService(family.members.toSequence().first());
     }*/
 
-    def initialService(MeshElement elt, PythonService service, String serviceType) {
-        '// TODO create ServiceStub'
+    def generateReceptionCallback(MeshElement elt, ServiceBase base) {
+        ''
     }
-
+    
     // --------------- service type -------------------------
     
     def String getClsName(MeshElement elt) {
@@ -176,10 +189,178 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def getServiceType(MeshElement elt, ServiceBase base) {
         "${getClsName(elt)}Service";
     }
-
+    
     def getServiceType(MeshElement elt, Connector conn) {
         isConnector = true;
         "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
+    }
+    
+    def generateImports(ServiceBase base) {
+        ''
+    }
+    
+    def generateServiceAttribute(MeshElement elt, ServiceBase base) {
+        String serviceType = getServiceType(elt, base);
+        'private ${serviceType} service;'
+    }
+    
+    def generateServiceAttribute(MeshProcessor elt, KodexService base) {
+        String serviceType = getServiceType(elt, base);
+        mapOf(IOType, IOType) pairs = ioPairs(elt);
+        for (IOType in : pairs.keys()) {
+            String inType = toTypeName(in.type);
+            IOType out = pairs.get(in);
+            String outType = toTypeName(out.type);
+            'private ${serviceType}<${inType},${outType}> ${kodexServiceName(in, out)};'
+        }
+    }
+    
+    // -------------------- Python --------------------------
+
+    def initialService(MeshElement elt, PythonService service) {
+        '// TODO create ServiceStub'
+    }
+
+    // -------------------- KODEX ---------------------------
+
+    def String kodexServiceName(IOType in, IOType out) {
+        "service${toTypeName(in.type)}${toTypeName(out.type)}";
+    }
+    
+    def getServiceType(MeshElement elt, KodexService service) {
+        "de.iip_ecosphere.platform.security.services.kodex.KodexService";
+    }
+    
+    def generateIngestor(KodexService service, String methodSuffix) {
+        ''
+    }
+
+    def generateImports(KodexService service) {
+        'import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;
+        import org.slf4j.LoggerFactory;'
+    }
+    
+    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String type) {
+        mapOf(IOType, IOType) pairs = ioPairs(proc);
+        setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
+        if (ins.size() > 0) {
+            IOType in = ins.toSequence().first();
+            if (pairs.containsKey(in)) {
+                IOType out = pairs.get(in);
+                'return data -> { 
+                    try {
+                        ${kodexServiceName(in, out)}.process(data);
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(getClass()).error("Processing data: " + e.getMessage());
+                    }
+                };'
+            } else {
+                'return null;'
+            }
+        } else {
+            'return null;'
+        }
+    }
+
+    def initialService(MeshProcessor elt, KodexService service) {
+        String clsName = getClsName(elt);
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        mapOf(IOType, IOType) pairs = ioPairs(elt);
+        for (IOType in : pairs.keys()) {
+            String inType = toTypeName(in.type);
+            IOType out = pairs.get(in);
+            String outType = toTypeName(out.type);
+            '${kodexServiceName(in, out)} = new ${getServiceType(elt, elt.impl)}(
+                new ${inType}InputTranslator(), 
+                new ${outType}OutputTranslator(), 
+                new ${outType}ReceptionCallback(), 
+                serviceData);'
+        }
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, KodexService service) {
+        String serviceId = "_" + toIdentifier(service.id);
+
+        for (IOType out : elt.output) {
+             String type = toTypeName(out.type);
+             String methodSuffix = "create" + type.firstToUpperCase() + serviceId;
+
+            '/**
+             * Reception callback.
+             * 
+             * @author EASy-Producer
+             */
+            private class ${type}ReceptionCallback implements ReceptionCallback<${type}> {
+
+                @Override
+                public void received(${type} data) {
+                    streamBridge.send("${methodSuffix}", data);
+                }
+
+                @Override
+                public Class<${type}> getType() {
+                    return ${type}.class;
+                }
+
+            }
+            '
+        }
+        
+        for (IOType in : elt.input) {
+            String type = toTypeName(in.type);
+            '/**
+             * In-data JSON type translator.
+             * 
+             * @author EASy-Producer
+             */
+            private static class ${type}InputTranslator implements TypeTranslator<${type}, String> {
+
+                @Override
+                public ${type} from(String data) throws IOException {
+                    return null; // shall be filled, not needed here
+                }
+
+                @Override
+                public String to(${type} source) throws IOException {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        return objectMapper.writeValueAsString(source);
+                    } catch (JsonProcessingException e) {
+                        throw new IOException(e);
+                    }                
+                }
+
+             }
+             '
+        }
+        
+        for (IOType out : elt.output) {
+             String type = toTypeName(out.type);
+             '/**
+              * Out-data JSON type translator.
+              * 
+              * @author EASy-Producer
+              */
+             private static class ${type}OutputTranslator implements TypeTranslator<String, ${type}> {
+
+                 @Override
+                 public String from(${type} data) throws IOException {
+                     return null; // shall be filled, not needed here
+                 }
+
+                 @Override
+                 public ${type} to(String source) throws IOException {
+                     try {
+                         ObjectMapper objectMapper = new ObjectMapper();
+                         return objectMapper.readValue(source, ${type}.class);
+                     } catch (JsonProcessingException e) {
+                         throw new IOException(e);
+                     }
+                 }
+             }
+             '
+         }
     }
     
     // --------------------- main ---------------------------
@@ -187,7 +368,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) {
         String clsName = getClsName(elt);
-        String serviceType = getServiceType(elt, elt.impl);
         ServiceBase impl = elt.impl;
         'package ${pkg};
         
@@ -212,10 +392,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import iip.datatypes.*;
         import iip.interfaces.*;
         import iip.stubs.*;
+        ${generateImports(elt.impl)|e}
 
         /**
          * Spring Cloud Stream service frame for net node \'${elt.name}\'.
-         * Generated by: EASy-Producer.
+         *
+         * @author EASy-Producer.
          */
         @Component
         @EnableScheduling
@@ -223,17 +405,19 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         
             @Autowired
             private StreamBridge streamBridge;
-            private ${serviceType} service;
+            ${generateServiceAttribute(elt, elt.impl)}
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             @SuppressWarnings("unused")
             private MetricsProvider metrics;
+
+            ${generateReceptionCallback(elt, elt.impl)|e}
         
             /**
              * Creates an instance.
              */
             public ${clsName}() {
-                ${initialService(elt, elt.impl, serviceType)}
+                ${initialService(elt, elt.impl)}
             }
         
             ${generateDataMethods(elt)}
@@ -244,7 +428,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             @PostConstruct 
             public void attachIngestors() {
-                ${attachIngestors()}
+                ${attachIngestors(elt.impl)}
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}

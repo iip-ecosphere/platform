@@ -1,6 +1,10 @@
 @advice(IIPEcosphere)
 template Basics(Configuration config, FileArtifact target) {
 	
+	def String toFolderName(String s) {
+        s.firstToLowerCase().toIdentifier();
+    }
+	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);
     }

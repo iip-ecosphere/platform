@@ -100,17 +100,26 @@ project Services {
        Boolean deployable;
    }
    
+   // a service that ships with the platform for which an actual implementation exists (may have to be customized)
+   abstract compound PlatformService refines Service {
+       String artifact = ""; // optional maven artifact
+   }
+   
+   // ------------------------------ Java services -------------------------------
+   
    enum JavaVersion {jdk11, jdk16}; 
    
-   compound JavaService refines Service {
+   compound JavaService refines Service { // not implemented service as not necessarily shipped with platform
        String class; // optional class name, if not given do not generate service binding
        String artifact; // optional maven artifact
        
        isDefined(class); // must be defined, not necessarily with a value
        isDefined(artifact); // must be defined, not necessarily with a value
        
-       JavaVersion javaVersion;
+       JavaVersion javaVersion; // minimum requirement
    }
+   
+   // ------------------------------- python (integrated) services -----------------
    
    compound PythonDependency {      //e.g. numpy 1.21.5
        String name;
@@ -121,6 +130,34 @@ project Services {
        String entrypointModule;
        String artifact;
        setOf(PythonDependency) dependencies;
+   }
+   
+   // ------------------------------- integrated KODEX service -----------------------
+   
+   // initial, unclear, input missing
+   enum KodexAction {
+       PseudonymizeMerengue
+   };
+   
+   // applies KodexAction to field
+   compound KodexFieldAction {
+       refTo(Field) field;
+       KodexAction action;
+       // parameter needed?
+   }
+   
+   // preliminary, own module as kind of "extension"?
+   compound KodexService refines PlatformService {
+       setOf(KodexFieldAction) actions;
+       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
+       IipVersion ver = "0.7.0";
+       String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
+       // asynchronous true
+       // deployable may influcence integration type
+       // integration type: CMD, REST, CENTRAL
+       // TODO constraint all action fields must match input/output fieldsM actions must be defined
+       // TODO #input=#output
+       // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
    }
    
    // IIP-Ecosphere provided connectors

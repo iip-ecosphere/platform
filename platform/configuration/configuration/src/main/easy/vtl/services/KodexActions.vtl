@@ -1,0 +1,88 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template KodexActions(Configuration config, FileArtifact target, MeshElement elt) {
+
+    def generateFields(MeshElement elt, ServiceBase base) {
+    }
+    
+    def generateFields(MeshProcessor elt, KodexService service) {
+        mapOf(Field, KodexFieldAction) actions = {};
+        for (KodexFieldAction a : service.actions) {
+            actions.add(a.field, a); 
+        }
+        for (IOType in: elt.input) {
+            '${generateField(in.type, actions)}'
+        }
+    }
+    
+    def generateField(DataType type, mapOf(Field, KodexFieldAction) actions) {
+        ''
+    }
+    
+    def generateField(PrimitiveType type, mapOf(Field, KodexFieldAction) actions) {
+        ''
+    }
+    
+    // unclear: nested fields
+    def generateField(RecordType type, mapOf(Field, KodexFieldAction) actions) {
+        for (Field f: type.fields) {
+            if (actions.containsKey(f)) {
+                KodexFieldAction fAction = actions.get(f);
+                KodexAction action = fAction.action;
+                '- name: ${f.name}
+                   validators:
+                     - type: IsAction
+                       config:
+                         type: ${actionType(action)}
+                         config:
+                           method: ${actionMethod(action)}
+                     ${typeValidator(f.type)|e}'
+            }
+        }
+    }
+    
+    def typeValidator(DataType type) {
+    }
+    
+    def typeValidator(PrimitiveType type) {
+        switch(type.name) {
+            "Integer" : '', // TODO format unclear
+            "Long" : '', // TODO format unclear
+            "String" : 
+                '- type: IsString', // TODO config needed, maxLength
+            "Boolean" : '', // TODO format unclear
+            "Float" : '', // TODO format unclear
+            "Double" : '' // TODO format unclear
+        }
+    }
+    
+    // TODO nested compounds??
+    
+    def String actionType(KodexAction action) {
+        switch (action) {
+            KodexAction::PseudonymizeMerengue: "pseudonymize"
+        }
+    }
+
+    def String actionMethod(KodexAction action) {
+        switch (action) {
+            KodexAction::PseudonymizeMerengue: "merengue"
+        }
+    }
+    
+    // --------------------- main ---------------------------
+
+    def main(Configuration config, FileArtifact target, MeshElement elt) {
+        'forms:
+           DataForm: &DataForm
+             fields:
+               ${generateFields(elt, elt.impl)}
+         actions:
+           - name: protect example data
+             type: form
+             config: *DataForm'
+    }
+    
+}

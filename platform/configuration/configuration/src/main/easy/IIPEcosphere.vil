@@ -76,11 +76,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
-                    vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+                    if (not(no.impl.isKindOf(PlatformService))) { 
+                        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
+                        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+                    }
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
+                    generateServiceResources(no, no.impl, resourcesSrc);
                 };
             };
             elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -99,6 +102,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             maven("${appRoot}", true);
         };
+    }
+
+    // dispatch basis    
+    generateServiceResources(MeshElement no, ServiceBase base, String folder) = {
+    }
+    
+    // KODEX (preliminary)    
+    generateServiceResources(MeshElement no, KodexService service, String folder) = {
+        Path path = folder + "/" + toFolderName(no.impl.id);
+        path.mkdir();
+        vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
+        vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
+        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
     }
     
     // called from tests, don't change signature

@@ -4,13 +4,8 @@ project IIPEcosphere {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    NonEmptyString iipVer = "0.3.0-SNAPSHOT"; // Maven version of platform
     String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
     String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
     String pidDir = "/run"; // linux only, windows goes to tmp
-    
-    freeze {
-        iipVer;
-    };
    
 }

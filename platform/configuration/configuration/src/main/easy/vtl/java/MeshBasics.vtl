@@ -107,4 +107,13 @@ template MeshBasics(Configuration config, FileArtifact target) {
         ''
     } 
     
+    def mapOf(IOType, IOType) ioPairs(MeshProcessor elt) {
+        mapOf(IOType, IOType) result = {};
+        sequenceOf(Integer) indexes = createIntegerSequence(0, min(elt.input.size(), elt.output.size()));
+        for (Integer i : indexes) {
+            result.add(elt.input.get(i), elt.output.get(i));
+        }
+        result;
+    }
+    
 }

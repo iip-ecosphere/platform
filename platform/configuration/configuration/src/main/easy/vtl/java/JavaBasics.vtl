@@ -40,6 +40,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
         "";
     }
 
+    def String getArtifact(PlatformService service) {
+        service.artifact;
+    }
+
     def String getArtifact(JavaService service) {
         service.artifact;
     }
