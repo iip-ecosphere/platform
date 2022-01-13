@@ -301,12 +301,12 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                 if (!artPath.startsWith("/")) {
                     artPath = "/" + artPath;
                 }
+                FileInputStream fis = null;
                 InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
                 if (null == artifact) { // spring packaging fallback
                     try {
-                        FileInputStream fis = new FileInputStream(getArtifact().getJar());
+                        fis = new FileInputStream(getArtifact().getJar());
                         artifact = JarUtils.findFile(fis, "BOOT-INF/classes" + artPath);
-                        FileUtils.closeQuietly(fis);
                     } catch (IOException e) {
                         getLogger().info("Cannot open " + getArtifact().getJar() + ": " + e.getMessage());
                     }
@@ -316,7 +316,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                 }
                 JarUtils.extractZip(artifact, processDir.toPath());
                 getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
-                artifact.close();
+                FileUtils.closeQuietly(artifact);
+                FileUtils.closeQuietly(fis);
             }
 
             if (!pSpec.isStarted()) {
