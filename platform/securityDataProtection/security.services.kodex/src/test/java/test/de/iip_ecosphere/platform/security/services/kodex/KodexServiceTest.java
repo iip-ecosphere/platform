@@ -238,7 +238,7 @@ public class KodexServiceTest {
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
         pDesc.setExecutablePath(new File("./src/main/resources/"));
-        pDesc.setHome("./src/test/resources");
+        pDesc.setHomePath("./src/test/resources");
         sDesc.setProcess(pDesc);
         
         // just that the constructor is called, throw away
