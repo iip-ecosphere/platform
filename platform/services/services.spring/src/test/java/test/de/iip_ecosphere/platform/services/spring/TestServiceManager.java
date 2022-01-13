@@ -59,8 +59,10 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepre
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
+import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -174,8 +176,7 @@ public class TestServiceManager {
 
             @Override
             public void testDeployment(ArtifactDescriptor aDesc) {
-                // commented out after initial commit
-/*                ServiceDescriptor sDesc = aDesc.getService("simpleStream-create");
+                ServiceDescriptor sDesc = aDesc.getService("simpleStream-create");
                 Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
                 ProcessSpec pspec = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
                 Assert.assertNotNull(pspec);
@@ -189,7 +190,7 @@ public class TestServiceManager {
                 Assert.assertNotNull(pspec.getExecutablePath());
                 Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
                 assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
-                assertFileExists(new File(homePath, "test2.txt"));*/
+                assertFileExists(new File(homePath, "test2.txt"));
             }
             
             @Override
@@ -205,7 +206,6 @@ public class TestServiceManager {
      * 
      * @param file the file
      */
-    @SuppressWarnings("unused")
     private static final void assertFileExists(File file) {
         Assert.assertTrue("File " + file + " does not exist", file.exists());
     }

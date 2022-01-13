@@ -177,7 +177,8 @@ public class SpringCloudServiceManager
                 LOGGER.info("Reading artifact " + file + ", descriptor " + descName);
                 InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
                 if (null != descStream) {
-                    result = YamlArtifact.readFromYaml(descStream); 
+                    result = YamlArtifact.readFromYaml(descStream);
+                    FileUtils.closeQuietly(descStream);
                 } else {
                     throwExecutionException("Reading artifact " + file, descName + " does not exist in " + file);
                 }
