@@ -301,8 +301,10 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         }
         if (null != proc) {
             TimeUtils.sleep(Math.max(0, getWaitTimeBeforeDestroy()));
-            proc.destroy();
-            proc = null;
+            if (null != proc) { // may be gone anyway
+                proc.destroy();
+                proc = null;
+            }
         }
     }
 
