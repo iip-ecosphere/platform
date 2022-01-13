@@ -100,8 +100,8 @@ project Services {
        Boolean deployable;
    }
    
-   // a service that ships with the platform for which an actual implementation exists (may have to be customized)
-   abstract compound PlatformService refines Service {
+   // a service for which a complete implementation exists and no generated interfaces are needed
+   abstract compound CompleteService refines Service {
        String artifact = ""; // optional maven artifact
    }
    
@@ -147,7 +147,7 @@ project Services {
    }
    
    // preliminary, own module as kind of "extension"?
-   compound KodexService refines PlatformService {
+   compound KodexService refines CompleteService {
        setOf(KodexFieldAction) actions;
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        IipVersion ver = "0.7.0";

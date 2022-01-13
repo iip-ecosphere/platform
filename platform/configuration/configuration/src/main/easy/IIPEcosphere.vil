@@ -81,7 +81,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    if (not(no.impl.isKindOf(PlatformService))) { 
+                    if (not(no.impl.isKindOf(CompleteService))) { 
                         vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
                         vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
                     }
