@@ -21,6 +21,13 @@ services:
         type: String
         service: simpleStream-log
         direction: OUT
+    process: 
+      artifacts:
+        - artifact.zip
+        - artifact2.zip
+      homePath: ${tmp}/test-process
+      executablePath: ${tmp}/test-process
+      started: true        
   - id: simpleStream-log
     name: log
     version: 0.2.0

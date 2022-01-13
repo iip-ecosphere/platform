@@ -95,6 +95,7 @@
             <includes>
                 <include>application.yml</include>
                 <include>deployment*.yml</include>
+                <include>artifact*.zip</include>
             </includes>
         </testResource> 
         <testResource> 
