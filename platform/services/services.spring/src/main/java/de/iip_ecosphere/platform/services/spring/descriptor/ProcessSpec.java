@@ -56,7 +56,7 @@ public interface ProcessSpec {
      * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
      *     define a home path
      */
-    public File getHome();
+    public File getHomePath();
     
     /**
      * Returns the command line arguments to start the process. The shell will be executed within the folder where

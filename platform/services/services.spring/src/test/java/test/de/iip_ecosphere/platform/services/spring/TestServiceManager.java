@@ -169,13 +169,45 @@ public class TestServiceManager {
     @Test
     public void testSimpleStartStop() throws ExecutionException, IOException {
         doTestStartStop("deployment.yml", new ArtifactAsserter() {
+            
+            private File homePath;
 
-            /*@Override
-            public void testDescriptor(ArtifactDescriptor aDesc) {
-                // more specific tests may go here
-            }*/
+            @Override
+            public void testDeployment(ArtifactDescriptor aDesc) {
+                // commented out after initial commit
+/*                ServiceDescriptor sDesc = aDesc.getService("simpleStream-create");
+                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+                ProcessSpec pspec = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
+                Assert.assertNotNull(pspec);
+                Assert.assertTrue(pspec.isStarted());
+                Assert.assertNotNull(pspec.getArtifacts());
+                Assert.assertEquals(2, pspec.getArtifacts().size());
+
+                homePath = pspec.getHomePath();
+                Assert.assertNotNull(homePath);
+                Assert.assertTrue(homePath.toString().indexOf("${tmp}") < 0); // has been substituted
+                Assert.assertNotNull(pspec.getExecutablePath());
+                Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
+                assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
+                assertFileExists(new File(homePath, "test2.txt"));*/
+            }
+            
+            @Override
+            public void cleanup(ArtifactDescriptor aDesc) {
+                FileUtils.deleteQuietly(homePath); // for next test
+            }
 
         }, false);
+    }
+    
+    /**
+     * Asserts that {@code file} exists.
+     * 
+     * @param file the file
+     */
+    @SuppressWarnings("unused")
+    private static final void assertFileExists(File file) {
+        Assert.assertTrue("File " + file + " does not exist", file.exists());
     }
 
     /**
@@ -218,6 +250,14 @@ public class TestServiceManager {
          * @param desc the descriptor
          */
         public void testDeployment(ArtifactDescriptor desc) {
+        }
+
+        /**
+         * Called after service stop to clean up resources.
+         * 
+         * @param desc the descriptor
+         */
+        public void cleanup(ArtifactDescriptor desc) {
         }
 
     }
@@ -276,7 +316,7 @@ public class TestServiceManager {
             startFakeServiceCommandServers(mgr, ids);
         }
 
-        System.out.println("STARTING " + mgr + " " + ids); // strange, does not work on Jenkins without...
+        System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(ids)); // needed on Jenkins...
         mgr.startService(ids);
 
         for (ServiceDescriptor sDesc : aDesc.getServices()) {
@@ -296,6 +336,7 @@ public class TestServiceManager {
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
         assertMetrics(ids, expectedMetrics);
 
+        asserter.testDeployment(aDesc);
         mgr.stopService(ids);
         releaseFakeServiceCommandServers();
         
@@ -303,9 +344,8 @@ public class TestServiceManager {
             Assert.assertEquals("Service " + sDesc.getId() + " " + sDesc.getName() + " not stopped: " 
                 + sDesc.getState(), ServiceState.STOPPED, sDesc.getState());
         }
-
-        asserter.testDeployment(aDesc);
         
+        asserter.cleanup(aDesc);
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
@@ -345,7 +385,7 @@ public class TestServiceManager {
             Assert.assertNotNull(service);
             for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
                 Property prop = service .getProperty(ent.getKey());
-                Assert.assertNotNull(prop);
+                Assert.assertNotNull(ent.getKey() + " missing", prop);
                 Predicate<Object> pred = ent.getValue();
                 if (null != pred) {
                     Object val = prop.getValue();

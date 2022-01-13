@@ -236,16 +236,18 @@ public class Validator {
         assertStringList(process.getArtifacts(), "artifacts", "artifact", msgContext);
         assertCondition(process.getArtifacts() != null && process.getArtifacts().size() > 0, 
             "At least one artifact must be given", msgContext);
-        assertStringNotEmpty(process.getExecutable(), "executable", msgContext);
         assertStringList(process.getCmdArg(), "cmdArg", "arg", msgContext);
-        if (assertFieldNotNull(process.getAasEndpoint(), "aasEndpoint", msgContext)) {
-            validate(process.getAasEndpoint(), appendToContext(msgContext, "aasEndpoint"));
-        }
-        if (assertFieldNotNull(process.getStreamEndpoint(), "streamEndpoint", msgContext)) {
-            validate(process.getStreamEndpoint(), appendToContext(msgContext, "streamEndpoint"));
-        }
-        if (assertFieldNotNull(process.getServiceStreamEndpoint(), "serviceStreamEndpoint", msgContext)) {
-            validate(process.getServiceStreamEndpoint(), appendToContext(msgContext, "serviceStreamEndpoint"));
+        if (!process.isStarted()) {
+            assertStringNotEmpty(process.getExecutable(), "executable", msgContext);
+            if (assertFieldNotNull(process.getAasEndpoint(), "aasEndpoint", msgContext)) {
+                validate(process.getAasEndpoint(), appendToContext(msgContext, "aasEndpoint"));
+            }
+            if (assertFieldNotNull(process.getStreamEndpoint(), "streamEndpoint", msgContext)) {
+                validate(process.getStreamEndpoint(), appendToContext(msgContext, "streamEndpoint"));
+            }
+            if (assertFieldNotNull(process.getServiceStreamEndpoint(), "serviceStreamEndpoint", msgContext)) {
+                validate(process.getServiceStreamEndpoint(), appendToContext(msgContext, "serviceStreamEndpoint"));
+            }
         }
         // started and waitTime are valid anyway
     }

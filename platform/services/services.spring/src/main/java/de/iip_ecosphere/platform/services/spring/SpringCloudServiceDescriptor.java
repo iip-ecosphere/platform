@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
@@ -227,8 +229,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                 cmdLine.addAll(cmdArgs);
             }
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
-            LoggerFactory.getLogger(SpringCloudServiceDescriptor.class).info("Creates deployment request for " 
-                + getName() + " " + cmdLine);
+            getLogger().info("Creates deployment request for " + getName() + " " + cmdLine);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;
@@ -285,7 +286,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         int result = -1;
         try {
             // take over / create process home dir
-            processDir = pSpec.getHome();
+            processDir = pSpec.getHomePath();
             if (null == processDir) {
                 processDir = new File(SpringInstances.getConfig().getDownloadDir(), 
                     Starter.normalizeServiceId(getId()) + "-" + System.currentTimeMillis());
@@ -301,10 +302,20 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                     artPath = "/" + artPath;
                 }
                 InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
+                if (null == artifact) { // spring packaging fallback
+                    try {
+                        FileInputStream fis = new FileInputStream(getArtifact().getJar());
+                        artifact = JarUtils.findFile(fis, "BOOT-INF/classes" + artPath);
+                        FileUtils.closeQuietly(fis);
+                    } catch (IOException e) {
+                        getLogger().info("Cannot open " + getArtifact().getJar() + ": " + e.getMessage());
+                    }
+                }
                 if (null == artifact) {
                     throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
                 }
                 JarUtils.extractZip(artifact, processDir.toPath());
+                getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
                 artifact.close();
             }
 
@@ -395,6 +406,24 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     String getDeploymentId() {
         return deploymentId;
+    }
+    
+    /**
+     * Returns the YAML descriptor. [for testing]
+     * 
+     * @return the YAML descriptor
+     */
+    public Service getSvc() {
+        return service;
+    }
+    
+    /**
+     * Returns the logger.
+     * 
+     * @return the logger
+     */
+    private Logger getLogger() {
+        return LoggerFactory.getLogger(SpringCloudServiceDescriptor.class);
     }
     
 }
