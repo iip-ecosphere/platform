@@ -115,11 +115,12 @@ public class JarUtilsTest {
         String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8.name());
         fileStream.close();
         Assert.assertEquals("text21.txt", test);
+        FileUtils.closeQuietly(in);
 
         in = getClass().getClassLoader().getResourceAsStream("test.zip");
         fileStream = JarUtils.findFile(in, "folder2/text23.txt");
         Assert.assertNull(fileStream);
-        in.close();
+        FileUtils.closeQuietly(in);
 
         FileUtils.deleteQuietly(f);
     }

@@ -50,7 +50,6 @@ public class JarUtils {
             }
             if (null == found) {
                 zis.closeEntry();
-                zis.close();
             }
         } catch (IOException e) {
             throw e;
