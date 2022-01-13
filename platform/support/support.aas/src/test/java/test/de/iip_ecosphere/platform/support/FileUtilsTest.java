@@ -1,6 +1,8 @@
 package test.de.iip_ecosphere.platform.support;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +28,23 @@ public class FileUtilsTest {
         Assert.assertTrue(created.canRead());
         Assert.assertTrue(created.canWrite());
         FileUtils.deleteQuietly(created);
+    }
+    
+    /**
+     * Tests closing quietly.
+     */
+    @Test 
+    public void testCloseQuietly() {
+        FileUtils.closeQuietly(null);
+        Closeable cl = new Closeable() {
+
+            @Override
+            public void close() throws IOException {
+                throw new IOException();
+            }
+            
+        };
+        FileUtils.closeQuietly(cl);
     }
 
 }

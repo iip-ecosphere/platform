@@ -12,7 +12,9 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Basic file functionality.
@@ -58,6 +60,21 @@ public class FileUtils {
      */
     public static boolean deleteQuietly(File file) {
         return org.apache.commons.io.FileUtils.deleteQuietly(file);        
+    }
+
+    /**
+     * Closes a closable quietly.
+     * 
+     * @param closable the closable, may be <b>null</b>
+     */
+    public static void closeQuietly(Closeable closable) {
+        if (null != closable) {
+            try {
+                closable.close();
+            } catch (IOException e ) {
+                // do nothing, quietly
+            }
+        }
     }
     
 }
