@@ -47,8 +47,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         String id = toFolderName(service.id);
         'process: 
             artifacts:
-              - kodex.zip
-              - ${id}.zip
+              - /kodex.zip
+              - /${id}.zip
             homePath: \\${tmp}/${id}/kodex
             executablePath: \\${tmp}/${id}/kodex 
             started: true'
