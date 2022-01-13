@@ -86,7 +86,7 @@ public class PythonProcessServiceTest {
         protected void start() throws ExecutionException {
             YamlProcess sSpec = getProcessSpec();
             File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("python3")); 
-            File home = selectNotNull(sSpec, s -> s.getHome(), new File("src/test/python"));
+            File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("src/test/python"));
             
             List<String> args = new ArrayList<>();
             args.add("ForwardingApp.py");
@@ -163,7 +163,7 @@ public class PythonProcessServiceTest {
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
         pDesc.setExecutable("java");
-        pDesc.setHome("target/test-classes");
+        pDesc.setHomePath("target/test-classes");
         sDesc.setProcess(pDesc);
         
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);

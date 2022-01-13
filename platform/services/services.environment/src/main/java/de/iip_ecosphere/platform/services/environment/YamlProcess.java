@@ -27,8 +27,8 @@ import org.apache.commons.io.FileUtils;
 public class YamlProcess {
 
     private String executable;
-    private File executablePath;
-    private String home;
+    private String executablePath;
+    private String homePath;
     private List<String> cmdArg = new ArrayList<>();
     
     /**
@@ -41,12 +41,13 @@ public class YamlProcess {
     }
 
     /**
-     * Returns an optional path to be prefixed before the executable. Relevance depends on the execution environment.
+     * Returns an optional path to be prefixed before the executable. Relevance depends on the execution environment. 
+     * Replaces "${tmp}" by the system temporary directory path and "${user}" by the user directory path.
      * 
      * @return the optional executable path, may be <b>null</b> for none
      */
     public File getExecutablePath() {
-        return executablePath;
+        return toSubstFilePath(executablePath);
     }
 
     /**
@@ -56,12 +57,22 @@ public class YamlProcess {
      * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
      *     define a home path
      */
-    public File getHome() {
+    public File getHomePath() {
+        return toSubstFilePath(homePath);
+    }
+    
+    /**
+     * Substitutes "${tmp}" and "${user}" and returns a file for {@code path}.
+     * 
+     * @param path the path
+     * @return the file, may be <b>null</b> if {@code path} is <b>null</b> or empty
+     */
+    private static File toSubstFilePath(String path) {
         File result;
-        if (null == home || home.length() == 0) {
+        if (null == path || path.length() == 0) {
             result = null;
         } else {
-            String tmp = home.replace("${tmp}", FileUtils.getTempDirectoryPath());
+            String tmp = path.replace("${tmp}", FileUtils.getTempDirectoryPath());
             tmp = tmp.replace("${user}", FileUtils.getUserDirectoryPath());
             result = new File(tmp);
         }
@@ -88,24 +99,46 @@ public class YamlProcess {
     
     /**
      * Changes the optional path to be prefixed before the executable. Relevance depends on the execution environment. 
+     * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
+     * [required by SnakeYaml]
+     * 
+     * @param executablePath the optional executable path, may be <b>null</b> for none
+     */
+    public void setExecutablePath(String executablePath) {
+        this.executablePath = executablePath;
+    }
+
+    /**
+     * Changes the optional path to be prefixed before the executable. Relevance depends on the execution environment. 
+     * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
      * [required by SnakeYaml]
      * 
      * @param executablePath the optional executable path, may be <b>null</b> for none
      */
     public void setExecutablePath(File executablePath) {
-        this.executablePath = executablePath;
+        this.executablePath = null == executablePath ? null : executablePath.toString();
     }
     
     /**
      * Changes the home directory of the process to be executed. [required by SnakeYaml]
-     * May contain "${tmp}" for the system temporary directory path
-     * and "${user}" for the user directory path.
+     * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
+     * 
+     * @param homePath the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
+     *     define a home path
+     */
+    public void setHomePath(String homePath) {
+        this.homePath = homePath;
+    }
+    
+    /**
+     * Changes the home directory of the process to be executed. [required by SnakeYaml]
+     * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
      * 
      * @param home the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
      *     define a home path
      */
-    public void setHome(String home) {
-        this.home = home;
+    public void setHomePath(File home) {
+        this.homePath = null == home ? null : home.toString();
     }
 
     /**

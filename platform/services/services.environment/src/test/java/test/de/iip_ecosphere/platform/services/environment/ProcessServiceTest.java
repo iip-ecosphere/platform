@@ -86,7 +86,7 @@ public class ProcessServiceTest {
         protected void start() throws ExecutionException {
             YamlProcess sSpec = getProcessSpec();
             File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("java")); 
-            File home = selectNotNull(sSpec, s -> s.getHome(), new File("target/test-classes"));
+            File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("target/test-classes"));
             
             List<String> args = new ArrayList<>();
             args.add("test.de.iip_ecosphere.platform.services.environment.ForwardingApp");
@@ -163,7 +163,7 @@ public class ProcessServiceTest {
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
         pDesc.setExecutable("java");
-        pDesc.setHome("target/test-classes");
+        pDesc.setHomePath("target/test-classes");
         sDesc.setProcess(pDesc);
         
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);
