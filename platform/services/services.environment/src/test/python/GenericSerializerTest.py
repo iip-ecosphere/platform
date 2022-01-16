@@ -3,7 +3,7 @@ import json
 from GenericSerializer import GenericSerializer
 from DataTypes import Rec1
 
-class GenericSerializerTest(unittest.TestCase):
+class Rec1SerializerTest(unittest.TestCase):
 
     def test_Rec1Serializer(self):
 
@@ -12,6 +12,8 @@ class GenericSerializerTest(unittest.TestCase):
         rec1.setParameters(parameters)
 
         rec1_serializer = GenericSerializer(Rec1)
+
+        ## Serialization
         rec1_serialized = rec1_serializer.writeTo(rec1)
 
         # Is returned object bytes?
@@ -23,3 +25,9 @@ class GenericSerializerTest(unittest.TestCase):
         assert rec1_serialized_dict['intField'] == parameters['intField']
         assert rec1_serialized_dict['stringField'] == parameters['stringField']
 
+        ## Deserialization
+        rec1_deserialized = rec1_serializer.readFrom(rec1_serialized)
+
+        assert type(rec1_deserialized) == Rec1
+        assert rec1_deserialized.intField == parameters["intField"]
+        assert rec1_deserialized.stringField == parameters["stringField"]
