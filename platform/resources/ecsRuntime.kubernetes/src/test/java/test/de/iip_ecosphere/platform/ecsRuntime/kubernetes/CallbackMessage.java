@@ -2,19 +2,19 @@ package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.MqttMessage;
+import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.TransportMessage;
 import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
 
-public class CallbackMessage extends AbstractReceptionCallback<MqttMessage> {
+public class CallbackMessage extends AbstractReceptionCallback<TransportMessage> {
 
 //    private MqttMessage data;
-    private ConcurrentLinkedDeque<MqttMessage> dataDeque = new ConcurrentLinkedDeque<MqttMessage>();
+    private ConcurrentLinkedDeque<TransportMessage> dataDeque = new ConcurrentLinkedDeque<TransportMessage>();
 
     /**
      * Creates the callback instance.
      */
     protected CallbackMessage() {
-        super(MqttMessage.class);
+        super(TransportMessage.class);
     }
 
     /**
@@ -22,9 +22,9 @@ public class CallbackMessage extends AbstractReceptionCallback<MqttMessage> {
      * 
      * @return the MqttMessage
      */
-    public MqttMessage getData() {
+    public TransportMessage getData() {
         
-        return dataDeque.remove();
+        return dataDeque.removeFirst();
     }
 
     /**
@@ -32,14 +32,14 @@ public class CallbackMessage extends AbstractReceptionCallback<MqttMessage> {
      *
      * @param data the MQTT message
      */
-    public void setData(MqttMessage data) {
-        this.dataDeque.add(data);
+    public void setData(TransportMessage data) {
+        this.dataDeque.addLast(data);
 //        this.data = data;
     }
 
     @Override
-    public void received(MqttMessage data) {
-        this.dataDeque.add(data);
+    public void received(TransportMessage data) {
+        this.dataDeque.addLast(data);
 //      this.data = data;
     }
     

@@ -34,11 +34,13 @@ public class WorkerAasCreator {
     public static final String AAS_SUBMODEL_PROPERTY_VERSION = "version";
     public static final String AAS_SUBMODEL_PROPERTY_DESCRIPTION = "description";
     public static final String AAS_SUBMODEL_OPERATION_SEND_TO_AAS = "sendToAAS";
+    public static final String AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_AAS = "sendWatchToAAS";
     
     public static final String VAB_PROPERTY_NAME = AAS_SUBMODEL_PROPERTY_NAME;
     public static final String VAB_PROPERTY_VERSION = AAS_SUBMODEL_PROPERTY_VERSION;
     public static final String VAB_PROPERTY_DESCRIPTION = AAS_SUBMODEL_PROPERTY_DESCRIPTION;
     public static final String VAB_OPERATION_SEND_TO_AAS = AAS_SUBMODEL_OPERATION_SEND_TO_AAS;
+    public static final String VAB_OPERATION_SEND_WATCH_TO_AAS = AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_AAS;
 
     /**
      * Creates an AAS for testing.
@@ -67,6 +69,9 @@ public class WorkerAasCreator {
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SEND_TO_AAS)
             .setInvocable(iCreator.createInvocable(VAB_OPERATION_SEND_TO_AAS))
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_AAS)
+            .setInvocable(iCreator.createInvocable(VAB_OPERATION_SEND_WATCH_TO_AAS))
             .build();
         smBuilder.build();
         return aasBuilder.build();

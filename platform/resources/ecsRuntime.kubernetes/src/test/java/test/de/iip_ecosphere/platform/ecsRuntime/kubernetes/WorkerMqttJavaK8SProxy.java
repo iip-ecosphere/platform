@@ -1,11 +1,12 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -15,18 +16,28 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 
+import org.junit.Test;
+
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnectorFactoryDescriptor;
+import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
+import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.TransportParameterConfigurer;
 
 public class WorkerMqttJavaK8SProxy {
   
     private static int localPort = 6443;
     private static int mqttPort = 9911;
-    private static String serverIP = "192.168.81.199";
+    private static String serverIP = "192.168.81.212";
     private static String serverPort = "9922";
+    private static boolean tlsCheck = false;
+
+    //    private static ConcurrentLinkedDeque<Integer> requestDeque = new ConcurrentLinkedDeque<Integer>();
     
     /** 
      * Returns the port on localhost to receive new requests.
@@ -108,16 +119,29 @@ public class WorkerMqttJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-        ServerAddress addr = new ServerAddress(Schema.IGNORE, mqttPort);
-        
-        MqttK8S mqtt = new MqttK8S(ProxyType.WorkerProxy, addr, serverIP, serverPort);
-        mqtt.start();
-//        WorkerK8SAas aas = new WorkerK8SAas(serverIP, serverPort, vabPort, aasPort);
-//        ArrayList<Server> servers = aas.startLocalAas();
-        
-        K8SJavaProxy mqttK8SJavaProxy = new MqttK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort, mqttPort);
-        
-        try {
+        try {            
+            TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
+            TransportConnector cl1 = TransportFactory.createConnector();
+            
+            TransportParameterConfigurer configurer = null;
+            if (tlsCheck) {
+                File secCfg = new File("./src/test/MQTT/secCfg");
+                configurer = new TransportParameterConfigurer() {
+                    
+                    @Override
+                    public void configure(TransportParameterBuilder builder) {
+                        builder.setKeystore(new File(secCfg, "client-trust-store.jks"),
+                                TestHiveMqServer.KEYSTORE_PASSWORD);
+                        builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                    }
+                };
+            }
+            
+            TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
+            
+            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+                    transportK8STLS);
+            
             startMultiThreaded(mqttK8SJavaProxy, localPort);
         } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
                 | CertificateException | InvalidKeySpecException | IOException e) {
@@ -125,11 +149,51 @@ public class WorkerMqttJavaK8SProxy {
             e.printStackTrace();
         }
         
-//        for (Server server : servers) {
-//            server.stop(true);
-//        }
     }
 
+    /**
+     * The main method to run the test server proxy.
+     * 
+     */
+    @Test(timeout = 100 * 1000)
+    public void mainTest() {
+        tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
+
+        try {            
+            TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
+            TransportConnector cl1 = TransportFactory.createConnector();
+            
+            TransportParameterConfigurer configurer = null;
+            if (tlsCheck) {
+                File secCfg = new File("./src/test/MQTT/secCfg");
+                configurer = new TransportParameterConfigurer() {
+                    
+                    @Override
+                    public void configure(TransportParameterBuilder builder) {
+                        builder.setKeystore(new File(secCfg, "client-trust-store.jks"),
+                                TestHiveMqServer.KEYSTORE_PASSWORD);
+                        builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                    }
+                };
+            }
+            
+            TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
+            
+            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+                    transportK8STLS);
+            
+            startMultiThreaded(mqttK8SJavaProxy, localPort);
+        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
+                | CertificateException | InvalidKeySpecException | IOException e) {
+            System.err.println("Exception in the starting the multi-threads method");
+            e.printStackTrace();
+        }
+        
+        while (true) {
+            TimeUtils.sleep(1);
+        }
+    }
+    
     /**
      * Start multi-threads method to receive and process requests.
      * 
@@ -150,7 +214,7 @@ public class WorkerMqttJavaK8SProxy {
             throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
             CertificateException, InvalidKeySpecException, IOException {
 
-        ServerSocket serverSocket = mqttK8SJavaProxy.getServerSocket(localPort, null, null, null);
+        ServerSocket serverSocket = mqttK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
 
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
@@ -158,44 +222,57 @@ public class WorkerMqttJavaK8SProxy {
 
         while (true) {
             final Socket socket = serverSocket.accept();
-            System.out.println("Accept socket");
+//            System.out.println("Accept socket");
 
             Thread requestThread = new Thread() {
                 public void run() {
                     InputStream reader = null;
-                    BufferedWriter writer = null;
+                    BufferedOutputStream writer = null;
 
                     try {
-                        reader = socket.getInputStream();
+                        while (true) {
+                            reader = socket.getInputStream();
+                            writer = new BufferedOutputStream(socket.getOutputStream());
 
-                        writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), encoding.name()));
+                            byte[] requestByte = mqttK8SJavaProxy.extractK8SRequestByte(reader);
 
-                        byte[] requestByte = mqttK8SJavaProxy.extractK8SRequestByte(reader);
+                            if (requestByte != null) {
 
-                        if (requestByte.length == 0) {
-                            return;
+                                K8SRequest request = mqttK8SJavaProxy.createK8SRequest(requestByte);
+                                byte[] responseString = mqttK8SJavaProxy.sendK8SRequest(writer, request);
+                                
+                                if (responseString.length == 0) {
+                                    break;
+                                }
+                                
+                                writer.write(responseString);
+                                writer.flush();
+                                
+                                if (request.getPath().contains("&watch=true")) {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                       
                         }
-
-                        
-                        K8SRequest request = mqttK8SJavaProxy.createK8SRequest(requestByte);
-                        
-                        String responseString = mqttK8SJavaProxy.sendK8SRequest(request);
-
-                        if (responseString != null) {
-                            writer.write(responseString);
-
-                            writer.flush();
-                            System.out.println("socket thread ends normal");
+                    
+                    } catch (SocketException e) {
+                        if (e.getMessage().contentEquals("Socket input is already shutdown")) {
+                            System.out.println(e.getMessage());
+                        } else {
+                            System.err.println("SocketException while creating response");
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        System.err.println("Exception while creating response");
-                        e.printStackTrace();
-                        System.out.println("socket thread ends Throwable");
+                    } catch (IOException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
+                            | CertificateException e) {
+                            System.err.println("Exception while creating response");
+                            e.printStackTrace();
+                            System.out.println("socket thread ends Throwable");
                     } finally {
                         try {
                             writer.close();
                             reader.close();
-                            socket.close();
                         } catch (IOException e) {
                             System.err.println("Could not close the streams");
                             e.printStackTrace();

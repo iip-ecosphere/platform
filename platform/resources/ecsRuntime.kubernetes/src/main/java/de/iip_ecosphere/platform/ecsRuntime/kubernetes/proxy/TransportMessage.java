@@ -1,27 +1,46 @@
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 
-import java.util.Date;
-
 /**
  * A test data class.
  * 
  * @author Ahmad Alamoush, SSE
  */
-public class MqttMessage {
+public class TransportMessage {
     
     private String streamId;
     private String messageTxt;
+    private String requestWatch;
 
     /**
-     * Creates a MqttMessage instance.
+     * Creates a TransportMessage instance.
      * 
+     * @param requestWatch is the Request Watch Type for the stream message
      * @param streamId the streamId for the stream message
      * @param messageTxt the text for the message
      */
-    public MqttMessage(String streamId, String messageTxt) {
+    public TransportMessage(String streamId, String messageTxt, String requestWatch) {
         super();
         this.streamId = streamId;
         this.messageTxt = messageTxt;
+        this.requestWatch = requestWatch;
+    }
+
+    /**
+     * Returns the Request Watch Type for the stream message.
+     * 
+     * @return the RequestWatchType for the stream message
+     */
+    public String getRequestWatch() {
+        return requestWatch;
+    }
+
+    /**
+     * Set the RequestWatchType for the stream message.
+     *
+     * @param requestWatch is the Request Watch Type for the stream message
+     */
+    public void setRequestWatch(String requestWatch) {
+        this.requestWatch = requestWatch;
     }
 
     /**
@@ -65,6 +84,6 @@ public class MqttMessage {
      *
      */
     public void generateStreamIdNo() {
-        this.streamId = this.streamId + new Date().getTime();
+        this.streamId = this.streamId + System.nanoTime();
     }   
 }

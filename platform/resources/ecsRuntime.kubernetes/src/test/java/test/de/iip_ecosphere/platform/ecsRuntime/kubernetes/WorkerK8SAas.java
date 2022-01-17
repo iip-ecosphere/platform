@@ -25,6 +25,7 @@ public class WorkerK8SAas {
 
     private static String serverIP;
     private static String serverPort;
+    private static Submodel submodel;
     private int vabPort;
     private int aasPort;
     
@@ -42,6 +43,22 @@ public class WorkerK8SAas {
         WorkerK8SAas.serverPort = serverPort;
         this.vabPort = vabPort;
         this.aasPort = aasPort;
+        
+        ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, Integer.parseInt(serverPort));
+        
+        Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+
+//        System.out.println(aasServerRegistry.getEndpoint());
+        
+        AasFactory factory = AasFactory.getInstance();
+        Aas aas = null;
+        try {
+            aas = factory.obtainRegistry(aasServerRegistry).retrieveAas("urn:::AAS:::MasterK8SAas#");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        submodel = aas.getSubmodel("MasterK8SAasService");
     }
 
     /**
@@ -137,6 +154,8 @@ public class WorkerK8SAas {
         pBuilder.defineProperty(WorkerAasCreator.AAS_SUBMODEL_PROPERTY_VERSION, () -> "0.0.1", null);
         pBuilder.defineProperty(WorkerAasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, () -> "K8S AAS", null);
         pBuilder.defineOperation(WorkerAasCreator.AAS_SUBMODEL_OPERATION_SEND_TO_AAS, params -> sendToAAS(params));
+        pBuilder.defineOperation(WorkerAasCreator.AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_AAS,
+            params -> sendWatchToAAS(params));
         Server server = pBuilder.build();
         server.start();
         
@@ -170,25 +189,40 @@ public class WorkerK8SAas {
             if (params.length > 0 && params[0] != null) {
                 requestString = params[0].toString();
             }
-                
-            ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, Integer.parseInt(serverPort));
-            
-            Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
-
-            System.out.println(aasServerRegistry.getEndpoint());
-            
-            AasFactory factory = AasFactory.getInstance();
-            Aas aas = factory.obtainRegistry(aasServerRegistry).retrieveAas("urn:::AAS:::MasterK8SAas#");
-
-            Submodel submodel = aas.getSubmodel("MasterK8SAasService");
             
             Operation operation = submodel.getOperation("sendToK8S");
             response = (String) operation.invoke(requestString);
             
-        } catch (IOException | ExecutionException e) {
-            // TODO Auto-generated catch block
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
+        return response;
+    }
+
+    /**
+     * get response to request.
+     * 
+     * @param params the call parameters, only the first is evaluated
+     * 
+     * @return the response string
+     * 
+     */
+    private static Object sendWatchToAAS(Object[] params) {
+        
+        String response = null;
+        String requestString = null;
+        try {
+            if (params.length > 0 && params[0] != null) {
+                requestString = params[0].toString();
+            }
+                
+            Operation operation = submodel.getOperation("sendWatchToK8S");
+            response = (String) operation.invoke(requestString);
+            
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        
         return response;
     }
 

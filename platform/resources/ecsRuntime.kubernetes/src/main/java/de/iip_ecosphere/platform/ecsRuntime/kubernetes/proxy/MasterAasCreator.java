@@ -34,11 +34,13 @@ public class MasterAasCreator {
     public static final String AAS_SUBMODEL_PROPERTY_VERSION = "version";
     public static final String AAS_SUBMODEL_PROPERTY_DESCRIPTION = "description";
     public static final String AAS_SUBMODEL_OPERATION_SEND_TO_K8S = "sendToK8S";
+    public static final String AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_K8S = "sendWatchToK8S";
     
     public static final String VAB_PROPERTY_NAME = AAS_SUBMODEL_PROPERTY_NAME;
     public static final String VAB_PROPERTY_VERSION = AAS_SUBMODEL_PROPERTY_VERSION;
     public static final String VAB_PROPERTY_DESCRIPTION = AAS_SUBMODEL_PROPERTY_DESCRIPTION;
     public static final String VAB_OPERATION_SEND_TO_K8S = AAS_SUBMODEL_OPERATION_SEND_TO_K8S;
+    public static final String VAB_OPERATION_SEND_WATCH_TO_K8S = AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_K8S;
 
     /**
      * Creates an AAS for testing.
@@ -67,6 +69,13 @@ public class MasterAasCreator {
             .build();
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SEND_TO_K8S)
             .setInvocable(iCreator.createInvocable(VAB_OPERATION_SEND_TO_K8S))
+            .addInputVariable("M1", Type.STRING)
+            .addOutputVariable("R1", Type.STRING)
+            .build();
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SEND_WATCH_TO_K8S)
+            .setInvocable(iCreator.createInvocable(VAB_OPERATION_SEND_WATCH_TO_K8S))
+            .addInputVariable("M1", Type.STRING)
+            .addOutputVariable("R1", Type.STRING)
             .build();
         smBuilder.build();
         return aasBuilder.build();

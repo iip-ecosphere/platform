@@ -1,10 +1,9 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -16,35 +15,30 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.AasK8SJavaProxy;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.HttpK8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.Operation;
-import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportFactoryDescriptor;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.TransportParameterConfigurer;
 
-public class WorkerAasJavaK8SProxy {
+public class WorkerAmqpJavaK8SProxy {
   
     private static int localPort = 6443;
-    private static int vabPort = 5511;
-    private static int aasPort = 6611;
+    private static int mqttPort = 9911;
     private static String serverIP = "192.168.81.212";
-    private static String serverPort = "8811";
+    private static String serverPort = "9922";
     private static boolean tlsCheck = false;
+
+    //    private static ConcurrentLinkedDeque<Integer> requestDeque = new ConcurrentLinkedDeque<Integer>();
     
     /** 
      * Returns the port on localhost to receive new requests.
@@ -61,7 +55,7 @@ public class WorkerAasJavaK8SProxy {
      * @param localPort the port on localhost to receive new requests
      */
     public static void setLocalPort(int localPort) {
-        WorkerAasJavaK8SProxy.localPort = localPort;
+        WorkerAmqpJavaK8SProxy.localPort = localPort;
     }
 
     /**
@@ -79,7 +73,7 @@ public class WorkerAasJavaK8SProxy {
      * @param serverIP the IP Address of the server 
      */
     public static void setServerIP(String serverIP) {
-        WorkerAasJavaK8SProxy.serverIP = serverIP;
+        WorkerAmqpJavaK8SProxy.serverIP = serverIP;
     }
 
     /**
@@ -97,45 +91,27 @@ public class WorkerAasJavaK8SProxy {
      * @param serverPort the port of the server (either the Aas port or K8S apiserver port).
      */
     public static void setServerPort(String serverPort) {
-        WorkerAasJavaK8SProxy.serverPort = serverPort;
+        WorkerAmqpJavaK8SProxy.serverPort = serverPort;
     }
 
     /**
-     * Returns the vab port.
+     * Returns the mqtt port.
      * 
-     * @return the vab port
+     * @return the mqtt port
      */
-    public int getVabPort() {
-        return vabPort;
+    public int getMqttPort() {
+        return mqttPort;
     }
 
     /**
-     * Set the vab port.
+     * Set the mqtt port.
      *
-     * @param vabPort the vab port
+     * @param mqttPort the mqtt port
      */
-    public void setVabPort(int vabPort) {
-        this.vabPort = vabPort;
+    public void setMqttPort(int mqttPort) {
+        WorkerAmqpJavaK8SProxy.mqttPort = mqttPort;
     }
 
-    /**
-     * Returns the aas port.
-     * 
-     * @return the aas port
-     */
-    public int getAasPort() {
-        return aasPort;
-    }
-
-    /**
-     * Set the aas port.
-     *
-     * @param aasPort the aas port
-     */
-    public void setAasPort(int aasPort) {
-        this.aasPort = aasPort;
-    }
-    
     /**
      * The main method to run the server proxy.
      * 
@@ -144,23 +120,48 @@ public class WorkerAasJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-//        WorkerK8SAas aas = new WorkerK8SAas(serverIP, serverPort, vabPort, aasPort);
-//        ArrayList<Server> servers = aas.startLocalAas();
-        
-        K8SJavaProxy aasK8SJavaProxy = new AasK8SJavaProxy(ProxyType.WorkerProxy, aasPort, serverIP, serverPort,
-                tlsCheck);
-        
         try {
-            startMultiThreaded(aasK8SJavaProxy, localPort);
+            TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
+            
+            ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+
+                @Override
+                public TransportConnector createConnector() {
+                    return new FakeAuthConnector();
+                }
+
+                @Override
+                public String getName() {
+                    return FakeAuthConnector.NAME;
+                }
+
+            });
+            
+            TransportParameterConfigurer configurer = null;
+            if (tlsCheck) {
+                File secCfg = new File("./src/test/AMQP/secCfg");
+                configurer = new TransportParameterConfigurer() {
+                    
+                    @Override
+                    public void configure(TransportParameterBuilder builder) {
+                        builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                    }
+                };
+            }
+            
+            TransportConnector cl1 = TransportFactory.createConnector();
+            TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
+            
+            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+                    transportK8STLS);
+            
+            startMultiThreaded(mqttK8SJavaProxy, localPort);
         } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
                 | CertificateException | InvalidKeySpecException | IOException e) {
             System.err.println("Exception in the starting the multi-threads method");
             e.printStackTrace();
         }
         
-//        for (Server server : servers) {
-//            server.stop(true);
-//        }
     }
 
     /**
@@ -171,23 +172,48 @@ public class WorkerAasJavaK8SProxy {
     public void mainTest() {
         tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
 
-//        WorkerK8SAas aas = new WorkerK8SAas(serverIP, serverPort, vabPort, aasPort);
-//        ArrayList<Server> servers = aas.startLocalAas();
-        
-        K8SJavaProxy aasK8SJavaProxy = new AasK8SJavaProxy(ProxyType.WorkerProxy, aasPort, serverIP, serverPort,
-                tlsCheck);
-        
         try {
-            startMultiThreaded(aasK8SJavaProxy, localPort);
+            TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
+            
+            ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+
+                @Override
+                public TransportConnector createConnector() {
+                    return new FakeAuthConnector();
+                }
+
+                @Override
+                public String getName() {
+                    return FakeAuthConnector.NAME;
+                }
+
+            });
+            
+            TransportParameterConfigurer configurer = null;
+            if (tlsCheck) {
+                File secCfg = new File("./src/test/AMQP/secCfg");
+                configurer = new TransportParameterConfigurer() {
+                    
+                    @Override
+                    public void configure(TransportParameterBuilder builder) {
+                        builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                    }
+                };
+            }
+            
+            TransportConnector cl1 = TransportFactory.createConnector();
+            TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
+            
+            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+                    transportK8STLS);
+            
+            startMultiThreaded(mqttK8SJavaProxy, localPort);
         } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
                 | CertificateException | InvalidKeySpecException | IOException e) {
             System.err.println("Exception in the starting the multi-threads method");
             e.printStackTrace();
         }
         
-//        for (Server server : servers) {
-//            server.stop(true);
-//        }
         while (true) {
             TimeUtils.sleep(1);
         }
@@ -196,9 +222,9 @@ public class WorkerAasJavaK8SProxy {
     /**
      * Start multi-threads method to receive and process requests.
      * 
-     * @param aasK8SJavaProxy  the proxy used to receive the new requests
-     * @param localPort        is the port on the localhost to receive the new
-     *                         requests
+     * @param mqttK8SJavaProxy  the proxy used to receive the new requests
+     * @param localPort         is the port on the localhost to receive the new
+     *                          requests
      * 
      * @throws IOException
      * @throws InvalidKeySpecException
@@ -209,11 +235,11 @@ public class WorkerAasJavaK8SProxy {
      * @throws UnrecoverableKeyException
      * 
      */
-    public static void startMultiThreaded(final K8SJavaProxy aasK8SJavaProxy, int localPort)
+    public static void startMultiThreaded(final K8SJavaProxy mqttK8SJavaProxy, int localPort)
             throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
             CertificateException, InvalidKeySpecException, IOException {
 
-        ServerSocket serverSocket = aasK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
+        ServerSocket serverSocket = mqttK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
 
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
@@ -232,27 +258,30 @@ public class WorkerAasJavaK8SProxy {
                         while (true) {
                             reader = socket.getInputStream();
                             writer = new BufferedOutputStream(socket.getOutputStream());
-                            byte[] requestByte = aasK8SJavaProxy.extractK8SRequestByte(reader);
+
+                            byte[] requestByte = mqttK8SJavaProxy.extractK8SRequestByte(reader);
 
                             if (requestByte != null) {
-                                K8SRequest request = aasK8SJavaProxy.createK8SRequest(requestByte);
-                                byte[] responseString = aasK8SJavaProxy.sendK8SRequest(writer, request);
-                                if (responseString == null || responseString.length == 0) {
-                                    System.out.println(request.getPath());
-                                    System.out.println("Empty response");
+
+                                K8SRequest request = mqttK8SJavaProxy.createK8SRequest(requestByte);
+                                byte[] responseString = mqttK8SJavaProxy.sendK8SRequest(writer, request);
+                                
+                                if (responseString.length == 0) {
+                                    break;
                                 }
+                                
                                 writer.write(responseString);
                                 writer.flush();
                                 
                                 if (request.getPath().contains("&watch=true")) {
                                     break;
                                 }
-//                                System.out.println("socket thread ends normal");
                             } else {
                                 break;
                             }
+                       
                         }
-                        
+                    
                     } catch (SocketException e) {
                         if (e.getMessage().contentEquals("Socket input is already shutdown")) {
                             System.out.println(e.getMessage());
@@ -262,9 +291,9 @@ public class WorkerAasJavaK8SProxy {
                         }
                     } catch (IOException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
                             | CertificateException e) {
-                        System.err.println("Exception while creating response");
-                        e.printStackTrace();
-                        System.out.println("socket thread ends Throwable");
+                            System.err.println("Exception while creating response");
+                            e.printStackTrace();
+                            System.out.println("socket thread ends Throwable");
                     } finally {
                         try {
                             writer.close();

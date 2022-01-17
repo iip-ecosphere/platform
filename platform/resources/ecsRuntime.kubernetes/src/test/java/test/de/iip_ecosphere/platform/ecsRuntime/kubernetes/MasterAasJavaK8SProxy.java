@@ -1,43 +1,20 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.AasK8SJavaProxy;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.HttpK8SJavaProxy;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
+import org.junit.Test;
+
 import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.Operation;
-import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.TimeUtils;
 
 public class MasterAasJavaK8SProxy {
 
     private static int vabPort = 7711;
     private static int aasPort = 8811;
-    private static String serverIP = "192.168.81.199";
+    private static String serverIP = "192.168.81.212";
     private static String serverPort = "6443";
+    private static boolean tlsCheck = false;
 
     /**
      * Returns the IP Address of the server.
@@ -119,14 +96,46 @@ public class MasterAasJavaK8SProxy {
      */
     public static void main(String[] args) {
                 
-        MasterK8SAas aas = new MasterK8SAas(serverIP, serverPort, vabPort, aasPort);
-        ArrayList<Server> servers = aas.startLocalAas();
+        MasterK8SAas aas = new MasterK8SAas(serverIP, serverPort, vabPort, aasPort, tlsCheck);
         
-//        for (Server server : servers) {
-//            server.stop(true);
-//        }
+        try {
+            if (tlsCheck) {
+                ArrayList<Server> servers = aas.startLocalTLSAas();
+            } else {
+                ArrayList<Server> servers = aas.startLocalAas();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 
+    /**
+     * The main method to run the test server proxy.
+     * 
+     */
+    @Test(timeout = 120 * 1000)
+    public void mainTest() {
+        tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
+
+        MasterK8SAas aas = new MasterK8SAas(serverIP, serverPort, vabPort, aasPort, tlsCheck);
+        
+        try {
+            if (tlsCheck) {
+                ArrayList<Server> servers = aas.startLocalTLSAas();
+            } else {
+                ArrayList<Server> servers = aas.startLocalAas();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        while (true) {
+            TimeUtils.sleep(1);
+        }
+    }
 //    /**
 //     * Start multi-threads method to receive and process requests.
 //     * 

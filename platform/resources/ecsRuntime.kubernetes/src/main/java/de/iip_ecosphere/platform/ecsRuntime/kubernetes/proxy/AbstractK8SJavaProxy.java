@@ -1,12 +1,16 @@
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
+import java.net.SocketTimeoutException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -16,13 +20,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.util.Arrays;
 
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
@@ -33,6 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 import okhttp3.Request.Builder;
 
 /**
@@ -45,6 +54,9 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
 
     private ProxyType proxyType;
     private String serverAddress;
+    private OkHttpClient client11;
+    private ApiClient client;
+    private File confFile;
 
     /**
      * Creates a K8S java proxy instance, it will be either MasterProxy or
@@ -59,6 +71,18 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
     public AbstractK8SJavaProxy(ProxyType proxyType, String serverAddress) {
         this.proxyType = proxyType;
         this.serverAddress = serverAddress;
+
+        if (proxyType.equals(ProxyType.MasterProxy)) {
+            confFile = new File("admin.conf");
+
+            try {
+                client = Config.fromConfig(confFile.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Configuration.setDefaultApiClient(client);
+            client11 = client.getHttpClient();
+        }
     }
 
     /**
@@ -104,6 +128,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      * @param certificatePath the path of certificate used to create the socket.
      * @param keyPath         the path of key used to create the socket
      * @param algo            the algorithm used for the key
+     * @param tlsCheck        check to use tls security
      * 
      * @return the created server socket for the specified port on localhost
      * @throws IOException
@@ -114,12 +139,26 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      * @throws UnrecoverableKeyException
      * @throws KeyManagementException
      */
-    public ServerSocket getServerSocket(int localPort, String certificatePath, String keyPath, String algo)
-            throws IOException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
-            CertificateException, InvalidKeySpecException, KeyManagementException {
+    public ServerSocket getServerSocket(int localPort, String certificatePath, String keyPath, String algo,
+            boolean tlsCheck) throws IOException, UnrecoverableKeyException, NoSuchAlgorithmException,
+            KeyStoreException, CertificateException, InvalidKeySpecException, KeyManagementException {
 
         if (proxyType.equals(ProxyType.MasterProxy)) {
-            return new ServerSocket(localPort);
+            if (tlsCheck) {
+                KeyStore ks = KeyStore.getInstance("JKS");
+                ks.load(new FileInputStream("./src/test/resources/keystore.jks"), "a1234567".toCharArray());
+                KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+                kmf.init(ks, "a1234567".toCharArray());
+                SSLContext sc = SSLContext.getInstance("TLS");
+                sc.init(kmf.getKeyManagers(), null, null);
+                SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+                SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(localPort);
+                
+                return serverSocket;
+            } else {
+                return new ServerSocket(localPort);
+            }
+            
         }
 
         String keyFile = null;
@@ -166,7 +205,10 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
 
         byte[] requestByte = new byte[bytesRead];
         System.arraycopy(request, 0, requestByte, 0, bytesRead);
-        String requestFirstString = new String(request);
+        String requestFirstString = new String(requestByte);
+//        if (requestFirstString.contains("User-Agent: kube-proxy")) {
+//            System.out.println("here2");
+//        }
         int requestLength = 0;
         boolean isHeader = true;
         int headerSize = 0;
@@ -209,7 +251,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
         String requestString = new String(requestByte);
         K8SRequest request = new K8SRequest();
         request.setRequestByte(requestByte);
-        
+
         Map<String, String[]> requestHeaders = new HashMap<String, String[]>();
         int requestLength = 0;
         int count = 0;
@@ -223,7 +265,8 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
                 String[] requestLine = string.split(" ");
 
                 request.setMethod(requestLine[0]);
-                request.setPath(requestLine[1].replace("&watch=true", ""));
+//                request.setPath(requestLine[1].replace("&watch=true", ""));
+                request.setPath(requestLine[1]);
                 request.setProtocol(requestLine[2]);
                 count++;
             } else {
@@ -233,9 +276,9 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
                     }
                     String key = string.substring(0, string.indexOf(":"));
                     String[] header = {key, string.substring(string.indexOf(":") + 2)};
-                    if (string.contains("Accept: ")) {
-                        header[1] = "application/json";
-                    }
+//                    if (string.contains("Accept: ")) {
+//                        header[1] = "application/json";
+//                    }
                     requestHeaders.put(key.toUpperCase(), header);
                 }
             }
@@ -258,20 +301,26 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
     /**
      * Send the K8S request object to the MasterProxy or K8S apiserver.
      *
+     * @param writer  is the output buffer to send watch request stream
      * @param request the K8S request object (K8SRequest)
      * 
      * @return the response from the MasterProxy or K8S apiserver for sent request
      * @throws IOException
+     * @throws CertificateException 
+     * @throws KeyStoreException 
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException 
      */
-    public String sendK8SRequest(K8SRequest request) throws IOException {
+    public byte[] sendK8SRequest(BufferedOutputStream writer, K8SRequest request) throws IOException,
+            KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException {
 
-        String response = null;
+        byte[] response = null;
 
         if (getProxyType() == ProxyType.MasterProxy) {
-            response = executeK8SJavaClientRequest(request);
+            response = executeK8SJavaClientRequest(writer, request);
         } else {
             if (request.getMethod().equals("GET")) {
-                response = executeK8SGet(request);
+                response = executeK8SGet(writer, request);
             } else if (request.getMethod().equals("POST")) {
                 response = executeK8SPost(request);
             } else if (request.getMethod().equals("PUT")) {
@@ -290,16 +339,17 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      * Execute the request and send it to K8S apiserver.
      *
      * @param request the K8S request object (K8SRequest)
+     * @param writer  is the output buffer to send watch request stream
      * 
      * @return the response from K8S apiserver for sent DELETE request
      * @throws IOException
      */
-    public String executeK8SJavaClientRequest(K8SRequest request) throws IOException {
-        File confFile = new File("admin.conf");
-
-        ApiClient client = Config.fromConfig(confFile.toString());
-        Configuration.setDefaultApiClient(client);
-        OkHttpClient client11 = client.getHttpClient();
+    public byte[] executeK8SJavaClientRequest(BufferedOutputStream writer, K8SRequest request) throws IOException {
+//        File confFile = new File("admin.conf");
+//
+//        ApiClient client = Config.fromConfig(confFile.toString());
+//        Configuration.setDefaultApiClient(client);
+//        OkHttpClient client11 = client.getHttpClient();
 
         String url = serverAddress + request.getPath();
 
@@ -323,13 +373,75 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
             javaK8SRequest = requestBuilder.build();
         }
 
-        Response response = client11.newCall(javaK8SRequest).execute();
+//        Response response = client11.newCall(javaK8SRequest).execute();
 
-        String formattedResponse = formatK8SResponse(request, response);
+        byte[] formattedResponse = null;
 
+        if (request.getPath().contains("&watch=true")) {
+            OkHttpClient client11 = client.getHttpClient();
+            Response response = client11.newCall(javaK8SRequest).execute();
+            formattedResponse = formatWatchK8SResponse(writer, request, response);
+        } else {
+            Response response = client11.newCall(javaK8SRequest).execute();
+            formattedResponse = formatK8SResponse(request, response);
+        }
+
+        if (formattedResponse == null || formattedResponse.length == 0) {
+            System.out.println("Empty response k8s execute");
+        }
         return formattedResponse;
     }
 
+    /**
+     * Execute the request and send it to K8S apiserver.
+     *
+     * @param request the K8S request object (K8SRequest)
+     * 
+     * @return the response from K8S apiserver for sent DELETE request
+     * @throws IOException
+     */
+    public Response executeWatchK8SJavaClientRequest(K8SRequest request) throws IOException {
+//        File confFile = new File("admin.conf");
+//
+//        ApiClient client = Config.fromConfig(confFile.toString());
+//        Configuration.setDefaultApiClient(client);
+        OkHttpClient client11 = client.getHttpClient();
+
+        String url = getServerAddress() + request.getPath();
+
+        Request javaK8SRequest = null;
+        Builder requestBuilder = null;
+
+        if (request.getMethod().equals("GET")) {
+            requestBuilder = new Request.Builder().url(url);
+            for (String[] value : request.getHeaders().values()) {
+                requestBuilder.addHeader(value[0], value[1]);
+            }
+            javaK8SRequest = requestBuilder.build();
+        } else {
+            requestBuilder = new Request.Builder().url(url);
+            for (String[] value : request.getHeaders().values()) {
+                requestBuilder.addHeader(value[0], value[1]);
+            }
+            RequestBody requestBody = RequestBody.create(MediaType.parse(request.getHeaders().get("CONTENT-TYPE")[1]),
+                    request.getPayload());
+            requestBuilder.method(request.getMethod(), requestBody);
+            javaK8SRequest = requestBuilder.build();
+        }
+
+        Response response = client11.newCall(javaK8SRequest).execute();
+
+//        String formattedResponse = "";
+//        
+//        if (request.getPath().contains("&watch=true")) {
+//            formattedResponse = formatWatchK8SResponse(writer, request, response);
+//        }else {
+//            formattedResponse = formatK8SResponse(request, response);
+//        }
+
+        return response;
+    }
+    
     /**
      * Format the response from the MasterProxy.
      *
@@ -340,23 +452,118 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      * @throws IOException
      * @throws ParseException
      */
-    public String formatK8SResponse(K8SRequest request, HttpResponse httpResponse) throws ParseException, IOException {
+    public byte[] formatK8SResponse(K8SRequest request, HttpResponse httpResponse) throws ParseException, IOException {
 
         String formattedResponse = request.getProtocol() + " " + httpResponse.getStatusLine().getStatusCode() + "\r\n";
 
         for (Header header : httpResponse.getAllHeaders()) {
             formattedResponse = formattedResponse + header.toString() + "\r\n";
         }
+        byte[] formattedResponsebyte = (formattedResponse + "\r\n").getBytes();
 
+        byte[] responsebyte = null;
         HttpEntity entity = httpResponse.getEntity();
         if (entity != null) {
-            String result = EntityUtils.toString(entity);
-            formattedResponse = formattedResponse + "\r\n" + result;
+            byte[] result = EntityUtils.toByteArray(entity);
+
+            if (formattedResponse.toUpperCase().contains("TRANSFER-ENCODING: CHUNKED")) {
+//                result = Integer.toHexString(result.length())
+//                        + "\r\n"
+//                        + result
+//                        + "\r\n"
+//                        + "0\r\n"
+//                        + "\r\n";
+                byte[] firstPart = (Integer.toHexString(result.length) + "\r\n").getBytes();
+
+                byte[] secondPart = ("\r\n" + "0\r\n" + "\r\n").getBytes();
+
+                result = Arrays.concatenate(firstPart, result);
+                result = Arrays.concatenate(result, secondPart);
+            }
+
+//            formattedResponse = formattedResponse + "\r\n" + result;
+            responsebyte = Arrays.concatenate(formattedResponsebyte, result);
         }
 
-        System.out.println(formattedResponse);
+//        System.out.println(formattedResponse);
 
-        return formattedResponse;
+        return responsebyte;
+    }
+
+    /**
+     * Format the response from the MasterProxy.
+     *
+     * @param writer       is the output buffer to send watch request stream
+     * @param request      the K8S request object (K8SRequest)
+     * @param httpResponse the response from the MasterProxy
+     * 
+     * @return the formated response
+     * @throws IOException
+     * @throws ParseException
+     */
+    public byte[] formatWatchK8SResponse(BufferedOutputStream writer, K8SRequest request, HttpResponse httpResponse)
+            throws ParseException, IOException {
+
+        String formattedResponse = request.getProtocol() + " " + httpResponse.getStatusLine().getStatusCode() + "\r\n";
+
+        for (Header header : httpResponse.getAllHeaders()) {
+            formattedResponse = formattedResponse + header.toString() + "\r\n";
+        }
+        byte[] formattedResponsebyte = (formattedResponse + "\r\n").getBytes();
+
+        byte[] responseBody = new byte[4096];
+        int responseSize = 0;
+        responseSize = httpResponse.getEntity().getContent().read(responseBody);
+        if (responseSize != -1) {
+            if (request.getPath().contains("/api/v1/namespaces/services")) {
+                System.out.println("here");
+            }
+            responseBody = Arrays.copyOf(responseBody, responseSize);
+
+            byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+            responseBody = Arrays.concatenate(responseBody, ("\r\n").getBytes());
+
+            String test1 = new String(responseBody);
+            String test2 = new String(firstPart);
+            String test3 = new String(formattedResponsebyte);
+
+            responseBody = Arrays.concatenate(firstPart, responseBody);
+
+            responseBody = Arrays.concatenate(formattedResponsebyte, responseBody);
+
+            String test4 = new String(responseBody);
+            if (request.getPath().contains("/api/v1/namespaces/services")) {
+                System.out.println("\"" + test4 + "\"");
+            }
+            writer.write(responseBody);
+            writer.flush();
+            responseBody = new byte[4096];
+        } else {
+            return (formattedResponse + "\r\n" + "0\r\n" + "\r\n").getBytes();
+        }
+        while ((responseSize = httpResponse.getEntity().getContent().read(responseBody)) != -1) {
+            responseBody = Arrays.copyOf(responseBody, responseSize);
+
+            byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+            responseBody = Arrays.concatenate(responseBody, ("\r\n").getBytes());
+
+            String test1 = new String(responseBody);
+            String test2 = new String(firstPart);
+
+            responseBody = Arrays.concatenate(firstPart, responseBody);
+
+            String test3 = new String(responseBody);
+            if (request.getPath().contains("/api/v1/namespaces/services")) {
+                System.out.println("\"" + test3 + "\"");
+            }
+
+            writer.write(responseBody);
+            writer.flush();
+            responseBody = new byte[4096];
+        }
+
+        formattedResponse = "0\r\n" + "\r\n";
+        return formattedResponse.getBytes();
     }
 
     /**
@@ -368,24 +575,118 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      * @return the formated response
      * @throws IOException
      */
-    public String formatK8SResponse(K8SRequest request, Response response) throws IOException {
-        String responseBody = response.body().string();
-
-        int byteI = responseBody.getBytes().length;
-        String bodyLength = "Content-Length: ".concat(Integer.toString(byteI));
+    public byte[] formatK8SResponse(K8SRequest request, Response response) throws IOException {
+//        String responseBody = response.body().string();
+        byte[] responseBody = response.body().bytes();
 
         String formattedResponse = request.getProtocol() + " " + response.code() + " " + response.message() + "\r\n"
-                + response.headers().toString().replace("Transfer-Encoding: chunked", bodyLength);
+                + response.headers().toString() + "\r\n";
+        byte[] formattedResponsebyte = formattedResponse.getBytes();
 
-        if (!formattedResponse.toUpperCase().contains("CONTENT-LENGTH")) {
-            formattedResponse = formattedResponse + bodyLength + "\r\n";
+        if (formattedResponse.toUpperCase().contains("TRANSFER-ENCODING: CHUNKED")) {
+
+            byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+
+            byte[] secondPart = ("\r\n" + "0\r\n" + "\r\n").getBytes();
+
+            responseBody = Arrays.concatenate(firstPart, responseBody);
+            responseBody = Arrays.concatenate(responseBody, secondPart);
         }
-
-        formattedResponse = formattedResponse + "\r\n" + responseBody;
 
         response.body().close();
 
-        return formattedResponse;
+        byte[] responsebyte = Arrays.concatenate(formattedResponsebyte, responseBody);
+
+        return responsebyte;
+    }
+
+    /**
+     * Format the response from K8S apiserver.
+     *
+     * @param request  the K8S request object (K8SRequest)
+     * @param response the response from the K8S apiserver
+     * @param writer  is the output buffer to send watch request stream
+     * 
+     * @return the formated response
+     * @throws IOException
+     */
+    public byte[] formatWatchK8SResponse(BufferedOutputStream writer, K8SRequest request, Response response)
+            throws IOException {
+
+        byte[] responseBody = new byte[0];
+        String formattedResponse = request.getProtocol() + " " + response.code() + " " + response.message() + "\r\n"
+                + response.headers().toString() + "\r\n";
+        byte[] formattedResponsebyte = formattedResponse.getBytes();
+
+        try {
+            if (!response.body().source().exhausted()) {
+
+                if (formattedResponse.contains("application/vnd.kubernetes.protobuf")) {
+                    Buffer buffer = new Buffer();
+                    response.body().source().read(buffer, 4096);
+                    responseBody = buffer.readByteArray();
+                } else {
+                    long count = response.body().source().indexOf((byte) '\n');
+                    responseBody = response.body().source().readByteArray(count + 1);
+                }
+                
+                byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+                responseBody = Arrays.concatenate(responseBody, "\r\n".getBytes());
+
+                String test1 = new String(responseBody);
+                String test2 = new String(firstPart);
+                String test3 = new String(formattedResponsebyte);
+
+                responseBody = Arrays.concatenate(firstPart, responseBody);
+                responseBody = Arrays.concatenate(formattedResponsebyte, responseBody);
+
+                String test4 = new String(responseBody);
+                
+                writer.write(responseBody);
+                writer.flush();
+            }
+
+            while (!response.body().source().exhausted()) {
+
+                if (formattedResponse.contains("application/vnd.kubernetes.protobuf")) {
+                    Buffer buffer = new Buffer();
+                    response.body().source().read(buffer, 4096);
+                    responseBody = buffer.readByteArray();
+                } else {
+                    long count = response.body().source().indexOf((byte) '\n');
+                    responseBody = response.body().source().readByteArray(count + 1);
+                }
+
+                byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+                responseBody = Arrays.concatenate(responseBody, "\r\n".getBytes());
+
+                String test1 = new String(responseBody);
+                String test2 = new String(firstPart);
+
+                responseBody = Arrays.concatenate(firstPart, responseBody);
+
+                String test4 = new String(responseBody);
+
+                writer.write(responseBody);
+                writer.flush();
+            } 
+        } catch (SocketTimeoutException e) {
+            if (e.getMessage().contentEquals("timeout") || e.getMessage().contentEquals("Read timed out")) {
+                System.out.println(e.getMessage());
+            } else {
+                e.printStackTrace();
+            }
+        } finally {
+            response.body().close();
+        }
+
+        if (responseBody.length != 0) {
+            formattedResponse = "0\r\n" + "\r\n";
+        } else {
+            formattedResponse = formattedResponse + "0\r\n" + "\r\n";
+        }
+
+        return formattedResponse.getBytes();
     }
 
     /**
@@ -399,11 +700,13 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
      *                   apiserver)
      * @param serverPort the port of the server (either the MasterProxy or K8S
      *                   apiserver)
+     * @param tlsCheck        check to use tls security
      * 
      * @return the server address and port as String
      */
-    protected static String getServerAddress(ProxyType proxyType, String serverIP, String serverPort) {
-        if (proxyType == ProxyType.MasterProxy) {
+    protected static String getServerAddress(ProxyType proxyType, String serverIP, String serverPort,
+            boolean tlsCheck) {
+        if (proxyType == ProxyType.MasterProxy || tlsCheck) {
             return "https://" + serverIP + ":" + serverPort;
         } else {
             return "http://" + serverIP + ":" + serverPort;
