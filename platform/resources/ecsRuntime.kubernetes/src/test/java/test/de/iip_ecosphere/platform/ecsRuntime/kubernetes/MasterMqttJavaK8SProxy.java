@@ -102,7 +102,7 @@ public class MasterMqttJavaK8SProxy {
 
     /**
      * The main method to run the server proxy.
-     * Test push to github
+     * 
      * @param args the main method arguments
      * 
      */
