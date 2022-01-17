@@ -111,7 +111,7 @@ public class ClientHttpJavaK8SProxy {
 
     /**
      * The main method to run the test server proxy.
-     * Test
+     * 
      */
     @Test(timeout = 100 * 1000)
     public void mainTest() {
