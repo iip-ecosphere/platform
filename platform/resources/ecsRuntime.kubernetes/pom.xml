@@ -119,6 +119,12 @@
 	  <groupId>org.eclipse.paho</groupId>
 	  <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
 	</dependency>
+	
+	<dependency>
+     <groupId>com.esotericsoftware</groupId>
+     <artifactId>kryo</artifactId>
+    <version>5.2.1</version>
+</dependency>
   </dependencies>
 
 </project>

@@ -20,7 +20,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.Transpo
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
- * The Implementation of Mqtt for the Abstract class AbstractK8SJavaProxy.
+ * The Implementation of transport for the Abstract class AbstractK8SJavaProxy.
  * K8S (Kubernetes)
  * 
  * @author Ahmad Alamoush, SSE
@@ -29,9 +29,7 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
     
     private String serverIP;
     private String serverPort;
-//    private TransportK8STLS transportK8STLS;
     private TransportConnector normalcl1;
-    private TransportConnector watchcl1;
     private TransportParameter param1;
     /**
      * Creates a K8S java proxy instance, it will be either MasterProxy or WorkerProxy.
@@ -92,8 +90,6 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
         normalcl1 = TransportFactory.createConnector();
         normalcl1.connect(param1);
         
-        watchcl1 = TransportFactory.createConnector();
-        watchcl1.connect(param1);
     }
 
     /**
@@ -162,20 +158,18 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
         String response = null;
         byte[] responseByte = null;
         
-        TransportMessage message1 = new TransportMessage(request.getPathNoParameter(), request.convertToBase64String(),
+        TransportMessage message1 = new TransportMessage(request.getPathNoParameter(), request.getRequestByte(),
                 request.getPath().contains("&watch=true") ? "Yes" : "No");
         message1.generateStreamIdNo();
         
         SerializerRegistry.registerSerializer(TransportMessageJsonSerializer.class);
 
         try {
-            TransportConnector cl1 = null;
+            TransportConnector cl1 = normalcl1;
             final String stream1;
             if (message1.getRequestWatch().equals("Yes")) {
-                cl1 = watchcl1;
                 stream1 = cl1.composeStreamName("", "watchStream1");
             } else {
-                cl1 = normalcl1;
                 stream1 = cl1.composeStreamName("", "stream1");
             }
             final String stream2 = cl1.composeStreamName("", message1.getStreamId());
@@ -195,10 +189,8 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
                 }
                 TimeUtils.sleep(1);
             }
-
-            response = cb1.getData().getMessageTxt();
             
-            responseByte = request.convertBase64StringToByte(response);
+            responseByte = cb1.getData().getMessageByte();
             String responseString = new String(responseByte);
 //            System.out.println(responseString);
             
@@ -219,8 +211,7 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
                         TimeUtils.sleep(1);
                     }
                     
-                    response = cb1.getData().getMessageTxt();
-                    responseByte = request.convertBase64StringToByte(response);
+                    responseByte = cb1.getData().getMessageByte();
                     responseString = new String(responseByte);
                 }
             }

@@ -8,7 +8,7 @@ package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 public class TransportMessage {
     
     private String streamId;
-    private String messageTxt;
+    private byte[] messageByte;
     private String requestWatch;
 
     /**
@@ -16,12 +16,12 @@ public class TransportMessage {
      * 
      * @param requestWatch is the Request Watch Type for the stream message
      * @param streamId the streamId for the stream message
-     * @param messageTxt the text for the message
+     * @param messageByte the text for the message in bytes
      */
-    public TransportMessage(String streamId, String messageTxt, String requestWatch) {
+    public TransportMessage(String streamId, byte[] messageByte, String requestWatch) {
         super();
         this.streamId = streamId;
-        this.messageTxt = messageTxt;
+        this.messageByte = messageByte;
         this.requestWatch = requestWatch;
     }
 
@@ -66,17 +66,17 @@ public class TransportMessage {
      * 
      * @return the messageTxt
      */
-    public String getMessageTxt() {
-        return messageTxt;
+    public byte[] getMessageByte() {
+        return messageByte; 
     }
 
     /**
      * Set the method of the text for the message.
      *
-     * @param messageTxt the text for the message
+     * @param messageByte the text for the message
      */
-    public void setResponse(String messageTxt) {
-        this.messageTxt = messageTxt;
+    public void setMessageByte(byte[] messageByte) {
+        this.messageByte = messageByte;
     } 
  
     /**

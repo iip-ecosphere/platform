@@ -131,7 +131,7 @@ public class TransportK8S {
      */
     public void start(TransportK8STLS transportK8STLS) {
 
-        ConcurrentLinkedDeque<TransportMessage> mqttMessagesList = new ConcurrentLinkedDeque<TransportMessage>();
+        ConcurrentLinkedDeque<TransportMessage> transportMessagesList = new ConcurrentLinkedDeque<TransportMessage>();
         SerializerRegistry.registerSerializer(TransportMessageJsonSerializer.class);
         TransportParameterBuilder tpb1 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl1");
         if (transportK8STLS.isTlsCheck()) {
@@ -152,9 +152,9 @@ public class TransportK8S {
                 public void run() {
                     while (true) {
                         if (!cb1.dequeIsEmpty()) {
-                            mqttMessagesList.add(cb1.getData());
+                            transportMessagesList.add(cb1.getData());
                         } else if (!watchcb1.dequeIsEmpty()) {
-                            mqttMessagesList.add(watchcb1.getData());
+                            transportMessagesList.add(watchcb1.getData());
                         } else {
                             TimeUtils.sleep(1);
                         }
@@ -165,26 +165,26 @@ public class TransportK8S {
             Thread requestThread = new Thread() {
                 public void run() {
                     while (true) {
-                        if (mqttMessagesList.isEmpty()) {
+                        if (transportMessagesList.isEmpty()) {
                             TimeUtils.sleep(1);
                         } else {
-                            TransportMessage tempMessage = mqttMessagesList.removeFirst();
+                            TransportMessage tempMessage = transportMessagesList.removeFirst();
                             Thread requestThread = new Thread() {
                                 public void run() {
                                     try {
-                                        TransportMessage responseMessage = new TransportMessage("Empty", "Empty",
+                                        TransportMessage responseMessage = new TransportMessage("Empty", null,
                                                 "Empty");
                                         final String stream2 = cl1.composeStreamName("", tempMessage.getStreamId());
                                         responseMessage.setStreamId(tempMessage.getStreamId());
                                         responseMessage.setRequestWatch(tempMessage.getRequestWatch());
                                         if (proxyType == ProxyType.MasterProxy) {
                                             if (tempMessage.getRequestWatch().equals("Yes")) {
-                                                responseMessage.setResponse(sendWatchToK8S(tempMessage, cl1));
+                                                responseMessage.setMessageByte(sendWatchToK8S(tempMessage, cl1));
                                             } else {
-                                                responseMessage.setResponse(sendToK8S(tempMessage));
+                                                responseMessage.setMessageByte(sendToK8S(tempMessage));
                                             }
                                         } else {
-                                            responseMessage.setResponse(sendToMasterMqtt(tempMessage));
+                                            responseMessage.setMessageByte(sendToMasterTransport(tempMessage));
                                         }
                                         cl1.syncSend(stream2, responseMessage);
                                     } catch (IOException e) {
@@ -208,13 +208,13 @@ public class TransportK8S {
      * Asserts that {@code expected} and the received value in {@code callback}
      * contain the same values.
      * 
-     * @param received mqtt Message
+     * @param received transport Message
      * 
-     * @return the response from the master Mqtt
+     * @return the response from the master transport
      * 
      */
-    private static String sendToMasterMqtt(TransportMessage received) {
-        String response = null;
+    private static byte[] sendToMasterTransport(TransportMessage received) {
+        byte[] response = null; 
         
 //        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 //
@@ -232,7 +232,7 @@ public class TransportK8S {
 
         ServerAddress addr = new ServerAddress(Schema.IGNORE, serverIP, Integer.parseInt(serverPort)); 
 
-        TransportMessage message1 = new TransportMessage("PCstream", received.getMessageTxt(),
+        TransportMessage message1 = new TransportMessage("PCstream", received.getMessageByte(),
                 received.getRequestWatch());
         message1.generateStreamIdNo();
         
@@ -255,7 +255,7 @@ public class TransportK8S {
                 TimeUtils.sleep(1);
             }
 
-            response = cb1.getData().getMessageTxt();
+            response = cb1.getData().getMessageByte();
             
             cl1.disconnect();
         } catch (IOException e) {
@@ -273,14 +273,14 @@ public class TransportK8S {
      * Asserts that {@code expected} and the received value in {@code callback}
      * contain the same values.
      * 
-     * @param received mqtt Message
+     * @param received transport Message
      * 
      * @return the response from the K8S apiserver;
      */
-    private String sendToK8S(TransportMessage received) {        
+    private byte[] sendToK8S(TransportMessage received) {        
         K8SRequest request = new K8SRequest();
         
-        byte[] requestByte = request.convertBase64StringToByte(received.getMessageTxt());
+        byte[] requestByte = received.getMessageByte();
         
         request = transportK8SJavaProxy.createK8SRequest(requestByte);
 
@@ -292,22 +292,22 @@ public class TransportK8S {
             e.printStackTrace();
         }
         
-        return request.convertByteArrayToBase64String(response);
+        return response;
     }
     
     /**
      * Asserts that {@code expected} and the received value in {@code callback}
      * contain the same values.
      * 
-     * @param received mqtt Message
+     * @param received transport Message
      * @param connector the connector to send the watch stream messages
      * 
      * @return the response from the K8S apiserver;
      * @throws IOException 
      */
-    private String sendWatchToK8S(TransportMessage received, TransportConnector connector) throws IOException {        
+    private byte[] sendWatchToK8S(TransportMessage received, TransportConnector connector) throws IOException {        
         K8SRequest request = new K8SRequest();
-        byte[] requestByte = request.convertBase64StringToByte(received.getMessageTxt());
+        byte[] requestByte = received.getMessageByte();
         request = transportK8SJavaProxy.createK8SRequest(requestByte);
         byte[] responseBody = new byte[0];
         String responseString = "";
@@ -327,8 +327,7 @@ public class TransportK8S {
                     responseBody = response.body().source().readByteArray(count + 1);
                 }
                 responseBody = getResponseMessage(responseBody, formattedHeaderResponse); 
-                responseString = request.convertByteArrayToBase64String(responseBody);
-                TransportMessage responseMessage = new TransportMessage(received.getStreamId(), responseString,
+                TransportMessage responseMessage = new TransportMessage(received.getStreamId(), responseBody,
                         received.getRequestWatch());
                 connector.syncSend(stream2, responseMessage);
             }
@@ -336,7 +335,7 @@ public class TransportK8S {
             if (e.getMessage().contentEquals("timeout") || e.getMessage().contentEquals("Read timed out")) {
                 response.body().close();
                 responseBody = (formattedHeaderResponse + "0\r\n" + "\r\n").getBytes();
-                return request.convertByteArrayToBase64String(responseBody);
+                return responseBody;
             } else {
                 e.printStackTrace();
             }
@@ -356,21 +355,20 @@ public class TransportK8S {
                             responseBody = response.body().source().readByteArray(count + 1);
                         }
                         responseBody = getResponseMessage(responseBody, null); 
-                        responseString = request.convertByteArrayToBase64String(responseBody);
-                        TransportMessage responseMessage = new TransportMessage(received.getStreamId(), responseString,
+                        TransportMessage responseMessage = new TransportMessage(received.getStreamId(), responseBody,
                                 received.getRequestWatch());
                         connector.syncSend(stream2, responseMessage);
                     } else {
                         response.body().close();
-                        return request.convertByteArrayToBase64String(("0\r\n" + "\r\n").getBytes());
+                        return ("0\r\n" + "\r\n").getBytes();
                     }
                 } catch (IOException e) {
                     if (e.getMessage().contentEquals("timeout") || e.getMessage().contentEquals("Read timed out")) {
                         response.body().close();
-                        return request.convertByteArrayToBase64String(("0\r\n" + "\r\n").getBytes());
+                        return ("0\r\n" + "\r\n").getBytes();
                     } else {
                         e.printStackTrace();
-                        return request.convertByteArrayToBase64String(("0\r\n" + "\r\n").getBytes());
+                        return ("0\r\n" + "\r\n").getBytes();
                     }
                 }
             }
@@ -382,7 +380,7 @@ public class TransportK8S {
             System.out.println("Empty response AAS execute");
         }
         response.body().close();
-        return request.convertByteArrayToBase64String(responseBody); 
+        return responseBody; 
     }
 
     /**
