@@ -12,6 +12,13 @@ public class TransportMessage {
     private String requestWatch;
 
     /**
+     * Creates an empty TransportMessage instance.
+     * 
+     */
+    public TransportMessage() {
+    }
+    
+    /**
      * Creates a TransportMessage instance.
      * 
      * @param requestWatch is the Request Watch Type for the stream message
