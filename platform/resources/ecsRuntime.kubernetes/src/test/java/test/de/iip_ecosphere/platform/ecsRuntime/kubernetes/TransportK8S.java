@@ -34,7 +34,7 @@ public class TransportK8S {
     
     /**
      * Creates a transport K8S java proxy instance, it will be either MasterProxy or WorkerProxy.
-     *  
+     * 
      * @param proxyType the type of the proxy (MasterProxy or WorkerProxy)
      * @param addr the address of the transport proxy
      * @param serverPort  the port of the server
