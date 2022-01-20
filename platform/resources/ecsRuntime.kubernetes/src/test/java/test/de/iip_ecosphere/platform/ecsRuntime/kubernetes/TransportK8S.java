@@ -186,7 +186,7 @@ public class TransportK8S {
                                         } else {
                                             responseMessage.setMessageByte(sendToMasterTransport(tempMessage));
                                         }
-                                        cl1.syncSend(stream2, responseMessage);
+                                        cl1.asyncSend(stream2, responseMessage);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }

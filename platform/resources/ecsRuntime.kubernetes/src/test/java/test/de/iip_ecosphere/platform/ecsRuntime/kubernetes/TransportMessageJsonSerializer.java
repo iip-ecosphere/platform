@@ -48,7 +48,7 @@ public class TransportMessageJsonSerializer implements Serializer<TransportMessa
 //        json.put("requestWatch", value.getRequestWatch());
 //        return json.toJSONString().getBytes();
         
-        Output out = new Output(10000);
+        Output out = new Output(20000);
         Kryo tes = new Kryo();
         tes.register(TransportMessage.class);
         tes.register(byte[].class);
