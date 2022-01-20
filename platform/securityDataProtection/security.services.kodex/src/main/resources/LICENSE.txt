@@ -1,0 +1,7 @@
+KODEX and its binaries are licensed under AGPL-3.0. The binaries are releases from 
+
+https://github.com/kiprotect/kodex/releases/
+
+without modifications, the documentation is available from 
+
+https://heykodex.com/

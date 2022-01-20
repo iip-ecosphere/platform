@@ -41,10 +41,11 @@ class ForwardingAppTest(unittest.TestCase):
         received_values_list = reader.get_target()
         number_of_received_values = len(received_values_list)
         received_value = received_values_list.pop(0).decode('utf-8')
-        print(number_of_received_values)
+        print("Sent/received values: " + repr(test_value) + " " + repr(received_value))
+        print("# sent/received: " + repr(number_of_sended_values) + " " + repr(number_of_received_values))
 
         # Senden value equals received value
-        assert received_value == test_value
+        assert received_value.rstrip() == test_value.rstrip()
 
         # Repeated sending and receiving
         assert number_of_sended_values == number_of_received_values
