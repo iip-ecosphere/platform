@@ -9,17 +9,14 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
-import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnectorFactoryDescriptor;
-//import de.iip_ecosphere.platform.transport.TransportFactory;
-//import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
-//import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-//import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
-import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
+import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportFactoryDescriptor;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.TransportParameterConfigurer;
 
-public class MasterMqttJavaK8SProxy {
+public class MasterAmqpJavaK8SProxy {
   
     private static int localPort = 6443;
     private static int mqttPort = 9922;
@@ -42,7 +39,7 @@ public class MasterMqttJavaK8SProxy {
      * @param localPort the port on localhost to receive new requests
      */
     public static void setLocalPort(int localPort) {
-        MasterMqttJavaK8SProxy.localPort = localPort;
+        MasterAmqpJavaK8SProxy.localPort = localPort;
     }
 
     /**
@@ -60,7 +57,7 @@ public class MasterMqttJavaK8SProxy {
      * @param serverIP the IP Address of the server 
      */
     public static void setServerIP(String serverIP) {
-        MasterMqttJavaK8SProxy.serverIP = serverIP;
+        MasterAmqpJavaK8SProxy.serverIP = serverIP;
     }
 
     /**
@@ -78,7 +75,7 @@ public class MasterMqttJavaK8SProxy {
      * @param serverPort the port of the server (either the Aas port or K8S apiserver port).
      */
     public static void setServerPort(String serverPort) {
-        MasterMqttJavaK8SProxy.serverPort = serverPort;
+        MasterAmqpJavaK8SProxy.serverPort = serverPort;
     }
 
     /**
@@ -96,7 +93,7 @@ public class MasterMqttJavaK8SProxy {
      * @param mqttPort the mqtt port
      */
     public void setMqttPort(int mqttPort) {
-        MasterMqttJavaK8SProxy.mqttPort = mqttPort;
+        MasterAmqpJavaK8SProxy.mqttPort = mqttPort;
     }
 
     /**
@@ -109,31 +106,40 @@ public class MasterMqttJavaK8SProxy {
         
         ServerAddress addr = new ServerAddress(Schema.IGNORE, serverIP, mqttPort);
         
-        TestHiveMqServer.setConfigDir(null);
-        TestHiveMqServer server = new TestHiveMqServer(addr);
+        TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
+        
+        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+            @Override
+            public TransportConnector createConnector() {
+                return new FakeAuthConnector();
+            }
+            @Override
+            public String getName() {
+                return FakeAuthConnector.NAME;
+            }
+        });
+        TestQpidServer server = new TestQpidServer(addr);
         TransportParameterConfigurer configurer = null;
         if (tlsCheck) {
-            File secCfg = new File("./src/test/MQTT/secCfg");
-            TestHiveMqServer.setConfigDir(secCfg);
+            File secCfg = new File("./src/test/AMQP/secCfg");
+            TestQpidServer.setConfigDir(secCfg);
             configurer = new TransportParameterConfigurer() {
                 
                 @Override
                 public void configure(TransportParameterBuilder builder) {
-                    builder.setKeystore(new File(secCfg, "client-trust-store.jks"), TestHiveMqServer.KEYSTORE_PASSWORD);
-                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
                 }
             };
         } else {
-            TestHiveMqServer.setConfigDir(null);
+            TestQpidServer.setConfigDir(null);
         }
         server.start();
         TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
-
-        TransportK8S mqtt = new TransportK8S(ProxyType.MasterProxy, addr, serverIP, serverPort, tlsCheck);
-        TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
-//        TransportConnector cl1 = TransportFactory.createConnector();
         
-        mqtt.start(transportK8STLS);
+//        TransportConnector cl1 = TransportFactory.createConnector();
+
+        TransportK8S amqp = new TransportK8S(ProxyType.MasterProxy, addr, serverIP, serverPort, tlsCheck);
+        amqp.start(transportK8STLS);
     }
 
     /**
@@ -146,36 +152,46 @@ public class MasterMqttJavaK8SProxy {
 
         ServerAddress addr = new ServerAddress(Schema.IGNORE, serverIP, mqttPort);
         
-        TestHiveMqServer.setConfigDir(null);
-        TestHiveMqServer server = new TestHiveMqServer(addr);
+        TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
+        
+        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+            @Override
+            public TransportConnector createConnector() {
+                return new FakeAuthConnector();
+            }
+            @Override
+            public String getName() {
+                return FakeAuthConnector.NAME;
+            }
+        });
+        TestQpidServer server = new TestQpidServer(addr);
         TransportParameterConfigurer configurer = null;
         if (tlsCheck) {
-            File secCfg = new File("./src/test/MQTT/secCfg");
-            TestHiveMqServer.setConfigDir(secCfg);
+            File secCfg = new File("./src/test/AMQP/secCfg");
+            TestQpidServer.setConfigDir(secCfg);
             configurer = new TransportParameterConfigurer() {
                 
                 @Override
                 public void configure(TransportParameterBuilder builder) {
-                    builder.setKeystore(new File(secCfg, "client-trust-store.jks"), TestHiveMqServer.KEYSTORE_PASSWORD);
-                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
                 }
             };
         } else {
-            TestHiveMqServer.setConfigDir(null);
+            TestQpidServer.setConfigDir(null);
         }
         server.start();
         TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
-
-        TransportK8S mqtt = new TransportK8S(ProxyType.MasterProxy, addr, serverIP, serverPort, tlsCheck);
-        TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
-//        TransportConnector cl1 = TransportFactory.createConnector();
         
-        mqtt.start(transportK8STLS);
+//        TransportConnector cl1 = TransportFactory.createConnector();
+
+        TransportK8S amqp = new TransportK8S(ProxyType.MasterProxy, addr, serverIP, serverPort, tlsCheck);
+        amqp.start(transportK8STLS);
         
         while (true) {
             TimeUtils.sleep(1);
         }
     }
+    
 //    /**
 //     * Start multi-threads method to receive and process requests.
 //     * 

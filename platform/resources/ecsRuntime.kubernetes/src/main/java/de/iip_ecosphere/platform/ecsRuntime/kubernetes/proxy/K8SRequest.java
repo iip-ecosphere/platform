@@ -2,6 +2,7 @@ package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -227,6 +228,65 @@ public class K8SRequest {
         byte[] newRequestByte = Base64.getDecoder().decode(requestBase64String);        
         
         return newRequestByte;
+        
+    }
+    
+    /**
+     * convert the request to base64 String.
+     *
+     * @return the request as base64 String
+     */
+    public String convertToBase64StringWithID() {
+        
+        String requestID = "requestID:" + getPathNoParameter() + System.nanoTime() + "\r\n";
+        requestID = Base64.getEncoder().encodeToString(requestID.getBytes());
+        
+        String requestBase64String = Base64.getEncoder().encodeToString(requestByte);
+        
+        return requestID + "*" + requestBase64String;
+    }    
+    
+    /**
+     * convert the String from base64 String to String.
+     *
+     * @param requestBase64String the request as base64 String
+     *
+     * @return textString the request as array of bytes
+     */
+    public String convertBase64StringToString(String requestBase64String) {
+        
+        String textString = new String(Base64.getDecoder().decode(requestBase64String));        
+        
+        return textString;
+        
+    }
+    
+    /**
+     * convert the String from base64 String to String.
+     *
+     * @param byteArray the request as array of bytes
+     *
+     * @return byteArrayBase64String the request as base64 String
+     */
+    public String convertByteArrayToBase64String(byte[] byteArray) {
+        String byteArrayBase64String = Base64.getEncoder().encodeToString(byteArray);
+        
+        return byteArrayBase64String;
+    }
+    
+    /**
+     * get the path name without parameters.
+     *
+     * @return requestString the request as array of bytes
+     */
+    public String getPathNoParameter() {
+        
+        if (path.indexOf("?") == -1) {
+            return path.replace("/", ""); 
+        } else {
+            return (path.contains("&watch=true") ? "Watch" : "")
+                    + path.substring(0, path.indexOf("?")).replace("/", "");
+        }
         
     }
 }

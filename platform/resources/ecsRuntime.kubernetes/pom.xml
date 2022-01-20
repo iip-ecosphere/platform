@@ -44,12 +44,6 @@
     </dependency>  
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>transport.amqp</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
@@ -91,6 +85,46 @@
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.mqttv5</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport.amqp</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+        
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <scope>test</scope>
+    </dependency>      
+	<dependency>
+	  <groupId>de.iip-ecosphere.platform</groupId>
+	  <artifactId>test.mqtt.hivemq</artifactId>
+	  <version>${project.version}</version>
+	  <type>test-jar</type>
+	  <scope>test</scope>
+	</dependency>   
+	<dependency>
+	  <groupId>com.hivemq</groupId>
+	  <artifactId>hivemq-community-edition-embedded</artifactId>
+	  <scope>test</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.eclipse.paho</groupId>
+	  <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+	</dependency>
+	
+	<dependency>
+     <groupId>com.esotericsoftware</groupId>
+     <artifactId>kryo</artifactId>
+    <version>5.2.1</version>
+</dependency>
   </dependencies>
 
 </project>
