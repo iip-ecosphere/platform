@@ -84,8 +84,8 @@ public abstract class AbstractEnvironmentTest {
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SWITCH, null, e -> true, "otherService");
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_UPDATE, null, e -> true, 
             "http://wherever.com/service/0.1.0");
-        Map<String, Object> values = new HashMap<>();
-        values.put("name1", new Object());
+        Map<String, Object> values = new HashMap<>(); // contents must be serializable -> String
+        values.put("name1", "TEST"); 
         values.put("name2", 25);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_RECONF, null, e -> true, values);
     }
