@@ -58,9 +58,14 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
     public static Process createPythonProcess(File dir, String... args) throws IOException {
         String pythonPath = "python";
         // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
-        File jenkinsPath = new File("/var/lib/jenkins/python/active/bin/python3");
-        if (jenkinsPath.exists()) {
-            pythonPath = jenkinsPath.toString();
+        File tmpPath = new File("/var/lib/jenkins/python/active/bin/python3"); // JENKINS
+        if (tmpPath.exists()) {
+            pythonPath = tmpPath.toString();
+        } else {
+            tmpPath = new File("/usr/bin/python3"); // Standard Unix... do we need more???
+            if (tmpPath.exists()) {
+                pythonPath = tmpPath.toString();
+            }
         }
         System.out.println("Using Python: " + pythonPath);
         List<String> tmp = new ArrayList<String>();
