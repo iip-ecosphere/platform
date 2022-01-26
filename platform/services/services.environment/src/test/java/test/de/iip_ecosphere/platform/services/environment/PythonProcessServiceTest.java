@@ -34,7 +34,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class GenericPythonProcessServiceTest {
+public class PythonProcessServiceTest {
 
     /**
      * In-data type translator.
