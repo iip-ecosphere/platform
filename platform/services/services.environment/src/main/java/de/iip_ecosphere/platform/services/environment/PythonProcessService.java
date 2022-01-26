@@ -42,19 +42,31 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonProcessService extends AbstractService implements GenericService {
+public class PythonProcessService extends AbstractService implements GenericMultiTypeService {
 
     private Process proc;
     private File home;
     private List<String> pythonArgs = new ArrayList<>();
-    private Map<Class<?>, TypeTranslator<?, String>> inTranslators = new HashMap<>();
-    private Map<Class<?>, TypeTranslator<String, ?>> outTranslators = new HashMap<>();
-    private Map<String, Class<?>> outTranslatorsClasses = new HashMap<>();
-    private Map<Class<?>, DataIngestor<?>> ingestors = new HashMap<>();
     private int timeout = 1;
     private TimeUnit timeoutUnit = TimeUnit.SECONDS;
     private PrintWriter serviceIn;
+    private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
+    private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
+    private int ingestorsCount;
     
+    private abstract static class AbstractTypeInfo <T> {
+        protected Class<T> cls;
+    }
+    
+    private class InTypeInfo <T> extends AbstractTypeInfo<T> {
+        private TypeTranslator<T, String> inTranslator;
+    }
+
+    private class OutTypeInfo <T> extends AbstractTypeInfo<T> {
+        private TypeTranslator<String, T> outTranslator;
+        private DataIngestor<T> ingestor;
+    }
+
     /**
      * Creates an abstract service from YAML information.
      * 
@@ -143,7 +155,7 @@ public class PythonProcessService extends AbstractService implements GenericServ
      * @see #startExecutableByName()
      */
     protected void start() throws ExecutionException {
-        if (ingestors.size() > 0) {
+        if (ingestorsCount > 0) {
             proc = createAndCustomizeProcess(null);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
             serviceIn = new PrintWriter(writer);
@@ -152,47 +164,66 @@ public class PythonProcessService extends AbstractService implements GenericServ
                 
                 @Override
                 public void run() {
-                    scanInputStream(proc, false);
+                    scanInputStream(proc, (t, d) -> {
+                        OutTypeInfo<?> info = outTypeInfos.get(t);
+                        if (null != info) {
+                            handleResult(info.cls, d, t);
+                        } else {
+                            LoggerFactory.getLogger(getClass()).error("No output type translator registered for: " + t);
+                        }
+                        return false;
+                    });
                 }
                 
             }).start();
         }
+    }
+       
+    /**
+     * Defines a function that handles "parsed" input, split into type and serialized data.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private interface InputHandler {
+
+        /**
+         * Handles input.
+         * 
+         * @param type the type
+         * @param data the data
+         * @return {@code true} for continue reading lines, {@code false} else
+         * @throws IOException in case that data cannot be translated/processed
+         */
+        public boolean handle(String type, String data) throws IOException;
+        
     }
     
     /**
      * Scans the input stream of the given process for return data.
      * 
      * @param proc the process
-     * @param returnFirst whether a process for an ingestor shall be started or whether 
+     * @param handler the input handler
      * @return the first line if {@code returnFirst}, else <b>null</b>
      * @see #handleResult(Class, String, String) 
      */
-    private String scanInputStream(Process proc, boolean returnFirst) {
+    private String scanInputStream(Process proc, InputHandler handler) {
         String result = null;
         Scanner sc = new Scanner(proc.getInputStream());
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            if (returnFirst) {
-                int pos = line.indexOf('|');
-                if (pos > 0 && pos < line.length()) {
-                    result = line.substring(pos + 1);
-                }
-                break;
-            } else {
-                int pos = line.indexOf('|');
-                if (pos > 0 && pos < line.length()) {
-                    String typeName = line.substring(0, pos);
-                    String data = line.substring(pos + 1);
-                    Class<?> outCls = outTranslatorsClasses.get(typeName);
-                    if (null != outCls) {
-                        handleResult(outCls, data, typeName);
-                    } else {
-                        LoggerFactory.getLogger(getClass()).error("No output type translator registered for: " 
-                            + typeName);
+            int pos = line.indexOf('|');
+            if (pos > 0 && pos < line.length()) {
+                String typeName = line.substring(0, pos);
+                String data = line.substring(pos + 1);
+                try {
+                    if (handler.handle(typeName, data)) {
+                        break;
                     }
-                } else {
-                    LoggerFactory.getLogger(getClass()).error("No type name in result: " + line);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("Error processing " + line + ": " + e.getMessage());
                 }
+            } else {
+                LoggerFactory.getLogger(getClass()).error("No type name in result " + line);
             }
         }
         sc.close();
@@ -210,17 +241,19 @@ public class PythonProcessService extends AbstractService implements GenericServ
     @SuppressWarnings("unchecked")
     private <O> void handleResult(Class<O> cls, String data, String typeName) {
         try {
-            TypeTranslator<String, O> outT = (TypeTranslator<String, O>) outTranslators.get(cls);
-            if (outT != null) {
-                O tmp = outT.to(data);
-                DataIngestor<O> ingestor = (DataIngestor<O>) ingestors.get(cls);
-                if (null != ingestor) {
-                    ingestor.ingest(tmp);
+            OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
+            if (null != info) {
+                TypeTranslator<String, O> outT = info.outTranslator;
+                if (outT != null) {
+                    O tmp = outT.to(data);
+                    if (null != info.ingestor) {
+                        info.ingestor.ingest(tmp);
+                    } else {
+                        LoggerFactory.getLogger(getClass()).error("No ingestor registered for: " + typeName);
+                    }
                 } else {
-                    LoggerFactory.getLogger(getClass()).error("No ingestor registered for: " + typeName);
+                    LoggerFactory.getLogger(getClass()).error("No result type translator registered for: " + typeName);
                 }
-            } else {
-                LoggerFactory.getLogger(getClass()).error("No result type translator registered for: " + typeName);
             }
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
@@ -304,28 +337,96 @@ public class PythonProcessService extends AbstractService implements GenericServ
         return LoggerFactory.getLogger(PythonProcessService.class);
     }
 
+    /**
+     * Adds an input type translator.
+     *  
+     * @param <I> the input data type
+     * @param inCls the class representing the input type
+     * @param inTypeName symbolic name of {@code inCls}, e.g. from configuration model
+     * @param inTrans the input data type translator
+     * @see #registerOutputTypeTranslators(Class, String, TypeTranslator)
+     */
     @Override
-    public <I, O> void registerTypeTranslators(Class<I> inCls, Class<O> outCls, String outName, 
-        TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans) {
-        inTranslators.put(inCls, inTrans);
-        outTranslators.put(outCls, outTrans);
-        outTranslatorsClasses.put(outName, outCls);
+    public <I> void registerInputTypeTranslator(Class<I> inCls, String inTypeName, 
+        TypeTranslator<I, String> inTrans) {
+        InTypeInfo<I> info = obtainInTypeInfo(inCls, inTypeName);
+        info.inTranslator = inTrans;
     }
+
+    /**
+     * Obtains an input type information object.
+     * 
+     * @param <I> the input type
+     * @param cls the class representing the type
+     * @param typeName the associated symbolic type name
+     * @return the input type information object, may be retrieved or new
+     */
+    @SuppressWarnings("unchecked")
+    private <I> InTypeInfo<I> obtainInTypeInfo(Class<I> cls, String typeName) {
+        InTypeInfo<I> info = (InTypeInfo<I>) inTypeInfos.get(typeName);
+        if (null == info) {
+            info = new InTypeInfo<I>();
+            inTypeInfos.put(typeName, info);
+            info.cls = cls;
+        }
+        return info;
+    }
+
+    /**
+     * Obtains an output type information object.
+     * 
+     * @param <O> the output type
+     * @param cls the class representing the type
+     * @param typeName the associated symbolic type name
+     * @return the output type information object, may be retrieved or new
+     */
+    @SuppressWarnings("unchecked")
+    private <O> OutTypeInfo<O> obtainOutTypeInfo(Class<O> cls, String typeName) {
+        OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
+        if (null == info) {
+            info = new OutTypeInfo<O>();
+            outTypeInfos.put(typeName, info);
+            info.cls = cls;
+        }
+        return info;
+    }
+
+    /**
+     * Adds an output type translator.
+     *  
+     * @param <O> the output data type
+     * @param outCls the class representing the input type
+     * @param outTypeName symbolic name of {@code outCls}, e.g. from configuration model
+     * @param outTrans the output data type translator
+     * @see #registerInputTypeTranslators(Class, String, TypeTranslator)
+     */
+    @Override
+    public <O> void registerOutputTypeTranslator(Class<O> outCls, String outTypeName, 
+        TypeTranslator<String, O> outTrans) {
+        OutTypeInfo<O> info = obtainOutTypeInfo(outCls, outTypeName);
+        info.outTranslator = outTrans;
+    }
+
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I> void processAsync(Class<I> inCls, String inType, I data) throws ExecutionException {
-        TypeTranslator<I, String> inT = (TypeTranslator<I, String>) inTranslators.get(inCls);
-        if (null != inT) {
-            if (null != serviceIn) {
-                try {
-                    serviceIn.println(inType + "|" + inT.to(data));
-                    serviceIn.flush();
-                } catch (IOException e) {
-                    throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
+    public <I> void processAsync(String inType, I data) throws ExecutionException {
+        InTypeInfo<?> info = inTypeInfos.get(inType);
+        if (null != info) {
+            TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.inTranslator;
+            if (null != inT) {
+                if (null != serviceIn) {
+                    try {
+                        serviceIn.println(inType + "|" + inT.to(data));
+                        serviceIn.flush();
+                    } catch (IOException e) {
+                        throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
+                    }
+                } else {
+                    throw new ExecutionException("Service/process not started,", null);
                 }
             } else {
-                throw new ExecutionException("Service/process not started,", null);
+                throw new ExecutionException("No input type translator registered", null);
             }
         } else {
             throw new ExecutionException("No input type translator registered", null);
@@ -334,44 +435,55 @@ public class PythonProcessService extends AbstractService implements GenericServ
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I, O> O processSync(Class<I> inCls, String inType, Class<O> outCls, I data) throws ExecutionException {
+    public <I, O> O processSync(String inType, I data) throws ExecutionException {
         O result = null;
-        TypeTranslator<I, String> inT = (TypeTranslator<I, String>) inTranslators.get(inCls);
-        if (null != inT) {
-            try {
-                AtomicReference<String> tmp = new AtomicReference<String>();
-                proc = createAndCustomizeProcess(inType + "|" + inT.to(data));
-                new Thread(new Runnable() {
-                    
-                    @Override
-                    public void run() {
-                        tmp.set(scanInputStream(proc, true));
+        InTypeInfo<?> info = inTypeInfos.get(inType);
+        if (null != info) {
+            TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.inTranslator;
+            if (null != inT) {
+                try {
+                    AtomicReference<O> tmp = new AtomicReference<O>();
+                    proc = createAndCustomizeProcess(inType + "|" + inT.to(data));
+                    new Thread(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            scanInputStream(proc, (t, d) -> {
+                                OutTypeInfo<?> info = outTypeInfos.get(t);
+                                if (null != info) {
+                                    TypeTranslator<String, O> outT = (TypeTranslator<String, O>) info.outTranslator;
+                                    if (null != outT) {
+                                        tmp.set(outT.to(d));
+                                    } else {
+                                        throw new IOException("No output type translator registered");
+                                    }
+                                }
+                                return true;
+                            });
+                        }
+                        
+                    }).start();                
+                    if (timeout < 0) {
+                        proc.waitFor();
+                    } else {
+                        proc.waitFor(timeout, timeoutUnit);
                     }
-                    
-                }).start();                
-                if (timeout < 0) {
-                    proc.waitFor();
-                } else {
-                    proc.waitFor(timeout, timeoutUnit);
+                    result = tmp.get();
+                } catch (InterruptedException | IOException e) {
+                    throw new ExecutionException("Exception while data processing: " + e.getMessage(), e);
                 }
-                TypeTranslator<String, O> outT = (TypeTranslator<String, O>) outTranslators.get(outCls);
-                if (null != outT) {
-                    result = outT.to(tmp.get());
-                } else {
-                    throw new ExecutionException("No output type translator registered", null);
-                }
-            } catch (InterruptedException | IOException e) {
-                throw new ExecutionException("Exception while data processing: " + e.getMessage(), e);
+            } else {
+                throw new ExecutionException("No input type translator registered", null);
             }
-        } else {
-            throw new ExecutionException("No input type translator registered", null);
         }
         return result;
     }
 
     @Override
-    public <D> void attachIngestor(Class<D> cls, DataIngestor<D> ingestor) {
-        ingestors.put(cls, ingestor);
+    public <O> void attachIngestor(Class<O> outCls, String outTypeName, DataIngestor<O> ingestor) {
+        OutTypeInfo<O> info = (OutTypeInfo<O>) obtainOutTypeInfo(outCls, outTypeName);
+        info.ingestor = ingestor;
+        ingestorsCount++;
     }
 
 }

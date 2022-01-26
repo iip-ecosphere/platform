@@ -92,10 +92,11 @@ public class PythonProcessServiceTest {
         pDesc.setHomePath("src/test/python");
         sDesc.setProcess(pDesc);
         
+        final String typeName = "S"; // same symbolic type name for in/output
         PythonProcessService service = new PythonProcessService(sDesc);
-        service.registerTypeTranslators(String.class, String.class, "S", 
-            new InDataTypeTranslator(), new OutDataTypeTranslator());
-        service.attachIngestor(String.class, new DataIngestor<String>() {
+        service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
+        service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
+        service.attachIngestor(String.class, typeName, new DataIngestor<String>() {
 
             @Override
             public void ingest(String data) {
@@ -103,9 +104,9 @@ public class PythonProcessServiceTest {
             } 
         });
         service.setState(ServiceState.STARTING);
-        service.processAsync(String.class, "S", "test");
-        service.processAsync(String.class, "S", "test");
-        service.processAsync(String.class, "S", "test");
+        service.processAsync(typeName, "test");
+        service.processAsync(typeName, "test");
+        service.processAsync(typeName, "test");
         TimeUtils.sleep(1000);
         
         service.setState(ServiceState.STOPPING);
@@ -133,14 +134,14 @@ public class PythonProcessServiceTest {
         pDesc.setHomePath("src/test/python");
         sDesc.setProcess(pDesc);
         
-        final String typeName = "S";
+        final String typeName = "S"; // same symbolic type name for in/output
         PythonProcessService service = new PythonProcessService(sDesc);
-        service.registerTypeTranslators(String.class, String.class, typeName, 
-            new InDataTypeTranslator(), new OutDataTypeTranslator());
+        service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
+        service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
         service.setState(ServiceState.STARTING);
-        Assert.assertEquals("test", service.processSync(String.class, typeName, String.class, "test"));
-        Assert.assertEquals("test", service.processSync(String.class, typeName, String.class, "test"));
-        Assert.assertEquals("test", service.processSync(String.class, typeName, String.class, "test"));
+        Assert.assertEquals("test", service.processSync(typeName, "test"));
+        Assert.assertEquals("test", service.processSync(typeName, "test"));
+        Assert.assertEquals("test", service.processSync(typeName, "test"));
         service.setState(ServiceState.STOPPING);
 
         service.activate();

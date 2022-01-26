@@ -7,8 +7,7 @@ if len(sys.argv) > 1:
     if len(args) > 0:
         print(args[len(args) - 1])
 else:
-    sys.stderr.write("wait\n")
     while True:
         s = input()
-        sys.stderr.write(s+"\n")
+        #sys.stderr.write(s+"\n")
         print(s)
