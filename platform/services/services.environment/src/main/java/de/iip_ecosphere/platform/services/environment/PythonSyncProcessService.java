@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +40,16 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
     private int timeout = 1;
     private TimeUnit timeoutUnit = TimeUnit.SECONDS;
 
+    /**
+     * Creates an instance from a service id and a YAML artifact.
+     * 
+     * @param serviceId the service id
+     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     */
+    public PythonSyncProcessService(String serviceId, InputStream ymlFile) {
+        super(serviceId, ymlFile);
+    }
+    
     /**
      * Creates an abstract service from YAML information.
      * 

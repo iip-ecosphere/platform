@@ -38,7 +38,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     public static final char TYPE_SEPARATOR_CHAR = '|';
     
     private File home;
-    private List<String> pythonArgs = new ArrayList<>();
+    private List<String> pythonArgs;
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
     
@@ -137,6 +137,16 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     }
 
     /**
+     * Creates an abstract service from a service id and a YAML artifact.
+     * 
+     * @param serviceId the service id
+     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     */
+    public AbstractPythonProcessService(String serviceId, InputStream ymlFile) {
+        super(serviceId, ymlFile);
+    }
+    
+    /**
      * Creates an abstract service from YAML information.
      * 
      * @param yaml the service information as read from YAML. We assume that {@link YamlProcess#getExecutable()} is 
@@ -145,7 +155,16 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      */
     public AbstractPythonProcessService(YamlService yaml) {
         super(yaml);
+    }
+    
+    /**
+     * Does further setup of this instance from the given YAML information.
+     * 
+     * @param yaml the service information as read from YAML
+     */
+    protected void configureFrom(YamlService yaml) {
         YamlProcess pSpec = yaml.getProcess();
+        pythonArgs = new ArrayList<>();
         if (pSpec != null) {
             home = pSpec.getHomePath();
             pythonArgs.add(getPythonModule(pSpec.getExecutable(), yaml));

@@ -108,7 +108,7 @@ public class PythonProcessServiceTest {
         service.setState(ServiceState.STARTING);
         service.process(typeName, "test");
         service.process(typeName, "test");
-        service.process(typeName, "test");
+        service.processQuiet(typeName, "test");
         TimeUtils.sleep(1000);
         
         service.setState(ServiceState.STOPPING);
@@ -143,7 +143,7 @@ public class PythonProcessServiceTest {
         service.setState(ServiceState.STARTING);
         Assert.assertEquals("test", service.process(typeName, "test"));
         Assert.assertEquals("test", service.process(typeName, "test"));
-        Assert.assertEquals("test", service.process(typeName, "test"));
+        Assert.assertEquals("test", service.processQuiet(typeName, "test"));
         service.setState(ServiceState.STOPPING);
 
         service.activate();

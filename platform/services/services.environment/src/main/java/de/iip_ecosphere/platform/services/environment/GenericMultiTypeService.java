@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -73,5 +75,25 @@ public interface GenericMultiTypeService extends Service {
      *    are not registered (@link #registerInputTypeTranslator(Class, Class, TypeTranslator, TypeTranslator)}
      */
     public <I, O> O process(String inTypeName, I data) throws ExecutionException;
-    
+
+    /**
+     * Requests synchronous processing a data item. Shall call {@link #process(String, Object)} but handle potential
+     * exceptions.
+     * 
+     * @param <I> the input data type
+     * @param <O> the output data type
+     * @param inTypeName the name of {@code inType} in the configuration model
+     * @param data the data item to be processed
+     * @return the output, always <b>null</b> in case of asynchronous processing as the result is passed to a 
+     *     registered ingestor
+     */
+    public default <I, O> O processQuiet(String inTypeName, I data) {
+        try {
+            return process(inTypeName, data);
+        } catch (ExecutionException e) {
+            LoggerFactory.getLogger(getClass()).error("Processing failed: " + e.getMessage());
+            return null;
+        }
+    }
+
 }

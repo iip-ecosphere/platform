@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -40,6 +41,16 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     private Process proc;
     private PrintWriter serviceIn;
  
+    /**
+     * Creates an instace from a service id and a YAML artifact.
+     * 
+     * @param serviceId the service id
+     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     */
+    public PythonAsyncProcessService(String serviceId, InputStream ymlFile) {
+        super(serviceId, ymlFile);
+    }
+    
     /**
      * Creates an abstract service from YAML information.
      * 
