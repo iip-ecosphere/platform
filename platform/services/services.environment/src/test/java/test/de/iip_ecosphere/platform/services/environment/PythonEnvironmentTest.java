@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.environment.PythonUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
@@ -20,7 +21,6 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-
 
 /**
  * Integration test for the Python environment.
@@ -56,17 +56,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws IOException if process creation fails
      */
     public static Process createPythonProcess(File dir, String... args) throws IOException {
-        String pythonPath = "python";
-        // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
-        File tmpPath = new File("/var/lib/jenkins/python/active/bin/python3"); // JENKINS
-        if (tmpPath.exists()) {
-            pythonPath = tmpPath.toString();
-        } else {
-            tmpPath = new File("/usr/bin/python3"); // Standard Unix... do we need more???
-            if (tmpPath.exists()) {
-                pythonPath = tmpPath.toString();
-            }
-        }
+        String pythonPath = PythonUtils.getPythonExecutable().toString();
         System.out.println("Using Python: " + pythonPath);
         List<String> tmp = new ArrayList<String>();
         tmp.add(pythonPath);

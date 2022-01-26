@@ -39,7 +39,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonProcessServiceTest {
+public class AbstractProcessService4PythonTest {
 
     /**
      * Defines a simple string-in-string-out test service.
@@ -161,10 +161,7 @@ public class PythonProcessServiceTest {
         sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
         sDesc.setId("Test");
         sDesc.setDeployable(true);
-        YamlProcess pDesc = new YamlProcess();
-        pDesc.setExecutable("java");
-        pDesc.setHomePath("target/test-classes");
-        sDesc.setProcess(pDesc);
+        // no process information needed, defaults sufficient
         
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);
         service.setState(ServiceState.STARTING);
