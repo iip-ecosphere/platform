@@ -1,0 +1,121 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package de.iip_ecosphere.platform.services.environment;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+
+/**
+ * Generic command-line-based Python integration for multiple data types. Conventions:
+ * <ul>
+ *   <li>Python is determined by {@link PythonUtils#getPythonExecutable()}.</li>
+ *   <li>A synchronous Python program receives the data including the symbolic type name as last command line argument 
+ *       and returns the result on the command line including the symbolic type name.</li>
+ *   <li>The Python program runs until the input data is processed.</li>
+ * </ul>
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+public class PythonSyncProcessService extends AbstractPythonProcessService {
+
+    private int timeout = 1;
+    private TimeUnit timeoutUnit = TimeUnit.SECONDS;
+
+    /**
+     * Creates an abstract service from YAML information.
+     * 
+     * @param yaml the service information as read from YAML. We assume that {@link YamlProcess#getExecutable()} is 
+     * set to the Python file to start and {@link YamlProcess#getHomePath()} is set to the home path where the 
+     * executable was extracted to. Further, {@link YamlProcess#getCmdArg()} are taken over if given.
+     */
+    public PythonSyncProcessService(YamlService yaml) {
+        super(yaml);
+    }
+    
+    @Override
+    public void migrate(String resourceId) throws ExecutionException {
+        // do within Java
+    }
+
+    @Override
+    public void update(URI location) throws ExecutionException {
+        // do within Java
+    }
+
+    @Override
+    public void switchTo(String targetId) throws ExecutionException {
+        // do within Java
+    }
+
+    @Override
+    public void reconfigure(Map<String, String> values) throws ExecutionException {
+        // do within Java
+    }
+
+    /**
+     * Returns the logger.
+     * 
+     * @return the logger
+     */
+    protected static Logger getLogger() {
+        return LoggerFactory.getLogger(PythonSyncProcessService.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <I, O> O process(String inType, I data) throws ExecutionException {
+        O result = null;
+        InTypeInfo<?> info = getInTypeInfo(inType);
+        if (null != info) {
+            TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.getInTranslator();
+            if (null != inT) {
+                try {
+                    AtomicReference<O> tmp = new AtomicReference<O>();
+                    Process proc = createAndCustomizeProcess(compose(inType, inT.to(data)));
+                    createScanInputThread(proc, (t, d) -> {
+                        OutTypeInfo<?> oInfo = getOutTypeInfo(t);
+                        if (null != oInfo) {
+                            TypeTranslator<String, O> outT = (TypeTranslator<String, O>) oInfo.getOutTranslator();
+                            if (null != outT) {
+                                tmp.set(outT.to(d));
+                            } else {
+                                throw new IOException("No output type translator registered");
+                            }
+                        }
+                        return true;
+                    }).start();
+                    if (timeout < 0) {
+                        proc.waitFor();
+                    } else {
+                        proc.waitFor(timeout, timeoutUnit);
+                    }
+                    result = tmp.get();
+                } catch (InterruptedException | IOException e) {
+                    throw new ExecutionException("Exception while data processing: " + e.getMessage(), e);
+                }
+            } else {
+                throw new ExecutionException("No input type translator registered", null);
+            }
+        }
+        return result;
+    }
+
+}

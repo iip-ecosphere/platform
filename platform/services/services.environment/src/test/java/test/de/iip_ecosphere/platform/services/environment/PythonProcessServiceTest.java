@@ -20,7 +20,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
-import de.iip_ecosphere.platform.services.environment.PythonProcessService;
+import de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService;
+import de.iip_ecosphere.platform.services.environment.PythonSyncProcessService;
+import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -30,7 +32,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Tests the generic Python process service {@link PythonProcessService}.
+ * Tests the generic Python process service {@link AbstractPythonProcessService}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -93,7 +95,7 @@ public class PythonProcessServiceTest {
         sDesc.setProcess(pDesc);
         
         final String typeName = "S"; // same symbolic type name for in/output
-        PythonProcessService service = new PythonProcessService(sDesc);
+        AbstractPythonProcessService service = new PythonAsyncProcessService(sDesc);
         service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
         service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
         service.attachIngestor(String.class, typeName, new DataIngestor<String>() {
@@ -104,9 +106,9 @@ public class PythonProcessServiceTest {
             } 
         });
         service.setState(ServiceState.STARTING);
-        service.processAsync(typeName, "test");
-        service.processAsync(typeName, "test");
-        service.processAsync(typeName, "test");
+        service.process(typeName, "test");
+        service.process(typeName, "test");
+        service.process(typeName, "test");
         TimeUtils.sleep(1000);
         
         service.setState(ServiceState.STOPPING);
@@ -135,13 +137,13 @@ public class PythonProcessServiceTest {
         sDesc.setProcess(pDesc);
         
         final String typeName = "S"; // same symbolic type name for in/output
-        PythonProcessService service = new PythonProcessService(sDesc);
+        AbstractPythonProcessService service = new PythonSyncProcessService(sDesc);
         service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
         service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
         service.setState(ServiceState.STARTING);
-        Assert.assertEquals("test", service.processSync(typeName, "test"));
-        Assert.assertEquals("test", service.processSync(typeName, "test"));
-        Assert.assertEquals("test", service.processSync(typeName, "test"));
+        Assert.assertEquals("test", service.process(typeName, "test"));
+        Assert.assertEquals("test", service.process(typeName, "test"));
+        Assert.assertEquals("test", service.process(typeName, "test"));
         service.setState(ServiceState.STOPPING);
 
         service.activate();

@@ -12,59 +12,128 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.URI;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Generic command-line-based Python integration for multiple data types. Conventions:
- * <ul>
- *   <li>Python is determined by {@link  
- *   <li>A synchronous Python program receives the data as last command line</li>
- * </ul>
+ * Generic command-line-based Python integration for multiple data types.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonProcessService extends AbstractService implements GenericMultiTypeService {
+public abstract class AbstractPythonProcessService extends AbstractService implements GenericMultiTypeService {
 
-    private Process proc;
+    public static final char TYPE_SEPARATOR_CHAR = '|';
+    
     private File home;
     private List<String> pythonArgs = new ArrayList<>();
-    private int timeout = 1;
-    private TimeUnit timeoutUnit = TimeUnit.SECONDS;
-    private PrintWriter serviceIn;
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
-    private int ingestorsCount;
     
-    private abstract static class AbstractTypeInfo <T> {
-        protected Class<T> cls;
-    }
-    
-    private class InTypeInfo <T> extends AbstractTypeInfo<T> {
-        private TypeTranslator<T, String> inTranslator;
+    /**
+     * Represents an input or output type.
+     * 
+     * @param <T> the Java representation of the output type
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected abstract static class AbstractTypeInfo<T> {
+        
+        private Class<T> type;
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param type the class representing the data type
+         */
+        protected AbstractTypeInfo(Class<T> type) {
+            this.type = type;
+        }
+       
+        /**
+         * Returns the Java representation of the type.
+         * 
+         * @return the type
+         */
+        protected Class<T> getType() {
+            return type;
+        }
+        
     }
 
-    private class OutTypeInfo <T> extends AbstractTypeInfo<T> {
+    /**
+     * Represents an input type.
+     * 
+     * @param <T> the Java representation of the output type
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected class InTypeInfo <T> extends AbstractTypeInfo<T> {
+        
+        private TypeTranslator<T, String> inTranslator;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param type the class representing the data type
+         */
+        protected InTypeInfo(Class<T> type) {
+            super(type);
+        }
+        
+        /**
+         * Returns the input translator.
+         * 
+         * @return the type translator, may be <b>null</b>
+         */
+        protected TypeTranslator<T, String> getInTranslator() {
+            return inTranslator;
+        }
+        
+    }
+
+    /**
+     * Represents an output type.
+     * 
+     * @param <T> the Java representation of the output type
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected class OutTypeInfo <T> extends AbstractTypeInfo<T> {
+        
         private TypeTranslator<String, T> outTranslator;
         private DataIngestor<T> ingestor;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param type the class representing the data type
+         */
+        protected OutTypeInfo(Class<T> type) {
+            super(type);
+        }
+
+        /**
+         * Returns the output translator.
+         * 
+         * @return the type translator, may be <b>null</b>
+         */
+        protected TypeTranslator<String, T> getOutTranslator() {
+            return outTranslator;
+        }
+
     }
 
     /**
@@ -74,7 +143,7 @@ public class PythonProcessService extends AbstractService implements GenericMult
      * set to the Python file to start and {@link YamlProcess#getHomePath()} is set to the home path where the 
      * executable was extracted to. Further, {@link YamlProcess#getCmdArg()} are taken over if given.
      */
-    public PythonProcessService(YamlService yaml) {
+    public AbstractPythonProcessService(YamlService yaml) {
         super(yaml);
         YamlProcess pSpec = yaml.getProcess();
         if (pSpec != null) {
@@ -148,35 +217,11 @@ public class PythonProcessService extends AbstractService implements GenericMult
     }
     
     /**
-     * Preliminary: Starts the service and the background process.
+     * Starts the service and the background process.
      * 
      * @throws ExecutionException if starting the process fails
-     * @see #getPythonExecutable()
-     * @see #startExecutableByName()
      */
     protected void start() throws ExecutionException {
-        if (ingestorsCount > 0) {
-            proc = createAndCustomizeProcess(null);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
-            serviceIn = new PrintWriter(writer);
-
-            new Thread(new Runnable() {
-                
-                @Override
-                public void run() {
-                    scanInputStream(proc, (t, d) -> {
-                        OutTypeInfo<?> info = outTypeInfos.get(t);
-                        if (null != info) {
-                            handleResult(info.cls, d, t);
-                        } else {
-                            LoggerFactory.getLogger(getClass()).error("No output type translator registered for: " + t);
-                        }
-                        return false;
-                    });
-                }
-                
-            }).start();
-        }
     }
        
     /**
@@ -184,7 +229,7 @@ public class PythonProcessService extends AbstractService implements GenericMult
      * 
      * @author Holger Eichelberger, SSE
      */
-    private interface InputHandler {
+    protected interface InputHandler {
 
         /**
          * Handles input.
@@ -201,17 +246,17 @@ public class PythonProcessService extends AbstractService implements GenericMult
     /**
      * Scans the input stream of the given process for return data.
      * 
-     * @param proc the process
+     * @param proc the Python process
      * @param handler the input handler
      * @return the first line if {@code returnFirst}, else <b>null</b>
      * @see #handleResult(Class, String, String) 
      */
-    private String scanInputStream(Process proc, InputHandler handler) {
+    protected String scanInputStream(Process proc, InputHandler handler) {
         String result = null;
         Scanner sc = new Scanner(proc.getInputStream());
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            int pos = line.indexOf('|');
+            int pos = line.indexOf(TYPE_SEPARATOR_CHAR);
             if (pos > 0 && pos < line.length()) {
                 String typeName = line.substring(0, pos);
                 String data = line.substring(pos + 1);
@@ -229,6 +274,25 @@ public class PythonProcessService extends AbstractService implements GenericMult
         sc.close();
         return result;
     }
+
+    /**
+     * Creates a thread calling {@link #scanInputStream(Process, InputHandler)}.
+     * 
+     * @param proc the Python process
+     * @param handler the input handler
+     * @return the thread
+     */
+    protected Thread createScanInputThread(Process proc, InputHandler handler) {
+        Thread result = new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                scanInputStream(proc, handler);
+            }
+            
+        });
+        return result;
+    }
     
     /**
      * Handles a received processing result and ingests it back asynchronously.
@@ -239,7 +303,7 @@ public class PythonProcessService extends AbstractService implements GenericMult
      * @param typeName the data type name
      */
     @SuppressWarnings("unchecked")
-    private <O> void handleResult(Class<O> cls, String data, String typeName) {
+    protected <O> void handleResult(Class<O> cls, String data, String typeName) {
         try {
             OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
             if (null != info) {
@@ -298,34 +362,6 @@ public class PythonProcessService extends AbstractService implements GenericMult
      * Preliminary: Stops the service and the background process.
      */
     protected void stop() {
-        if (null != serviceIn) {
-            serviceIn.flush();
-            serviceIn = null;
-        }
-        if (null != proc) {
-            proc.destroy();
-            proc = null;
-        }
-    }
-    
-    @Override
-    public void migrate(String resourceId) throws ExecutionException {
-        throw new ExecutionException("Not implemented", null); // let's see, may be generically possible for Python
-    }
-
-    @Override
-    public void update(URI location) throws ExecutionException {
-        throw new ExecutionException("Not implemented", null); // let's see, may be generically possible for Python
-    }
-
-    @Override
-    public void switchTo(String targetId) throws ExecutionException {
-        throw new ExecutionException("Not implemented", null); // let's see, may be generically possible for Python
-    }
-
-    @Override
-    public void reconfigure(Map<String, String> values) throws ExecutionException {
-        throw new ExecutionException("Not implemented", null); // let's see, may be generically possible for Python
     }
 
     /**
@@ -334,7 +370,7 @@ public class PythonProcessService extends AbstractService implements GenericMult
      * @return the logger
      */
     protected static Logger getLogger() {
-        return LoggerFactory.getLogger(PythonProcessService.class);
+        return LoggerFactory.getLogger(AbstractPythonProcessService.class);
     }
 
     /**
@@ -352,6 +388,16 @@ public class PythonProcessService extends AbstractService implements GenericMult
         InTypeInfo<I> info = obtainInTypeInfo(inCls, inTypeName);
         info.inTranslator = inTrans;
     }
+    
+    /**
+     * Returns the input type information object for the given symbolic type name.
+     * 
+     * @param inTypeName the symbolic type name
+     * @return the information object or <b>null</b> if none was registered
+     */
+    public InTypeInfo<?> getInTypeInfo(String inTypeName) {
+        return inTypeInfos.get(inTypeName);
+    }
 
     /**
      * Obtains an input type information object.
@@ -365,11 +411,20 @@ public class PythonProcessService extends AbstractService implements GenericMult
     private <I> InTypeInfo<I> obtainInTypeInfo(Class<I> cls, String typeName) {
         InTypeInfo<I> info = (InTypeInfo<I>) inTypeInfos.get(typeName);
         if (null == info) {
-            info = new InTypeInfo<I>();
+            info = new InTypeInfo<I>(cls);
             inTypeInfos.put(typeName, info);
-            info.cls = cls;
         }
         return info;
+    }
+
+    /**
+     * Returns the output type information object for the given symbolic type name.
+     * 
+     * @param outTypeName the symbolic type name
+     * @return the information object or <b>null</b> if none was registered
+     */
+    public OutTypeInfo<?> getOutTypeInfo(String outTypeName) {
+        return outTypeInfos.get(outTypeName);
     }
 
     /**
@@ -384,9 +439,8 @@ public class PythonProcessService extends AbstractService implements GenericMult
     private <O> OutTypeInfo<O> obtainOutTypeInfo(Class<O> cls, String typeName) {
         OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
         if (null == info) {
-            info = new OutTypeInfo<O>();
+            info = new OutTypeInfo<O>(cls);
             outTypeInfos.put(typeName, info);
-            info.cls = cls;
         }
         return info;
     }
@@ -407,83 +461,21 @@ public class PythonProcessService extends AbstractService implements GenericMult
         info.outTranslator = outTrans;
     }
 
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <I> void processAsync(String inType, I data) throws ExecutionException {
-        InTypeInfo<?> info = inTypeInfos.get(inType);
-        if (null != info) {
-            TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.inTranslator;
-            if (null != inT) {
-                if (null != serviceIn) {
-                    try {
-                        serviceIn.println(inType + "|" + inT.to(data));
-                        serviceIn.flush();
-                    } catch (IOException e) {
-                        throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
-                    }
-                } else {
-                    throw new ExecutionException("Service/process not started,", null);
-                }
-            } else {
-                throw new ExecutionException("No input type translator registered", null);
-            }
-        } else {
-            throw new ExecutionException("No input type translator registered", null);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <I, O> O processSync(String inType, I data) throws ExecutionException {
-        O result = null;
-        InTypeInfo<?> info = inTypeInfos.get(inType);
-        if (null != info) {
-            TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.inTranslator;
-            if (null != inT) {
-                try {
-                    AtomicReference<O> tmp = new AtomicReference<O>();
-                    proc = createAndCustomizeProcess(inType + "|" + inT.to(data));
-                    new Thread(new Runnable() {
-                        
-                        @Override
-                        public void run() {
-                            scanInputStream(proc, (t, d) -> {
-                                OutTypeInfo<?> info = outTypeInfos.get(t);
-                                if (null != info) {
-                                    TypeTranslator<String, O> outT = (TypeTranslator<String, O>) info.outTranslator;
-                                    if (null != outT) {
-                                        tmp.set(outT.to(d));
-                                    } else {
-                                        throw new IOException("No output type translator registered");
-                                    }
-                                }
-                                return true;
-                            });
-                        }
-                        
-                    }).start();                
-                    if (timeout < 0) {
-                        proc.waitFor();
-                    } else {
-                        proc.waitFor(timeout, timeoutUnit);
-                    }
-                    result = tmp.get();
-                } catch (InterruptedException | IOException e) {
-                    throw new ExecutionException("Exception while data processing: " + e.getMessage(), e);
-                }
-            } else {
-                throw new ExecutionException("No input type translator registered", null);
-            }
-        }
-        return result;
-    }
-
     @Override
     public <O> void attachIngestor(Class<O> outCls, String outTypeName, DataIngestor<O> ingestor) {
         OutTypeInfo<O> info = (OutTypeInfo<O>) obtainOutTypeInfo(outCls, outTypeName);
         info.ingestor = ingestor;
-        ingestorsCount++;
     }
-
+    
+    /**
+     * Composes a symbolic type name with the string-serialized data.
+     * 
+     * @param typeName the type name
+     * @param data the data
+     * @return the composed String
+     */
+    protected static String compose(String typeName, String data) {
+        return typeName + TYPE_SEPARATOR_CHAR + data;
+    }
+    
 }

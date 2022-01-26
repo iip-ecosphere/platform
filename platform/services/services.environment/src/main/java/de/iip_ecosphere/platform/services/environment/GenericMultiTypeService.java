@@ -61,28 +61,17 @@ public interface GenericMultiTypeService extends Service {
     public <O> void attachIngestor(Class<O> outCls, String outTypeName, DataIngestor<O> ingestor);
 
     /**
-     * Requests asynchronous processing a data item. Results shall be "returned" via 
-     * {@link #attachIngestor(Class, DataIngestor)}.
-     * 
-     * @param <I> the input data type
-     * @param inTypeName symbolic name of {@code inCls}, e.g. from configuration model
-     * @param data the data item
-     * @throws ExecutionException if the execution fails for some reason, e.g., because type translators 
-     *    are not registered (@link #registerInputTypeTranslator(Class, Class, TypeTranslator, TypeTranslator)}
-     */
-    public <I> void processAsync(String inTypeName, I data) throws ExecutionException;
-
-    /**
      * Requests synchronous processing a data item.
      * 
      * @param <I> the input data type
      * @param <O> the output data type
      * @param inTypeName the name of {@code inType} in the configuration model
      * @param data the data item to be processed
-     * @return the output
+     * @return the output, always <b>null</b> in case of asynchronous processing as the result is passed to a 
+     *     registered ingestor
      * @throws ExecutionException if the execution fails for some reason, e.g., because type translators 
      *    are not registered (@link #registerInputTypeTranslator(Class, Class, TypeTranslator, TypeTranslator)}
      */
-    public <I, O> O processSync(String inTypeName, I data) throws ExecutionException;
+    public <I, O> O process(String inTypeName, I data) throws ExecutionException;
     
 }
