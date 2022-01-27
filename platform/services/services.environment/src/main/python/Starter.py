@@ -13,7 +13,7 @@ from ServiceMapper import mapService
 
 
 def start(services):
-    """Starts the Python Java framework for the given instances of administratove service wrappers.
+    """Starts the Python Java framework for the given instances of administrative service wrappers.
 
     Parameters:
       services -- list of Service instances

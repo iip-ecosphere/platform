@@ -52,6 +52,8 @@ class ForwardingAppTest(unittest.TestCase):
 
         process.terminate()
         process.wait()
+        reader.stop()
+        writer.stop()
 
 
 if __name__ == '__main__':

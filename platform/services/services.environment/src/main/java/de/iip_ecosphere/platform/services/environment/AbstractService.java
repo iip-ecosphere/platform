@@ -89,12 +89,12 @@ public abstract class AbstractService implements Service {
      * Creates an abstract service from YAML information.
      * 
      * @param yaml the service information as read from YAML
-     * @see #configureFrom(YamlService)
+     * @see #initializeFrom(YamlService)
      */
     protected AbstractService(YamlService yaml) {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
             yaml.getKind());
-        configureFrom(yaml);
+        initializeFrom(yaml);
     }
     
     /**
@@ -108,11 +108,11 @@ public abstract class AbstractService implements Service {
     }
 
     /**
-     * Does further setup of this instance from the given YAML information.
+     * Does further initialization of this instance from the given YAML information.
      * 
      * @param yaml the service information as read from YAML
      */
-    protected void configureFrom(YamlService yaml) {
+    protected void initializeFrom(YamlService yaml) {
     }
 
     /**

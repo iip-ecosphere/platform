@@ -162,7 +162,8 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      * 
      * @param yaml the service information as read from YAML
      */
-    protected void configureFrom(YamlService yaml) {
+    @Override
+    protected void initializeFrom(YamlService yaml) {
         YamlProcess pSpec = yaml.getProcess();
         pythonArgs = new ArrayList<>();
         if (pSpec != null) {
