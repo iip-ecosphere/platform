@@ -42,6 +42,15 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     def generateProcess(MeshElement elt, Service service) {
         ''
     }
+
+    def generateProcess(MeshElement elt, PythonService service) {
+        String id = toFolderName(service.id);
+        'process: 
+            homePath: \\${tmp}/${id}/python
+            executable: ${service.entrypointModule}
+            executablePath: \\${tmp}/${id}/python
+            started: true'
+    }
     
     def generateProcess(MeshElement elt, KodexService service) {
         String id = toFolderName(service.id);

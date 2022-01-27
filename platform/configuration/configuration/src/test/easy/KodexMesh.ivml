@@ -107,6 +107,18 @@ project KodexMesh {
         // TODO parameter
     };
     
+    Service myPythonService = PythonService {
+        id = "PythonService",
+        name = "Python Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(rec2)}},
+        output = {{type=refBy(rec2)}},
+        entrypointModule = "MyPython.py",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer
+    };
+    
     Service myReceiverService = JavaService {
         id = "KodexReceiver",
         name = "Kodex Data Receiver",
@@ -148,11 +160,21 @@ project KodexMesh {
 
     MeshProcessor myTransformer = {
         impl = refBy(myKodexService),
-        next = {refBy(myConnMyTransformerMyReceiver)}
+        next = {refBy(myConnMyTransformerMyPython)}
     };
 
-    MeshConnector myConnMyTransformerMyReceiver = {
-        name = "Kodex->Receiver",
+    MeshConnector myConnMyTransformerMyPython = {
+        name = "Kodex->Python",
+        next = refBy(myPython)
+    };
+
+    MeshProcessor myPython = {
+        impl = refBy(myPythonService),
+        next = {refBy(myConnMyPythonMyReceiver)}
+    };
+
+    MeshConnector myConnMyPythonMyReceiver = {
+        name = "Python->Receiver",
         next = refBy(myReceiver)
     };
 

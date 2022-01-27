@@ -81,10 +81,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    if (not(no.impl.isKindOf(CompleteService))) { 
-                        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
-                        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
-                    }
+                    generateServiceElements(appRoot, config, no, no.impl);
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
@@ -110,6 +107,25 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             maven("${appRoot}", true);
         };
     }
+    
+    // dispatch basis
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service) = {
+        String clsName = asTypeName(no.name);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
+        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
+        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+    }
+    
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, CompleteService service) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
+        Path pySrc = "${appRoot}/src/main/python";
+    }
+    
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
