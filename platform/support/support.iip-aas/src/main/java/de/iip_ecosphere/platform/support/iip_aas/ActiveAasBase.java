@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
@@ -108,7 +109,9 @@ public class ActiveAasBase {
                         }
                     }
                 } else {
-                    LOGGER.error("Cannot find submodel: " + subId);
+                    if (!AasFactory.isNoInstanceWarningEmitted()) {
+                        LOGGER.error("Cannot find submodel: " + subId);
+                    }
                 }
             } catch (IOException e) {
                 LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
