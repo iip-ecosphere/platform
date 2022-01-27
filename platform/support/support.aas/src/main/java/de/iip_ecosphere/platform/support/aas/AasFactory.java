@@ -171,6 +171,7 @@ public abstract class AasFactory {
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
+    private static boolean noInstanceWarningEmitted = false;
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
     private String[] protocols;
@@ -236,10 +237,25 @@ public abstract class AasFactory {
                     LOGGER.fine("AAS factory implementation registered: " + instance.getClass().getName());
                 }
             } else {
-                LOGGER.severe("No AAS factory implementation known.");
+                if (!noInstanceWarningEmitted) {
+                    noInstanceWarningEmitted = true;
+                    LOGGER.warning("No AAS factory implementation known. This may be intended in a simple testing "
+                        + "setup where AAS operations are optional, but also a severe misconfiguration if this occurs "
+                        + "in the context of a full platform instance where AAS operations are mandatory.");
+                }
             }
         }
         return instance;
+    }
+    
+    /**
+     * Returns whether a no instance warning was already emitted, i.e., the factory is not configured for production 
+     * use. The (some) subsequent errors/warning may be omitted.
+     * 
+     * @return {@code true} for "no instance warning" emitted, {@code false} if no such warning was emitted 
+     */
+    public static boolean isNoInstanceWarningEmitted() {
+        return noInstanceWarningEmitted;
     }
 
     /**
