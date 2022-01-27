@@ -164,8 +164,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, JavaService service) {
         if (service.class.length() > 0) {
             String serviceType = getServiceType(elt, service);
-            '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}
-            Starter.mapService(service);'
+            '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
+            'Starter.mapService(service);'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -224,6 +224,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, PythonService service) {
         '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
+        'Starter.mapService(service);'
     }
     
     def getServiceType(MeshElement elt, PythonService service) {
@@ -311,7 +312,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 new ${inType}InputTranslator(), 
                 new ${outType}OutputTranslator(), 
                 new ${outType}ReceptionCallback(), 
-                serviceData);'
+                serviceData);
+            Starter.mapService(${kodexServiceName(in, out)});'
         }
     }
 
