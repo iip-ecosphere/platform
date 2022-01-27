@@ -190,18 +190,20 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
 
     @Override
     protected void disconnectImpl() throws IOException {
-        try {
-            for (String out : getOutputChannels()) {
-                try {
-                    waitForCompletion(client.unsubscribe(out));
-                } catch (MqttException e) {
-                    // ignore
+        if (null != client && client.isConnected()) {
+            try {
+                for (String out : getOutputChannels()) {
+                    try {
+                        waitForCompletion(client.unsubscribe(out));
+                    } catch (MqttException e) {
+                        // ignore
+                    }
                 }
+                waitForCompletion(client.disconnect());
+                client.close();
+            } catch (MqttException e) {
+                throw new IOException(e);
             }
-            waitForCompletion(client.disconnect());
-            client.close();
-        } catch (MqttException e) {
-            throw new IOException(e);
         }
     }
 
