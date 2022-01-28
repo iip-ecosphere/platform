@@ -28,7 +28,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 /**
  * Generic command-line-based Python integration for asynchronous processing of multiple data types. Conventions:
  * <ul>
- *   <li>Python is determined by {@link PythonUtils#getPythonExecutable()}.</li>
+ *   <li>Python is determined by {@link PythonUtils#getPythonExecutable()}. The default is "ServiceEnvironment.py" 
+ *       which must run for this integration with "--mode console".</li>
  *   <li>The Python program runs endless until stopped by this class.</li>
  *   <li>An asynchronous Python program receives the data via command line input streams based on the input serializer 
  *       and the symbolic type name.</li>
@@ -54,9 +55,10 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     /**
      * Creates an abstract service from YAML information.
      * 
-     * @param yaml the service information as read from YAML. We assume that {@link YamlProcess#getExecutable()} is 
-     * set to the Python file to start and {@link YamlProcess#getHomePath()} is set to the home path where the 
-     * executable was extracted to. Further, {@link YamlProcess#getCmdArg()} are taken over if given.
+     * @param yaml the service information as read from YAML. By default, the Python executable is 
+     *     "ServiceEnvironment.py", which can be overridden by {@link YamlProcess#getExecutable()}. 
+     *     {@link YamlProcess#getHomePath()} is set to the home path where the 
+     *     executable was extracted to. Further, {@link YamlProcess#getCmdArg()} are taken over if given.
      */
     public PythonAsyncProcessService(YamlService yaml) {
         super(yaml);

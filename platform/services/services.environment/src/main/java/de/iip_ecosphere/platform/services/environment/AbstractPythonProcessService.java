@@ -149,8 +149,9 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     /**
      * Creates an abstract service from YAML information.
      * 
-     * @param yaml the service information as read from YAML. We assume that {@link YamlProcess#getExecutable()} is 
-     * set to the Python file to start and {@link YamlProcess#getHomePath()} is set to the home path where the 
+     * @param yaml the service information as read from YAML. By default, the Python executable is 
+     * "ServiceEnvironment.py", which can be overridden by {@link YamlProcess#getExecutable()}. 
+     * {@link YamlProcess#getHomePath()} is set to the home path where the 
      * executable was extracted to. Further, {@link YamlProcess#getCmdArg()} are taken over if given.
      */
     public AbstractPythonProcessService(YamlService yaml) {
@@ -182,7 +183,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     }
     
     /**
-     * Returns the name of the Python module if given or returns a (non-existent) fallback and emits a warning.
+     * Returns the name of the Python module. The default (if not explicitly given) is "ServiceEnvironment.py".
      * 
      * @param module the module name, may be empty or <b>null</b>
      * @param yaml the YAML service deployment information
@@ -191,9 +192,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     private static String getPythonModule(String module, YamlService yaml) {
         String result = module;
         if (null == result || result.length() == 0) {
-            result = "default.py";
-            getLogger().warn("No Python module given as execuable for Service '" + yaml.getId() 
-                + "'. Falling back to module name that probably does not exist.");    
+            result = "ServiceEnvironment.py";
         }
         return result;
     }
