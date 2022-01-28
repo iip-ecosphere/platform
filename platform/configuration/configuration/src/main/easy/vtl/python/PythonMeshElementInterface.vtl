@@ -90,11 +90,11 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
-        'from AbstractService import AbstractService
-        import Registry
-        from Version import Version
-        from Service import ServiceState
-        from Service import ServiceKind
+        'from iip.AbstractService import AbstractService
+        import iip.Registry
+        from iip.Version import Version
+        from iip.Service import ServiceState
+        from iip.Service import ServiceKind
         ${produceDatatypeImports(elt)}
 
         class ${clsName}Interface(AbstractService):

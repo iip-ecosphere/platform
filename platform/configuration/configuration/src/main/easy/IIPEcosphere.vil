@@ -65,8 +65,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
                 vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
                 javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
-                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
             };
 
             // generate service classes and service integration
@@ -126,7 +126,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         String clsName = asTypeName(no.name);
         Path pySrc = "${appRoot}/src/main/python";
         Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
-        vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.java", elt=no, pkg="interfaces");
+        vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", elt=no, pkg="interfaces");
     }
     
     
