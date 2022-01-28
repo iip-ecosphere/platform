@@ -60,23 +60,33 @@ public class YamlProcess {
     public File getHomePath() {
         return toSubstFilePath(homePath);
     }
-    
+
+    /**
+     * Substitutes "${tmp}" and "${user}" and returns a name for {@code path}.
+     * 
+     * @param path the path
+     * @return the name, may be <b>null</b> if {@code path} is <b>null</b> or empty
+     */
+    protected static String toSubstFileName(String path) {
+        String result;
+        if (null == path || path.length() == 0) {
+            result = null;
+        } else {
+            result = path.replace("${tmp}", FileUtils.getTempDirectoryPath());
+            result = result.replace("${user}", FileUtils.getUserDirectoryPath());
+        }
+        return result;
+    }
+
     /**
      * Substitutes "${tmp}" and "${user}" and returns a file for {@code path}.
      * 
      * @param path the path
      * @return the file, may be <b>null</b> if {@code path} is <b>null</b> or empty
      */
-    private static File toSubstFilePath(String path) {
-        File result;
-        if (null == path || path.length() == 0) {
-            result = null;
-        } else {
-            String tmp = path.replace("${tmp}", FileUtils.getTempDirectoryPath());
-            tmp = tmp.replace("${user}", FileUtils.getUserDirectoryPath());
-            result = new File(tmp);
-        }
-        return result;
+    protected static File toSubstFilePath(String path) {
+        String tmp = toSubstFileName(path);
+        return null == tmp ? null : new File(tmp);
     }
     
     /**
