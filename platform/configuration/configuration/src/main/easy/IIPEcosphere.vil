@@ -123,7 +123,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
     
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
+        String clsName = asTypeName(no.name);
         Path pySrc = "${appRoot}/src/main/python";
+        Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
+        vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.java", elt=no, pkg="interfaces");
     }
     
     

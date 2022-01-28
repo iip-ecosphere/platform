@@ -115,7 +115,6 @@ project KodexMesh {
         deployable = true,
         input = {{type=refBy(rec2)}},
         output = {{type=refBy(rec2)}},
-        entrypointModule = "MyPython.py",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer
     };
     

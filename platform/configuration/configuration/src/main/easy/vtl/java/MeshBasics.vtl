@@ -115,5 +115,43 @@ template MeshBasics(Configuration config, FileArtifact target) {
         }
         result;
     }
+
+    def setOf(RecordType) collectRecordTypes(MeshElement elt) {
+        setOf(RecordType) types = {};
+        collectRecordTypesImpl(elt, types);
+        types;
+    }
+    
+    def collectRecordTypesImpl(MeshElement elt, setOf(RecordType) types) {
+        // nothing, dispatch base
+    } 
+     
+
+    def collectRecordTypesImpl(MeshSource source, setOf(RecordType) types) {
+        collectRecordTypesFromSet(source.output, types);
+    }
+    
+    def collectRecordTypesImpl(MeshProcessor processor, setOf(RecordType) types) {
+        collectRecordTypesFromSet(processor.input, types);
+        collectRecordTypesFromSet(processor.output, types);
+    }
+    
+    def collectRecordTypesImpl(MeshSink sink, setOf(RecordType) types) {
+        collectRecordTypesFromSet(sink.input, types);
+    }
+    
+    def collectRecordTypesFromSet(sequenceOf(IOType) types, setOf(RecordType) result) {
+       for (IOType t: types) {
+           collectRecordType(t.type, result);
+       }
+    }
+    
+    def collectRecordType(DataType type, setOf(RecordType) result) {
+        // nothing, dispatch base
+    }
+
+    def collectRecordType(RecordType type, setOf(RecordType) result) {
+        result.add(type);
+    }
     
 }

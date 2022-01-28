@@ -132,7 +132,7 @@ project Services {
    };
    
    compound PythonService refines Service {
-       String entrypointModule;
+       String entrypointModule; // optional, would override default ServiceEnvironment.py
        String artifact;
        setOf(PythonDependency) dependencies;
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
