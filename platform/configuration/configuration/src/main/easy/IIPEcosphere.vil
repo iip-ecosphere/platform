@@ -96,8 +96,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
-            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml", withServices=true);
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false);
             
             // partition according to container strategy
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
