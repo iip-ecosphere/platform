@@ -8,7 +8,7 @@ import Registry
 from datatypes.Rec12 import Rec12
 from datatypes.Rec13 import Rec13
 
-class MyService(MyServiceInterface, AbstractService):
+class MyService(MyServiceInterface):
     """Demonstration and testing service (wrapper).""" 
 
     rec12ingestor = None

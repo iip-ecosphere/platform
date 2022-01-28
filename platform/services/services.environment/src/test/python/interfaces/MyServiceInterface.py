@@ -1,4 +1,4 @@
-from Service import Service
+from AbstractService import AbstractService
 import Registry
 from Version import Version
 from Service import ServiceState
@@ -7,7 +7,7 @@ from Service import ServiceKind
 from datatypes.Rec12 import Rec12
 from datatypes.Rec13 import Rec13
 
-class MyServiceInterface(Service):
+class MyServiceInterface(AbstractService):
 
     ingestor = None
     
@@ -48,7 +48,7 @@ class MyServiceInterface(Service):
         Parameters:
           - data -- the data to be transformed. 
         Returns:
-          the transformed data,
+          the transformed data
         """
     
     def transformStringString(self, data: str):
