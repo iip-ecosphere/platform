@@ -67,24 +67,21 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
 
         XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
-        XmlElement items;
-        Boolean first = true; 
+        mapOf(String, XmlElement) goalItems = {}; 
         for (String bin: bins.toSequence()->sortedBy(b|b)) { // sortedBy for testing
             sequenceOf(String) tmp = bin.split("\\|"); // escape |, splits into chars
             String artifact = tmp[0];
             String classifier = tmp[1];
             String outputDir = tmp[2];
             String destFileName = tmp[3];
-            String type = "jar";
-            if (tmp.size() == 5) {
-               type = tmp[4];
-            }
-            if (first) {
-                items = appendMavenDependencyPluginExecution(execs, "copy", artifact, classifier, outputDir, destFileName, type=type);
+            String type = tmp[4];
+            String goal = tmp[5];
+            if (goalItems.containsKey(goal)) {
+               appendMavenDependencyPluginArtifactItem(goalItems.get(goal), artifact, classifier, outputDir, destFileName, type=type);
             } else {
-               appendMavenDependencyPluginArtifactItem(items, artifact, classifier, outputDir, destFileName, type=type);
+                XmlElement items = appendMavenDependencyPluginExecution(execs, goal, artifact, classifier, outputDir, destFileName, type=type, id=goal + "-unpack");
+                goalItems.add(goal, items);
             }
-            first = false;
         }
     }
 

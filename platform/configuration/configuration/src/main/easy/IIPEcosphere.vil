@@ -36,6 +36,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         generateApps(source, config, target);
         generatePlatform(source, config, target);
     }
+
+    // ------------------------------------------ generating apps ----------------------------------------
     
     // called from tests, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
@@ -96,8 +98,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
-            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml", withServices=true);
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
+            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml", withServices=true);
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false);
             
             // partition according to container strategy
@@ -108,6 +110,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             maven("${appRoot}", true);
         };
     }
+    
+    // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     
     // dispatch basis
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service) = {
@@ -123,6 +127,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // do nothing, everything is here already generically in place
     }
     
+    // Python (preliminary in here)
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
         String clsName = asTypeName(no.name);
         Path pySrc = "${appRoot}/src/main/python";
@@ -130,16 +135,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", elt=no, pkg="interfaces");
     }
     
+    // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
     }
 
+    // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
+
     // dispatch basis    
     generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
     }
     
-    // KODEX (preliminary)    
+    // KODEX (preliminary in here)    
     generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
@@ -149,9 +157,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${serviceFolderName}.xml", id=serviceFolderName, dir="${path}");
-        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip");
+        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip|copy");
         assemblies.add(serviceFolderName + "|${assemblyRel}/${serviceFolderName}.xml");
     }
+
+    // Python (preliminary in here); copy integratable sources from the artifact    
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+        String serviceFolderName = toFolderName(service.id);
+        bins.add(service.artifact+"|python|\\${project.basedir}/src/main/python|${serviceFolderName}.zip|zip|unpack");
+    }
+    
+    // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
     
     // called from tests, don't change signature
     generatePlatform(Project source, Configuration config, Project target) = {

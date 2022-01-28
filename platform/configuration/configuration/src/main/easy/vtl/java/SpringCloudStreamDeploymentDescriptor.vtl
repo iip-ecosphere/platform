@@ -45,11 +45,12 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
 
     def generateProcess(MeshElement elt, PythonService service) {
         String id = toFolderName(service.id);
-        // todo artifacts, cmdParams
         'process: 
             homePath: \\${tmp}/${id}/python
             ${pythonExecutable(service)|e}
             executablePath: \\${tmp}/${id}/python
+            artifacts:
+              - /python.zip
             cmdArg:
               - --mode
               - console

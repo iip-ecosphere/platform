@@ -143,9 +143,12 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
-    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
+    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources", String id="") {
         XmlElement exec = new XmlElement(execs, "execution");
-        new XmlElement(exec, "id", goal);
+        if (length(id) == 0) { // fallback
+            id = goal;
+        }
+        new XmlElement(exec, "id", id);
         appendGoal(exec, goal);
         new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);
