@@ -228,7 +228,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def getServiceType(MeshElement elt, PythonService service) {
-        if (asynchronous) {
+        if (service.integrationMode == PythonIntegrationMode::console_continuous) {
             "PythonAsyncProcessService"
         } else {
             "PythonSyncProcessService"
