@@ -9,6 +9,8 @@
 * Initial version of service execution with multiple brokers and data paths between multiple devices.
 * More flexible device ids via IdProvider and, if permitted, overriding the device id via command line parameter `--iip.id`.
 * Simple deployment plans for the CLI.
+* Python service execution environment (command-line based approach) and model-based automated integration of Python services.
+* Automatic build of demo containers on github, deployment to dockerhub.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package
@@ -24,11 +26,9 @@
     * Platform instantiation process without Java test execution (may fail depending on JDK/surefire combination).
     * Integration of initial device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
     * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
-    * Automatic build of demo containers on github, deployment to dockerhub.
     * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
     * Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
 * Planned improvements:
-    * Python service execution environment (started).
     * Integrated container management for Kubernetes
     * Automatic creation of containers and their accessibility for devices (started).
     * Potentially, an initial version of the platform monitoring.
