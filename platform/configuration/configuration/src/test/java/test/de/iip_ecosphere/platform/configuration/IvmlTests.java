@@ -174,7 +174,7 @@ public class IvmlTests {
         assertPythonDatatype(srcMainPython, "MyConnMachineIn");
         assertPythonDatatype(srcMainPython, "MyConnMachineOut");
         
-        assertFile(srcMainAssembly, "python.xml");
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
 
         assertFileContains(base, "pom.xml", "transport.spring.amqp", "transport.amqp");
         
@@ -416,7 +416,7 @@ public class IvmlTests {
         assertFile(srcMainAssembly, "pseudonymizer.xml");
         assertFile(srcMainAssembly, "pythonInterfaces.xml");
         assertFile(srcMainAssembly, "javaInterfaces.xml");
-        assertFile(srcMainAssembly, "python_pythonService.xml");
+        assertFile(srcMainAssembly, "python_kodexPythonService.xml");
 
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
         JarUtils.extractZip(zip, srcMainPython.toPath());
@@ -427,7 +427,7 @@ public class IvmlTests {
         pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13Anon.py");
         pythonSourceCodeCheck(srcMainPython, "serializers/Rec13Serializer.py");
         pythonSourceCodeCheck(srcMainPython, "serializers/Rec13AnonSerializer.py");
-        pythonSourceCodeCheck(srcMainPython, "interfaces/PythonServiceInterface.py");
+        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
     }
 
 }

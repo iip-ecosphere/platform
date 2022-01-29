@@ -108,8 +108,8 @@ project KodexMesh {
     };
     
     Service myPythonService = PythonService {
-        id = "PythonService",
-        name = "Python Service",
+        id = "KodexPythonService",
+        name = "Kodex Python Service",
         description = "",
         ver = "0.1.0",
         deployable = true,
