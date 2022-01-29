@@ -1,7 +1,7 @@
 from interfaces.PythonServiceInterface import PythonServiceInterface
 from datatypes.Rec13Anon import Rec13Anon
 
-class PythonService(PythonServiceInterface):
+class KodexPythonService(KodexPythonServiceInterface):
     """Service implementation for PythonService based on provided parts, in particular registration of methods
        with service environment. Just the global constructor execution is needed - will be loaded automatically
        and identified through ID in generated code.
@@ -20,4 +20,4 @@ class PythonService(PythonServiceInterface):
         # we could do magic here, but we just "return" the unmodified data asynchronously
         ingest(data)
        
-PythonService()
+KodexPythonService()
