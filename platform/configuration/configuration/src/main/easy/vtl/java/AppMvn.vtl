@@ -55,7 +55,6 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        appendAssemblyDescriptor(assemblyPlugin, "appPython", "src/main/assembly/python.xml", outputDir="\\${project.build.directory}/classes", phase="test", finalName="python");
         appendAssemblyDescriptor(assemblyPlugin, "interfaces", "src/main/assembly/javaInterfaces.xml", attach=true);
         appendAssemblyDescriptor(assemblyPlugin, "python", "src/main/assembly/pythonInterfaces.xml", attach=true);
         for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing

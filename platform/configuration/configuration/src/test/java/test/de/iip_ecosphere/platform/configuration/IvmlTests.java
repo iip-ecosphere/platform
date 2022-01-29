@@ -413,7 +413,10 @@ public class IvmlTests {
         assertPythonDatatype(srcMainPython, "Rec13");
         assertPythonDatatype(srcMainPython, "Rec13Anon");
         
-        assertFile(srcMainAssembly, "python.xml");
+        assertFile(srcMainAssembly, "pseudonymizer.xml");
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
+        assertFile(srcMainAssembly, "javaInterfaces.xml");
+        assertFile(srcMainAssembly, "python_pythonService.xml");
 
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
         JarUtils.extractZip(zip, srcMainPython.toPath());

@@ -50,7 +50,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             ${pythonExecutable(service)|e}
             executablePath: \\${tmp}/${id}/python
             artifacts:
-              - /python.zip
+              - /python_${id}.zip
             cmdArg:
               - --mode
               - console

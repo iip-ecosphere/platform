@@ -87,7 +87,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
-                    generateServiceResources(no, no.impl, appRoot, bins, assemblies);
+                    generateServiceResources(no, no.impl, appRoot, bins, assemblies, artifacts);
                 };
             };
             elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -99,8 +99,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
             vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml", withServices=true);
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false);
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             
             // partition according to container strategy
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
@@ -144,11 +143,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     // dispatch basis    
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
     }
     
     // KODEX (preliminary in here)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
         Path path = "${appRoot}/${serviceArtifactsRel}";
@@ -162,9 +161,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
         String serviceFolderName = toFolderName(service.id);
-        bins.add(service.artifact+"|python|\\${project.basedir}/src/main/python|${serviceFolderName}.zip|zip|unpack");
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        sequenceOf(String) tmp = service.artifact.split(":");
+        String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+        artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
+        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml");
     }
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
