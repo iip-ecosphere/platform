@@ -142,6 +142,8 @@ project SimpleMesh {
         javaModuleOpts;
         javaOpts;
         pidDir;
+        sharedInterfaces;
+        sharedArtifact;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
