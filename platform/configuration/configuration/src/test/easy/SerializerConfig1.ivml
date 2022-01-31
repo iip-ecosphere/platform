@@ -204,6 +204,11 @@ project SerializerConfig1 {
         impl = refBy(myKiService)
     };
 
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    // default sharedArtifact, not used in testing
+
     // ------------ freezing ------------------
     
     freeze {

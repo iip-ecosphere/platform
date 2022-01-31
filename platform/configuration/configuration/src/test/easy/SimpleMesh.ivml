@@ -121,6 +121,11 @@ project SimpleMesh {
     MeshSink myReceiver = {
         impl = refBy(myReceiverService)
     };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh:" + iipVer; // for testing all-in-one
 
     // ------------ freezing ------------------
     

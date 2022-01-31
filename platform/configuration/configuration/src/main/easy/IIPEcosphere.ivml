@@ -10,6 +10,6 @@ project IIPEcosphere {
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;
-    String sharedArtifact = "de.iip-ecosphere.platform:apps.Interfaces:" + iipVer;
+    String sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfaces:" + iipVer;
    
 }

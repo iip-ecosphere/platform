@@ -41,7 +41,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // called from tests, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
-        generateSharedInterfaces(config, target);
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            generateSharedInterfaces(config, target);
+        }
         setOf(RecordType) recordTypes = RecordType.allInstances();
         for (Application a : Application.allInstances()) {
             String appName = asTypeName(a.name);
@@ -175,6 +178,32 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
     
     generateSharedInterfaces(Configuration config, Project target) = {
+        Path appRoot = "${target}/ApplicationInterfaces";
+        appRoot.mkdir();
+
+        setOf(RecordType) recordTypes = RecordType.allInstances();
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path pySrc = "${appRoot}/src/main/python";
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        Path javaDatatypesSrc = "${javaSrc}/${toPath(javaDatatypesPackage)}";
+        Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+
+        javaDatatypesSrc.mkdir();
+        javaSerializersSrc.mkdir();
+        assemblySrc.mkdir();
+        
+        setOf(String) javaSerializers = {};
+        for (RecordType r : recordTypes) {
+            // generate for all languages and according to serializer settings
+            String clsName = asTypeName(r.name);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+            vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
+        };
     }
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
