@@ -1,6 +1,7 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -111,21 +112,32 @@ public class ServerHttpJavaK8SProxy {
      * The main method to run the test server proxy.
      * 
      */
-    @Test(timeout = 120 * 1000)
+    @Test(timeout = 3 * 60 * 60 * 1000)
     public void mainTest() {
-        tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
-
-        try {
-            K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.MasterProxy, serverIP, serverPort, tlsCheck);
-
-            startMultiThreaded(httpJavaK8SProxy, localPort);
-        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | InvalidKeySpecException | IOException e) {
-            System.err.println("Exception in the starting the multi-threads method");
-            e.printStackTrace();
-        }
         
+        Thread requestThread = new Thread() {
+            public void run() {
+                tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
+
+                try {
+                    K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.MasterProxy, serverIP, serverPort,
+                            tlsCheck);
+
+                    startMultiThreaded(httpJavaK8SProxy, localPort);
+                } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+                        | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
+                    System.err.println("Exception in the starting the multi-threads method");
+                    e.printStackTrace();
+                } 
+            }
+        };
+        requestThread.start();
+        
+        System.out.println("Waiting");
         while (true) {
+            if (new File("/tmp/EndServerRun.k8s").exists()) {
+                break;
+            }
             TimeUtils.sleep(1);
         }
     }
