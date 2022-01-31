@@ -12,7 +12,7 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.3.0-SNAPSHOT</version>
   </parent>
-
+ 
   <repositories>       
     <repository>
       <id>SSE</id>
