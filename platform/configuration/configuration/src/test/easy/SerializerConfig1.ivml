@@ -204,6 +204,11 @@ project SerializerConfig1 {
         impl = refBy(myKiService)
     };
 
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    // default sharedArtifact, not used in testing
+
     // ------------ freezing ------------------
     
     freeze {
@@ -224,6 +229,8 @@ project SerializerConfig1 {
         javaModuleOpts;
         javaOpts;
         pidDir;
+        sharedInterfaces;
+        sharedArtifact;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

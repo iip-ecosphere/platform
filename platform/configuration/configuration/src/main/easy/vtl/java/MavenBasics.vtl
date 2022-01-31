@@ -13,7 +13,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // appends a dependency. parent shall be a <dependencies> node. If groupId or artifactId are empty, nothing is emitted
     // version, type and scope are as in Maven and, by default, empty
     // returns the dependency XML element 
-    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "", Boolean createDepElt=true) {
+    def XmlElement appendDependency(XmlElement parent, String groupId, String artifactId, String ver = "", String type = "", String scope = "", Boolean createDepElt=true, String classifier = "") {
         if (groupId.length() > 0 and artifactId.length() > 0) {
             XmlElement dep;
             if (createDepElt) {
@@ -32,17 +32,26 @@ template MavenBasics(Configuration config, FileArtifact target) {
             if (scope.length() > 0) {
                 new XmlElement(dep, "scope", scope);
             }
+            if (classifier.length() > 0) {
+                new XmlElement(dep, "classifier", classifier);
+            }
             dep;
         }
     }
     
     def appendArtifact(XmlElement parent, String artifact, String dfltVersion="", Boolean createDepElt=true) {
         sequenceOf(String) artList = artifact.split(":");
-        if (artList.size() == 2) {
+        if (artList.size() == 2) { // groupId:artifactId
             appendDependency(parent, artList[0], artList[1], dfltVersion, createDepElt=createDepElt);
         }
-        if (artList.size() == 3) {
+        if (artList.size() == 3) { // groupId:artifactId:version
             appendDependency(parent, artList[0], artList[1], artList[2], createDepElt=createDepElt);
+        }
+        if (artList.size() == 4) { // groupId:artifactId:type:version
+            appendDependency(parent, artList[0], artList[1], artList[3], artList[2], createDepElt=createDepElt);
+        }
+        if (artList.size() == 5) { // groupId:artifactId:type:classifier:version
+            appendDependency(parent, artList[0], artList[1], artList[4], artList[2], createDepElt=createDepElt, classifier=artList[3]);
         }
     }
     
@@ -143,9 +152,12 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
-    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
+    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources", String id="") {
         XmlElement exec = new XmlElement(execs, "execution");
-        new XmlElement(exec, "id", goal);
+        if (length(id) == 0) { // fallback
+            id = goal;
+        }
+        new XmlElement(exec, "id", id);
         appendGoal(exec, goal);
         new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);

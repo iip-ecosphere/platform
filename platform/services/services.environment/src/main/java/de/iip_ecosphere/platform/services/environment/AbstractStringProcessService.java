@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * Implements an abstract asynchronous process-based service which require a String-based communication with
- * the actual service process, e.g., via JSON.
+ * the actual service process for a single pair of input-output types, e.g., via JSON.
  * 
  * @author Holger Eichelberger, SSE
  *
@@ -47,7 +48,9 @@ public abstract class AbstractStringProcessService<I, O> extends AbstractProcess
     
     @Override
     public void process(I data) throws IOException {
-        getServiceIn().println(getInputTranslator().to(data));
+        PrintWriter w = getServiceIn(); 
+        w.println(getInputTranslator().to(data));
+        w.flush();
     }
     
     /**

@@ -3,6 +3,7 @@ import unittest
 from YamlArtifactTest import YamlArtifactTest
 from ForwardingAppTest import ForwardingAppTest
 from GenericSerializerTest import Rec1SerializerTest
+from ServiceEnvironmentTest import CmdLineServiceEnvironmentTest
 
 def suite():
     """The test suite for services.environment. It might be surprising that
@@ -13,6 +14,7 @@ def suite():
     suite.addTest(YamlArtifactTest())
     suite.addTest(ForwardingAppTest())
     suite.addTest(Rec1SerializerTest())
+    suite.addTest(CmdLineServiceEnvironmentTest())
     return suite
 
 if __name__ == '__main__':
@@ -24,3 +26,7 @@ if __name__ == '__main__':
 
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(Rec1SerializerTest)
     unittest.TextTestRunner(verbosity=3).run(suite)
+    
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(CmdLineServiceEnvironmentTest)
+    unittest.TextTestRunner(verbosity=3).run(suite)    
+    

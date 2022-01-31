@@ -126,10 +126,16 @@ project Services {
        String version;
    }
    
+   enum PythonIntegrationMode {
+       console_continuous,
+       console_oneShot
+   };
+   
    compound PythonService refines Service {
-       String entrypointModule;
+       String entrypointModule; // optional, would override default ServiceEnvironment.py
        String artifact;
        setOf(PythonDependency) dependencies;
+       PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
    }
    
    // ------------------------------- integrated KODEX service -----------------------

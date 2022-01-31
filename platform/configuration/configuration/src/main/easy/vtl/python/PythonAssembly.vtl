@@ -1,7 +1,33 @@
 @advice(IIPEcosphere)
-template PythonAssembly(IIPEcosphere config, XmlFileArtifact target) {
+@indent(indentation = 4, additional = 0)
+template PythonAssembly(IIPEcosphere config, XmlFileArtifact target, Boolean withServices, String dependency="") {
 
-    def main(IIPEcosphere config, XmlFileArtifact target) {
+    def generateExcludes(Boolean withServices) {
+       if (withServices) {
+           ''
+       } else {
+           '<excludes>
+               <exclude>**/services/*.py</exclude>
+           </excludes>'
+       }
+    }
+    
+    def dependencySet(String dependency) {
+       if (length(dependency) > 0) {
+           '<dependencySets>
+               <dependencySet>
+                   <includes>
+                       <include>${dependency}</include>
+                   </includes>
+                   <unpack>true</unpack>
+               </dependencySet>
+           </dependencySets>'
+       } else {
+           ''
+       }
+    }
+
+    def main(IIPEcosphere config, XmlFileArtifact target, Boolean withServices, String dependency) {
         '<assembly
             xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,7 +37,8 @@ template PythonAssembly(IIPEcosphere config, XmlFileArtifact target) {
                 <format>zip</format>
             </formats>
             <baseDirectory>iip</baseDirectory>
-            <includeBaseDirectory>true</includeBaseDirectory>
+            <includeBaseDirectory>false</includeBaseDirectory>
+            ${dependencySet(dependency)|e}
             <fileSets>
                 <fileSet>
                     <directory>\\${project.basedir}/src/main/python</directory>
@@ -19,6 +46,7 @@ template PythonAssembly(IIPEcosphere config, XmlFileArtifact target) {
                     <includes>
                         <include>**/*.py</include>
                     </includes>
+                    ${generateExcludes(withServices)|e}
                     <useDefaultExcludes>true</useDefaultExcludes>
                 </fileSet>
             </fileSets>

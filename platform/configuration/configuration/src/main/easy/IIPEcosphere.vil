@@ -36,9 +36,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         generateApps(source, config, target);
         generatePlatform(source, config, target);
     }
+
+    // ------------------------------------------ generating apps ----------------------------------------
     
     // called from tests, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            generateSharedInterfaces(config, target);
+        }
         setOf(RecordType) recordTypes = RecordType.allInstances();
         for (Application a : Application.allInstances()) {
             String appName = asTypeName(a.name);
@@ -65,8 +71,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
                 vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
                 javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                vilTemplateProcessor("PythonType", config, "${pySrc}/${clsName}.py", type=r);
-                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/${clsName}Serializer.py", type=r);
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
             };
 
             // generate service classes and service integration
@@ -81,14 +87,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    if (not(no.impl.isKindOf(CompleteService))) { 
-                        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
-                        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
-                    }
+                    generateServiceElements(appRoot, config, no, no.impl);
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
-                    generateServiceResources(no, no.impl, appRoot, bins, assemblies);
+                    generateServiceResources(no, no.impl, appRoot, bins, assemblies, artifacts);
                 };
             };
             elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -100,7 +103,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
             vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python.xml");
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             
             // partition according to container strategy
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
@@ -111,16 +114,44 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         };
     }
     
+    // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
+    
+    // dispatch basis
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service) = {
+        String clsName = asTypeName(no.name);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
+        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
+        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+    }
+    
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, CompleteService service) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    // Python (preliminary in here)
+    generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
+        String clsName = asTypeName(no.name);
+        Path pySrc = "${appRoot}/src/main/python";
+        Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
+        vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", elt=no, pkg="interfaces");
+    }
+    
+    // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
+    
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
     }
 
+    // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
+
     // dispatch basis    
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
     }
     
-    // KODEX (preliminary)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies) = {
+    // KODEX (preliminary in here)    
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
         Path path = "${appRoot}/${serviceArtifactsRel}";
@@ -129,9 +160,53 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${serviceFolderName}.xml", id=serviceFolderName, dir="${path}");
-        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip");
+        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip|copy");
         assemblies.add(serviceFolderName + "|${assemblyRel}/${serviceFolderName}.xml");
     }
+
+    // Python (preliminary in here); copy integratable sources from the artifact    
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+        String serviceFolderName = toFolderName(service.id);
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        sequenceOf(String) tmp = service.artifact.split(":");
+        String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+        artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
+        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml");
+    }
+    
+    // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
+    
+    generateSharedInterfaces(Configuration config, Project target) = {
+        Path appRoot = "${target}/ApplicationInterfaces";
+        appRoot.mkdir();
+
+        setOf(RecordType) recordTypes = RecordType.allInstances();
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path pySrc = "${appRoot}/src/main/python";
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        Path javaDatatypesSrc = "${javaSrc}/${toPath(javaDatatypesPackage)}";
+        Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+
+        javaDatatypesSrc.mkdir();
+        javaSerializersSrc.mkdir();
+        assemblySrc.mkdir();
+        
+        setOf(String) javaSerializers = {};
+        for (RecordType r : recordTypes) {
+            // generate for all languages and according to serializer settings
+            String clsName = asTypeName(r.name);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+            vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
+        };
+    }
+    
+    // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
     
     // called from tests, don't change signature
     generatePlatform(Project source, Configuration config, Project target) = {

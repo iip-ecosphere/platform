@@ -174,19 +174,38 @@ public class IvmlTests {
         assertPythonDatatype(srcMainPython, "MyConnMachineIn");
         assertPythonDatatype(srcMainPython, "MyConnMachineOut");
         
-        assertFile(srcMainAssembly, "python.xml");
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
 
         assertFileContains(base, "pom.xml", "transport.spring.amqp", "transport.amqp");
         
+        extractPythonServiceEnv(srcMainPython);
+        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec1Serializer.py");
+    }
+    
+    /**
+     * Extracts the python service environment implementation (via Maven and main project). Required for 
+     * {@link #pythonSourceCodeCheck(File, String)}.
+     *  
+     * @param srcMainPython the target folder where to extract the service environment to
+     */
+    private void extractPythonServiceEnv(File srcMainPython) throws IOException {
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
         JarUtils.extractZip(zip, srcMainPython.toPath());
         zip.close();
-        
+    }
+    
+    /**
+     * Checks a python source code file (in packages with folders).
+     * 
+     * @param srcMainPython the main (parent) source folder for python files
+     * @param pyFile the python file to check (packages as folders)
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void pythonSourceCodeCheck(File srcMainPython, String pyFile) throws IOException {
         try {
-            int res = createPythonProcess(srcMainPython, "-m", "py_compile", "Rec1.py").waitFor();
-            Assert.assertEquals("Source code checking Rec1.py", 0, res);
-            res = createPythonProcess(srcMainPython, "-m", "py_compile", "Rec1Serializer.py").waitFor();
-            Assert.assertEquals("Source code checking Rec1Serializer.py", 0, res);
+            int res = createPythonProcess(srcMainPython, "-m", "py_compile", pyFile).waitFor();
+            Assert.assertEquals("Source code checking " + pyFile, 0, res);
         } catch (InterruptedException e) {
             Assert.fail("Python code check shall not be interrupted: " + e.getMessage());
         }
@@ -237,7 +256,7 @@ public class IvmlTests {
      * @param name the name of the datatype (as identifier)
      */
     private void assertPythonDatatype(File folder, String name) {
-        assertDatatype(folder, folder, name, "py");
+        assertDatatype(new File(folder, "datatypes"), new File(folder, "serializers"), name, "py");
     }
 
     /**
@@ -385,6 +404,30 @@ public class IvmlTests {
         PlatformInstantiator.instantiate(
             new TestConfigurer("KodexMesh", new File("src/test/easy"), gen)
                 .setStartRuleName("generateApps"));
+
+        File base = new File(gen, "SimpleKodexTestingApp");
+        File srcMain = new File(base, "src/main");
+        File srcMainPython = new File(srcMain, "python");
+        File srcMainAssembly = new File(srcMain, "assembly");
+
+        assertPythonDatatype(srcMainPython, "Rec13");
+        assertPythonDatatype(srcMainPython, "Rec13Anon");
+        
+        assertFile(srcMainAssembly, "pseudonymizer.xml");
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
+        assertFile(srcMainAssembly, "javaInterfaces.xml");
+        assertFile(srcMainAssembly, "python_kodexPythonService.xml");
+
+        FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
+        JarUtils.extractZip(zip, srcMainPython.toPath());
+        zip.close();
+
+        extractPythonServiceEnv(srcMainPython);
+        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13Anon.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13Serializer.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13AnonSerializer.py");
+        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
     }
 
 }

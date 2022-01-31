@@ -7,5 +7,9 @@ project IIPEcosphere {
     String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
     String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
     String pidDir = "/run"; // linux only, windows goes to tmp
+    
+    // legacy transition (to be removed)
+    Boolean sharedInterfaces = false;
+    String sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfaces:" + iipVer;
    
 }

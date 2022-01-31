@@ -42,6 +42,41 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     def generateProcess(MeshElement elt, Service service) {
         ''
     }
+
+    def generateProcess(MeshElement elt, PythonService service) {
+        String id = toFolderName(service.id);
+        'process: 
+            homePath: \\${tmp}/${id}/python
+            ${pythonExecutable(service)|e}
+            executablePath: \\${tmp}/${id}/python
+            artifacts:
+              - /python_${id}.zip
+            cmdArg:
+              - --mode
+              - console
+              - --modulesPath
+              - \\${tmp}/${id}/python
+              - --sid
+              - ${service.id}
+              ${pythonDataArg(service)|e}
+            started: true'
+    }
+    
+    def pythonDataArg(PythonService service) {
+        if (service.integrationMode == PythonIntegrationMode::console_oneShot) {
+            "--data"
+        } else {
+            ""
+        }
+    }
+    
+    def pythonExecutable(PythonService service) {
+        if (isDefined(service.entrypointModule) and service.entrypointModule.length() > 0) {
+            "executable: ${service.entrypointModule}"
+        } else {
+            ""
+        }
+    }
     
     def generateProcess(MeshElement elt, KodexService service) {
         String id = toFolderName(service.id);

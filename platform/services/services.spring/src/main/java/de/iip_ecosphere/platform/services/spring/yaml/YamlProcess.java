@@ -47,6 +47,7 @@ public class YamlProcess extends de.iip_ecosphere.platform.services.environment.
         for (String arg : getCmdArg()) {
             arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
             arg = arg.replace(Service.PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
+            arg = toSubstFileName(arg);
             result.add(arg);
         }
         return result;
