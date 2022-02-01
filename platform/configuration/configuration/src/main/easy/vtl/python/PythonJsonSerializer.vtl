@@ -2,7 +2,7 @@ import PythonBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonJsonSerializer(Configuration config, FileArtifact target, RecordType type) {
+template PythonJsonSerializer(Configuration config, FileArtifact target, RecordType type, Boolean sharedInterfaces) {
 
     def encoder(String clsName) {
     'class ${clsName}Encoder(JSONEncoder):
@@ -22,8 +22,12 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
     '
     }
 
-    def main(Configuration config, FileArtifact target, RecordType type) {
+    def main(Configuration config, FileArtifact target, RecordType type, Boolean sharedInterfaces) {
         String clsName = asTypeName(type.name);
+        String add = "";
+        if (sharedInterfaces) {
+            add = "Impl";
+        }
         'from json import JSONEncoder
         import json
         from iip.TypeTransatorToString import TypeTransatorToString
@@ -50,7 +54,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                     the deserialized object
                 """
             
-                result = ${clsName}()
+                result = ${clsName}${add}()
                 result.__dict__ = json.loads(data)
                 return result
 
