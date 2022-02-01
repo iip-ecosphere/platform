@@ -42,11 +42,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // called from tests, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
         IIPEcosphere cfg = config;
+        setOf(RecordType) recordTypes = RecordType.allInstances();
+        setOf(Application) applications = Application.allInstances(); // VTL interference?
+        
         if (cfg.sharedInterfaces) {
             generateSharedInterfaces(config, target);
         }
-        setOf(RecordType) recordTypes = RecordType.allInstances();
-        for (Application a : Application.allInstances()) {
+        
+        for (Application a : applications) {
             String appName = asTypeName(a.name);
             Path appRoot = "${target}/${appName}";
             appRoot.mkdir();
@@ -106,7 +109,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             
             // partition according to container strategy
-            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", app=a, appName=appName, tests=tests);
+            String appVersion = "${a.ver}";
+            if (a.snapshot) {
+                appVersion = appVersion + "-SNAPSHOT";
+            }
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
@@ -178,6 +185,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
     
     generateSharedInterfaces(Configuration config, Project target) = {
+        IIPEcosphere cfg = config;
         Path appRoot = "${target}/ApplicationInterfaces";
         appRoot.mkdir();
 
@@ -195,6 +203,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         assemblySrc.mkdir();
         
         setOf(String) javaSerializers = {};
+        setOf(String) artifacts = {};
+        setOf(String) bins = {}; 
+        setOf(String) assemblies = {}; 
+        sequenceOf(MeshElement) elements = {};
+        
         for (RecordType r : recordTypes) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
@@ -204,6 +217,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
         };
+        
+        vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+            
+        // partition according to container strategy
+        
+        sequenceOf(String) artList = cfg.sharedArtifact.split(":");
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", 
+            appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
+        vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
+            
+        maven("${appRoot}", true);
     }
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
