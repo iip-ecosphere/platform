@@ -2,7 +2,7 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaJsonSerializer(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg) {
+template JavaJsonSerializer(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces) {
 
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -12,8 +12,12 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
         }
     }
 
-    def main(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg) {
+    def main(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces) {
         String clsName = asTypeName(type.name);
+        String add = "";
+        if (sharedInterfaces) {
+            add = "Impl";
+        }        
         'package ${pkg};
         
         import java.io.IOException;
@@ -32,7 +36,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public ${clsName} from(byte[] data) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    return objectMapper.readValue(data, ${clsName}.class);
+                    return objectMapper.readValue(data, ${clsName}${add}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
                 }
@@ -50,7 +54,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
 
             @Override
             public ${clsName} clone(${clsName} origin) throws IOException {
-                return new ${clsName}(origin);
+                return new ${clsName}${add}(origin);
             }
 
             @Override

@@ -151,7 +151,7 @@ project SimpleMesh3 {
     // ---------- generation setup ------------
     
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesKodexSimpleMesh3:" + iipVer; // for testing all-in-one
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh3:" + iipVer; // for testing all-in-one
 
     // ------------ freezing ------------------
     

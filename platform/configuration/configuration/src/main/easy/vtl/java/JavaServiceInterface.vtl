@@ -23,12 +23,12 @@ template JavaServiceInterface(Configuration config, FileArtifact target, Service
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
         '/**
-         * Processes a data item of type "${t}" synchronously.
+         * Processes/transforms a data item of type "${t}" synchronously.
          *
          * @param data the data item to be processed
          * @return the result of processing
          */
-        public ${r} process${t.firstToUpperCase()}(${t} data);'
+        public ${r} transform${t.firstToUpperCase()}(${t} data);'
     }
     
     // called via produceForInputTypes/produceForOutputTypes

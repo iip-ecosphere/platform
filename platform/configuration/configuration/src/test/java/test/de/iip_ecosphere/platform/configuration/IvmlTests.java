@@ -405,10 +405,22 @@ public class IvmlTests {
             new TestConfigurer("KodexMesh", new File("src/test/easy"), gen)
                 .setStartRuleName("generateApps"));
 
-        File base = new File(gen, "SimpleKodexTestingApp");
+        File base = new File(gen, "ApplicationInterfaces");
         File srcMain = new File(base, "src/main");
         File srcMainPython = new File(srcMain, "python");
         File srcMainAssembly = new File(srcMain, "assembly");
+        
+        extractPythonServiceEnv(srcMainPython);
+        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13Anon.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13Serializer.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13AnonSerializer.py");
+        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
+        
+        base = new File(gen, "SimpleKodexTestingApp");
+        srcMain = new File(base, "src/main");
+        srcMainPython = new File(srcMain, "python");
+        srcMainAssembly = new File(srcMain, "assembly");
 
         assertPythonDatatype(srcMainPython, "Rec13");
         assertPythonDatatype(srcMainPython, "Rec13Anon");
