@@ -1,14 +1,15 @@
 import JavaBasics;
 import MeshBasics;
+import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonMeshElementInterface(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
+template PythonServiceInterface(Configuration config, FileArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
 
     setOf(String) reg = {};
     
-    def registerMethod(String kind, MeshElement elt, String type, String methodSuffix) {
-        reg.add("Registry.${kind}['${elt.impl.id}_${type}'] = self.${methodSuffix}");
+    def registerMethod(String kind, String type, String funcName) {
+        reg.add("Registry.${kind}['${service.id}_${type}'] = self.${funcName}");
     }
     
     def generateRegisterMethodBody() {
@@ -16,37 +17,28 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
             '${s}'
         }
     }
-
-    // called via MeshBasics.generateDataMethods for MeshSource
-    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        if (!src.impl.asynchronous) {
-        registerMethod("senders", src, type, methodSuffix);
-        'def ${methodSuffix}(self) -> ${type}:
-            """Data generator for source classes.
-        
-            Return:
-              - the created data
-            """
-            raise NotImplementedError'
-        }
-    } 
-
-    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
-    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        registerMethod("asyncTransformers", proc, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${type}):
+    
+        // called via produceForInputTypes/produceForOutputTypes
+    def produceAsyncProcessorBody(IOType type) {
+        String t = toTypeName(type);
+        String funcName = "process${t.firstToUpperCase()}";
+        registerMethod("asyncTransformers", t, funcName);
+        'def ${funcName}(self, data: ${t}):
             """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
         
             Parameters:
               - data -- the data to process
             """
             raise NotImplementedError'
-    } 
-
-    // called via MeshBasics.generateDataMethods for synch MeshProcessor
-    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        registerMethod("syncTransformers", proc, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${inType}) -> ${outType}:
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+        String r = toTypeName(returnType);
+        String t = toTypeName(dataType);
+        String funcName = "process${t.firstToUpperCase()}";
+        registerMethod("syncTransformers", t, funcName);
+        'def ${funcName}(self, data: ${t}) -> ${r}:
             """Synchronous data processing method.
         
             Parameters:
@@ -55,16 +47,18 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
               the processed data              
             """
             raise NotImplementedError'
-    } 
+    }
     
-    // called via MeshBasics.generateDataMethods for MeshSink
-    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
-         registerMethod("receivers", snk, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${type}):
-            """Sink method, receives data.
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceProducerBody(IOType type) {
+        String t = toTypeName(type);
+        String funcName = "produce${t.firstToUpperCase()}";
+        registerMethod("senders", t, funcName);
+        'def ${funcName}(self) -> ${t}:
+            """Synchronous data generator for source classes.
         
-            Parameters:
-              - data -- the received data
+            Return:
+              - the created data
             """
             raise NotImplementedError'
     }
@@ -79,32 +73,32 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
         Registry.services[${sId}] = self'
     }
     
-    def produceDatatypeImports(MeshElement elt) {
-        setOf(RecordType) types = collectRecordTypes(elt);
+    def produceDatatypeImports(ServiceBase service) {
+        setOf(RecordType) types = collectRecordTypes(service);
         for (RecordType t: types) {
             String name = t.name;
             'from datatypes.${name} import ${name}'
         }
-    } 
+    }
 
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
-        String clsName = asTypeName(elt.name);
+    def main(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
+        String clsName = asTypeName(service.name);
         'from iip.AbstractService import AbstractService
         import iip.Registry
         from iip.Version import Version
         from iip.Service import ServiceState
         from iip.Service import ServiceKind
-        ${produceDatatypeImports(elt)}
+        ${produceDatatypeImports(service)}
 
         class ${clsName}Interface(AbstractService):
-            """Partially implemented service interface for ${clsName}
+            """Partially implemented service interface for "${service.name}"
                Generated by: EASy-Producer."""
             
             ingestor = None
             
             def __init__(self):
                 """Initializes the service.""" 
-                ${produceSuper(elt.impl)}
+                ${produceSuper(service)}
                 self.registerMethods()
                 
             def attachIngestor(self, ingestor):
@@ -127,7 +121,8 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
                 if self.ingestor is not None:
                     self.ingestor(data)
             
-            ${generateDataMethods(elt)}
+            ${produceForInputTypes(service)}
+            ${produceForOutputTypes(service)}
             
             def registerMethods(self):
                 ${generateRegisterMethodBody()}'

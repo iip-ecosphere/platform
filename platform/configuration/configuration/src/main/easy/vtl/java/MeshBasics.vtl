@@ -1,4 +1,6 @@
+import Basics;
 import JavaBasics;
+import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -108,12 +110,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     } 
     
     def mapOf(IOType, IOType) ioPairs(MeshProcessor elt) {
-        mapOf(IOType, IOType) result = {};
-        sequenceOf(Integer) indexes = createIntegerSequence(0, min(elt.input.size(), elt.output.size()));
-        for (Integer i : indexes) {
-            result.add(elt.input.get(i), elt.output.get(i));
-        }
-        result;
+        ioPairs(elt.input, elt.output);
     }
 
     def setOf(RecordType) collectRecordTypes(MeshElement elt) {
@@ -125,7 +122,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def collectRecordTypesImpl(MeshElement elt, setOf(RecordType) types) {
         // nothing, dispatch base
     } 
-     
 
     def collectRecordTypesImpl(MeshSource source, setOf(RecordType) types) {
         collectRecordTypesFromSet(source.output, types);
@@ -138,20 +134,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     def collectRecordTypesImpl(MeshSink sink, setOf(RecordType) types) {
         collectRecordTypesFromSet(sink.input, types);
-    }
-    
-    def collectRecordTypesFromSet(sequenceOf(IOType) types, setOf(RecordType) result) {
-       for (IOType t: types) {
-           collectRecordType(t.type, result);
-       }
-    }
-    
-    def collectRecordType(DataType type, setOf(RecordType) result) {
-        // nothing, dispatch base
-    }
-
-    def collectRecordType(RecordType type, setOf(RecordType) result) {
-        result.add(type);
     }
     
 }

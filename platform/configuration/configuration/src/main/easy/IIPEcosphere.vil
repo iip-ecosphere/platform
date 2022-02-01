@@ -190,6 +190,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         appRoot.mkdir();
 
         setOf(RecordType) recordTypes = RecordType.allInstances();
+        setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
         Path javaSrc = "${appRoot}/src/main/java";
         Path pySrc = "${appRoot}/src/main/python";
         Path resourcesSrc = "${appRoot}/src/main/resources";
@@ -218,6 +219,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
         };
         
+        for (ServiceBase s : serviceTypes) {
+            generateServiceInterfaces(appRoot, config, s);
+        }
+        
         vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             
@@ -229,6 +234,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
         maven("${appRoot}", true);
+    }
+    
+    // ------------------------------------------ gen interfaces: service interfaces ---------------------------------------------------------
+
+    // dispatch basis
+    generateServiceInterfaces(Path appRoot, Configuration config, ServiceBase service) = {
+        String clsName = asTypeName(service.name);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        vilTemplateProcessor("JavaServiceInterface", config, "${javaInterfacesSrc}/${clsName}Interface.java", service=service, pkg=javaInterfacesPackage);
+    }
+    
+    generateServiceInterfaces(Path appRoot, Configuration config, CompleteService service) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    // Python (preliminary in here)
+    generateServiceInterfaces(Path appRoot, Configuration config, PythonService service) = {
+        String clsName = asTypeName(service.name);
+        Path pySrc = "${appRoot}/src/main/python";
+        Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
+        vilTemplateProcessor("PythonServiceInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", service=service, pkg="interfaces");
     }
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
