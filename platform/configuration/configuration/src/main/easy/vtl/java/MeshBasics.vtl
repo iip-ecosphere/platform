@@ -54,14 +54,23 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(MeshProcessor elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
+            for (IOType out : elt.output) {
+                String type = toTypeName(out.type);
+                String methodSuffix = "process" + type.firstToUpperCase();
+                String methodSuffixId = methodSuffix + serviceId;
+                if (recordAsyncProcessorIngestor(elt, out)) {
+                    ingestors.add(methodSuffixId, type);
+                    asyncIngestors.add(methodSuffixId, true);
+                }
+            }
             for (IOType in : elt.input) {
                 String type = toTypeName(in.type);
                 String methodSuffix = "process" + type.firstToUpperCase();
                 String methodSuffixId = methodSuffix + serviceId;
-                if (recordAsyncProcessorIngestor(elt, in)) {
+                /*if (recordAsyncProcessorIngestor(elt, in)) {
                     ingestors.add(methodSuffixId, type);
                     asyncIngestors.add(methodSuffixId, true);
-                }
+                }*/
                 generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
             }
         } else {

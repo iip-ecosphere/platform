@@ -45,8 +45,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(Application) applications = Application.allInstances(); // VTL interference?
         
+        setOf(String) javaSerializers = {};
+        setOf(String) artifacts = {};
         if (cfg.sharedInterfaces) {
-            generateSharedInterfaces(config, target);
+            generateSharedInterfaces(config, target, javaSerializers, artifacts);
         }
         
         for (Application a : applications) {
@@ -68,22 +70,23 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             assemblySrc.mkdir();
             // generate data classes and serializers
             setOf(String) javaSerializers = {};
-            for (RecordType r : recordTypes) {
-                // generate for all languages and according to serializer settings
-                String clsName = asTypeName(r.name);
-                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
-                    pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false);
-                vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
-                    type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
-                javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
-                    sharedInterfaces=false);
-                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
-                    type=r, sharedInterfaces=false);
-            };
+            if (not(cfg.sharedInterfaces)) {
+                for (RecordType r : recordTypes) {
+                    // generate for all languages and according to serializer settings
+                    String clsName = asTypeName(r.name);
+                    vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                        pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false);
+                    vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
+                        type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
+                    javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+                    vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
+                        sharedInterfaces=false);
+                    vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
+                        type=r, sharedInterfaces=false);
+                };
+            }
 
             // generate service classes and service integration
-            setOf(String) artifacts = {};
             setOf(String) bins = {}; 
             setOf(String) assemblies = {}; 
             sequenceOf(MeshElement) elements = {};
@@ -95,7 +98,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
                     generateServiceElements(appRoot, config, no, no.impl);
-                    vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", elt=no, pkg=javaNodesPackage, app=a);
+                    vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
+                        elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
                     generateServiceResources(no, no.impl, appRoot, bins, assemblies, artifacts);
@@ -109,8 +113,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
             vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
 
-            vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+            if (not(cfg.sharedInterfaces)) {
+                vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+                assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
+                vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+                assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package");
+            }
             
             // partition according to container strategy
             String appVersion = "${a.ver}";
@@ -121,7 +129,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
-            maven("${appRoot}", true);
+            //maven("${appRoot}", true);
         };
     }
     
@@ -129,12 +137,20 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // dispatch basis
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service) = {
+        IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
         Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
-        vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, pkg=javaInterfacesPackage);
-        vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, pkg=javaStubsPackage);
+        if (not(cfg.sharedInterfaces)) {
+            vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, 
+                pkg=javaInterfacesPackage);
+            vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, 
+                pkg=javaStubsPackage);
+        } else {
+            vilTemplateProcessor("JavaServiceStub", config, "${javaStubsSrc}/${clsName}Stub.java", service=service, 
+                pkg=javaStubsPackage);
+        }
     }
     
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, CompleteService service) = {
@@ -143,10 +159,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // Python (preliminary in here)
     generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
+        IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
         Path pySrc = "${appRoot}/src/main/python";
         Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
-        vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", elt=no, pkg="interfaces");
+        if (not(cfg.sharedInterfaces)) {
+            vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", 
+                elt=no, pkg="interfaces");
+        }
     }
     
     // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
@@ -188,7 +208,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
     
-    generateSharedInterfaces(Configuration config, Project target) = {
+    generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         Path appRoot = "${target}/ApplicationInterfaces";
         appRoot.mkdir();
@@ -207,8 +227,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         javaSerializersSrc.mkdir();
         assemblySrc.mkdir();
         
-        setOf(String) javaSerializers = {};
-        setOf(String) artifacts = {};
         setOf(String) bins = {}; 
         setOf(String) assemblies = {}; 
         sequenceOf(MeshElement) elements = {};
@@ -236,7 +254,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         }
         
         vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+        assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package");
             
         // partition according to container strategy
         
@@ -246,6 +266,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
         maven("${appRoot}", true);
+
+        artifacts.add(cfg.sharedArtifact);
     }
     
     // ------------------------------------------ gen interfaces: service interfaces ---------------------------------------------------------

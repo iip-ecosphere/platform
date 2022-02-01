@@ -5,7 +5,7 @@ import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) extends MeshBasics {
+template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) extends MeshBasics {
 
     Boolean isConnector = false;
 
@@ -41,13 +41,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                      '${generateIngestor(base, methodSuffix, ingestors.get(methodSuffix))}'
                  }
              }
-             // no-hack code
-             //'service.attach${methodSuffix}Ingestor(data -> streamBridge.send("${methodSuffix}-in-0", data));'
          }
     }
     
     def generateIngestor(ServiceBase base, String methodSuffix, String type) {
-        'service.attach${methodSuffix}Ingestor(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
+        String methodName;
+        if (sharedInterfaces) {
+            methodName = "attach${type.firstToUpperCase()}Ingestor";
+        } else {
+            methodName = "attach${methodSuffix}Ingestor";
+        }    
+        'service.${methodName}(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -60,6 +64,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
         if (!service.asynchronous) {
+            String methodName;
+            if (sharedInterfaces) {
+                methodName = "produce${type.firstToUpperCase()}";
+            } else {
+                methodName = methodSuffix;
+            }
             '/**
             * Creates data to be ingested.
             *
@@ -67,7 +77,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             */
             @Bean
             public Supplier<${type}> ${methodSuffixWithServiceId}() {
-                return () -> ${fallbackToNull(src, "service.${methodSuffix}()", true)}; 
+                return () -> ${fallbackToNull(src, "service.${methodName}()", true)}; 
             }'
         }
     }
@@ -106,7 +116,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def generateAsyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String type) {
-        'return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", false)};'
+        String methodName;
+        if (sharedInterfaces) {
+            methodName = "process${type.firstToUpperCase()}";
+        } else {
+            methodName = methodSuffix;
+        }
+        'return data -> ${fallbackToNull(proc, "service.${methodName}(data)", false)};'
     }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
@@ -127,11 +143,23 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     } 
 
     def generateSyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String inType, String outType) {
-        'return data -> ${fallbackToNull(proc, "service.${methodSuffix}(data)", true)};'
+        String methodName;
+        if (sharedInterfaces) {
+            methodName = "transform${inType.firstToUpperCase()}";
+        } else {
+            methodName = methodSuffix;
+        }
+        'return data -> ${fallbackToNull(proc, "service.${methodName}(data)", true)};'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        String methodName;
+        if (sharedInterfaces) {
+            methodName = "process${type.firstToUpperCase()}";
+        } else {
+            methodName = methodSuffix;
+        }
         '/**
         * Called when data arrived that shall be received (data sink).
         *
@@ -139,7 +167,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         @Bean
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(snk, "service.${methodSuffix}(data)", false)};
+            return data -> ${fallbackToNull(snk, "service.${methodName}(data)", false)};
         }'
     } 
     
@@ -203,7 +231,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def getServiceType(MeshElement elt, ServiceBase base) {
-        "${getClsName(elt)}Service";
+        if (sharedInterfaces) {
+            "${getClsName(elt)}Interface";
+        } else {
+            "${getClsName(elt)}Service";
+        }
     }
     
     def getServiceType(MeshElement elt, Connector conn) {
@@ -404,7 +436,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) {
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) {
         String clsName = getClsName(elt);
         ServiceBase impl = elt.impl;
         'package ${pkg};

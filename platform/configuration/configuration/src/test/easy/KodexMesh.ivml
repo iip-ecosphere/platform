@@ -52,7 +52,7 @@ project KodexMesh {
     // ------------ data types ------------------
     
     RecordType rec1 = {
-        name = "Rec13",
+        name = "KRec13",
         fields = {
             Field {
                 name = "intField",
@@ -65,7 +65,7 @@ project KodexMesh {
     };
     
     RecordType rec2 = {
-        name = "Rec13Anon",
+        name = "KRec13Anon",
         fields = {
             Field {
                 name = "kip",
@@ -83,13 +83,13 @@ project KodexMesh {
     // ------------ individual, reusable services ------------------
         
     Service mySourceService = JavaService {
-        id = "SimpleSource3",
-        name = "Simple Data Source3",
+        id = "SimpleKodexSource",
+        name = "Simple Kodex Data Source",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = false,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSource3Impl",
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceKodexImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}

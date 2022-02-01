@@ -135,8 +135,9 @@ public class IvmlTests {
     public void testSerializerConfig1() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
-        
-        assertApplication(gen);
+
+        assertAppInterfaces(new File(gen, "ApplicationInterfaces"), false);
+        assertApplication(new File(gen, "MyAppExample"));
         assertEcsRuntime(gen);
         assertServiceManager(gen);
         assertPlatform(gen);
@@ -145,21 +146,17 @@ public class IvmlTests {
     /**
      * Asserts file and contents of the application part.
      * 
-     * @param gen the generation base folder
+     * @param base the source base folder
      * @throws IOException in case that expected files cannot be found or inspected
      */
-    private void assertApplication(File gen) throws IOException {
-        File base = new File(gen, "MyAppExample");
+    private void assertApplication(File base) throws IOException {
         File srcMain = new File(base, "src/main");
         File srcMainJava = new File(srcMain, "java");
         File srcMainResources = new File(srcMain, "resources");
-        File srcMainPython = new File(srcMain, "python");
-        File srcMainAssembly = new File(srcMain, "assembly");
-        
+        //File srcMainPython = new File(srcMain, "python");
+        //File srcMainAssembly = new File(srcMain, "assembly");
         File srcMainJavaIip = new File(srcMainJava, "iip");
-        assertJavaDatatype(srcMainJavaIip, "Rec1");
-        assertJavaDatatype(srcMainJavaIip, "MyConnMachineIn");
-        assertJavaDatatype(srcMainJavaIip, "MyConnMachineOut");
+
         assertJavaNode(srcMainJavaIip, "MyAnonymizerExample");
         assertJavaNode(srcMainJavaIip, "MyKiExample");
         assertJavaNode(srcMainJavaIip, "MyMqttConnExample");
@@ -169,20 +166,51 @@ public class IvmlTests {
         assertFile(srcMainResources, "application.yml");
         assertDeploymentYaml(srcMainResources, "deployment.yml");
         assertFile(srcMainResources, "logback.xml");
-        
-        assertPythonDatatype(srcMainPython, "Rec1");
-        assertPythonDatatype(srcMainPython, "MyConnMachineIn");
-        assertPythonDatatype(srcMainPython, "MyConnMachineOut");
-        
-        assertFile(srcMainAssembly, "pythonInterfaces.xml");
 
         assertFileContains(base, "pom.xml", "transport.spring.amqp", "transport.amqp");
+    }
+
+    /**
+     * Asserts the Serializer1 application interfaces.
+     * 
+     * @param base the base folder (shared or app-individual)
+     * @param old old (separated) or new shared interface style
+     * @throws IOException in case that expected files cannot be found or inspected
+     */
+    private void assertAppInterfaces(File base, boolean old) throws IOException {
+        File srcMain = new File(base, "src/main");
+        File srcMainPython = new File(srcMain, "python");
+        File srcMainAssembly = new File(srcMain, "assembly");
+        File srcMainJava = new File(srcMain, "java");
+        File srcMainJavaIip = new File(srcMainJava, "iip");
+
+        assertJavaDatatype(srcMainJavaIip, "Rec1");
+        assertJavaDatatype(srcMainJavaIip, "MyConnMachineIn");
+        assertJavaDatatype(srcMainJavaIip, "MyConnMachineOut");
+
+        assertJavaInterface(srcMainJavaIip, "MyAnonymizerExample", old);
+        assertJavaInterface(srcMainJavaIip, "MyKiExample", old);
+        assertJavaInterface(srcMainJavaIip, "MyMqttConnExample", old);
+        assertJavaInterface(srcMainJavaIip, "MyOpcConnExample", old);
+        assertJavaInterface(srcMainJavaIip, "MySourceExample", old);
         
+        assertPythonDatatype(srcMainPython, "Rec1");
+        if (!old) {
+            assertPythonDatatypeImpl(srcMainPython, "Rec1Impl");
+        }
+        assertPythonDatatype(srcMainPython, "MyConnMachineIn");
+        assertPythonDatatype(srcMainPython, "MyConnMachineOut");
+
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
+
         extractPythonServiceEnv(srcMainPython);
         pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1.py");
+        if (!old) {
+            pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1Impl.py");
+        }
         pythonSourceCodeCheck(srcMainPython, "serializers/Rec1Serializer.py");
     }
-    
+
     /**
      * Extracts the python service environment implementation (via Maven and main project). Required for 
      * {@link #pythonSourceCodeCheck(File, String)}.
@@ -226,6 +254,18 @@ public class IvmlTests {
             Assert.fail(e.getMessage());
         }
     }
+
+    /**
+     * Tests for the existence of all files related to a Java Service Mesh Node.
+     * 
+     * @param folder the basic source folder including base package
+     * @param name the name of the service (as identifier)
+     * @param old old (separated) or new shared interface style
+     */
+    private void assertJavaInterface(File folder, String name, boolean old) {
+        String add = old ? "Service" : "Interface";
+        assertFile(new File(folder, "interfaces"), name + add + ".java");
+    }
     
     /**
      * Tests for the existence of all files related to a Java Service Mesh Node.
@@ -234,7 +274,6 @@ public class IvmlTests {
      * @param name the name of the service (as identifier)
      */
     private void assertJavaNode(File folder, String name) {
-        assertFile(new File(folder, "interfaces"), name + "Service.java");
         assertFile(new File(folder, "nodes"), name + ".java");
         assertFile(new File(folder, "stubs"), name + "Stub.java");
     }
@@ -247,6 +286,16 @@ public class IvmlTests {
      */
     private void assertJavaDatatype(File folder, String name) {
         assertDatatype(new File(folder, "datatypes"), new File(folder, "serializers"), name, "java");
+    }
+
+    /**
+     * Tests for the existence of all files related to a Python Data Type implementation.
+     * 
+     * @param folder the basic source folder
+     * @param name the name of the datatype (as identifier)
+     */
+    private void assertPythonDatatypeImpl(File folder, String name) {
+        assertDatatype(new File(folder, "datatypes"), null, name, "py");
     }
 
     /**
@@ -263,13 +312,16 @@ public class IvmlTests {
      * Tests for the existence of all files related to a Data Type.
      * 
      * @param typeFolder the folder containing the datatypes
-     * @param serFolder the folder containing the datatypes serializers (may be <code>typeFolder</code>)
+     * @param serFolder the folder containing the datatypes serializers (may be <code>typeFolder</code>, ignored 
+     *     if null)
      * @param name the name of the datatype (as identifier)
      * @param extension the file name extension
      */
     private void assertDatatype(File typeFolder, File serFolder, String name, String extension) {
         assertFile(typeFolder, name + "." + extension);
-        assertFile(serFolder, name + "Serializer." + extension);
+        if (null != serFolder) {
+            assertFile(serFolder, name + "Serializer." + extension);
+        }
     }
 
     /**
@@ -368,9 +420,7 @@ public class IvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh");
-        PlatformInstantiator.instantiate(
-            new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen)
-                .setStartRuleName("generateApps"));
+        PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen)));
     }
 
     /**
@@ -384,9 +434,7 @@ public class IvmlTests {
     @Test
     public void testSimpleMesh3() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh3");
-        PlatformInstantiator.instantiate(
-            new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)
-                .setStartRuleName("generateApps"));
+        PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)));
     }
     
     /**
@@ -401,45 +449,61 @@ public class IvmlTests {
     @Test
     public void testKodexMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/KodexMesh");
-        PlatformInstantiator.instantiate(
-            new TestConfigurer("KodexMesh", new File("src/test/easy"), gen)
-                .setStartRuleName("generateApps"));
+        PlatformInstantiator.instantiate(genApps(new TestConfigurer("KodexMesh", new File("src/test/easy"), gen)));
 
         File base = new File(gen, "ApplicationInterfaces");
         File srcMain = new File(base, "src/main");
         File srcMainPython = new File(srcMain, "python");
         File srcMainAssembly = new File(srcMain, "assembly");
-        
+
+        assertFile(srcMainAssembly, "pythonInterfaces.xml");
+        assertFile(srcMainAssembly, "javaInterfaces.xml");
+
         extractPythonServiceEnv(srcMainPython);
-        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13.py");
-        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13Anon.py");
-        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13Serializer.py");
-        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13AnonSerializer.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13Impl.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13Anon.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13AnonImpl.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/KRec13Serializer.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/KRec13AnonSerializer.py");
         pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
         
         base = new File(gen, "SimpleKodexTestingApp");
         srcMain = new File(base, "src/main");
         srcMainPython = new File(srcMain, "python");
         srcMainAssembly = new File(srcMain, "assembly");
-
-        assertPythonDatatype(srcMainPython, "Rec13");
-        assertPythonDatatype(srcMainPython, "Rec13Anon");
         
         assertFile(srcMainAssembly, "pseudonymizer.xml");
-        assertFile(srcMainAssembly, "pythonInterfaces.xml");
-        assertFile(srcMainAssembly, "javaInterfaces.xml");
         assertFile(srcMainAssembly, "python_kodexPythonService.xml");
-
-        FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
-        JarUtils.extractZip(zip, srcMainPython.toPath());
-        zip.close();
-
-        extractPythonServiceEnv(srcMainPython);
-        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13.py");
-        pythonSourceCodeCheck(srcMainPython, "datatypes/Rec13Anon.py");
-        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13Serializer.py");
-        pythonSourceCodeCheck(srcMainPython, "serializers/Rec13AnonSerializer.py");
-        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
     }
 
+    /**
+     * Tests loading, reasoning and instantiating "SerializerConfig1Old" (legacy name, originally only for serializer) 
+     * here with non-shared interfaces and without platform configurations. Depending on Maven setup/exclusions, 
+     * this Test may require Java 11.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testSerializerConfig1Old() throws ExecutionException, IOException {
+        File gen = new File("gen/tests/SerializerConfig1old");
+        PlatformInstantiator.instantiate(
+            genApps(new TestConfigurer("SerializerConfig1Old", new File("src/test/easy"), gen)));
+        
+        File base = new File(gen, "MyAppExampleOld");
+        assertAppInterfaces(base, true); // old style
+        assertApplication(base);
+    }
+    
+    /**
+     * Helper method to configure for partial instantiation, i.e., apps only and no platform components.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    private static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateApps");
+    }
+    
 }

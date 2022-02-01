@@ -55,13 +55,15 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        appendAssemblyDescriptor(assemblyPlugin, "interfaces", "src/main/assembly/javaInterfaces.xml", attach=true);
-        appendAssemblyDescriptor(assemblyPlugin, "python", "src/main/assembly/pythonInterfaces.xml", attach=true);
         for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
             String id = tmp[0];
             String path = tmp[1];
-            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir="\\${project.build.directory}/classes", finalName=id, phase="process-sources");
+            String phase="process-sources";
+            if (tmp.size() > 2) {
+                phase = tmp[2];
+            }
+            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir="\\${project.build.directory}/classes", finalName=id, phase=phase);
         }
         if (springPackaging) {
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
