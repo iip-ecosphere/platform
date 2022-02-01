@@ -71,10 +71,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             for (RecordType r : recordTypes) {
                 // generate for all languages and according to serializer settings
                 String clsName = asTypeName(r.name);
-                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
-                vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                    pkg=javaDatatypesPackage, interface=false);
+                vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
+                    type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
                 javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false);
                 vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
             };
 
@@ -212,10 +214,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         for (RecordType r : recordTypes) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
-            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, pkg=javaDatatypesPackage);
-            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}If.java", type=r, 
+                pkg=javaDatatypesPackage, interface=true);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                pkg=javaDatatypesPackage, interface=false);
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, 
+                pkg=javaSerializersPackage, typePkg=javaDatatypesPackage);
             javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r);
+            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}If.py", type=r, interface=true);
+            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false);
             vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r);
         };
         
