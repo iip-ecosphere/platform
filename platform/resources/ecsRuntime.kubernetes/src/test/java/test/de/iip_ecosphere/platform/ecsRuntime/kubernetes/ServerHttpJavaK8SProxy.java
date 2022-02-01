@@ -97,14 +97,30 @@ public class ServerHttpJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-        try {
-            K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.MasterProxy, serverIP, serverPort, tlsCheck);
+        Thread requestThread = new Thread() {
+            public void run() {
+                tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
 
-            startMultiThreaded(httpJavaK8SProxy, localPort);
-        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | InvalidKeySpecException | IOException e) {
-            System.err.println("Exception in the starting the multi-threads method");
-            e.printStackTrace();
+                try {
+                    K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.MasterProxy, serverIP, serverPort,
+                            tlsCheck);
+
+                    startMultiThreaded(httpJavaK8SProxy, localPort);
+                } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+                        | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
+                    System.err.println("Exception in the starting the multi-threads method");
+                    e.printStackTrace();
+                } 
+            }
+        };
+        requestThread.start();
+        
+        System.out.println("Waiting");
+        while (true) {
+            if (new File("/tmp/EndServerRun.k8s").exists()) {
+                break;
+            }
+            TimeUtils.sleep(1);
         }
     }
 
