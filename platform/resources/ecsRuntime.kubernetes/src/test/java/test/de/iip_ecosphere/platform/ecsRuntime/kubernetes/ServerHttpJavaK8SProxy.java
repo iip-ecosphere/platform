@@ -193,7 +193,7 @@ public class ServerHttpJavaK8SProxy {
 
         final Charset encoding = StandardCharsets.UTF_8;
         
-        File file = new File("ServerReady.k8s");
+        File file = new File("ServerReady.k8s"); 
         file.createNewFile();
         
         while (true) {
