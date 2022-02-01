@@ -16,6 +16,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String test(String s) {
         s;
     }
+
+    def String toTypeName(IOType type) {
+        toTypeName(type.type);
+    }
     
     def String toTypeName(DataType type) {
         type.name;

@@ -2,7 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, Application app, String appName, Boolean tests) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -17,17 +17,17 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, Application app, String appName, Boolean tests) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
         String iipGroup = "de.iip-ecosphere.platform";
-        String projectVersion = config.iipVer;
-        String appVersion = "${app.ver}";
-        if (app.snapshot) {
-            appVersion = appVersion + "-SNAPSHOT";
+        String gId = groupId;
+        if (length(gId) == 0) {
+            gId = "${iipGroup}.apps";
         }
+        String projectVersion = config.iipVer;
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "${appName}", "${appName}", "${app.description}");
-        new XmlElement(project, "groupId", "${iipGroup}.apps");
+        createMavenProjectAttributes(project, "${appName}", "${appName}", "${appDescription}");
+        new XmlElement(project, "groupId", gId);
         new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
@@ -63,7 +63,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
             String path = tmp[1];
             appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir="\\${project.build.directory}/classes", finalName=id, phase="process-sources");
         }
-        appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
+        if (springPackaging) {
+            appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
+        }
 
         XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         mapOf(String, XmlElement) goalItems = {}; 

@@ -1,0 +1,75 @@
+import Basics;
+
+@advice(IIPEcosphere)
+template ServiceBasics(Configuration config, FileArtifact target) {
+    
+    def mapOf(IOType, IOType) ioPairs(ServiceBase service) {
+        ioPairs(service.input, service.output);
+    }
+    
+    def produceForInputTypes(ServiceBase service) {
+        if (service.asynchronous) {
+            for (IOType in : service.input) {
+                '${produceAsyncProcessorBody(in)}'
+            }
+        } else {
+            mapOf(IOType, IOType) pairs = ioPairs(service);
+            for (IOType in : pairs.keys()) {
+                IOType out = pairs.get(in);
+                '${produceSyncProcessorBody(out, in)}'
+            }
+        }
+    }
+    
+    def produceForOutputTypes(ServiceBase service) {
+        if (service.asynchronous) {
+            for (IOType out : service.output) {
+                '${produceIngestorBody(out)}'
+            }
+        } else {
+            mapOf(IOType, IOType) pairs = ioPairs(service.input, service.output);
+            setOf(IOType) mappedOut = values(pairs);
+            for (IOType out : service.output) {
+                if (mappedOut.excludes(out)) {
+                    '${produceProducerBody(out)}'
+                }
+            }
+        }
+    }
+
+    def produceAsyncProcessorBody(IOType type) {
+    }
+    
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+    }
+    
+    def produceIngestorBody(IOType type) {
+    }
+    
+    def produceProducerBody(IOType type) {
+    }
+    
+    // -------------------------- collecting types ----------------------------
+    
+    def setOf(RecordType) collectRecordTypes(ServiceBase service) {
+        setOf(RecordType) types = {};
+        collectRecordTypesFromSet(service.input, types);
+        collectRecordTypesFromSet(service.output, types);
+        types;
+    }
+    
+    def collectRecordTypesFromSet(sequenceOf(IOType) types, setOf(RecordType) result) {
+       for (IOType t: types) {
+           collectRecordType(t.type, result);
+       }
+    }
+    
+    def collectRecordType(DataType type, setOf(RecordType) result) {
+        // nothing, dispatch base
+    }
+
+    def collectRecordType(RecordType type, setOf(RecordType) result) {
+        result.add(type);
+    }    
+	
+}

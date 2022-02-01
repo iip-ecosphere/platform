@@ -34,5 +34,14 @@ template Basics(Configuration config, FileArtifact target) {
         }
         next->collect(MeshConnector c|c.next);
     }
+    
+    def mapOf(IOType, IOType) ioPairs(sequenceOf(IOType) input, sequenceOf(IOType) output) {
+        mapOf(IOType, IOType) result = {};
+        sequenceOf(Integer) indexes = createIntegerSequence(0, min(input.size(), output.size()));
+        for (Integer i : indexes) {
+            result.add(input.get(i), output.get(i));
+        }
+        result;
+    }
 	
 }
