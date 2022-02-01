@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -22,14 +23,16 @@ import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.HttpK8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 public class ServerHttpJavaK8SProxy {
 
     private static int localPort = 4411;
-    private static String serverIP = "192.168.81.212";
+    private static String serverIP = "192.168.81.208";
     private static String serverPort = "6443";
     private static boolean tlsCheck = false;
+    private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
     
     /**
      * Returns the port on localhost to receive new requests.
@@ -97,7 +100,7 @@ public class ServerHttpJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-        Thread requestThread = new Thread() {
+        Thread requestThread = new Thread() { 
             public void run() {
                 tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
 
@@ -118,6 +121,11 @@ public class ServerHttpJavaK8SProxy {
         System.out.println("Waiting");
         while (true) {
             if (new File("/tmp/EndServerRun.k8s").exists()) {
+                try {
+                    serverSocketList.get(0).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             }
             TimeUtils.sleep(1);
@@ -179,7 +187,8 @@ public class ServerHttpJavaK8SProxy {
             CertificateException, InvalidKeySpecException, IOException {
 
         ServerSocket serverSocket = httpJavaK8SProxy.getServerSocket(localPort, null, null, null, tlsCheck);
-
+        serverSocketList.add(serverSocket);
+        
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
         final Charset encoding = StandardCharsets.UTF_8;
@@ -217,7 +226,7 @@ public class ServerHttpJavaK8SProxy {
                             System.out.println(e.getMessage());
                         } else {
                             System.err.println("SocketException while creating response");
-                            System.out.println(new String(requestByte)); 
+//                            System.out.println(new String(requestByte)); 
                             e.printStackTrace();
                         }
                     } catch (IOException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException

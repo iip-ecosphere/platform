@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -29,9 +30,10 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 public class ClientHttpJavaK8SProxy {
 
     private static int localPort = 6443;
-    private static String serverIP = "192.168.81.212";
+    private static String serverIP = "192.168.81.208";
     private static String serverPort = "4411";
     private static boolean tlsCheck = false;
+    private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
 
     /**
      * Returns the port on localhost to receive new requests.
@@ -119,7 +121,12 @@ public class ClientHttpJavaK8SProxy {
 
         System.out.println("Waiting");
         while (true) {
-            if (new File("/tmp/EndClientRun.k8s").exists()) {
+            if (new File("/tmp/EndServerRun.k8s").exists()) {
+                try {
+                    serverSocketList.get(0).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             }
             TimeUtils.sleep(1);
@@ -181,6 +188,7 @@ public class ClientHttpJavaK8SProxy {
             CertificateException, InvalidKeySpecException, IOException {
 
         ServerSocket serverSocket = httpJavaK8SProxy.getServerSocket(localPort, null, null, null, tlsCheck);
+        serverSocketList.add(serverSocket);
 
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
