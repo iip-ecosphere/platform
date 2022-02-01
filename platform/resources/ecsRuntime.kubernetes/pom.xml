@@ -12,7 +12,16 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.3.0-SNAPSHOT</version>
   </parent>
-
+ 
+  <repositories>       
+    <repository>
+      <id>SSE</id>
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

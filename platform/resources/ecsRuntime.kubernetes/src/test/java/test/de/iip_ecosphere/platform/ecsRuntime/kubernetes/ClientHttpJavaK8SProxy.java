@@ -2,6 +2,7 @@ package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -113,21 +114,32 @@ public class ClientHttpJavaK8SProxy {
      * The main method to run the test server proxy.
      * 
      */
-    @Test(timeout = 100 * 1000)
+    @Test(timeout = 3 * 60 * 60 * 1000)
     public void mainTest() {
-        tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
-
-        try {
-            K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort, tlsCheck);
-
-            startMultiThreaded(httpJavaK8SProxy, localPort);
-        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | InvalidKeySpecException | IOException e) {
-            System.err.println("Exception in the starting the multi-threads method");
-            e.printStackTrace();
-        }
         
+        Thread requestThread = new Thread() {
+            public void run() {
+                tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
+
+                try {
+                    K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+                            tlsCheck);
+
+                    startMultiThreaded(httpJavaK8SProxy, localPort);
+                } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+                        | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
+                    System.err.println("Exception in the starting the multi-threads method");
+                    e.printStackTrace();
+                }                
+            }
+        };
+        requestThread.start();
+
+        System.out.println("Waiting");
         while (true) {
+            if (new File("/tmp/EndClientRun.k8s").exists()) {
+                break;
+            }
             TimeUtils.sleep(1);
         }
     }
