@@ -192,8 +192,12 @@ public class ServerHttpJavaK8SProxy {
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
         final Charset encoding = StandardCharsets.UTF_8;
-
+        
+        File file = new File("ServerReady.k8s"); 
+        file.createNewFile();
+        
         while (true) {
+            
             final Socket socket = serverSocket.accept();
 //            System.out.println("Accept socket");
 

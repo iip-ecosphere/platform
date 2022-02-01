@@ -194,6 +194,9 @@ public class ClientHttpJavaK8SProxy {
 
         final Charset encoding = StandardCharsets.UTF_8;
 
+        File file = new File("ClientReady.k8s"); 
+        file.createNewFile();
+        
         while (true) {
             final Socket socket = serverSocket.accept();
 //            System.out.println("Accept socket");
