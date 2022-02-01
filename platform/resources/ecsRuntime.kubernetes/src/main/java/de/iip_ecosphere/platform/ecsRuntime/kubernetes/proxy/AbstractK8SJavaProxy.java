@@ -633,14 +633,14 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
                 byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
                 responseBody = Arrays.concatenate(responseBody, "\r\n".getBytes());
 
-                String test1 = new String(responseBody);
-                String test2 = new String(firstPart);
-                String test3 = new String(formattedResponsebyte);
+//                String test1 = new String(responseBody);
+//                String test2 = new String(firstPart);
+//                String test3 = new String(formattedResponsebyte);
 
                 responseBody = Arrays.concatenate(firstPart, responseBody);
                 responseBody = Arrays.concatenate(formattedResponsebyte, responseBody);
 
-                String test4 = new String(responseBody);
+//                String test4 = new String(responseBody);
                 
                 writer.write(responseBody);
                 writer.flush();
@@ -660,19 +660,19 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
                 byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
                 responseBody = Arrays.concatenate(responseBody, "\r\n".getBytes());
 
-                String test1 = new String(responseBody);
-                String test2 = new String(firstPart);
+//                String test1 = new String(responseBody);
+//                String test2 = new String(firstPart);
 
                 responseBody = Arrays.concatenate(firstPart, responseBody);
 
-                String test4 = new String(responseBody);
+//                String test4 = new String(responseBody);
 
                 writer.write(responseBody);
                 writer.flush();
             } 
         } catch (SocketTimeoutException e) {
             if (e.getMessage().contentEquals("timeout") || e.getMessage().contentEquals("Read timed out")) {
-                System.out.println(e.getMessage());
+                String timeout = "timeout";
             } else {
                 e.printStackTrace();
             }
