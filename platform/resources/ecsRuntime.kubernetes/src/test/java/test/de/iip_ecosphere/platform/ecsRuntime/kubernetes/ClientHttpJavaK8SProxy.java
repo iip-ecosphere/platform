@@ -99,7 +99,7 @@ public class ClientHttpJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-        Thread requestThread = new Thread() {
+        Thread requestThread = new Thread() { 
             public void run() {
                 tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
 
