@@ -121,7 +121,7 @@ public class ClientHttpJavaK8SProxy {
 
         System.out.println("Waiting");
         while (true) {
-            if (new File("/tmp/EndServerRun.k8s").exists()) {
+            if (new File("/tmp/EndClientRun.k8s").exists()) {
                 try {
                     serverSocketList.get(0).close();
                 } catch (IOException e) {
