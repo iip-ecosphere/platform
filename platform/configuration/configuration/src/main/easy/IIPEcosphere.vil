@@ -129,7 +129,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
-            //maven("${appRoot}", true);
+            maven("${appRoot}", true);
         };
     }
     
