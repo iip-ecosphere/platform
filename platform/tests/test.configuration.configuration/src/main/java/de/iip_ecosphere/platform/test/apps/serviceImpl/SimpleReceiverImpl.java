@@ -17,14 +17,14 @@ import java.io.InputStream;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
-import iip.interfaces.SimpleDataReceiverService;
+import iip.interfaces.SimpleDataReceiverInterface;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleReceiverImpl extends DefaultServiceImpl implements SimpleDataReceiverService {
+public class SimpleReceiverImpl extends DefaultServiceImpl implements SimpleDataReceiverInterface {
 
     /**
      * Fallback constructor.
@@ -44,7 +44,7 @@ public class SimpleReceiverImpl extends DefaultServiceImpl implements SimpleData
     }
 
     @Override
-    public void receiveRec1(Rec1 data) {
+    public void processRec1(Rec1 data) {
         System.out.println("RECEIVED " + data.getStringField() + " " + data.getIntField());
     }
 

@@ -24,22 +24,22 @@
      <version>${project.version}</version>
     </dependency>
     <dependency>
-     <artifactId>SimpleMeshTestingApp</artifactId>
-     <groupId>de.iip-ecosphere.platform.apps</groupId>
-     <version>0.1.0-SNAPSHOT</version>
-     <classifier>interfaces</classifier>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesSimpleMesh</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
     </dependency>
     <dependency>
-     <artifactId>SimpleMeshTestingApp3</artifactId>
-     <groupId>de.iip-ecosphere.platform.apps</groupId>
-     <version>0.1.0-SNAPSHOT</version>
-     <classifier>interfaces</classifier>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesSimpleMesh3</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
     </dependency>
     <dependency>
-     <artifactId>SimpleKodexTestingApp</artifactId>
-     <groupId>de.iip-ecosphere.platform.apps</groupId>
-     <version>0.1.0-SNAPSHOT</version>
-     <classifier>interfaces</classifier>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesKodex</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
     </dependency>    
   
     <dependency>
@@ -71,9 +71,9 @@
                                  but for CI testing convenient form. Typically there shall be just one project
                                  per app so that the python sources cannot overlap/interfere. -->
                             <artifactItem>
-                                <groupId>de.iip-ecosphere.platform.apps</groupId>
-                                <artifactId>SimpleKodexTestingApp</artifactId>
-                                <version>0.1.0-SNAPSHOT</version>
+                                <groupId>de.iip-ecosphere.platform</groupId>
+                                <artifactId>apps.AppInterfacesKodex</artifactId>
+                                <version>${project.version}</version>
                                 <type>zip</type>
                                 <classifier>python</classifier>
                                 <overWrite>true</overWrite>

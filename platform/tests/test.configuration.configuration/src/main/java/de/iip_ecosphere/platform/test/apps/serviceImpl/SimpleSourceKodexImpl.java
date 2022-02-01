@@ -20,9 +20,9 @@ import java.util.TimerTask;
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.Rec13;
-import iip.datatypes.Rec13Impl;
-import iip.interfaces.SimpleDataSource3Interface;
+import iip.datatypes.KRec13;
+import iip.datatypes.KRec13Impl;
+import iip.interfaces.SimpleKodexDataSourceInterface;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -30,7 +30,7 @@ import iip.interfaces.SimpleDataSource3Interface;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceMonikaImpl extends DefaultServiceImpl implements SimpleDataSource3Interface {
+public class SimpleSourceKodexImpl extends DefaultServiceImpl implements SimpleKodexDataSourceInterface {
 
     private Timer timer = new Timer();
     private Random random = new Random();
@@ -38,7 +38,7 @@ public class SimpleSourceMonikaImpl extends DefaultServiceImpl implements Simple
     /**
      * Fallback constructor.
      */
-    public SimpleSourceMonikaImpl() {
+    public SimpleSourceKodexImpl() {
         super(ServiceKind.SOURCE_SERVICE);
     }
     
@@ -48,7 +48,7 @@ public class SimpleSourceMonikaImpl extends DefaultServiceImpl implements Simple
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleSourceMonikaImpl(String serviceId, InputStream ymlFile) {
+    public SimpleSourceKodexImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 
@@ -59,8 +59,8 @@ public class SimpleSourceMonikaImpl extends DefaultServiceImpl implements Simple
     *
     * @return the created data, <b>null</b> for no data
     */
-    public Rec13 produceRec13() {
-        Rec13 rec = new Rec13Impl();
+    public KRec13 produceKRec13() {
+        KRec13 rec = new KRec13Impl();
         rec.setIntField(random.nextInt());
         rec.setStringField("SYNC");
         return rec;
@@ -71,13 +71,13 @@ public class SimpleSourceMonikaImpl extends DefaultServiceImpl implements Simple
      *
      * @param ingestor the "Rec13" ingestor instance
      */
-    public void attachRec13Ingestor(final DataIngestor<Rec13> ingestor) {
+    public void attachKRec13Ingestor(final DataIngestor<KRec13> ingestor) {
         if (null != ingestor) {
             timer.schedule(new TimerTask() {
                 
                 @Override
                 public void run() {
-                    Rec13 rec = new Rec13Impl();
+                    KRec13 rec = new KRec13Impl();
                     rec.setIntField(random.nextInt());
                     rec.setStringField("ASYNC");
                     ingestor.ingest(rec);

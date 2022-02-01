@@ -21,7 +21,8 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
-import iip.interfaces.SimpleDataSourceService;
+import iip.datatypes.Rec1Impl;
+import iip.interfaces.SimpleDataSourceInterface;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -29,7 +30,7 @@ import iip.interfaces.SimpleDataSourceService;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSourceService {
+public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSourceInterface {
 
     private Timer timer = new Timer();
     private Random random = new Random();
@@ -58,8 +59,8 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
     *
     * @return the created data, <b>null</b> for no data
     */
-    public Rec1 createRec1() {
-        Rec1 rec = new Rec1();
+    public Rec1 produceRec1() {
+        Rec1 rec = new Rec1Impl();
         rec.setIntField(random.nextInt());
         rec.setStringField("SYNC");
         return rec;
@@ -70,13 +71,13 @@ public class SimpleSourceImpl extends DefaultServiceImpl implements SimpleDataSo
      *
      * @param ingestor the "Rec1" ingestor instance
      */
-    public void attachcreateRec1_SimpleSourceIngestor(final DataIngestor<Rec1> ingestor) {
+    public void attachRec1Ingestor(final DataIngestor<Rec1> ingestor) {
         if (null != ingestor) {
             timer.schedule(new TimerTask() {
                 
                 @Override
                 public void run() {
-                    Rec1 rec = new Rec1();
+                    Rec1 rec = new Rec1Impl();
                     rec.setIntField(random.nextInt());
                     rec.setStringField("ASYNC");
                     ingestor.ingest(rec);

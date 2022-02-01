@@ -16,15 +16,15 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.Rec13Anon;
-import iip.interfaces.KodexDataReceiverService;
+import iip.datatypes.KRec13Anon;
+import iip.interfaces.KodexDataReceiverInterface;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class KodexReceiverImpl extends DefaultServiceImpl implements KodexDataReceiverService {
+public class KodexReceiverImpl extends DefaultServiceImpl implements KodexDataReceiverInterface {
 
     /**
      * Fallback constructor.
@@ -44,7 +44,7 @@ public class KodexReceiverImpl extends DefaultServiceImpl implements KodexDataRe
     }
 
     @Override
-    public void receiveRec13Anon(Rec13Anon data) {
+    public void processKRec13Anon(KRec13Anon data) {
         System.out.println("RECEIVED " + data.getKip() + " " + data.getStringField() + " " + data.getIntField());
     }
 

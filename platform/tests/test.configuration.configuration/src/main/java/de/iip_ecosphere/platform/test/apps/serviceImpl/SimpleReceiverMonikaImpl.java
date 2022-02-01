@@ -24,14 +24,14 @@ import java.time.LocalDate;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec13;
-import iip.interfaces.SimpleDataReceiver3Service;
+import iip.interfaces.SimpleDataReceiver3Interface;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Monika Staciwa, SSE
  */
-public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements SimpleDataReceiver3Service {
+public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements SimpleDataReceiver3Interface {
 
     /**
      * Fallback constructor.
@@ -52,7 +52,7 @@ public class SimpleReceiverMonikaImpl extends DefaultServiceImpl implements Simp
     }
 
     @Override
-    public void receiveRec13(Rec13 data) {
+    public void processRec13(Rec13 data) {
         System.out.println("TestApp03 RECEIVED " + data.getStringField() + " " + data.getIntField());
 
         // Creating new file

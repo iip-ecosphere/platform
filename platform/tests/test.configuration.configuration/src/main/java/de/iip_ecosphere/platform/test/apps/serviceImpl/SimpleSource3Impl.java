@@ -21,7 +21,8 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec13;
-import iip.interfaces.SimpleDataSource3Service;
+import iip.datatypes.Rec13Impl;
+import iip.interfaces.SimpleDataSource3Interface;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -29,7 +30,7 @@ import iip.interfaces.SimpleDataSource3Service;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSource3Impl extends DefaultServiceImpl implements SimpleDataSource3Service {
+public class SimpleSource3Impl extends DefaultServiceImpl implements SimpleDataSource3Interface {
 
     private Timer timer = new Timer();
     private Random random = new Random();
@@ -58,8 +59,8 @@ public class SimpleSource3Impl extends DefaultServiceImpl implements SimpleDataS
     *
     * @return the created data, <b>null</b> for no data
     */
-    public Rec13 createRec13() {
-        Rec13 rec = new Rec13();
+    public Rec13 produceRec13() {
+        Rec13 rec = new Rec13Impl();
         rec.setIntField(random.nextInt());
         rec.setStringField("SYNC");
         return rec;
@@ -68,15 +69,15 @@ public class SimpleSource3Impl extends DefaultServiceImpl implements SimpleDataS
     /**
      * Called by the platform to attach an asynchronous data ingestor for type "Rec1".
      *
-     * @param ingestor the "Rec1" ingestor instance
+     * @param ingestor the "Rec13" ingestor instance
      */
-    public void attachcreateRec1_SimpleSourceIngestor(final DataIngestor<Rec13> ingestor) {
+    public void attachRec13Ingestor(final DataIngestor<Rec13> ingestor) {
         if (null != ingestor) {
             timer.schedule(new TimerTask() {
                 
                 @Override
                 public void run() {
-                    Rec13 rec = new Rec13();
+                    Rec13 rec = new Rec13Impl();
                     rec.setIntField(random.nextInt());
                     rec.setStringField("ASYNC");
                     ingestor.ingest(rec);
