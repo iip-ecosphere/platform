@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractService implements Service, ParameterConfigurerProvider {
+public abstract class AbstractService implements Service {
 
     private String id;
     private String name;
@@ -372,11 +372,6 @@ public abstract class AbstractService implements Service, ParameterConfigurerPro
         } catch (IOException e) {
             throw new ExecutionException(e);
         }
-    }
-
-    @Override
-    public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
-        return null;
     }
     
     @Override

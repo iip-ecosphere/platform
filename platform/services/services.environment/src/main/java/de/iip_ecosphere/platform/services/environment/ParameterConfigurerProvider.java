@@ -20,7 +20,8 @@ package de.iip_ecosphere.platform.services.environment;
 public interface ParameterConfigurerProvider {
 
     /**
-     * Returns the parameter configurer.
+     * Returns the parameter configurer for a given parameter. We need this generic approach to ease code 
+     * generation and initial setting of parameter values.
      * 
      * @param paramName the name of the parameter
      * @return the associated parameter configurer or <b>null</b> if there is none

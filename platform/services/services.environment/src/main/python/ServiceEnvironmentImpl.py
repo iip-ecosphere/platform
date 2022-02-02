@@ -40,7 +40,7 @@ def start(a):
     parser.add_argument('--sid', dest='sId', action='store', nargs=1, type=str, required=True,
         default="", help='Id of the service to execute.')    
     parser.add_argument('--configure', dest='config', action='store', nargs=1, type=str, required=False,
-        default="", help='JSON value map to be passed to the service for 'reconfiguration'.')    
+        default="", help='JSON value map to be passed to the service for initial reconfiguration.')    
         
     args = parser.parse_args(a)
 

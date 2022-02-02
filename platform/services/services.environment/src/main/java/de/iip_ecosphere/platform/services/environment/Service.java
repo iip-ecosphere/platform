@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Service {
+public interface Service extends ParameterConfigurerProvider {
 
     /**
      * Returns the unique id of the service.
@@ -132,5 +132,10 @@ public interface Service {
      * @throws ExecutionException if reconfiguration fails
      */
     public void reconfigure(Map<String, String> values) throws ExecutionException;
+
+    @Override
+    public default ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+        return null;
+    }
 
 }
