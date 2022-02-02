@@ -8,7 +8,10 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
- * Default service implementation realizing the left open methods of {@link AbstractService} empty.
+ * Default service implementation realizing the left open methods of {@link AbstractService} empty. Uses 
+ * {@link #reconfigure(Map, Map, boolean, ServiceState)}, {@link #setParameterConfigurer(Map)} and 
+ * {@link #rollbackReconfigurationOnFailure()} to generically implement {@link #reconfigure(Map)}, i.e., define
+ * the relevant parameters for
  */
 public class DefaultServiceImpl extends AbstractService {
 
@@ -79,10 +82,6 @@ public class DefaultServiceImpl extends AbstractService {
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
-    }
-
-    @Override
-    public void reconfigure(Map<String, String> values) throws ExecutionException {
     }
 
 }

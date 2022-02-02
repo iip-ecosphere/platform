@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -342,23 +346,42 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
             LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
         }
     }
+    
+    /**
+     * Turns a map of string values into JSON.
+     * 
+     * @param reconfValues the values to turn into JSON
+     * @return the JSON representation
+     */
+    protected String toJson(Map<String, String> reconfValues) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(reconfValues);
+        } catch (JsonProcessingException e) {
+            getLogger().error("Translating " + reconfValues + " to JSON failed: " + e.getMessage());
+            return "{}";
+        }
+    }
 
     /**
      * Creates and customizes the process.
      * 
      * @param data the data to be directly handed to the process via command line
+     * @param reconfValues values to (re)configure the service environment, may be <b>null</b> for none
      * @return the process
      * @throws ExecutionException if the process cannot be created
      */
-    protected Process createAndCustomizeProcess(String data) throws ExecutionException {
+    protected Process createAndCustomizeProcess(String data, Map<String, String> reconfValues) 
+        throws ExecutionException {
         try {
-            List<String> args;
-            if (data != null) {
-                args = new ArrayList<String>(pythonArgs);
-                args.add(data);
-            } else {
-                args = pythonArgs;
+            List<String> args = new ArrayList<String>(pythonArgs);
+            if (null != reconfValues && reconfValues.size() > 0) {
+                args.add("-configure");
+                args.add(toJson(reconfValues));
             }
+            if (null != data) {
+                args.add(data);
+            } 
             Process proc = AbstractProcessService.createProcess(PythonUtils.getPythonExecutable(), 
                 startExecutableByName(), home, args);
             handleErrorStream(proc.getErrorStream());

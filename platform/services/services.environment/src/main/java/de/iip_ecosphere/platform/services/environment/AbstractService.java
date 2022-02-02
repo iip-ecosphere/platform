@@ -16,11 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * Basic implementation of the service interface (aligned with Python). Implementing classes shall at least either
@@ -28,10 +32,12 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * taking the service id or a constructor like {@link #AbstractService(String, InputStream)}.
  * The three types of constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
  * {@link #createInstance(ClassLoader, String, Class, String, String)} to be used from generated service code.
+ * {@link #reconfigure(Map)} is generically implemented via {@link #getParameterConfigurer(String)} (shall be 
+ * overwritten), {@link #rollbackReconfigurationOnFailure()} and {@link #reconfigure(Map, Map, boolean, ServiceState)}
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractService implements Service {
+public abstract class AbstractService implements Service, ParameterConfigurerProvider {
 
     private String id;
     private String name;
@@ -262,5 +268,133 @@ public abstract class AbstractService implements Service {
             setState(ServiceState.PASSIVATED);
         }
     }
+    
+    /**
+     * Helper method to add parameter configurers to {@code configurers} (without getter for rollback).
+     *  
+     * @param <T> the parameter type
+     * @param configurers the configurers map to be modified
+     * @param name the name of the parameter
+     * @param cls the class representing the parameter type
+     * @param trans the type translator to turn initial string values into internal values
+     * @param cfg the value configurer that may change the value / throw exceptions
+     */
+    public static <T> void addConfigurer(Map<String, ParameterConfigurer<?>> configurers, String name, 
+        Class<T> cls, TypeTranslator<String, T> trans, ValueConfigurer<T> cfg) {
+        addConfigurer(configurers, name, cls, trans, cfg, null);
+    }
+    
+    // checkstyle: stop parameter number check
+
+    /**
+     * Helper method to add parameter configurers to {@code configurers}.
+     * 
+     * @param <T> the parameter type
+     * @param configurers the configurers map to be modified
+     * @param name the name of the parameter
+     * @param cls the class representing the parameter type
+     * @param trans the type translator to turn initial string values into internal values
+     * @param cfg the value configurer that may change the value / throw exceptions
+     * @param getter the getter for the value (may be <b>null</b> for none, prevents rollback)
+     */
+    public static <T> void addConfigurer(Map<String, ParameterConfigurer<?>> configurers, String name, 
+        Class<T> cls, TypeTranslator<String, T> trans, ValueConfigurer<T> cfg, Supplier<T> getter) {
+        configurers.put(name, new ParameterConfigurer<T>(name, cls, trans, cfg, getter));
+    }
+
+    // checkstyle: resume parameter number check
+
+    /**
+     * Generic service reconfiguration via values that may be passed in through {@link #reconfigure(Map)}.
+     * Prepared that code generation can hook in any parameter attributes.
+     * 
+     * @param values the values to reconfigure in the encoding requested by {@link #reconfigure(Map)}. The specified
+     *   configurers must provide appropriate serializers to turn individual values into compatible objects
+     * @param provider access to the parameter configurers (may be <b>null</b>, then nothing happens)
+     * @param rollback whether a rollback shall be performed if reconfiguration leads to exceptions on individual 
+     *   parameters
+     * @param state the state of the service. Currently unused, but may be used to filter out parameter reconfigurations
+     * @throws ExecutionException if the reconfiguration cannot be carried out; if {@code rollback} is {@code true} 
+     *   and getters for individual parameters are available in the {@link ParameterConfigurer}, a rollback of the 
+     *   values set before will be carried out
+     */
+    public static void reconfigure(Map<String, String> values, ParameterConfigurerProvider provider, 
+        boolean rollback, ServiceState state) throws ExecutionException {
+        if (null != provider) {
+            Map<String, String> rollbackMap = rollback ? new HashMap<>() : null;
+            try {
+                for (Map.Entry<String, String> ent : values.entrySet()) {
+                    ParameterConfigurer<?> cfg = provider.getParameterConfigurer(ent.getKey());
+                    if (null != cfg) {
+                        reconf(cfg, ent.getKey(), ent.getValue(), rollbackMap);
+                    }
+                }
+            } catch (ExecutionException e) {
+                if (null != rollbackMap) {
+                    for (Map.Entry<String, String> ent : rollbackMap.entrySet()) {
+                        try {
+                            ParameterConfigurer<?> cfg = provider.getParameterConfigurer(ent.getKey());
+                            if (null != cfg) {
+                                reconf(cfg, ent.getKey(), ent.getValue(), rollbackMap);
+                            }
+                        } catch (ExecutionException e1) {
+                            // do as much as possible, ignore execution exceptions during rollback 
+                        }
+                    }
+                }
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Reconfigures an individual parameter.
+     * 
+     * @param <T> the parameter type
+     * @param configurer the configurer to use
+     * @param name the name of the parameter to reconfigure
+     * @param value the value, may be <b>null</b>
+     * @param rollbackMap the rollback
+     * @throws ExecutionException
+     */
+    protected static <T> void reconf(ParameterConfigurer<T> configurer, String name, String value, 
+        Map<String, String> rollbackMap) throws ExecutionException {
+        try {
+            TypeTranslator<String, T> trans = configurer.getTranslator();
+            if (null != rollbackMap) {
+                Supplier<T> getter = configurer.getGetter();
+                if (null != getter) {
+                    T v = getter.get();
+                    rollbackMap.put(name, v == null ? null : trans.from(v));
+                }
+            }
+            configurer.configure(null == value ? null : trans.to(value));
+        } catch (IOException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    @Override
+    public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+        return null;
+    }
+    
+    @Override
+    public void reconfigure(Map<String, String> values) throws ExecutionException {
+        reconfigure(values, this, rollbackReconfigurationOnFailure(), getState());
+    }
+
+    /**
+     * Returns whether the configuration shall be rolled by on failures. 
+     * 
+     * @return {@code true}
+     * 
+     * @see #reconfigure(Map)
+     * @see #reconfigure(Map, Map, boolean, ServiceState)
+     */
+    protected boolean rollbackReconfigurationOnFailure() {
+        return true;
+    }
+
 
 }

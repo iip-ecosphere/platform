@@ -32,6 +32,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     StarterTest.class,
     ProcessServiceTest.class,
     AbstractProcessServiceTest.class,
+    ReconfigureTest.class,
     
     MetricsProviderTests.class
 })

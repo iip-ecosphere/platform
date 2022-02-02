@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.environment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,7 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
 
     private int timeout = 1;
     private TimeUnit timeoutUnit = TimeUnit.SECONDS;
+    private Map<String, String> reconfValues;
 
     /**
      * Creates an instance from a service id and a YAML artifact.
@@ -78,10 +80,27 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
     public void switchTo(String targetId) throws ExecutionException {
         // do within Java
     }
+    
+    @Override
+    public void activate() throws ExecutionException {
+        super.setState(ServiceState.ACTIVATING);
+        stop();
+        super.setState(ServiceState.ACTIVATING);
+    }
+
+    @Override
+    public void passivate() throws ExecutionException {
+        super.setState(ServiceState.PASSIVATING);
+        start();
+        super.setState(ServiceState.PASSIVATED);
+    }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
-        // do within Java
+        if (null == reconfValues) {
+            reconfValues = new HashMap<>();
+        }
+        reconfValues.putAll(values); // overwrite existing
     }
 
     /**
@@ -103,7 +122,7 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
             if (null != inT) {
                 try {
                     AtomicReference<O> tmp = new AtomicReference<O>();
-                    Process proc = createAndCustomizeProcess(compose(inType, inT.to(data)));
+                    Process proc = createAndCustomizeProcess(compose(inType, inT.to(data)), reconfValues);
                     createScanInputThread(proc, (t, d) -> {
                         OutTypeInfo<?> oInfo = getOutTypeInfo(t);
                         if (null != oInfo) {

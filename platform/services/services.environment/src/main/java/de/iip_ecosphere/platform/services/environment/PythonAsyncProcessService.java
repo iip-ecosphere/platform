@@ -72,7 +72,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
      * @see #startExecutableByName()
      */
     protected void start() throws ExecutionException {
-        proc = createAndCustomizeProcess(null);
+        proc = createAndCustomizeProcess(null, null);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
         serviceIn = new PrintWriter(writer);
         createScanInputThread(proc, (t, d) -> {
@@ -102,22 +102,38 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     
     @Override
     public void migrate(String resourceId) throws ExecutionException {
-        // let's see, may be generically possible for Python, VAB?
+        sendToService(compose("*migrate", resourceId));
     }
 
     @Override
     public void update(URI location) throws ExecutionException {
-        // let's see, may be generically possible for Python, VAB?
+        sendToService(compose("*update", location.toString()));
     }
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
-        // let's see, may be generically possible for Python, VAB?
+        sendToService(compose("*switch", targetId));
     }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
-        // let's see, may be generically possible for Python, VAB?
+        sendToService(compose("*recfg", toJson(values)));
+    }
+    
+    @Override
+    public void activate() throws ExecutionException {
+        if (getState() == ServiceState.PASSIVATED) {
+            sendToService(compose("*activate", ""));
+        }
+        super.activate(); // TODO access to state -> Python
+    }
+
+    @Override
+    public void passivate() throws ExecutionException {
+        if (getState() == ServiceState.RUNNING) {
+            sendToService(compose("*passivate", ""));
+        }
+        super.passivate(); // TODO access to state -> Python
     }
 
     /**
@@ -129,6 +145,21 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         return LoggerFactory.getLogger(PythonAsyncProcessService.class);
     }
 
+    /**
+     * Sends {@code text} as input to the service process.
+     * 
+     * @param text the text to be sent
+     * @throws ExecutionException if sending fails for some reason
+     */
+    private void sendToService(String text) throws ExecutionException {
+        if (null != serviceIn) {
+            serviceIn.println(text);
+            serviceIn.flush();
+        } else {
+            throw new ExecutionException("Service/process not started,", null);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <I, O> O process(String inType, I data) throws ExecutionException {
@@ -136,15 +167,10 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         if (null != info) {
             TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.getInTranslator();
             if (null != inT) {
-                if (null != serviceIn) {
-                    try {
-                        serviceIn.println(compose(inType, inT.to(data)));
-                        serviceIn.flush();
-                    } catch (IOException e) {
-                        throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
-                    }
-                } else {
-                    throw new ExecutionException("Service/process not started,", null);
+                try {
+                    sendToService(compose(inType, inT.to(data)));
+                } catch (IOException e) {
+                    throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
                 }
             } else {
                 throw new ExecutionException("No input type translator registered", null);

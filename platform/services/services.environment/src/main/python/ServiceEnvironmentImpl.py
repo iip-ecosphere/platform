@@ -6,6 +6,7 @@ import argparse
 import importlib
 import time
 import os
+import json
 import Registry
 
 # for command line version of service environment: do not emit anything to system out rather than intended results
@@ -38,6 +39,8 @@ def start(a):
         default="", help='The operation mode of the environment (values: console, default: console).')    
     parser.add_argument('--sid', dest='sId', action='store', nargs=1, type=str, required=True,
         default="", help='Id of the service to execute.')    
+    parser.add_argument('--configure', dest='config', action='store', nargs=1, type=str, required=False,
+        default="", help='JSON value map to be passed to the service for 'reconfiguration'.')    
         
     args = parser.parse_args(a)
 
@@ -59,6 +62,10 @@ def start(a):
     #sys.stderr.write("sid: " + str(args.sId)+"\n")
     
     sId = args.sId[0]
+
+    if len(args.config) > 0:
+        service = Registry.services[sId]
+        service.reconfigure(json.loads(data))
 
     if len(args.mode) > 0 and args.mode[0]=='console':
         console(a, args.data, sId)
@@ -116,14 +123,29 @@ def process(composedData, sId):
         type = tmp[0]
         data = tmp[1]
         
-        serializer = Registry.serializers[type]
-        if serializer is not None:
-            d = serializer.readFrom(str(data))
-            func = Registry.asyncTransformers[sId+"_"+type]
-            if func is not None:
-                func(d) #ingestor takes result
-            else:
-                func = Registry.syncTransformers[sId]
+        if type.startswith('*'):
+            service = Registry.services[sId]
+            if type == '*migrate':
+                service.migrate(data)
+            elif type == '*update':
+                service.update(data)
+            elif type == '*switch':
+                service.switchTo(data)
+            elif type == '*recfg':
+                service.reconfigure(json.loads(data))
+            elif type == '*activate':
+                service.activate()
+            elif type == '*passivate':
+                service.passivate()
+        else :
+            serializer = Registry.serializers[type]
+            if serializer is not None:
+                d = serializer.readFrom(str(data))
+                func = Registry.asyncTransformers[sId+"_"+type]
                 if func is not None:
-                    consoleIngestResult(func(d))
+                    func(d) #ingestor takes result
+                else:
+                    func = Registry.syncTransformers[sId]
+                    if func is not None:
+                        consoleIngestResult(func(d))
         
