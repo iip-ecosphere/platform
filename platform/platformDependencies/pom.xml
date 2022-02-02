@@ -91,6 +91,7 @@
     <com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
     <org.glassfish.javax.json.version>1.1.4</org.glassfish.javax.json.version>
     <apache.commons.version>2.6</apache.commons.version>    
+    <apache.commons.text.version>1.9</apache.commons.text.version>    
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
@@ -185,6 +186,11 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>${apache.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${apache.commons.text.version}</version>
       </dependency>
     
       <!-- Serialization  -->
