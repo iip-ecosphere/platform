@@ -62,7 +62,53 @@ project Services {
    
    isDefined(serviceProtocol);
 
-   // -------------------- services ------------------
+   // -------------------- service parameters -------------------------
+   
+    compound Parameter refines CReversibleProperty {
+    }
+    typedef Parameters sequenceOf(Parameter) with (Parameters->collect(p|p.name).size() == Parameters.size()/*  and isDefined(Parameters)*/);
+
+    compound IntegerParameter refines Parameter {
+        Integer defaultValue;
+        /*assign(bindingTime = BindingTime.runtimeEnact) to {
+            Integer value;
+        }*/
+        //Constraint defaultValueCheck = isDefined(defaultValue);
+    }
+    
+    compound StringParameter refines Parameter {
+        String defaultValue;
+        /*assign(bindingTime = BindingTime.runtimeEnact) to {
+            String value;
+        }*/
+        //Constraint defaultValueCheck = isDefined(defaultValue);
+    }
+
+    compound RealParameter refines Parameter {
+        Real defaultValue;
+        /*assign(bindingTime = BindingTime.runtimeEnact) to {
+            Real value;
+        }*/
+        //Constraint defaultValueCheck = isDefined(defaultValue);
+    }
+
+    compound BooleanParameter refines Parameter {
+        Boolean defaultValue;
+        /*assign(bindingTime = BindingTime.runtimeEnact) to {
+            Boolean value;
+        }*/
+        //Constraint defaultValueCheck = isDefined(defaultValue);
+    }
+    
+    compound LongParameter refines Parameter {
+        Real defaultValue;
+        /*assign(bindingTime = BindingTime.runtimeEnact) to {
+            Real value;
+        }*/
+        //Constraint defaultValueCheck = isDefined(defaultValue);
+    }
+   
+   // -------------------- services -----------------------------------
 
    // required by meta concepts, direct ref would be alternative but conflit with QM   
    compound IOType refines CDataProperty {
@@ -83,8 +129,7 @@ project Services {
        Boolean asynchronous = true;
        sequenceOf(IOType) input;
        sequenceOf(IOType) output;
-       // TODO refine parameter
-       //sequenceOf(CReversibleProperty) parameters;
+       Parameters parameter = {};
        setOf(refTo(EcsDevice)) requires;
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
 

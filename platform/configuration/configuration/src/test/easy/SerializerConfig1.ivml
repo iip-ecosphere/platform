@@ -77,7 +77,6 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(StringType)}}
-        // TODO parameter
     };
     
     RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
@@ -138,8 +137,13 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(StringType)}},
-        output = {{type=refBy(rec1)}}
-        // TODO parameter
+        output = {{type=refBy(rec1)}},
+        parameter = {
+          BooleanParameter {
+            name="passThrough", 
+            defaultValue=false
+          }
+        }
     };
 
     Service myKiService = JavaService {
@@ -153,8 +157,13 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(StringType)}}
-        // TODO parameter
+        output = {{type=refBy(StringType)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
     };
 
     // ------------ application and service nets ------------------

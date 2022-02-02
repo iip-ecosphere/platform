@@ -171,6 +171,52 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }'
     } 
     
+    // ----------------------- initial service parameters -----------------------------------------------
+    
+    def generateParameterInit(ServiceBase service) {
+        Parameters params = service.parameter;
+        if (size(params) > 0) {
+            'HashMap<String, String> paramValues = new HashMap<>();
+            ParameterConfigurer<?> cfg;'
+            for (Parameter p: params) {
+                // TODO compile time?
+                'cfg = service.getParameterConfigurer("${p.name}");
+                if (null != cfg) {
+                    ${generateParameterInit(p)}
+                }'
+            }
+            'try {
+                service.reconfigure(paramValues);
+            } catch (ExecutionException e) {
+                LoggerFactory.getLogger(getClass()).error("Configuring initial parameter: " + e.getMessage());
+            }'
+        }
+    }
+
+    def generateParameterInit(CReversibleProperty p) {
+        '//type not considered in generation, please detail dynamic dispatch'
+    }
+    
+    def generateParameterInit(IntegerParameter p) {
+        'cfg.addValue(paramValues, ${p.defaultValue});'
+    }
+
+    def generateParameterInit(StringParameter p) {
+        'cfg.addValue(paramValues, "${p.defaultValue}");'
+    }
+
+    def generateParameterInit(RealParameter p) {
+        'cfg.addValue(paramValues, (double) ${p.defaultValue});'
+    }
+
+    def generateParameterInit(BooleanParameter p) {
+        'cfg.addValue(paramValues, ${p.defaultValue});'
+    }
+
+    def generateParameterInit(LongParameter p) {
+        'cfg.addValue(paramValues, ${p.value}L);'
+    }
+        
     // --------------- initial service to obtain a service instance to run with -------------------------
     
     def initialService(MeshElement elt, ServiceBase service) {
@@ -194,6 +240,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String serviceType = getServiceType(elt, service);
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
             'Starter.mapService(service);'
+            '${generateParameterInit(service)|e}'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -295,8 +342,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def generateImports(KodexService service) {
         'import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;
-        import org.slf4j.LoggerFactory;'
+        import com.fasterxml.jackson.core.JsonProcessingException;'
     }
     
     def generateServiceAttribute(MeshProcessor elt, KodexService service) {
@@ -442,8 +488,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'package ${pkg};
         
         import java.io.IOException;
+        import java.util.*;
         import java.util.function.*;
+        import java.util.concurrent.ExecutionException;
         import javax.annotation.PostConstruct;
+        import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.context.annotation.Bean;
         import org.springframework.cloud.stream.function.StreamBridge;
