@@ -11,6 +11,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     String javaDatatypesPackage = "iip.datatypes";
     String javaSerializersPackage = "iip.serializers";
     String javaInterfacesPackage = "iip.interfaces";
+    String javaImplPackage = "iip.impl";
     String javaStubsPackage = "iip.stubs";
     String javaNodesPackage = "iip.nodes";
     String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
@@ -253,8 +254,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             generateServiceInterfaces(appRoot, config, s);
         }
         
-        vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-        assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
+        //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+        //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
         assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package");
             
@@ -277,7 +278,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         String clsName = asTypeName(service.name);
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        Path javaServiceImplSrc = "${javaSrc}/${toPath(javaImplPackage)}";
         vilTemplateProcessor("JavaServiceInterface", config, "${javaInterfacesSrc}/${clsName}Interface.java", service=service, pkg=javaInterfacesPackage);
+        vilTemplateProcessor("JavaServiceBaseImpl", config, "${javaServiceImplSrc}/${clsName}Impl.java", service=service, pkg=javaImplPackage);
     }
     
     generateServiceInterfaces(Path appRoot, Configuration config, CompleteService service) = {
