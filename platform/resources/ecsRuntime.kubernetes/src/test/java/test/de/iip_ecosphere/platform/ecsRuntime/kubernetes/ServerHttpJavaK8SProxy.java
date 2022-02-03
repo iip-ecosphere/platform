@@ -187,8 +187,10 @@ public class ServerHttpJavaK8SProxy {
             CertificateException, InvalidKeySpecException, IOException {
 
         if (new File("/tmp/EndServerRun.k8s").exists()) {
+            System.out.println("/tmp/EndServerRun.k8s is exist and stop the Client");
             return;
         }
+        
         ServerSocket serverSocket = httpJavaK8SProxy.getServerSocket(localPort, null, null, null, tlsCheck);
         serverSocketList.add(serverSocket);
         
