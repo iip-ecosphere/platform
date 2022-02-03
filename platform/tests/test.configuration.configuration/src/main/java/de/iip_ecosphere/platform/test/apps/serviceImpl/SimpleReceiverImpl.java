@@ -14,17 +14,16 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl;
 
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
-import iip.interfaces.SimpleDataReceiverInterface;
+import iip.impl.SimpleDataReceiverImpl;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleReceiverImpl extends DefaultServiceImpl implements SimpleDataReceiverInterface {
+public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
 
     /**
      * Fallback constructor.

@@ -18,11 +18,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
-import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.KRec13;
 import iip.datatypes.KRec13Impl;
-import iip.interfaces.SimpleKodexDataSourceInterface;
+import iip.impl.SimpleKodexDataSourceImpl;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -30,7 +29,7 @@ import iip.interfaces.SimpleKodexDataSourceInterface;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceKodexImpl extends DefaultServiceImpl implements SimpleKodexDataSourceInterface {
+public class SimpleSourceKodexImpl extends SimpleKodexDataSourceImpl {
 
     private Timer timer = new Timer();
     private Random random = new Random();

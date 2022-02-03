@@ -14,17 +14,16 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl;
 
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.KRec13Anon;
-import iip.interfaces.KodexDataReceiverInterface;
+import iip.impl.KodexDataReceiverImpl;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class KodexReceiverImpl extends DefaultServiceImpl implements KodexDataReceiverInterface {
+public class KodexReceiverImpl extends KodexDataReceiverImpl {
 
     /**
      * Fallback constructor.
