@@ -130,6 +130,25 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
             private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
 
             /**
+             * Fallback constructor setting most fields to "empty" default values.
+             * 
+             * @param kind the service kind
+             */
+            protected ${clsName}Impl(ServiceKind kind) {
+                super(kind);
+            }
+
+            /**
+             * Fallback constructor setting most fields to "empty" default values.
+             * 
+             * @param id the id of the service
+             * @param kind the service kind
+             */
+            protected ${clsName}Impl(String id, ServiceKind kind) {
+                super(id, kind);
+            }
+
+            /**
             * Creates a service instance from YAML information.
             * 
             * @param yaml the service information as read from YAML
