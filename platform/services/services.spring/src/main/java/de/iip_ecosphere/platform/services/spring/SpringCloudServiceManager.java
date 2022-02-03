@@ -196,7 +196,7 @@ public class SpringCloudServiceManager
      * 
      * @param serviceIds the services to determine the arguments for
      * @return the command line arguments
-     * @see #determineExternalConnections(String...)
+     * @see #determineExternalConnections(ServiceManager, String...)
      */
     private List<String> determineExternalServiceArgs(String... serviceIds) {
         return determineExternalConnections(this, serviceIds)
@@ -204,6 +204,18 @@ public class SpringCloudServiceManager
             .filter(c -> isValidId(c.getName()))
             .map(c -> "--spring.cloud.stream.bindings." + c.getName() + ".binder=external")
             .collect(Collectors.toList());
+    }
+    
+    /**
+     * Determines the cloud function argument for the given services.
+     * 
+     * @param serviceIds the services to determine the arguments for
+     * @return the command line arguments
+     * @see #determineInternalConnections(ServiceManager, String...)
+     */
+    private String determineCloudFunctionArg(String... serviceIds) {
+        return "--spring.cloud.function.definition=" 
+            + SpringCloudServiceDescriptor.toFunctionDefinition(determineInternalConnections(this, serviceIds));
     }
 
     @Override
@@ -213,7 +225,10 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
+        // re-link binders if needed, i.e., subset shall be started locally
         List<String> externalServiceArgs = determineExternalServiceArgs(serviceIds);
+        // adjust spring function definition from application.yml if subset of services shall be started 
+        externalServiceArgs.add(determineCloudFunctionArg(serviceIds));
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {

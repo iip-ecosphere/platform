@@ -1,0 +1,231 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package test.de.iip_ecosphere.platform.services.spring;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.iip_ecosphere.platform.services.AbstractServiceManager;
+import de.iip_ecosphere.platform.services.ArtifactDescriptor;
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
+import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
+import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+
+/**
+ * Tests selected service manager functionality based on simplified instances of a service manager loaded from 
+ * a descriptor file.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+public class ServiceMgrAndDescriptorTest {
+    
+    /**
+     * A mocking service manager for a given service artifact. Only selected functions are implemented!
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MockServiceManager implements ServiceManager {
+
+        private Map<String, SpringCloudArtifactDescriptor> arts = new HashMap<>();
+        private Map<String, SpringCloudServiceDescriptor> svc = new HashMap<>();
+
+        /**
+         * Creates a service manager instance for the given artifact descriptor.
+         * 
+         * @param aDesc the artifact descriptor to analyze
+         */
+        private MockServiceManager(SpringCloudArtifactDescriptor aDesc) {
+            arts.put(aDesc.getId(), aDesc);
+            for (SpringCloudServiceDescriptor s: aDesc.getServices()) {
+                svc.put(s.getId(), s);
+            }
+        }
+        
+        @Override
+        public void updateService(String serviceId, URI location) throws ExecutionException {
+        }
+        
+        @Override
+        public void switchToService(String serviceId, String targetId) throws ExecutionException {
+        }
+        
+        @Override
+        public void stopService(String... serviceId) throws ExecutionException {
+        }
+        
+        @Override
+        public void startService(String... serviceId) throws ExecutionException {
+        }
+        
+        @Override
+        public void setServiceState(String serviceId, ServiceState state) throws ExecutionException {
+        }
+        
+        @Override
+        public void removeArtifact(String artifactId) throws ExecutionException {
+        }
+        
+        @Override
+        public void reconfigureService(String serviceId, Map<String, String> values) throws ExecutionException {
+        }
+        
+        @Override
+        public void passivateService(String serviceId) throws ExecutionException {
+        }
+        
+        @Override
+        public void migrateService(String serviceId, String resourceId) throws ExecutionException {
+        }
+        
+        @Override
+        public ServiceState getServiceState(String serviceId) {
+            return null;
+        }
+        
+        @Override
+        public String addArtifact(URI location) throws ExecutionException {
+            return null;
+        }
+        
+        @Override
+        public void activateService(String serviceId) throws ExecutionException {
+        }
+        
+        @Override
+        public Collection<? extends ServiceDescriptor> getServices() {
+            return svc.values();
+        }
+        
+        @Override
+        public Set<String> getServiceIds() {
+            return null;
+        }
+        
+        @Override
+        public ServiceDescriptor getService(String serviceId) {
+            return svc.get(serviceId);
+        }
+        
+        @Override
+        public List<TypedDataDescriptor> getParameters(String serviceId) {
+            return null;
+        }
+        
+        @Override
+        public List<TypedDataConnectorDescriptor> getOutputDataConnectors(String serviceId) {
+            return null;
+        }
+        
+        @Override
+        public List<TypedDataConnectorDescriptor> getInputDataConnectors(String serviceId) {
+            return null;
+        }
+        
+        @Override
+        public Collection<? extends ArtifactDescriptor> getArtifacts() {
+            return arts.values();
+        }
+        
+        @Override
+        public Set<String> getArtifactIds() {
+            return null;
+        }
+        
+        @Override
+        public ArtifactDescriptor getArtifact(String artifactId) {
+            return arts.get(artifactId);
+        }
+        
+        @Override
+        public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
+        }
+
+    }
+
+    /**
+     * Creates a simple service manager from loading a YAML file. Only basic operations referring to the loaded 
+     * artifact descriptor and the contained services are implemented.
+     * 
+     * @param descriptor the descriptor to load
+     * @return the service manager instance
+     * @throws IOException if the descriptor cannot be loaded for some reason
+     */
+    private static ServiceManager createServiceManager(File descriptor) throws IOException {
+        YamlArtifact art = YamlArtifact.readFromYaml(new FileInputStream(descriptor));
+        SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(art, 
+            descriptor.toURI(), descriptor);
+        return new MockServiceManager(aDesc);
+    }
+
+    /**
+     * Asserts a function definition.
+     * 
+     * @param expected
+     * @param mgr
+     * @param serviceId
+     */
+    private static void assertFunctionDef(String expected, ServiceManager mgr, String... serviceId) {
+        Set<TypedDataConnection> conn = AbstractServiceManager.determineInternalConnections(mgr, serviceId);
+        String tmp = SpringCloudServiceDescriptor.toFunctionDefinition(conn);
+        String[] exp = expected.split(";");
+        if (exp.length == 1) {
+            Assert.assertEquals(expected, tmp);
+        } else {
+            for (String e : exp) {
+                Assert.assertTrue(tmp.startsWith(e) || tmp.endsWith(e) || tmp.contains(";" + e + ";"));
+            }
+        }
+    }
+
+    /**
+     * Tests {@link AbstractServiceManager#determineInternalConnections(ServiceManager, String...)} in combination 
+     * with {@link SpringCloudServiceDescriptor#toFunctionDefinition(Set)}.
+     * 
+     * @throws IOException if loading the test descriptor "ServiceMesh3Deployment.yml" fails
+     */
+    @Test
+    public void testInternalConnections() throws IOException {
+        ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
+        
+        assertFunctionDef("receiveRec13_SimpleReceiver3", mgr, "SimpleReceiver3");
+        assertFunctionDef("createRec13_SimpleSource3", mgr, "SimpleSource3");
+        assertFunctionDef("transformRec13Rec13_SimpleTransformer3", mgr, "SimpleTransformer3");
+        
+        assertFunctionDef("receiveRec13_SimpleReceiver3;transformRec13Rec13_SimpleTransformer3", mgr, 
+            "SimpleReceiver3", "SimpleTransformer3");
+        assertFunctionDef("createRec13_SimpleSource3;transformRec13Rec13_SimpleTransformer3", mgr, 
+            "SimpleSource3", "SimpleTransformer3");
+
+        assertFunctionDef(
+            "receiveRec13_SimpleReceiver3;createRec13_SimpleSource3;transformRec13Rec13_SimpleTransformer3", mgr, 
+             "SimpleSource3", "SimpleReceiver3", "SimpleTransformer3");
+    }
+
+}
