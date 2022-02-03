@@ -12,7 +12,10 @@
 
 package test.de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +32,7 @@ import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
  * Tests the generic Python process service {@link AbstractPythonProcessService}.
@@ -39,41 +42,23 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 public class PythonProcessServiceTest {
 
     /**
-     * In-data type translator.
+     * Composes the basic command line arguments for this test. We assume that the service modules are in the 
+     * "src/test/python" folder and we set the home folder of the Python process to "src/main/python" where the 
+     * service environment is located. This may differ in a real integration, e.g., both parts in one sub-folder 
+     * of temp.
      * 
-     * @author Holger Eichelberger, SSE
+     * @return the basic command line arguments
      */
-    private static class InDataTypeTranslator implements TypeTranslator<String, String> {
-
-        @Override
-        public String from(String data) throws IOException {
-            return null; // shall be filled, not needed here
-        }
-
-        @Override
-        public String to(String source) throws IOException {
-            return source;
-        }
-        
-    }
-
-    /**
-     * Out-data type translator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class OutDataTypeTranslator implements TypeTranslator<String, String> {
-
-        @Override
-        public String from(String data) throws IOException {
-            return null; // shall be filled, not needed here
-        }
-
-        @Override
-        public String to(String source) throws IOException {
-            return source; // just pass-through
-        }
-        
+    private List<String> composeCmdLineArguments() {
+        File f = new File("src/test/python");
+        List<String> args = new ArrayList<String>();
+        args.add("--mode");
+        args.add("console");
+        args.add("--modulesPath");
+        args.add(f.getAbsolutePath());
+        args.add("--sid");
+        args.add("1234");
+        return args;
     }
     
     /**
@@ -90,14 +75,16 @@ public class PythonProcessServiceTest {
         sDesc.setId("Test");
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
-        pDesc.setExecutable("ForwardingApp.py");
-        pDesc.setHomePath("src/test/python");
+        //pDesc.setExecutable("ForwardingApp.py");
+        pDesc.setHomePath("src/main/python");
+        pDesc.setCmdArg(composeCmdLineArguments());
         sDesc.setProcess(pDesc);
+        
         
         final String typeName = "S"; // same symbolic type name for in/output
         AbstractPythonProcessService service = new PythonAsyncProcessService(sDesc);
-        service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
-        service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
+        service.registerInputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
+        service.registerOutputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
         service.attachIngestor(String.class, typeName, new DataIngestor<String>() {
 
             @Override
@@ -132,14 +119,15 @@ public class PythonProcessServiceTest {
         sDesc.setId("Test");
         sDesc.setDeployable(true);
         YamlProcess pDesc = new YamlProcess();
-        pDesc.setExecutable("ForwardingApp.py");
-        pDesc.setHomePath("src/test/python");
+        //pDesc.setExecutable("ForwardingApp.py");
+        pDesc.setHomePath("src/main/python");
+        pDesc.setCmdArg(composeCmdLineArguments());
         sDesc.setProcess(pDesc);
         
         final String typeName = "S"; // same symbolic type name for in/output
         AbstractPythonProcessService service = new PythonSyncProcessService(sDesc);
-        service.registerInputTypeTranslator(String.class, typeName, new InDataTypeTranslator());
-        service.registerOutputTypeTranslator(String.class, typeName, new OutDataTypeTranslator());
+        service.registerInputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
+        service.registerOutputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
         service.setState(ServiceState.STARTING);
         Assert.assertEquals("test", service.process(typeName, "test"));
         Assert.assertEquals("test", service.process(typeName, "test"));

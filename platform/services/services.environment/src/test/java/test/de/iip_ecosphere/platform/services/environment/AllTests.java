@@ -33,6 +33,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     ProcessServiceTest.class,
     AbstractProcessServiceTest.class,
     ReconfigureTest.class,
+    PythonProcessServiceTest.class,
     
     MetricsProviderTests.class
 })
