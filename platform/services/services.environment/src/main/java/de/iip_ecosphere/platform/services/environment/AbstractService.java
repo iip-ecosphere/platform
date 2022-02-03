@@ -210,7 +210,8 @@ public abstract class AbstractService implements Service {
             result = cls.cast(instance);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
             LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
-                + className + "': " + e.getMessage() + ". Service will not be functional!");
+                + className + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
+                + ". Service will not be functional!");
         }
         return result;
     }
