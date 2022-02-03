@@ -33,6 +33,10 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
+import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13;
+import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13Impl;
+import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13InTranslator;
+import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13OutTranslator;
 
 /**
  * Tests the generic Python process service {@link AbstractPythonProcessService}.
@@ -66,7 +70,8 @@ public class PythonProcessServiceTest {
      */
     @Test
     public void testAsyncProcessService() throws ExecutionException, IOException {
-        AtomicInteger receivedCount = new AtomicInteger(0);
+        AtomicInteger receivedStringCount = new AtomicInteger(0);
+        AtomicInteger receivedRec13Count = new AtomicInteger(0);
         // mock the YAML service instance, as if read from a descriptor
         YamlService sDesc = new YamlService();
         sDesc.setName("Test");
@@ -81,25 +86,40 @@ public class PythonProcessServiceTest {
         sDesc.setProcess(pDesc);
         
         
-        final String typeName = "S"; // same symbolic type name for in/output
+        final String stringTypeName = "S"; // same symbolic type name for in/output
+        final String rec13TypeName = "Rec13";
         AbstractPythonProcessService service = new PythonAsyncProcessService(sDesc);
-        service.registerInputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
-        service.registerOutputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
-        service.attachIngestor(String.class, typeName, new DataIngestor<String>() {
+        service.registerInputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
+        service.registerOutputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
+        service.attachIngestor(String.class, stringTypeName, new DataIngestor<String>() {
 
             @Override
             public void ingest(String data) {
-                receivedCount.incrementAndGet();
+                receivedStringCount.incrementAndGet();
+            } 
+        });
+        service.registerInputTypeTranslator(Rec13.class, rec13TypeName, new Rec13InTranslator());
+        service.registerOutputTypeTranslator(Rec13.class, rec13TypeName, new Rec13OutTranslator());
+        service.attachIngestor(Rec13.class, rec13TypeName, new DataIngestor<Rec13>() {
+
+            @Override
+            public void ingest(Rec13 data) {
+                receivedRec13Count.incrementAndGet();
             } 
         });
         service.setState(ServiceState.STARTING);
-        service.process(typeName, "test");
-        service.process(typeName, "test");
-        service.processQuiet(typeName, "test");
+        service.process(stringTypeName, "test");
+        service.process(stringTypeName, "test");
+        service.processQuiet(stringTypeName, "test");
+        Rec13 r = new Rec13Impl();
+        r.setIntField(10);
+        r.setStringField("abba");
+        service.process(rec13TypeName, r);
         TimeUtils.sleep(1000);
         
         service.setState(ServiceState.STOPPING);
-        Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
+        Assert.assertEquals(3, receivedStringCount.get()); // 3 in, 3 out
+        //Assert.assertEquals(1, receivedStringCount.get()); // 1 in, 1 out // TODO enable
 
         service.activate();
         service.passivate();
@@ -124,14 +144,22 @@ public class PythonProcessServiceTest {
         pDesc.setCmdArg(composeCmdLineArguments());
         sDesc.setProcess(pDesc);
         
-        final String typeName = "S"; // same symbolic type name for in/output
+        final String stringTypeName = "S"; // same symbolic type name for in/output
+        final String rec13TypeName = "Rec13";
         AbstractPythonProcessService service = new PythonSyncProcessService(sDesc);
-        service.registerInputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
-        service.registerOutputTypeTranslator(String.class, typeName, TypeTranslators.STRING);
+        service.registerInputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
+        service.registerOutputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
+        service.registerInputTypeTranslator(Rec13.class, rec13TypeName, new Rec13InTranslator());
+        service.registerOutputTypeTranslator(Rec13.class, rec13TypeName, new Rec13OutTranslator());
+        
         service.setState(ServiceState.STARTING);
-        Assert.assertEquals("test", service.process(typeName, "test"));
-        Assert.assertEquals("test", service.process(typeName, "test"));
-        Assert.assertEquals("test", service.processQuiet(typeName, "test"));
+        Assert.assertEquals("test", service.process(stringTypeName, "test"));
+        Assert.assertEquals("test", service.process(stringTypeName, "test"));
+        Assert.assertEquals("test", service.processQuiet(stringTypeName, "test"));
+        Rec13 r = new Rec13Impl();
+        r.setIntField(10);
+        r.setStringField("abba");
+        Assert.assertEquals(r, service.processQuiet(rec13TypeName, r));
         service.setState(ServiceState.STOPPING);
 
         service.activate();

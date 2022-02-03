@@ -381,7 +381,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
             }
             if (null != data) {
                 args.add("--data");
-                args.add(data);
+                args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
             Process proc = AbstractProcessService.createProcess(PythonUtils.getPythonExecutable(), 
                 startExecutableByName(), home, args);
