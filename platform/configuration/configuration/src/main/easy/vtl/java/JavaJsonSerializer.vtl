@@ -58,7 +58,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
 
             @Override
             public ${typeName} clone(${typeName} origin) throws IOException {
-                return new ${className}Impl(origin);
+                return new ${clsName}${add}(origin);
             }
 
             @Override
