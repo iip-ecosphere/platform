@@ -70,7 +70,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             javaSerializersSrc.mkdir();
             assemblySrc.mkdir();
             // generate data classes and serializers
-            setOf(String) javaSerializers = {};
             if (not(cfg.sharedInterfaces)) {
                 for (RecordType r : recordTypes) {
                     // generate for all languages and according to serializer settings
@@ -130,7 +129,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
-            maven("${appRoot}", true);
+            //maven("${appRoot}", true);
         };
     }
     
@@ -240,8 +239,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
                 pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true);
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, 
-                pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true);
+                pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=false);
             javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}ImplSerializer.java", 
+                type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=true);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
             vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
                 sharedInterfaces=true);
             vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
