@@ -409,10 +409,11 @@ class CliBackend {
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
-                println("Adding artifact '" + artifact + "' to resource " + a.getResource());
+                URI art = getArtifact(artifact, a);
+                println("Adding artifact '" + art + "' to resource " + a.getResource());
                 ServicesClient client = getServicesFactory().create(a.getResource());
                 serviceClients.put(a.getResource(), client);
-                client.addArtifact(getArtifact(artifact, a));
+                client.addArtifact(art);
                 printlnDone();
             }
             ExecutorService es = p.isParallelize() ? Executors.newCachedThreadPool() : null;
