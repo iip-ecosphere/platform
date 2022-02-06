@@ -66,11 +66,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
             Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
 
-            javaDatatypesSrc.mkdir();
-            javaSerializersSrc.mkdir();
             assemblySrc.mkdir();
             // generate data classes and serializers
             if (not(cfg.sharedInterfaces)) {
+                javaDatatypesSrc.mkdir();
+                javaSerializersSrc.mkdir();
                 for (RecordType r : recordTypes) {
                     // generate for all languages and according to serializer settings
                     String clsName = asTypeName(r.name);
