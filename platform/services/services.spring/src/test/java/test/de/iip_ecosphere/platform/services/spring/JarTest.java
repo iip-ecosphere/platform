@@ -65,8 +65,6 @@ public class JarTest extends JarLauncher {
             JarTest test = new JarTest(new JarFileArchive(new File(fileName)));
             System.out.println("Creating class loader... ");
             ClassLoader cl = test.createClassLoader();
-            //MyJarLauncher launcher = new MyJarLauncher(new JarFileArchive(new File(fileName)));
-            //ClassLoader cl = launcher.createClassLoader();
             System.out.println("Loading class " + cl.loadClass(args[1]));
             System.out.println("Ok.");
         }
