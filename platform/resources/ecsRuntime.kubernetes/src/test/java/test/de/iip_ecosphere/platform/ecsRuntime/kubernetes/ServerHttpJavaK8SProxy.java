@@ -29,7 +29,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 public class ServerHttpJavaK8SProxy {
 
     private static int localPort = 4411;
-    private static String serverIP = "192.168.81.208";
+    private static String serverIP = "Empty";
     private static String serverPort = "6443";
     private static boolean tlsCheck = false;
     private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
@@ -99,6 +99,23 @@ public class ServerHttpJavaK8SProxy {
      * 
      */
     public static void main(String[] args) {
+        if (args.length > 0) {
+            serverIP = args[0];
+            System.out.println("Api Server IP:" + serverIP);
+        } else {
+            System.out.println("No Api Server IP passed");
+        }
+        
+        if (args.length > 1) {
+            tlsCheck = Boolean.parseBoolean(args[1]);
+            if (tlsCheck) {
+                System.out.println("Security option Enabled");
+            } else {
+                System.out.println("Security option Disabled");
+            }
+        } else {
+            System.out.println("No security option passed, default false");
+        }
         
         Thread requestThread = new Thread() { 
             public void run() {
