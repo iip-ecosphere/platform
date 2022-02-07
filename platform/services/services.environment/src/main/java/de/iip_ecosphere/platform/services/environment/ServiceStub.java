@@ -136,7 +136,9 @@ public class ServiceStub implements Service {
 
     @Override
     public ServiceState getState() {
-        return ServiceState.valueOf(getters.get(NAME_PROP_STATE).get().toString());
+        // should be done on all methods, but getState is required by service manager
+        Object tmp = getters.get(NAME_PROP_STATE).get();
+        return (null == tmp || "".equals(tmp)) ? null : ServiceState.valueOf(tmp.toString());
     }
 
     @Override
