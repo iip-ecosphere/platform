@@ -15,6 +15,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     String javaStubsPackage = "iip.stubs";
     String javaNodesPackage = "iip.nodes";
     String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
+    String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
@@ -115,9 +116,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
             if (not(cfg.sharedInterfaces)) {
                 vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-                assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
+                assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-                assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package");
+                assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
             }
             
             // partition according to container strategy
@@ -191,8 +192,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${serviceFolderName}.xml", id=serviceFolderName, dir="${path}");
-        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|\\${project.build.directory}/classes|kodex.zip|zip|copy");
-        assemblies.add(serviceFolderName + "|${assemblyRel}/${serviceFolderName}.xml");
+        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
+        assemblies.add(serviceFolderName + "|${assemblyRel}/${serviceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|" + serviceFolderName);
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
@@ -203,7 +204,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
         artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
-        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml");
+        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
     }
     
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
@@ -257,9 +258,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         }
         
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-        //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package");
+        //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package");
+        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
             
         // partition according to container strategy
         
