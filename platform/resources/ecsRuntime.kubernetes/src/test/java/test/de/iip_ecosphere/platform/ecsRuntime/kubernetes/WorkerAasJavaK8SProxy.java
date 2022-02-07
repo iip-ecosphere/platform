@@ -2,6 +2,7 @@ package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -42,9 +43,10 @@ public class WorkerAasJavaK8SProxy {
     private static int localPort = 6443;
     private static int vabPort = 5511;
     private static int aasPort = 6611;
-    private static String serverIP = "192.168.81.212";
+    private static String serverIP = "Empty";
     private static String serverPort = "8811";
     private static boolean tlsCheck = false;
+    private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
     
     /** 
      * Returns the port on localhost to receive new requests.
@@ -144,20 +146,51 @@ public class WorkerAasJavaK8SProxy {
      */
     public static void main(String[] args) {
         
-//        WorkerK8SAas aas = new WorkerK8SAas(serverIP, serverPort, vabPort, aasPort);
-//        ArrayList<Server> servers = aas.startLocalAas();
-        
-        K8SJavaProxy aasK8SJavaProxy = new AasK8SJavaProxy(ProxyType.WorkerProxy, aasPort, serverIP, serverPort,
-                tlsCheck);
-        
-        try {
-            startMultiThreaded(aasK8SJavaProxy, localPort);
-        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | InvalidKeySpecException | IOException e) {
-            System.err.println("Exception in the starting the multi-threads method");
-            e.printStackTrace();
+        if (args.length > 0) {
+            serverIP = args[0];
+            System.out.println("Api Server IP:" + serverIP);
+        } else {
+            System.out.println("No Api Server IP passed");
         }
         
+        if (args.length > 1) {
+            tlsCheck = Boolean.parseBoolean(args[1]);
+            if (tlsCheck) {
+                System.out.println("Security option Enabled");
+            } else {
+                System.out.println("Security option Disabled");
+            }
+        } else {
+            System.out.println("No security option passed, default false");
+        }
+        
+        Thread requestThread = new Thread() { 
+            public void run() {
+                K8SJavaProxy aasK8SJavaProxy = new AasK8SJavaProxy(ProxyType.WorkerProxy, aasPort, serverIP, serverPort,
+                        tlsCheck);
+                
+                try {
+                    startMultiThreaded(aasK8SJavaProxy, localPort);
+                } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+                        | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
+                    System.err.println("Exception in the starting the multi-threads method");
+                    e.printStackTrace();
+                }
+            }
+        };
+        requestThread.start();
+        
+        while (true) {
+            if (new File("/tmp/EndServerRun.k8s").exists()) {
+                try {
+                    serverSocketList.get(0).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            TimeUtils.sleep(1);
+        }
 //        for (Server server : servers) {
 //            server.stop(true);
 //        }
@@ -213,12 +246,21 @@ public class WorkerAasJavaK8SProxy {
             throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
             CertificateException, InvalidKeySpecException, IOException {
 
+        if (new File("/tmp/EndClientRun.k8s").exists()) {
+            System.out.println("/tmp/EndClientRun.k8s is exist and stop the Client");
+            return;
+        }
+        
         ServerSocket serverSocket = aasK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
-
+        serverSocketList.add(serverSocket);
+        
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
         final Charset encoding = StandardCharsets.UTF_8;
 
+        File file = new File("ClientReady.k8s"); 
+        file.createNewFile();
+        
         while (true) {
             final Socket socket = serverSocket.accept();
 //            System.out.println("Accept socket");
