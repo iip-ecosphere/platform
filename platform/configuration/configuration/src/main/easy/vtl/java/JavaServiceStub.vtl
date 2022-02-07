@@ -5,35 +5,37 @@ import ServiceBasics;
 @indent(indentation = 4, additional = 0)
 template JavaServiceStub(Configuration config, FileArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
     
+    // something in the auto-formatting goes crazy here. Resorting to individual VIL context expressions :/
+    
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
-        'public void process${t.firstToUpperCase()}(${t} data) {
-            // TODO connect via VAB
-        }'
+        'public void process${t.firstToUpperCase()}(${t} data) {'
+        '    // TODO connect via VAB'
+        '}'
     }
     
     def produceSyncProcessorBody(IOType returnType, IOType dataType) {
         String d = toTypeName(dataType);
         String r = toTypeName(returnType);
-        'public ${r} transform${d.firstToUpperCase()}(${d} data) {
-            return null; // TODO connect via VAB
-        }'
+        'public ${r} transform${d.firstToUpperCase()}(${d} data) {'
+        '    return null; // TODO connect via VAB'
+        '}'
     }
     
     def produceIngestorBody(IOType type) {
         String t = toTypeName(type);
-        '@Override
-        public void attach${t.firstToUpperCase()}Ingestor(DataIngestor<${t}> ingestor) {
-            // TODO clarify with Python
-        }'
+        '@Override'
+        'public void attach${t.firstToUpperCase()}Ingestor(DataIngestor<${t}> ingestor) {'
+        '    // TODO clarify with Impl'
+        '}'
     }
     
     def produceProducerBody(IOType type) {
         String t = toTypeName(type);
-        '@Override
-        public ${t} produce${t.firstToUpperCase()}() {
-            return null; // TODO connect via VAB
-        }'
+        '@Override'
+        'public ${t} produce${t.firstToUpperCase()}() {'
+        '    return null; // TODO connect via VAB'
+        '}'
     }
 
     def main(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
