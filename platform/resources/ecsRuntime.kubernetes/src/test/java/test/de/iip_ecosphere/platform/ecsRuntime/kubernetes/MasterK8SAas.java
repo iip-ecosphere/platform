@@ -227,6 +227,7 @@ public class MasterK8SAas {
         reg.createSubmodel(aas, aas.getSubmodel("MasterK8SAasService"));
 
         ArrayList<Server> servers = new ArrayList<Server>();
+        
         servers.add(server);
         servers.add(regServer);
         servers.add(cloudServer);
