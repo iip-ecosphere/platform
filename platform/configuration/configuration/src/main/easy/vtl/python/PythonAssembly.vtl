@@ -6,22 +6,22 @@ template PythonAssembly(IIPEcosphere config, XmlFileArtifact target, Boolean wit
        if (withServices) {
            ''
        } else {
-           '<excludes>
-               <exclude>**/services/*.py</exclude>
-           </excludes>'
+            '<excludes>
+                <exclude>**/services/*.py</exclude>
+            </excludes>'
        }
     }
     
     def dependencySet(String dependency) {
-       if (length(dependency) > 0) {
-           '<dependencySets>
-               <dependencySet>
-                   <includes>
-                       <include>${dependency}</include>
-                   </includes>
-                   <unpack>true</unpack>
-               </dependencySet>
-           </dependencySets>'
+        if (length(dependency) > 0) {
+            '<dependencySets>
+                <dependencySet>
+                    <includes>
+                        <include>${dependency}</include>
+                    </includes>
+                    <unpack>true</unpack>
+                </dependencySet>
+            </dependencySets>'
        } else {
            ''
        }
