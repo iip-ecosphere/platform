@@ -105,7 +105,7 @@ public class ClientHttpJavaK8SProxy {
         } else {
             System.out.println("No Api Server IP passed");
         }
-        
+         
         if (args.length > 1) {
             tlsCheck = Boolean.parseBoolean(args[1]);
             if (tlsCheck) {
