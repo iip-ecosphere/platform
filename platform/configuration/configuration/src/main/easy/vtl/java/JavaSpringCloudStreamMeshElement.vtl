@@ -30,28 +30,55 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '${text}';
         }
     }
+    
+    def genIngestors(MeshElement elt, ServiceBase base, String methodSuffix, String type) {
+    }
+
+    def genIngestors(MeshSource elt, ServiceBase base, String methodSuffix, String type) {
+        genIngestorSet(base, elt.next, methodSuffix, type);
+    }
+
+    def genIngestors(MeshProcessor elt, ServiceBase base, String methodSuffix, String type) {
+        genIngestorSet(base, elt.next, methodSuffix, type);
+    }
+    
+    // sinks shall not ingest
+    
+    def genIngestorSet(ServiceBase base, setOf(MeshConnector) next, String methodSuffix, String type) {
+        if (not(sharedInterfaces)) {
+            methodSuffix = getMethodSuffixId(methodSuffix, getServiceIdSuffix(base));
+        }    
+
+        for (MeshConnector c : next) {
+            MeshElement target = c.next;
+            String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+            generateIngestor(base, methodSuffix, conn, type, "in");
+        }
+    }
 
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
     def attachIngestors(ServiceBase base) {
-         for (String methodSuffix : ingestors.getKeys()) {
-             // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
-             if (asyncIngestors.containsKey(methodSuffix)) {
-                 if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
-                     '${generateIngestor(base, methodSuffix, ingestors.get(methodSuffix))}'
+         if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
+             for (String methodSuffix : ingestors.getKeys()) {
+                 // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+                 if (asyncIngestors.containsKey(methodSuffix)) {
+                     if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
+                         '${generateIngestor(base, methodSuffix, methodSuffix, ingestors.get(methodSuffix), "in")}'
+                     }
                  }
              }
          }
     }
     
-    def generateIngestor(ServiceBase base, String methodSuffix, String type) {
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "attach${type.firstToUpperCase()}Ingestor";
         } else {
             methodName = "attach${methodSuffix}Ingestor";
         }    
-        'service.${methodName}(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
+        'service.${methodName}(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data));'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -63,20 +90,29 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        if (!service.asynchronous) {
-            String methodName;
-            if (sharedInterfaces) {
-                methodName = "produce${type.firstToUpperCase()}";
-            } else {
-                methodName = methodSuffix;
-            }
-            '/**
-            * Creates data to be ingested.
-            *
-            * @return the data supplier functor
-            */
-            @Bean
-            public Supplier<${type}> ${methodSuffixWithServiceId}() {
+        String methodName;
+        if (sharedInterfaces) {
+            methodName = "produce${type.firstToUpperCase()}";
+        } else {
+            methodName = methodSuffix;
+        }
+        '/**
+        * Creates data to be ingested.
+        *
+        * @return the data supplier functor
+        */
+        @Bean'
+        //${generateIngestor(service, methodSuffix, methodSuffixWithServiceId, type, "out")}
+        if (service.asynchronous) {
+            'public Supplier<Flux<${type}>> ${methodSuffixWithServiceId}() {
+                // this is no real use of flux, but ensures that method is called only once to set the ingestor
+                // when the mesh element is really active
+                return () -> Flux.from(emitter -> {
+                    ${genIngestors(src, service, methodSuffix, type)}          
+                });
+            }'
+        } else {
+            'public Supplier<${type}> ${methodSuffixWithServiceId}() {
                 return () -> ${fallbackToNull(src, "service.${methodName}()", true)}; 
             }'
         }
@@ -291,7 +327,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def generateImports(ServiceBase base) {
-        ''
+        if (base.kind == ServiceKind::SOURCE_SERVICE) {
+            'import reactor.core.publisher.Flux;'
+        } else {
+            ''
+        }
     }
     
     def generateServiceAttribute(MeshElement elt, ServiceBase base) {
@@ -314,8 +354,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
-    def generateIngestor(PythonService service, String methodSuffix, String type) {
-        'service.attachIngestor(${type}.class, "${type}", data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${methodSuffix}-in-0", data));'
+    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir) {
+        'service.attachIngestor(${type}.class, "${type}", data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data));'
     }
 
     def generateAsyncProcessorBody(MeshProcessor proc, PythonService base, String methodSuffix, String type) {
@@ -336,7 +376,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.security.services.kodex.KodexService";
     }
     
-    def generateIngestor(KodexService service, String methodSuffix, String type) {
+    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir) {
         ''
     }
 

@@ -1,0 +1,67 @@
+id: SimpleMeshApp3
+name: Simple Mesh Testing App 3
+version: 0.1.0
+types:
+    - name: Rec13
+      fields:
+        - name: intField
+          type: int
+        - name: stringField
+          type: String
+services:
+   - id: SimpleReceiver3
+     name: Simple Data Receiver3
+     version: 0.1.0
+     description: 
+     deployable: true
+     kind: SINK_SERVICE
+     cmdArg: 
+       - --iip.port=${port}
+       - --iip.protocol=${protocol}
+     relations:
+       - endpoint:
+         portArg: --mqtt.port=${port} --amqp.port=${port}
+         hostArg: --mqtt.host=${host} --amqp.host=${host}   
+   - id: SimpleSource3
+     name: Simple Data Source3
+     version: 0.1.0
+     description: 
+     deployable: true
+     kind: SOURCE_SERVICE
+     cmdArg: 
+       - --iip.port=${port}
+       - --iip.protocol=${protocol}
+     relations:
+       - endpoint:
+         portArg: --mqtt.port=${port} --amqp.port=${port}
+         hostArg: --mqtt.host=${host} --amqp.host=${host}
+       - channel: createRec13_SimpleSource3-out-0
+         direction: OUT
+         type: Rec13
+       - channel: transformRec13Rec13_SimpleTransformer3-in-0
+         id: Source->Transformer
+         service: SimpleTransformer3
+         direction: IN
+         type: Rec13
+   - id: SimpleTransformer3
+     name: Simple Data Transformer3
+     version: 0.1.0
+     description: 
+     deployable: true
+     kind: TRANSFORMATION_SERVICE
+     cmdArg: 
+       - --iip.port=${port}
+       - --iip.protocol=${protocol}
+     relations:
+       - endpoint:
+         portArg: --mqtt.port=${port} --amqp.port=${port}
+         hostArg: --mqtt.host=${host} --amqp.host=${host}
+       - channel: transformRec13Rec13_SimpleTransformer3-out-0
+         direction: OUT
+         type: Rec13
+       - channel: receiveRec13_SimpleReceiver3-in-0
+         id: Transformer->Receiver
+         service: SimpleReceiver3
+         direction: IN
+         type: Rec13
+

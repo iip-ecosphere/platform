@@ -11,6 +11,8 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
+import org.apache.commons.lang.SystemUtils;
+
 /**
  * Implements the docker specific configuration.
  * 
@@ -19,7 +21,7 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
  */
 public class Docker {
 
-    private String dockerHost;
+    private String dockerHost = SystemUtils.IS_OS_WINDOWS ? "" : "unix:///var/run/docker.sock";
     private String dockerImageYamlFilename = "image-info.yml";
     private boolean deleteWhenUndeployed = false;
     private String downloadDirectory;

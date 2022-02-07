@@ -7,6 +7,7 @@ import importlib
 import time
 import os
 import json
+from codecs import decode
 import Registry
 
 # for command line version of service environment: do not emit anything to system out rather than intended results
@@ -64,8 +65,9 @@ def start(a):
     sId = args.sId[0]
 
     if len(args.config) > 0:
-        service = Registry.services[sId]
-        service.reconfigure(json.loads(data))
+        service = Registry.services.get(sId)
+        if service:
+            service.reconfigure(json.loads(data))
 
     if len(args.mode) > 0 and args.mode[0]=='console':
         console(a, args.data, sId)
@@ -85,11 +87,11 @@ def loadModules(modulesPath, modulesDir):
 
 def consoleIngestResult(data): 
     result = None
-    typeInfo = Registry.types[type(data)]
-    if typeInfo is not None:
-        serializer = Registry.serializers[typeInfo]
-        if serializer is not None:
-            result = typeInfo + "|" + serializer.writeTo(data)    
+    typeInfo = Registry.types.get(type(data))
+    if typeInfo:
+        serializer = Registry.serializers.get(typeInfo)
+        if serializer:
+            result = typeInfo + "|" + serializer.writeTo(data)
             print(result)
             sys.stdout.flush()
 
@@ -105,8 +107,9 @@ def console(a, data, sId):
         s.attachIngestor(consoleIngestResult)
 
     if data is not None:
+        d = decode(data[0], 'unicode-escape') # unescape in particular quotes
         # for now: just forward once
-        process(data[0], sId)
+        process(d, sId)
     else:
         # for now: receive and forward
         while True:
@@ -124,28 +127,30 @@ def process(composedData, sId):
         data = tmp[1]
         
         if type.startswith('*'):
-            service = Registry.services[sId]
-            if type == '*migrate':
-                service.migrate(data)
-            elif type == '*update':
-                service.update(data)
-            elif type == '*switch':
-                service.switchTo(data)
-            elif type == '*recfg':
-                service.reconfigure(json.loads(data))
-            elif type == '*activate':
-                service.activate()
-            elif type == '*passivate':
-                service.passivate()
+            service = Registry.services.get(sId)
+            if service:
+                if type == '*migrate':
+                    service.migrate(data)
+                elif type == '*update':
+                    service.update(data)
+                elif type == '*switch':
+                    service.switchTo(data)
+                elif type == '*recfg':
+                    service.reconfigure(json.loads(data))
+                elif type == '*activate':
+                    service.activate()
+                elif type == '*passivate':
+                    service.passivate()
         else :
-            serializer = Registry.serializers[type]
-            if serializer is not None:
+            serializer = Registry.serializers.get(type)
+            if serializer:
                 d = serializer.readFrom(str(data))
-                func = Registry.asyncTransformers[sId+"_"+type]
-                if func is not None:
+                funcId = sId+"_"+type
+                func = Registry.asyncTransformers.get(funcId)
+                if func:
                     func(d) #ingestor takes result
                 else:
-                    func = Registry.syncTransformers[sId]
-                    if func is not None:
+                    func = Registry.syncTransformers.get(funcId)
+                    if func:
                         consoleIngestResult(func(d))
         

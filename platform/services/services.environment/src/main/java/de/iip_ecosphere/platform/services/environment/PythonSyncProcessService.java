@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -123,7 +124,7 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
                 try {
                     AtomicReference<O> tmp = new AtomicReference<O>();
                     Process proc = createAndCustomizeProcess(compose(inType, inT.to(data)), reconfValues);
-                    createScanInputThread(proc, (t, d) -> {
+                    Thread thread = createScanInputThread(proc, (t, d) -> {
                         OutTypeInfo<?> oInfo = getOutTypeInfo(t);
                         if (null != oInfo) {
                             TypeTranslator<String, O> outT = (TypeTranslator<String, O>) oInfo.getOutTranslator();
@@ -134,12 +135,15 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
                             }
                         }
                         return true;
-                    }).start();
+                    });
+                    thread.start();
                     if (timeout < 0) {
                         proc.waitFor();
                     } else {
                         proc.waitFor(timeout, timeoutUnit);
                     }
+                    thread.join();
+                    
                     result = tmp.get();
                 } catch (InterruptedException | IOException e) {
                     throw new ExecutionException("Exception while data processing: " + e.getMessage(), e);

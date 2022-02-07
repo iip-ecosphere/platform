@@ -45,4 +45,5 @@ services:
       - channel: log-in-0
         id: intern
         type: String
+        service: simpleStream-create
         direction: IN

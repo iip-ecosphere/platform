@@ -9,6 +9,46 @@ template MeshBasics(Configuration config, FileArtifact target) {
     mapOf(String, Boolean) asyncIngestors = {};
     mapOf(String, String) ingestors = {};
     
+    // -------------------------------------------- suffixes -------------------------------
+
+    def String getMethodSuffix(MeshElement elt, String type, String outType) {
+        "";
+    }
+
+    def String getMethodSuffix(MeshSource elt, String type, String outType) {
+        "create" + type.firstToUpperCase();
+    }
+
+    def String getMethodSuffix(MeshProcessor elt, String type, String outType) {
+        if (elt.impl.asynchronous) {
+            "process" + type.firstToUpperCase();
+        } else {
+            "transform" + type.firstToUpperCase() + outType.firstToUpperCase();
+        }
+    }
+
+    def String getMethodSuffix(MeshSink elt, String type, String outType) {
+        "receive" + type.firstToUpperCase();
+    }
+
+    def String getServiceIdSuffix(ServiceBase base) {
+        "_" + toIdentifier(base.id);
+    }
+    
+    def String getServiceIdSuffix(MeshElement elt) {
+        getServiceIdSuffix(elt.impl);
+    }
+    
+    def String getMethodSuffixId(String methodSuffix, String serviceId) {
+        methodSuffix + serviceId;
+    }
+
+    def String getMethodSuffixId(String methodSuffix, MeshElement elt) {
+        methodSuffix + getServiceIdSuffix(elt);
+    }
+
+    // -------------------------------------------------------------------------------------
+    
     def String getDeploymentDescriptorPath() {
         "/deployment.yml";
     }
@@ -16,10 +56,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def String getYamlServiceFragment(String varName, String clsName, String serviceId) {
         'YamlService ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
             .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}")'
-    }
-
-    def getServiceIdSuffix(MeshElement elt) {
-        "";
     }
 
     def generateDataMethods(MeshElement elt) {
@@ -117,6 +153,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
+    
+    // --------------------------------- collecting record types ---------------------------------------------
     
     def mapOf(IOType, IOType) ioPairs(MeshProcessor elt) {
         ioPairs(elt.input, elt.output);

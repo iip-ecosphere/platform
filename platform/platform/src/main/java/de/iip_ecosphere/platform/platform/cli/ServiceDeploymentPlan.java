@@ -95,6 +95,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     public static class ServiceResourceAssignment extends ResourceAssignment {
         
         private List<String> services;
+        private String artifact;
 
         /**
          * Returns the assigned service names.
@@ -103,6 +104,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
          */
         public List<String> getServices() {
             return services;
+        }
+        
+        /**
+         * Returns the path/URI of the artifact.
+         * 
+         * @return the path/URI
+         */
+        public String getArtifact() {
+            return artifact;
         }
         
         /**
@@ -121,6 +131,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
          */
         public void setServices(List<String> services) {
             this.services = services;
+        }
+        
+        /**
+         * Defines the path/URI of the artifact. [required by SnakeYaml]
+         * 
+         * @param artifact the path/URI
+         */
+        public void setArtifact(String artifact) {
+            this.artifact = artifact;
         }
 
     }

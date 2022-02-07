@@ -38,3 +38,4 @@ services:
         id: intern
         type: String
         direction: IN
+        service: simpleStream-create

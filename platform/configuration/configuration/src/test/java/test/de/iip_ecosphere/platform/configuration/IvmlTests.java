@@ -457,7 +457,7 @@ public class IvmlTests {
         File srcMainAssembly = new File(srcMain, "assembly");
 
         assertFile(srcMainAssembly, "pythonInterfaces.xml");
-        assertFile(srcMainAssembly, "javaInterfaces.xml");
+        //assertFile(srcMainAssembly, "javaInterfaces.xml"); // new style
 
         extractPythonServiceEnv(srcMainPython);
         pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13.py");

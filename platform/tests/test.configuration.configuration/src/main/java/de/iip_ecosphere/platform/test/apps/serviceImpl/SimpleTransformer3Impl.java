@@ -16,18 +16,17 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl;
 import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
-import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec13;
 import iip.datatypes.Rec13Impl;
-import iip.interfaces.SimpleDataTransformer3Interface;
+import iip.impl.SimpleDataTransformer3Impl;
 
 /**
  * A simple test transformer. 
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleTransformer3Impl extends DefaultServiceImpl implements SimpleDataTransformer3Interface {
+public class SimpleTransformer3Impl extends SimpleDataTransformer3Impl {
 
     private DataIngestor<Rec13> ingestor;
     

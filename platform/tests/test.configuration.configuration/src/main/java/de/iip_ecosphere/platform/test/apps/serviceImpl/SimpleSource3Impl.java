@@ -18,11 +18,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
-import de.iip_ecosphere.platform.services.environment.DefaultServiceImpl;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec13;
 import iip.datatypes.Rec13Impl;
-import iip.interfaces.SimpleDataSource3Interface;
+import iip.impl.SimpleDataSource3Impl;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -30,7 +29,7 @@ import iip.interfaces.SimpleDataSource3Interface;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSource3Impl extends DefaultServiceImpl implements SimpleDataSource3Interface {
+public class SimpleSource3Impl extends SimpleDataSource3Impl {
 
     private Timer timer = new Timer();
     private Random random = new Random();

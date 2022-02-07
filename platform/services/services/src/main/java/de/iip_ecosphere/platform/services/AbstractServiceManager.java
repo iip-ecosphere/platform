@@ -527,7 +527,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      * Determines the external connections of the given services.
      * 
      * @param mgr the service manager
-     * @param serviceIds the services to determine the arguments for
+     * @param serviceIds the services to determine the connections for
      * @return the external connections
      */
     public static Set<TypedDataConnection> determineExternalConnections(ServiceManager mgr, 
@@ -563,6 +563,44 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             }
         }
         
+        return result;
+    }
+
+    /**
+     * Determines all connections within {@code serviceIds}.
+     * 
+     * @param mgr the service manager
+     * @param serviceIds the services to determine the connections for
+     * @return the internal connections
+     */
+    public static Set<TypedDataConnection> determineInternalConnections(ServiceManager mgr, 
+        String... serviceIds) {
+        Set<TypedDataConnection> result = new HashSet<TypedDataConnection>();
+        Set<String> ids = CollectionUtils.addAll(new HashSet<>(), serviceIds);
+
+        Set<ArtifactDescriptor> artifacts = new HashSet<>();
+        for (String id : serviceIds) {
+            ServiceDescriptor service = mgr.getService(id);
+            if (null != service) {
+                artifacts.add(service.getArtifact());
+            }
+        }
+
+        for (ArtifactDescriptor a : artifacts) {
+            for (ServiceDescriptor s: a.getServices()) {
+                if (containsIdSafe(ids, s.getId())) { 
+                    for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
+                        result.add(new TypedDataConnection(c, null));
+                    }
+                }
+                for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
+                    if (containsIdSafe(ids, c.getService())) {
+                        result.add(new TypedDataConnection(c, null));
+                    }
+                }
+            }
+        }
+
         return result;
     }
 

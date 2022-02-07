@@ -49,6 +49,26 @@ template ServiceBasics(Configuration config, FileArtifact target) {
     def produceProducerBody(IOType type) {
     }
     
+    // ----------------------------- parameters -------------------------------
+
+    def produceForParameterAttributes(ServiceBase service) {
+        for (Parameter p: service.parameter) {
+            '${produceParameterAttribute(p)}'
+        }
+    }
+    
+    def produceParameterAttribute(Parameter p) {
+    }
+    
+    def produceForParameter(ServiceBase service) {
+        for (Parameter p: service.parameter) {
+            '${produceParameterBody(p)}'
+        }
+    }
+    
+    def produceParameterBody(Parameter p) {
+    }
+    
     // -------------------------- collecting types ----------------------------
     
     def setOf(RecordType) collectRecordTypes(ServiceBase service) {

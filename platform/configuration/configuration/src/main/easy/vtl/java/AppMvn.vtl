@@ -59,11 +59,13 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
             String id = tmp[0];
             String path = tmp[1];
-            String phase="process-sources";
-            if (tmp.size() > 2) {
-                phase = tmp[2];
-            }
-            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir="\\${project.build.directory}/classes", finalName=id, phase=phase);
+            String phase = tmp[2];
+            String outDir = tmp[3];
+            String fName = "";
+            if (tmp.size() > 4) {
+                fName = tmp[4];
+            }            
+            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir=outDir, finalName=fName, phase=phase);
         }
         if (springPackaging) {
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");

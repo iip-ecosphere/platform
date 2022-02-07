@@ -371,6 +371,23 @@ class CliBackend {
     }
     
     /**
+     * Returns the artifact for a service assignment.
+     * 
+     * @param artifact the global artifact
+     * @param assng the assignment
+     * @return either {@code artifact} or the specific one specified in {@code assng}
+     * @throws URISyntaxException
+     */
+    private static URI getArtifact(URI artifact, ServiceResourceAssignment assng) throws URISyntaxException {
+        URI result = artifact;
+        String art = assng.getArtifact();
+        if (art != null && art.length() > 0) {
+            result = toUri(art);
+        }
+        return result;
+    }
+    
+    /**
      * Deploys a {@link ServiceDeploymentPlan} given in terms of an URI.
      * 
      * @param plan the plan to be deployed
@@ -392,10 +409,11 @@ class CliBackend {
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
-                println("Adding artifact '" + artifact + "' to resource " + a.getResource());
+                URI art = getArtifact(artifact, a);
+                println("Adding artifact '" + art + "' to resource " + a.getResource());
                 ServicesClient client = getServicesFactory().create(a.getResource());
                 serviceClients.put(a.getResource(), client);
-                client.addArtifact(artifact);
+                client.addArtifact(art);
                 printlnDone();
             }
             ExecutorService es = p.isParallelize() ? Executors.newCachedThreadPool() : null;
@@ -451,7 +469,7 @@ class CliBackend {
     protected static void undeployPlan(URI plan) throws ExecutionException {
         ServiceDeploymentPlan p = loadPlan(plan);
         try {
-            String uri = toUri(p.getArtifact()).normalize().toString();
+            URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
@@ -471,8 +489,10 @@ class CliBackend {
                     String resourceId = a.getResource();
                     if (!done.contains(resourceId)) {
                         done.add(resourceId);
-                        println("Removing artifact " + p.getArtifact() + " from " + resourceId);
-                        serviceClients.get(resourceId).removeArtifact(uri); // shall also work with Artifact URI
+                        URI art = getArtifact(artifact, a);
+                        String uri = art.normalize().toString();
+                        println("Removing artifact " + art + " from " + resourceId);
+                        serviceClients.get(resourceId).removeArtifact(uri); // works also with Artifact URI
                     }
                 }
             }

@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
@@ -416,6 +419,37 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     public Service getSvc() {
         return service;
+    }
+    
+    /**
+     * Turns a channel name to a function name.
+     * 
+     * @param channel the channel
+     * @return the function name
+     */
+    public static String channelToFunction(String channel) {
+        String result = channel;
+        int pos = channel.lastIndexOf('-');
+        if (pos > 0) {
+            pos = channel.lastIndexOf('-', pos - 1);
+            if (pos > 0) {
+                result = result.substring(0, pos);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Turns typed data connections into a Spring cloud function definition argument.
+     * 
+     * @param conn the connections
+     * @return the composed function definition argument
+     */
+    public static String toFunctionDefinition(Set<TypedDataConnection> conn) {
+        return conn.stream()
+            .map(c -> channelToFunction(c.getName()))
+            .distinct()
+            .collect(Collectors.joining(";"));        
     }
     
     /**

@@ -376,11 +376,12 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
         try {
             List<String> args = new ArrayList<String>(pythonArgs);
             if (null != reconfValues && reconfValues.size() > 0) {
-                args.add("-configure");
+                args.add("--configure");
                 args.add(toJson(reconfValues));
             }
             if (null != data) {
-                args.add(data);
+                args.add("--data");
+                args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
             Process proc = AbstractProcessService.createProcess(PythonUtils.getPythonExecutable(), 
                 startExecutableByName(), home, args);
