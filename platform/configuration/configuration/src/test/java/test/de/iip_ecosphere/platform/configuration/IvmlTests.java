@@ -473,7 +473,7 @@ public class IvmlTests {
         srcMainPython = new File(srcMain, "python");
         srcMainAssembly = new File(srcMain, "assembly");
         
-        assertFile(srcMainAssembly, "pseudonymizer.xml");
+        assertFile(srcMainAssembly, "kodex_pseudonymizer.xml");
         assertFile(srcMainAssembly, "python_kodexPythonService.xml");
     }
 
