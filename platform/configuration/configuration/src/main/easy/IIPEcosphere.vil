@@ -186,14 +186,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
+        String kodexServiceFolderName = "kodex_" + serviceFolderName;
         Path path = "${appRoot}/${serviceArtifactsRel}";
         path.mkdir();
         vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
-        vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${serviceFolderName}.xml", id=serviceFolderName, dir="${path}");
+        vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
         bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
-        assemblies.add(serviceFolderName + "|${assemblyRel}/${serviceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|" + serviceFolderName);
+        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
