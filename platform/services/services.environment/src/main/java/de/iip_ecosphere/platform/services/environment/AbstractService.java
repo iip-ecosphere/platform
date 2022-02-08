@@ -209,9 +209,18 @@ public abstract class AbstractService implements Service {
             }
             result = cls.cast(instance);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+            String loaders = "";
+            ClassLoader l = loader;
+            while (null != l) {
+                if (loaders.length() > 0) {
+                    loaders += " -> ";
+                }
+                loaders += l.getClass().getSimpleName();
+                l = l.getParent();
+            }
             LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
-                + className + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
-                + ". Service will not be functional!");
+                + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
+                + ". Service '" + serviceId + "' will not be functional!");
         }
         return result;
     }
