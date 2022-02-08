@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -34,10 +35,11 @@ public class WorkerAmqpJavaK8SProxy {
   
     private static int localPort = 6443;
     private static int mqttPort = 9911;
-    private static String serverIP = "192.168.81.212";
+    private static String serverIP = "Empty";
     private static String serverPort = "9922";
     private static boolean tlsCheck = false;
-
+    private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
+    
     //    private static ConcurrentLinkedDeque<Integer> requestDeque = new ConcurrentLinkedDeque<Integer>();
     
     /** 
@@ -119,49 +121,82 @@ public class WorkerAmqpJavaK8SProxy {
      * 
      */
     public static void main(String[] args) {
-        
-        try {
-            TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
-            
-            ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
-
-                @Override
-                public TransportConnector createConnector() {
-                    return new FakeAuthConnector();
-                }
-
-                @Override
-                public String getName() {
-                    return FakeAuthConnector.NAME;
-                }
-
-            });
-            
-            TransportParameterConfigurer configurer = null;
-            if (tlsCheck) {
-                File secCfg = new File("./src/test/AMQP/secCfg");
-                configurer = new TransportParameterConfigurer() {
-                    
-                    @Override
-                    public void configure(TransportParameterBuilder builder) {
-                        builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
-                    }
-                };
-            }
-            
-            TransportConnector cl1 = TransportFactory.createConnector();
-            TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
-            
-            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
-                    transportK8STLS);
-            
-            startMultiThreaded(mqttK8SJavaProxy, localPort);
-        } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | InvalidKeySpecException | IOException e) {
-            System.err.println("Exception in the starting the multi-threads method");
-            e.printStackTrace();
+        if (args.length > 0) {
+            serverIP = args[0];
+            System.out.println("Api Server IP:" + serverIP);
+        } else {
+            System.out.println("No Api Server IP passed");
         }
         
+        if (args.length > 1) {
+            tlsCheck = Boolean.parseBoolean(args[1]);
+            if (tlsCheck) {
+                System.out.println("Security option Enabled");
+            } else {
+                System.out.println("Security option Disabled");
+            }
+        } else {
+            System.out.println("No security option passed, default false");
+        }
+        
+        Thread requestThread = new Thread() { 
+            public void run() {
+                try {
+                    TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
+                    
+                    ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+        
+                        @Override
+                        public TransportConnector createConnector() {
+                            return new FakeAuthConnector();
+                        }
+        
+                        @Override
+                        public String getName() {
+                            return FakeAuthConnector.NAME;
+                        }
+        
+                    });
+                    
+                    TransportParameterConfigurer configurer = null;
+                    if (tlsCheck) {
+                        File secCfg = new File("./src/test/AMQP/secCfg");
+                        configurer = new TransportParameterConfigurer() {
+                            
+                            @Override
+                            public void configure(TransportParameterBuilder builder) {
+                                builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                            }
+                        };
+                    }
+                    
+                    TransportConnector cl1 = TransportFactory.createConnector();
+                    TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
+                    
+                    K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP,
+                            serverPort, transportK8STLS);
+                    
+                    startMultiThreaded(mqttK8SJavaProxy, localPort);
+                } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+                        | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
+                    System.err.println("Exception in the starting the multi-threads method");
+                    e.printStackTrace();
+                }
+            }
+        };
+        requestThread.start();
+        
+        while (true) {
+            if (new File("/tmp/EndClientRun.k8s").exists()) {
+                try {
+                    serverSocketList.get(0).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            TimeUtils.sleep(1);
+        }
     }
 
     /**
@@ -239,12 +274,21 @@ public class WorkerAmqpJavaK8SProxy {
             throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
             CertificateException, InvalidKeySpecException, IOException {
 
+        if (new File("/tmp/EndClientRun.k8s").exists()) {
+            System.out.println("/tmp/EndClientRun.k8s is exist and stop the Client");
+            return;
+        }
+        
         ServerSocket serverSocket = mqttK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
-
+        serverSocketList.add(serverSocket);
+        
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
         final Charset encoding = StandardCharsets.UTF_8;
 
+        File file = new File("ClientReady.k8s"); 
+        file.createNewFile();
+        
         while (true) {
             final Socket socket = serverSocket.accept();
 //            System.out.println("Accept socket");

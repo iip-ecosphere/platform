@@ -120,8 +120,6 @@ public class ClientHttpJavaK8SProxy {
         
         Thread requestThread = new Thread() {
             public void run() {
-                tlsCheck = Boolean.valueOf(System.getProperty("tlsCheck"));
-
                 try {
                     K8SJavaProxy httpJavaK8SProxy = new HttpK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
                             tlsCheck);
@@ -136,7 +134,6 @@ public class ClientHttpJavaK8SProxy {
         };
         requestThread.start();
 
-        System.out.println("Waiting");
         while (true) {
             if (new File("/tmp/EndClientRun.k8s").exists()) {
                 try {

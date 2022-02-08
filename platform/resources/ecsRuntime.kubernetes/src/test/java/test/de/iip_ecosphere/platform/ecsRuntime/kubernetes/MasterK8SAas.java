@@ -143,10 +143,11 @@ public class MasterK8SAas {
      * Start the local aas.
      * 
      * @return the running servers
+     * @throws IOException 
      * 
      */
-    public ArrayList<Server> startLocalAas() {
-
+    public ArrayList<Server> startLocalAas() throws IOException {
+ 
         ServerAddress vabServer = new ServerAddress(Schema.HTTP, serverIP, vabPort);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, aasPort);
         Endpoint aasServerBase = new Endpoint(aasServer, "");
@@ -172,6 +173,9 @@ public class MasterK8SAas {
         servers.add(httpServer);
         servers.add(server);
 
+        File file = new File("ServerReady.k8s"); 
+        file.createNewFile();
+        
         return servers;
     }
 
@@ -223,8 +227,14 @@ public class MasterK8SAas {
         reg.createSubmodel(aas, aas.getSubmodel("MasterK8SAasService"));
 
         ArrayList<Server> servers = new ArrayList<Server>();
+        
         servers.add(server);
-
+        servers.add(regServer);
+        servers.add(cloudServer);
+        
+        File file = new File("ServerReady.k8s"); 
+        file.createNewFile();
+        
         return servers;
     }
     

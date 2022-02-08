@@ -1,5 +1,6 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ public class MasterAasJavaK8SProxy {
 
     private static int vabPort = 7711;
     private static int aasPort = 8811;
-    private static String serverIP = "192.168.81.212";
+    private static String serverIP = "Empty";
     private static String serverPort = "6443";
     private static boolean tlsCheck = false;
 
@@ -95,20 +96,53 @@ public class MasterAasJavaK8SProxy {
      * 
      */
     public static void main(String[] args) {
-                
+        if (args.length > 0) {
+            serverIP = args[0];
+            System.out.println("Api Server IP:" + serverIP);
+        } else {
+            System.out.println("No Api Server IP passed");
+        }
+        
+        if (args.length > 1) {
+            tlsCheck = Boolean.parseBoolean(args[1]);
+            if (tlsCheck) {
+                System.out.println("Security option Enabled");
+            } else {
+                System.out.println("Security option Disabled");
+            }
+        } else {
+            System.out.println("No security option passed, default false");
+        }
+        
+        if (new File("/tmp/EndServerRun.k8s").exists()) {
+            System.out.println("/tmp/EndServerRun.k8s is exist and stop the Client");
+            return;
+        }
+        
+        ArrayList<Server> servers = null;
+        
         MasterK8SAas aas = new MasterK8SAas(serverIP, serverPort, vabPort, aasPort, tlsCheck);
         
         try {
             if (tlsCheck) {
-                ArrayList<Server> servers = aas.startLocalTLSAas();
+                servers = aas.startLocalTLSAas();
             } else {
-                ArrayList<Server> servers = aas.startLocalAas();
+                servers = aas.startLocalAas();
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
+        while (true) {
+            if (new File("/tmp/EndServerRun.k8s").exists()) {
+                for (Server server : servers) {
+                    server.stop(true);
+                }
+                break;
+            }
+            TimeUtils.sleep(1);
+        }
     }
 
     /**

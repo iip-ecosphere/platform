@@ -29,8 +29,10 @@ public class TransportK8S {
     private static String serverIP;
     private static String serverPort;
     private static K8SJavaProxy transportK8SJavaProxy;
+    private static boolean isStopped = false;
     private ServerAddress addr;
     private ProxyType proxyType;
+    
     
     /**
      * Creates a transport K8S java proxy instance, it will be either MasterProxy or WorkerProxy.
@@ -124,6 +126,24 @@ public class TransportK8S {
     }
     
     /**
+     * Returns the Transport stop status.
+     * 
+     * @return the Transport stop status
+     */
+    public boolean isStopped() {
+        return isStopped;
+    }
+
+    /**
+     * Set the Transport stop status.
+     *
+     * @param isStopped the Transport stop status
+     */
+    public void setStopped(boolean isStopped) {
+        TransportK8S.isStopped = isStopped;
+    }
+
+    /**
      * The start method to run the server proxy.
      * 
      * @param transportK8STLS the tls security information
@@ -151,6 +171,9 @@ public class TransportK8S {
             Thread requestMessageAddingThread = new Thread() {
                 public void run() {
                     while (true) {
+                        if (isStopped) {
+                            break;
+                        }
                         if (!cb1.dequeIsEmpty()) {
                             transportMessagesList.add(cb1.getData());
                         } else if (!watchcb1.dequeIsEmpty()) {
@@ -165,6 +188,10 @@ public class TransportK8S {
             Thread requestThread = new Thread() {
                 public void run() {
                     while (true) {
+                        if (isStopped) {
+                            break;
+                        }
+                        
                         if (transportMessagesList.isEmpty()) {
                             TimeUtils.sleep(1);
                         } else {
@@ -196,7 +223,6 @@ public class TransportK8S {
                         }
                     }
                 }
-
             };
             requestThread.start();
         } catch (IOException e) {
