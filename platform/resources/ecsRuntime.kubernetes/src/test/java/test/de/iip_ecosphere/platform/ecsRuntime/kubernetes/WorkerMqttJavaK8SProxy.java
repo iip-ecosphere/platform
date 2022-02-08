@@ -142,7 +142,6 @@ public class WorkerMqttJavaK8SProxy {
             public void run() {
                 try {            
                     TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
-                    TransportConnector cl1 = TransportFactory.createConnector();
                     
                     TransportParameterConfigurer configurer = null;
                     if (tlsCheck) {

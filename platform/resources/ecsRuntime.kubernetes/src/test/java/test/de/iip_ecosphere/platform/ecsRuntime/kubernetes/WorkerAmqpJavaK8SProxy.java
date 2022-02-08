@@ -170,7 +170,6 @@ public class WorkerAmqpJavaK8SProxy {
                         };
                     }
                     
-                    TransportConnector cl1 = TransportFactory.createConnector();
                     TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
                     
                     K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP,
