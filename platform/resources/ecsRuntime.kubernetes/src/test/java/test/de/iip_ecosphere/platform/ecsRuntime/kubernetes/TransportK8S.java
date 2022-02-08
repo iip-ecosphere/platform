@@ -1,5 +1,6 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -150,7 +151,6 @@ public class TransportK8S {
      * 
      */
     public void start(TransportK8STLS transportK8STLS) {
-
         ConcurrentLinkedDeque<TransportMessage> transportMessagesList = new ConcurrentLinkedDeque<TransportMessage>();
         SerializerRegistry.registerSerializer(TransportMessageJsonSerializer.class);
         TransportParameterBuilder tpb1 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl1");
@@ -158,7 +158,6 @@ public class TransportK8S {
             transportK8STLS.getConfigurer().configure(tpb1);
         }
         TransportParameter param1 = tpb1.build();
-        
         TransportConnector cl1 = TransportFactory.createConnector();
         try {
             cl1.connect(param1);
@@ -191,7 +190,6 @@ public class TransportK8S {
                         if (isStopped) {
                             break;
                         }
-                        
                         if (transportMessagesList.isEmpty()) {
                             TimeUtils.sleep(1);
                         } else {
@@ -225,6 +223,8 @@ public class TransportK8S {
                 }
             };
             requestThread.start();
+            File file = new File("ServerReady.k8s"); 
+            file.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
