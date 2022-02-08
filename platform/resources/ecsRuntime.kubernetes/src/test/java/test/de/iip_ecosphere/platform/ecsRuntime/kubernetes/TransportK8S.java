@@ -151,7 +151,6 @@ public class TransportK8S {
      * 
      */
     public void start(TransportK8STLS transportK8STLS) {
-
         ConcurrentLinkedDeque<TransportMessage> transportMessagesList = new ConcurrentLinkedDeque<TransportMessage>();
         SerializerRegistry.registerSerializer(TransportMessageJsonSerializer.class);
         TransportParameterBuilder tpb1 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl1");
