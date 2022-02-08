@@ -39,6 +39,7 @@ public class WorkerAmqpJavaK8SProxy {
     private static String serverPort = "9922";
     private static boolean tlsCheck = false;
     private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
+    private static ArrayList<TransportK8SJavaProxy> k8SJavaProxyList = new ArrayList<TransportK8SJavaProxy>();
     
     //    private static ConcurrentLinkedDeque<Integer> requestDeque = new ConcurrentLinkedDeque<Integer>();
     
@@ -172,10 +173,12 @@ public class WorkerAmqpJavaK8SProxy {
                     
                     TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
                     
-                    K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP,
+                    K8SJavaProxy amqpK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP,
                             serverPort, transportK8STLS);
                     
-                    startMultiThreaded(mqttK8SJavaProxy, localPort);
+                    k8SJavaProxyList.add((TransportK8SJavaProxy) amqpK8SJavaProxy);
+
+                    startMultiThreaded(amqpK8SJavaProxy, localPort);
                 } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
                         | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
                     System.err.println("Exception in the starting the multi-threads method");
@@ -188,6 +191,7 @@ public class WorkerAmqpJavaK8SProxy {
         while (true) {
             if (new File("/tmp/EndClientRun.k8s").exists()) {
                 try {
+                    k8SJavaProxyList.get(0).getNormalcl1().disconnect();
                     serverSocketList.get(0).close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -256,7 +260,7 @@ public class WorkerAmqpJavaK8SProxy {
     /**
      * Start multi-threads method to receive and process requests.
      * 
-     * @param mqttK8SJavaProxy  the proxy used to receive the new requests
+     * @param amqpK8SJavaProxy  the proxy used to receive the new requests
      * @param localPort         is the port on the localhost to receive the new
      *                          requests
      * 
@@ -269,7 +273,7 @@ public class WorkerAmqpJavaK8SProxy {
      * @throws UnrecoverableKeyException
      * 
      */
-    public static void startMultiThreaded(final K8SJavaProxy mqttK8SJavaProxy, int localPort)
+    public static void startMultiThreaded(final K8SJavaProxy amqpK8SJavaProxy, int localPort)
             throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
             CertificateException, InvalidKeySpecException, IOException {
 
@@ -278,7 +282,7 @@ public class WorkerAmqpJavaK8SProxy {
             return;
         }
         
-        ServerSocket serverSocket = mqttK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
+        ServerSocket serverSocket = amqpK8SJavaProxy.getServerSocket(localPort, null, null, null, tlsCheck);
         serverSocketList.add(serverSocket);
         
         System.out.println("Started multi-threaded server at localhost port " + localPort);
@@ -302,12 +306,12 @@ public class WorkerAmqpJavaK8SProxy {
                             reader = socket.getInputStream();
                             writer = new BufferedOutputStream(socket.getOutputStream());
 
-                            byte[] requestByte = mqttK8SJavaProxy.extractK8SRequestByte(reader);
+                            byte[] requestByte = amqpK8SJavaProxy.extractK8SRequestByte(reader);
 
                             if (requestByte != null) {
 
-                                K8SRequest request = mqttK8SJavaProxy.createK8SRequest(requestByte);
-                                byte[] responseString = mqttK8SJavaProxy.sendK8SRequest(writer, request);
+                                K8SRequest request = amqpK8SJavaProxy.createK8SRequest(requestByte);
+                                byte[] responseString = amqpK8SJavaProxy.sendK8SRequest(writer, request);
                                 
                                 if (responseString.length == 0) {
                                     break;
