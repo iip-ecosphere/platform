@@ -33,7 +33,7 @@ public class TransportK8S {
     private static boolean isStopped = false;
     private ServerAddress addr;
     private ProxyType proxyType;
-    
+    private TransportConnector cl1;
     
     /**
      * Creates a transport K8S java proxy instance, it will be either MasterProxy or WorkerProxy.
@@ -139,8 +139,10 @@ public class TransportK8S {
      * Set the Transport stop status.
      *
      * @param isStopped the Transport stop status
+     * @throws IOException 
      */
-    public void setStopped(boolean isStopped) {
+    public void setStopped(boolean isStopped) throws IOException {
+        cl1.disconnect();
         TransportK8S.isStopped = isStopped;
     }
 
@@ -158,7 +160,7 @@ public class TransportK8S {
             transportK8STLS.getConfigurer().configure(tpb1);
         }
         TransportParameter param1 = tpb1.build();
-        TransportConnector cl1 = TransportFactory.createConnector();
+        cl1 = TransportFactory.createConnector();
         try {
             cl1.connect(param1);
             final String stream1 = cl1.composeStreamName("", "stream1");
