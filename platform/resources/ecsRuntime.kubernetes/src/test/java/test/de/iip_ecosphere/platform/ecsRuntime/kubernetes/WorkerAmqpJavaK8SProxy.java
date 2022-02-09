@@ -242,10 +242,10 @@ public class WorkerAmqpJavaK8SProxy {
             TransportConnector cl1 = TransportFactory.createConnector();
             TransportK8STLS transportK8STLS = new TransportK8STLS(tlsCheck, configurer);
             
-            K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
+            K8SJavaProxy amqpK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP, serverPort,
                     transportK8STLS);
             
-            startMultiThreaded(mqttK8SJavaProxy, localPort);
+            startMultiThreaded(amqpK8SJavaProxy, localPort);
         } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException
                 | CertificateException | InvalidKeySpecException | IOException e) {
             System.err.println("Exception in the starting the multi-threads method");
