@@ -20,4 +20,4 @@ Besides the Maven build specifications for the platform dependencies, the test b
 
 This package contains also programs to optimize specific deployments, e.g., to reduce the overlap between JAR folders.
 
-**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **16.11.2021** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/02/10** or newer is required. Use `mvn -U exec:java ...`
