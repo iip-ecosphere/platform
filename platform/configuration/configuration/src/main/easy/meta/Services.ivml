@@ -210,56 +210,7 @@ project Services {
        // TODO #input=#output
        // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
    }
-   
-   // IIP-Ecosphere provided connectors
-   compound Connector refines Service {
-       IOType machineInput; // initial only one, connector not machine representation
-       IOType machineOutput; // initial only one, connector not machine representation
-       
-       String class;
-       String artifact;
-       String inAdapterClass = ""; // if given, use adapter
-       String outAdapterClass = ""; // if given, use adapter
-       // may collapse into one, to be supported by configurable mapping
-       refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
-       refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
-       
-       NonEmptyString host = "localhost";
-       Port port;
-
-       output.size() < 2;
-       input.size() < 2;
-       kind == ServiceKind.SOURCE_SERVICE;
-       deployable == true;
-   }
-   
-   compound ChannelConnector refines Connector {
-       String inSerializerClass = ""; // if not given, use registry
-       String outSerializerClass = ""; // if not given, use registry
-       String inChannel = "";
-       String outChannel = "";
-       IOType machineInput = {type = refBy(ByteArrayType)};
-       IOType machineOutput = {type = refBy(ByteArrayType)};
-   }
-   
-   compound OpcUaV1Connector refines Connector {
-        String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
-        String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
-        IOType machineInput = {type = refBy(ObjectType)};
-        IOType machineOutput = {type = refBy(OpcUaV1DataItemType)};
-   }
-   
-   compound MqttV3Connector refines ChannelConnector {
-        String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
-        String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
-   }
-
-   PrimitiveType OpcUaV1DataItemType = {
-       name = "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"
-   };
-   
-   // TODO remaining connectors
-   
+      
    // ------------------------ families -----------------
    
    abstract compound ServiceFamily refines ServiceBase, CFamily {
@@ -267,9 +218,5 @@ project Services {
         Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
         kind == members.asSequence().first().kind; // propagate
    }
-   
-   freeze {
-       OpcUaV1DataItemType;
-    } but (f|f.bindingTime >= BindingTime.runtimeMon);
-   
+      
 }
