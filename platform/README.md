@@ -56,7 +56,9 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * Upcoming: Resource management for Kubernetes
     * [Device management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt/README.md) with MinIO, S3Mock and ThingsBoard integrations.
  * [Security and Data Protection](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
- * Reusable Intelligent Services
+    * [KIPROTECT](https://kiprotect.com/) [KODEX](https://heykodex.com/) [integration](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/security.services.kodex/README.md)
+ * [Reusable Intelligent Services](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/README.md)
+    * [RapidMiner](https://rapidminer.com) Real-Time Scoring Agent (RTSA) for [AI components and processes](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.rapidminer.rtsa/README.md).
  * Configuration
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
     * Resource optimization
