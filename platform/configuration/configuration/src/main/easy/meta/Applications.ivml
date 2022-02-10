@@ -2,6 +2,7 @@ project Applications {
 
     import Devices;
     import Services;
+    import Connectors;
     import DataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;

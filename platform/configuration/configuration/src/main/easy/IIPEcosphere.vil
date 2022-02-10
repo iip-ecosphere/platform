@@ -16,6 +16,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     String javaNodesPackage = "iip.nodes";
     String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
     String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
+    String mvnProjectPySrcDir = "$" + "{project.basedir}/src/main/python";
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
@@ -194,18 +195,25 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
         bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
-        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
+        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
     generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+        IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
         sequenceOf(String) tmp = service.artifact.split(":");
         String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
         artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+        
+        if (cfg.sharedInterfaces) {
+            bins.add(cfg.sharedArtifact+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+            bins.add(tmp[0]+":"+tmp[1]+":"+tmp[2]+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+        }
+        
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
-        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|process-sources|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
+        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
     }
     
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------

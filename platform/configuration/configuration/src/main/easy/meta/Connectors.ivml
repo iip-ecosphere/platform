@@ -1,7 +1,94 @@
 project Connectors {
 
+    import DataTypes;
     import Transport;
+    import Services;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // TODO move up connectors
+    
+    enum TextEncoding{ANSI, ASCII, UTF8};
+    
+    // ------------------------------ Machine Parsers -----------------------------
+    
+    // turn machine-level information into input that can be used by a generated connector
+    // serializer. May parse into linear or hierarchical structure, either by name convention
+    // (given in implementation, configured by mapping) or via index/positions in structure (linear
+    // up-down traversal in IVML sequence). Name-based mapping has priority if given.
+    
+    abstract compound MachineParser {
+        setOf(MachineParserMappingEntry) mapping = {};
+    }
+    
+    compound MachineParserMappingEntry {
+        Integer position;
+        String name;
+    }
+    
+    compound JavaMachineParser refines MachineParser {
+       String class; // optional class name, if not given do not generate service binding
+       String artifact; // optional maven artifact
+    }
+    
+    abstract compound GenericMachineParser {
+    }
+    
+    compound TextLineParser refines GenericMachineParser {
+        NonEmptyString separator;
+    }
+    
+    // may be more GenericMachineParsers, e.g., CSV, TSV
+    
+    // -------------------------------------- Connector Operations -------------------------------
+    
+    // Post-parser mapping operations forming a simplified expression tree structure with 
+    // record-field leaf nodes
+    
+    abstract compound ConnectorOperation {
+    }
+    
+    compound ConnectorFieldAccess refines ConnectorOperation {
+        refTo(Field) field;
+    }
+
+    abstract compound ConstantConnectorOperation refines ConnectorOperation {
+    }
+
+    compound IntegerConstantConnectorOperation refines ConstantConnectorOperation {
+        Integer value;
+    }
+
+    compound StringConstantConnectorOperation refines ConstantConnectorOperation {
+        String value;
+    }
+
+    compound BooleanConstantConnectorOperation refines ConstantConnectorOperation {
+        Boolean value;
+    }
+
+    compound RealConstantConnectorOperation refines ConstantConnectorOperation {
+        Real value;
+    }
+    
+    abstract compound ConnectorTranslationOperation refines ConnectorOperation {
+        sequenceOf(ConnectorOperation) arguments;
+    }
+    
+    compound AddConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound SubtractConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound MuliplyConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound DivideConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
     
 }
