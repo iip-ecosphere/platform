@@ -111,33 +111,6 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
 
     /**
-     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
-     * 
-     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
-     * 
-     * @see #getServiceMapper()
-     * @see #createMetricsClient()
-     * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
-     */
-    public static void mapService(Service service) {
-        mapService(getServiceMapper(), service);
-    }
-
-    /**
-     * Maps a service through a given mapper and metrics client. No mapping will take place if either {@code service},
-     * {@code mapper} or {@link #getProtocolBuilder()} is <b>null</b>. The specific mapping for the metrics will only
-     * take place if {@code metricsClient} is not <b>null</b>.
-     * 
-     * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
-     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
-     */
-    public static void mapService(ServiceMapper mapper, Service service) {
-        if (null != service && null != mapper && null != Starter.getProtocolBuilder()) {
-            mapper.mapService(service);
-        }
-    }
-
-    /**
      * Creates a metrics client.
      * 
      * @param environment the Spring environment
