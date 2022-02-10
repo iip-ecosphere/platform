@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -175,51 +176,39 @@ public class Starter {
     }
     
     /**
+     * Maps a service through a given mapper and metrics client. No mapping will take place if either {@code service},
+     * {@code mapper} or {@link #getProtocolBuilder()} is <b>null</b>. The specific mapping for the metrics will only
+     * take place if {@code metricsClient} is not <b>null</b>.
+     * 
+     * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     */
+    public static void mapService(ServiceMapper mapper, Service service) {
+        if (null != service && null != mapper && null != Starter.getProtocolBuilder()) {
+            mapper.mapService(service);
+        }
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * 
+     * @see #getServiceMapper()
+     * @see #createMetricsClient()
+     * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
+     */
+    public static void mapService(Service service) {
+        mapService(getServiceMapper(), service);
+    }
+    
+    /**
      * Terminates running server instances.
      */
     public static void shutdown() {
         if (null != server) {
             server.stop(false); 
         }
-    }
-    
-    /**
-     * Emulates reading a Spring-like parameter if the configuration is not yet in place.
-     * 
-     * @param args the arguments
-     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
-     */
-    public static String getArg(String[] args, String argName, String dflt) {
-        String result = dflt;
-        String prefix = PARAM_PREFIX + argName + PARAM_VALUE_SEP;
-        for (int a = 0; a < args.length; a++) {
-            String arg = args[a];
-            if (arg.startsWith(prefix)) {
-                result = arg.substring(prefix.length());
-                break;
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * Returns an int command line argument.
-     * 
-     * @param args the arguments
-     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
-     */
-    public static int getIntArg(String[] args, String argName, int dflt) {
-        int result;
-        try {
-            result = Integer.parseInt(getArg(args, argName, String.valueOf(dflt)));
-        } catch (NumberFormatException e) {
-            result = dflt;
-        }
-        return result;
     }
 
     /**

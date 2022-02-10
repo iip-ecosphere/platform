@@ -218,7 +218,9 @@ public abstract class AbstractService implements Service {
                 loaders += l.getClass().getSimpleName();
                 l = l.getParent();
             }
-            LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
+            // not automatically error - if multiple services are available, Spring may load all but only one 
+            // is correctly bound
+            LoggerFactory.getLogger(AbstractService.class).warn("Cannot instantiate service of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
                 + ". Service '" + serviceId + "' will not be functional!");
         }
