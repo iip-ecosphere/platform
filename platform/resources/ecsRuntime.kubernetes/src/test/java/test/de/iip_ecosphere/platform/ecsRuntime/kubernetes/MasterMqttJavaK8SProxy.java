@@ -1,6 +1,7 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Test;
 
@@ -160,8 +161,12 @@ public class MasterMqttJavaK8SProxy {
         
         while (true) {
             if (new File("/tmp/EndServerRun.k8s").exists()) {
+                try {
+                    mqtt.setStopped(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 server.stop(true);
-                mqtt.setStopped(true);
                 break;
             }
             TimeUtils.sleep(1);

@@ -128,6 +128,24 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
         this.serverPort = serverPort;
     }
     
+    /**
+     * Returns the transport connector.
+     * 
+     * @return the transport connector
+     */
+    public TransportConnector getNormalcl1() {
+        return normalcl1;
+    }
+
+    /**
+     * Set the transport connector.
+     *
+     * @param normalcl1 the transport connector
+     */
+    public void setNormalcl1(TransportConnector normalcl1) {
+        this.normalcl1 = normalcl1;
+    }
+
     @Override
     public byte[] sendK8SRequest(BufferedOutputStream writer, K8SRequest request) throws IOException {
 

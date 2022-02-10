@@ -38,7 +38,8 @@ public class WorkerMqttJavaK8SProxy {
     private static String serverPort = "9922";
     private static boolean tlsCheck = false;
     private static ArrayList<ServerSocket> serverSocketList = new ArrayList<ServerSocket>();
-    
+    private static ArrayList<TransportK8SJavaProxy> k8SJavaProxyList = new ArrayList<TransportK8SJavaProxy>();
+
     //    private static ConcurrentLinkedDeque<Integer> requestDeque = new ConcurrentLinkedDeque<Integer>();
     
     /** 
@@ -142,7 +143,6 @@ public class WorkerMqttJavaK8SProxy {
             public void run() {
                 try {            
                     TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
-                    TransportConnector cl1 = TransportFactory.createConnector();
                     
                     TransportParameterConfigurer configurer = null;
                     if (tlsCheck) {
@@ -163,6 +163,8 @@ public class WorkerMqttJavaK8SProxy {
                     K8SJavaProxy mqttK8SJavaProxy = new TransportK8SJavaProxy(ProxyType.WorkerProxy, serverIP,
                             serverPort, transportK8STLS);
                     
+                    k8SJavaProxyList.add((TransportK8SJavaProxy) mqttK8SJavaProxy);
+                    
                     startMultiThreaded(mqttK8SJavaProxy, localPort);
                 } catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
                         | KeyStoreException | CertificateException | InvalidKeySpecException | IOException e) {
@@ -176,6 +178,7 @@ public class WorkerMqttJavaK8SProxy {
         while (true) {
             if (new File("/tmp/EndClientRun.k8s").exists()) {
                 try {
+                    k8SJavaProxyList.get(0).getNormalcl1().disconnect();
                     serverSocketList.get(0).close();
                 } catch (IOException e) {
                     e.printStackTrace();
