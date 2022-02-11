@@ -10,12 +10,12 @@ project Connectors {
     
     enum TextEncoding{ANSI, ASCII, UTF8};
     
-    // ------------------------------ Machine Parsers -----------------------------
+    // ------------------------------ Machine Parsers -----------------------------------------
     
     // turn machine-level information into input that can be used by a generated connector
     // serializer. May parse into linear or hierarchical structure, either by name convention
-    // (given in implementation, configured by mapping) or via index/positions in structure (linear
-    // up-down traversal in IVML sequence). Name-based mapping has priority if given.
+    // (given in implementation, configured by mapping) or via index/positions in structure 
+    // (linear up-down traversal in IVML sequence). Name-based mapping has priority if given.
     
     abstract compound MachineParser {
         setOf(MachineParserMappingEntry) mapping = {};
@@ -27,23 +27,50 @@ project Connectors {
     }
     
     compound JavaMachineParser refines MachineParser {
-       String class; // optional class name, if not given do not generate service binding
+       String class; // optional class name, must comply with parser.InputParser 
        String artifact; // optional maven artifact
     }
     
-    abstract compound GenericMachineParser {
+    abstract compound GenericMachineParser refines MachineParser {
     }
     
+    // represents parser.TestLineParser
+    // reads text line and splits according to separator, serves also for TSV, CSV
     compound TextLineParser refines GenericMachineParser {
         NonEmptyString separator;
     }
     
-    // may be more GenericMachineParsers, e.g., CSV, TSV
+    // --------------------------------------- Machine Formatters --------------------------------
+    
+    // opposite direction of machine parsers for sending back commands on the same connector
+    
+    abstract compound MachineFormatter {
+        setOf(MachineParserMappingEntry) mapping = {};
+    }
+    
+    compound JavaMachineFormatter refines MachineFormatter {
+       String class; // optional class name, must comply with formatter.OutputFormatter
+       String artifact; // optional maven artifact
+    }
+
+    abstract compound GenericMachineFormatter refines MachineFormatter {
+    }
+
+    // represents formatter.TestLineFormatter
+    // composes text lines using separator, serves also for TSV, CSV
+    compound TextLineFormatter refines GenericMachineFormatter {
+        NonEmptyString separator;
+    }
     
     // -------------------------------------- Connector Operations -------------------------------
     
     // Post-parser mapping operations forming a simplified expression tree structure with 
     // record-field leaf nodes
+    
+    compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+        refTo(Field) field;
+        ConnectorOperation operation;
+    }
     
     abstract compound ConnectorOperation {
     }
@@ -96,6 +123,8 @@ project Connectors {
    compound Connector refines Service {
        IOType machineInput; // initial only one, connector not machine representation
        IOType machineOutput; // initial only one, connector not machine representation
+       setOf(AssignmentOperation) operations = {};
+       TextEncoding encoding = TextEncoding::ASCII;
        
        String class;
        String artifact;
@@ -121,6 +150,8 @@ project Connectors {
        String outChannel = "";
        IOType machineInput = {type = refBy(ByteArrayType)};
        IOType machineOutput = {type = refBy(ByteArrayType)};
+       MachineFormatter outputFormatter;
+       MachineParser inputParser;
    }
    
    compound OpcUaV1Connector refines Connector {
@@ -133,6 +164,11 @@ project Connectors {
    compound MqttV3Connector refines ChannelConnector {
         String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
         String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
+   }
+   
+   compound MqttV5Connector refines ChannelConnector {
+        String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
    }
 
    PrimitiveType OpcUaV1DataItemType = {
