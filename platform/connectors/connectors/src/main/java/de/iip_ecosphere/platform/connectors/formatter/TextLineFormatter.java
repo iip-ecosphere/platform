@@ -10,41 +10,50 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.connectors.parser;
+package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 
 /**
- * Implements a generic line parser, i.e., data instances are assumed to be given in a 
- * single line of text.
+ * A simple text line formatter for given separators. Field names are ignored.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TextLineParser implements InputParser<String> {
+public class TextLineFormatter implements OutputFormatter<String> {
 
-    public static final InputConverter<String> CONVERTER = new ConverterFromString();
+    public static final OutputConverter<String> CONVERTER = new ConverterToString();
     private String charset;
     private String separator;
-    
+    private StringBuilder tmp = new StringBuilder();
+
     /**
-     * Creates a new text line parser.
+     * Creates a new text line formatter.
      * 
      * @param charset the charset of the text encoding (preliminary as string)
      * @param separator the separator to be used between data fields
      */
-    public TextLineParser(String charset, String separator) {
+    public TextLineFormatter(String charset, String separator) {
         this.charset = charset;
         this.separator = separator;
     }
     
     @Override
-    public ParseResult<String> parse(byte[] data) throws IOException {
-        String s = new String(data, charset); // unsupportedencoding -> IOException
-        return new ArrayParseResult(s.split(separator)); // we may pool this...
+    public void add(String name, String data) throws IOException {
+        if (tmp.length() > 0) {
+            tmp.append(separator);
+        }
+        tmp.append(data);
     }
 
     @Override
-    public InputConverter<String> getConverter() {
+    public byte[] chunkCompleted() throws IOException {
+        String result = tmp.toString();
+        tmp = new StringBuilder();
+        return result.getBytes(charset);
+    }
+
+    @Override
+    public OutputConverter<String> getConverter() {
         return CONVERTER;
     }
 

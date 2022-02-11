@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
     ConnectorParameterTest.class,
     ConnectorTest.class,
     ConnectorsAasTest.class,
-    TextLineParserTest.class
+    TextLineParserTest.class,
+    TextLineFormatterTest.class
 })
 public class AllTests {
 }

@@ -14,9 +14,12 @@ package test.de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import org.junit.Assert;
 import de.iip_ecosphere.platform.connectors.parser.TextLineParser;
@@ -36,9 +39,36 @@ public class TextLineParserTest {
     @Test
     public void testTextLineParser() throws IOException {
         String charset = StandardCharsets.UTF_8.name();
-        final String[] parts = new String[]{"aaa", "bbb", "ccc", "ddd"};
+        final String[] parts = new String[]{"123", "bbb", "true", "0.45", "0.56", "12345"};
         testTextLineParser(parts, charset, "#");
-        testTextLineParser(parts, charset, "#-#");
+        ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
+
+        InputConverter<String> conv = TextLineParser.CONVERTER;
+        Assert.assertEquals(123, conv.toInt(pr.getData(0)));
+        Assert.assertEquals("bbb", conv.toString(pr.getData(1)));
+        Assert.assertEquals(true, conv.toBoolean(pr.getData(2)));
+        Assert.assertEquals(0.45, conv.toDouble(pr.getData(3)), 0.01);
+        Assert.assertEquals(0.56, conv.toFloat(pr.getData(4)), 0.01);
+        Assert.assertEquals(12345L, conv.toLong(pr.getData(5)));
+        
+        Map<String, Integer> mapping = new HashMap<>();
+        mapping.put("field1", 0);
+        mapping.put("field2", 1);
+        mapping.put("field3", 2);
+        mapping.put("fieldX", 3);
+        Assert.assertEquals(parts[3], pr.getData("fieldX", 0, mapping));
+        Assert.assertEquals(parts[1], pr.getData("field2", 0, mapping));
+        Assert.assertEquals(parts[1], pr.getData("f", 1, mapping));
+        try {
+            pr.getData("f", 10, mapping);
+            Assert.fail("No Exception");
+        } catch (IndexOutOfBoundsException e) {
+        }
+        try {
+            pr.getData(-1);
+            Assert.fail("No Exception");
+        } catch (IndexOutOfBoundsException e) {
+        }
 
         charset = StandardCharsets.ISO_8859_1.name();
         testTextLineParser(parts, charset, "#");
@@ -54,7 +84,8 @@ public class TextLineParserTest {
      * @return the parse result for further tests
      * @throws IOException in case that parsing fails
      */
-    private ParseResult testTextLineParser(String[] parts, String charset, String separator) throws IOException {
+    private ParseResult<String> testTextLineParser(String[] parts, String charset, String separator) 
+        throws IOException {
         String testString = "";
         for (String p: parts) {
             if (testString.length() > 0) {
@@ -63,13 +94,46 @@ public class TextLineParserTest {
             testString += p;
         }
         TextLineParser parser = new TextLineParser(charset, separator);
-        ParseResult result = parser.parse(testString.getBytes(charset));
+        Assert.assertNotNull(parser.getConverter());
+        ParseResult<String> result = parser.parse(testString.getBytes(charset));
         Assert.assertNotNull(result);
         Assert.assertEquals(parts.length, result.getDataCount());
         for (int i = 0; i < parts.length; i++) {
             Assert.assertEquals(parts[i], result.getData(i));
         }
         return result;
+    }
+    
+    /**
+     * Tests cases where the converter shall fail.
+     */
+    @Test
+    public void testConverterFail() {
+        InputConverter<String> conv = TextLineParser.CONVERTER;
+
+        try {
+            conv.toInt("abba");
+            Assert.fail("No exception thrown");
+        } catch (IOException e) {
+        }
+
+        try {
+            conv.toFloat("abba");
+            Assert.fail("No exception thrown");
+        } catch (IOException e) {
+        }
+
+        try {
+            conv.toLong("abba");
+            Assert.fail("No exception thrown");
+        } catch (IOException e) {
+        }
+
+        try {
+            conv.toDouble("abba");
+            Assert.fail("No exception thrown");
+        } catch (IOException e) {
+        }
     }
 
 }

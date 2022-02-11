@@ -12,14 +12,14 @@
 
 package de.iip_ecosphere.platform.connectors.parser;
 
-import java.util.Map;
+import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 
 /**
- * An array-based parse result.
+ * An array-based parse result for data parsed to strings.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ArrayParseResult extends AbstractParseResult {
+public class ArrayParseResult implements ParseResult<String> {
 
     private String[] data;
 
@@ -27,10 +27,8 @@ public class ArrayParseResult extends AbstractParseResult {
      * Creates an array-based parse result.
      * 
      * @param data the parsed data
-     * @param mapping the name-index mapping (may be empty)
      */
-    protected ArrayParseResult(String[] data, Map<String, Integer> mapping) {
-        super(mapping);
+    protected ArrayParseResult(String[] data) {
         this.data = data;
     }
     
@@ -40,7 +38,7 @@ public class ArrayParseResult extends AbstractParseResult {
     }
 
     @Override
-    public Object getData(int index) {
+    public String getData(int index) {
         return data[index];
     }
 
