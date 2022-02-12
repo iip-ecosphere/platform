@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.qpid.server.util.FileUtils;
@@ -46,6 +48,18 @@ import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironm
  * @author Holger Eichelberger, SSE
  */
 public class IvmlTests {
+    
+    private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
+    private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
+
+    static  {
+        ASSERT_FILE_EXTENSIONS.add(".java");
+        ASSERT_FILE_EXTENSIONS.add(".py");
+        ASSERT_FILE_EXTENSIONS.add(".yml");
+        ASSERT_FILE_EXTENSIONS.add(".xml");
+        
+        ASSERT_FILE_NAME_EXCLUSIONS.add("__init__.py");
+    }
 
     /**
      * Asserts and returns an instance of the configuration lifecycle descriptor.
@@ -416,8 +430,12 @@ public class IvmlTests {
                     assertAllFiles(f);
                 } else {
                     String name = f.getName();
-                    if (!name.equals("__init__.py")) {
-                        assertFile(f);
+                    int pos = name.lastIndexOf('.');
+                    String extension = "";
+                    if (pos > 0) {
+                        extension = name.substring(pos);
+                    }
+                    if (ASSERT_FILE_EXTENSIONS.contains(extension) && !ASSERT_FILE_NAME_EXCLUSIONS.contains(name)) {
                         Assert.assertTrue("File " + f + " is empty", FileUtils.readFileAsString(f).trim().length() > 0);
                     }
                 }
