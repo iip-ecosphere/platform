@@ -131,7 +131,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
-            maven("${appRoot}", true);
+            //maven("${appRoot}", true);
         };
     }
     
@@ -278,7 +278,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
-        maven("${appRoot}", true);
+        //maven("${appRoot}", true);
 
         artifacts.add(cfg.sharedArtifact);
     }
@@ -323,7 +323,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
-        maven("${ecsRuntimeRoot}", true);
+        //maven("${ecsRuntimeRoot}", true);
         generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, cfg.containerManager.memLimit)));
         
         serviceMgrRoot.mkdir();
@@ -334,7 +334,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
-        maven("${serviceMgrRoot}", true);
+        //maven("${serviceMgrRoot}", true);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service", addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit));
 
         ecsServiceMgrRoot.mkdir();
@@ -346,7 +346,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests);
-        maven("${ecsServiceMgrRoot}", true);
+        //maven("${ecsServiceMgrRoot}", true);
         generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit));
         
         platformRoot.mkdir();
@@ -357,7 +357,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests);
-        maven("${platformRoot}", true);
+        //maven("${platformRoot}", true);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "", withJava8=false);
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
  

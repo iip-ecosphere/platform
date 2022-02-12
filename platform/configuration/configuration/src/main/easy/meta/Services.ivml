@@ -219,4 +219,182 @@ project Services {
         kind == members.asSequence().first().kind; // propagate
    }
       
+      
+      
+   // --------------------------- connectors preliminary (easy import bug) --------------------      
+ 
+ 
+     enum TextEncoding{ANSI, ASCII, UTF8};
+    
+    // ------------------------------ Machine Parsers -----------------------------------------
+    
+    // turn machine-level information into input that can be used by a generated connector
+    // serializer. May parse into linear or hierarchical structure, either by name convention
+    // (given in implementation, configured by mapping) or via index/positions in structure 
+    // (linear up-down traversal in IVML sequence). Name-based mapping has priority if given.
+    
+    abstract compound MachineParser {
+        setOf(MachineParserMappingEntry) mapping = {};
+    }
+    
+    compound MachineParserMappingEntry {
+        Integer position;
+        String name;
+    }
+    
+    compound JavaMachineParser refines MachineParser {
+       String class; // optional class name, must comply with parser.InputParser 
+       String artifact; // optional maven artifact
+    }
+    
+    abstract compound GenericMachineParser refines MachineParser {
+    }
+    
+    // represents parser.TestLineParser
+    // reads text line and splits according to separator, serves also for TSV, CSV
+    compound TextLineParser refines GenericMachineParser {
+        NonEmptyString separator;
+    }
+    
+    // --------------------------------------- Machine Formatters --------------------------------
+    
+    // opposite direction of machine parsers for sending back commands on the same connector
+    
+    abstract compound MachineFormatter {
+        setOf(MachineParserMappingEntry) mapping = {};
+    }
+    
+    compound JavaMachineFormatter refines MachineFormatter {
+       String class; // optional class name, must comply with formatter.OutputFormatter
+       String artifact; // optional maven artifact
+    }
+
+    abstract compound GenericMachineFormatter refines MachineFormatter {
+    }
+
+    // represents formatter.TestLineFormatter
+    // composes text lines using separator, serves also for TSV, CSV
+    compound TextLineFormatter refines GenericMachineFormatter {
+        NonEmptyString separator;
+    }
+    
+    // -------------------------------------- Connector Operations -------------------------------
+    
+    // Post-parser mapping operations forming a simplified expression tree structure with 
+    // record-field leaf nodes
+    
+    compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+        refTo(Field) field;
+        ConnectorOperation operation;
+    }
+    
+    abstract compound ConnectorOperation {
+    }
+    
+    compound ConnectorFieldAccess refines ConnectorOperation {
+        refTo(Field) field;
+    }
+
+    abstract compound ConstantConnectorOperation refines ConnectorOperation {
+    }
+
+    compound IntegerConstantConnectorOperation refines ConstantConnectorOperation {
+        Integer value;
+    }
+
+    compound StringConstantConnectorOperation refines ConstantConnectorOperation {
+        String value;
+    }
+
+    compound BooleanConstantConnectorOperation refines ConstantConnectorOperation {
+        Boolean value;
+    }
+
+    compound RealConstantConnectorOperation refines ConstantConnectorOperation {
+        Real value;
+    }
+    
+    abstract compound ConnectorTranslationOperation refines ConnectorOperation {
+        sequenceOf(ConnectorOperation) arguments;
+    }
+    
+    compound AddConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound SubtractConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound MuliplyConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound DivideConnectorTranslationOperation refines ConnectorTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+      
+    // IIP-Ecosphere provided connectors
+    compound Connector refines Service {
+       IOType machineInput; // initial only one, connector not machine representation
+       IOType machineOutput; // initial only one, connector not machine representation
+       //setOf(AssignmentOperation) operations = {};
+       //TextEncoding encoding = TextEncoding::ASCII;
+       
+       String class;
+       String artifact;
+       String inAdapterClass = ""; // if given, use adapter
+       String outAdapterClass = ""; // if given, use adapter
+       // may collapse into one, to be supported by configurable mapping
+       refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
+       refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       
+       NonEmptyString host = "localhost";
+       Port port;
+
+       output.size() < 2;
+       input.size() < 2;
+       kind == ServiceKind.SOURCE_SERVICE;
+       deployable == true;
+   }
+   
+   compound ChannelConnector refines Connector {
+       String inSerializerClass = ""; // if not given, use registry
+       String outSerializerClass = ""; // if not given, use registry
+       String inChannel = "";
+       String outChannel = "";
+       IOType machineInput = {type = refBy(ByteArrayType)};
+       IOType machineOutput = {type = refBy(ByteArrayType)};
+       //MachineFormatter outputFormatter;
+       //MachineParser inputParser;
+   }
+   
+   compound OpcUaV1Connector refines Connector {
+        String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
+        String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
+        IOType machineInput = {type = refBy(ObjectType)};
+        IOType machineOutput = {type = refBy(OpcUaV1DataItemType)};
+   }
+   
+   compound MqttV3Connector refines ChannelConnector {
+        String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
+   }
+   
+   compound MqttV5Connector refines ChannelConnector {
+        String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
+   }
+
+   PrimitiveType OpcUaV1DataItemType = {
+       name = "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"
+   };
+   
+   // TODO remaining connectors
+    
+   freeze {
+       OpcUaV1DataItemType;
+   } but (f|f.bindingTime >= BindingTime.runtimeMon);
+      
+      
 }

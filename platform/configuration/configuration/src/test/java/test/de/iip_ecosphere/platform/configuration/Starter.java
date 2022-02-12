@@ -18,6 +18,7 @@ import java.util.List;
 
 import de.uni_hildesheim.sse.easy.loader.ListLoader;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
+import net.ssehub.easy.basics.modelManagement.ModelLocations.Location;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.instantiation.core.model.buildlangModel.BuildModel;
@@ -51,12 +52,14 @@ public class Starter {
      */
     public static void main(String[] args) throws IOException, ModelManagementException {
         final File modelFolder = new File("src/main/easy");
+        final File cfgFolder = new File("src/main/test");
         ListLoader loader = new ListLoader(); // file .easyStartup from classloader
         loader.setVerbose(true);
         System.out.println("EASy starting");
         loader.startup();
         System.out.println("EASy started");
-        VarModel.INSTANCE.locations().addLocation(modelFolder, ProgressObserver.NO_OBSERVER);
+        Location l = VarModel.INSTANCE.locations().addLocation(cfgFolder, ProgressObserver.NO_OBSERVER);
+        l.addDependentLocation(VarModel.INSTANCE.locations().addLocation(modelFolder, ProgressObserver.NO_OBSERVER));
         BuildModel.INSTANCE.locations().addLocation(modelFolder, ProgressObserver.NO_OBSERVER);
         TemplateModel.INSTANCE.locations().addLocation(modelFolder, ProgressObserver.NO_OBSERVER);
         System.out.println("Location added");
@@ -93,6 +96,7 @@ public class Starter {
         }
         System.out.println("Removing location");
         TemplateModel.INSTANCE.locations().removeLocation(modelFolder, ProgressObserver.NO_OBSERVER);
+        TemplateModel.INSTANCE.locations().removeLocation(cfgFolder, ProgressObserver.NO_OBSERVER);
         BuildModel.INSTANCE.locations().removeLocation(modelFolder, ProgressObserver.NO_OBSERVER);
         VarModel.INSTANCE.locations().removeLocation(modelFolder, ProgressObserver.NO_OBSERVER);
         System.out.println("EASy stopping");

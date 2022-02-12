@@ -126,7 +126,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             exec.setVilTarget(easySetup.getGenTarget());
             File ivmlCfg = easySetup.getIvmlConfigFolder();
             if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
-                exec.addIvmlFolder(ivmlCfg);
+                exec.prependIvmlFolder(ivmlCfg);
             }
             try {
                 exec.setupLocations();

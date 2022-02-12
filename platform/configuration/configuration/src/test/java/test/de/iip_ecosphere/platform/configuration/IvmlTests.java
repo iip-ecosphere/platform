@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.qpid.server.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -387,10 +388,41 @@ public class IvmlTests {
      * @return the actual asserted file ({@code base} + {@code name})
      */
     private static File assertFile(File base, String name) {
-        File f = new File(base, name);
-        Assert.assertTrue("File " + f + " does not exist", f.exists());
-        Assert.assertTrue("File " + f + " is empty", f.length() > 0);
-        return f;
+        return assertFile(new File(base, name));
+    }
+    
+    /**
+     * Asserts that the specified file exists and has contents.
+     * 
+     * @param file the file
+     * @return {@code file}
+     */
+    private static File assertFile(File file) {
+        Assert.assertTrue("File " + file + " does not exist", file.exists());
+        Assert.assertTrue("File " + file + " is empty", file.length() > 0);
+        return file;
+    }
+    
+    /**
+     * Generically asserts all files in {@code folder} and recursively in contained folders.
+     * 
+     * @param folder the folder to asserts the files within
+     */
+    private static final void assertAllFiles(File folder) {
+        File[] files = folder.listFiles();
+        if (null != files) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    assertAllFiles(f);
+                } else {
+                    String name = f.getName();
+                    if (!name.equals("__init__.py")) {
+                        assertFile(f);
+                        Assert.assertTrue("File " + f + " is empty", FileUtils.readFileAsString(f).trim().length() > 0);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -494,6 +526,7 @@ public class IvmlTests {
         File base = new File(gen, "MyAppExampleOld");
         assertAppInterfaces(base, true); // old style
         assertApplication(base);
+        assertAllFiles(base);
     }
     
     /**
