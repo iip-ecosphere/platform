@@ -156,6 +156,7 @@ public class IvmlTests {
         assertEcsRuntime(gen);
         assertServiceManager(gen);
         assertPlatform(gen);
+        assertAllFiles(gen);
     }
 
     /**
@@ -471,6 +472,7 @@ public class IvmlTests {
     public void testSimpleMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh");
         PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen)));
+        assertAllFiles(gen);
     }
 
     /**
@@ -485,6 +487,7 @@ public class IvmlTests {
     public void testSimpleMesh3() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh3");
         PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)));
+        assertAllFiles(gen);
     }
     
     /**
@@ -525,6 +528,7 @@ public class IvmlTests {
         
         assertFile(srcMainAssembly, "kodex_pseudonymizer.xml");
         assertFile(srcMainAssembly, "python_kodexPythonService.xml");
+        assertAllFiles(gen);
     }
 
     /**
