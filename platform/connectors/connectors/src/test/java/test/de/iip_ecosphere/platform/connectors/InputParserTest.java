@@ -22,14 +22,17 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import org.junit.Assert;
+
+import de.iip_ecosphere.platform.connectors.parser.InputParser;
+import de.iip_ecosphere.platform.connectors.parser.ParserUtils;
 import de.iip_ecosphere.platform.connectors.parser.TextLineParser;
 
 /**
- * Tests the {@link TextLineParser}.
+ * Tests the {@link InputParser}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TextLineParserTest {
+public class InputParserTest {
     
     /**
      * Tests basic successful text line parsing with different charsets and separators.
@@ -134,6 +137,68 @@ public class TextLineParserTest {
             Assert.fail("No exception thrown");
         } catch (IOException e) {
         }
+    }
+
+    /**
+     * A test parser without encoding.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class CustomBaseParser implements InputParser<String> {
+        
+        @Override
+        public ParseResult<String> parse(byte[] data) throws IOException {
+            return null;
+        }
+
+        @Override
+        public InputConverter<String> getConverter() {
+            return null;
+        }
+        
+    }
+
+    /**
+     * A test parser with encoding.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class CustomExBaseParser extends CustomBaseParser {
+        
+        private String encoding;
+        
+        /**
+         * Creates an instance and sets the {@code encoding}.
+         * 
+         * @param encoding the character encoding
+         */
+        public CustomExBaseParser(String encoding) {
+            this.encoding = encoding;
+        }
+        
+        /**
+         * Returns the encoding.
+         * 
+         * @return the encoding
+         */
+        public String getEncoding() {
+            return encoding;
+        }
+
+    }
+
+    /**
+     * Tests {@link ParserUtils#createInstance(ClassLoader, String, Class, String)}.
+     */
+    @Test
+    public void testCreateInstance() {
+        ClassLoader loader = InputParserTest.class.getClassLoader();
+        Assert.assertNull(ParserUtils.createInstance(loader, "me.here.Parser", "UTF-8"));
+        
+        Assert.assertNotNull(ParserUtils.createInstance(loader, CustomBaseParser.class.getName(), "UTF-8"));
+        InputParser<?> p = ParserUtils.createInstance(loader, CustomExBaseParser.class.getName(), "UTF-8");
+        Assert.assertTrue(p instanceof CustomExBaseParser);
+        Assert.assertEquals("UTF-8", ((CustomExBaseParser) p).getEncoding());
     }
 
 }

@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Interfaces for generic named/indexed input parsers.
+ * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
+ * String argument, the character encoding name.
  * 
  * @param <T> the type of data produced by parsing
  * @author Holger Eichelberger, SSE
