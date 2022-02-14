@@ -42,6 +42,15 @@ public interface OutputFormatter<T> {
         public T fromInt(int data) throws IOException;
 
         /**
+         * Converts data from int to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromInteger(int data) throws IOException;
+
+        /**
          * Converts data from long to the output format.
          * 
          * @param data the data

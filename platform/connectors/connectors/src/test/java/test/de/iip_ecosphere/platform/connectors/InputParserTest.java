@@ -47,7 +47,7 @@ public class InputParserTest {
         ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
 
         InputConverter<String> conv = TextLineParser.CONVERTER;
-        Assert.assertEquals(123, conv.toInt(pr.getData(0)));
+        Assert.assertEquals(123, conv.toInteger(pr.getData(0)));
         Assert.assertEquals("bbb", conv.toString(pr.getData(1)));
         Assert.assertEquals(true, conv.toBoolean(pr.getData(2)));
         Assert.assertEquals(0.45, conv.toDouble(pr.getData(3)), 0.01);
@@ -115,7 +115,7 @@ public class InputParserTest {
         InputConverter<String> conv = TextLineParser.CONVERTER;
 
         try {
-            conv.toInt("abba");
+            conv.toInteger("abba");
             Assert.fail("No exception thrown");
         } catch (IOException e) {
         }

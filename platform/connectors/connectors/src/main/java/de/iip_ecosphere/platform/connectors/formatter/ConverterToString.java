@@ -27,6 +27,11 @@ public class ConverterToString implements OutputConverter<String> {
     public String fromInt(int data) throws IOException {
         return Integer.toString(data);
     }
+    
+    @Override
+    public String fromInteger(int data) throws IOException {
+        return Integer.toString(data);
+    }
 
     @Override
     public String fromLong(long data) throws IOException {

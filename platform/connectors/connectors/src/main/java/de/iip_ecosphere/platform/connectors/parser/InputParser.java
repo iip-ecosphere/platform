@@ -86,6 +86,15 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public int toInt(T data) throws IOException;
+        
+        /**
+         * Converts parsed data returned by {@link ParseResult} to integer.
+         * 
+         * @param data the obtained data
+         * @return the converted integer
+         * @throws IOException if conversion fails
+         */
+        public int toInteger(T data) throws IOException;
 
         /**
          * Converts parsed data returned by {@link ParseResult} to long.

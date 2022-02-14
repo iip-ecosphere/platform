@@ -42,7 +42,7 @@ public class OutputFormatterTest {
         OutputConverter<String> conv = formatter.getConverter();
         Assert.assertNotNull(conv);
         formatter.add("field1", conv.fromString("abba"));
-        formatter.add("field2", conv.fromInt(21));
+        formatter.add("field2", conv.fromInteger(21));
         formatter.add("field2", conv.fromDouble(1.234));
         formatter.add("field2", conv.fromFloat(1.235f));
         formatter.add("field2", conv.fromLong(3456L));

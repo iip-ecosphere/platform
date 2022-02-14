@@ -31,6 +31,15 @@ public class ConverterFromString implements InputConverter<String> {
             throw new IOException(e);
         }
     }
+    
+    @Override
+    public int toInteger(String data) throws IOException {
+        try {
+            return Integer.parseInt(data);
+        } catch (NumberFormatException e) {
+            throw new IOException(e);
+        }
+    }
 
     @Override
     public long toLong(String data) throws IOException {
