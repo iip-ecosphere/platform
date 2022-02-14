@@ -37,6 +37,9 @@ project Connectors {
     compound TextLineParser refines GenericMachineParser {
         NonEmptyString separator;
     }
+
+    compound JsonParser refines GenericMachineParser {
+    }
     
     // --------------------------------------- Machine Formatters --------------------------------
     
@@ -58,6 +61,9 @@ project Connectors {
     // composes text lines using separator, serves also for TSV, CSV
     compound TextLineFormatter refines GenericMachineFormatter {
         NonEmptyString separator;
+    }
+
+    compound JsonFormatter refines GenericMachineFormatter {
     }
     
     // -------------------------------------- Connector Operations -------------------------------
@@ -147,8 +153,8 @@ project Connectors {
        String outChannel = "";
        IOType machineInput = {type = refBy(ByteArrayType)};
        IOType machineOutput = {type = refBy(ByteArrayType)};
-       //MachineFormatter outputFormatter;
-       //MachineParser inputParser;
+       MachineFormatter machineFormatter;
+       MachineParser machineParser;
    }
    
    compound OpcUaV1Connector refines Connector {

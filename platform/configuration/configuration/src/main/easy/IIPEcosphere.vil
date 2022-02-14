@@ -77,7 +77,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     // generate for all languages and according to serializer settings
                     String clsName = asTypeName(r.name);
                     vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
-                        pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false);
+                        pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false, impl=true);
                     vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
                         type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
                     javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
@@ -99,7 +99,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement no : nodes) {
                     String clsName = asTypeName(no.name);
-                    generateServiceElements(appRoot, config, no, no.impl);
+                    generateServiceElements(appRoot, config, artifacts, no, no.impl);
                     vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                         elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
                     artifacts.add(getArtifact(no));
@@ -138,7 +138,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     
     // dispatch basis
-    generateServiceElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service) = {
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ServiceBase service) = {
+        generateJavaServiceElements(appRoot, config, artifacts, no, service);
+    }
+    
+    generateJavaServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ServiceBase service) = {
         IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
         Path javaSrc = "${appRoot}/src/main/java";
@@ -155,12 +159,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         }
     }
     
-    generateServiceElements(Path appRoot, Configuration config, MeshElement no, CompleteService service) = {
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, CompleteService service) = {
         // do nothing, everything is here already generically in place
     }
     
     // Python (preliminary in here)
-    generateServiceElements(Path appRoot, Configuration config, MeshElement no, PythonService service) = {
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, PythonService service) = {
         IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
         Path pySrc = "${appRoot}/src/main/python";
@@ -168,6 +172,56 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         if (not(cfg.sharedInterfaces)) {
             vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", 
                 elt=no, pkg="interfaces");
+        }
+    }
+
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, Connector conn) = {
+        generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+    }
+
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ChannelConnector conn) = {
+        generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+        IIPEcosphere cfg = config;
+        // TODO consider given serializers
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+        RecordType machineInIf = conn.inInterface;
+        RecordType machineOutIf = conn.outInterface;
+        String connName = asTypeName(conn.name);
+
+        vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineInIf.name)}.java", type=machineInIf, 
+            pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
+        vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineOutIf.name)}.java", type=machineOutIf, 
+            pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
+        
+        String parserName = connName + "ParserSerializer";
+        vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", type=machineOutIf, 
+            pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
+            formatter=null, parser=conn.machineParser, className=parserName);
+        determineArtifacts(artifacts, conn.machineParser);
+
+        String formatterName = connName + "FormatterSerializer";
+        vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", type=machineInIf, 
+            pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
+            formatter=conn.machineFormatter, parser=null, className=formatterName);
+        determineArtifacts(artifacts, conn.machineFormatter);
+    }
+    
+    determineArtifacts(setOf(String) artifacts, MachineFormatter formatter) = {
+    }
+
+    determineArtifacts(setOf(String) artifacts, JavaMachineFormatter formatter) = {
+        if (isDefined(formatter.artifact) and formatter.artifact.length() > 0) {
+            artifacts.add(formatter.artifact);
+        }
+    }
+
+    determineArtifacts(setOf(String) artifacts, MachineParser parser) = {
+    }
+
+    determineArtifacts(setOf(String) artifacts, JavaMachineParser parser) = {
+        if (isDefined(parser.artifact) and parser.artifact.length() > 0) {
+            artifacts.add(parser.artifact);
         }
     }
     
@@ -245,9 +299,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
-                pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true);
+                pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true, impl=true);
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
-                pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true);
+                pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true, impl=true);
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, 
                 pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=false);
             javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
