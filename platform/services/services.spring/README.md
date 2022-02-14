@@ -104,6 +104,8 @@ In addition to the basic AAS settings, the following properties can be configure
   * The `executables` define operating system command mappings for the `executable` used in the `process` structure of the service descriptor. If the `executable` is one of the keys listed in `executables`, the corresponding value is used instead of the value given in `executable`. This is intended that a service manager configuration can override operating system defaults if needed, e.g., because a system Python version cannot be upgrated for some reason and a newer/local version must be used due to service dependencies. Then the local version can be given as value for the key `python` here and the `executable` just mentions `python` which is substituted accordingly.
   * `javaOpts` additional Java options to be appended to the command line of service JVMs to be started, default: `–Dlog4j2.formatMsgNoLookups=True` due to  [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228).
   * Please note that global service settings settings such as `aas` or `netMgr` occur here in the scope of `service-mgr`.
+  * `sharedLibs` may point to a folder where shared service libraries are located (default `/shared` also within containers)
+  * `downloadDir` the folder where to download service artifacts to
 * `cloud.deployer.local` refers to the underlying mechanism of Spring Cloud Stream. Service artifacts and their working directory may be temporary if not configured or in a given folder. These files may be deleted automatically on exit or remain in the folder. Both settings are helpful for debugging.
 
 The configuration structure is as shown below (the `executables` mapping is indicated by a single key-value pair):
@@ -120,6 +122,8 @@ The configuration structure is as shown below (the `executables` mapping is indi
         - ...
       aas: ...
       netMgr: ...
+      sharedLibs: <File>
+      downloadDir: <File>
       javaOpts:
         - <String>
         - ...
