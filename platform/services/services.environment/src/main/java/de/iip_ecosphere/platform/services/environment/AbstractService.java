@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +41,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public abstract class AbstractService implements Service {
 
+    private static ClassLoader loader = AbstractService.class.getClassLoader();
     private String id;
     private String name;
     private Version version;
@@ -120,6 +123,17 @@ public abstract class AbstractService implements Service {
      */
     protected void initializeFrom(YamlService yaml) {
     }
+    
+    /**
+     * Sets shared jar libraries for the services.
+     * 
+     * @param jars the libraries, ignored if <b>null</b>
+     */
+    public static void setLibJars(URL[] jars) {
+        if (null != jars) {
+            loader = new URLClassLoader(jars, loader);
+        }
+    }
 
     /**
      * Convenience method for creating service instances via the default constructor using the class loader of this 
@@ -132,7 +146,7 @@ public abstract class AbstractService implements Service {
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
     public static <S extends Service> S createInstance(String className, Class<S> cls) {
-        return createInstance(AbstractService.class.getClassLoader(), className, cls, null, null);
+        return createInstance(loader, className, cls, null, null);
     }
 
     /**
@@ -150,7 +164,7 @@ public abstract class AbstractService implements Service {
      */
     public static <S extends Service> S createInstance(String className, Class<S> cls, String serviceId, 
         String deploymentDescFile) {
-        return createInstance(AbstractService.class.getClassLoader(), className, cls, serviceId, deploymentDescFile);
+        return createInstance(loader, className, cls, serviceId, deploymentDescFile);
     }
 
     /**

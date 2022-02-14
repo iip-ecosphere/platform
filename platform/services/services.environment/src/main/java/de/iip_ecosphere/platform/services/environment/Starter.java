@@ -12,9 +12,16 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
@@ -33,6 +40,7 @@ public class Starter {
     
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
+    public static final String PARAM_JAR_FOLDER = "iip.jars";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
@@ -139,7 +147,34 @@ public class Starter {
             }
         }
 
-        LoggerFactory.getLogger(Starter.class).info("Configuring service command server for protocol '" + protocol 
+        String jarFolders = getArg(args, PARAM_JAR_FOLDER, null);
+        if (null != jarFolders && jarFolders.length() > 0) {
+            StringTokenizer t = new StringTokenizer(jarFolders.replace(";", ":"), ";");
+            while (t.hasMoreTokens()) {
+                String jarFolder = t.nextToken();
+                getLogger().info("Scanning " + jarFolder + " for shared libraries");
+                File jf = new File(jarFolder);
+                File[] files = jf.listFiles();
+                if (null != files) {
+                    List<URL> urls = new ArrayList<>();
+                    for (File f : files) {
+                        if (f.getName().endsWith(".jar")) {
+                            try {
+                                urls.add(f.toURI().toURL());
+                            } catch (MalformedURLException e) {
+                                getLogger().error("Cannot turn shared JAR file " + f + " to URL");
+                            }
+                        }
+                    }
+                    if (urls.size() > 0) {
+                        getLogger().info("Configuring shared libraries: " + urls);
+                        AbstractService.setLibJars(urls.toArray(new URL[0]));
+                    }
+                }
+            }
+        }
+
+        getLogger().info("Configuring service command server for protocol '" + protocol 
             + "' (empty means default) and port " + port);
         builder = factory.createProtocolServerBuilder(protocol, port);
     }
@@ -149,12 +184,21 @@ public class Starter {
      */
     public static void start() {
         if (null != builder) {
-            LoggerFactory.getLogger(Starter.class).info("Starting service command server");
+            getLogger().info("Starting service command server");
             server = builder.build();
             server.start();
         } else {
-            LoggerFactory.getLogger(Starter.class).error("Cannot start service command server as no builder is set.");
+            getLogger().error("Cannot start service command server as no builder is set.");
         }
+    }
+    
+    /**
+     * Returns the logger instance.
+     * 
+     * @return the logger instance
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(Starter.class);
     }
 
     /**
