@@ -188,23 +188,30 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         RecordType machineInIf = conn.inInterface;
         RecordType machineOutIf = conn.outInterface;
         String connName = asTypeName(conn.name);
-
-        vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineInIf.name)}.java", type=machineInIf, 
-            pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
-        vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineOutIf.name)}.java", type=machineOutIf, 
-            pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
         
-        String parserName = connName + "ParserSerializer";
-        vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", type=machineOutIf, 
-            pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
-            formatter=null, parser=conn.machineParser, className=parserName);
-        determineArtifacts(artifacts, conn.machineParser);
+println("InIf " + conn.machineParser);
+println("OutIf " + conn.machineFormatter);
+        if (isConfigured(conn.machineParser) and conn.machineParser <> null) {
+            vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineOutIf.name)}.java", type=machineOutIf, 
+                pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
 
-        String formatterName = connName + "FormatterSerializer";
-        vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", type=machineInIf, 
-            pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
-            formatter=conn.machineFormatter, parser=null, className=formatterName);
-        determineArtifacts(artifacts, conn.machineFormatter);
+            String parserName = connName + "ParserSerializer";
+            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", type=machineOutIf, 
+                pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
+                formatter=null, parser=conn.machineParser, className=parserName);
+            determineArtifacts(artifacts, conn.machineParser);
+        }
+
+        if (isConfigured(conn.machineFormatter) and conn.machineFormatter <> null) {
+            vilTemplateProcessor("JavaType", config, "${javaNodesSrc}/${asTypeName(machineInIf.name)}.java", type=machineInIf, 
+                pkg=javaNodesPackage, interface=false, sharedInterfaces=cfg.sharedInterfaces, impl=false);
+
+            String formatterName = connName + "FormatterSerializer";
+            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", type=machineInIf, 
+                pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=cfg.sharedInterfaces, impl=false, 
+                formatter=conn.machineFormatter, parser=null, className=formatterName);
+            determineArtifacts(artifacts, conn.machineFormatter);
+        }
     }
     
     determineArtifacts(setOf(String) artifacts, MachineFormatter formatter) = {

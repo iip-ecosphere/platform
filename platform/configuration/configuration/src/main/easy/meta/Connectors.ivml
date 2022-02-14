@@ -17,6 +17,7 @@ project Connectors {
     
     abstract compound MachineParser {
         setOf(MachineParserMappingEntry) mapping = {};
+        String transferType = "String"; // internal Java transfer type, redefine if needed
     }
     
     compound MachineParserMappingEntry {
@@ -39,6 +40,7 @@ project Connectors {
     }
 
     compound JsonParser refines GenericMachineParser {
+        //String transferType = "String";
     }
     
     // --------------------------------------- Machine Formatters --------------------------------
@@ -47,6 +49,7 @@ project Connectors {
     
     abstract compound MachineFormatter {
         setOf(MachineParserMappingEntry) mapping = {};
+        String transferType = "String"; // internal Java transfer type, redefine if needed 
     }
     
     compound JavaMachineFormatter refines MachineFormatter {
@@ -64,6 +67,7 @@ project Connectors {
     }
 
     compound JsonFormatter refines GenericMachineFormatter {
+        //String transferType = "String";
     }
     
     // -------------------------------------- Connector Operations -------------------------------
@@ -153,8 +157,8 @@ project Connectors {
        String outChannel = "";
        IOType machineInput = {type = refBy(ByteArrayType)};
        IOType machineOutput = {type = refBy(ByteArrayType)};
-       MachineFormatter machineFormatter;
-       MachineParser machineParser;
+       MachineFormatter machineFormatter = null;
+       MachineParser machineParser = null;
    }
    
    compound OpcUaV1Connector refines Connector {

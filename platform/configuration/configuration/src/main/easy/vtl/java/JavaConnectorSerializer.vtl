@@ -5,7 +5,6 @@ import JavaBasics;
 template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className=null) {
 
     Integer index = 0; // temporary
-    String templateType = "String";
 
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -15,9 +14,10 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
 
+    // preliminary... JavaBasics + ??
     def convName(PrimitiveType type) {
         switch(type.name) {
-            "Integer" : "Int",
+            "Integer" : "Integer",
             "Long" : "Long",
             "String" : "String",
             "Boolean" : "Boolean",
@@ -35,7 +35,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genFrom(RecordType type) {
         index = 0;
-        if (isConfigured(parser) and parser <> null) {
+        if (parser <> null) {
             genFromField("result", "", "", "", type);
         } else {
             ''
@@ -78,7 +78,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genTo(RecordType type) {
         index = 0;
-        if (isConfigured(formatter) and formatter <> null) {
+        if (formatter <> null) {
             genToField("source", "", "", type);
         } else {
             ''
@@ -112,67 +112,67 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // ---------------------------- inits ---------------------------------
 
-    def generateInitParser() {
-        if (isConfigured(parser) and parser <> null) {
-            '${generateInitParser(parser)}'
+    def generateInitParser(String className) {
+        if (parser <> null) {
+            '${generateInitParser(parser, className)}'
         } else {
             ''
         }
     }
 
-    def generateInitParser(MachineParser parser) {
+    def generateInitParser(MachineParser parser, String className) {
         ''
     }
 
-    def generateInitParser(TextLineParser parser) {
+    def generateInitParser(TextLineParser parser, String className) {
         'parser = new TextLineParser(encoding, "${parser.separator}");'
     }
 
-    def generateInitParser(JsonParser parser) {
+    def generateInitParser(JsonParser parser, String className) {
         ''  // TODO replace by class
     }
 
-    def generateInitParser(JavaMachineParser parser) {
-        'parser = ParserUtils.createInstace(${className}.class.getClassLoader(), "${parser.class}", encoding);'
+    def generateInitParser(JavaMachineParser parser, String className) {
+        'parser = (InputParser<${parser.transferType}>) ParserUtils.createInstance(${className}.class.getClassLoader(), "${parser.class}", encoding);'
     }
     
-    def generateInitFormatter() {
-        if (isConfigured(formatter) and formatter <> null) {
-            '${generateInitFormatter(formatter)}'
+    def generateInitFormatter(String className) {
+        if (formatter <> null) {
+            '${generateInitFormatter(formatter, className)}'
         } else {
             ''
         }
     }
     
-    def generateInitFormatter(MachineFormatter formatter) {
+    def generateInitFormatter(MachineFormatter formatter, String className) {
         'formatter = new DummyFormatter();'
     }
 
-    def generateInitFormatter(TextLineFormatter formatter) {
+    def generateInitFormatter(TextLineFormatter formatter, String className) {
         'formatter = new TextLineFormatter(encoding, "${formatter.separator}");'
     }
 
-    def generateInitFormatter(JsonFormatter formatter) {
+    def generateInitFormatter(JsonFormatter formatter, String className) {
         'formatter = new DummyFormatter();' // TODO replace by class 
     }
 
-    def generateInitFormatter(JavaMachineFormatter formatter) {
-        'formatter = FormatterUtils.createInstace(${className}.class.getClassLoader(), "${formatter.class}", encoding);'
+    def generateInitFormatter(JavaMachineFormatter formatter, String className) {
+        'formatter = (OutputFormatter<${formatter.transferType}>) FormatterUtils.createInstance(${className}.class.getClassLoader(), "${formatter.class}", encoding);'
     }
     
     // ---------------------------- attributes ---------------------------------
     
     def generateParserAttribute() {
-        if (isConfigured(parser) and parser <> null) {
-            'private InputParser<${templateType}> parser;'
+        if (parser <> null) {
+            'private InputParser<${parser.transferType}> parser;'
         } else {
             ''
         }
     }
     
     def generateParserFrom(String dataTypeName) {
-        if (isConfigured(parser) and parser <> null) {
-            'ParseResult<${templateType}> pr = parser.parse(data);
+        if (parser <> null) {
+            'ParseResult<${parser.transferType}> pr = parser.parse(data);
             ${dataTypeName} result = new ${dataTypeName}();
             ${genFrom(type)|e}
             return result;'
@@ -182,15 +182,15 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def generateFormatterAttribute() {
-        if (isConfigured(formatter) and formatter <> null) {
-            'private OutputFormatter<${templateType}> formatter;'
+        if (formatter <> null) {
+            'private OutputFormatter<${formatter.transferType}> formatter;'
         } else {
             ''
         }
     }
 
     def generateFormatterTo() {
-        if (isConfigured(formatter) and formatter <> null) {
+        if (formatter <> null) {
             '${genTo(type)|e}
             return formatter.chunkCompleted();'
         } else {
@@ -235,8 +235,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             
             public ${className}(String encoding, Map<String, Integer> mapping) {
                 this.mapping = mapping;
-                ${generateInitParser()|e}
-                ${generateInitFormatter()|e}
+                ${generateInitParser(className)|e}
+                ${generateInitFormatter(className)|e}
             }
         
             @Override             

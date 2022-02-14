@@ -68,8 +68,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(MeshSource elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : elt.output) {
-        println("HERE " + out+" "+elt);
-        println("HERE "+out.type);
             String type = toTypeName(out.type);
             String methodSuffix = "create" + type.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;

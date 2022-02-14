@@ -124,7 +124,9 @@ project SerializerConfig1 {
         inChannel = "IN",
         outChannel = "OUT",
         inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        outInterface = refBy(myConnMachineOut),  // PRELIMINARY
+        machineFormatter = JavaMachineFormatter{class="my.class.DoesNotExistFormatter", artifact="", transferType="String", mapping={}},
+        machineParser = JavaMachineParser{class="my.class.DoesNotExistParser", artifact="", transferType="String", mapping={}}
     };
 
     Service myAnonymizerService = JavaService {
