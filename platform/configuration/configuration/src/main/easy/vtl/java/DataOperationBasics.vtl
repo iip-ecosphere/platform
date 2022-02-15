@@ -1,0 +1,113 @@
+@advice(IIPEcosphere)
+template DataOperationBasics(Configuration config, FileArtifact target) {
+
+    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual) {
+        mapOf(Field, String) fields = {};
+        mapFields(src, fields, srcQual); 
+        mapFields(tgt, fields, tgtQual); 
+        for (AssignmentOperation a : assng) {
+            '${translateDataOperation(a, fields)}'
+        }
+    }
+
+    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields) {
+        translateFieldAccess(assng.field, fields) + " = " + translateDataOperation(assng.operation, fields) + ";";
+    }
+
+    // dispatch basis
+    def String translateDataOperation(DataOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
+        translateFieldAccess(op.field, fields);
+    }
+    
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields) {
+        fields.get(field);
+    }
+
+    // dispatch basis (completeness)
+    def String translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+
+    def String translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields) {
+        "\"${op.value}\""
+    }
+
+    def String translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+
+    def String translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+    
+    def String translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields) {
+        "(" + translateDataOperation(op.operation, fields) + ")";
+    }
+
+    // dispatch basis (completeness)
+    def String translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " + ", fields);
+    }
+
+    def String translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " - ", fields);
+    }
+
+    def String translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " * ", fields);
+    }
+
+    def String translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " / ", fields);
+    }
+
+    def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields) {
+        combine(op.arguments, sep, fields);
+    }
+    
+    def String combine(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields) {
+        /*String result = "";
+        boolean first = true;
+        for (ConnectorOperation op : args) {
+            if (not(first)) {
+                result = result + sep;
+            }
+            result = result + translateDataOperation(op, fields);
+            first = false;
+        }
+        result;*/
+
+        String result = "";
+        for (DataOperation op : args, sep) {
+            translateDataOperation(op, fields);
+        }
+        result;
+    }
+    
+    // ----------------------------------- mapping fields ---------------------------------
+    
+    // dispatch basis
+    def mapFields(DataType type, mapOf(Field, String) result, String qual) {
+    } 
+
+    def mapFields(RecordType type, mapOf(Field, String) result, String qual) {
+        for (Field f : type.fields) {
+            String fn = qual + "." + f.name;
+            result.add(f, fn);
+            mapFields(f.type, result, qual + "." + fn);
+        }
+    } 
+
+}

@@ -70,61 +70,67 @@ project Connectors {
         //String transferType = "String";
     }
     
-    // -------------------------------------- Connector Operations -------------------------------
+    // -------------------------------------- Data Operations -------------------------------
     
     // Post-parser mapping operations forming a simplified expression tree structure with 
     // record-field leaf nodes
     
     compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
         refTo(Field) field;
-        ConnectorOperation operation;
+        DataOperation operation;
     }
     
-    abstract compound ConnectorOperation {
+    abstract compound DataOperation {
     }
     
-    compound ConnectorFieldAccess refines ConnectorOperation {
+    compound DataFieldAccess refines DataOperation {
         refTo(Field) field;
     }
 
-    abstract compound ConstantConnectorOperation refines ConnectorOperation {
+    abstract compound ConstantDataOperation refines DataOperation {
     }
 
-    compound IntegerConstantConnectorOperation refines ConstantConnectorOperation {
+    compound IntegerConstantDataOperation refines ConstantDataOperation {
         Integer value;
     }
 
-    compound StringConstantConnectorOperation refines ConstantConnectorOperation {
+    compound StringConstantDataOperation refines ConstantDataOperation {
         String value;
     }
 
-    compound BooleanConstantConnectorOperation refines ConstantConnectorOperation {
+    compound BooleanConstantDataOperation refines ConstantDataOperation {
         Boolean value;
     }
 
-    compound RealConstantConnectorOperation refines ConstantConnectorOperation {
+    compound RealConstantDataOperation refines ConstantDataOperation {
         Real value;
     }
+
+    compound ParenthesisDataOperation refines DataOperation {
+        DataOperation operation;
+    }
     
-    abstract compound ConnectorTranslationOperation refines ConnectorOperation {
-        sequenceOf(ConnectorOperation) arguments;
+    abstract compound DataTranslationOperation refines DataOperation {
+        sequenceOf(DataOperation) arguments;
     }
     
-    compound AddConnectorTranslationOperation refines ConnectorTranslationOperation {
+    compound AddDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
 
-    compound SubtractConnectorTranslationOperation refines ConnectorTranslationOperation {
+    compound SubtractDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
 
-    compound MuliplyConnectorTranslationOperation refines ConnectorTranslationOperation {
+    compound MuliplyDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
 
-    compound DivideConnectorTranslationOperation refines ConnectorTranslationOperation {
+    compound DivideDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
+    
+    // ------------------------ connector types --------------------------
       
     // IIP-Ecosphere provided connectors
     compound Connector refines Service {
