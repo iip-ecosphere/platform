@@ -8,6 +8,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     String className, setOf(AssignmentOperation) assng) {
 
     Integer index = 0; // temporary
+    String add = "";
 
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -40,7 +41,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         index = 0;
         if (parser <> null) {
             '${genFromField("result", "", "", "", imType)}'
-            '${pltfTypeName} test = null; // PRELIMIARY'
+            '${pltfTypeName} test = new ${pltfTypeName}${add}();'
             '${translateDataOperations(assng, imType, "result", pltfType, "test")}'
         } else {
             ''
@@ -212,7 +213,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         setOf(AssignmentOperation) assng) {
         String imTypeName = asTypeName(imType.name);
         String pltfTypeName = asTypeName(pltfType.name);
-        String add = "";
         if (sharedInterfaces) {
             add = "Impl";
         }

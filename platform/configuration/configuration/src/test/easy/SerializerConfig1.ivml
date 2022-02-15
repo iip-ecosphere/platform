@@ -79,21 +79,37 @@ project SerializerConfig1 {
         output = {{type=refBy(StringType)}}
     };
     
-    RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineIn = {
         name = "myConnMachineIn",
         fields = {
             Field {
                 name = "dataField",
                 type = refBy(StringType)
+            }, Field {
+                name = "axis",
+                type = refBy(IntegerType)
             }
         }        
     };
 
-    RecordType myConnMachineOut = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineOut = {
         name = "myConnMachineOut",
         fields = {
             Field {
                 name = "cmdField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
+    RecordType myConnPltfIn = {
+        name = "myConnPltfIn",
+        fields = {
+            Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "dataField",
                 type = refBy(StringType)
             }
         }        
@@ -120,11 +136,11 @@ project SerializerConfig1 {
         port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut),  // PRELIMINARY
+        inInterface = refBy(myConnMachineIn), 
+        outInterface = refBy(myConnMachineOut),
         machineFormatter = JavaMachineFormatter{class="my.class.DoesNotExistFormatter", artifact="", transferType="String", mapping={}},
         machineParser = JavaMachineParser{class="my.class.DoesNotExistParser", artifact="", transferType="String", mapping={}}
     };

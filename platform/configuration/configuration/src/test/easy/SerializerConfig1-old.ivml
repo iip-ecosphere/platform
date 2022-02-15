@@ -137,11 +137,11 @@ project SerializerConfig1Old {
         port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(myConnPltfIn)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut),  // PRELIMINARY
+        inInterface = refBy(myConnMachineIn),
+        outInterface = refBy(myConnMachineOut),
         machineFormatter = TextLineFormatter{separator=",", mapping={}, transferType="String"},
         machineParser = TextLineParser{separator=",", mapping={}, transferType="String"},
         operations = {
