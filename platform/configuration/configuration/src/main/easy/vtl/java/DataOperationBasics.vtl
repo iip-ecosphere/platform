@@ -1,3 +1,5 @@
+import JavaBasics;
+
 @advice(IIPEcosphere)
 template DataOperationBasics(Configuration config, FileArtifact target) {
 
@@ -11,7 +13,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields) {
-        translateFieldAccess(assng.field, fields) + " = " + translateDataOperation(assng.operation, fields) + ";";
+        if (fields.containsKey(assng.field)) {
+            translateFieldAccess(assng.field, fields, "set", "(") + translateDataOperation(assng.operation, fields) + ");";
+        } else {
+            ""
+        }
     }
 
     // dispatch basis
@@ -20,11 +26,15 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
-        translateFieldAccess(op.field, fields);
+        translateFieldAccess(op.field, fields, "get", "()");
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields) {
-        fields.get(field);
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, String prefix, String suffix) {
+        if (fields.containsKey(field)) {
+           fields.get(field) + "." + prefix + asMethodNameSuffix(field.name) + suffix; 
+        } else {
+           ""
+        }
     }
 
     // dispatch basis (completeness)
@@ -74,26 +84,26 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields) {
-        combine(op.arguments, sep, fields);
+        combineArgs(op.arguments, sep, fields);
     }
     
-    def String combine(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields) {
-        /*String result = "";
+    def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields) {
+        String result = "";
         boolean first = true;
-        for (ConnectorOperation op : args) {
+        for (DataOperation op : args) {
             if (not(first)) {
                 result = result + sep;
             }
             result = result + translateDataOperation(op, fields);
             first = false;
         }
-        result;*/
+        result;
 
-        String result = "";
+        /*String result = "";
         for (DataOperation op : args, sep) {
             translateDataOperation(op, fields);
         }
-        result;
+        result;*/
     }
     
     // ----------------------------------- mapping fields ---------------------------------
@@ -104,9 +114,9 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def mapFields(RecordType type, mapOf(Field, String) result, String qual) {
         for (Field f : type.fields) {
-            String fn = qual + "." + f.name;
-            result.add(f, fn);
-            mapFields(f.type, result, qual + "." + fn);
+            String fn = qual + ".get" + asMethodNameSuffix(f.name);
+            result.add(f, qual);
+            mapFields(f.type, result, fn);
         }
     } 
 

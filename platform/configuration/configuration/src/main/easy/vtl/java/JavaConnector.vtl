@@ -7,14 +7,14 @@ template JavaConnector(Configuration config, FileArtifact target) {
     def getConnectorGenerics(Connector conn, boolean withMachine) {
         String type = "<";
         if (withMachine) {
-            type = type + conn.machineOutput.type.name;
+            type = type + asTypeName(conn.machineOutput.type.name);
             type = type + ",";
-            type = type + conn.machineInput.type.name;
+            type = type + asTypeName(conn.machineInput.type.name);
             type = type + ",";
         }
-        type = type + getFirstTypeName(conn.output);
+        type = type + asTypeName(getFirstTypeName(conn.output));
         type = type + ",";
-        type = type + getFirstTypeName(conn.input);
+        type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
     }
     
@@ -54,12 +54,12 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.inSerializerClass.length() > 0) {
             inSerializer = "new ${conn.inSerializerClass}()";
         } else {
-            inSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.input)}.class)";
+            inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
         }
         if (conn.outSerializerClass.length() > 0) {
             outSerializer = "new ${conn.outSerializerClass}()";
         } else {
-            outSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.output)}.class)";
+            outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
         }
 
         String inAdapter;
@@ -67,12 +67,12 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.inAdapterClass.length() > 0) {
             inAdapter = "new ${conn.inAdapterClass}()";
         } else {
-            inAdapter = "new ConnectorInputTypeAdapter<${getFirstTypeName(conn.input)}>(${inSerializer})";
+            inAdapter = "new ConnectorInputTypeAdapter<${asTypeName(getFirstTypeName(conn.input))}>(${inSerializer})";
         }
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = "new ${conn.outAdapterClass}()";
         } else {
-            outAdapter = "new ConnectorOutputTypeAdapter<${getFirstTypeName(conn.output)}>(${outSerializer})";
+            outAdapter = "new ConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
         }
 
         'ChannelTranslatingProtocolAdapter${connGen} ${varName} = new ChannelTranslatingProtocolAdapter${connGen}(
@@ -180,7 +180,7 @@ template JavaConnector(Configuration config, FileArtifact target) {
 
     def generateReceptionCallback(Connector conn) {
         String serviceId = "_" + toIdentifier(conn.id);
-        String coType = getFirstTypeName(conn.output);
+        String coType = asTypeName(getFirstTypeName(conn.output));
         String methodSuffix = "create" + coType.firstToUpperCase() + serviceId;
         'private class ConnectorReceptionCallback implements ReceptionCallback<${coType}> {
         

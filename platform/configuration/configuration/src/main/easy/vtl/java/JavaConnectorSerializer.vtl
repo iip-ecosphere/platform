@@ -1,10 +1,11 @@
 import JavaBasics;
+import DataOperationBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, DataType pltfType, 
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
-    String className) {
+    String className, setOf(AssignmentOperation) assng) {
 
     Integer index = 0; // temporary
 
@@ -30,15 +31,17 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // --------------------------------- genFrom ---------------------------------
     
-    def genFrom(DataType type) {
+    def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = 0;
         ''
     }
     
-    def genFrom(RecordType type) {
+    def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = 0;
         if (parser <> null) {
-            genFromField("result", "", "", "", type);
+            '${genFromField("result", "", "", "", imType)}'
+            '${pltfTypeName} test = null; // PRELIMIARY'
+            '${translateDataOperations(assng, imType, "result", pltfType, "test")}'
         } else {
             ''
         }
@@ -73,15 +76,15 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // ---------------------------------- genTo -------------------------------------
     
-    def genTo(DataType type) {
+    def genTo(DataType imType, DataType pltfType) {
         index = 0;
         ''
     }
     
-    def genTo(RecordType type) {
+    def genTo(RecordType imType, RecordType pltfType) {
         index = 0;
         if (formatter <> null) {
-            genToField("source", "", "", type);
+            genToField("source", "", "", imType);
         } else {
             ''
         }
@@ -174,11 +177,11 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
-    def generateParserFrom(String dataTypeName) {
+    def generateParserFrom(String imTypeName, String pltfTypeName) {
         if (parser <> null) {
             'ParseResult<${parser.transferType}> pr = parser.parse(data);
-            ${dataTypeName} result = new ${dataTypeName}();
-            ${genFrom(imType)|e}
+            ${imTypeName} result = new ${imTypeName}();
+            ${genFrom(imType, imTypeName, pltfType, pltfTypeName)|e}
             return result;'
         } else {
             'return null;'
@@ -195,7 +198,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo() {
         if (formatter <> null) {
-            '${genTo(imType)|e}
+            '${genTo(imType, pltfType)|e}
             return formatter.chunkCompleted();'
         } else {
             'return null;'
@@ -205,7 +208,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     // ---------------------------------- main ---------------------------------------
 
     def main(Configuration config, FileArtifact target, DataType imType, DataType pltfType, String pkg, String typePkg, 
-        Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className) {
+        Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className, 
+        setOf(AssignmentOperation) assng) {
         String imTypeName = asTypeName(imType.name);
         String pltfTypeName = asTypeName(pltfType.name);
         String add = "";
@@ -243,7 +247,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         
             @Override             
             public ${imTypeName} from(byte[] data) throws IOException {
-                ${generateParserFrom("${imTypeName}${add}")}
+                ${generateParserFrom("${imTypeName}${add}", "${pltfTypeName}")}
             }
 
             @Override    

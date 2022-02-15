@@ -125,7 +125,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         * @return the data consumer functor
         */
         @Bean
-        public Consumer<${type}> ${methodSuffixWithServiceId}() {
+        public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}() {
             return data -> ${fallbackToNull(src, "service.send(data)", false)};
         }'    
     }

@@ -80,21 +80,37 @@ project SerializerConfig1Old {
         // TODO parameter
     };
     
-    RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineIn = {
         name = "myConnMachineIn",
         fields = {
             Field {
                 name = "dataField",
                 type = refBy(StringType)
+            }, Field {
+                name = "axis",
+                type = refBy(IntegerType)
             }
         }        
     };
 
-    RecordType myConnMachineOut = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineOut = {
         name = "myConnMachineOut",
         fields = {
             Field {
                 name = "cmdField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
+    RecordType myConnPltfIn = {
+        name = "myConnPltfIn",
+        fields = {
+            Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "dataField",
                 type = refBy(StringType)
             }
         }        
@@ -121,13 +137,22 @@ project SerializerConfig1Old {
         port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}}, // PRELIMINARY
         inChannel = "IN",
         outChannel = "OUT",
         inInterface = refBy(myConnMachineIn), // PRELIMINARY
         outInterface = refBy(myConnMachineOut),  // PRELIMINARY
         machineFormatter = TextLineFormatter{separator=",", mapping={}, transferType="String"},
-        machineParser = TextLineParser{separator=",", mapping={}, transferType="String"}
+        machineParser = TextLineParser{separator=",", mapping={}, transferType="String"},
+        operations = {
+          AssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }
     };
 
     Service myAnonymizerService = JavaService {

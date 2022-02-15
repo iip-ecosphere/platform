@@ -136,8 +136,8 @@ project Connectors {
     compound Connector refines Service {
        IOType machineInput; // initial only one, connector not machine representation
        IOType machineOutput; // initial only one, connector not machine representation
-       //setOf(AssignmentOperation) operations = {};
-       //TextEncoding encoding = TextEncoding::ASCII;
+       setOf(AssignmentOperation) operations = {};
+       TextEncoding encoding = TextEncoding::ASCII;
        
        String class;
        String artifact;

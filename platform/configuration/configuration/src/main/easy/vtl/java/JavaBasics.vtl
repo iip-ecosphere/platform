@@ -10,7 +10,13 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String asTypeName(String s) {
-        s.firstToUpperCase().toCamelCaseIdentifier();
+        if (s.indexOf("[") > 0) {
+            s; // assume type name with array
+        } else if (s.indexOf(".") > 0) {
+            s; // assume FQN
+        } else {
+            s.firstToUpperCase().toCamelCaseIdentifier();
+        }
     }
     
     def String test(String s) {
@@ -22,7 +28,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String toTypeName(DataType type) {
-        type.name;
+        asTypeName(type.name);
     }
     
     def String toTypeName(PrimitiveType type) {
