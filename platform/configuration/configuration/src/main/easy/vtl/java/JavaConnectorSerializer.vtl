@@ -19,6 +19,10 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     // preliminary... JavaBasics + ??
+    def convName(DataType type) {
+        ""
+    }
+    
     def convName(PrimitiveType type) {
         switch(type.name) {
             "Integer" : "Integer",
@@ -34,7 +38,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = 0;
-        ''
+        '' // TODO unclear for now
     }
     
     def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
@@ -83,13 +87,18 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genTo(DataType imType, DataType pltfType) {
         index = 0;
-        ''
+        if (formatter <> null) {
+            String convert = "from" + convName(pltfType);
+            'formatter.add("", formatter.getConverter().${convert}(source));'
+        } else {
+            ''
+        }
     }
     
     def genTo(RecordType imType, RecordType pltfType) {
         index = 0;
         if (formatter <> null) {
-            genToField("source", "", "", imType);
+            genToField("source", "", "", pltfType);
         } else {
             ''
         }
