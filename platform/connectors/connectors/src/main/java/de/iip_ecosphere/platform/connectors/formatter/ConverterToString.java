@@ -22,11 +22,6 @@ import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConv
  * @author Holger Eichelberger, SSE
  */
 public class ConverterToString implements OutputConverter<String> {
-
-    @Override
-    public String fromInt(int data) throws IOException {
-        return Integer.toString(data);
-    }
     
     @Override
     public String fromInteger(int data) throws IOException {

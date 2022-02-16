@@ -24,15 +24,6 @@ import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
 public class ConverterFromString implements InputConverter<String> {
 
     @Override
-    public int toInt(String data) throws IOException {
-        try {
-            return Integer.parseInt(data);
-        } catch (NumberFormatException e) {
-            throw new IOException(e);
-        }
-    }
-    
-    @Override
     public int toInteger(String data) throws IOException {
         try {
             return Integer.parseInt(data);
