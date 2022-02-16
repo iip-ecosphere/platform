@@ -3,18 +3,20 @@ import JavaBasics;
 @advice(IIPEcosphere)
 template DataOperationBasics(Configuration config, FileArtifact target) {
 
-    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual) {
+    setOf(String) dummy = {}; // not nice
+
+    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
         mapFields(src, fields, srcQual); 
-        mapFields(tgt, fields, tgtQual); 
-        for (AssignmentOperation a : assng) {
-            '${translateDataOperation(a, fields)}'
+        mapFields(tgt, fields, tgtQual);
+        for (AssignmentOperation a : assng, "\n") {
+            '${translateDataOperation(a, fields, done)}'
         }
     }
 
-    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields) {
+    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, setOf(String) done) {
         if (fields.containsKey(assng.field)) {
-            translateFieldAccess(assng.field, fields, "set", "(") + translateDataOperation(assng.operation, fields) + ");";
+            translateFieldAccess(assng.field, fields, "set", "(", done, true) + translateDataOperation(assng.operation, fields) + ");";
         } else {
             ""
         }
@@ -26,11 +28,14 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
-        translateFieldAccess(op.field, fields, "get", "()");
+        translateFieldAccess(op.field, fields, "get", "()", dummy, false);
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields, String prefix, String suffix) {
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, String prefix, String suffix, setOf(String) done, Boolean recordDone) {
         if (fields.containsKey(field)) {
+           if (recordDone) {
+               done.add(fields.get(field) + ".get" + asMethodNameSuffix(field.name) + "()");
+           }            
            fields.get(field) + "." + prefix + asMethodNameSuffix(field.name) + suffix; 
         } else {
            ""
@@ -98,15 +103,9 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             first = false;
         }
         result;
-
-        /*String result = "";
-        for (DataOperation op : args, sep) {
-            translateDataOperation(op, fields);
-        }
-        result;*/
     }
     
-    // ----------------------------------- mapping fields ---------------------------------
+    // ----------------------------------- maps fields to access paths  -----------------------------
     
     // dispatch basis
     def mapFields(DataType type, mapOf(Field, String) result, String qual) {
@@ -114,10 +113,57 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def mapFields(RecordType type, mapOf(Field, String) result, String qual) {
         for (Field f : type.fields) {
-            String fn = qual + ".get" + asMethodNameSuffix(f.name);
+            String fn = getterPath(qual, f);
             result.add(f, qual);
             mapFields(f.type, result, fn);
         }
     } 
+    
+    def getterPath(String qual, Field f) {
+        qual + ".get" + asMethodNameSuffix(f.name) + "()";
+    }
+
+    def setterPath(String qual, Field f, String value) {
+        qual + ".set" + asMethodNameSuffix(f.name) + "(${value})";
+    }
+
+    // ----------------------------------- maps access paths to fields -----------------------------
+    
+    def mapPaths(DataType type, mapOf(String, Field) result, String qual) {
+    }
+
+    def mapPaths(RecordType type, mapOf(String, Field) result, String qual) {
+        for (Field f : type.fields) {
+            String fn = getterPath(qual, f);
+            result.add(fn, f);
+            mapPaths(f.type, result, fn);
+        }
+    }
+    
+    // ------------------------------------ produce data transfer -----------------------------------
+    // to be used with mapPaths; the idea is to hash over the target datatype (mapPaths, target = to write to) and to 
+    // produce for the input data type (to read from). Thus we have to build up both access path.
+    
+    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    }
+
+    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+println("PROD " + type + mapping);    
+        for (Field f : type.fields) {
+            String tn = getterPath(typeQual, f);
+            String mq = getterPath(mapQual, f);
+            if (not(done.includes(tn)) and mapping.containsKey(mq)) {
+                Integer tnPos = tn.rfind(".");
+                Integer mqPos = mq.rfind(".");
+                produceDataTransfer(f, tn.substring(0, tnPos), mapping.get(mq), mq.substring(0, mqPos));
+            } else {
+                ''
+            }
+        }
+    }
+    
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
+    }
 
 }

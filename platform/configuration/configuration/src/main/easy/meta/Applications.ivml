@@ -42,16 +42,17 @@ project Applications {
         setOf(refTo(MeshConnector)) next;
         Integer pollInterval = 1000; //in ms, ignored if negative or asynchronous
         sequenceOf(IOType) output;
-        output == getSourceOutput(impl);
+        //output == getSourceOutput(impl);
+        output == impl.output;
         
         kind == ServiceKind::SOURCE_SERVICE;
     }
     
-    def sequenceOf(IOType) getSourceOutput(ServiceBase impl) =
+    /*def sequenceOf(IOType) getSourceOutput(ServiceBase impl) =
         impl.output;
 
     def sequenceOf(IOType) getSourceOutput(Connector impl) =
-        impl.input;
+        impl.input;*/
     
     abstract compound MeshInnerElement refines MeshElement {
         setOf(refTo(MeshConnector)) next;

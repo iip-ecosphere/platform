@@ -64,10 +64,18 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
         true;
     }
+    
+    def sequenceOf(IOType) getSourceOutput(ServiceBase impl) {
+        impl.output;
+    }
+
+    def sequenceOf(IOType) getSourceOutput(Connector impl) {
+        impl.input;
+    }
 
     def generateDataMethods(MeshSource elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
-        for (IOType out : elt.output) {
+        for (IOType out : getSourceOutput(elt.impl)) {
             String type = toTypeName(out.type);
             String methodSuffix = "create" + type.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;

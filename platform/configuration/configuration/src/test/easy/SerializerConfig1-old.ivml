@@ -99,6 +99,9 @@ project SerializerConfig1Old {
             Field {
                 name = "cmdField",
                 type = refBy(StringType)
+            }, Field {
+                name = "dataField",
+                type = refBy(StringType)
             }
         }        
     };
