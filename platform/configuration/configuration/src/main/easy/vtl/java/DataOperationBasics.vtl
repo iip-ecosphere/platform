@@ -148,7 +148,6 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
-println("PROD " + type + mapping);    
         for (Field f : type.fields) {
             String tn = getterPath(typeQual, f);
             String mq = getterPath(mapQual, f);
