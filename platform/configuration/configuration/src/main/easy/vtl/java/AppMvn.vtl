@@ -53,6 +53,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         for (String art : artifacts.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
+        d = appendDependency(dep, "org.glassfish", "jakarta.el");
+        new XmlElement(d, "optional", "false");
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
@@ -89,6 +91,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
                 goalItems.add(goal, items);
             }
         }
+        
+        appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, phase="prepare-package", prependGroupId=false); // prependGroupId as in Spring, fails otherwise with jakarta.el 
     }
 
 }

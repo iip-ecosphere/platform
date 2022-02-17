@@ -85,7 +85,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // ---------------------------------- genTo -------------------------------------
     
-    def genTo(DataType imType, DataType pltfType) {
+    def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = 0;
         if (formatter <> null) {
             String convert = "from" + convName(pltfType);
@@ -95,9 +95,10 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
-    def genTo(RecordType imType, RecordType pltfType) {
+    def genTo(RecordType imType, String imTypeName, RecordType pltfType, String pltfTypeName) {
         index = 0;
         if (formatter <> null) {
+            '${imTypeName} tmp = new ${imTypeName}();'
             genToField("source", "", "", pltfType);
         } else {
             ''
@@ -195,7 +196,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         if (parser <> null) {
             'ParseResult<${parser.transferType}> pr = parser.parse(data);
             ${pltfTypeName} result = new ${pltfTypeName}${add}();
-            ${genFrom(imType, imTypeName, pltfType, pltfTypeName)|e}
+            ${genFrom(imType, imTypeName, pltfType, pltfTypeName)}
             return result;'
         } else {
             'return null;'
@@ -210,9 +211,9 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
 
-    def generateFormatterTo() {
+    def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
-            '${genTo(imType, pltfType)|e}
+            '${genTo(imType, imTypeName, pltfType, pltfTypeName)}
             return formatter.chunkCompleted();'
         } else {
             'return null;'
@@ -275,7 +276,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
             @Override    
             public byte[] to(${pltfTypeName} source) throws IOException {
-                ${generateFormatterTo()}
+                ${generateFormatterTo("${imTypeName}${add}", "${pltfTypeName}")}
             }
 
             @Override
