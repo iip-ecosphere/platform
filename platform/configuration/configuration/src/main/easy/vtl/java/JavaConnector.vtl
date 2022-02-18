@@ -1,8 +1,9 @@
 import JavaBasics;
+import DataOperationBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaConnector(Configuration config, FileArtifact target) {
+template JavaConnector(Configuration config, FileArtifact target) extends DataOperationBasics {
 
     def getConnectorGenerics(Connector conn, boolean withMachine) {
         String type = "<";
@@ -17,14 +18,21 @@ template JavaConnector(Configuration config, FileArtifact target) {
         type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
     }
-    
-    def getFirstTypeName(sequenceOf(IOType) types) {
+
+    def DataType getFirstType(sequenceOf(IOType) types) {
         if (types.size() > 0) {
             IOType t = types.get(0);
-            t.type.name;
+            t.type;
+        }    
+    }
+    
+    def getFirstTypeName(sequenceOf(IOType) types) {
+        DataType dt = getFirstType(types);
+        if (dt <> null) {
+            dt.name;
         } else {
             "Object";
-        }    
+        }
     }
     
     def adapterCreationFragment(Connector conn, String varName) {
@@ -104,17 +112,63 @@ template JavaConnector(Configuration config, FileArtifact target) {
     def generateAdapterTranslators(ChannelConnector conn) {
         ''
     }
+    
+    def genOutputTransTo(DataType imType, DataType pltfType) {
+        ''
+    }
+    
+    def genOutputTransTo(RecordType imType, RecordType pltfType) {
+        setOf(String) done = {};
+        // im Type mit modell unifizieren, pltfType beschreiben
+
+        mapOf(String, Field) mapping = {};
+        mapSourcePaths(imType, mapping, "");
+        '//mapping ${mapping}'
+        '${produceDataTransfer(pltfType, mapping, "result", "", done)}'
+    }
+    
+    // called via mapPaths and produceDataTransfer
+    def mapSourcePath(String qual, Field f) {
+        qual + "/" + f.name;
+    }
+    
+    def String mapSourceSeparator() {
+        "/";
+    }
+    
+    // called via produceDataTransfer
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+    }
+    
+    /*
+
+            '${genFromField("tmp", "", "", "", imType)}'
+            '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
+            mapOf(String, Field) mapping = {};
+            mapPaths(imType, mapping, "result");
+            '${produceDataTransfer(pltfType, mapping, "result", "tmp", done)}'
+    
+    */
 
     def generateMachineOutputTranslator(Connector conn) {
         if (conn.inAdapterClass.length() == 0) {
-            String coType = getFirstTypeName(conn.output);
+            IIPEcosphere cfg = config;
+            String coType = asTypeName(getFirstTypeName(conn.output));
             String oType = conn.machineOutput.type.name;
+            String add = "";
+            if (cfg.sharedInterfaces) {
+                add = "Impl";
+            }
         '
         private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
         
             @Override
             public ${coType} to(${oType} source) throws IOException {
-                return null; // TODO
+                ModelAccess access = getModelAccess();
+                ${coType} result = new ${coType}${add}();
+                ${genOutputTransTo(conn.outInterface, getFirstType(conn.output))}
+                return result; 
             }
         
             @Override
@@ -142,13 +196,14 @@ template JavaConnector(Configuration config, FileArtifact target) {
 
     def generateMachineInputTranslator(Connector conn) {
         if (conn.outAdapterClass.length() == 0) {
-            String ciType = getFirstTypeName(conn.input);
+            String ciType = asTypeName(getFirstTypeName(conn.input));
             String iType = conn.machineInput.type.name;
         '
         private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
         
             @Override
             public ${iType} from(${ciType} data) throws IOException {
+                ModelAccess access = getModelAccess();
                 return null; // TODO irrelevant?
             }
         

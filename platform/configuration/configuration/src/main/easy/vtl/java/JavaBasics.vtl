@@ -22,6 +22,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String test(String s) {
         s;
     }
+    
+    // ------------------------------------------ type name access -------------------------------------
 
     def String toTypeName(IOType type) {
         toTypeName(type.type);
@@ -42,6 +44,26 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    // ------------------------------------------ primitive type casting -------------------------------------
+    
+        // preliminary... JavaBasics + ??
+    def cast(DataType type) {
+        ""
+    }
+    
+    def cast(PrimitiveType type) {
+        switch(type.name) {
+            "Integer" : "(int)",
+            "Long" : "(long)",
+            "String" : "(String)",
+            "Boolean" : "(boolean)",
+            "Float" : "(float)",
+            "Double" : "(double)"
+        }
+    }    
+    
+    // ------------------------------------------ (MVN) artifact access -------------------------------------
+    
     def String getArtifact(MeshElement elt) {
         getArtifact(elt.impl);
     }
@@ -61,6 +83,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String getArtifact(Connector conn) {
         conn.artifact;
     }
+    
+    // ------------------------------------------ other -------------------------------------
 
     def String toPath(String pkg) {
         pkg.replace(".", "/");

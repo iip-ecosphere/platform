@@ -118,6 +118,16 @@ project SerializerConfig1Old {
             }
         }        
     };
+
+    RecordType myConnPltfOut = {
+        name = "myConnPltfOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }
+        }        
+    };
     
     OpcUaV1Connector myOpcUaConn = {
         id = "myOpcConn",
@@ -126,10 +136,10 @@ project SerializerConfig1Old {
         ver = "0.1.0",
         port = 1234, // default localhost
         
-        input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
+        inInterface = refBy(myConnMachineIn), 
+        outInterface = refBy(myConnMachineOut)
     };
     
     MqttV3Connector myMqttConn = {

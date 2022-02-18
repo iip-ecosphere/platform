@@ -34,7 +34,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def String translateFieldAccess(Field field, mapOf(Field, String) fields, String prefix, String suffix, setOf(String) done, Boolean recordDone) {
         if (fields.containsKey(field)) {
            if (recordDone) {
-               done.add(fields.get(field) + ".get" + asMethodNameSuffix(field.name) + "()");
+               done.add(mapTargetPath(fields.get(field), field));
            }            
            fields.get(field) + "." + prefix + asMethodNameSuffix(field.name) + suffix; 
         } else {
@@ -129,15 +129,35 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     // ----------------------------------- maps access paths to fields -----------------------------
     
-    def mapPaths(DataType type, mapOf(String, Field) result, String qual) {
+    def mapSourcePaths(DataType type, mapOf(String, Field) result, String qual) {
     }
 
-    def mapPaths(RecordType type, mapOf(String, Field) result, String qual) {
+    def mapSourcePaths(RecordType type, mapOf(String, Field) result, String qual) {
         for (Field f : type.fields) {
-            String fn = getterPath(qual, f);
+            String fn = mapSourcePath(qual, f);
             result.add(fn, f);
-            mapPaths(f.type, result, fn);
+            mapSourcePaths(f.type, result, fn);
         }
+    }
+    
+    // customizable paths, may be different depending on application, use here method calls
+    // if you override this function, also override mapTargetSeparator()
+    def mapTargetPath(String qual, Field f) {
+        getterPath(qual, f);
+    }
+
+    def String mapTargetSeparator() {
+        ".";
+    }
+
+    // customizable paths, may be different depending on application, use here method calls
+    // if you override this function, also override mapSourceSeparator()
+    def mapSourcePath(String qual, Field f) {
+        getterPath(qual, f);
+    }
+    
+    def String mapSourceSeparator() {
+        ".";
     }
     
     // ------------------------------------ produce data transfer -----------------------------------
@@ -148,18 +168,29 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+        String targetSep = mapTargetSeparator();
+        String sourceSep = mapSourceSeparator();
         for (Field f : type.fields) {
-            String tn = getterPath(typeQual, f);
-            String mq = getterPath(mapQual, f);
+            String tn = mapTargetPath(typeQual, f);
+            String mq = mapSourcePath(mapQual, f);
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
-                Integer tnPos = tn.rfind(".");
-                Integer mqPos = mq.rfind(".");
-                produceDataTransfer(f, tn.substring(0, tnPos), mapping.get(mq), mq.substring(0, mqPos));
+                Integer tnPos = tn.rfind(targetSep);
+                Integer mqPos = mq.rfind(sourceSep);
+                produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep));
             } else {
                 ''
             }
         }
     }
+    
+    def prefixPath(String path, String sep) {
+        Integer pos = path.rfind(sep);
+        if (pos <= 0) {
+            "";
+        } else {
+            path.substring(0, pos);
+        }
+    } 
     
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
         "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
