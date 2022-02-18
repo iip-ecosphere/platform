@@ -5,6 +5,8 @@ import DataOperationBasics;
 @indent(indentation = 4, additional = 0)
 template JavaConnector(Configuration config, FileArtifact target) extends DataOperationBasics {
 
+    Boolean genFrom = false; // temporary
+
     def getConnectorGenerics(Connector conn, boolean withMachine) {
         String type = "<";
         if (withMachine) {
@@ -117,13 +119,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         ''
     }
     
+    // unify imType with access/model without having an instance, write into pltfType
     def genOutputTransTo(RecordType imType, RecordType pltfType) {
+        genFrom = false;
         setOf(String) done = {};
-        // im Type mit modell unifizieren, pltfType beschreiben
-
         mapOf(String, Field) mapping = {};
         mapSourcePaths(imType, mapping, "");
-        '//mapping ${mapping}'
         '${produceDataTransfer(pltfType, mapping, "result", "", done)}'
     }
     
@@ -138,8 +139,26 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
-        "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+        if (genFrom) {
+            '\naccess.set("${mapSourcePath(srcQual, src)}", ${getterPath(tgtQual, tgt)});';
+        } else {
+            "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+        }
     }
+
+    def genOutputTransFrom(DataType imType, DataType pltfType) {
+        ''
+    }
+
+    // unify imType with access/model without having an instance, write into pltfType
+    def genOutputTransFrom(RecordType imType, RecordType pltfType) {
+        genFrom = true;
+        setOf(String) done = {};
+        mapOf(String, Field) mapping = {};
+        mapSourcePaths(imType, mapping, "");
+        '${produceDataTransfer(pltfType, mapping, "data", "", done)}'
+    }
+
     
     /*
 
@@ -204,7 +223,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public ${iType} from(${ciType} data) throws IOException {
                 ModelAccess access = getModelAccess();
-                return null; // TODO irrelevant?
+                ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input))}
+                return null; // done, no instance of pseudo type
             }
         
             @Override

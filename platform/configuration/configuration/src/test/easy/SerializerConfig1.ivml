@@ -88,6 +88,9 @@ project SerializerConfig1 {
             }, Field {
                 name = "axis",
                 type = refBy(IntegerType)
+            }, Field {
+                name = "cmdField",
+                type = refBy(StringType)
             }
         }        
     };
