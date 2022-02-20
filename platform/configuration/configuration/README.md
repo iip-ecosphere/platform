@@ -52,4 +52,4 @@ For running the tests locally, you need a Python 3.9 installed. On Windows, this
 - generated Python service instantiation: inclusion of environment zip, data connection, serializer registration, ...
 - optional: included micrometer gauges, timers, counters
 
-**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/02/14** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/02/19** or newer is required. Use `mvn -U exec:java ...`

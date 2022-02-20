@@ -1,5 +1,8 @@
 import JavaBasics;
 
+// Generation operations for data assignment operations and data transfer among data types
+// May be called direcly for Java-based access, but also can be extended and individual (marked) parts
+// overridden to generate different access styles, e.g., for model access paths.
 @advice(IIPEcosphere)
 template DataOperationBasics(Configuration config, FileArtifact target) {
 
@@ -7,8 +10,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
-        mapFields(src, fields, srcQual); 
-        mapFields(tgt, fields, tgtQual);
+        mapFields(src, fields, srcQual, true); 
+        mapFields(tgt, fields, tgtQual, false);
         for (AssignmentOperation a : assng, "\n") {
             '${translateDataOperation(a, fields, done)}'
         }
@@ -16,7 +19,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, setOf(String) done) {
         if (fields.containsKey(assng.field)) {
-            translateFieldAccess(assng.field, fields, "set", "(", done, true) + translateDataOperation(assng.operation, fields) + ");";
+            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields), done, true);
         } else {
             ""
         }
@@ -28,18 +31,27 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
-        translateFieldAccess(op.field, fields, "get", "()", dummy, false);
+        translateFieldAccess(op.field, fields, false, "", dummy, false);
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields, String prefix, String suffix, setOf(String) done, Boolean recordDone) {
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String value, setOf(String) done, Boolean recordDone) {
         if (fields.containsKey(field)) {
            if (recordDone) {
                done.add(mapTargetPath(fields.get(field), field));
-           }            
-           fields.get(field) + "." + prefix + asMethodNameSuffix(field.name) + suffix; 
+           }
+           genFieldAccess(fields.get(field), field, set, value);
         } else {
            ""
         }
+    }
+        
+    // can be overridden
+    def genFieldAccess(String path, Field field, Boolean set, String value) {
+       if (set) {
+           path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ");"; 
+       } else {
+           path + ".get" + asMethodNameSuffix(field.name) + "()"; 
+       }
     }
 
     // dispatch basis (completeness)
@@ -108,14 +120,19 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // ----------------------------------- maps fields to access paths  -----------------------------
     
     // dispatch basis
-    def mapFields(DataType type, mapOf(Field, String) result, String qual) {
+    def mapFields(DataType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
     } 
 
-    def mapFields(RecordType type, mapOf(Field, String) result, String qual) {
+    def mapFields(RecordType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
         for (Field f : type.fields) {
-            String fn = getterPath(qual, f);
+            String fn;
+            if (forSrc) {
+               fn = mapSourcePath(qual, f);
+            } else {
+               fn = mapTargetPath(qual, f);
+            }
             result.add(f, qual);
-            mapFields(f.type, result, fn);
+            mapFields(f.type, result, fn, forSrc);
         }
     } 
     
@@ -176,7 +193,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
                 Integer tnPos = tn.rfind(targetSep);
                 Integer mqPos = mq.rfind(sourceSep);
-                produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep));
+                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}'
             } else {
                 ''
             }

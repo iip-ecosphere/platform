@@ -142,7 +142,16 @@ project SerializerConfig1Old {
         input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
         output = {{type=refBy(myConnPltfIn)}},
         inInterface = refBy(myConnMachineIn), 
-        outInterface = refBy(myConnMachineOut)
+        outInterface = refBy(myConnMachineOut),
+        operations = {
+          AssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }
     };
     
     MqttV3Connector myMqttConn = {
