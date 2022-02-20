@@ -58,6 +58,12 @@ project DataTypes {
     PrimitiveType ByteArrayType = {
         name = "byte[]"
     };    
+    PrimitiveType IntArrayType = {
+        name = "int[]"
+    };    
+    PrimitiveType DoubleArrayType = {
+        name = "double[]"
+    };    
     
     // freeze all primitives
     freeze {
@@ -69,6 +75,8 @@ project DataTypes {
         DoubleType;
         ObjectType;
         ByteArrayType;
+        IntArrayType;
+        DoubleArrayType;
         iipVer;
     };
     

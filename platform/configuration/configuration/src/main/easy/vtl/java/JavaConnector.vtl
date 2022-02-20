@@ -6,13 +6,41 @@ import DataOperationBasics;
 template JavaConnector(Configuration config, FileArtifact target) extends DataOperationBasics {
 
     Boolean genFrom = false; // temporary
+    
+    // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
+    // dispatch basis
+    def String getMachineOutputTypeName(Connector conn) {
+        "Object";
+    }
+
+    def String getMachineOutputTypeName(ChannelConnector conn) {
+        "byte[]";
+    }
+
+    def String getMachineOutputTypeName(OpcUaV1Connector conn) {
+        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem";
+    }
+
+    // qualified/unqualified Java types to be used as template parameter for data to machine in connector generation, 
+    // dispatch basis
+    def String getMachineInputTypeName(Connector conn) {
+        "Object";
+    }
+
+    def String getMachineInputTypeName(ChannelConnector conn) {
+        "byte[]";
+    }
+
+    def String getMachineInputTypeName(OpcUaV1Connector conn) {
+        "Object";
+    }
 
     def getConnectorGenerics(Connector conn, boolean withMachine) {
         String type = "<";
         if (withMachine) {
-            type = type + asTypeName(conn.machineOutput.type.name);
+            type = type + getMachineOutputTypeName(conn);
             type = type + ",";
-            type = type + asTypeName(conn.machineInput.type.name);
+            type = type + getMachineInputTypeName(conn);
             type = type + ",";
         }
         type = type + asTypeName(getFirstTypeName(conn.output));
@@ -165,7 +193,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         ''
     }
 
-    //'${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
     // unify imType with access/model without having an instance, write into pltfType
     def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
         genFrom = true;
@@ -180,7 +207,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (conn.inAdapterClass.length() == 0) {
             IIPEcosphere cfg = config;
             String coType = asTypeName(getFirstTypeName(conn.output));
-            String oType = conn.machineOutput.type.name;
+            String oType = getMachineOutputTypeName(conn);
             String add = "";
             if (cfg.sharedInterfaces) {
                 add = "Impl";
@@ -222,7 +249,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def generateMachineInputTranslator(Connector conn) {
         if (conn.outAdapterClass.length() == 0) {
             String ciType = asTypeName(getFirstTypeName(conn.input));
-            String iType = conn.machineInput.type.name;
+            String iType = getMachineInputTypeName(conn);
         '
         private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
         
