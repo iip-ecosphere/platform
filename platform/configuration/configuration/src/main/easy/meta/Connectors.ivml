@@ -163,19 +163,22 @@ project Connectors {
        MachineParser machineParser = null;
    }
    
-   compound OpcUaV1Connector refines Connector {
+   compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
         String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
         String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
    }
+
+   compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
+        String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
+        String artifact ="de.iip-ecosphere.platform:connectors.aas:";
+   }
    
-   // TODO add AASconnector
-   
-   compound MqttV3Connector refines ChannelConnector {
+   compound MqttV3Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
         String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
         String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
    }
    
-   compound MqttV5Connector refines ChannelConnector {
+   compound MqttV5Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
         String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
         String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
    }

@@ -10,29 +10,37 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
     // dispatch basis
     def String getMachineOutputTypeName(Connector conn) {
-        "Object";
+        "Object"; // generic, to be overridden
     }
 
     def String getMachineOutputTypeName(ChannelConnector conn) {
-        "byte[]";
+        "byte[]"; // taken from code
     }
 
     def String getMachineOutputTypeName(OpcUaV1Connector conn) {
-        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem";
+        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"; // taken from code
+    }
+
+    def String getMachineOutputTypeName(AasConnector conn) {
+        "Object"; // taken from code
     }
 
     // qualified/unqualified Java types to be used as template parameter for data to machine in connector generation, 
     // dispatch basis
     def String getMachineInputTypeName(Connector conn) {
-        "Object";
+        "Object"; // generic, to be overridden
     }
 
     def String getMachineInputTypeName(ChannelConnector conn) {
-        "byte[]";
+        "byte[]"; // generic, to be overridden
     }
 
     def String getMachineInputTypeName(OpcUaV1Connector conn) {
-        "Object";
+        "Object"; // generic, to be overridden
+    }
+
+    def String getMachineInputTypeName(AasConnector conn) {
+        "Object"; // taken from code
     }
 
     def getConnectorGenerics(Connector conn, boolean withMachine) {
