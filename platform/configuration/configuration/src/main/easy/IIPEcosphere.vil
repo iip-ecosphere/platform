@@ -179,13 +179,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, Connector conn) = {
         generateJavaServiceElements(appRoot, config, artifacts, no, conn);
-// TODO consider given serializers
     }
 
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ChannelConnector conn) = {
         generateJavaServiceElements(appRoot, config, artifacts, no, conn);
         IIPEcosphere cfg = config;
-// TODO consider given serializers
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
         RecordType machineInIf = conn.inInterface;

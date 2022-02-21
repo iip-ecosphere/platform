@@ -92,20 +92,32 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             ${outAdapter}, 
             ${inAdapter})'
     }
+    
+    def getEncoding(Connector conn) {
+        switch(conn.encoding) {
+            TextEncoding::ANSI : "ISO-8859-1",
+            TextEncoding::ASCII : "US-ASCII",
+            TextEncoding::UTF8 : "UTF8"
+        }
+    }
 
     def adapterCreationFragment(ChannelConnector conn, String varName) {
         String connGen = getConnectorGenerics(conn, true);
         String inSerializer;
         String outSerializer;
         if (conn.inSerializerClass.length() > 0) {
-            inSerializer = "new ${conn.inSerializerClass}()";
+            //inSerializer = "new ${conn.inSerializerClass}()";
+            inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
         } else {
-            inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
+            //inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
+            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(null, null)";
         }
         if (conn.outSerializerClass.length() > 0) {
-            outSerializer = "new ${conn.outSerializerClass}()";
+            //outSerializer = "new ${conn.outSerializerClass}()";
+            outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
         } else {
-            outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
+            //outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
+            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(null, null)";
         }
 
         String inAdapter;
