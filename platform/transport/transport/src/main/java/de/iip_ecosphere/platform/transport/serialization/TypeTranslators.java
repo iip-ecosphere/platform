@@ -17,6 +17,8 @@ import java.io.IOException;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.ClassLoaderUtils;
+
 /**
  * Defines a set of type translators for primitive types.
  * 
@@ -151,15 +153,7 @@ public class TypeTranslators {
             Class<?> translatorClass = loader.loadClass(className);
             result = (TypeTranslator<?, ?>) translatorClass.newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
-            String loaders = "";
-            ClassLoader l = loader;
-            while (null != l) {
-                if (loaders.length() > 0) {
-                    loaders += " -> ";
-                }
-                loaders += l.getClass().getSimpleName();
-                l = l.getParent();
-            }
+            String loaders = ClassLoaderUtils.hierarchyToString(loader);
             LoggerFactory.getLogger(TypeTranslators.class).error("Cannot instantiate instance of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
