@@ -40,7 +40,7 @@ project Connectors {
     }
 
     compound JsonParser refines GenericMachineParser {
-        //String transferType = "String";
+        String transferType = "com.jsoniter.any.Any"; // keep this in here, move to template?
     }
     
     // --------------------------------------- Machine Formatters --------------------------------
@@ -67,7 +67,7 @@ project Connectors {
     }
 
     compound JsonFormatter refines GenericMachineFormatter {
-        //String transferType = "String";
+        String transferType = "ConsumerWithException<com.fasterxml.jackson.core.JsonGenerator>"; // keep this in here, move to template?
     }
     
     // -------------------------------------- Data Operations -------------------------------
