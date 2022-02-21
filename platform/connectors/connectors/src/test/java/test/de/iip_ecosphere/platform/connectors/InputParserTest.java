@@ -47,28 +47,19 @@ public class InputParserTest {
         ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
 
         InputConverter<String> conv = TextLineParser.CONVERTER;
-        Assert.assertEquals(123, conv.toInteger(pr.getData(0)));
-        Assert.assertEquals("bbb", conv.toString(pr.getData(1)));
-        Assert.assertEquals(true, conv.toBoolean(pr.getData(2)));
-        Assert.assertEquals(0.45, conv.toDouble(pr.getData(3)), 0.01);
-        Assert.assertEquals(0.56, conv.toFloat(pr.getData(4)), 0.01);
-        Assert.assertEquals(12345L, conv.toLong(pr.getData(5)));
-        
         Map<String, Integer> mapping = new HashMap<>();
         mapping.put("field1", 0);
         mapping.put("field2", 1);
         mapping.put("field3", 2);
         mapping.put("fieldX", 3);
-        Assert.assertEquals(parts[3], pr.getData("fieldX", 0, mapping));
-        Assert.assertEquals(parts[1], pr.getData("field2", 0, mapping));
-        Assert.assertEquals(parts[1], pr.getData("f", 1, mapping));
+        Assert.assertEquals(parts[3], conv.toString(pr.getData("fieldX", 0, mapping)));
+        Assert.assertEquals(parts[1], conv.toString(pr.getData("field2", 0, mapping)));
+        Assert.assertEquals(parts[1], conv.toString(pr.getData("f", 1, mapping)));
+        Assert.assertEquals(0.45, conv.toDouble(pr.getData("f", 3, mapping)), 0.01);
+        Assert.assertEquals(0.56, conv.toDouble(pr.getData("", 4, null)), 0.01);
+        Assert.assertEquals(12345, conv.toInteger(pr.getData("", 5, null)));
         try {
             pr.getData("f", 10, mapping);
-            Assert.fail("No Exception");
-        } catch (IndexOutOfBoundsException e) {
-        }
-        try {
-            pr.getData(-1);
             Assert.fail("No Exception");
         } catch (IndexOutOfBoundsException e) {
         }
@@ -101,9 +92,6 @@ public class InputParserTest {
         ParseResult<String> result = parser.parse(testString.getBytes(charset));
         Assert.assertNotNull(result);
         Assert.assertEquals(parts.length, result.getDataCount());
-        for (int i = 0; i < parts.length; i++) {
-            Assert.assertEquals(parts[i], result.getData(i));
-        }
         return result;
     }
     

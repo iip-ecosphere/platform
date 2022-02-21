@@ -69,4 +69,14 @@ public class ConverterFromString implements InputConverter<String> {
         return Boolean.valueOf(data);
     }
 
+    @Override
+    public int[] toIntegerArray(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
+    @Override
+    public double[] toDoubleArray(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
 }

@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
     ConnectorTest.class,
     ConnectorsAasTest.class,
     InputParserTest.class,
+    JsonInputParserTest.class,
     OutputFormatterTest.class
 })
 public class AllTests {

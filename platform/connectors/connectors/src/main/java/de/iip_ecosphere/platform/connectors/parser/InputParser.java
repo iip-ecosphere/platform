@@ -25,6 +25,11 @@ import java.util.Map;
 public interface InputParser<T> {
     
     /**
+     * Separator for hierarchical names.
+     */
+    public static char SEPARATOR = '.';
+    
+    /**
      * Result of parsing data.
      * 
      * @param <T> the type of data produced by parsing
@@ -40,33 +45,22 @@ public interface InputParser<T> {
         public int getDataCount();
         
         /**
-         * Returns the value of the data field at position {@code index}.
-         * 
-         * @param index the 0-based position of the data field
-         * @return the data value
-         * @throws IndexOutOfBoundsException if {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
-         */
-        public T getData(int index);
-        
-        /**
          * Returns the value of the data field for the given field {@code name} from {@code mapping} or with 
-         * via the given {@code index}.
+         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
+         * access shall be used as fallback. Names may be hierarchical. May be overridden if direct access to names 
+         * is provided by the parsed structure, e.g., in JSON. Thus, no index-access is provided in the first place
+         * by this interface.
          * 
-         * @param name the name of the data field
-         * @param index the 0-based position of the data field
-         * @param mapping the name-index mapping (may be empty for none)
+         * @param name the name of the data field, may contain hierarchical names separated by 
+         *     {@link InputParser#SEPARATOR}
+         * @param index the 0-based position of the data field, limit is {@link #getDataCount()}
+         * @param mapping the name-index mapping (may be empty or <b>null</b> for none, then fallback to 
+         *     index-based access)
          * @return the data value
          * @throws IndexOutOfBoundsException if the mapped index or the given 
          *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
          */
-        public default T getData(String name, int index, Map<String, Integer> mapping) {
-            Integer idx = mapping.get(name);
-            if (null != idx) {
-                return getData(idx.intValue());
-            } else {
-                return getData(index);
-            }
-        }
+        public T getData(String name, int index, Map<String, Integer> mapping);
         
     }
     
@@ -131,6 +125,24 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public boolean toBoolean(T data) throws IOException;
+        
+        /**
+         * Converts parsed data returned by {@link ParseResult} to an integer array.
+         * 
+         * @param data the obtained data
+         * @return the converted integer array
+         * @throws IOException if conversion fails
+         */
+        public int[] toIntegerArray(T data) throws IOException;
+
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a double array.
+         * 
+         * @param data the obtained data
+         * @return the converted double array
+         * @throws IOException if conversion fails
+         */
+        public double[] toDoubleArray(T data) throws IOException;
 
     }
     
