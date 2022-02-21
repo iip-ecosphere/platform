@@ -19,8 +19,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.iip_ecosphere.platform.connectors.parser.InputParser;
-
 /**
  * JSON output formatter (preliminary).
  * 
@@ -28,11 +26,6 @@ import de.iip_ecosphere.platform.connectors.parser.InputParser;
  */
 public class JsonOutputFormatter implements OutputFormatter<ConsumerWithException<JsonGenerator>> {
 
-    /**
-     * Separator for hierarchical names.
-     */
-    public static final char SEPARATOR = InputParser.SEPARATOR;
-    
     private ObjectMapper objectMapper = new ObjectMapper();
     private StringWriter writer; // 
     private JsonGenerator gen; // temporary

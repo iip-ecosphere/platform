@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.parser.InputParser;
+
 /**
  * Generic output formatter. You may add information to one chunk until {@link #chunkCompleted()} is called.
  * Custom implementations must have a constructor with a single String argument, the character encoding name.
@@ -22,6 +24,11 @@ import java.io.IOException;
  * @author Holger Eichelberger, SSE
  */
 public interface OutputFormatter<T> {
+    
+    /**
+     * Separator for hierarchical names.
+     */
+    public static final char SEPARATOR = InputParser.SEPARATOR;
     
     /**
      * Converts primitive types to the output format. Must be stateless.
@@ -88,7 +95,8 @@ public interface OutputFormatter<T> {
     }
 
     /**
-     * Adds information to one chunk of output.
+     * Adds information to one chunk of output. Hierarchical names separated by {@link #SEPARATOR} can be used, but 
+     * nested values for the same parent (object) field <b>must</b> be named in sequence.
      * 
      * @param name optional data name field (may be <b>null</b> for none)
      * @param data the data to be added
