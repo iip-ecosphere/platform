@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
@@ -150,7 +152,13 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
             stub = null; 
         }
         if (null != stub) {
-            stub.setState(state);
+            try {            
+                stub.setState(state);
+            } catch (ExecutionException e) {
+                // may fail, keep local; handover needed
+                LoggerFactory.getLogger(getClass()).info("Cannot set state for service '" + getId() + "' via AAS. "
+                    + "Falling back to local state. " + e.getMessage());
+            }
         }
         this.state = state; // keep the descriptor shadow state up to date
     }
