@@ -168,7 +168,7 @@ public class SpringCloudServiceManager
      */
     public static YamlArtifact readFromFile(File file) throws ExecutionException {
         YamlArtifact result = null;
-        if (file.getName().endsWith(".jar")) {
+        if (file.getName().endsWith(".jar") || file.getName().endsWith(".zip")) {
             try {
                 String descName = "deployment.yml";
                 if (null != getConfig()) { // null in case of standalone/non-spring execution
@@ -176,6 +176,9 @@ public class SpringCloudServiceManager
                 }
                 LOGGER.info("Reading artifact " + file + ", descriptor " + descName);
                 InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
+                if (null == descStream) {
+                    descStream = JarUtils.findFile(new FileInputStream(file), descName);                    
+                }
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream);
                     FileUtils.closeQuietly(descStream);
@@ -186,7 +189,8 @@ public class SpringCloudServiceManager
                 throwExecutionException("Reading artifact " + file, e);
             }
         } else {
-            throwExecutionException("Reading artifact " + file, file + " is not considered as JAR file");
+            throwExecutionException("Reading artifact " + file, file + " is not considered as service "
+                + "artifact (JAR, ZIP)");
         }
         return result;
     }
@@ -206,10 +210,6 @@ public class SpringCloudServiceManager
             .collect(Collectors.toList());
         // adjust spring function definition from application.yml if subset of services shall be started 
         result.add(determineCloudFunctionArg(serviceIds));
-        SpringCloudServiceSetup config = getConfig();
-        if (config.getSharedLibs() != null && config.getSharedLibs().toString().length() > 0) {
-            result.add("--iip.jars=" + config.getSharedLibs().getAbsolutePath());
-        }
         return result;
     }
     

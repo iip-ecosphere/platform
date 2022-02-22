@@ -301,15 +301,19 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
 
             // unpack artifacts to home
             for (String artPath : pSpec.getArtifacts()) {
-                if (!artPath.startsWith("/")) {
-                    artPath = "/" + artPath;
+                while (artPath.startsWith("/")) {
+                    artPath = artPath.substring(1);
                 }
                 FileInputStream fis = null;
                 InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
                 if (null == artifact) { // spring packaging fallback
                     try {
                         fis = new FileInputStream(getArtifact().getJar());
-                        artifact = JarUtils.findFile(fis, "BOOT-INF/classes" + artPath);
+                        artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
+                        if (null == artifact) {
+                            fis = new FileInputStream(getArtifact().getJar()); // TODO preliminary, use predicate 
+                            artifact = JarUtils.findFile(fis, artPath);
+                        }
                     } catch (IOException e) {
                         getLogger().info("Cannot open " + getArtifact().getJar() + ": " + e.getMessage());
                     }
