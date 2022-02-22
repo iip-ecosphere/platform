@@ -36,7 +36,6 @@
     <dependency>
      <groupId>com.jsoniter</groupId>
      <artifactId>jsoniter</artifactId>
-     <version>0.9.19</version>
     </dependency>
     
     <dependency>
