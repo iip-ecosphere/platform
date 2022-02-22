@@ -54,6 +54,13 @@
       <artifactId>transport.spring.amqp</artifactId>
       <version>${project.version}</version>
     </dependency>  
+    
+<dependency>    
+    <groupId>org.glassfish</groupId>
+    <artifactId>jakarta.el</artifactId>
+    <optional>false</optional>
+</dependency>    
+    
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
@@ -166,6 +173,20 @@
                      <appendAssemblyId>false</appendAssemblyId>
                  </configuration>
              </execution>
+             <execution>
+                 <id>make-serviceAssembly</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/main/assembly/serviceZipAssembly.xml</descriptor>
+                     </descriptors>
+                     <finalName>${project.build.finalName}-spring</finalName>
+                     <appendAssemblyId>false</appendAssemblyId>
+                 </configuration>
+             </execution>
          </executions>
         </plugin>
         <plugin>
@@ -212,6 +233,27 @@
                        <goal>repackage</goal>
                    </goals>
                </execution>               
+           </executions>
+       </plugin>
+       <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-dependency-plugin</artifactId>
+           <version>3.2.0</version>
+           <executions>
+               <execution>
+                   <id>copy-dependencies</id>
+                   <goals>
+                       <goal>copy-dependencies</goal>
+                   </goals>
+                   <phase>prepare-package</phase>
+                   <configuration>
+                       <prependGroupId>false</prependGroupId>
+                       <outputDirectory>${project.build.directory}/jars</outputDirectory>
+                       <overWriteReleases>false</overWriteReleases>
+                       <overWriteSnapshots>true</overWriteSnapshots>
+                       <overWriteIfNewer>true</overWriteIfNewer>
+                   </configuration>
+               </execution>
            </executions>
        </plugin>
     </plugins>
