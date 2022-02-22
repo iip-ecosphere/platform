@@ -90,6 +90,7 @@
     <org.slf4j.version>1.7.25</org.slf4j.version>
     <com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
     <org.glassfish.javax.json.version>1.1.4</org.glassfish.javax.json.version>
+    <com.jsoniter.version>0.9.19</com.jsoniter.version>
     <apache.commons.version>2.6</apache.commons.version>    
     <apache.commons.text.version>1.9</apache.commons.text.version>    
     <eclipse.milo.version>0.5.2</eclipse.milo.version>
@@ -209,6 +210,11 @@
 	    <groupId>org.glassfish</groupId>
 	    <artifactId>javax.json</artifactId>
 	    <version>${org.glassfish.javax.json.version}</version>
+	  </dependency>
+	  <dependency>
+	    <groupId>com.jsoniter</groupId>
+	    <artifactId>jsoniter</artifactId>
+	    <version>${com.jsoniter.version}</version>
 	  </dependency>
       
       <!-- MQTT -->
