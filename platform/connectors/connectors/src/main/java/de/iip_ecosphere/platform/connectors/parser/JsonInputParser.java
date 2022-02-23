@@ -133,6 +133,11 @@ public class JsonInputParser implements InputParser<Any> {
             }
             return dta;
         }
+
+        @Override
+        public Object toObject(Any data) throws IOException {
+            return null; // preliminary
+        }
         
     }
     

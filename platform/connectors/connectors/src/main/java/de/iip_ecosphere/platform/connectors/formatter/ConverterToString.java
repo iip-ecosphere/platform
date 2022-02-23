@@ -53,4 +53,19 @@ public class ConverterToString implements OutputConverter<String> {
         return Boolean.toString(data);
     }
 
+    @Override
+    public String fromIntegerArray(int[] data) throws IOException {
+        throw new IOException("currently not supported");
+    }
+
+    @Override
+    public String fromDoubleArray(double[] data) throws IOException {
+        throw new IOException("currently not supported");
+    }
+
+    @Override
+    public String fromObject(Object data) throws IOException {
+        throw new IOException("currently not supported");
+    }
+
 }

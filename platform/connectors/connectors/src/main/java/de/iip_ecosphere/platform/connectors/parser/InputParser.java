@@ -144,6 +144,15 @@ public interface InputParser<T> {
          */
         public double[] toDoubleArray(T data) throws IOException;
 
+        /**
+         * Converts parsed data returned by {@link ParseResult} to an object. [fallback dummy]
+         * 
+         * @param data the obtained data
+         * @return the converted double array
+         * @throws IOException if conversion fails
+         */
+        public Object toObject(T data) throws IOException;
+
     }
     
     /**

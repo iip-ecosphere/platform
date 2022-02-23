@@ -92,6 +92,34 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public T fromBoolean(boolean data) throws IOException;
+        
+        /**
+         * Converts data from an integer array to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromIntegerArray(int[] data) throws IOException;
+
+        /**
+         * Converts data from a double array to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromDoubleArray(double[] data) throws IOException;
+
+        /**
+         * Converts data from an object the output format. [fallback dummy]
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromObject(Object data) throws IOException;
+
     }
 
     /**

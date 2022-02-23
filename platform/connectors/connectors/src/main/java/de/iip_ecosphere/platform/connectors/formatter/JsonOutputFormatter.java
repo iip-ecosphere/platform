@@ -63,6 +63,21 @@ public class JsonOutputFormatter implements OutputFormatter<ConsumerWithExceptio
             return g -> g.writeBoolean(data);
         }
 
+        @Override
+        public ConsumerWithException<JsonGenerator> fromIntegerArray(int[] data) throws IOException {
+            return g -> g.writeArray(data, 0, data.length);
+        }
+
+        @Override
+        public ConsumerWithException<JsonGenerator> fromDoubleArray(double[] data) throws IOException {
+            return g -> g.writeArray(data, 0, data.length);
+        }
+
+        @Override
+        public ConsumerWithException<JsonGenerator> fromObject(Object data) throws IOException {
+            return g -> g.writeObject(data);
+        }
+
     }
     
     /**

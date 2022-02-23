@@ -79,4 +79,9 @@ public class ConverterFromString implements InputConverter<String> {
         throw new IOException("currently not implemented");
     }
 
+    @Override
+    public Object toObject(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
 }
