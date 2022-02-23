@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -36,6 +37,7 @@ public class ServiceFactory {
     private static ServiceManager manager = null;
     private static AasSetup setup;
     private static TransportSetup transport;
+    private static NetworkManagerSetup netwMgrSetup;
 
     /**
      * Initializes this factory.
@@ -95,6 +97,27 @@ public class ServiceFactory {
         }
         return setup;
     }
+    
+    /**
+     * Returns the actual network manager setup.
+     * 
+     * @return the network manager setup
+     */
+    public static NetworkManagerSetup getNetworkManagerSetup() {
+        if (null == netwMgrSetup) {
+            init();
+            try {
+                ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
+                netwMgrSetup = cfg.getNetMgr();
+            } catch (IOException e) {
+                LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+            }
+            if (null == setup) {
+                netwMgrSetup = new NetworkManagerSetup();
+            }
+        } 
+        return netwMgrSetup;
+    }
 
     /**
      * Returns the actual transport setup for the implementing service manager.
@@ -123,12 +146,21 @@ public class ServiceFactory {
     }
 
     /**
-     * Defines the AAs setup instance [for testing].
+     * Defines the AAS setup instance.
      * 
      * @param instance the new setup instance
      */
     public static void setAasSetup(AasSetup instance) {
         setup = instance;
+    }
+
+    /**
+     * Defines the network manager setup instance.
+     * 
+     * @param instance the new setup instance
+     */
+    public static void setNetworkManagerSetup(NetworkManagerSetup instance) {
+        netwMgrSetup = instance;
     }
 
 }
