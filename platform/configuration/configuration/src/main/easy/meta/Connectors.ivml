@@ -17,7 +17,6 @@ project Connectors {
     
     abstract compound MachineParser {
         setOf(MachineParserMappingEntry) mapping = {};
-        String transferType = "String"; // internal Java transfer type, redefine if needed
     }
     
     compound MachineParserMappingEntry {
@@ -40,7 +39,6 @@ project Connectors {
     }
 
     compound JsonParser refines GenericMachineParser {
-        String transferType = "com.jsoniter.any.Any"; // keep this in here, move to template?
     }
     
     // --------------------------------------- Machine Formatters --------------------------------
@@ -49,7 +47,6 @@ project Connectors {
     
     abstract compound MachineFormatter {
         setOf(MachineParserMappingEntry) mapping = {};
-        String transferType = "String"; // internal Java transfer type, redefine if needed 
     }
     
     compound JavaMachineFormatter refines MachineFormatter {
@@ -67,7 +64,6 @@ project Connectors {
     }
 
     compound JsonFormatter refines GenericMachineFormatter {
-        String transferType = "ConsumerWithException<com.fasterxml.jackson.core.JsonGenerator>"; // keep this in here, move to template?
     }
     
     // -------------------------------------- Data Operations -------------------------------
@@ -139,8 +135,8 @@ project Connectors {
        
        String class;
        String artifact;
-       String inAdapterClass = ""; // if given, use adapter
-       String outAdapterClass = ""; // if given, use adapter
+       String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+       String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
        // may collapse into one, to be supported by configurable mapping
        refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass

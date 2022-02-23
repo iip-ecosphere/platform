@@ -190,7 +190,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         plugin;
     }
     
-    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package") {
+    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="") {
         XmlElement exec = new XmlElement(execs, "execution");
 
         new XmlElement(exec, "id", "copy-dependencies");
@@ -201,7 +201,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(config, "outputDirectory", jarDir);
         new XmlElement(config, "overWriteReleases", "false");
         new XmlElement(config, "overWriteSnapshots", "true");
-        new XmlElement(config, "overWriteIfNewer", "true");        
+        new XmlElement(config, "overWriteIfNewer", "true");
+        if (excludeIds.length() > 0) {
+            new XmlElement(config, "overWriteIfNewer", "${excludeIds}");
+        }
 
         if (copyOwn) {
             exec = new XmlElement(execs, "execution");

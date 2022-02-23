@@ -23,6 +23,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         ""
     }
     
+    // to/from will be prefixed, must map to method names in Input/OutputConverter
     def convName(PrimitiveType type) {
         switch(type.name) {
             "Integer" : "Integer",
@@ -30,7 +31,10 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             "String" : "String",
             "Boolean" : "Boolean",
             "Float" : "Float",
-            "Double" : "Double"
+            "Double" : "Double",
+            "int[]" : "IntegerArray",
+            "double[]" : "DoubleArray",
+            default : "Unknown" // shall lead to compile error
         }
     }
     
@@ -130,6 +134,24 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
+    // ------------------------- transfer types ---------------------------
+    
+    def String getParserTransferType(MachineParser parser) {
+        "String";
+    }
+    
+    def String getParserTransferType(JsonParser parser) {
+        "com.jsoniter.any.Any";
+    }
+
+    def String getFormatterTransferType(MachineFormatter parser) {
+        "String";
+    }
+
+    def String getFormatterTransferType(JsonFormatter parser) {
+        "ConsumerWithException<com.fasterxml.jackson.core.JsonGenerator>"
+    }
+    
     // ---------------------------- inits ---------------------------------
 
     def generateInitParser(String className) {
@@ -149,11 +171,11 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def generateInitParser(JsonParser parser, String className) {
-        ''  // TODO replace by class
+        'parser = new JsonInputParser();'
     }
 
     def generateInitParser(JavaMachineParser parser, String className) {
-        'parser = (InputParser<${parser.transferType}>) ParserUtils.createInstance(
+        'parser = (InputParser<${getParserTransferType(parser)}>) ParserUtils.createInstance(
             ${className}.class.getClassLoader(), "${parser.class}", encoding);'
     }
     
@@ -174,11 +196,11 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def generateInitFormatter(JsonFormatter formatter, String className) {
-        'formatter = new DummyFormatter();' // TODO replace by class 
+        'formatter = new JsonOutputFormatter();'
     }
 
     def generateInitFormatter(JavaMachineFormatter formatter, String className) {
-        'formatter = (OutputFormatter<${formatter.transferType}>) FormatterUtils.createInstance(
+        'formatter = (OutputFormatter<${getFormatterTransferType(formatter)}>) FormatterUtils.createInstance(
             ${className}.class.getClassLoader(), "${formatter.class}", encoding);'
     }
     
@@ -186,7 +208,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def generateParserAttribute() {
         if (parser <> null) {
-            'private InputParser<${parser.transferType}> parser;'
+            'private InputParser<${getParserTransferType(parser)}> parser;'
         } else {
             ''
         }
@@ -194,7 +216,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def generateParserFrom(String imTypeName, String pltfTypeName) {
         if (parser <> null) {
-            'ParseResult<${parser.transferType}> pr = parser.parse(data);
+            'ParseResult<${getParserTransferType(parser)}> pr = parser.parse(data);
             ${pltfTypeName} result = new ${pltfTypeName}${add}();
             ${genFrom(imType, imTypeName, pltfType, pltfTypeName)}
             return result;'
@@ -205,7 +227,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterAttribute() {
         if (formatter <> null) {
-            'private OutputFormatter<${formatter.transferType}> formatter;'
+            'private OutputFormatter<${getFormatterTransferType(formatter)}> formatter;'
         } else {
             ''
         }

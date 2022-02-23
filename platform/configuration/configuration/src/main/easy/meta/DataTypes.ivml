@@ -22,7 +22,8 @@ project DataTypes {
     }
     
     compound RecordType refines CDataProperty, DataType {
-        Fields fields;      
+        String path = "";
+        Fields fields;
     }
     
     compound Field {
@@ -58,7 +59,7 @@ project DataTypes {
     PrimitiveType ByteArrayType = {
         name = "byte[]"
     };    
-    PrimitiveType IntArrayType = {
+    PrimitiveType IntegerArrayType = {
         name = "int[]"
     };    
     PrimitiveType DoubleArrayType = {
@@ -75,7 +76,7 @@ project DataTypes {
         DoubleType;
         ObjectType;
         ByteArrayType;
-        IntArrayType;
+        IntegerArrayType;
         DoubleArrayType;
         iipVer;
     };

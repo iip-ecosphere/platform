@@ -40,7 +40,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
             "String" : "String",
             "Boolean" : "boolean",
             "Float" : "float",
-            "Double" : "double"
+            "Double" : "double",
+            default: type.name
         }
     }
     
@@ -58,7 +59,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
             "String" : "(String)",
             "Boolean" : "(boolean)",
             "Float" : "(float)",
-            "Double" : "(double)"
+            "Double" : "(double)",
+            default : "(" + type.name + ")"
         }
     }    
     

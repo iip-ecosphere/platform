@@ -93,6 +93,11 @@ public class IvmlTests {
         lcd.shutdown();
     }
     
+    /**
+     * Reusable test configuration/setup.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class TestConfigurer extends InstantiationConfigurer {
 
         /**
@@ -557,7 +562,7 @@ public class IvmlTests {
      * @param cfg the configurer instance
      * @return {@code cfg}
      */
-    private static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
+    public static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
         return cfg.setStartRuleName("generateApps");
     }
     

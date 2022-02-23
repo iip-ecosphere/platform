@@ -92,7 +92,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
             }
         }
         
-        appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, phase="prepare-package", prependGroupId=false); // prependGroupId as in Spring, fails otherwise with jakarta.el 
+        appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
+            phase="prepare-package", prependGroupId=false, excludeIds="tomcat-catalina, tomcat-coyote"); // prependGroupId as in Spring, fails otherwise with jakarta.el 
     }
 
 }

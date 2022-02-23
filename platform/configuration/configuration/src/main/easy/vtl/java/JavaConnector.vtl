@@ -106,15 +106,23 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         String inSerializer;
         String outSerializer;
         if (conn.inSerializerClass.length() > 0) {
-            //inSerializer = "new ${conn.inSerializerClass}()";
-            inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
+            if (conn.inSerializerClass == "*") {
+                inSerializer = "new ${conn.inInterface}Serializer()";
+            } else {
+                //inSerializer = "new ${conn.inSerializerClass}()";
+                inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
+            }
         } else {
             //inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
             inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(null, null)";
         }
         if (conn.outSerializerClass.length() > 0) {
-            //outSerializer = "new ${conn.outSerializerClass}()";
-            outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
+            if (conn.outSerializerClass == "*") {
+                outSerializer = "new ${conn.outInterface}Serializer()";
+            } else {
+                //outSerializer = "new ${conn.outSerializerClass}()";
+                outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
+            }
         } else {
             //outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
             outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(null, null)";
@@ -171,10 +179,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
         genFrom = false;
         setOf(String) done = {};
-        '${translateDataOperations(assng, imType, "", pltfType, "result", done)}'
+        String imTypePath = imType.path;
+        '${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}'
         mapOf(String, Field) mapping = {};
-        mapSourcePaths(imType, mapping, "");
-        '${produceDataTransfer(pltfType, mapping, "result", "", done)}'
+        mapSourcePaths(imType, mapping, imTypePath);
+        '${produceDataTransfer(pltfType, mapping, "result", imTypePath, done)}'
     }
     
     // called via translateDataOperations
@@ -217,10 +226,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
         genFrom = true;
         setOf(String) done = {};
-        '${translateDataOperations(assng, imType, "", pltfType, "data", done)}'
+        String imTypePath = imType.path;
+        '${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}'
         mapOf(String, Field) mapping = {};
-        mapSourcePaths(imType, mapping, "");
-        '${produceDataTransfer(pltfType, mapping, "data", "", done)}'|8;
+        mapSourcePaths(imType, mapping, imTypePath);
+        '${produceDataTransfer(pltfType, mapping, "data", imTypePath, done)}'|8;
     }
 
     def generateMachineOutputTranslator(Connector conn) {

@@ -81,6 +81,7 @@ project SerializerConfig1Old {
     };
     
     RecordType myConnMachineIn = {
+        path = "/opc/mach/",
         name = "myConnMachineIn",
         fields = {
             Field {
@@ -97,6 +98,7 @@ project SerializerConfig1Old {
     };
 
     RecordType myConnMachineOut = {
+        path = "/opc/mach/",
         name = "myConnMachineOut",
         fields = {
             Field {
@@ -139,7 +141,7 @@ project SerializerConfig1Old {
         ver = "0.1.0",
         port = 1234, // default localhost
         
-        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}},
         output = {{type=refBy(myConnPltfIn)}},
         inInterface = refBy(myConnMachineIn), 
         outInterface = refBy(myConnMachineOut),
@@ -167,8 +169,8 @@ project SerializerConfig1Old {
         outChannel = "OUT",
         inInterface = refBy(myConnMachineIn),
         outInterface = refBy(myConnMachineOut),
-        machineFormatter = TextLineFormatter{separator=",", mapping={}, transferType="String"},
-        machineParser = TextLineParser{separator=",", mapping={}, transferType="String"},
+        machineFormatter = TextLineFormatter{separator=",", mapping={}},
+        machineParser = TextLineParser{separator=",", mapping={}},
         operations = {
           AssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{
