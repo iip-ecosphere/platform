@@ -65,6 +65,7 @@ public class SpringInstances {
     public static void setConfig(SpringCloudServiceSetup cfg) {
         config = cfg;
         ServiceFactory.setAasSetup(cfg.getAas());
+        ServiceFactory.setNetworkManagerSetup(cfg.getNetMgr());
     }
 
 }

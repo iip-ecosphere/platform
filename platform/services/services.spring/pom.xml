@@ -147,6 +147,16 @@
               <outputDirectory>${project.build.directory}/jars</outputDirectory>
               <destFileName>simpleStream.spring.jar</destFileName>
             </artifactItem>
+            <artifactItem>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <artifactId>test.simpleStream.spring</artifactId>
+              <version>${project.version}</version>
+              <classifier>services</classifier>
+              <type>zip</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}/jars</outputDirectory>
+              <destFileName>simpleStream.spring.zip</destFileName>
+            </artifactItem>
           </artifactItems>
           <outputDirectory>${project.build.directory}</outputDirectory>
           <overWriteReleases>false</overWriteReleases>
