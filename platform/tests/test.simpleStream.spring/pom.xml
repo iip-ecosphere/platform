@@ -252,7 +252,10 @@
                        <overWriteReleases>false</overWriteReleases>
                        <overWriteSnapshots>true</overWriteSnapshots>
                        <overWriteIfNewer>true</overWriteIfNewer>
-                       <excludeArtifactIds>tomcat-catalina, tomcat-coyote</excludeArtifactIds> <!-- BaSyx clash with Spring -->
+                       <excludeArtifactIds>tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, 
+                           tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli,
+                           tomcat-servlet-api, tomcat-util, tomcat-util-scan
+                       </excludeArtifactIds> <!-- BaSyx clash with Spring -->
                    </configuration>
                </execution>
            </executions>
