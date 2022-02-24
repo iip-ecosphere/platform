@@ -515,4 +515,20 @@ public class TestServiceManager {
         Assert.assertTrue(config.getJavaOpts().size() > 0);
     }
     
+    /**
+     * Tests service start/stop with the ZIP artifact containing explicit dependency JARs.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testWithZipArchive() throws ExecutionException {
+        ServiceManager mgr = ServiceFactory.getServiceManager();
+        File file = new File("target/jars/simpleStream.spring.zip");
+        String aid = mgr.addArtifact(file.toURI());
+        mgr.startService("simpleStream-create", "simpleStream-log");
+        TimeUtils.sleep(5000);
+        mgr.stopService("simpleStream-create", "simpleStream-log");
+        mgr.removeArtifact(aid);
+    }
+    
 }
