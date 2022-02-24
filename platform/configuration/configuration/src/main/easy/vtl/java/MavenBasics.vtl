@@ -185,12 +185,12 @@ template MavenBasics(Configuration config, FileArtifact target) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         if (jarDir.length() > 0) {
             XmlElement execs = new XmlElement(plugin, "executions");
-            appendMavenDependencyPluginCopyDepsExecution(execs, ver, jarDir, copyOwn, prependGroupId);
+            appendMavenDependencyPluginCopyDepsExecution(execs, jarDir, copyOwn, prependGroupId);
         }
         plugin;
     }
     
-    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="") {
+    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="") {
         XmlElement exec = new XmlElement(execs, "execution");
 
         new XmlElement(exec, "id", "copy-dependencies");
@@ -203,7 +203,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(config, "overWriteSnapshots", "true");
         new XmlElement(config, "overWriteIfNewer", "true");
         if (excludeIds.length() > 0) {
-            new XmlElement(config, "overWriteIfNewer", "${excludeIds}");
+            new XmlElement(config, "excludeArtifactIds", "${excludeIds}");
         }
 
         if (copyOwn) {
@@ -220,6 +220,31 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlElement(art, "type", "\\${project.packaging}");
             new XmlElement(config, "prependGroupId", "${prependGroupId}");
             new XmlElement(config, "outputDirectory", jarDir);
+        }
+        exec;
+    }
+    
+    def XmlElement appendMavenDependencyPluginBuildClasspathExecution(XmlElement execs, String id="build-classpath", 
+        String phase="prepare-package", String outputFile="\\${project.build.directory}/classes/classpath", 
+        Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="") {
+        
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", id);
+        new XmlElement(exec, "phase", phase);
+        appendGoal(exec, "build-classpath");
+        XmlElement config = appendConfiguration(exec);
+        new XmlElement(config, "outputFile", outputFile);
+        new XmlElement(config, "prependGroupId", "${prependGroupId}");
+        new XmlElement(config, "overWriteIfNewer", "true");
+        if (prefix.length() > 0) {
+            new XmlElement(config, "localRepoProperty", prefix);
+            new XmlElement(config, "prefix", prefix);
+        }
+        if (fileSeparator.length() > 0) {
+            new XmlElement(config, "fileSeparator", fileSeparator);
+        }
+        if (pathSeparator.length() > 0) {
+            new XmlElement(config, "pathSeparator", pathSeparator);
         }
         exec;
     }

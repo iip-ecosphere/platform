@@ -115,7 +115,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genToField(String qual, String name, String fieldName, PrimitiveType type) {
         String convert = "from" + convName(type);
-        'formatter.add("${name}", formatter.getConverter().${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()));'
+        'formatter.add("${name}", formatter.getConverter().${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()));\n'
     }
     
     def genToField(String qual, String name, String fieldName, RecordType type) {
