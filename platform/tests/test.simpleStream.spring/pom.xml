@@ -258,7 +258,24 @@
                        </excludeArtifactIds> <!-- BaSyx clash with Spring -->
                    </configuration>
                </execution>
-           </executions>
+	          <execution>
+	            <id>build-classpath</id>
+	            <phase>prepare-package</phase>
+	            <goals>
+	              <goal>build-classpath</goal>
+	            </goals>
+	            <configuration>
+	                <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
+	                <prependGroupId>false</prependGroupId>
+	                <localRepoProperty>jars</localRepoProperty>
+	                <prefix>jars</prefix>
+	                <overWriteIfNewer>true</overWriteIfNewer>
+	                <fileSeparator>/</fileSeparator>
+	                <pathSeparator>:</pathSeparator>
+	              <!-- configure the plugin here -->
+	            </configuration>
+	          </execution>
+	        </executions>               
        </plugin>
     </plugins>
   </build>
