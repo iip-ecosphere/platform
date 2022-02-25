@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -166,6 +168,36 @@ public abstract class AbstractService implements Service {
         String deploymentDescFile) {
         return createInstance(loader, className, cls, serviceId, deploymentDescFile);
     }
+    
+    /**
+     * Loads a resource as stream from {@code loader}, first with given name, as fallback using {@code resource}
+     * without leading slashes (may be present after ZIP unpacking), else as file (may be present after ZIP unpacking).
+     * 
+     * @param loader the class loader to load the class with
+     * @param resource the resource name/path
+     * @return the input stream if the resource was found, <b>null</b> else
+     */
+    private static InputStream getResourceAsStream(ClassLoader loader, String resource) {
+        InputStream desc = loader.getResourceAsStream(resource);
+        if (null == desc) {
+            String tmp = resource;
+            while (tmp.startsWith("/")) {
+                tmp = tmp.substring(1);
+            }
+            desc = loader.getResourceAsStream(tmp);
+            if (null == desc) {
+                File f = new File(tmp);
+                if (f.exists()) {
+                    try {
+                        desc = new FileInputStream(f);
+                    } catch (IOException e) {
+                        // also not there
+                    }
+                }
+            }
+        }
+        return desc;
+    }
 
     /**
      * Convenience method for creating service instances.
@@ -190,7 +222,7 @@ public abstract class AbstractService implements Service {
             if (null != serviceId && null != deploymentDescFile) {
                 try {
                     Constructor<?> cons = serviceClass.getConstructor(String.class, InputStream.class);
-                    InputStream desc = loader.getResourceAsStream(deploymentDescFile);
+                    InputStream desc = getResourceAsStream(loader, deploymentDescFile);
                     instance = cons.newInstance(serviceId, desc);
                     if (null != desc) {
                         desc.close();
