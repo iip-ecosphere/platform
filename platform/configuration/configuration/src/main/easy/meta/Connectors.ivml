@@ -8,6 +8,21 @@ project Connectors {
 
     enum TextEncoding{ANSI, ASCII, UTF8};
     
+    // ------------------------------ Mass-Mappings -------------------------------------------
+
+    abstract compound MappingEntry {
+    }
+
+    compound MachineParserMappingEntry refines MappingEntry {
+        Integer position;
+        refTo(Field) field;
+    }
+
+    compound InputOutputMappingEntry refines MappingEntry {
+        refTo(Field) fromField;
+        refTo(Field) toField;
+    }
+    
     // ------------------------------ Machine Parsers -----------------------------------------
     
     // turn machine-level information into input that can be used by a generated connector
@@ -16,12 +31,6 @@ project Connectors {
     // (linear up-down traversal in IVML sequence). Name-based mapping has priority if given.
     
     abstract compound MachineParser {
-        setOf(MachineParserMappingEntry) mapping = {};
-    }
-    
-    compound MachineParserMappingEntry {
-        Integer position;
-        String name;
     }
     
     compound JavaMachineParser refines MachineParser {
@@ -46,7 +55,6 @@ project Connectors {
     // opposite direction of machine parsers for sending back commands on the same connector
     
     abstract compound MachineFormatter {
-        setOf(MachineParserMappingEntry) mapping = {};
     }
     
     compound JavaMachineFormatter refines MachineFormatter {
@@ -132,6 +140,7 @@ project Connectors {
     compound Connector refines Service {
        setOf(AssignmentOperation) operations = {};
        TextEncoding encoding = TextEncoding::ASCII;
+       setOf(MappingEntry) mapping = {};
        
        String class;
        String artifact;

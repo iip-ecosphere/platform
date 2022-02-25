@@ -111,6 +111,10 @@ project SerializerConfig1Old {
         }        
     };
     
+    compound UnitMeta {
+        String unit;
+    }
+    
     RecordType myConnPltfIn = {
         name = "myConnPltfIn",
         fields = {
@@ -123,6 +127,7 @@ project SerializerConfig1Old {
             }
         }        
     };
+    annotate UnitMeta meta to myConnPltfIn;
 
     RecordType myConnPltfOut = {
         name = "myConnPltfOut",
@@ -169,8 +174,8 @@ project SerializerConfig1Old {
         outChannel = "OUT",
         inInterface = refBy(myConnMachineIn),
         outInterface = refBy(myConnMachineOut),
-        machineFormatter = TextLineFormatter{separator=",", mapping={}},
-        machineParser = TextLineParser{separator=",", mapping={}},
+        machineFormatter = TextLineFormatter{separator=","},
+        machineParser = TextLineParser{separator=","},
         operations = {
           AssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{
