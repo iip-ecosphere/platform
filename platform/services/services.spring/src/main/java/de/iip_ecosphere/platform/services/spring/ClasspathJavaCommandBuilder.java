@@ -269,6 +269,31 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
     }
     
     /**
+     * Tries to clean up workdirs created by the local deployer that are left over from the last time, e.g., after
+     * issuing CTRL+C. We recommend setting up a dedicated workdir, e.g., a folder within temp.
+     * 
+     * @param properties the local deployer properties
+     */
+    private static void cleanWorkdirs(LocalDeployerProperties properties) {
+        File root = properties.getWorkingDirectoriesRoot().toFile();
+        File[] cands = root.listFiles(new FilenameFilter() {
+            
+            @Override
+            public boolean accept(File dir, String name) {
+                File f = new File(dir, name);
+                return (f.isDirectory() && name.matches("^\\d+$") 
+                     && name.length() >= 13); // looks like a directory with timestamp as name -> local deployer
+            }
+        });
+        
+        if (cands != null) {
+            for (File f : cands) {
+                FileUtils.deleteQuietly(f);
+            }
+        }
+    }
+    
+    /**
      * Installs an instance of this builder into {@code deployer}.
      * 
      * @param deployer the deployer instance, may be <b>null</b>
@@ -282,6 +307,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                 Method locProps = AbstractLocalDeployerSupport.class.getDeclaredMethod("getLocalDeployerProperties");
                 locProps.setAccessible(true);
                 LocalDeployerProperties localPropsInst = (LocalDeployerProperties) locProps.invoke(deployer);
+                cleanWorkdirs(localPropsInst);
                 
                 jBuilder.set(deployer, new ClasspathJavaCommandBuilder(localPropsInst));
             } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException 
