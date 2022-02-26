@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -51,6 +53,7 @@ import de.iip_ecosphere.platform.support.JarUtils;
  */
 public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
 
+    public static final String PROP_ZIP_CLASSPATH = "iip.spring.readZipClasspath"; // for testing
     private final LocalDeployerProperties properties;
     private String curDeployerId; // would not work with parallel deployments, hopefully they do not occur
     
@@ -185,22 +188,76 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
         return classpath;
     }
     
+    /**
+     * Checks/rewrites a classpath file.
+     * 
+     * @param cpFile the (existing) file to check
+     * @param request the deployment request object
+     * @param workDir the work directory
+     * @return {@code true} if the file was modified without problems, {@code false} if the wildcard classpath shall 
+     *   be used
+     */
+    private boolean checkCpFile(File cpFile, AppDeploymentRequest request, File workDir) {
+        boolean result = false;
+        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9) 
+            && Boolean.valueOf(System.getProperty(PROP_ZIP_CLASSPATH, "true"))) {
+            try {
+                String classpath = org.apache.commons.io.FileUtils.readFileToString(cpFile, "UTF-8");
+                String mainJars = "";
+                File[] files = workDir.listFiles();
+                if (null != files) {  // file may contain only "jars"
+                    for (File f : files) {
+                        if (f.getName().endsWith(".jar")) {
+                            if (mainJars.length() > 0) {
+                                mainJars += File.pathSeparator;
+                            }
+                            mainJars += f.getName();
+                        }
+                    }
+                }
+                if (mainJars.length() > 0) {
+                    classpath = mainJars + File.pathSeparator + classpath;
+                }
+                classpath = add(classpath, request, workDir); // add the common folders if needed
+                // https://docs.oracle.com/javase/9/tools/java.htm#JSWOR-GUID-4856361B-8BFD-4964-AE84-121F5F6CF111
+                String fileSep = File.separator;
+                if (fileSep.equals("\\")) {
+                    fileSep = "\\\\"; 
+                }
+                classpath = classpath.replace("/", fileSep).replace(':', File.pathSeparatorChar);
+                classpath = "-cp \"" + classpath + "\""; // turn into cp commandline argument
+                org.apache.commons.io.FileUtils.writeStringToFile(cpFile, classpath, "UTF-8");
+                result = true;
+            } catch (IOException e) {
+                getLogger().info("Cannot rewrite classpath file: " + e.getMessage() 
+                    + " Falling back to wildcard classpath.");
+                result = false;
+            }
+        }
+        return result;
+    }
+    
     @Override
     protected void addJavaExecutionOptions(List<String> commands, AppDeploymentRequest request) {
         try {
             Resource resource = request.getResource();
             String path = resource.getFile().getAbsolutePath();
             if (path.endsWith(".zip")) {
-                commands.add("-cp");
                 FileInputStream zis = new FileInputStream(path);
                 File workDir = findWorkingDirectory();
                 getLogger().info("Unpacking Jars into " + workDir.getAbsolutePath());
                 JarUtils.extractZip(zis, workDir.toPath());
                 zis.close();
-                
-                String classpath = "*" + File.pathSeparator + "jars/*"; // fix after unpacking
-                classpath = add(classpath, request, workDir);
-                commands.add(classpath);
+
+                File cpFile = new File(workDir, "classpath");
+                if (cpFile.exists() && checkCpFile(cpFile, request, workDir)) {
+                    commands.add("@classpath");
+                } else {
+                    String classpath = "*" + File.pathSeparator + "jars/*"; // fix after unpacking
+                    classpath = add(classpath, request, workDir);
+                    commands.add("-cp");
+                    commands.add(classpath);
+                }
                 commands.add("iip.Starter");
             } else { // as in the base class
                 commands.add("-jar");
