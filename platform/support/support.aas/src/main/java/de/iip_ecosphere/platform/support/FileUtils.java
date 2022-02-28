@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Basic file functionality.
@@ -73,6 +75,28 @@ public class FileUtils {
                 closable.close();
             } catch (IOException e ) {
                 // do nothing, quietly
+            }
+        }
+    }
+    
+    /**
+     * Lists contained files.
+     * 
+     * @param file the file/folder to list
+     * @param accept accept the file for further (nested) listing, not called for folders
+     * @param handle handle an accepted file
+     */
+    public static void listFiles(File file, Predicate<File> accept, Consumer<File> handle) {
+        if (accept.test(file)) {
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                if (null != files) {
+                    for (File f : files) {
+                        listFiles(f, accept, handle);
+                    }
+                }
+            } else {
+                handle.accept(file);
             }
         }
     }
