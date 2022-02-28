@@ -190,7 +190,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         plugin;
     }
     
-    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="") {
+    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", 
+        Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="", 
+        String includeScope="") {
+        
         XmlElement exec = new XmlElement(execs, "execution");
 
         new XmlElement(exec, "id", "copy-dependencies");
@@ -204,6 +207,9 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(config, "overWriteIfNewer", "true");
         if (excludeIds.length() > 0) {
             new XmlElement(config, "excludeArtifactIds", "${excludeIds}");
+        }
+        if (includeScope.length() > 0) {
+            new XmlElement(config, "includeScope", "${includeScope}");
         }
 
         if (copyOwn) {
@@ -226,7 +232,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def XmlElement appendMavenDependencyPluginBuildClasspathExecution(XmlElement execs, String id="build-classpath", 
         String phase="prepare-package", String outputFile="\\${project.build.directory}/classes/classpath", 
-        Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="") {
+        Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="", 
+        String includeScope="") {
         
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
@@ -245,6 +252,9 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
         if (pathSeparator.length() > 0) {
             new XmlElement(config, "pathSeparator", pathSeparator);
+        }
+        if (includeScope.length() > 0) {
+            new XmlElement(config, "includeScope", "${includeScope}");
         }
         exec;
     }
