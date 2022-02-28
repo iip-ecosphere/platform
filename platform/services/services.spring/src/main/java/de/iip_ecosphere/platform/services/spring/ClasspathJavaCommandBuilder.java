@@ -172,20 +172,36 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
      * @param classpath the base classpath
      * @param request the deployment request
      * @param workDir the work directory
+     * @param asWildcard adds shared libraries as wildcard or by individual files to the classpath
      * @return the modified classpath
      */
-    private String add(String classpath, AppDeploymentRequest request, File workDir) {
+    private String add(String classpath, AppDeploymentRequest request, File workDir, boolean asWildcard) {
         File sharedLibs = SpringInstances.getConfig().getSharedLibs();
+        StringBuilder tmp = new StringBuilder(classpath);
         if (null != sharedLibs && sharedLibs.toString().length() > 0) {
-            if (copySharedLibs(sharedLibs, new File(workDir, "shared"))) {
-                classpath += File.pathSeparator + "shared/*";
+            File sharedTarget = new File(workDir, "shared");
+            if (copySharedLibs(sharedLibs, sharedTarget)) {
+                if (asWildcard) {
+                    tmp.append(File.pathSeparator + "shared/*");
+                } else {
+                    FileUtils.listFiles(sharedTarget, 
+                        f -> f.isFile() && f.getName().endsWith(".jar"), 
+                        f -> tmp.append(File.pathSeparator + f.getName()));
+                }
             }
             sharedLibs = new File(sharedLibs, request.getDefinition().getName());
-            if (copySharedLibs(sharedLibs, new File(workDir, "shared-specific"))) {
-                classpath += File.pathSeparator + "shared-specific/*";
+            File sharedSpecificTarget = new File(workDir, "shared-specific");
+            if (copySharedLibs(sharedLibs, sharedSpecificTarget)) {
+                if (asWildcard) {
+                    tmp.append(File.pathSeparator + "shared-specific/*");
+                } else {
+                    FileUtils.listFiles(sharedSpecificTarget, 
+                        f -> f.isFile() && f.getName().endsWith(".jar"), 
+                        f -> tmp.append(File.pathSeparator + f.getName()));
+                }
             }
         }
-        return classpath;
+        return tmp.toString();
     }
     
     /**
@@ -218,7 +234,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                 if (mainJars.length() > 0) {
                     classpath = mainJars + File.pathSeparator + classpath;
                 }
-                classpath = add(classpath, request, workDir); // add the common folders if needed
+                classpath = add(classpath, request, workDir, false); // add the common folders if needed
                 // https://docs.oracle.com/javase/9/tools/java.htm#JSWOR-GUID-4856361B-8BFD-4964-AE84-121F5F6CF111
                 String fileSep = File.separator;
                 if (fileSep.equals("\\")) {
@@ -254,7 +270,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                     commands.add("@classpath");
                 } else {
                     String classpath = "*" + File.pathSeparator + "jars/*"; // fix after unpacking
-                    classpath = add(classpath, request, workDir);
+                    classpath = add(classpath, request, workDir, true);
                     commands.add("-cp");
                     commands.add(classpath);
                 }
