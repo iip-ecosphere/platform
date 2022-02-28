@@ -252,10 +252,11 @@
                        <overWriteReleases>false</overWriteReleases>
                        <overWriteSnapshots>true</overWriteSnapshots>
                        <overWriteIfNewer>true</overWriteIfNewer>
+                       <includeScope>compile</includeScope>
                        <excludeArtifactIds>tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, 
                            tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli,
-                           tomcat-servlet-api, tomcat-util, tomcat-util-scan
-                       </excludeArtifactIds> <!-- BaSyx clash with Spring -->
+                           tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api
+                       </excludeArtifactIds> <!-- Spring may handle that through layers, BaSyx clash with Spring -->
                    </configuration>
                </execution>
 	          <execution>
@@ -272,6 +273,7 @@
 	                <overWriteIfNewer>true</overWriteIfNewer>
 	                <fileSeparator>/</fileSeparator>
 	                <pathSeparator>:</pathSeparator>
+                    <includeScope>compile</includeScope>
 	              <!-- configure the plugin here -->
 	            </configuration>
 	          </execution>
