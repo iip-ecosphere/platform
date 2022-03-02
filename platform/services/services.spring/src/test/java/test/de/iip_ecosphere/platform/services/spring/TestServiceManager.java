@@ -59,6 +59,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepre
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
+import de.iip_ecosphere.platform.services.spring.ClasspathJavaCommandBuilder;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
@@ -515,4 +516,45 @@ public class TestServiceManager {
         Assert.assertTrue(config.getJavaOpts().size() > 0);
     }
     
+    /**
+     * Tests service start/stop with the ZIP artifact containing explicit dependency JARs and no classpath 
+     * file enabled.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testWithZipArchiveNoClasspath() throws ExecutionException {
+        testWithZipArchive(false);
+    }
+
+    /**
+     * Tests service start/stop with the ZIP artifact containing explicit dependency JARs and classpath file 
+     * usage enabled.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testWithZipArchiveAndClasspath() throws ExecutionException {
+        testWithZipArchive(true);
+    }
+
+    /**
+     * Tests service start/stop with the ZIP artifact containing explicit dependency JARs.
+     * 
+     * @param useClasspath consider classpath file 
+     * @throws ExecutionException shall not occur
+     */
+    private void testWithZipArchive(boolean useClasspath) throws ExecutionException {
+        String prop = System.getProperty(ClasspathJavaCommandBuilder.PROP_ZIP_CLASSPATH, "");
+        System.setProperty(ClasspathJavaCommandBuilder.PROP_ZIP_CLASSPATH, String.valueOf(useClasspath));
+        ServiceManager mgr = ServiceFactory.getServiceManager();
+        File file = new File("target/jars/simpleStream.spring.zip");
+        String aid = mgr.addArtifact(file.toURI());
+        mgr.startService("simpleStream-create", "simpleStream-log");
+        TimeUtils.sleep(5000);
+        mgr.stopService("simpleStream-create", "simpleStream-log");
+        mgr.removeArtifact(aid);
+        System.setProperty(ClasspathJavaCommandBuilder.PROP_ZIP_CLASSPATH, prop);
+    }
+
 }

@@ -152,7 +152,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         try {
             Object funcRes = func.apply(param);
             result = new Result(null == funcRes ? null : funcRes.toString());
-        } catch (Exception e) {
+        } catch (Exception e) { // including AasExecutionException
             result = new Result(e);
         }
         return toJson(result);
@@ -218,6 +218,23 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
             result = null;
         }
         return result;
+    }
+    
+    /**
+     * Executes {@code function} with {@code params} and catches all occurring exceptions turning them into an 
+     * {@link ExecutionException}.
+     * 
+     * @param function the function to be executed
+     * @param params the function parameters
+     * @return the return value
+     * @throws ExecutionException in case that function cannot be executed
+     */
+    public static String fromJson(Function<Object[], Object> function, Object... params) throws ExecutionException {
+        try {
+            return fromJson(function.apply(params));
+        } catch (Throwable t) {
+            throw new ExecutionException(t.getMessage(), t);
+        }
     }
 
 }

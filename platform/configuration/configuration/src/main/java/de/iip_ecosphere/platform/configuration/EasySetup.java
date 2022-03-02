@@ -69,7 +69,7 @@ public class EasySetup {
     }
 
     /**
-     * Returns the IVML folder containing the platform meta model.
+     * Returns the IVML folder containing the platform meta model as well as the VIL and VTL scripts.
      * 
      * @return the IVML folder folder, by default {@code src/main/easy}.
      */

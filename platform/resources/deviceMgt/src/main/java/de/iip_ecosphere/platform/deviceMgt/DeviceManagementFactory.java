@@ -62,7 +62,7 @@ public class DeviceManagementFactory {
                     firmwareOperations = first.get();
                 } else {
                     firmwareOperations = new AasDeviceFirmwareOperations();
-                    LOGGER.error("No DeviceFirmwareOperations implementation available, " 
+                    LOGGER.warn("No DeviceFirmwareOperations implementation available, " 
                         + "fall back to default implementation: Direct AAS Method");
                 }
             }
@@ -74,7 +74,7 @@ public class DeviceManagementFactory {
                     resourceConfigOperations = first.get();
                 } else {
                     resourceConfigOperations = new AasDeviceResourceConfigOperations();
-                    LOGGER.error("No DeviceResourceConfigOperations implementation available, " 
+                    LOGGER.warn("No DeviceResourceConfigOperations implementation available, " 
                         + "fall back to default implementation: Direct AAS Method");
                 }
             }
@@ -86,7 +86,7 @@ public class DeviceManagementFactory {
                     remoteManagementOperations = first.get();
                 } else {
                     remoteManagementOperations = new SshRemoteManagementOperations();
-                    LOGGER.error("No DeviceRemoteManagementOperations implementation available, " 
+                    LOGGER.warn("No DeviceRemoteManagementOperations implementation available, " 
                         + "fall back to default implementation: SSHProxy.");
                 }
             }

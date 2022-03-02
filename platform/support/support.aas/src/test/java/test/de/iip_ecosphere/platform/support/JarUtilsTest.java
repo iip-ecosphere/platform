@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -123,6 +124,45 @@ public class JarUtilsTest {
         FileUtils.closeQuietly(in);
 
         FileUtils.deleteQuietly(f);
+    }
+    
+    /**
+     * Tests {@link JarUtils#listFiles(InputStream, java.util.function.Predicate, java.util.function.Consumer)}.
+     * 
+     * @throws IOException if reading/writing fails
+     */
+    @Test
+    public void testListFiles() throws IOException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream("test.zip");
+        AtomicInteger fileCount = new AtomicInteger();
+        AtomicInteger dirCount = new AtomicInteger();
+        
+        JarUtils.listFiles(in, z -> true, z -> {
+            if (z.isDirectory()) {
+                dirCount.incrementAndGet();
+            } else {
+                fileCount.incrementAndGet();
+            }
+        });
+        FileUtils.closeQuietly(in);
+        Assert.assertEquals(5, fileCount.get());
+        Assert.assertEquals(2, dirCount.get());
+        
+        fileCount.set(0);
+        dirCount.set(0);
+        
+        
+        in = getClass().getClassLoader().getResourceAsStream("test.zip");
+        JarUtils.listFiles(in, z -> !z.isDirectory(), z -> {
+            if (z.isDirectory()) {
+                dirCount.incrementAndGet();
+            } else {
+                fileCount.incrementAndGet();
+            }
+        });
+        FileUtils.closeQuietly(in);
+        Assert.assertEquals(5, fileCount.get());
+        Assert.assertEquals(0, dirCount.get());
     }
 
 }

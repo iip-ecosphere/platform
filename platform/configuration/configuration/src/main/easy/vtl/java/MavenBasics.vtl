@@ -185,35 +185,78 @@ template MavenBasics(Configuration config, FileArtifact target) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         if (jarDir.length() > 0) {
             XmlElement execs = new XmlElement(plugin, "executions");
-            XmlElement exec = new XmlElement(execs, "execution");
-
-            new XmlElement(exec, "id", "copy-dependencies");
-            appendGoal(exec, "copy-dependencies");
-            new XmlElement(exec, "phase", "package");
-            XmlElement config = appendConfiguration(exec);
-            new XmlElement(config, "prependGroupId", "${prependGroupId}");
-            new XmlElement(config, "outputDirectory", jarDir);
-            new XmlElement(config, "overWriteReleases", "false");
-            new XmlElement(config, "overWriteSnapshots", "true");
-            new XmlElement(config, "overWriteIfNewer", "true");        
-
-            if (copyOwn) {
-                exec = new XmlElement(execs, "execution");
-                new XmlElement(exec, "id", "copy-self");
-                appendGoal(exec, "copy");
-                new XmlElement(exec, "phase", "install");
-                XmlElement config = appendConfiguration(exec);
-                XmlElement arts = new XmlElement(config, "artifactItems");
-                XmlElement art = new XmlElement(arts, "artifactItem");
-                new XmlElement(art, "groupId", "\\${project.groupId}");
-                new XmlElement(art, "artifactId", "\\${project.artifactId}");
-                new XmlElement(art, "version", "\\${project.version}");
-                new XmlElement(art, "type", "\\${project.packaging}");
-                new XmlElement(config, "prependGroupId", "${prependGroupId}");
-                new XmlElement(config, "outputDirectory", jarDir);
-            }
+            appendMavenDependencyPluginCopyDepsExecution(execs, jarDir, copyOwn, prependGroupId);
         }
         plugin;
+    }
+    
+    def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", 
+        Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="", 
+        String includeScope="") {
+        
+        XmlElement exec = new XmlElement(execs, "execution");
+
+        new XmlElement(exec, "id", "copy-dependencies");
+        appendGoal(exec, "copy-dependencies");
+        new XmlElement(exec, "phase", phase);
+        XmlElement config = appendConfiguration(exec);
+        new XmlElement(config, "prependGroupId", "${prependGroupId}");
+        new XmlElement(config, "outputDirectory", jarDir);
+        new XmlElement(config, "overWriteReleases", "false");
+        new XmlElement(config, "overWriteSnapshots", "true");
+        new XmlElement(config, "overWriteIfNewer", "true");
+        if (excludeIds.length() > 0) {
+            new XmlElement(config, "excludeArtifactIds", "${excludeIds}");
+        }
+        if (includeScope.length() > 0) {
+            new XmlElement(config, "includeScope", "${includeScope}");
+        }
+
+        if (copyOwn) {
+            exec = new XmlElement(execs, "execution");
+            new XmlElement(exec, "id", "copy-self");
+            appendGoal(exec, "copy");
+            new XmlElement(exec, "phase", "install");
+            XmlElement config = appendConfiguration(exec);
+            XmlElement arts = new XmlElement(config, "artifactItems");
+            XmlElement art = new XmlElement(arts, "artifactItem");
+            new XmlElement(art, "groupId", "\\${project.groupId}");
+            new XmlElement(art, "artifactId", "\\${project.artifactId}");
+            new XmlElement(art, "version", "\\${project.version}");
+            new XmlElement(art, "type", "\\${project.packaging}");
+            new XmlElement(config, "prependGroupId", "${prependGroupId}");
+            new XmlElement(config, "outputDirectory", jarDir);
+        }
+        exec;
+    }
+    
+    def XmlElement appendMavenDependencyPluginBuildClasspathExecution(XmlElement execs, String id="build-classpath", 
+        String phase="prepare-package", String outputFile="\\${project.build.directory}/classes/classpath", 
+        Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="", 
+        String includeScope="") {
+        
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", id);
+        new XmlElement(exec, "phase", phase);
+        appendGoal(exec, "build-classpath");
+        XmlElement config = appendConfiguration(exec);
+        new XmlElement(config, "outputFile", outputFile);
+        new XmlElement(config, "prependGroupId", "${prependGroupId}");
+        new XmlElement(config, "overWriteIfNewer", "true");
+        if (prefix.length() > 0) {
+            new XmlElement(config, "localRepoProperty", prefix);
+            new XmlElement(config, "prefix", prefix);
+        }
+        if (fileSeparator.length() > 0) {
+            new XmlElement(config, "fileSeparator", fileSeparator);
+        }
+        if (pathSeparator.length() > 0) {
+            new XmlElement(config, "pathSeparator", pathSeparator);
+        }
+        if (includeScope.length() > 0) {
+            new XmlElement(config, "includeScope", "${includeScope}");
+        }
+        exec;
     }
 
     def XmlElement appendMavenShadePlugin(XmlElement plugins, String ver="2.3", String mainClass="") {

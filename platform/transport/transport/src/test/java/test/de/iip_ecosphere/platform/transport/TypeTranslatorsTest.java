@@ -17,6 +17,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.transport.serialization.StringSerializer;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
@@ -97,6 +99,42 @@ public class TypeTranslatorsTest {
     public void testDouble() throws IOException {
         final double test = 12.353058;
         Assert.assertEquals(test, TypeTranslators.DOUBLE.to(TypeTranslators.DOUBLE.from(test)).doubleValue(), 0.001);
+    }
+    
+    public static class TestTypeTranslator implements TypeTranslator<String, String> {
+
+        @Override
+        public String from(String data) throws IOException {
+            return null;
+        }
+
+        @Override
+        public String to(String source) throws IOException {
+            return null;
+        }
+        
+    }
+
+    /**
+     * Tests {@link TypeTranslators#createTypeTranslator(ClassLoader, String)}.
+     */
+    @Test
+    public void testCreateTypeTranslator() {
+        Assert.assertNotNull(TypeTranslators.createTypeTranslator(getClass().getClassLoader(), 
+            TestTypeTranslator.class.getName()));
+        Assert.assertNull(TypeTranslators.createTypeTranslator(getClass().getClassLoader(), 
+            "abc.defg"));
+    }
+
+    /**
+     * Tests {@link TypeTranslators#createSerializer(ClassLoader, String)}.
+     */
+    @Test
+    public void testCreateSerializer() {
+        Assert.assertNotNull(TypeTranslators.createSerializer(getClass().getClassLoader(), 
+            StringSerializer.class.getName()));
+        Assert.assertNull(TypeTranslators.createSerializer(getClass().getClassLoader(), 
+            "abc.def"));
     }
 
 }

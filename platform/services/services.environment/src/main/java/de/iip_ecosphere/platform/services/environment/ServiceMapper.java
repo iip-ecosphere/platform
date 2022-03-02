@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.services.environment;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
@@ -65,63 +67,67 @@ public class ServiceMapper {
      * @param service the service to define
      */
     public void mapService(Service service) {
-        builder.defineProperty(getQName(service, NAME_PROP_ID), 
-            () -> service.getId(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
-            () -> service.getDescription(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_VERSION), 
-            () -> service.getVersion().toString(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_KIND), 
-            () -> service.getKind().toString(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_STATE), 
-            () -> service.getState().toString(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_NAME), 
-            () -> service.getName(), null);
-        builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
-            () -> service.isDeployable(), null);
-        builder.defineOperation(getQName(service, NAME_OP_ACTIVATE), 
-            new JsonResultWrapper(p -> {
-                service.activate(); 
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_PASSIVATE), 
-            new JsonResultWrapper(p -> {
-                service.passivate(); 
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_MIGRATE), 
-            new JsonResultWrapper(p -> {
-                service.migrate(readString(p)); 
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_RECONF), 
-            new JsonResultWrapper(p -> {
-                service.reconfigure(readMap(p, 0, null)); 
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_SET_STATE), 
-            new JsonResultWrapper(p -> {
-                ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
-                service.setState(state);
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_SWITCH), 
-            new JsonResultWrapper(p -> {
-                service.switchTo(readString(p));
-                return null;
-            }
-        ));
-        builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
-            new JsonResultWrapper(p -> {
-                service.update(readUri(p, 0, EMPTY_URI));
-                return null;
-            }
-        ));
+        try {
+            builder.defineProperty(getQName(service, NAME_PROP_ID), 
+                () -> service.getId(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
+                () -> service.getDescription(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_VERSION), 
+                () -> service.getVersion().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_KIND), 
+                () -> service.getKind().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_STATE), 
+                () -> service.getState().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_NAME), 
+                () -> service.getName(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
+                () -> service.isDeployable(), null);
+            builder.defineOperation(getQName(service, NAME_OP_ACTIVATE), 
+                new JsonResultWrapper(p -> {
+                    service.activate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_PASSIVATE), 
+                new JsonResultWrapper(p -> {
+                    service.passivate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_MIGRATE), 
+                new JsonResultWrapper(p -> {
+                    service.migrate(readString(p)); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_RECONF), 
+                new JsonResultWrapper(p -> {
+                    service.reconfigure(readMap(p, 0, null)); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_SET_STATE), 
+                new JsonResultWrapper(p -> {
+                    ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
+                    service.setState(state);
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_SWITCH), 
+                new JsonResultWrapper(p -> {
+                    service.switchTo(readString(p));
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
+                new JsonResultWrapper(p -> {
+                    service.update(readUri(p, 0, EMPTY_URI));
+                    return null;
+                }
+            ));
+        } catch (IllegalArgumentException e) {
+            LoggerFactory.getLogger(ServiceMapper.class).error("Cannot map/register service: " + e.getMessage());
+        }
     }
     
     /**

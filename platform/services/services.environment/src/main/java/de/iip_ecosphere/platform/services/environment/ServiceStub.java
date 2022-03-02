@@ -113,81 +113,144 @@ public class ServiceStub implements Service {
     public Function<Object[], Object> getOperation(String name) {
         return operations.get(name);
     }
+
+    /**
+     * Converts a getter result.
+     * 
+     * @param <T> the target type of the value
+     * @param getId the getter ID
+     * @param dflt the default value to return if a conversion is not possible, e.g., response is <b>null</b>
+     * @param conversion the conversion operation
+     * @return the converted value or {@code dflt}
+     */
+    private <T> T convertGetterResult(String getId, T dflt, Function<Object, T> conversion) {
+        T result;
+        Object response = getters.get(getId).get();
+        if (null == response) {
+            result = dflt;
+        } else {
+            result = conversion.apply(response);
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the result of the specified getter converted to string with default value "".
+     * 
+     * @param getId the getter ID
+     * @return the converted value
+     * @see #convertGetterResult(String, Object, Function)
+     */
+    private String convertGetterResultToString(String getId) {
+        return convertGetterResult(getId, "", r -> r.toString());
+    }
+    
+    /**
+     * Converts an object {@code val} to an enum value without throwing exceptions.
+     * 
+     * @param <T> the enum value type
+     * @param val the value to be converted, may be <b>null</b>, a non-matching string, etc.
+     * @param dflt the default value if the conversion cannot be applied
+     * @param cls the enum type
+     * @return the converted value or {@code dflt}
+     */
+    public static <T extends Enum<T>> T convertToEnumSafe(Object val, T dflt, Class<T> cls) {
+        T result;
+        try {
+            result = Enum.valueOf(cls, val.toString());
+        } catch (NullPointerException | IllegalArgumentException e) { // official exceptions
+            result = dflt;
+        }
+        return result;
+    }
+
+    /**
+     * Returns the result of the specified getter converted to the given enum type.
+     * 
+     * @param <T> the enum value type
+     * @param getId the getter ID
+     * @param dflt the default value if the conversion fails
+     * @param cls the enum type
+     * @return the converted value or {@code dflt}
+     * @see #convertGetterResult(String, Object, Function)
+     * @see #convertToEnumSafe(Object, Enum, Class)
+     */
+    private <T extends Enum<T>> T convertGetterResultToEnum(String getId, T dflt, Class<T> cls) {
+        return convertGetterResult(getId, dflt, r -> convertToEnumSafe(r, dflt, cls));
+    }
     
     @Override
     public String getId() {
-        return getters.get(NAME_PROP_ID).get().toString();
+        return convertGetterResultToString(NAME_PROP_ID);
     }
 
     @Override
     public String getName() {
-        return getters.get(NAME_PROP_NAME).get().toString();
+        return convertGetterResultToString(NAME_PROP_NAME);
     }
 
     @Override
     public Version getVersion() {
-        return new Version(getters.get(NAME_PROP_VERSION).get().toString());
+        return convertGetterResult(NAME_PROP_VERSION, null, r -> new Version(r.toString()));
     }
 
     @Override
     public String getDescription() {
-        return getters.get(NAME_PROP_DESCRIPTION).get().toString();
+        return convertGetterResultToString(NAME_PROP_DESCRIPTION);
     }
 
     @Override
     public ServiceState getState() {
-        // should be done on all methods, but getState is required by service manager
-        Object tmp = getters.get(NAME_PROP_STATE).get();
-        return (null == tmp || "".equals(tmp)) ? null : ServiceState.valueOf(tmp.toString());
+        return convertGetterResultToEnum(NAME_PROP_STATE, null, ServiceState.class);
     }
 
     @Override
     public boolean isDeployable() {
-        return Boolean.valueOf(getters.get(NAME_PROP_DEPLOYABLE).get().toString());
+        return convertGetterResult(NAME_PROP_DEPLOYABLE, false, r -> Boolean.valueOf(r.toString()));
     }
 
     @Override
     public ServiceKind getKind() {
-        return ServiceKind.valueOf(getters.get(NAME_PROP_KIND).get().toString());
+        return convertGetterResultToEnum(NAME_PROP_KIND, null, ServiceKind.class);
     }
     
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         Object[] param = new Object[] {state.name()};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_SET_STATE).apply(param));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_SET_STATE), param);
     }
 
     @Override
     public void migrate(String resourceId) throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE).apply(new String[] {}));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE));
     }
 
     @Override
     public void update(URI location) throws ExecutionException {
         Object[] param = new Object[] {location.toString()};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE).apply(param));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE), param);
     }
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
         Object[] param = new Object[] {targetId};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH).apply(param));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH), param);
     }
 
     @Override
     public void activate() throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_ACTIVATE).apply(new String[] {}));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_ACTIVATE));
     }
 
     @Override
     public void passivate() throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_PASSIVATE).apply(new String[] {}));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_PASSIVATE));
     }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
         Object[] param = new Object[] {AasUtils.writeMap(values)};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONF).apply(param));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONF), param);
     }
 
 }

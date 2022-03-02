@@ -3,6 +3,7 @@ package test.de.iip_ecosphere.platform.support;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,6 +46,28 @@ public class FileUtilsTest {
             
         };
         FileUtils.closeQuietly(cl);
+    }
+    
+    /**
+     * Tests {@link FileUtils#listFiles(File, java.util.function.Predicate, java.util.function.Consumer)}.
+     */
+    @Test
+    public void testListFiles() {
+        File f = new File("src/test/resources");
+        AtomicInteger fileCount = new AtomicInteger();
+        
+        FileUtils.listFiles(f, g -> true, g -> {
+            fileCount.incrementAndGet();
+        });
+
+        Assert.assertEquals(7, fileCount.get());
+        fileCount.set(0);
+
+        FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
+            fileCount.incrementAndGet();
+        });
+
+        Assert.assertEquals(2, fileCount.get());
     }
 
 }

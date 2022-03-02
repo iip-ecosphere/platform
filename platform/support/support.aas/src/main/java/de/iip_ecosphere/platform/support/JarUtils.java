@@ -17,19 +17,21 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Basic Jar utilities.
+ * Basic JAR/ZIP utilities. Streams given as parameters in this class are generic {@link InputStream}s to be used
+ * with class/resource loading. 
  * 
  * @author Holger Eichelberger, SSE
  */
 public class JarUtils {
     
     /**
-     * Finds a file within the ZIP/JAR file given by {@code in}.
+     * Finds a file within the ZIP/JAR file given by {@code in}. Closes {@code in} if not found.
      * 
      * @param in the input stream containing ZIP/JAR data
      * @param name the name of the file within {@code in} to be returned
@@ -37,12 +39,24 @@ public class JarUtils {
      * @throws IOException if something I/O related fails
      */
     public static InputStream findFile(InputStream in, String name) throws IOException {
+        return findFile(in, z -> z.getName().equals(name));
+    }
+
+    /**
+     * Finds a file within the ZIP/JAR file given by {@code in}. Closes {@code in} if not found.
+     * 
+     * @param in the input stream containing ZIP/JAR data
+     * @param pred the predicate to identify the file
+     * @return the input stream to {@code name} (must be closed explicitly) or <b>null</b> for none
+     * @throws IOException if something I/O related fails
+     */
+    public static InputStream findFile(InputStream in, Predicate<ZipEntry> pred) throws IOException {
         InputStream found = null;
         try {
             ZipInputStream zis = new ZipInputStream(in);
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                if (zipEntry.getName().equals(name)) {
+                if (pred.test(zipEntry)) {
                     found = zis;
                     break;
                 }
@@ -55,6 +69,32 @@ public class JarUtils {
             throw e;
         }
         return found;
+    }
+
+    
+    /**
+     * Finds a file within the ZIP/JAR file given by {@code in}. Closes {@code in}.
+     * 
+     * @param in the input stream containing ZIP/JAR data
+     * @param pred optional predicate to determine the entries to return, may be <b>null</b>
+     * @param consumer called for an ZIP entry to be listed, called also for folders if accepted by {@code pred}
+     * @throws IOException if something I/O related fails
+     */
+    public static void listFiles(InputStream in, Predicate<ZipEntry> pred, Consumer<ZipEntry> consumer) 
+        throws IOException {
+        try {
+            ZipInputStream zis = new ZipInputStream(in);
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                if (null == pred || pred.test(zipEntry)) {
+                    consumer.accept(zipEntry);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
     /**

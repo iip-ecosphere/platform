@@ -1,0 +1,318 @@
+import JavaBasics;
+import DataOperationBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, DataType pltfType, 
+    String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
+    String className, setOf(AssignmentOperation) assng) {
+
+    Integer index = 0; // temporary
+    String add = "";
+
+    def importTypePackage(String pkg, String typePkg) {
+        if (pkg != typePkg) {
+            'import ${typePkg}.*;'
+        } else {
+            ''
+        }
+    }
+
+    // preliminary... JavaBasics + ??
+    def convName(DataType type) {
+        ""
+    }
+    
+    // to/from will be prefixed, must map to method names in Input/OutputConverter
+    def convName(PrimitiveType type) {
+        switch(type.name) {
+            "Integer" : "Integer",
+            "Long" : "Long",
+            "String" : "String",
+            "Boolean" : "Boolean",
+            "Float" : "Float",
+            "Double" : "Double",
+            "int[]" : "IntegerArray",
+            "double[]" : "DoubleArray",
+            default : "Unknown" // shall lead to compile error
+        }
+    }
+    
+    // --------------------------------- genFrom ---------------------------------
+    
+    def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
+        index = 0;
+        '' // TODO unclear for now
+    }
+    
+    def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
+        index = 0;
+        if (parser <> null) {
+            setOf(String) done = {};
+            '${imTypeName} tmp = new ${imTypeName}();'
+            '${genFromField("tmp", "", "", "", imType)}'
+            '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
+            mapOf(String, Field) mapping = {};
+            mapSourcePaths(imType, mapping, "result");
+            '${produceDataTransfer(pltfType, mapping, "result", "tmp", done)}'
+        } else {
+            ''
+        }
+    }
+    
+    def genFromField(String qual, String name, String fieldName, String typeQual, DataType type) {
+        ''
+    }
+
+    def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type) {
+        String convert = "to" + convName(type);
+        '${qual}.set${asMethodNameSuffix(fieldName)}(parser.getConverter().${convert}(pr.getData("${name}", ${index}, mapping)));'
+    }
+
+    def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type) {
+        String q = qual;
+        if (fieldName.length() > 0) { // fieldName == "" on top level
+           q = q + ".get" + asMethodNameSuffix(fieldName);
+           '${q} = new ${typeQual}${asTypeName(type.name)}();'
+        }
+        String tq = type.name + ".";
+        for (Field f : type.fields, "\n") {
+            String n = f.name;
+            if (name.length() > 0) {
+               n = name + "." + n;
+            }
+            String s = genFromField(q, n, f.name, tq, f.type);            
+            index = index + 1;
+            '${s}'
+        }
+    }
+    
+    // ---------------------------------- genTo -------------------------------------
+    
+    def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
+        index = 0;
+        if (formatter <> null) {
+            String convert = "from" + convName(pltfType);
+            'formatter.add("", formatter.getConverter().${convert}(source));'
+        } else {
+            ''
+        }
+    }
+    
+    def genTo(RecordType imType, String imTypeName, RecordType pltfType, String pltfTypeName) {
+        index = 0;
+        if (formatter <> null) {
+            '${imTypeName} tmp = new ${imTypeName}();'
+            genToField("source", "", "", pltfType);
+        } else {
+            ''
+        }
+    }
+
+    def genToField(String qual, String name, String fieldName, DataType type) {
+        ''
+    }
+    
+    def genToField(String qual, String name, String fieldName, PrimitiveType type) {
+        String convert = "from" + convName(type);
+        'formatter.add("${name}", formatter.getConverter().${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()));\n'
+    }
+    
+    def genToField(String qual, String name, String fieldName, RecordType type) {
+        String q = qual;
+        if (fieldName.length() > 0) { // fieldName == "" on top level
+           q = q + ".get" + asMethodNameSuffix(fieldName);
+        }
+        for (Field f : type.fields) {
+            String n = f.name;
+            if (name.length() > 0) {
+               n = name + "." + n;
+            }
+            String s = genToField(q, n, f.name, f.type);
+            index = index + 1;
+            '${s}'
+        }
+    }
+    
+    // ------------------------- transfer types ---------------------------
+    
+    def String getParserTransferType(MachineParser parser) {
+        "String";
+    }
+    
+    def String getParserTransferType(JsonParser parser) {
+        "com.jsoniter.any.Any";
+    }
+
+    def String getFormatterTransferType(MachineFormatter parser) {
+        "String";
+    }
+
+    def String getFormatterTransferType(JsonFormatter parser) {
+        "ConsumerWithException<com.fasterxml.jackson.core.JsonGenerator>"
+    }
+    
+    // ---------------------------- inits ---------------------------------
+
+    def generateInitParser(String className) {
+        if (parser <> null) {
+            '${generateInitParser(parser, className)}'
+        } else {
+            ''
+        }
+    }
+
+    def generateInitParser(MachineParser parser, String className) {
+        ''
+    }
+
+    def generateInitParser(TextLineParser parser, String className) {
+        'parser = new TextLineParser(encoding, "${parser.separator}");'
+    }
+
+    def generateInitParser(JsonParser parser, String className) {
+        'parser = new JsonInputParser();'
+    }
+
+    def generateInitParser(JavaMachineParser parser, String className) {
+        'parser = (InputParser<${getParserTransferType(parser)}>) ParserUtils.createInstance(
+            ${className}.class.getClassLoader(), "${parser.class}", encoding);'
+    }
+    
+    def generateInitFormatter(String className) {
+        if (formatter <> null) {
+            '${generateInitFormatter(formatter, className)}'
+        } else {
+            ''
+        }
+    }
+    
+    def generateInitFormatter(MachineFormatter formatter, String className) {
+        'formatter = new DummyFormatter();'
+    }
+
+    def generateInitFormatter(TextLineFormatter formatter, String className) {
+        'formatter = new TextLineFormatter(encoding, "${formatter.separator}");'
+    }
+
+    def generateInitFormatter(JsonFormatter formatter, String className) {
+        'formatter = new JsonOutputFormatter();'
+    }
+
+    def generateInitFormatter(JavaMachineFormatter formatter, String className) {
+        'formatter = (OutputFormatter<${getFormatterTransferType(formatter)}>) FormatterUtils.createInstance(
+            ${className}.class.getClassLoader(), "${formatter.class}", encoding);'
+    }
+    
+    // ---------------------------- attributes ---------------------------------
+    
+    def generateParserAttribute() {
+        if (parser <> null) {
+            'private InputParser<${getParserTransferType(parser)}> parser;'
+        } else {
+            ''
+        }
+    }
+    
+    def generateParserFrom(String imTypeName, String pltfTypeName) {
+        if (parser <> null) {
+            'ParseResult<${getParserTransferType(parser)}> pr = parser.parse(data);
+            ${pltfTypeName} result = new ${pltfTypeName}${add}();
+            ${genFrom(imType, imTypeName, pltfType, pltfTypeName)}
+            return result;'
+        } else {
+            'return null;'
+        }
+    }
+
+    def generateFormatterAttribute() {
+        if (formatter <> null) {
+            'private OutputFormatter<${getFormatterTransferType(formatter)}> formatter;'
+        } else {
+            ''
+        }
+    }
+
+    def generateFormatterTo(String imTypeName, String pltfTypeName) {
+        if (formatter <> null) {
+            '${genTo(imType, imTypeName, pltfType, pltfTypeName)}
+            return formatter.chunkCompleted();'
+        } else {
+            'return null;'
+        }
+    }
+    
+    // ---------------------------------- clone -------------------------------------
+    
+    def generateClone(DataType type, String typeName, String add) {
+        'return new ${typeName}(origin);' // no ${add}, arrays?
+    }
+
+    def generateClone(RecordType type, String typeName, String add) {
+        'return new ${typeName}${add}(origin);'
+    }
+    
+    // ---------------------------------- main ---------------------------------------
+
+    def main(Configuration config, FileArtifact target, DataType imType, DataType pltfType, String pkg, String typePkg, 
+        Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className, 
+        setOf(AssignmentOperation) assng) {
+        String imTypeName = asTypeName(imType.name);
+        String pltfTypeName = asTypeName(pltfType.name);
+        if (sharedInterfaces) {
+            add = "Impl";
+        }
+
+        'package ${pkg};
+        
+        import java.io.IOException;
+        import java.util.*;
+        import de.iip_ecosphere.platform.transport.serialization.*;
+        import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
+        import de.iip_ecosphere.platform.connectors.parser.*;
+        import de.iip_ecosphere.platform.connectors.formatter.*;
+        ${importTypePackage(pkg, typePkg)}
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;
+        
+        /**
+         * Parser/formatter connector serializer for ${pltfTypeName}.
+         * Generated by: EASy-Producer.
+         */
+        public class ${className} implements Serializer<${pltfTypeName}> {
+        
+            ${generateParserAttribute()|e}
+            ${generateFormatterAttribute()|e}
+            private Map<String, Integer> mapping;
+            
+            public ${className}(String encoding, Map<String, Integer> mapping) {
+                this.mapping = mapping;
+                ${generateInitParser(className)|e}
+                ${generateInitFormatter(className)|e}
+            }
+        
+            @Override             
+            public ${pltfTypeName} from(byte[] data) throws IOException {
+                ${generateParserFrom("${imTypeName}${add}", "${pltfTypeName}")}
+            }
+
+            @Override    
+            public byte[] to(${pltfTypeName} source) throws IOException {
+                ${generateFormatterTo("${imTypeName}${add}", "${pltfTypeName}")}
+            }
+
+            @Override
+            public ${pltfTypeName} clone(${pltfTypeName} origin) throws IOException {
+                ${generateClone(pltfType, pltfTypeName, add)}
+            }
+
+            @Override
+            public Class<${pltfTypeName}> getType() {
+                return ${pltfTypeName}.class;
+            }
+        
+        }
+        '
+    }
+    
+}

@@ -38,6 +38,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, "org.apache.logging.log4j", "log4j-core", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, iipGroup, "transport", projectVersion);
+        appendDependency(dep, iipGroup, "connectors", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
         // TURN THIS INTO XML
         appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
@@ -52,6 +53,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         for (String art : artifacts.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
+        d = appendDependency(dep, "org.glassfish", "jakarta.el");
+        new XmlElement(d, "optional", "false");
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
@@ -88,6 +91,13 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
                 goalItems.add(goal, items);
             }
         }
+        
+        // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
+        String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
+        appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
+            phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="compile"); 
+        appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
+            prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="compile"); 
     }
 
 }

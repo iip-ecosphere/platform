@@ -40,6 +40,7 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     private int availabilityRetryDelay = 500;
     private HashMap<String, String> executables = new HashMap<String, String>();
     private List<String> javaOpts = CollectionUtils.toList("-Dlog4j2.formatMsgNoLookups=true"); 
+    private File sharedLibs = new File("/shared"); // preliminary default
 
     /**
      * Returns the name of the broker host.
@@ -71,12 +72,21 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     /**
      * Returns the download directory for artifacts.
      * 
-     * @return downloadDir the download directory (if <b>null</b> use temporary directory/files)
+     * @return the download directory (if <b>null</b> use temporary directory/files)
      */
     public File getDownloadDir() {
         return downloadDir;
     }
-    
+
+    /**
+     * Returns the directory for shared service libraries.
+     * 
+     * @return the shared library directory (if <b>null</b> or empty for none)
+     */
+    public File getSharedLibs() {
+        return sharedLibs;
+    }
+
     /**
      * Returns the name of the descriptor file to load from an artifact.
      * 
@@ -163,6 +173,15 @@ public class SpringCloudServiceSetup extends ServiceSetup {
      */
     public void setDownloadDir(File downloadDir) {
         this.downloadDir = downloadDir;
+    }
+
+    /**
+     * Changes the directory for shared service libraries.
+     * 
+     * @param sharedLibs the shared library directory (if <b>null</b> or empty for none)
+     */
+    public void setSharedLibs(File sharedLibs) {
+        this.sharedLibs = sharedLibs;
     }
 
     /**

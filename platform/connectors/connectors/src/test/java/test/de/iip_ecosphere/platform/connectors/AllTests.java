@@ -22,7 +22,11 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     ConnectorParameterTest.class,
     ConnectorTest.class,
-    ConnectorsAasTest.class
+    ConnectorsAasTest.class,
+    InputParserTest.class,
+    JsonInputParserTest.class,
+    OutputFormatterTest.class,
+    JsonOutputFormatterTest.class
 })
 public class AllTests {
 }

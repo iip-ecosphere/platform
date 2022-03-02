@@ -12,8 +12,10 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 
 ## News
 
-* Initial device management
+* Python Service Execution Environment and model-based Python Service integration
+* Generic integration of the anonymization and pseudonymization tool [KODEX](https://heykodex.com/)
 * Distributed service execution via CLI scripts
+* Initial device management
 * Pre-built containers to experiment with the platform on Dockerhub.
 * Security fixes for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228)
 
@@ -56,7 +58,9 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * Upcoming: Resource management for Kubernetes
     * [Device management](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt/README.md) with MinIO, S3Mock and ThingsBoard integrations.
  * [Security and Data Protection](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
- * Reusable Intelligent Services
+    * [KIPROTECT](https://kiprotect.com/) [KODEX](https://heykodex.com/) [integration](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/security.services.kodex/README.md)
+ * [Reusable Intelligent Services](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/README.md)
+    * [RapidMiner](https://rapidminer.com) Real-Time Scoring Agent (RTSA) for [AI components and processes](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.rapidminer.rtsa/README.md).
  * Configuration
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
     * Resource optimization

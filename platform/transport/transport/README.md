@@ -28,7 +28,8 @@ prepared in terms of specifying a keystore (JKS, PCK12) and a keystore password,
 * Select a wire format and set up the type-based serialization classes (in platform: generated). Register the serializer with the `SerializerRegistry` (along with default serializers, e.g. for Strings).
 * Create a transport parameter instance via its builder class (`TransportParameter.TransportParameterBuilder`)
 * Create a connector instance
-    * Pragmatic: Call the constructor of the connector
-    * Intended platform use: Use the `TransportFactory`, which is automatically set up via JSL for the selected transport component (not for multiple ones).
+    * Typical platform approach: Use the `TransportFactory`, which is automatically set up via Java Service Loader (JSL) for the included transport component, e.g., transport.mqttv3 (just for one, not for multiple ones).
+    * Pragmatic (recommended for tests only): Call the constructor of the connector.
 * If you want to receive data: Register a `ReceptionCallback` with the connector. Wire-to-instance translation will be done by the serializer mechanism.
 * If you want to send data: Call the send method (synchronous, asynchronous). Wire-to-instance translation will be done by the serializer mechanism.
+* Finally, after use: Disconnect the connector.

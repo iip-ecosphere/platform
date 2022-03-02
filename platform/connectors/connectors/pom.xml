@@ -33,6 +33,10 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>com.jsoniter</groupId>
+     <artifactId>jsoniter</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>junit</groupId>

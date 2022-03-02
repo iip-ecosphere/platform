@@ -14,9 +14,17 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 
 /**
@@ -67,6 +75,61 @@ public class StarterTest {
     private static void assertStringContaining(String str, String expected) {
         assertString(str);
         Assert.assertTrue(str.indexOf(expected) > 0);
+    }
+    
+    /**
+     * Asserts that accessing the state of a non-existent service in the service environment does not fail.
+     */
+    @Test
+    public void testFailingServiceCreation() {
+        final String protocol = "";
+        final int port = NetUtils.getEphemeralPort();
+        
+        Starter.main(new String[] {
+            Starter.composeArgument(Starter.PARAM_IIP_PROTOCOL, protocol),
+            Starter.composeArgument(Starter.PARAM_IIP_PORT, String.valueOf(port))    
+        });
+        Starter.mapService(null); // service does not exist
+        InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(protocol, "localhost", port);
+        ServiceStub stub = new ServiceStub(iCreator, "1234"); // service does not exist
+        Assert.assertNull(stub.getState());
+        Assert.assertEquals("", stub.getDescription());
+        Assert.assertEquals("", stub.getId());
+        Assert.assertNull(stub.getKind());
+        Assert.assertNull(stub.getVersion());
+        Assert.assertFalse(stub.isDeployable());
+        System.out.println("The following exception(s)/failing operations are intended!!!");
+        try {
+            stub.setState(ServiceState.ACTIVATING); // goes for 1min recovery
+            Assert.fail();
+        } catch (ExecutionException e) {
+            // this is ok
+        }
+        try {
+            stub.activate();
+            Assert.fail();
+        } catch (ExecutionException e) {
+        }
+        try {
+            stub.passivate();
+            Assert.fail();
+        } catch (ExecutionException e) {
+        }
+        try {
+            stub.update(new File("").toURI());
+            Assert.fail();
+        } catch (ExecutionException e) {
+        }
+        try {
+            stub.switchTo("id");
+            Assert.fail();
+        } catch (ExecutionException e) {
+        }
+        try {
+            stub.reconfigure(new HashMap<String, String>());
+            Assert.fail();
+        } catch (ExecutionException e) {
+        }
     }
 
 }

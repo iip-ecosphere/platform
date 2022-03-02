@@ -16,10 +16,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.qpid.server.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,6 +48,18 @@ import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironm
  * @author Holger Eichelberger, SSE
  */
 public class IvmlTests {
+    
+    private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
+    private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
+
+    static  {
+        ASSERT_FILE_EXTENSIONS.add(".java");
+        ASSERT_FILE_EXTENSIONS.add(".py");
+        ASSERT_FILE_EXTENSIONS.add(".yml");
+        ASSERT_FILE_EXTENSIONS.add(".xml");
+        
+        ASSERT_FILE_NAME_EXCLUSIONS.add("__init__.py");
+    }
 
     /**
      * Asserts and returns an instance of the configuration lifecycle descriptor.
@@ -78,6 +93,11 @@ public class IvmlTests {
         lcd.shutdown();
     }
     
+    /**
+     * Reusable test configuration/setup.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class TestConfigurer extends InstantiationConfigurer {
 
         /**
@@ -141,6 +161,7 @@ public class IvmlTests {
         assertEcsRuntime(gen);
         assertServiceManager(gen);
         assertPlatform(gen);
+        assertAllFiles(gen);
     }
 
     /**
@@ -387,10 +408,45 @@ public class IvmlTests {
      * @return the actual asserted file ({@code base} + {@code name})
      */
     private static File assertFile(File base, String name) {
-        File f = new File(base, name);
-        Assert.assertTrue("File " + f + " does not exist", f.exists());
-        Assert.assertTrue("File " + f + " is empty", f.length() > 0);
-        return f;
+        return assertFile(new File(base, name));
+    }
+    
+    /**
+     * Asserts that the specified file exists and has contents.
+     * 
+     * @param file the file
+     * @return {@code file}
+     */
+    private static File assertFile(File file) {
+        Assert.assertTrue("File " + file + " does not exist", file.exists());
+        Assert.assertTrue("File " + file + " is empty", file.length() > 0);
+        return file;
+    }
+    
+    /**
+     * Generically asserts all files in {@code folder} and recursively in contained folders.
+     * 
+     * @param folder the folder to asserts the files within
+     */
+    private static final void assertAllFiles(File folder) {
+        File[] files = folder.listFiles();
+        if (null != files) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    assertAllFiles(f);
+                } else {
+                    String name = f.getName();
+                    int pos = name.lastIndexOf('.');
+                    String extension = "";
+                    if (pos > 0) {
+                        extension = name.substring(pos);
+                    }
+                    if (ASSERT_FILE_EXTENSIONS.contains(extension) && !ASSERT_FILE_NAME_EXCLUSIONS.contains(name)) {
+                        Assert.assertTrue("File " + f + " is empty", FileUtils.readFileAsString(f).trim().length() > 0);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -421,6 +477,7 @@ public class IvmlTests {
     public void testSimpleMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh");
         PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh", new File("src/test/easy"), gen)));
+        assertAllFiles(gen);
     }
 
     /**
@@ -435,6 +492,7 @@ public class IvmlTests {
     public void testSimpleMesh3() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh3");
         PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)));
+        assertAllFiles(gen);
     }
     
     /**
@@ -475,6 +533,7 @@ public class IvmlTests {
         
         assertFile(srcMainAssembly, "kodex_pseudonymizer.xml");
         assertFile(srcMainAssembly, "python_kodexPythonService.xml");
+        assertAllFiles(gen);
     }
 
     /**
@@ -494,6 +553,7 @@ public class IvmlTests {
         File base = new File(gen, "MyAppExampleOld");
         assertAppInterfaces(base, true); // old style
         assertApplication(base);
+        assertAllFiles(base);
     }
     
     /**
@@ -502,7 +562,7 @@ public class IvmlTests {
      * @param cfg the configurer instance
      * @return {@code cfg}
      */
-    private static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
+    public static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
         return cfg.setStartRuleName("generateApps");
     }
     

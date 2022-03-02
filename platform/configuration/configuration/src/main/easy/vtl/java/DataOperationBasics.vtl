@@ -1,0 +1,216 @@
+import JavaBasics;
+
+// Generation operations for data assignment operations and data transfer among data types
+// May be called direcly for Java-based access, but also can be extended and individual (marked) parts
+// overridden to generate different access styles, e.g., for model access paths.
+@advice(IIPEcosphere)
+template DataOperationBasics(Configuration config, FileArtifact target) {
+
+    setOf(String) dummy = {}; // not nice
+
+    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
+        mapOf(Field, String) fields = {};
+        mapFields(src, fields, srcQual, true); 
+        mapFields(tgt, fields, tgtQual, false);
+        for (AssignmentOperation a : assng, "\n") {
+            '${translateDataOperation(a, fields, done)}'
+        }
+    }
+
+    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, setOf(String) done) {
+        if (fields.containsKey(assng.field)) {
+            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields), done, true);
+        } else {
+            ""
+        }
+    }
+
+    // dispatch basis
+    def String translateDataOperation(DataOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
+        translateFieldAccess(op.field, fields, false, "", dummy, false);
+    }
+    
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String value, setOf(String) done, Boolean recordDone) {
+        if (fields.containsKey(field)) {
+           if (recordDone) {
+               done.add(mapTargetPath(fields.get(field), field));
+           }
+           genFieldAccess(fields.get(field), field, set, value);
+        } else {
+           ""
+        }
+    }
+        
+    // can be overridden
+    def genFieldAccess(String path, Field field, Boolean set, String value) {
+       if (set) {
+           path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ");"; 
+       } else {
+           path + ".get" + asMethodNameSuffix(field.name) + "()"; 
+       }
+    }
+
+    // dispatch basis (completeness)
+    def String translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+
+    def String translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields) {
+        "\"${op.value}\""
+    }
+
+    def String translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+
+    def String translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields) {
+        "${op.value}"
+    }
+    
+    def String translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields) {
+        "(" + translateDataOperation(op.operation, fields) + ")";
+    }
+
+    // dispatch basis (completeness)
+    def String translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields) {
+        ""
+    }
+
+    def String translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " + ", fields);
+    }
+
+    def String translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " - ", fields);
+    }
+
+    def String translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " * ", fields);
+    }
+
+    def String translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields) {
+        combine(op, " / ", fields);
+    }
+
+    def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields) {
+        combineArgs(op.arguments, sep, fields);
+    }
+    
+    def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields) {
+        String result = "";
+        boolean first = true;
+        for (DataOperation op : args) {
+            if (not(first)) {
+                result = result + sep;
+            }
+            result = result + translateDataOperation(op, fields);
+            first = false;
+        }
+        result;
+    }
+    
+    // ----------------------------------- maps fields to access paths  -----------------------------
+    
+    // dispatch basis
+    def mapFields(DataType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
+    } 
+
+    def mapFields(RecordType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
+        for (Field f : type.fields) {
+            String fn;
+            if (forSrc) {
+               fn = mapSourcePath(qual, f);
+            } else {
+               fn = mapTargetPath(qual, f);
+            }
+            result.add(f, qual);
+            mapFields(f.type, result, fn, forSrc);
+        }
+    } 
+    
+    def getterPath(String qual, Field f) {
+        qual + ".get" + asMethodNameSuffix(f.name) + "()";
+    }
+
+    def setterPath(String qual, Field f, String value) {
+        qual + ".set" + asMethodNameSuffix(f.name) + "(${value})";
+    }
+
+    // ----------------------------------- maps access paths to fields -----------------------------
+    
+    def mapSourcePaths(DataType type, mapOf(String, Field) result, String qual) {
+    }
+
+    def mapSourcePaths(RecordType type, mapOf(String, Field) result, String qual) {
+        for (Field f : type.fields) {
+            String fn = mapSourcePath(qual, f);
+            result.add(fn, f);
+            mapSourcePaths(f.type, result, fn);
+        }
+    }
+    
+    // customizable paths, may be different depending on application, use here method calls
+    // if you override this function, also override mapTargetSeparator()
+    def mapTargetPath(String qual, Field f) {
+        getterPath(qual, f);
+    }
+
+    def String mapTargetSeparator() {
+        ".";
+    }
+
+    // customizable paths, may be different depending on application, use here method calls
+    // if you override this function, also override mapSourceSeparator()
+    def mapSourcePath(String qual, Field f) {
+        getterPath(qual, f);
+    }
+    
+    def String mapSourceSeparator() {
+        ".";
+    }
+    
+    // ------------------------------------ produce data transfer -----------------------------------
+    // to be used with mapPaths; the idea is to hash over the target datatype (mapPaths, target = to write to) and to 
+    // produce for the input data type (to read from). Thus we have to build up both access path.
+    
+    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    }
+
+    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+        String targetSep = mapTargetSeparator();
+        String sourceSep = mapSourceSeparator();
+        for (Field f : type.fields) {
+            String tn = mapTargetPath(typeQual, f);
+            String mq = mapSourcePath(mapQual, f);
+            if (not(done.includes(tn)) and mapping.containsKey(mq)) {
+                Integer tnPos = tn.rfind(targetSep);
+                Integer mqPos = mq.rfind(sourceSep);
+                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}'
+            } else {
+                ''
+            }
+        }
+    }
+    
+    def prefixPath(String path, String sep) {
+        Integer pos = path.rfind(sep);
+        if (pos <= 0) {
+            "";
+        } else {
+            path.substring(0, pos);
+        }
+    } 
+    
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
+    }
+
+}

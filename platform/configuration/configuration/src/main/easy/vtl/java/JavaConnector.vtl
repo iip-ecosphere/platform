@@ -1,30 +1,76 @@
 import JavaBasics;
+import DataOperationBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaConnector(Configuration config, FileArtifact target) {
+template JavaConnector(Configuration config, FileArtifact target) extends DataOperationBasics {
+
+    Boolean genFrom = false; // temporary
+    
+    // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
+    // dispatch basis
+    def String getMachineOutputTypeName(Connector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    def String getMachineOutputTypeName(ChannelConnector conn) {
+        "byte[]"; // taken from code
+    }
+
+    def String getMachineOutputTypeName(OpcUaV1Connector conn) {
+        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"; // taken from code
+    }
+
+    def String getMachineOutputTypeName(AasConnector conn) {
+        "Object"; // taken from code
+    }
+
+    // qualified/unqualified Java types to be used as template parameter for data to machine in connector generation, 
+    // dispatch basis
+    def String getMachineInputTypeName(Connector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    def String getMachineInputTypeName(ChannelConnector conn) {
+        "byte[]"; // generic, to be overridden
+    }
+
+    def String getMachineInputTypeName(OpcUaV1Connector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    def String getMachineInputTypeName(AasConnector conn) {
+        "Object"; // taken from code
+    }
 
     def getConnectorGenerics(Connector conn, boolean withMachine) {
         String type = "<";
         if (withMachine) {
-            type = type + conn.machineOutput.type.name;
+            type = type + getMachineOutputTypeName(conn);
             type = type + ",";
-            type = type + conn.machineInput.type.name;
+            type = type + getMachineInputTypeName(conn);
             type = type + ",";
         }
-        type = type + getFirstTypeName(conn.output);
+        type = type + asTypeName(getFirstTypeName(conn.output));
         type = type + ",";
-        type = type + getFirstTypeName(conn.input);
+        type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
+    }
+
+    def DataType getFirstType(sequenceOf(IOType) types) {
+        if (types.size() > 0) {
+            IOType t = types.get(0);
+            t.type;
+        }    
     }
     
     def getFirstTypeName(sequenceOf(IOType) types) {
-        if (types.size() > 0) {
-            IOType t = types.get(0);
-            t.type.name;
+        DataType dt = getFirstType(types);
+        if (dt <> null) {
+            dt.name;
         } else {
             "Object";
-        }    
+        }
     }
     
     def adapterCreationFragment(Connector conn, String varName) {
@@ -46,20 +92,40 @@ template JavaConnector(Configuration config, FileArtifact target) {
             ${outAdapter}, 
             ${inAdapter})'
     }
+    
+    def getEncoding(Connector conn) {
+        switch(conn.encoding) {
+            TextEncoding::ANSI : "ISO-8859-1",
+            TextEncoding::ASCII : "US-ASCII",
+            TextEncoding::UTF8 : "UTF8"
+        }
+    }
 
     def adapterCreationFragment(ChannelConnector conn, String varName) {
         String connGen = getConnectorGenerics(conn, true);
         String inSerializer;
         String outSerializer;
         if (conn.inSerializerClass.length() > 0) {
-            inSerializer = "new ${conn.inSerializerClass}()";
+            if (conn.inSerializerClass == "*") {
+                inSerializer = "new ${conn.inInterface}Serializer()";
+            } else {
+                //inSerializer = "new ${conn.inSerializerClass}()";
+                inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
+            }
         } else {
-            inSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.input)}.class)";
+            //inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
+            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(null, null)";
         }
         if (conn.outSerializerClass.length() > 0) {
-            outSerializer = "new ${conn.outSerializerClass}()";
+            if (conn.outSerializerClass == "*") {
+                outSerializer = "new ${conn.outInterface}Serializer()";
+            } else {
+                //outSerializer = "new ${conn.outSerializerClass}()";
+                outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
+            }
         } else {
-            outSerializer = "SerializerRegistry.getSerializer(${getFirstTypeName(conn.output)}.class)";
+            //outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
+            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(null, null)";
         }
 
         String inAdapter;
@@ -67,12 +133,12 @@ template JavaConnector(Configuration config, FileArtifact target) {
         if (conn.inAdapterClass.length() > 0) {
             inAdapter = "new ${conn.inAdapterClass}()";
         } else {
-            inAdapter = "new ConnectorInputTypeAdapter<${getFirstTypeName(conn.input)}>(${inSerializer})";
+            inAdapter = "new ConnectorInputTypeAdapter<${asTypeName(getFirstTypeName(conn.input))}>(${inSerializer})";
         }
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = "new ${conn.outAdapterClass}()";
         } else {
-            outAdapter = "new ConnectorOutputTypeAdapter<${getFirstTypeName(conn.output)}>(${outSerializer})";
+            outAdapter = "new ConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
         }
 
         'ChannelTranslatingProtocolAdapter${connGen} ${varName} = new ChannelTranslatingProtocolAdapter${connGen}(
@@ -104,17 +170,87 @@ template JavaConnector(Configuration config, FileArtifact target) {
     def generateAdapterTranslators(ChannelConnector conn) {
         ''
     }
+    
+    def genOutputTransTo(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng) {
+        ''
+    }
+    
+    // unify imType with access/model without having an instance, write into pltfType
+    def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
+        genFrom = false;
+        setOf(String) done = {};
+        String imTypePath = imType.path;
+        '${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}'
+        mapOf(String, Field) mapping = {};
+        mapSourcePaths(imType, mapping, imTypePath);
+        '${produceDataTransfer(pltfType, mapping, "result", imTypePath, done)}'
+    }
+    
+    // called via translateDataOperations
+    def genFieldAccess(String path, Field field, Boolean set, String value) {
+       if (set) {
+           "access.set(\"" + path + "/" + field.name +"\", " + value + ");"; 
+       } else {
+           String ex = "access.get(\"" + path + "/" + field.name +"\")"; 
+           String c = cast(field.type);
+           if (c.length() > 0) {
+               ex = "(" + c + " " + ex + ")";
+           }
+           ex;
+       }
+    }
+    
+    // called via mapPaths and produceDataTransfer
+    def mapSourcePath(String qual, Field f) {
+        qual + "/" + f.name;
+    }
+    
+    def String mapSourceSeparator() {
+        "/";
+    }
+    
+    // called via produceDataTransfer
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        if (genFrom) {
+            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${getterPath(tgtQual, tgt)});";
+        } else {
+            "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+        }
+    }
+
+    def genOutputTransFrom(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng) {
+        ''
+    }
+
+    // unify imType with access/model without having an instance, write into pltfType
+    def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
+        genFrom = true;
+        setOf(String) done = {};
+        String imTypePath = imType.path;
+        '${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}'
+        mapOf(String, Field) mapping = {};
+        mapSourcePaths(imType, mapping, imTypePath);
+        '${produceDataTransfer(pltfType, mapping, "data", imTypePath, done)}'|8;
+    }
 
     def generateMachineOutputTranslator(Connector conn) {
         if (conn.inAdapterClass.length() == 0) {
-            String coType = getFirstTypeName(conn.output);
-            String oType = conn.machineOutput.type.name;
+            IIPEcosphere cfg = config;
+            String coType = asTypeName(getFirstTypeName(conn.output));
+            String oType = getMachineOutputTypeName(conn);
+            String add = "";
+            if (cfg.sharedInterfaces) {
+                add = "Impl";
+            }
         '
         private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
         
             @Override
             public ${coType} to(${oType} source) throws IOException {
-                return null; // TODO
+                ModelAccess access = getModelAccess();
+                ${coType} result = new ${coType}${add}();
+                ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations)}
+                return result; 
             }
         
             @Override
@@ -142,14 +278,16 @@ template JavaConnector(Configuration config, FileArtifact target) {
 
     def generateMachineInputTranslator(Connector conn) {
         if (conn.outAdapterClass.length() == 0) {
-            String ciType = getFirstTypeName(conn.input);
-            String iType = conn.machineInput.type.name;
+            String ciType = asTypeName(getFirstTypeName(conn.input));
+            String iType = getMachineInputTypeName(conn);
         '
         private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
         
             @Override
             public ${iType} from(${ciType} data) throws IOException {
-                return null; // TODO irrelevant?
+                ModelAccess access = getModelAccess();
+                ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations)}
+                return null; // done, no instance of pseudo type
             }
         
             @Override
@@ -180,7 +318,7 @@ template JavaConnector(Configuration config, FileArtifact target) {
 
     def generateReceptionCallback(Connector conn) {
         String serviceId = "_" + toIdentifier(conn.id);
-        String coType = getFirstTypeName(conn.output);
+        String coType = asTypeName(getFirstTypeName(conn.output));
         String methodSuffix = "create" + coType.firstToUpperCase() + serviceId;
         'private class ConnectorReceptionCallback implements ReceptionCallback<${coType}> {
         

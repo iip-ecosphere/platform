@@ -30,7 +30,8 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
  * {@link VabOperationsProvider}. Function objects as well as class itself must be serializable for remote deployment.
  * 
  * Although serializable lambda functions appear feasible, we experienced deserialization problems and rely now on
- * explicit functor instances.
+ * explicit functor instances. Failing operation executions throw the occuring (runtime) exception and require catching 
+ * them.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -59,8 +60,8 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      */
     protected abstract static class AbstractFunctor implements Serializable {
 
+        protected static final long TIMEOUT = 60 * 1000; // a minute, preliminary
         private static final long serialVersionUID = 4104858388150273917L;
-        private static final long TIMEOUT = 60 * 1000; // a minute, preliminary
         private static Map<String, Long> failed;
         private VabInvocablesCreator creator;
         private String name;
@@ -250,11 +251,15 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
             try {
                 if (isOk()) {
                     result = createProxy().invokeOperation(VabOperationsProvider.PREFIX_SERVICE + getName(), params);
+                } else {
+                    throw new RuntimeException("Connection failed before and was blocked until timeout of " 
+                        + TIMEOUT + " ms");
                 }
             } catch (Throwable t) {
                 markAsFailed();
-                LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " on " + getId() 
-                    + " failed: " + t.getMessage());
+                LoggerFactory.getLogger(getClass()).info("Operation " + getName() + " on " + getId() + " failed: " 
+                        + t.getMessage());
+                throw t; // shall be caught by caller
             }
             return result;
         }

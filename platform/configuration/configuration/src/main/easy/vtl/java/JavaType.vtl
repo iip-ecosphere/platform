@@ -2,9 +2,10 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaType(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces) {
+template JavaType(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
 
     String ending = " {";
+    Boolean emitJavadoc = true;
 
     // generates code for the individual attributes
     def attributes(RecordType type) {
@@ -25,7 +26,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     // generates code for the getters
     def getters(RecordType type) {
         for (Field f: type.fields) {
-            if (not(sharedInterfaces) or interface) {
+            if (emitJavadoc) {
                 '/**
                   * Returns the value of {@code ${asIdentifier(f.name)}}.
                   * 
@@ -46,7 +47,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     // generates code for the setters
     def setters(RecordType type) {
         for (Field f: type.fields) {
-            if (not(sharedInterfaces) or interface) {
+            if (emitJavadoc) {
                 '/**
                  * Changes the value of {@code ${asIdentifier(f.name)}}.
                  * 
@@ -83,7 +84,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         }
     }
 
-    def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces) {
+    def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
         String kw = "class";
         String add = "";
@@ -95,15 +96,22 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
                 ending = ";\n";
                 kw = "interface";
                 comment = "Interface";
+                emitJavadoc = true;
             } else {
-                add = "Impl";
+                if (impl) {
+                    add = "Impl";
+                    implements = " implements ${clsName}";
+                    imp = "import ${pkg}.${clsName};";
+                    emitJavadoc = false;
+                } else { // just as a usual type, but anyway shared, e.g., for connector data types
+                    emitJavadoc = true;
+                }
                 comment = "Implementation";
-                implements = " implements ${clsName}";
-                imp = "import ${pkg}.${clsName};";
             }
         } else {
             comment = "Implementation";
             interface = false;
+            emitJavadoc = true;
         }
         'package ${pkg};
         ${imp|e}

@@ -33,8 +33,9 @@ public class LocalNetworkManagerWithParentAas implements NetworkManagerDescripto
         NetworkManager result;
         try {
             result = new LocalNetworkManagerImpl(new NetworkManagerAasClient());
+            LoggerFactory.getLogger(getClass()).info("AAS-based network manager installed");
         } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot create AAS-based network manager, falling back to "
+            LoggerFactory.getLogger(getClass()).warn("Cannot create AAS-based network manager, falling back to "
                 + "local network manager: " + e.getMessage());
             result = new LocalNetworkManagerImpl();
         }

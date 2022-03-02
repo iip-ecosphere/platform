@@ -12,10 +12,14 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +43,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public abstract class AbstractService implements Service {
 
+    private static ClassLoader loader = AbstractService.class.getClassLoader();
     private String id;
     private String name;
     private Version version;
@@ -120,6 +125,17 @@ public abstract class AbstractService implements Service {
      */
     protected void initializeFrom(YamlService yaml) {
     }
+    
+    /**
+     * Sets shared jar libraries for the services.
+     * 
+     * @param jars the libraries, ignored if <b>null</b>
+     */
+    public static void setLibJars(URL[] jars) {
+        if (null != jars) {
+            loader = new URLClassLoader(jars, loader);
+        }
+    }
 
     /**
      * Convenience method for creating service instances via the default constructor using the class loader of this 
@@ -132,7 +148,7 @@ public abstract class AbstractService implements Service {
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
     public static <S extends Service> S createInstance(String className, Class<S> cls) {
-        return createInstance(AbstractService.class.getClassLoader(), className, cls, null, null);
+        return createInstance(loader, className, cls, null, null);
     }
 
     /**
@@ -150,7 +166,37 @@ public abstract class AbstractService implements Service {
      */
     public static <S extends Service> S createInstance(String className, Class<S> cls, String serviceId, 
         String deploymentDescFile) {
-        return createInstance(AbstractService.class.getClassLoader(), className, cls, serviceId, deploymentDescFile);
+        return createInstance(loader, className, cls, serviceId, deploymentDescFile);
+    }
+    
+    /**
+     * Loads a resource as stream from {@code loader}, first with given name, as fallback using {@code resource}
+     * without leading slashes (may be present after ZIP unpacking), else as file (may be present after ZIP unpacking).
+     * 
+     * @param loader the class loader to load the class with
+     * @param resource the resource name/path
+     * @return the input stream if the resource was found, <b>null</b> else
+     */
+    private static InputStream getResourceAsStream(ClassLoader loader, String resource) {
+        InputStream desc = loader.getResourceAsStream(resource);
+        if (null == desc) {
+            String tmp = resource;
+            while (tmp.startsWith("/")) {
+                tmp = tmp.substring(1);
+            }
+            desc = loader.getResourceAsStream(tmp);
+            if (null == desc) {
+                File f = new File(tmp);
+                if (f.exists()) {
+                    try {
+                        desc = new FileInputStream(f);
+                    } catch (IOException e) {
+                        // also not there
+                    }
+                }
+            }
+        }
+        return desc;
     }
 
     /**
@@ -176,7 +222,7 @@ public abstract class AbstractService implements Service {
             if (null != serviceId && null != deploymentDescFile) {
                 try {
                     Constructor<?> cons = serviceClass.getConstructor(String.class, InputStream.class);
-                    InputStream desc = loader.getResourceAsStream(deploymentDescFile);
+                    InputStream desc = getResourceAsStream(loader, deploymentDescFile);
                     instance = cons.newInstance(serviceId, desc);
                     if (null != desc) {
                         desc.close();
@@ -218,7 +264,9 @@ public abstract class AbstractService implements Service {
                 loaders += l.getClass().getSimpleName();
                 l = l.getParent();
             }
-            LoggerFactory.getLogger(AbstractService.class).error("Cannot instantiate service of type '" 
+            // not automatically error - if multiple services are available, Spring may load all but only one 
+            // is correctly bound
+            LoggerFactory.getLogger(AbstractService.class).warn("Cannot instantiate service of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
                 + ". Service '" + serviceId + "' will not be functional!");
         }

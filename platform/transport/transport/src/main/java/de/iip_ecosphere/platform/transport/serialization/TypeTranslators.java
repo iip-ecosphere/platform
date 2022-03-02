@@ -15,6 +15,9 @@ package de.iip_ecosphere.platform.transport.serialization;
 import java.io.IOException;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.ClassLoaderUtils;
 
 /**
  * Defines a set of type translators for primitive types.
@@ -136,5 +139,36 @@ public class TypeTranslators {
         }
         
     };
+    
+    /**
+     * Convenience method for creating (custom) type translator instances.
+     * 
+     * @param loader the class loader to load the class with
+     * @param className the name of the type translator class (must provide a no-argument constructor)
+     * @return the type translator instance (or <b>null</b> if the translator cannot be found/initialized)
+     */
+    public static TypeTranslator<?, ?> createTypeTranslator(ClassLoader loader, String className) {
+        TypeTranslator<?, ?> result = null;
+        try {
+            Class<?> translatorClass = loader.loadClass(className);
+            result = (TypeTranslator<?, ?>) translatorClass.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+            String loaders = ClassLoaderUtils.hierarchyToString(loader);
+            LoggerFactory.getLogger(TypeTranslators.class).error("Cannot instantiate instance of type '" 
+                + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Convenience method for creating (custom) serializer instances.
+     * 
+     * @param loader the class loader to load the class with
+     * @param className the name of the type serializer class (must provide a no-argument constructor)
+     * @return the type serializer instance (or <b>null</b> if the serializer cannot be found/initialized)
+     */
+    public static Serializer<?> createSerializer(ClassLoader loader, String className) {
+        return (Serializer<?>) createTypeTranslator(loader, className);
+    }
 
 }

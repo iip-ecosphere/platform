@@ -1,7 +1,191 @@
 project Connectors {
 
+    import DataTypes;
     import Transport;
+    import Services;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    enum TextEncoding{ANSI, ASCII, UTF8};
+    
+    // ------------------------------ Mass-Mappings -------------------------------------------
+
+    abstract compound MappingEntry {
+    }
+
+    compound MachineParserMappingEntry refines MappingEntry {
+        Integer position;
+        refTo(Field) field;
+    }
+
+    compound InputOutputMappingEntry refines MappingEntry {
+        refTo(Field) fromField;
+        refTo(Field) toField;
+    }
+    
+    // ------------------------------ Machine Parsers -----------------------------------------
+    
+    // turn machine-level information into input that can be used by a generated connector
+    // serializer. May parse into linear or hierarchical structure, either by name convention
+    // (given in implementation, configured by mapping) or via index/positions in structure 
+    // (linear up-down traversal in IVML sequence). Name-based mapping has priority if given.
+    
+    abstract compound MachineParser {
+    }
+    
+    compound JavaMachineParser refines MachineParser {
+       String class; // optional class name, must comply with parser.InputParser 
+       String artifact; // optional maven artifact
+    }
+    
+    abstract compound GenericMachineParser refines MachineParser {
+    }
+    
+    // represents parser.TestLineParser
+    // reads text line and splits according to separator, serves also for TSV, CSV
+    compound TextLineParser refines GenericMachineParser {
+        NonEmptyString separator;
+    }
+
+    compound JsonParser refines GenericMachineParser {
+    }
+    
+    // --------------------------------------- Machine Formatters --------------------------------
+    
+    // opposite direction of machine parsers for sending back commands on the same connector
+    
+    abstract compound MachineFormatter {
+    }
+    
+    compound JavaMachineFormatter refines MachineFormatter {
+       String class; // optional class name, must comply with formatter.OutputFormatter
+       String artifact; // optional maven artifact
+    }
+
+    abstract compound GenericMachineFormatter refines MachineFormatter {
+    }
+
+    // represents formatter.TestLineFormatter
+    // composes text lines using separator, serves also for TSV, CSV
+    compound TextLineFormatter refines GenericMachineFormatter {
+        NonEmptyString separator;
+    }
+
+    compound JsonFormatter refines GenericMachineFormatter {
+    }
+    
+    // -------------------------------------- Data Operations -------------------------------
+    
+    // Post-parser mapping operations forming a simplified expression tree structure with 
+    // record-field leaf nodes
+    
+    compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+        refTo(Field) field;
+        DataOperation operation;
+    }
+    
+    abstract compound DataOperation {
+    }
+    
+    compound DataFieldAccess refines DataOperation {
+        refTo(Field) field;
+    }
+
+    abstract compound ConstantDataOperation refines DataOperation {
+    }
+
+    compound IntegerConstantDataOperation refines ConstantDataOperation {
+        Integer value;
+    }
+
+    compound StringConstantDataOperation refines ConstantDataOperation {
+        String value;
+    }
+
+    compound BooleanConstantDataOperation refines ConstantDataOperation {
+        Boolean value;
+    }
+
+    compound RealConstantDataOperation refines ConstantDataOperation {
+        Real value;
+    }
+
+    compound ParenthesisDataOperation refines DataOperation {
+        DataOperation operation;
+    }
+    
+    abstract compound DataTranslationOperation refines DataOperation {
+        sequenceOf(DataOperation) arguments;
+    }
+    
+    compound AddDataTranslationOperation refines DataTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound SubtractDataTranslationOperation refines DataTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound MuliplyDataTranslationOperation refines DataTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+
+    compound DivideDataTranslationOperation refines DataTranslationOperation {
+        // TODO constraint: args only real, integer fields/constants
+    }
+    
+    // ------------------------ connector types --------------------------
+      
+    // IIP-Ecosphere provided connectors
+    compound Connector refines Service {
+       setOf(AssignmentOperation) operations = {};
+       TextEncoding encoding = TextEncoding::ASCII;
+       setOf(MappingEntry) mapping = {};
+       
+       String class;
+       String artifact;
+       String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+       String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+       // may collapse into one, to be supported by configurable mapping
+       refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
+       refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       
+       NonEmptyString host = "localhost";
+       Port port;
+
+       output.size() < 2;
+       input.size() < 2;
+       kind == ServiceKind.SOURCE_SERVICE;
+       deployable == true;
+   }
+   
+   compound ChannelConnector refines Connector {
+       String inSerializerClass = ""; // if not given, use registry
+       String outSerializerClass = ""; // if not given, use registry
+       String inChannel = "";
+       String outChannel = "";
+       MachineFormatter machineFormatter = null;
+       MachineParser machineParser = null;
+   }
+   
+   compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
+        String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
+        String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
+   }
+
+   compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
+        String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
+        String artifact ="de.iip-ecosphere.platform:connectors.aas:";
+   }
+   
+   compound MqttV3Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
+        String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
+   }
+   
+   compound MqttV5Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
+        String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
+        String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
+   }
     
 }

@@ -43,5 +43,10 @@ template Basics(Configuration config, FileArtifact target) {
         }
         result;
     }
+
+    def DataType firstType(sequenceOf(IOType) types) {
+        IOType f = types.first();
+        f.type;
+    }
 	
 }

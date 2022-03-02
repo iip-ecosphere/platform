@@ -168,7 +168,7 @@ public class SpringCloudServiceManager
      */
     public static YamlArtifact readFromFile(File file) throws ExecutionException {
         YamlArtifact result = null;
-        if (file.getName().endsWith(".jar")) {
+        if (file.getName().endsWith(".jar") || file.getName().endsWith(".zip")) {
             try {
                 String descName = "deployment.yml";
                 if (null != getConfig()) { // null in case of standalone/non-spring execution
@@ -176,6 +176,9 @@ public class SpringCloudServiceManager
                 }
                 LOGGER.info("Reading artifact " + file + ", descriptor " + descName);
                 InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
+                if (null == descStream) {
+                    descStream = JarUtils.findFile(new FileInputStream(file), descName);                    
+                }
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream);
                     FileUtils.closeQuietly(descStream);
@@ -186,7 +189,8 @@ public class SpringCloudServiceManager
                 throwExecutionException("Reading artifact " + file, e);
             }
         } else {
-            throwExecutionException("Reading artifact " + file, file + " is not considered as JAR file");
+            throwExecutionException("Reading artifact " + file, file + " is not considered as service "
+                + "artifact (JAR, ZIP)");
         }
         return result;
     }
@@ -199,11 +203,14 @@ public class SpringCloudServiceManager
      * @see #determineExternalConnections(ServiceManager, String...)
      */
     private List<String> determineExternalServiceArgs(String... serviceIds) {
-        return determineExternalConnections(this, serviceIds)
+        List<String> result = determineExternalConnections(this, serviceIds)
             .stream()
             .filter(c -> isValidId(c.getName()))
             .map(c -> "--spring.cloud.stream.bindings." + c.getName() + ".binder=external")
             .collect(Collectors.toList());
+        // adjust spring function definition from application.yml if subset of services shall be started 
+        result.add(determineCloudFunctionArg(serviceIds));
+        return result;
     }
     
     /**
@@ -227,8 +234,6 @@ public class SpringCloudServiceManager
         SpringCloudServiceSetup config = getConfig();
         // re-link binders if needed, i.e., subset shall be started locally
         List<String> externalServiceArgs = determineExternalServiceArgs(serviceIds);
-        // adjust spring function definition from application.yml if subset of services shall be started 
-        externalServiceArgs.add(determineCloudFunctionArg(serviceIds));
         for (String ids : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(ids);
             if (null == service) {

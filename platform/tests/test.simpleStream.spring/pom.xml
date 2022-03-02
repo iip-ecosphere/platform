@@ -54,6 +54,13 @@
       <artifactId>transport.spring.amqp</artifactId>
       <version>${project.version}</version>
     </dependency>  
+    
+<dependency>    
+    <groupId>org.glassfish</groupId>
+    <artifactId>jakarta.el</artifactId>
+    <optional>false</optional>
+</dependency>    
+    
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
@@ -166,6 +173,20 @@
                      <appendAssemblyId>false</appendAssemblyId>
                  </configuration>
              </execution>
+             <execution>
+                 <id>make-serviceAssembly</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/main/assembly/serviceZipAssembly.xml</descriptor>
+                     </descriptors>
+                     <finalName>${project.build.finalName}-spring</finalName>
+                     <appendAssemblyId>false</appendAssemblyId>
+                 </configuration>
+             </execution>
          </executions>
         </plugin>
         <plugin>
@@ -213,6 +234,50 @@
                    </goals>
                </execution>               
            </executions>
+       </plugin>
+       <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-dependency-plugin</artifactId>
+           <version>3.2.0</version>
+           <executions>
+               <execution>
+                   <id>copy-dependencies</id>
+                   <goals>
+                       <goal>copy-dependencies</goal>
+                   </goals>
+                   <phase>prepare-package</phase>
+                   <configuration>
+                       <prependGroupId>false</prependGroupId>
+                       <outputDirectory>${project.build.directory}/jars</outputDirectory>
+                       <overWriteReleases>false</overWriteReleases>
+                       <overWriteSnapshots>true</overWriteSnapshots>
+                       <overWriteIfNewer>true</overWriteIfNewer>
+                       <includeScope>compile</includeScope>
+                       <excludeArtifactIds>tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, 
+                           tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli,
+                           tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api
+                       </excludeArtifactIds> <!-- Spring may handle that through layers, BaSyx clash with Spring -->
+                   </configuration>
+               </execution>
+	          <execution>
+	            <id>build-classpath</id>
+	            <phase>prepare-package</phase>
+	            <goals>
+	              <goal>build-classpath</goal>
+	            </goals>
+	            <configuration>
+	                <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
+	                <prependGroupId>false</prependGroupId>
+	                <localRepoProperty>jars</localRepoProperty>
+	                <prefix>jars</prefix>
+	                <overWriteIfNewer>true</overWriteIfNewer>
+	                <fileSeparator>/</fileSeparator>
+	                <pathSeparator>:</pathSeparator>
+                    <includeScope>compile</includeScope>
+	              <!-- configure the plugin here -->
+	            </configuration>
+	          </execution>
+	        </executions>               
        </plugin>
     </plugins>
   </build>

@@ -46,7 +46,7 @@ public class SpringInstances {
     static SpringCloudServiceSetup getConfig() {
         return config;
     }
-
+    
     /**
      * Defines the deployer instance.
      * 
@@ -54,6 +54,7 @@ public class SpringInstances {
      */
     static void setDeployer(AppDeployer depl) {
         deployer = depl;
+        ClasspathJavaCommandBuilder.installInto(deployer);
     }
 
     /**
@@ -64,6 +65,7 @@ public class SpringInstances {
     public static void setConfig(SpringCloudServiceSetup cfg) {
         config = cfg;
         ServiceFactory.setAasSetup(cfg.getAas());
+        ServiceFactory.setNetworkManagerSetup(cfg.getNetMgr());
     }
 
 }

@@ -80,18 +80,57 @@ project SerializerConfig1Old {
         // TODO parameter
     };
     
-    RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineIn = {
+        path = "/opc/mach/",
         name = "myConnMachineIn",
         fields = {
             Field {
                 name = "dataField",
                 type = refBy(StringType)
+            }, Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "cmdField",
+                type = refBy(StringType)
             }
         }        
     };
 
-    RecordType myConnMachineOut = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineOut = {
+        path = "/opc/mach/",
         name = "myConnMachineOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }, Field {
+                name = "dataField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
+    compound UnitMeta {
+        String unit;
+    }
+    
+    RecordType myConnPltfIn = {
+        name = "myConnPltfIn",
+        fields = {
+            Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "dataField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    annotate UnitMeta meta to myConnPltfIn;
+
+    RecordType myConnPltfOut = {
+        name = "myConnPltfOut",
         fields = {
             Field {
                 name = "cmdField",
@@ -107,10 +146,19 @@ project SerializerConfig1Old {
         ver = "0.1.0",
         port = 1234, // default localhost
         
-        input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}},
+        output = {{type=refBy(myConnPltfIn)}},
+        inInterface = refBy(myConnMachineIn), 
+        outInterface = refBy(myConnMachineOut),
+        operations = {
+          AssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }
     };
     
     MqttV3Connector myMqttConn = {
@@ -121,11 +169,22 @@ project SerializerConfig1Old {
         port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        inInterface = refBy(myConnMachineIn),
+        outInterface = refBy(myConnMachineOut),
+        machineFormatter = TextLineFormatter{separator=","},
+        machineParser = TextLineParser{separator=","},
+        operations = {
+          AssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }
     };
 
     Service myAnonymizerService = JavaService {

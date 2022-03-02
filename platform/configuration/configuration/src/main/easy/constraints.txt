@@ -2,3 +2,4 @@ constraints collection
  - type names must not start with *
  - names shall not have strange characters
  - in/out type compliance rules unclear (AI service discussion)
+ - connector service in/out types must be RecordTypes?

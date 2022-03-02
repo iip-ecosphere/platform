@@ -79,17 +79,23 @@ project SerializerConfig1 {
         output = {{type=refBy(StringType)}}
     };
     
-    RecordType myConnMachineIn = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineIn = {
         name = "myConnMachineIn",
         fields = {
             Field {
                 name = "dataField",
                 type = refBy(StringType)
+            }, Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "cmdField",
+                type = refBy(StringType)
             }
         }        
     };
 
-    RecordType myConnMachineOut = { // PRELIMINARY, INITIAL
+    RecordType myConnMachineOut = {
         name = "myConnMachineOut",
         fields = {
             Field {
@@ -99,6 +105,30 @@ project SerializerConfig1 {
         }        
     };
     
+    RecordType myConnPltfIn = {
+        name = "myConnPltfIn",
+        fields = {
+            Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "dataField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
+    RecordType myConnPltfOut = {
+        name = "myConnPltfOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }
+        }        
+    };
+    
+    
     OpcUaV1Connector myOpcUaConn = {
         id = "myOpcConn",
         name = "myOpcConn example",
@@ -106,10 +136,10 @@ project SerializerConfig1 {
         ver = "0.1.0",
         port = 1234, // default localhost
         
-        input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
+        inInterface = refBy(myConnMachineIn),
+        outInterface = refBy(myConnMachineOut)
     };
     
     MqttV3Connector myMqttConn = {
@@ -120,11 +150,13 @@ project SerializerConfig1 {
         port = 4321, // default localhost
         
         input = {{type=refBy(StringType)}}, // PRELIMINARY
-        output = {{type=refBy(StringType)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = refBy(myConnMachineIn), // PRELIMINARY
-        outInterface = refBy(myConnMachineOut)  // PRELIMINARY
+        inInterface = refBy(myConnMachineIn), 
+        outInterface = refBy(myConnMachineOut),
+        machineFormatter = JavaMachineFormatter{class="my.class.DoesNotExistFormatter", artifact=""},
+        machineParser = JavaMachineParser{class="my.class.DoesNotExistParser", artifact=""}
     };
 
     Service myAnonymizerService = JavaService {

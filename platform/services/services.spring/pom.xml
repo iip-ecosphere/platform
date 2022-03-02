@@ -102,6 +102,12 @@
      <version>${project.version}</version>
      <type>test-jar</type>
      <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services.environment.spring</artifactId>
+     <version>${project.version}</version>
+     <scope>test</scope>
     </dependency>      
     <dependency>
       <groupId>junit</groupId>
@@ -140,6 +146,16 @@
               <overWrite>true</overWrite>
               <outputDirectory>${project.build.directory}/jars</outputDirectory>
               <destFileName>simpleStream.spring.jar</destFileName>
+            </artifactItem>
+            <artifactItem>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <artifactId>test.simpleStream.spring</artifactId>
+              <version>${project.version}</version>
+              <classifier>services</classifier>
+              <type>zip</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}/jars</outputDirectory>
+              <destFileName>simpleStream.spring.zip</destFileName>
             </artifactItem>
           </artifactItems>
           <outputDirectory>${project.build.directory}</outputDirectory>
