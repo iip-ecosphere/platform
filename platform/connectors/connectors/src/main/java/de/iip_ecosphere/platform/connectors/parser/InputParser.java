@@ -62,6 +62,16 @@ public interface InputParser<T> {
          */
         public T getData(String name, int index, Map<String, Integer> mapping);
         
+        /**
+         * Returns the name of the field. This operation may not be efficient on all input parsers, in particular
+         * if no index positions are recorded. However, for generically parsing back some structures, this operation is
+         * required.
+         * 
+         * @param indexes the path of (nested) 0-based indexes to the field
+         * @return the name of the field or empty if not known
+         */
+        public String getFieldName(int... indexes);
+        
     }
     
     /**

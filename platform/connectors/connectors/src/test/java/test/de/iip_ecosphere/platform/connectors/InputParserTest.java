@@ -45,6 +45,7 @@ public class InputParserTest {
         final String[] parts = new String[]{"123", "bbb", "true", "0.45", "0.56", "12345"};
         testTextLineParser(parts, charset, "#");
         ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
+        Assert.assertEquals("", pr.getFieldName()); // must hold always, no deeper indexes supported
 
         InputConverter<String> conv = TextLineParser.CONVERTER;
         Map<String, Integer> mapping = new HashMap<>();

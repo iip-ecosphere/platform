@@ -40,4 +40,9 @@ public class ArrayParseResult extends AbstractParseResult<String> {
         return data[index];
     }
 
+    @Override
+    public String getFieldName(int... index) {
+        return "";
+    }
+
 }

@@ -41,13 +41,20 @@ public class JsonInputParserTest {
         InputConverter<Any> conv = parser.getConverter();
         Assert.assertEquals("abc", conv.toString(res.getData("name", 0, null)));
         Assert.assertEquals(1, conv.toInteger(res.getData("value", 0, null)));
-
+        
+        Assert.assertEquals("", res.getFieldName());
+        Assert.assertEquals("name", res.getFieldName(0));
+        Assert.assertEquals("value", res.getFieldName(1));
+        
         data = "{\"obj\": {\"name\": \"abc\", \"value\": 1}}";
         res = parser.parse(data.getBytes());
         Assert.assertEquals("abc", conv.toString(res.getData("obj.name", 0, null)));
         Assert.assertEquals(1, conv.toInteger(res.getData("obj.value", 0, null)));
 
-        // TODO hierarchical
+        Assert.assertEquals("", res.getFieldName());
+        Assert.assertEquals("obj", res.getFieldName(0));
+        Assert.assertEquals("name", res.getFieldName(0, 0));
+        Assert.assertEquals("value", res.getFieldName(0, 1));
     }
 
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
+import com.jsoniter.any.Any.EntryIterator;
 
 /**
  * Implements the default input parser for JSON data.
@@ -74,6 +75,30 @@ public class JsonInputParser implements InputParser<Any> {
                 }
             } while (end > 0);
             return obj;
+        }
+
+        @Override
+        public String getFieldName(int... index) {
+            String result = "";
+            if (index.length > 0) {
+                Any tmp = any;
+                for (int i = 0; i < index.length; i++) {
+                    tmp = JsonIterator.deserialize(tmp.toString()); // ensure (lazy) iterator :(
+                    int pos = index[i];
+                    EntryIterator it = tmp.entries();
+                    while (it.next() && pos >= 0) {
+                        if (pos == 0) {
+                            if (i < index.length - 1) {
+                                tmp = it.value();
+                            } else {
+                                result = it.key();        
+                            }
+                        }
+                        pos--;
+                    }                    
+                }
+            }
+            return result;
         }
         
     }
