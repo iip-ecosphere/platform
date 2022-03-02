@@ -26,14 +26,14 @@ import okhttp3.Response;
  */
 public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
     
-    private int aasPort;
+//    private int aasPort;
     private Submodel submodel;
     private Aas aas;
     private Submodel watchSubmodel;
     private Aas watchAas;
-    private boolean tlsCheck;
-    private String serverIP;
-    private String serverPort;
+//    private boolean tlsCheck;
+//    private String serverIP;
+//    private String serverPort;
     
     /**
      * Creates a K8S java proxy instance, it will be either MasterProxy or WorkerProxy.
@@ -49,10 +49,10 @@ public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
      */
     public AasK8SJavaProxy(ProxyType proxyType, int aasPort, String serverIP, String serverPort, boolean tlsCheck) {
         super(proxyType, getServerAddress(proxyType, serverIP, serverPort, tlsCheck));
-        this.aasPort = aasPort;
-        this.tlsCheck = tlsCheck;
-        this.serverIP = serverIP;
-        this.serverPort = serverPort;
+//        this.aasPort = aasPort;
+//        this.tlsCheck = tlsCheck;
+//        this.serverIP = serverIP;
+//        this.serverPort = serverPort;
         
         if (proxyType.equals(ProxyType.WorkerProxy)) {
             ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, Integer.parseInt(serverPort));
@@ -91,23 +91,23 @@ public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
 
     }
 
-    /**
-     * Returns the aas port.
-     * 
-     * @return the aas port
-     */
-    public int getAasPort() {
-        return aasPort;
-    }
-
-    /**
-     * Set the aas port.
-     *
-     * @param aasPort the aas port
-     */
-    public void setAasPort(int aasPort) {
-        this.aasPort = aasPort;
-    }
+//    /**
+//     * Returns the aas port.
+//     * 
+//     * @return the aas port
+//     */
+//    public int getAasPort() {
+//        return aasPort;
+//    }
+//
+//    /**
+//     * Set the aas port.
+//     *
+//     * @param aasPort the aas port
+//     */
+//    public void setAasPort(int aasPort) {
+//        this.aasPort = aasPort;
+//    }
 
     @Override
     public byte[] sendK8SRequest(BufferedOutputStream writer, K8SRequest request) throws IOException {

@@ -13,7 +13,6 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
@@ -27,8 +26,8 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
     
-    private String serverIP;
-    private String serverPort;
+//    private String serverIP;
+//    private String serverPort;
     private TransportConnector normalcl1;
     private TransportParameter param1;
     /**
@@ -63,8 +62,8 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
             TransportK8STLS transportK8STLS) throws IOException {
         super(proxyType, getServerAddress(proxyType, serverIP, serverPort, transportK8STLS.isTlsCheck()));
 //        this.transportPort = transportPort; 
-        this.serverIP = serverIP;
-        this.serverPort = serverPort;
+//        this.serverIP = serverIP;
+//        this.serverPort = serverPort;
 
 //        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
 //
@@ -92,41 +91,41 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
         
     }
 
-    /**
-     * Returns the server IP.
-     * 
-     * @return the server IP
-     */
-    public String getServerIP() {
-        return serverIP;
-    }
-
-    /**
-     * Set the server IP.
-     *
-     * @param serverIP the server IP
-     */
-    public void setServerIP(String serverIP) {
-        this.serverIP = serverIP;
-    }
+//    /**
+//     * Returns the server IP.
+//     * 
+//     * @return the server IP
+//     */
+//    public String getServerIP() {
+//        return serverIP;
+//    }
+//
+//    /**
+//     * Set the server IP.
+//     *
+//     * @param serverIP the server IP
+//     */
+//    public void setServerIP(String serverIP) {
+//        this.serverIP = serverIP;
+//    }
     
-    /**
-     * Returns the aas port.
-     * 
-     * @return the aas port
-     */
-    public String getServerPort() {
-        return serverPort;
-    }
-
-    /**
-     * Set the server port.
-     *
-     * @param serverPort the server port
-     */
-    public void setServerPort(String serverPort) {
-        this.serverPort = serverPort;
-    }
+//    /**
+//     * Returns the aas port.
+//     * 
+//     * @return the aas port
+//     */
+//    public String getServerPort() {
+//        return serverPort;
+//    }
+//
+//    /**
+//     * Set the server port.
+//     *
+//     * @param serverPort the server port
+//     */
+//    public void setServerPort(String serverPort) {
+//        this.serverPort = serverPort;
+//    }
     
     /**
      * Returns the transport connector.
@@ -173,7 +172,7 @@ public class TransportK8SJavaProxy extends AbstractK8SJavaProxy {
     public byte[] executeK8SGet(BufferedOutputStream writer, K8SRequest request)
             throws ClientProtocolException, IOException {
         
-        String response = null;
+//        String response = null;
         byte[] responseByte = null;
         
         TransportMessage message1 = new TransportMessage(request.getPathNoParameter(), request.getRequestByte(),

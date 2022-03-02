@@ -1,9 +1,6 @@
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -137,75 +134,75 @@ public class K8SRequest {
         this.headers = headers;
     }
     
-    /**
-     * convert the request to String.
-     *
-     * @return the request as String
-     */
-    public String convertToString() {
-        
-        String requestString = getMethod() + " " + getPath() + " " + getProtocol() + "\r\n";
-        
-        for (String[] header : getHeaders().values()) {
-            requestString = requestString + header[0] + ": " + header[1] + "\r\n";
-        }
-        
-        if (!getMethod().equals("GET")) {
-            StringBuilder payloadText = new StringBuilder();
-            for (byte b : payload) {
-                payloadText.append(b).append(" ");
-            }
-            requestString = requestString + "\r\n" + payloadText.toString();
-        }
-        
-        return requestString;
-    }
+//    /**
+//     * convert the request to String.
+//     *
+//     * @return the request as String
+//     */
+//    public String convertToString() {
+//        
+//        String requestString = getMethod() + " " + getPath() + " " + getProtocol() + "\r\n";
+//        
+//        for (String[] header : getHeaders().values()) {
+//            requestString = requestString + header[0] + ": " + header[1] + "\r\n";
+//        }
+//        
+//        if (!getMethod().equals("GET")) {
+//            StringBuilder payloadText = new StringBuilder();
+//            for (byte b : payload) {
+//                payloadText.append(b).append(" ");
+//            }
+//            requestString = requestString + "\r\n" + payloadText.toString();
+//        }
+//        
+//        return requestString;
+//    }
     
-    /**
-     * use the string request to fill method, path, protocol, headers, and payload.
-     *
-     * @param requestString the request as String
-     */
-    public void convertStringToRequest(String requestString) {
-        
-        int requestLength = 0;
-        Map<String, String[]> requestHeaders = new HashMap<String, String[]>();
-        
-        String[] requestLines = requestString.split("\r\n");
-        String[] firstLine = requestLines[0].split(" ");
-        
-        setMethod(firstLine[0]);
-        setPath(firstLine[1]);
-        setProtocol(firstLine[2]);
-        
-        for (int i = 1; i < requestLines.length - 2; i++) {
-            if (requestLines[i].toUpperCase().contains("CONTENT-LENGTH")) {
-                requestLength = Integer.parseInt(requestLines[i].substring(16));
-            }
-            String key = requestLines[i].substring(0, requestLines[i].indexOf(":"));
-            String[] header = {key, requestLines[i].substring(requestLines[i].indexOf(":") + 2)};
+//    /**
+//     * use the string request to fill method, path, protocol, headers, and payload.
+//     *
+//     * @param requestString the request as String
+//     */
+//    public void convertStringToRequest(String requestString) {
+//        
+//        int requestLength = 0;
+//        Map<String, String[]> requestHeaders = new HashMap<String, String[]>();
+//        
+//        String[] requestLines = requestString.split("\r\n");
+//        String[] firstLine = requestLines[0].split(" ");
+//        
+//        setMethod(firstLine[0]);
+//        setPath(firstLine[1]);
+//        setProtocol(firstLine[2]);
+//        
+//        for (int i = 1; i < requestLines.length - 2; i++) {
+//            if (requestLines[i].toUpperCase().contains("CONTENT-LENGTH")) {
+//                requestLength = Integer.parseInt(requestLines[i].substring(16));
+//            }
+//            String key = requestLines[i].substring(0, requestLines[i].indexOf(":"));
+//            String[] header = {key, requestLines[i].substring(requestLines[i].indexOf(":") + 2)};
+//
+//            requestHeaders.put(key.toUpperCase(), header);
+//        }
+//        
+//        setHeaders(requestHeaders);
+//        
+//        if (!getMethod().equals("GET")) {
+//            byte[] requestPayload = new byte[requestLength];
+//            int count = 0;
+//            for (String byteString : requestLines[requestLines.length - 1].toString().split(" ")) {
+//                Integer byteInt = Integer.parseInt(byteString);
+//                requestPayload[count] = byteInt.byteValue();
+//                count++;
+//            }
+//            
+//            setPayload(requestPayload);
+//        }
+//        
+//    }
 
-            requestHeaders.put(key.toUpperCase(), header);
-        }
-        
-        setHeaders(requestHeaders);
-        
-        if (!getMethod().equals("GET")) {
-            byte[] requestPayload = new byte[requestLength];
-            int count = 0;
-            for (String byteString : requestLines[requestLines.length - 1].toString().split(" ")) {
-                Integer byteInt = Integer.parseInt(byteString);
-                requestPayload[count] = byteInt.byteValue();
-                count++;
-            }
-            
-            setPayload(requestPayload);
-        }
-        
-    }
-
     /**
-     * convert the request to base64 String.
+     * convert the request array of byte to base64 String.
      *
      * @return the request as base64 String
      */
@@ -232,9 +229,9 @@ public class K8SRequest {
     }
     
     /**
-     * convert the request to base64 String.
+     * convert the request to base64 String with ID.
      *
-     * @return the request as base64 String
+     * @return the request as base64 String with ID
      */
     public String convertToBase64StringWithID() {
         
@@ -247,11 +244,11 @@ public class K8SRequest {
     }    
     
     /**
-     * convert the String from base64 String to String.
+     * convert the String from base64 String to request as String.
      *
      * @param requestBase64String the request as base64 String
      *
-     * @return textString the request as array of bytes
+     * @return textString the request as string
      */
     public String convertBase64StringToString(String requestBase64String) {
         
@@ -262,7 +259,7 @@ public class K8SRequest {
     }
     
     /**
-     * convert the String from base64 String to String.
+     * convert the array of bytes to Base64 String.
      *
      * @param byteArray the request as array of bytes
      *
@@ -275,7 +272,7 @@ public class K8SRequest {
     }
     
     /**
-     * get the path name without parameters.
+     * get the path without parameters.
      *
      * @return requestString the request as array of bytes
      */
