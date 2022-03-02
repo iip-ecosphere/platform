@@ -51,7 +51,7 @@ jobs:
           cp broker/amqp.sh gen
           cp -r broker/brokerJars gen
           cp -r broker/src gen
-          cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar gen
+          cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar gen
           echo "Base directory for container creation:"
           ls gen
       - name: Login to DockerHub

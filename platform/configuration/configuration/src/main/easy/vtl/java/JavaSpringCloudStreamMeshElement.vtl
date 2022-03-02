@@ -258,6 +258,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, ServiceBase service) {
         ''
     }
+    
+    // optional method to support testing, must be used in initialService if not empty
+    def generatedServiceInitMethod(MeshElement elt, ServiceBase service) {
+        ''
+    }
 
     def initialService(MeshElement elt, Service service) {
         ''
@@ -288,14 +293,28 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, Connector conn) {
         String connGen = getConnectorGenerics(conn, false);
         String clsName = getClsName(elt);
-        '${adapterCreationFragment(conn, "adapter")};
-        ${conn.class}${connGen} conn = new ${conn.class}<>(adapter);
+        '${conn.class}${connGen} conn = 
+            new ${conn.class}<>(createConnectorAdapter());
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
         service.setReceptionCallback(new ConnectorReceptionCallback());
         Starter.mapService(service);'
     }
+    
+    def generatedServiceInitMethod(MeshElement elt, Connector conn) {
+        String connGen = getConnectorGenerics(conn, true);
+        '/**
+        * Creates the connector adapter. [public for testing]
+        *
+        * @return the connector adapter
+        */
+        public static ${adapterType(conn)} createConnectorAdapter() {
+            ${adapterCreationFragment(conn, "adapter")};
+            return adapter;
+        }'
+    }
+    
 
     // TODO family
 
@@ -581,6 +600,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 ${initialService(elt, elt.impl)}
             }
         
+            ${generatedServiceInitMethod(elt, elt.impl)|e}
             ${generateDataMethods(elt)}
             ${generateConnectorParameter(elt, app)}
 

@@ -47,12 +47,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         String type = "<";
         if (withMachine) {
             type = type + getMachineOutputTypeName(conn);
-            type = type + ",";
+            type = type + ", ";
             type = type + getMachineInputTypeName(conn);
-            type = type + ",";
+            type = type + ", ";
         }
         type = type + asTypeName(getFirstTypeName(conn.output));
-        type = type + ",";
+        type = type + ", ";
         type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
     }
@@ -73,6 +73,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
     
+    def adapterType(Connector conn) {
+        String connGen = getConnectorGenerics(conn, true);
+        'TranslatingProtocolAdapter${connGen}'
+    }
+    
     def adapterCreationFragment(Connector conn, String varName) {
         String inAdapter;
         String outAdapter;
@@ -87,10 +92,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             outAdapter = "new MachineOutputTranslator()";
         }
         
-        String connGen = getConnectorGenerics(conn, true);
-        'TranslatingProtocolAdapter${connGen} ${varName} = new TranslatingProtocolAdapter${connGen}(
-            ${outAdapter}, 
-            ${inAdapter})'
+        '${adapterType(conn)} ${varName} = 
+            new ${adapterType(conn)}(
+                ${outAdapter}, 
+                ${inAdapter})'
+    }
+    
+    def escapeString(String str) {
+        "\"${str}\""
     }
     
     def getEncoding(Connector conn) {
@@ -100,9 +109,13 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             TextEncoding::UTF8 : "UTF8"
         }
     }
+    
+    def adapterType(ChannelConnector conn) {
+        String connGen = getConnectorGenerics(conn, true);
+        'ChannelTranslatingProtocolAdapter${connGen}'
+    }
 
     def adapterCreationFragment(ChannelConnector conn, String varName) {
-        String connGen = getConnectorGenerics(conn, true);
         String inSerializer;
         String outSerializer;
         if (conn.inSerializerClass.length() > 0) {
@@ -114,7 +127,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             }
         } else {
             //inSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.input))}.class)";
-            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(null, null)";
+            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null)";
         }
         if (conn.outSerializerClass.length() > 0) {
             if (conn.outSerializerClass == "*") {
@@ -125,7 +138,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             }
         } else {
             //outSerializer = "SerializerRegistry.getSerializer(${asTypeName(getFirstTypeName(conn.output))}.class)";
-            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(null, null)";
+            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null)";
         }
 
         String inAdapter;
@@ -141,9 +154,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             outAdapter = "new ConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
         }
 
-        'ChannelTranslatingProtocolAdapter${connGen} ${varName} = new ChannelTranslatingProtocolAdapter${connGen}(
-            "${conn.outChannel}", ${outAdapter}, 
-            "${conn.inChannel}", ${inAdapter})' 
+        '${adapterType(conn)} ${varName} = 
+            new ${adapterType(conn)}(
+                "${conn.outChannel}", ${outAdapter}, 
+                "${conn.inChannel}", ${inAdapter})' 
     }
     
     // ------------------------------------------ generating adapter translator classes ---------------------------
