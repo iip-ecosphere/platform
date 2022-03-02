@@ -54,7 +54,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
 
     private ProxyType proxyType;
     private String serverAddress;
-    private OkHttpClient client11;
+    private OkHttpClient okHttpClient;
     private ApiClient client;
     private File confFile;
 
@@ -81,7 +81,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
                 e.printStackTrace();
             }
             Configuration.setDefaultApiClient(client);
-            client11 = client.getHttpClient();
+            okHttpClient = client.getHttpClient();
         }
     }
 
@@ -382,7 +382,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
             Response response = client11.newCall(javaK8SRequest).execute();
             formattedResponse = formatWatchK8SResponse(writer, request, response);
         } else {
-            Response response = client11.newCall(javaK8SRequest).execute();
+            Response response = okHttpClient.newCall(javaK8SRequest).execute();
             formattedResponse = formatK8SResponse(request, response);
         }
 
@@ -521,20 +521,11 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
             responseBody = Arrays.copyOf(responseBody, responseSize);
 
             byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+            
             responseBody = Arrays.concatenate(responseBody, ("\r\n").getBytes());
-
-            String test1 = new String(responseBody);
-            String test2 = new String(firstPart);
-            String test3 = new String(formattedResponsebyte);
-
             responseBody = Arrays.concatenate(firstPart, responseBody);
-
             responseBody = Arrays.concatenate(formattedResponsebyte, responseBody);
 
-            String test4 = new String(responseBody);
-            if (request.getPath().contains("/api/v1/namespaces/services")) {
-                System.out.println("\"" + test4 + "\"");
-            }
             writer.write(responseBody);
             writer.flush();
             responseBody = new byte[4096];
@@ -545,17 +536,9 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
             responseBody = Arrays.copyOf(responseBody, responseSize);
 
             byte[] firstPart = (Integer.toHexString(responseBody.length) + "\r\n").getBytes();
+            
             responseBody = Arrays.concatenate(responseBody, ("\r\n").getBytes());
-
-            String test1 = new String(responseBody);
-            String test2 = new String(firstPart);
-
             responseBody = Arrays.concatenate(firstPart, responseBody);
-
-            String test3 = new String(responseBody);
-            if (request.getPath().contains("/api/v1/namespaces/services")) {
-                System.out.println("\"" + test3 + "\"");
-            }
 
             writer.write(responseBody);
             writer.flush();
