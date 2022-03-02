@@ -36,8 +36,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        if (fields.containsKey(field) and indexes.containsKey(field)) {
-            fields.get(field) + ".getFieldName(" + indexes.get(field) + ")";
+        if (fields.containsKey(op.field) and indexes.containsKey(op.field)) {
+            "pr.getFieldName(" + indexes.get(op.field) + ")";
         } else {
             ""
         }
