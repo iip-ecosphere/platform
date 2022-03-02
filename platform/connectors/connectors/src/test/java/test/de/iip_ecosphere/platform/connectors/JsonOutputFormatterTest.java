@@ -54,10 +54,11 @@ public class JsonOutputFormatterTest {
         JsonInputParser parser = new JsonInputParser();
         InputConverter<Any> pConv = parser.getConverter();
         ParseResult<Any> pr = parser.parse(chunk);
-        Assert.assertEquals(10, pConv.toInteger(pr.getData("field", 0, null)));
-        Assert.assertEquals("abba", pConv.toString(pr.getData("nest.name", 0, null)));
-        Assert.assertEquals(1.234, pConv.toDouble(pr.getData("nest.value", 0, null)), 0.01);
-        Assert.assertEquals(20, pConv.toInteger(pr.getData("fieldX", 0, null)));
+        Assert.assertEquals(10, pConv.toInteger(pr.getData("field", 0)));
+        Assert.assertEquals("abba", pConv.toString(pr.getData("nest.name")));
+        Assert.assertEquals(1.234, pConv.toDouble(pr.getData("nest.value", 0)), 0.01);
+        Assert.assertEquals(1.234, pConv.toDouble(pr.getData("", 1, 1)), 0.01);
+        Assert.assertEquals(20, pConv.toInteger(pr.getData("fieldX", 0)));
     }
 
 }

@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Arrays;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
@@ -35,7 +35,7 @@ public class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class JsonParseResult extends AbstractParseResult<Any> {
+    private static class JsonParseResult implements ParseResult<Any> {
 
         private Any any;
 
@@ -51,34 +51,6 @@ public class JsonInputParser implements InputParser<Any> {
         @Override
         public int getDataCount() {
             return any.size();
-        }
-
-        @Override
-        protected Any getData(int index) {
-            return any.get(index);
-        }
-        
-        @Override
-        public Any getData(String name, int index, Map<String, Integer> mapping) {
-            /*Any obj = any;
-            int start = 0;
-            int end = 0;
-            do {
-                end = name.indexOf(SEPARATOR, start);
-                if (end > 0) {
-                    obj = obj.get(name.substring(start, end));
-                    start = end + 1;
-                } else {
-                    if (0 == start) {
-                        obj = obj.get(name);
-                    } else {
-                        obj = obj.get(name.substring(start, name.length()));
-                    }
-                }
-            } while (end > 0);
-            // fallback difficult, change signature
-            return obj;*/
-            return getData(name, index); // TODO preliminary until removed
         }
 
         @Override
@@ -144,9 +116,13 @@ public class JsonInputParser implements InputParser<Any> {
                 EntryIterator it = findBy(indexes);
                 if (null != it) {
                     result = it.value();
+                } else {
+                    throw new IndexOutOfBoundsException("No entry found for " + Arrays.toString(indexes));
                 }
-            } else {
+            } else if (obj != any) {
                 result = obj;
+            } else {
+                throw new IndexOutOfBoundsException("No entry found for " + name);
             }
             return result;
         }

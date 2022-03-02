@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
@@ -43,24 +42,6 @@ public interface InputParser<T> {
          * @return the number of data fields (non-negative)
          */
         public int getDataCount();
-        
-        /**
-         * Returns the value of the data field for the given field {@code name} from {@code mapping} or with 
-         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
-         * access shall be used as fallback. Names may be hierarchical. May be overridden if direct access to names 
-         * is provided by the parsed structure, e.g., in JSON. Thus, no index-access is provided in the first place
-         * by this interface.
-         * 
-         * @param name the name of the data field, may contain hierarchical names separated by 
-         *     {@link InputParser#SEPARATOR}
-         * @param index the 0-based position of the data field, limit is {@link #getDataCount()}
-         * @param mapping the name-index mapping (may be empty or <b>null</b> for none, then fallback to 
-         *     index-based access)
-         * @return the data value
-         * @throws IndexOutOfBoundsException if the mapped index or the given 
-         *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
-         */
-        public T getData(String name, int index, Map<String, Integer> mapping);
 
         /**
          * Returns the value of the data field for the given field {@code name} from {@code mapping} or with 

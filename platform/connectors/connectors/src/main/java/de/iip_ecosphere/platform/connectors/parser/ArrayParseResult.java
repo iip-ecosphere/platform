@@ -12,12 +12,14 @@
 
 package de.iip_ecosphere.platform.connectors.parser;
 
+import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
+
 /**
  * An array-based parse result for data parsed to strings.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ArrayParseResult extends AbstractParseResult<String> {
+public class ArrayParseResult implements ParseResult<String> {
 
     private String[] data;
 
@@ -36,11 +38,6 @@ public class ArrayParseResult extends AbstractParseResult<String> {
     }
 
     @Override
-    public String getData(int index) {
-        return data[index];
-    }
-
-    @Override
     public String getFieldName(int... index) {
         return "";
     }
@@ -56,7 +53,7 @@ public class ArrayParseResult extends AbstractParseResult<String> {
                 index += indexes[i];
             }
         }
-        return getData(index);
+        return data[index];
     }
 
 }
