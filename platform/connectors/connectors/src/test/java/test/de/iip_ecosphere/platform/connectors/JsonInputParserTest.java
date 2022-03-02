@@ -39,8 +39,8 @@ public class JsonInputParserTest {
         String data = "{\"name\": \"abc\", \"value\": 1}";
         ParseResult<Any> res = parser.parse(data.getBytes());
         InputConverter<Any> conv = parser.getConverter();
-        Assert.assertEquals("abc", conv.toString(res.getData("name", 0, null)));
-        Assert.assertEquals(1, conv.toInteger(res.getData("value", 0, null)));
+        Assert.assertEquals("abc", conv.toString(res.getData("name", 0)));
+        Assert.assertEquals(1, conv.toInteger(res.getData("value", 0)));
         
         Assert.assertEquals("", res.getFieldName());
         Assert.assertEquals("name", res.getFieldName(0));
@@ -48,8 +48,9 @@ public class JsonInputParserTest {
         
         data = "{\"obj\": {\"name\": \"abc\", \"value\": 1}}";
         res = parser.parse(data.getBytes());
-        Assert.assertEquals("abc", conv.toString(res.getData("obj.name", 0, null)));
-        Assert.assertEquals(1, conv.toInteger(res.getData("obj.value", 0, null)));
+        Assert.assertEquals("abc", conv.toString(res.getData("obj.name", 0)));
+        Assert.assertEquals(1, conv.toInteger(res.getData("obj.value", 0)));
+        Assert.assertEquals(1, conv.toInteger(res.getData("x", 0, 1)));
 
         Assert.assertEquals("", res.getFieldName());
         Assert.assertEquals("obj", res.getFieldName(0));

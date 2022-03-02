@@ -16,11 +16,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.jsoniter.JsonIterator;
+import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
 
 /**
- * Implements the default input parser for JSON data.
+ * Implements the default input parser for JSON data. Name-based access shall be rather fast, however, 
+ * index-based access is currently a limited compromise.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -58,6 +60,70 @@ public class JsonInputParser implements InputParser<Any> {
         
         @Override
         public Any getData(String name, int index, Map<String, Integer> mapping) {
+            /*Any obj = any;
+            int start = 0;
+            int end = 0;
+            do {
+                end = name.indexOf(SEPARATOR, start);
+                if (end > 0) {
+                    obj = obj.get(name.substring(start, end));
+                    start = end + 1;
+                } else {
+                    if (0 == start) {
+                        obj = obj.get(name);
+                    } else {
+                        obj = obj.get(name.substring(start, name.length()));
+                    }
+                }
+            } while (end > 0);
+            // fallback difficult, change signature
+            return obj;*/
+            return getData(name, index); // TODO preliminary until removed
+        }
+
+        @Override
+        public String getFieldName(int... indexes) {
+            String result = "";
+            EntryIterator it = findBy(indexes);
+            if (null != it) {
+                result = it.key();
+            }
+            return result;
+        }
+        
+        /**
+         * Returns an entry iterator to the element denoted by (nested) {@code indexes}.
+         * 
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the input iterator, <b>null</b> for not found
+         */
+        private EntryIterator findBy(int[] indexes) {
+            EntryIterator result = null;
+            if (indexes.length > 0) {
+                Any tmp = any;
+                for (int i = 0; i < indexes.length; i++) {
+                    tmp = JsonIterator.deserialize(tmp.toString()); // ensure (lazy) iterator :(
+                    int pos = indexes[i];
+                    EntryIterator it = tmp.entries();
+                    while (pos >= 0 && it.next()) {
+                        if (pos == 0) {
+                            if (i < indexes.length - 1) {
+                                tmp = it.value();
+                            } else {
+                                result = it;
+                            }
+                        }
+                        pos--;
+                    }                    
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public Any getData(String name, int... indexes) {
+            Any result = null;
             Any obj = any;
             int start = 0;
             int end = 0;
@@ -74,29 +140,13 @@ public class JsonInputParser implements InputParser<Any> {
                     }
                 }
             } while (end > 0);
-            return obj;
-        }
-
-        @Override
-        public String getFieldName(int... index) {
-            String result = "";
-            if (index.length > 0) {
-                Any tmp = any;
-                for (int i = 0; i < index.length; i++) {
-                    tmp = JsonIterator.deserialize(tmp.toString()); // ensure (lazy) iterator :(
-                    int pos = index[i];
-                    EntryIterator it = tmp.entries();
-                    while (it.next() && pos >= 0) {
-                        if (pos == 0) {
-                            if (i < index.length - 1) {
-                                tmp = it.value();
-                            } else {
-                                result = it.key();        
-                            }
-                        }
-                        pos--;
-                    }                    
+            if (obj.valueType() == ValueType.INVALID) { // fallback
+                EntryIterator it = findBy(indexes);
+                if (null != it) {
+                    result = it.value();
                 }
+            } else {
+                result = obj;
             }
             return result;
         }

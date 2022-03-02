@@ -45,4 +45,18 @@ public class ArrayParseResult extends AbstractParseResult<String> {
         return "";
     }
 
+    @Override
+    public String getData(String name, int... indexes) {
+        int index;
+        if (indexes.length == 1) {
+            index = indexes[0];
+        } else {
+            index = 0;
+            for (int i = indexes.length - 1; i >= 0; i--) {
+                index += indexes[i];
+            }
+        }
+        return getData(index);
+    }
+
 }

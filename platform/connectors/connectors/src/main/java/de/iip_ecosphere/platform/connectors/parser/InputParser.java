@@ -61,13 +61,31 @@ public interface InputParser<T> {
          *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
          */
         public T getData(String name, int index, Map<String, Integer> mapping);
-        
+
+        /**
+         * Returns the value of the data field for the given field {@code name} from {@code mapping} or with 
+         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
+         * access shall be used as fallback. Names may be hierarchical. May be overridden if direct access to names 
+         * is provided by the parsed structure, e.g., in JSON. Thus, no index-access is provided in the first place
+         * by this interface.
+         * 
+         * @param name the name of the data field, may contain hierarchical names separated by 
+         *     {@link InputParser#SEPARATOR}
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the data value
+         * @throws IndexOutOfBoundsException if the mapped index or the given 
+         *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
+         */
+        public T getData(String name, int... indexes);
+
         /**
          * Returns the name of the field. This operation may not be efficient on all input parsers, in particular
          * if no index positions are recorded. However, for generically parsing back some structures, this operation is
          * required.
          * 
-         * @param indexes the path of (nested) 0-based indexes to the field
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
          * @return the name of the field or empty if not known
          */
         public String getFieldName(int... indexes);
