@@ -10,28 +10,37 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
-        mapFields(src, fields, srcQual, true); 
-        mapFields(tgt, fields, tgtQual, false);
+        mapOf(Field, String) fieldIndexes = {};
+        mapFields(src, fields, fieldIndexes, srcQual, "", true); 
+        mapFields(tgt, fields, fieldIndexes, tgtQual, "", false);
         for (AssignmentOperation a : assng, "\n") {
-            '${translateDataOperation(a, fields, done)}'
+            '${translateDataOperation(a, fields, fieldIndexes, done)}'
         }
     }
 
-    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, setOf(String) done) {
+    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (fields.containsKey(assng.field)) {
-            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields), done, true);
+            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields, indexes), done, true);
         } else {
             ""
         }
     }
 
     // dispatch basis
-    def String translateDataOperation(DataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(DataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         ""
     }
 
-    def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields) {
+    def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         translateFieldAccess(op.field, fields, false, "", dummy, false);
+    }
+    
+    def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        if (fields.containsKey(field) and indexes.containsKey(field)) {
+            fields.get(field) + ".getFieldName(" + indexes.get(field) + ")";
+        } else {
+            ""
+        }
     }
     
     def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String value, setOf(String) done, Boolean recordDone) {
@@ -55,63 +64,63 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     // dispatch basis (completeness)
-    def String translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         ""
     }
 
-    def String translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         "${op.value}"
     }
 
-    def String translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         "\"${op.value}\""
     }
 
-    def String translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         "${op.value}"
     }
 
-    def String translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         "${op.value}"
     }
     
-    def String translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields) {
-        "(" + translateDataOperation(op.operation, fields) + ")";
+    def String translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        "(" + translateDataOperation(op.operation, fields, indexes) + ")";
     }
 
     // dispatch basis (completeness)
-    def String translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields) {
+    def String translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         ""
     }
 
-    def String translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields) {
-        combine(op, " + ", fields);
+    def String translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, " + ", fields, indexes);
     }
 
-    def String translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields) {
-        combine(op, " - ", fields);
+    def String translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, " - ", fields, indexes);
     }
 
-    def String translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields) {
-        combine(op, " * ", fields);
+    def String translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, " * ", fields, indexes);
     }
 
-    def String translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields) {
-        combine(op, " / ", fields);
+    def String translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, " / ", fields, indexes);
     }
 
-    def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields) {
-        combineArgs(op.arguments, sep, fields);
+    def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combineArgs(op.arguments, sep, fields, indexes);
     }
     
-    def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields) {
+    def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         String result = "";
         boolean first = true;
         for (DataOperation op : args) {
             if (not(first)) {
                 result = result + sep;
             }
-            result = result + translateDataOperation(op, fields);
+            result = result + translateDataOperation(op, fields, indexes);
             first = false;
         }
         result;
@@ -120,10 +129,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // ----------------------------------- maps fields to access paths  -----------------------------
     
     // dispatch basis
-    def mapFields(DataType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
+    def mapFields(DataType type, mapOf(Field, String) result, mapOf(Field, String) indexes, String qual, String iQual, Boolean forSrc) {
     } 
 
-    def mapFields(RecordType type, mapOf(Field, String) result, String qual, Boolean forSrc) {
+    def mapFields(RecordType type, mapOf(Field, String) result, mapOf(Field, String) indexes, String qual, String iQual, Boolean forSrc) {
+        Integer index = 0;
         for (Field f : type.fields) {
             String fn;
             if (forSrc) {
@@ -132,7 +142,15 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
                fn = mapTargetPath(qual, f);
             }
             result.add(f, qual);
-            mapFields(f.type, result, fn, forSrc);
+            String iq;
+            if (iQual.length() > 0) {
+                iq = iQual + ", " + index;
+            } else {
+                iq = "" + index;
+            } 
+            indexes.add(f, iq);
+            mapFields(f.type, result, indexes, fn, iq, forSrc);
+            index = index + 1;
         }
     } 
     

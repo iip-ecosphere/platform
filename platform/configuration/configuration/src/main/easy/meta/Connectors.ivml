@@ -114,6 +114,10 @@ project Connectors {
         DataOperation operation;
     }
     
+    compound FieldNameDataOperation refines DataOperation {
+        refTo(Field) field;
+    }
+    
     abstract compound DataTranslationOperation refines DataOperation {
         sequenceOf(DataOperation) arguments;
     }
