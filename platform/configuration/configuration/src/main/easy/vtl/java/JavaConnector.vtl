@@ -361,11 +361,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
-        * Creates the connector parameter instance.
+        * Creates the connector parameter instance. [public for testing]
         *
         * @return the instance to be passed to the connector
         */
-        private ConnectorParameter createConnectorParameter() {
+        public static ConnectorParameter createConnectorParameter() {
             return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder("${conn.host}", ${conn.port})
                 .setApplicationInformation("${app.id}", "${app.description}")
