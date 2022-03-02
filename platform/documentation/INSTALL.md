@@ -84,7 +84,7 @@ and similarly for the CLI
 
     docker run -i --network platform iipecosphere/platform:cli.latest
     
-The service artifact that is needed to add/start services is available under the following local URI
+The service artifact that is needed to add/start services is available under the following local URI [the name is changing from SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar to SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar depending on your version]
 
     file:/device/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
 

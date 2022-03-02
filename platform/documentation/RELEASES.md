@@ -30,10 +30,11 @@
     * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
     * Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
     * Separated generation of platform application interfaces and application code
+    * Changed generated service artifact classifier to *bin* in order to keep the original file for testing.
 * Planned improvements:
     * Integrated container management for Kubernetes
     * Automatic creation of containers and their accessibility for devices (started).
-    * Potentially, an initial version of the platform monitoring.
+    * Potentially, an initial version of the platform monitoring (Prometheus testing started).
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python

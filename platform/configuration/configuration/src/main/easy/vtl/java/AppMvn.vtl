@@ -8,6 +8,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
         XmlElement config = appendConfiguration(plugin);
         new XmlElement(config, "addResources", "false");
+        new XmlElement(config, "scope", "bin");
         XmlElement exec = appendExecutions(plugin);
         appendGoal(exec, "repackage");
 
