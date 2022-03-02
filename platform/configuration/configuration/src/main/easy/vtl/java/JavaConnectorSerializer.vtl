@@ -7,7 +7,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
     String className, setOf(AssignmentOperation) assng) {
 
-    Integer index = 0; // temporary
+    String index = ""; // temporary
     String add = "";
 
     def importTypePackage(String pkg, String typePkg) {
@@ -41,16 +41,16 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     // --------------------------------- genFrom ---------------------------------
     
     def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
-        index = 0;
+        index = "";
         '' // TODO unclear for now
     }
     
     def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
-        index = 0;
+        index = "";
         if (parser <> null) {
             setOf(String) done = {};
             '${imTypeName} tmp = new ${imTypeName}();'
-            '${genFromField("tmp", "", "", "", imType)}'
+            '${genFromField("tmp", "", "", "", imType, "")}'
             '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
             mapOf(String, Field) mapping = {};
             mapSourcePaths(imType, mapping, "result");
@@ -60,28 +60,35 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
-    def genFromField(String qual, String name, String fieldName, String typeQual, DataType type) {
+    def genFromField(String qual, String name, String fieldName, String typeQual, DataType type, String iQual) {
         ''
     }
 
-    def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type) {
+    def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type, String iQual) {
         String convert = "to" + convName(type);
-        '${qual}.set${asMethodNameSuffix(fieldName)}(parser.getConverter().${convert}(pr.getData("${name}", ${index}, mapping)));'
+        '${qual}.set${asMethodNameSuffix(fieldName)}(parser.getConverter().${convert}(pr.getData("${name}", ${iQual})));'
     }
 
-    def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type) {
+    def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
            q = q + ".get" + asMethodNameSuffix(fieldName);
            '${q} = new ${typeQual}${asTypeName(type.name)}();'
         }
         String tq = type.name + ".";
+        int index = 0;
         for (Field f : type.fields, "\n") {
             String n = f.name;
             if (name.length() > 0) {
                n = name + "." + n;
             }
-            String s = genFromField(q, n, f.name, tq, f.type);            
+            String iq;
+            if (iQual.length() > 0) {
+                iq = ", " + index;
+            } else {
+                iq = "" + index;
+            }
+            String s = genFromField(q, n, f.name, tq, f.type, iq);
             index = index + 1;
             '${s}'
         }
