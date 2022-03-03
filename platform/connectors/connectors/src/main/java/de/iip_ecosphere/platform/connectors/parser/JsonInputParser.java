@@ -20,6 +20,8 @@ import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
 
+import de.iip_ecosphere.platform.support.function.IOConsumer;
+
 /**
  * Implements the default input parser for JSON data. Name-based access shall be rather fast, however, 
  * index-based access is currently a limited compromise.
@@ -54,11 +56,14 @@ public class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public String getFieldName(int... indexes) {
+        public String getFieldName(IOConsumer<Any> valueCons, int... indexes) throws IOException {
             String result = "";
             EntryIterator it = findBy(indexes);
             if (null != it) {
                 result = it.key();
+                if (null != valueCons) {
+                    valueCons.accept(it.value());
+                }
             }
             return result;
         }

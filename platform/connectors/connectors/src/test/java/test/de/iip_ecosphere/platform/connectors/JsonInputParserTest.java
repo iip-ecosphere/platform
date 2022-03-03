@@ -56,6 +56,7 @@ public class JsonInputParserTest {
         Assert.assertEquals("obj", res.getFieldName(0));
         Assert.assertEquals("name", res.getFieldName(0, 0));
         Assert.assertEquals("value", res.getFieldName(0, 1));
+        Assert.assertEquals("value", res.getFieldName(v -> Assert.assertEquals(1, conv.toInteger(v)), 0, 1));
     }
 
 }

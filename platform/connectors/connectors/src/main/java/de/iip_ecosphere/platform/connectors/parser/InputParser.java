@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.support.function.IOConsumer;
+
 /**
  * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
  * String argument, the character encoding name.
@@ -69,8 +71,29 @@ public interface InputParser<T> {
          *     {@link #getDataCount()}
          * @return the name of the field or empty if not known
          */
-        public String getFieldName(int... indexes);
-        
+        public default String getFieldName(int... indexes) {
+            try {
+                return getFieldName(null, indexes);
+            } catch (IOException e) {
+                // shall not occur as there is no value consumer
+                return "";
+            }
+        }
+
+        /**
+         * Returns the name of the field. This operation may not be efficient on all input parsers, in particular
+         * if no index positions are recorded. However, for generically parsing back some structures, this operation is
+         * required.
+         * 
+         * @param valueCons a value consumer to handle the value of the field (if found) in the same step, may be 
+         *     <b>null</b> for none
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the name of the field or empty if not known
+         * @throws IOException if applying {@code valueCons} leads to an exception
+         */
+        public String getFieldName(IOConsumer<T> valueCons, int... indexes) throws IOException;
+
     }
     
     /**

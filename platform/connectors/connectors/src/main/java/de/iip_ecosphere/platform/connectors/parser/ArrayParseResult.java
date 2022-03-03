@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
+import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
  * An array-based parse result for data parsed to strings.
@@ -38,7 +39,7 @@ public class ArrayParseResult implements ParseResult<String> {
     }
 
     @Override
-    public String getFieldName(int... index) {
+    public String getFieldName(IOConsumer<String> valueCons, int... index) {
         return "";
     }
 
