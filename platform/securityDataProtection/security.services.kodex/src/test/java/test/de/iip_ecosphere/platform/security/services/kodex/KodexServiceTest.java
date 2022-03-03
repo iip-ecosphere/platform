@@ -17,9 +17,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -31,8 +28,6 @@ import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
-import test.de.iip_ecosphere.platform.transport.JsonUtils;
 
 /**
  * Tests the KODEX service. The utilized JSON framework is just for testing, no production use!
@@ -41,154 +36,6 @@ import test.de.iip_ecosphere.platform.transport.JsonUtils;
  */
 public class KodexServiceTest {
 
-    /**
-     * Represents the input data.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class InData {
-        
-        private String name;
-        private String id;
-        
-        /**
-         * Creates an instance.
-         * 
-         * @param name the name value
-         * @param id the id value
-         */
-        InData(String name, String id) {
-            this.name = name;
-            this.id = id;
-        }
-        
-        /**
-         * Returns the name value.
-         * 
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Returns the id value.
-         * 
-         * @return the id
-         */
-        public String getId() {
-            return id;
-        }
-        
-    }
-
-    /**
-     * Represents the output data.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class OutData {
-
-        private String kip;
-        private String name;
-        private String id;
-        
-        /**
-         * Creates an instance.
-         *
-         * @param kip the kip value introduced by KODEX
-         * @param name the name value
-         * @param id the id value
-         */
-        OutData(String kip, String name, String id) {
-            this.kip = kip;
-            this.name = name;
-            this.id = id;
-        }
-
-        /**
-         * Returns the kip value introduced by KODEX.
-         * 
-         * @return the kip value
-         */
-        public String getKip() {
-            return kip;
-        }
-
-        /**
-         * Returns the name value.
-         * 
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-        
-        /**
-         * Returns the id value.
-         * 
-         * @return the id
-         */
-        public String getId() {
-            return id;
-        }
-
-    }
-    
-    /**
-     * In-data JSON type translator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class InDataJsonTypeTranslator implements TypeTranslator<InData, String> {
-
-        @Override
-        public InData from(String data) throws IOException {
-            return null; // shall be filled, not needed here
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public String to(InData source) throws IOException {
-            JSONObject json = new JSONObject();
-            json.put("name", source.getName());
-            json.put("id", source.getId());
-            return json.toJSONString();
-        }
-        
-    }
-
-    /**
-     * Out-data JSON type translator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class OutDataJsonTypeTranslator implements TypeTranslator<String, OutData> {
-
-        @Override
-        public String from(OutData data) throws IOException {
-            return null; // shall be filled, not needed here
-        }
-
-        @Override
-        public OutData to(String source) throws IOException {
-            OutData result;
-            try {
-                JSONParser parser = new JSONParser();
-                JSONObject obj = (JSONObject) parser.parse(source);
-                result = new OutData(JsonUtils.readString(obj, "_kip"), 
-                    JsonUtils.readString(obj, "name"), 
-                    JsonUtils.readString(obj, "id"));
-            } catch (ParseException e) {
-                throw new IOException(e.getMessage(), e);
-            } catch (ClassCastException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-            return result;
-        }
-        
-    }
-    
     /**
      * Processes {@code data} on {@code service} and logs the sent input.
      * 

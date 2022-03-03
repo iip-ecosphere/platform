@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     KodexServiceTest.class,
+    KodexRestServiceTest.class
 })
 public class AllTests {
 }
