@@ -13,13 +13,17 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
 
+import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
@@ -40,14 +44,16 @@ public class JsonInputParser implements InputParser<Any> {
     private static class JsonParseResult implements ParseResult<Any> {
 
         private Any any;
+        private byte[] data;
 
         /**
          * Creates a parse result instance.
          * 
-         * @param any the parsed intermediary data
+         * @param data the data to parse/deserialize
          */
-        private JsonParseResult(Any any) {
-            this.any = any;
+        private JsonParseResult(byte[] data) {
+            this.any = JsonIterator.deserialize(data);
+            this.data = data;
         }
         
         @Override
@@ -78,9 +84,8 @@ public class JsonInputParser implements InputParser<Any> {
         private EntryIterator findBy(int[] indexes) {
             EntryIterator result = null;
             if (indexes.length > 0) {
-                Any tmp = any;
+                Any tmp = JsonIterator.deserialize(data); // ensure (lazy) iterator :(
                 for (int i = 0; i < indexes.length; i++) {
-                    tmp = JsonIterator.deserialize(tmp.toString()); // ensure (lazy) iterator :(
                     int pos = indexes[i];
                     EntryIterator it = tmp.entries();
                     while (pos >= 0 && it.next()) {
@@ -195,11 +200,21 @@ public class JsonInputParser implements InputParser<Any> {
             return null; // preliminary
         }
         
+        @Override
+        public Date toDate(Any data, String format) throws IOException {
+            SimpleDateFormat f = FormatCache.getDateFormatter(format);
+            try {
+                return f.parse(data.toString());
+            } catch (ParseException e) {
+                throw new IOException(e);
+            }
+        }
+        
     }
     
     @Override
     public ParseResult<Any> parse(byte[] data) throws IOException {
-        return new JsonParseResult(JsonIterator.deserialize(data));
+        return new JsonParseResult(data);
     }
 
     @Override

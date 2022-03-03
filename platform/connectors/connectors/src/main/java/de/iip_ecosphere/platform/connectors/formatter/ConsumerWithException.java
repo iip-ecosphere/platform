@@ -14,13 +14,15 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.support.function.IOConsumer;
+
 /**
  * Specific consumer that throws IO exceptions.
  * 
  * @param <T> the type of data produced by parsing
  * @author Holger Eichelberger, SSE
  */
-public interface ConsumerWithException<T> {
+public interface ConsumerWithException<T> extends IOConsumer<T> {
     
     /**
      * Consumes an intermediary type for output producing.
@@ -28,6 +30,8 @@ public interface ConsumerWithException<T> {
      * @param data the intermediary data
      * @throws IOException if errors during I/O occur
      */
-    public void consume(T data) throws IOException;
-    
+    default void consume(T data) throws IOException {
+        accept(data); // changed for migration to IOConsumer
+    }
+
 }

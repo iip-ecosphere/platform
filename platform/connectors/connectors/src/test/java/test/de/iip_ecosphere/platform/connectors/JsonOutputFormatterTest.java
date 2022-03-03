@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,12 +22,12 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.jsoniter.any.Any;
 
-import de.iip_ecosphere.platform.connectors.formatter.ConsumerWithException;
 import de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter;
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
+import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
  * Tests {@link JsonOutputFormatter}.
@@ -41,12 +43,15 @@ public class JsonOutputFormatterTest {
      */
     @Test
     public void testFormatter() throws IOException {
+        final String iec61131u3DateTime = "'DT#'yyyy-MM-dd-HH:mm:ss.SS"; 
         JsonOutputFormatter formatter = new JsonOutputFormatter();
-        OutputConverter<ConsumerWithException<JsonGenerator>> fConv = formatter.getConverter();
+        OutputConverter<IOConsumer<JsonGenerator>> fConv = formatter.getConverter();
         formatter.add("field", fConv.fromInteger(10));
         formatter.add("nest.name", fConv.fromString("abba"));
         formatter.add("nest.value", fConv.fromDouble(1.234));
         formatter.add("fieldX", fConv.fromInteger(20));
+        Date now = Calendar.getInstance().getTime();
+        formatter.add("time", fConv.fromDate(now, iec61131u3DateTime));
         byte[] chunk = formatter.chunkCompleted();
         String tmp = new String(chunk);
         System.out.println("OUT " + tmp);
@@ -59,6 +64,7 @@ public class JsonOutputFormatterTest {
         Assert.assertEquals(1.234, pConv.toDouble(pr.getData("nest.value", 0)), 0.01);
         Assert.assertEquals(1.234, pConv.toDouble(pr.getData("", 1, 1)), 0.01);
         Assert.assertEquals(20, pConv.toInteger(pr.getData("fieldX", 0)));
+        Assert.assertEquals(now, pConv.toDate(pr.getData("time", 0), iec61131u3DateTime));
     }
 
 }

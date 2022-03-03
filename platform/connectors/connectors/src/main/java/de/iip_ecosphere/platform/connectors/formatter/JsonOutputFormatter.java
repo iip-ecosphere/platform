@@ -14,68 +14,80 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
  * JSON output formatter (preliminary).
  * 
  * @author Holger Eichelberger, SSE
  */
-public class JsonOutputFormatter implements OutputFormatter<ConsumerWithException<JsonGenerator>> {
+public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGenerator>> {
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private StringWriter writer; // 
     private JsonGenerator gen; // temporary
     private String parentName = ""; // temporary, initial top-level
     
-    private static class JsonOutputConverter implements OutputConverter<ConsumerWithException<JsonGenerator>> {
+    private static class JsonOutputConverter implements OutputConverter<IOConsumer<JsonGenerator>> {
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromInteger(int data) throws IOException {
+        public IOConsumer<JsonGenerator> fromInteger(int data) throws IOException {
             return g -> g.writeNumber(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromLong(long data) throws IOException {
+        public IOConsumer<JsonGenerator> fromLong(long data) throws IOException {
             return g -> g.writeNumber(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromString(String data) throws IOException {
+        public IOConsumer<JsonGenerator> fromString(String data) throws IOException {
             return g -> g.writeString(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromDouble(double data) throws IOException {
+        public IOConsumer<JsonGenerator> fromDouble(double data) throws IOException {
             return g -> g.writeNumber(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromFloat(float data) throws IOException {
+        public IOConsumer<JsonGenerator> fromFloat(float data) throws IOException {
             return g -> g.writeNumber(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromBoolean(boolean data) throws IOException {
+        public IOConsumer<JsonGenerator> fromBoolean(boolean data) throws IOException {
             return g -> g.writeBoolean(data);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromIntegerArray(int[] data) throws IOException {
+        public IOConsumer<JsonGenerator> fromIntegerArray(int[] data) throws IOException {
             return g -> g.writeArray(data, 0, data.length);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromDoubleArray(double[] data) throws IOException {
+        public IOConsumer<JsonGenerator> fromDoubleArray(double[] data) throws IOException {
             return g -> g.writeArray(data, 0, data.length);
         }
 
         @Override
-        public ConsumerWithException<JsonGenerator> fromObject(Object data) throws IOException {
+        public IOConsumer<JsonGenerator> fromObject(Object data) throws IOException {
             return g -> g.writeObject(data);
+        }
+        
+        @Override
+        public IOConsumer<JsonGenerator> fromDate(Date data, String format) throws IOException {
+            return g -> {
+                SimpleDateFormat f = FormatCache.getDateFormatter(format);
+                g.writeString(f.format(data));
+            };
         }
 
     }
@@ -103,7 +115,7 @@ public class JsonOutputFormatter implements OutputFormatter<ConsumerWithExceptio
     }
     
     @Override
-    public void add(String name, ConsumerWithException<JsonGenerator> func) throws IOException {
+    public void add(String name, IOConsumer<JsonGenerator> func) throws IOException {
         if (null == gen) {
             JsonFactory f = objectMapper.getFactory();
             writer = new StringWriter();
@@ -140,7 +152,7 @@ public class JsonOutputFormatter implements OutputFormatter<ConsumerWithExceptio
             parentName = "";
         }
         gen.writeFieldName(fieldName);
-        func.consume(gen);
+        func.accept(gen);
     }
 
     @Override
@@ -157,7 +169,7 @@ public class JsonOutputFormatter implements OutputFormatter<ConsumerWithExceptio
     }
 
     @Override
-    public OutputConverter<ConsumerWithException<JsonGenerator>> getConverter() {
+    public OutputConverter<IOConsumer<JsonGenerator>> getConverter() {
         return new JsonOutputConverter();
     }
 

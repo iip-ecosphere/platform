@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
@@ -177,6 +179,16 @@ public interface InputParser<T> {
         public double[] toDoubleArray(T data) throws IOException;
 
         /**
+         * Converts parsed data returned by {@link ParseResult} to a date representation.
+         * 
+         * @param data the obtained data
+         * @param format the target date format (see {@link SimpleDateFormat})
+         * @return the converted date
+         * @throws IOException if conversion fails
+         */
+        public Date toDate(T data, String format) throws IOException;
+        
+        /**
          * Converts parsed data returned by {@link ParseResult} to an object. [fallback dummy]
          * 
          * @param data the obtained data
@@ -184,7 +196,7 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public Object toObject(T data) throws IOException;
-
+        
     }
     
     /**

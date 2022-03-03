@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
 
@@ -111,6 +113,16 @@ public interface OutputFormatter<T> {
          */
         public T fromDoubleArray(double[] data) throws IOException;
 
+        /**
+         * Converts data from a date to the output format.
+         * 
+         * @param data the date
+         * @param format the target date format (see {@link SimpleDateFormat})
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromDate(Date data, String format) throws IOException;
+        
         /**
          * Converts data from an object the output format. [fallback dummy]
          * 

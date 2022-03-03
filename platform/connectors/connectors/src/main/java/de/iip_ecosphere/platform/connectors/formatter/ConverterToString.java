@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
 
@@ -66,6 +68,12 @@ public class ConverterToString implements OutputConverter<String> {
     @Override
     public String fromObject(Object data) throws IOException {
         throw new IOException("currently not supported");
+    }
+
+    @Override
+    public String fromDate(Date data, String format) throws IOException {
+        SimpleDateFormat f = FormatCache.getDateFormatter(format);
+        return f.format(data);
     }
 
 }
