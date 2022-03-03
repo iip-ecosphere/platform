@@ -17,38 +17,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             ''
         }
     }
-
-    // preliminary... JavaBasics + ??
-    def convName(DataType type) {
-        ""
-    }
-    
-    // to/from will be prefixed, must map to method names in Input/OutputConverter
-    def convName(PrimitiveType type) {
-        switch(type.name) {
-            "Integer" : "Integer",
-            "Long" : "Long",
-            "String" : "String",
-            "Boolean" : "Boolean",
-            "Float" : "Float",
-            "Double" : "Double",
-            "int[]" : "IntegerArray",
-            "double[]" : "DoubleArray",
-            "IEC61131-3DateTime" : "Date",
-            default : "Unknown" // shall lead to compile error
-        }
-    }
-    
-    def convParam(DataType type) {
-        ""
-    }
-    
-    def convParam(PrimitiveType type) {
-        switch(type.name) {
-            "IEC61131-3DateTime" : ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\"",
-            default : "" // no param
-        }
-    }
     
     // --------------------------------- genFrom ---------------------------------
     
@@ -77,8 +45,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type, String iQual) {
-        String convert = "to" + convName(type);
-        '${qual}.set${asMethodNameSuffix(fieldName)}(inConverter.${convert}(pr.getData("${name}", ${iQual})${convParam(type)}));'
+        String data = "pr.getData(\"${name}\", ${iQual})";
+        '${qual}.set${asMethodNameSuffix(fieldName)}(${genConvertOp("inConverter", type, "to", data)});'
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
@@ -111,8 +79,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = 0;
         if (formatter <> null) {
-            String convert = "from" + convName(pltfType);
-            'formatter.add("", outConverter.${convert}(source)${convParam(pltfType)});'
+            'formatter.add("", ${genConvertOp("outConverter", pltfType, "from", "source")});'
         } else {
             ''
         }
@@ -133,8 +100,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
     
     def genToField(String qual, String name, String fieldName, PrimitiveType type) {
-        String convert = "from" + convName(type);
-        'formatter.add("${name}", outConverter.${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()${convParam(type)}));\n'
+        String data = "${qual}.get${asMethodNameSuffix(fieldName)}()";
+        'formatter.add("${name}", ${genConvertOp("outConverter", type, "from", data)});\n'
     }
     
     def genToField(String qual, String name, String fieldName, RecordType type) {

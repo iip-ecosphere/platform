@@ -201,9 +201,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
     
     // called via translateDataOperations
-    def genFieldAccess(String path, Field field, Boolean set, String value) {
+    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value) {
        if (set) {
-           "access.set(\"" + path + "/" + field.name +"\", " + value + ");"; 
+           "access.set(\"" + path + "/" + field.name +"\", " + value + ")${setEnd}"; 
        } else {
            String ex = "access.get(\"" + path + "/" + field.name +"\")"; 
            String c = cast(field.type);

@@ -25,7 +25,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def String translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (fields.containsKey(assng.field)) {
-            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields, indexes), done, true);
+            translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true);
         } else {
             ""
         }
@@ -33,9 +33,9 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) {
-            String lambda = translateFieldAccess(assng.valueField, fields, true, "v", done, true);
+            String lambda = translateFieldAccess(assng.valueField, fields, true, "", genConvertOp("inConverter", assng.valueField.type, "to", "v"), done, true);
             String fnExpr = "pr.getFieldName(v -> ${lambda}, " + indexes.get(assng.field) + ")";
-            translateFieldAccess(assng.nameField, fields, true, fnExpr, done, true);
+            translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true);
         } else {
             ""
         }
@@ -47,7 +47,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        translateFieldAccess(op.field, fields, false, "", dummy, false);
+        translateFieldAccess(op.field, fields, false, "", "", dummy, false);
     }
     
     def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
@@ -58,21 +58,21 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String value, setOf(String) done, Boolean recordDone) {
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String setEnd, String value, setOf(String) done, Boolean recordDone) {
         if (fields.containsKey(field)) {
            if (recordDone) {
                done.add(mapTargetPath(fields.get(field), field));
            }
-           genFieldAccess(fields.get(field), field, set, value);
+           genFieldAccess(fields.get(field), field, set, setEnd, value);
         } else {
            ""
         }
     }
         
     // can be overridden
-    def genFieldAccess(String path, Field field, Boolean set, String value) {
+    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value) {
        if (set) {
-           path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ");"; 
+           path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")${setEnd}";
        } else {
            path + ".get" + asMethodNameSuffix(field.name) + "()"; 
        }
@@ -244,6 +244,45 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
         "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
+    }
+    
+    // -------------------------------------- formatter/parser conversion ------------------------------------ 
+    
+        // preliminary... JavaBasics + ??
+    def convName(DataType type) {
+        ""
+    }
+    
+    // to/from will be prefixed, must map to method names in Input/OutputConverter
+    def convName(PrimitiveType type) {
+        switch(type.name) {
+            "Integer" : "Integer",
+            "Long" : "Long",
+            "String" : "String",
+            "Boolean" : "Boolean",
+            "Float" : "Float",
+            "Double" : "Double",
+            "int[]" : "IntegerArray",
+            "double[]" : "DoubleArray",
+            "IEC61131-3DateTime" : "Date",
+            default : "Unknown" // shall lead to compile error
+        }
+    }
+    
+    def convParam(DataType type) {
+        ""
+    }
+    
+    def convParam(PrimitiveType type) {
+        switch(type.name) {
+            "IEC61131-3DateTime" : ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\"",
+            default : "" // no param
+        }
+    }
+    
+    def genConvertOp(String converter, DataType type, String prefix, String data) {
+        String convertOp = prefix + convName(type);
+        '${converter}.${prefix}${convName(type)}(${data}${convParam(type)})'
     }
 
 }
