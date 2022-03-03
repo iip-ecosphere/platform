@@ -64,7 +64,10 @@ project DataTypes {
     };    
     PrimitiveType DoubleArrayType = {
         name = "double[]"
-    };    
+    };
+    PrimitiveType IEC61131_3DateTime = {
+        name = "IEC61131-3DateTime"
+    };
     
     // freeze all primitives
     freeze {

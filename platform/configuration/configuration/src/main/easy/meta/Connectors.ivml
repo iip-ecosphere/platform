@@ -79,9 +79,19 @@ project Connectors {
     // Post-parser mapping operations forming a simplified expression tree structure with 
     // record-field leaf nodes
     
-    compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+    abstract compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+    }
+    
+    compound FieldAssignmentOperation refines AssignmentOperation {
         refTo(Field) field;
         DataOperation operation;
+    }
+    
+    // transfers both, value and field, potentially to different target fields (optimization)
+    compound TransferAssignmentOperation refines AssignmentOperation {
+        refTo(Field) field;
+        refTo(Field) valueField;
+        refTo(Field) nameField;
     }
     
     abstract compound DataOperation {

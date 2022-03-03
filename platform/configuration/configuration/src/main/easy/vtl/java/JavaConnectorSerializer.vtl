@@ -34,7 +34,19 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             "Double" : "Double",
             "int[]" : "IntegerArray",
             "double[]" : "DoubleArray",
+            "IEC61131-3DateTime" : "Date",
             default : "Unknown" // shall lead to compile error
+        }
+    }
+    
+    def convParam(DataType type) {
+        ""
+    }
+    
+    def convParam(PrimitiveType type) {
+        switch(type.name) {
+            "IEC61131-3DateTime" : ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\"",
+            default : "" // no param
         }
     }
     
@@ -66,7 +78,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type, String iQual) {
         String convert = "to" + convName(type);
-        '${qual}.set${asMethodNameSuffix(fieldName)}(parser.getConverter().${convert}(pr.getData("${name}", ${iQual})));'
+        '${qual}.set${asMethodNameSuffix(fieldName)}(inConverter.${convert}(pr.getData("${name}", ${iQual})${convParam(type)}));'
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
@@ -100,7 +112,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         index = 0;
         if (formatter <> null) {
             String convert = "from" + convName(pltfType);
-            'formatter.add("", formatter.getConverter().${convert}(source));'
+            'formatter.add("", outConverter.${convert}(source)${convParam(pltfType)});'
         } else {
             ''
         }
@@ -122,7 +134,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genToField(String qual, String name, String fieldName, PrimitiveType type) {
         String convert = "from" + convName(type);
-        'formatter.add("${name}", formatter.getConverter().${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()));\n'
+        'formatter.add("${name}", outConverter.${convert}(${qual}.get${asMethodNameSuffix(fieldName)}()${convParam(type)}));\n'
     }
     
     def genToField(String qual, String name, String fieldName, RecordType type) {
@@ -156,7 +168,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def String getFormatterTransferType(JsonFormatter parser) {
-        "ConsumerWithException<com.fasterxml.jackson.core.JsonGenerator>"
+        "IOConsumer<com.fasterxml.jackson.core.JsonGenerator>"
     }
     
     // ---------------------------- inits ---------------------------------
@@ -224,6 +236,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def generateParserFrom(String imTypeName, String pltfTypeName) {
         if (parser <> null) {
             'ParseResult<${getParserTransferType(parser)}> pr = parser.parse(data);
+            InputConverter<${getParserTransferType(parser)}> inConverter = parser.getConverter(); 
             ${pltfTypeName} result = new ${pltfTypeName}${add}();
             ${genFrom(imType, imTypeName, pltfType, pltfTypeName)}
             return result;'
@@ -242,7 +255,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
-            '${genTo(imType, imTypeName, pltfType, pltfTypeName)}
+            'OutputConverter<${getFormatterTransferType(formatter)}> outConverter = formatter.getConverter();
+            ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
             return formatter.chunkCompleted();'
         } else {
             'return null;'
@@ -274,9 +288,12 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         
         import java.io.IOException;
         import java.util.*;
+        import de.iip_ecosphere.platform.support.function.*;
         import de.iip_ecosphere.platform.transport.serialization.*;
+        import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
         import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
         import de.iip_ecosphere.platform.connectors.parser.*;
+        import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
         import de.iip_ecosphere.platform.connectors.formatter.*;
         ${importTypePackage(pkg, typePkg)}
         import com.fasterxml.jackson.databind.ObjectMapper;
