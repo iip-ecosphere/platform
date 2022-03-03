@@ -5,7 +5,7 @@ import DataOperationBasics;
 @indent(indentation = 4, additional = 0)
 template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, DataType pltfType, 
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
-    String className, setOf(AssignmentOperation) assng) {
+    String className, setOf(AssignmentOperation) assng) extends DataOperationBasics {
 
     String index = ""; // temporary
     String add = "";
@@ -16,6 +16,21 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         } else {
             ''
         }
+    }
+    
+    // ------------------------------- refinement of DataOperationBasics ---------
+    
+    def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        if (indexes.containsKey(op.field)) {
+            "pr.getFieldName(" + indexes.get(op.field) + ")";
+        } else {
+            ""
+        }
+    }
+    
+    def String getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        String lambda = translateFieldAccess(assng.valueField, fields, true, "", genConvertOp("inConverter", assng.valueField.type, "to", "v"), done, true);
+        "pr.getFieldName(v -> ${lambda}, " + indexes.get(assng.field) + ")";
     }
     
     // --------------------------------- genFrom ---------------------------------

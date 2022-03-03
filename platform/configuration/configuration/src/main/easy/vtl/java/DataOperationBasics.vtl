@@ -33,12 +33,15 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) {
-            String lambda = translateFieldAccess(assng.valueField, fields, true, "", genConvertOp("inConverter", assng.valueField.type, "to", "v"), done, true);
-            String fnExpr = "pr.getFieldName(v -> ${lambda}, " + indexes.get(assng.field) + ")";
+            String fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
             translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true);
         } else {
             ""
         }
+    }
+    
+    def String getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        "/* FIELD/CONVERTER ACCESS NOT DEFINED */"
     }
 
     // dispatch basis
@@ -52,7 +55,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         if (indexes.containsKey(op.field)) {
-            "pr.getFieldName(" + indexes.get(op.field) + ")";
+            "/* FIELD ACCESS NOT DEFINED */";
         } else {
             ""
         }
