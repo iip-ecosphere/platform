@@ -23,16 +23,7 @@ template PythonBasics(Configuration config, FileArtifact target) {
     
     def String toTypeName(PrimitiveType type) {
         type.name; // fallback
-        /*switch(type.name) {
-            "Integer" : "int",
-            "Long" : "int",
-            "String" : "str",
-            "Boolean" : "bool",
-            "Float" : "float",
-            "Double" : "float"
-        }*/
     }
-    
     
     def String toTypeName(IntegerTypeType type) {
         "int";

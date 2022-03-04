@@ -258,7 +258,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     // to/from will be prefixed, must map to method names in Input/OutputConverter
     def convName(PrimitiveType type) {
-        switch(type.name) {
+        "/* NOT DEFINED */"
+        /*switch(type.name) {
             "Integer" : "Integer",
             "Long" : "Long",
             "String" : "String",
@@ -269,19 +270,66 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             "double[]" : "DoubleArray",
             "IEC61131-3DateTime" : "Date",
             default : "Unknown" // shall lead to compile error
-        }
+        }*/
     }
     
+    def convName(IntegerTypeType type) {
+        "Integer"
+    }
+    
+    def convName(LongTypeType type) {
+        "Long"
+    }
+
+    def convName(StringTypeType type) {
+        "String"
+    }
+    
+    def convName(BooleanTypeType type) {
+        "Boolean"
+    }
+
+    def convName(FloatTypeType type) {
+        "Float"
+    }
+
+    def convName(DoubleTypeType type) {
+         "Double"
+    }
+
+    /*def convName(ObjectTypeType type) {
+    }
+
+    def convName(ByteArrayTypeType type) {
+    }*/
+
+    def convName(IntegerArrayTypeType type) {
+        "IntegerArray"
+    }
+
+    def convName(DoubleArrayTypeType type) {
+        "DoubleArray"
+    }
+
+    def convName(IEC61131_3DateTimeTypeType type) {
+        "Date"
+    }
+    
+    // dispatch basis, additional parameter to be passed to the parser/formatter conversion method, usually empty
     def convParam(DataType type) {
-        ""
+        "" // no param
     }
     
-    def convParam(PrimitiveType type) {
+    def convParam(IEC61131_3DateTimeTypeType type) {
+        ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
+    }
+    
+    /*def convParam(PrimitiveType type) {
         switch(type.name) {
             "IEC61131-3DateTime" : ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\"",
             default : "" // no param
         }
-    }
+    }*/
     
     def genConvertOp(String converter, DataType type, String prefix, String data) {
         String convertOp = prefix + convName(type);

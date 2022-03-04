@@ -18,7 +18,8 @@ project DataTypes {
     }
 
     // primitive data types in the sense of not refinable (via records)
-    // name is used as fallback, new types shall override toTypeName(.) in JavaBasics/PythonBasics    
+    // name is used as fallback, new types shall override toTypeName(.) and cast(.) in JavaBasics, 
+    // toTypeName(.) in PythonBasics, convName(.) and convParam(.) in DataOperationBasics    
     compound PrimitiveType refines DataType {
         //NonEmptyString name;
     }
@@ -104,6 +105,8 @@ project DataTypes {
     IEC61131_3DateTimeTypeType IEC61131_3DateTimeType = {
         name = "IEC61131-3DateTime"
     };
+    
+    // actions for new types, see above!
     
     // freeze all primitives
     freeze {

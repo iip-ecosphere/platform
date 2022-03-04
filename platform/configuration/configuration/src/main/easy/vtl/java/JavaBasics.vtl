@@ -89,17 +89,53 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def cast(PrimitiveType type) {
-        switch(type.name) {
-            "Integer" : "(int)",
-            "Long" : "(long)",
-            "String" : "(String)",
-            "Boolean" : "(boolean)",
-            "Float" : "(float)",
-            "Double" : "(double)",
-            default : "(" + type.name + ")"
-        }
-    }    
+        "(" + type.name + ")";
+    }
     
+    def String cast(IntegerTypeType type) {
+        "(int)";
+    }
+
+    def String cast(LongTypeType type) {
+        "(long)";
+    }
+
+    def String cast(StringTypeType type) {
+        "(String)";
+    }
+    
+    def String cast(BooleanTypeType type) {
+        "(boolean)";
+    }
+
+    def String cast(FloatTypeType type) {
+        "(float)";
+    }
+
+    def String cast(DoubleTypeType type) {
+        "(double)";
+    }
+
+    def String cast(ObjectTypeType type) {
+        "";
+    }
+
+    def String cast(ByteArrayTypeType type) {
+        "(byte[])";
+    }
+
+    def String cast(IntegerArrayTypeType type) {
+        "(int[])";
+    }
+
+    def String cast(DoubleArrayTypeType type) {
+        "(double[])";
+    }
+
+    def String cast(IEC61131_3DateTimeTypeType type) {
+        "(java.util.Date)";
+    }
+
     // ------------------------------------------ (MVN) artifact access -------------------------------------
     
     def String getArtifact(MeshElement elt) {
