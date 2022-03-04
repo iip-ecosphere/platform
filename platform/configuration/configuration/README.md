@@ -39,6 +39,10 @@ containerImageStorage:
   
 ```
 
+## Configuration model
+
+The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/main/easy) is also explained/documented.
+
 ## hint
 
 For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
