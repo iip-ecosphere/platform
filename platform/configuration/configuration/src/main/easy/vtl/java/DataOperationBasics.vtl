@@ -309,7 +309,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     def convParam(IEC61131_3DateTimeTypeType type) {
-        ", \"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
+        "'DT#'YYYY-MM-dd-HH:mm:ss.SS"
     }
     
     // generates a formatter/parser conversion operation call
@@ -319,7 +319,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // - data the actual data to be converted, may be a parameter name    
     def genConvertOp(String converter, DataType type, String prefix, String data) {
         String convertOp = prefix + convName(type);
-        '${converter}.${prefix}${convName(type)}(${data}${convParam(type)})'
+        String convP = convParam(type);
+        if (convP.length() > 0) {
+            convP = ", \"${convP}\"";
+        }
+        '${converter}.${prefix}${convName(type)}(${data}${convP})'
     }
 
 }

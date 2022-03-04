@@ -103,7 +103,7 @@ project DataTypes {
     compound IEC61131_3DateTimeTypeType refines PrimitiveType {
     }
     IEC61131_3DateTimeTypeType IEC61131_3DateTimeType = {
-        name = "IEC61131-3DateTime"
+        name = "IEC 61131-3 DateTime"
     };
     
     // actions for new types, see above!
