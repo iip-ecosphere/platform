@@ -18,7 +18,7 @@ project DataTypes {
     }
 
     // primitive data types in the sense of not refinable (via records)
-    // name is used as fallback, new types shall override toTypeName(.) and cast(.) in JavaBasics, 
+    // name is used as fallback, new types shall override toTypeName(.) or cast(.) - if needed - in JavaBasics, 
     // toTypeName(.) in PythonBasics, convName(.) and convParam(.) in DataOperationBasics    
     compound PrimitiveType refines DataType {
     }
