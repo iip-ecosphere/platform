@@ -30,6 +30,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         }
         'from json import JSONEncoder
         import json
+        from datetime import datetime
         from iip.TypeTransatorToString import TypeTransatorToString
         from datatypes.${clsName} import ${clsName}
         

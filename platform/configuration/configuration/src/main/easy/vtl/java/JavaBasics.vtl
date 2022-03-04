@@ -35,16 +35,6 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     def String toTypeName(PrimitiveType type) {
         type.name; // fallback
-        /*switch(type.name) {
-            "Integer" : "int",
-            "Long" : "long",
-            "String" : "String",
-            "Boolean" : "boolean",
-            "Float" : "float",
-            "Double" : "double",
-            "IEC61131-3DateTime" : "java.util.Date",
-            default: type.name
-        }*/
     }
     
     def String toTypeName(IntegerTypeType type) {
@@ -68,7 +58,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
 
     def String toTypeName(DoubleTypeType type) {
-        "float";
+        "double";
     }
 
     def String toTypeName(ObjectTypeType type) {
