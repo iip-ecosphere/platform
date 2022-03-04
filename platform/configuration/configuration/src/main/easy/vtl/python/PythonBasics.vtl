@@ -49,24 +49,28 @@ template PythonBasics(Configuration config, FileArtifact target) {
         "float";
     }
 
+    def String toTypeName(ByteTypeType type) {
+        "int"; // ??
+    }
+
     def String toTypeName(ObjectTypeType type) {
         "Any";
     }
+
+    def String toTypeName(ArrayType type) {
+        "list";
+    } // implies IntegerArrayTypeType, DoubleArrayTypeType 
 
     def String toTypeName(ByteArrayTypeType type) {
         "bytearray";
     }
 
-    def String toTypeName(IntegerArrayTypeType type) {
-        "list";
-    }
-
-    def String toTypeName(DoubleArrayTypeType type) {
-        "list";
-    }
-
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "datetime";
     }
+
+    def String toTypeName(ListType type) {
+        "list[" + toTypeName(type.type) + "]";
+    } 
     
 }

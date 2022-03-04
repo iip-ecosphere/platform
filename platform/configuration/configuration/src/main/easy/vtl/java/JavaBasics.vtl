@@ -61,34 +61,48 @@ template JavaBasics(Configuration config, FileArtifact target) {
         "double";
     }
 
+    def String toTypeName(ByteTypeType type) {
+        "byte";
+    }
+
     def String toTypeName(ObjectTypeType type) {
         "Object";
     }
-
-    def String toTypeName(ByteArrayTypeType type) {
-        "byte[]";
-    }
-
-    def String toTypeName(IntegerArrayTypeType type) {
-        "int[]";
-    }
-
-    def String toTypeName(DoubleArrayTypeType type) {
-        "double[]";
-    }
+    
+    def String toTypeName(ArrayType type) {
+        toTypeName(type) + "[]";
+    } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType
 
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "java.util.Date";
     }
     
-    // ------------------------------------------ primitive type casting -------------------------------------
-    
-        // preliminary... JavaBasics + ??
-    def cast(DataType type) {
-        ""
+    def String considerWrapper(String typeName) {
+        switch (typeName) { // Java primitives to Wrapper
+            "int" : "Integer",
+            "long" : "Long",
+            "float" : "Float",
+            "double" : "Double",
+            "byte" : "Byte",
+            "boolean" : "Boolean",
+            "char" : "Char",
+            "short" : "Short",
+            default: typeName
+        }
     }
     
-    def cast(PrimitiveType type) {
+    def String toTypeName(ListType type) {
+        String t = considerWrapper(toTypeName(type));
+        "java.util.List<${t}>"
+    }
+    
+    // ------------------------------------------ primitive type casting -------------------------------------
+    
+    def cast(DataType type) {
+        "(" + toTypeName(type) + ")";
+    }
+    
+    /*def cast(PrimitiveType type) {
         "(" + type.name + ")";
     }
     
@@ -115,6 +129,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String cast(DoubleTypeType type) {
         "(double)";
     }
+    
+    def String cast(ByteTypeType type) {
+        "(byte)";
+    }
 
     def String cast(ObjectTypeType type) {
         "";
@@ -134,7 +152,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
 
     def String cast(IEC61131_3DateTimeTypeType type) {
         "(java.util.Date)";
-    }
+    }*/
 
     // ------------------------------------------ (MVN) artifact access -------------------------------------
     

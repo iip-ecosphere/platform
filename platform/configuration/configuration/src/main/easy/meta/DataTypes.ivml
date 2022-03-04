@@ -21,9 +21,14 @@ project DataTypes {
     // name is used as fallback, new types shall override toTypeName(.) and cast(.) in JavaBasics, 
     // toTypeName(.) in PythonBasics, convName(.) and convParam(.) in DataOperationBasics    
     compound PrimitiveType refines DataType {
-        //NonEmptyString name;
     }
+    
     compound ArrayType refines PrimitiveType {
+        refTo(DataType) type;
+    }
+
+    compound ListType refines PrimitiveType {
+        refTo(DataType) type;
     }
     
     compound RecordType refines CDataProperty, DataType {
@@ -75,6 +80,11 @@ project DataTypes {
     DoubleTypeType DoubleType = {
         name = "Double"
     };
+    compound ByteTypeType refines PrimitiveType {
+    }
+    DoubleTypeType ByteType = {
+        name = "Byte"
+    };
 
     compound ObjectTypeType refines PrimitiveType {
     }
@@ -85,19 +95,22 @@ project DataTypes {
     compound ByteArrayTypeType refines ArrayType {
     }
     ByteArrayTypeType ByteArrayType = {
-        name = "byte[]"
+        name = "byte[]",
+        type = refBy(ByteType)
     };    
 
     compound IntegerArrayTypeType refines ArrayType {
     }
     IntegerArrayTypeType IntegerArrayType = {
-        name = "int[]"
+        name = "int[]",
+        type = refBy(IntegerType)
     };    
 
     compound DoubleArrayTypeType refines ArrayType {
     }
     DoubleArrayTypeType DoubleArrayType = {
-        name = "double[]"
+        name = "double[]",
+        type = refBy(DoubleType)
     };
     
     compound IEC61131_3DateTimeTypeType refines PrimitiveType {
