@@ -48,7 +48,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             '${genFromField("tmp", "", "", "", imType, "")}'
             '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
             mapOf(String, Field) mapping = {};
-            mapSourcePaths(imType, mapping, "result");
+            mapSourcePaths(imType, mapping, "tmp");
             '${produceDataTransfer(pltfType, mapping, "result", "tmp", done)}'
         } else {
             ''

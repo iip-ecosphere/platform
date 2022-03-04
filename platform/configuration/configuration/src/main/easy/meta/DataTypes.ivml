@@ -81,6 +81,7 @@ project DataTypes {
         ByteArrayType;
         IntegerArrayType;
         DoubleArrayType;
+        IEC61131_3DateTime;
         iipVer;
     };
     
