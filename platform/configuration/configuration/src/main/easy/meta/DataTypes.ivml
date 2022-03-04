@@ -16,9 +16,12 @@ project DataTypes {
     abstract compound DataType {
         NonEmptyString name;
     }
-    
+
+    // primitive data types in the sense of not refinable (via records)    
     compound PrimitiveType refines DataType {
         NonEmptyString name;
+    }
+    compound ArrayType refines PrimitiveType {
     }
     
     compound RecordType refines CDataProperty, DataType {
@@ -35,37 +38,69 @@ project DataTypes {
 
     // defining the basic type; if further ones are added, adjust the basic vtls in the generation
     // do not change the names!
-    PrimitiveType IntegerType = {
+    compound IntegerTypeType refines PrimitiveType {
+    }
+    IntegerTypeType IntegerType = {
         name = "Integer"
     };
-    PrimitiveType LongType = {
+
+    compound LongTypeType refines PrimitiveType {
+    }
+    LongTypeType LongType = {
         name = "Long"
     };
-    PrimitiveType StringType = {
+
+    compound StringTypeType refines PrimitiveType {
+    }
+    StringTypeType StringType = {
         name = "String"
     };
-    PrimitiveType BooleanType = {
+
+    compound BooleanTypeType refines PrimitiveType {
+    }
+    BooleanTypeType BooleanType = {
         name = "Boolean"
     };
-    PrimitiveType FloatType = {
+
+    compound FloatTypeType refines PrimitiveType {
+    }
+    FloatTypeType FloatType = {
         name = "Float"
     };
-    PrimitiveType DoubleType = {
+
+    compound DoubleTypeType refines PrimitiveType {
+    }
+    DoubleTypeType DoubleType = {
         name = "Double"
     };
-    PrimitiveType ObjectType = {
+
+    compound ObjectTypeType refines PrimitiveType {
+    }
+    ObjectTypeType ObjectType = {
         name = "Object"
     };
-    PrimitiveType ByteArrayType = {
+
+    compound ByteArrayTypeType refines ArrayType {
+    }
+    ByteArrayTypeType ByteArrayType = {
         name = "byte[]"
     };    
-    PrimitiveType IntegerArrayType = {
+
+    compound IntegerArrayTypeType refines ArrayType {
+    }
+    IntegerArrayTypeType IntegerArrayType = {
         name = "int[]"
     };    
-    PrimitiveType DoubleArrayType = {
+
+    compound DoubleArrayTypeType refines ArrayType {
+    }
+    DoubleArrayTypeType DoubleArrayType = {
         name = "double[]"
     };
-    PrimitiveType IEC61131_3DateTime = {
+    
+    compound IEC61131_3DateTimeTypeType refines PrimitiveType {
+    }
+    IEC61131_3DateTimeTypeType IEC61131_3DateTimeType = {
         name = "IEC61131-3DateTime"
     };
     
@@ -81,7 +116,7 @@ project DataTypes {
         ByteArrayType;
         IntegerArrayType;
         DoubleArrayType;
-        IEC61131_3DateTime;
+        IEC61131_3DateTimeType;
         iipVer;
     };
     
