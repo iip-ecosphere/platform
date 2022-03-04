@@ -34,7 +34,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String toTypeName(PrimitiveType type) {
-        switch(type.name) {
+        type.name; // fallback
+        /*switch(type.name) {
             "Integer" : "int",
             "Long" : "long",
             "String" : "String",
@@ -43,7 +44,51 @@ template JavaBasics(Configuration config, FileArtifact target) {
             "Double" : "double",
             "IEC61131-3DateTime" : "java.util.Date",
             default: type.name
-        }
+        }*/
+    }
+    
+    def String toTypeName(IntegerTypeType type) {
+        "int";
+    }
+
+    def String toTypeName(LongTypeType type) {
+        "long";
+    }
+    
+    def String toTypeName(StringTypeType type) {
+        "String";
+    }
+
+    def String toTypeName(BooleanTypeType type) {
+        "boolean";
+    }
+
+    def String toTypeName(FloatTypeType type) {
+        "float";
+    }
+
+    def String toTypeName(DoubleTypeType type) {
+        "float";
+    }
+
+    def String toTypeName(ObjectTypeType type) {
+        "Object";
+    }
+
+    def String toTypeName(ByteArrayTypeType type) {
+        "byte[]";
+    }
+
+    def String toTypeName(IntegerArrayTypeType type) {
+        "int[]";
+    }
+
+    def String toTypeName(DoubleArrayTypeType type) {
+        "double[]";
+    }
+
+    def String toTypeName(IEC61131_3DateTimeTypeType type) {
+        "java.util.Date";
     }
     
     // ------------------------------------------ primitive type casting -------------------------------------

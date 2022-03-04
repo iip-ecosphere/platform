@@ -17,9 +17,10 @@ project DataTypes {
         NonEmptyString name;
     }
 
-    // primitive data types in the sense of not refinable (via records)    
+    // primitive data types in the sense of not refinable (via records)
+    // name is used as fallback, new types shall override toTypeName(.)    
     compound PrimitiveType refines DataType {
-        NonEmptyString name;
+        //NonEmptyString name;
     }
     compound ArrayType refines PrimitiveType {
     }
