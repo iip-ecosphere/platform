@@ -67,8 +67,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
-           q = q + ".get" + asMethodNameSuffix(fieldName);
-           '${q} = new ${typeQual}${asTypeName(type.name)}();'
+           '${q}.set${asMethodNameSuffix(fieldName)}(new ${asTypeName(type.name)}${add}());\n'
+           q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
         }
         String tq = type.name + ".";
         int index = 0;
@@ -79,7 +79,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             }
             String iq;
             if (iQual.length() > 0) {
-                iq = ", " + index;
+                iq = iQual + ", " + index;
             } else {
                 iq = "" + index;
             }
