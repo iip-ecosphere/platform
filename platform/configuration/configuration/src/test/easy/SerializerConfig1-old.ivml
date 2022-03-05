@@ -80,6 +80,22 @@ project SerializerConfig1Old {
         // TODO parameter
     };
     
+    RecordType testType = {
+        name = "testType",
+        fields = {
+            Field {
+                name = "$type",
+                type = refBy(StringType)
+            }, Field {
+                name = "_kip",
+                type = refBy(StringType)
+            }, Field {
+                name = "values",
+                type = refBy(IntegerArrayType)
+            }
+        }
+    };
+    
     RecordType myConnMachineIn = {
         path = "/opc/mach/",
         name = "myConnMachineIn",

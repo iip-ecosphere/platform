@@ -19,10 +19,6 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def String test(String s) {
-        s;
-    }
-    
     // ------------------------------------------ type name access -------------------------------------
 
     def String toTypeName(IOType type) {
@@ -70,7 +66,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String toTypeName(ArrayType type) {
-        toTypeName(type) + "[]";
+        toTypeName(type.type) + "[]";
     } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType
 
     def String toTypeName(IEC61131_3DateTimeTypeType type) {

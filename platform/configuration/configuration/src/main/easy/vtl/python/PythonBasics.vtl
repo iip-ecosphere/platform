@@ -2,19 +2,15 @@
 template PythonBasics(Configuration config, FileArtifact target) {
 
     def String asIdentifier(String s) {
-        s;
+        s.replace(" ", "").replace("$","D").toIdentifier();
     }
 
     def String asMethodNameSuffix(String s) {
-        s.firstToUpperCase().toIdentifier();
+        s.asIdentifier().firstToUpperCase();
     }
     
     def String asTypeName(String s) {
-        s.firstToUpperCase().toIdentifier();
-    }
-    
-    def String test(String s) {
-        s;
+        s.asIdentifier().firstToUpperCase();
     }
     
     def String toTypeName(DataType type) {

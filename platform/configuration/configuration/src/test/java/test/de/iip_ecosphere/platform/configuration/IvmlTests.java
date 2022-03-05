@@ -554,6 +554,11 @@ public class IvmlTests {
         assertAppInterfaces(base, true); // old style
         assertApplication(base);
         assertAllFiles(base);
+        
+        // specific files only generated here for testing
+        File srcMain = new File(base, "src/main");
+        File srcMainPython = new File(srcMain, "python");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/TestType.py");
     }
     
     /**
