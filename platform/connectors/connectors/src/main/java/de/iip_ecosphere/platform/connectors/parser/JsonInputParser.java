@@ -29,9 +29,8 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
 /**
  * Implements the default input parser for JSON data. Name-based access shall be rather fast, however, 
  * index-based access is currently a limited compromise.
- * This interface is used to generate connector code against.
  * 
- * <b>Warning:</b> This interface is not stable and may change during performance optimization.
+ *  * <b>Warning:</b> This implementation is not stable and may change during performance optimization.
  * 
  * @author Holger Eichelberger, SSE
  */

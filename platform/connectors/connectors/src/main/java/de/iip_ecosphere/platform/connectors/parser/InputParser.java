@@ -20,7 +20,12 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
  * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
- * String argument, the character encoding name.
+ * String argument, the character encoding name. If adequate, a parser may interpret a given field, e.g., if a JSON 
+ * payload is given as string but the (field) access indicates that there shall be an object inside, the parser 
+ * implementation may "deserialize" the string and look for the field.
+ * 
+ * This interface is used to generate connector code against.
+ * <b>Warning:</b> This interface is not stable and may change during performance optimization.
  * 
  * @param <T> the type of data produced by parsing
  * @author Holger Eichelberger, SSE
