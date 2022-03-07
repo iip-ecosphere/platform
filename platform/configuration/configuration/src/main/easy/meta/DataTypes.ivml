@@ -39,6 +39,8 @@ project DataTypes {
     compound Field {
         NonEmptyString name;
         refTo(DataType) type;
+        String description = "";
+        Boolean optional = false;
     }
 
     typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);

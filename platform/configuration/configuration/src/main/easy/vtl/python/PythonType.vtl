@@ -1,3 +1,4 @@
+import Basics;
 import PythonBasics;
 
 @advice(IIPEcosphere)
@@ -17,7 +18,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     def getters(RecordType type) {
         for (Field f: type.fields) {
             'def get${asMethodNameSuffix(f.name)}(self) -> ${toTypeName(f.type)}:
-                """Returns the value of {@code ${asIdentifier(f.name)}}.
+                """Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
                 
                    Returns:
                      - the value of ${f.name}"""'
@@ -34,7 +35,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     def setters(RecordType type) {
         for (Field f: type.fields) {
             'def set${asMethodNameSuffix(f.name)}(self, v : ${toTypeName(f.type)}):
-                """Returns the value of {@code ${asIdentifier(f.name)}}.
+                """Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
                 
                    Returns:
                      - the value of ${f.name}"""'

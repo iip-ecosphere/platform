@@ -1,3 +1,4 @@
+import Basics;
 import JavaBasics;
 
 @advice(IIPEcosphere)
@@ -6,7 +7,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
 
     String ending = " {";
     Boolean emitJavadoc = true;
-
+    
     // generates code for the individual attributes
     def attributes(RecordType type) {
         if (not(interface)) {
@@ -28,7 +29,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                  * Returns the value of {@code ${asIdentifier(f.name)}}.
+                  * Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
                   * 
                   * @return the value
                   */'
@@ -49,7 +50,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                 * Changes the value of {@code ${asIdentifier(f.name)}}.
+                 * Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
                  * 
                  * @param value the new value
                  */'

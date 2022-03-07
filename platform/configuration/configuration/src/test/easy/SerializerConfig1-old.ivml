@@ -57,10 +57,12 @@ project SerializerConfig1Old {
         fields = {
             Field {
                 name = "intField",
-                type = refBy(IntegerType)
+                type = refBy(IntegerType),
+                description = "Some int value"
             }, Field {
                 name = "stringField",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                description = "Some String value"
             }
         }
     };

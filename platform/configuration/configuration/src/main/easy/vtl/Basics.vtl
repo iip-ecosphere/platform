@@ -49,4 +49,20 @@ template Basics(Configuration config, FileArtifact target) {
         f.type;
     }
 	
+	def String getDescription(Field field) {
+        if (isDefined(field.description) and field.description.length() > 0) {
+            field.description;
+        } else {
+            "";
+        }  
+    }
+    
+    def String prependIfNotEmpty(String prefix, String text) {
+        if (text.length() > 0) {
+            prefix + text;
+        } else {
+            "";
+        }
+    }
+	
 }
