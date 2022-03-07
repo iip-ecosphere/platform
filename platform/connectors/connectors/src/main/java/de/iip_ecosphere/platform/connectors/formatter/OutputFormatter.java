@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.connectors.parser.InputParser;
 /**
  * Generic output formatter. You may add information to one chunk until {@link #chunkCompleted()} is called.
  * Custom implementations must have a constructor with a single String argument, the character encoding name.
+ * This interface is used to generate connector code against.
  * 
  * @param <T> the output format type
  * @author Holger Eichelberger, SSE

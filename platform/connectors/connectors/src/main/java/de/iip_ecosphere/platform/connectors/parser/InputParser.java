@@ -149,7 +149,7 @@ public interface InputParser<T> {
          * @return the converted float
          * @throws IOException if conversion fails
          */
-        public double toFloat(T data) throws IOException;
+        public float toFloat(T data) throws IOException;
 
         /**
          * Converts parsed data returned by {@link ParseResult} to Boolean.

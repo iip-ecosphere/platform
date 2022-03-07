@@ -60,7 +60,7 @@ public class ConverterFromString implements InputConverter<String> {
     }
 
     @Override
-    public double toFloat(String data) throws IOException {
+    public float toFloat(String data) throws IOException {
         try {
             return Float.parseFloat(data);
         } catch (NumberFormatException e) {
