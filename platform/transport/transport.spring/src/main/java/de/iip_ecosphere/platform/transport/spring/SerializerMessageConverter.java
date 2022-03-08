@@ -37,8 +37,9 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
     /**
      * The default mime type for IIP-Ecosphere serialized data types via the transport layer.
      */
-    public static final MimeType MIME_TYPE = new MimeType("application", "iip");
-    private static final String MIME_TYPE_STRING = MIME_TYPE.toString();
+    public static final MimeType MIME_TYPE = new MimeType("application", "json");
+    // before this was application/iip and it worked. suddenly, SpringCloudStream sets all messages to 
+    // application/json although application.yml states different default
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerMessageConverter.class);
 
@@ -123,8 +124,7 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
         Serializer<T> serializer = (Serializer<T>) SerializerRegistry.getSerializer(payload.getClass());
         if (null != serializer) {
             try {
-                streamBridge.send(bindingName, MessageBuilder.withPayload(serializer.to(payload))
-                    .setHeader("contentType", MIME_TYPE_STRING).build());
+                streamBridge.send(bindingName, MessageBuilder.withPayload(serializer.to(payload)).build());
             } catch (IOException e) {
                 LOGGER.error("Cannot send instance of " + payload.getClass().getName() 
                     + ": " + e.getMessage());
