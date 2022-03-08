@@ -42,6 +42,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     private Channel channel;
     private boolean tlsEnabled = false;
     private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
+    private boolean closing = false;
 
     @Override
     public void syncSend(String stream, Object data) throws IOException {
@@ -68,7 +69,13 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         }
         // if not known
         byte[] payload = serialize(stream, data);
-        channel.basicPublish("", stream, null, payload);
+        try {
+            channel.basicPublish("", stream, null, payload);
+        } catch (IOException e) {
+            if (!closing) {
+                throw e;
+            }
+        }
     }
 
     @Override
@@ -154,6 +161,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
 
     @Override
     public void disconnect() throws IOException {
+        closing = true;
         super.disconnect();
         try {
             channel.close();
