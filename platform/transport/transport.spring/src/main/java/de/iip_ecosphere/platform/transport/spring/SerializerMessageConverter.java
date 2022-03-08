@@ -38,6 +38,7 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
      * The default mime type for IIP-Ecosphere serialized data types via the transport layer.
      */
     public static final MimeType MIME_TYPE = new MimeType("application", "iip");
+    private static final String MIME_TYPE_STRING = MIME_TYPE.toString();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerMessageConverter.class);
 
@@ -122,7 +123,8 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
         Serializer<T> serializer = (Serializer<T>) SerializerRegistry.getSerializer(payload.getClass());
         if (null != serializer) {
             try {
-                streamBridge.send(bindingName, MessageBuilder.withPayload(serializer.to(payload)).build());
+                streamBridge.send(bindingName, MessageBuilder.withPayload(serializer.to(payload))
+                    .setHeader("contentType", MIME_TYPE_STRING).build());
             } catch (IOException e) {
                 LOGGER.error("Cannot send instance of " + payload.getClass().getName() 
                     + ": " + e.getMessage());
