@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
+import iip.datatypes.Rec1Impl;
 import iip.impl.SimpleDataSourceImpl;
 
 /**
@@ -60,7 +61,7 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
     * @return the created data, <b>null</b> for no data
     */
     public Rec1 produceRec1() {
-        Rec1 rec = SimpleAppHelper.createRec1Instance(); // normal programming use constructor!
+        Rec1 rec = new Rec1Impl(); //SimpleAppHelper.createRec1Instance(); // normal programming use constructor!
         rec.setIntField(random.nextInt());
         rec.setStringField("SYNC");
         return rec;
@@ -77,7 +78,7 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
                 
                 @Override
                 public void run() {
-                    Rec1 rec = SimpleAppHelper.createRec1Instance(); // normal programming use constructor!
+                    Rec1 rec = new Rec1Impl(); // SimpleAppHelper.createRec1Instance();
                     rec.setIntField(random.nextInt());
                     rec.setStringField("ASYNC");
                     ingestor.ingest(rec);
