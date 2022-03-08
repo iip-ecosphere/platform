@@ -48,9 +48,13 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+        XmlElement exs = new XmlElement(d, "exclusions");
+        XmlElement ex = new XmlElement(exs, "exclusion");
         new XmlElement(ex, "groupId", "javax.el");
         new XmlElement(ex, "artifactId", "el-api");
+        ex = new XmlElement(exs, "exclusion");
+        new XmlElement(ex, "groupId", "org.apache.tomcat");
+        new XmlElement(ex, "artifactId", "tomcat-catalina");
         for (String art : artifacts.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
