@@ -31,13 +31,13 @@ public class SimpleApp3Helper {
     
     static {
         try {
-            ifCls = Class.forName("iip.Rec13");
+            ifCls = Class.forName("iip.datatypes.Rec13");
             // is a class in non-shared interface mode, is an interface in shared interface mode 
         } catch (ClassNotFoundException e) {
             LoggerFactory.getLogger(SimpleApp3Helper.class).error("Cannot find iip.Rec13!");
         }
         try {
-            implCls = Class.forName("iip.Rec13Impl");
+            implCls = Class.forName("iip.datatypes.Rec13Impl");
         } catch (ClassNotFoundException e) {
             // iip.Rec1Impl is only there when shared interfaces were created 
         }
