@@ -216,10 +216,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // ------------------------------------ produce data transfer -----------------------------------
     // to be used with mapPaths; the idea is to hash over the target datatype (mapPaths, target = to write to) and to 
     // produce for the input data type (to read from). Thus we have to build up both access path.
+	// Currently the default Java implementation focuses on object transfers from temporary instances.
     
+	// dispatch basis, do nothing on plain types
     def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
     }
 
+	// typical top-level entry point, produce data transfer for RecordType
     def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
@@ -229,11 +232,27 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
                 Integer tnPos = tn.rfind(targetSep);
                 Integer mqPos = mq.rfind(sourceSep);
-                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}'
+                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}' 
+                if (produceDataTransferRec(f.type)) {
+                    '${produceDataTransfer(f, f.type, mapping, tn, mq, done)}'
+                }
             } else {
                 ''
             }
         }
+    }
+
+    // internal dispatch basis, akin produceDataTransfer(DataType), but carries actual field that is not present at top-level call
+    def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    }
+
+    // akin produceDataTransfer(RecordType), but carries actual field that is not present at top-level call, calls produceDataTransfer(RecordType)
+    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+         produceDataTransfer(type, mapping, typeQual, mapQual, done);
+    }
+    
+    def Boolean produceDataTransferRec(DataType type) {
+        false; // do recursive as we currently assume temporary instance before
     }
     
     def prefixPath(String path, String sep) {

@@ -6,6 +6,7 @@ import DataOperationBasics;
 template JavaConnector(Configuration config, FileArtifact target) extends DataOperationBasics {
 
     Boolean genFrom = false; // temporary
+    String add = "";
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
     // dispatch basis
@@ -223,12 +224,34 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         "/";
     }
     
+    def Boolean produceDataTransferRec(DataType type) {
+        true; // do recursive as we do not have temporary instance before
+    }
+    
+	// overwrite internal dispatch basis to allow for data transfer generation on all fields. Object fields are used below to initalize
+	// object fields of data instances
+    def produceDataTransfer(Field f, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+        String tn = mapTargetPath(typeQual, f);
+        String mq = mapSourcePath(mapQual, f);
+        if (not(done.includes(tn)) and mapping.containsKey(mq)) {
+            Integer tnPos = tn.rfind(targetSep);
+            Integer mqPos = mq.rfind(sourceSep);
+            '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}' 
+        } else {
+            ''
+        }
+    }
+    
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
         if (genFrom) {
             "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${getterPath(tgtQual, tgt)});";
         } else {
-            "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+            if (tgt.type.isTypeOf(RecordType)) {
+                "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
+            } else {
+                "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+            }
         }
     }
 
@@ -246,16 +269,21 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         mapSourcePaths(imType, mapping, imTypePath);
         '${produceDataTransfer(pltfType, mapping, "data", imTypePath, done)}'|8;
     }
+    
+    def setAdd(Configuration config) {
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            add = "Impl";
+        } else {
+            add = "";
+        }
+    }
 
     def generateMachineOutputTranslator(Connector conn) {
         if (conn.inAdapterClass.length() == 0) {
-            IIPEcosphere cfg = config;
+            setAdd(config);
             String coType = asTypeName(getFirstTypeName(conn.output));
             String oType = getMachineOutputTypeName(conn);
-            String add = "";
-            if (cfg.sharedInterfaces) {
-                add = "Impl";
-            }
         '
         private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
         
@@ -292,6 +320,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineInputTranslator(Connector conn) {
         if (conn.outAdapterClass.length() == 0) {
+            setAdd(config);
             String ciType = asTypeName(getFirstTypeName(conn.input));
             String iType = getMachineInputTypeName(conn);
         '
