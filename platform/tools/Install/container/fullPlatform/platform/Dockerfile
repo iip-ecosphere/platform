@@ -8,7 +8,7 @@ COPY amqp.sh amqp.sh
 COPY plJars/ plJars
 COPY platform.sh platform.sh
 # App
-COPY SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+COPY SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
 # ECS
 COPY ecsJars/ ecsJars
 COPY ecs.sh ecs.sh

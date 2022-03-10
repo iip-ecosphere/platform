@@ -4,7 +4,7 @@ COPY brokerJars/ brokerJars
 COPY src/ src
 COPY amqp.sh amqp.sh
 # App
-COPY SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+COPY SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
 # Service Manger
 COPY svcJars/ svcJars
 COPY serviceMgr.sh serviceMgr.sh
