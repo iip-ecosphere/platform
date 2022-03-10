@@ -1,0 +1,217 @@
+project VDW {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolMQTTv5 {
+        port = 8883,
+        user = "user",
+        password = "pwd"
+    };
+    
+    serviceProtocol = ServiceProtocolMQTTv5 {};
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8884,
+        region = "local"
+    };
+    
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
+
+    // ------------ data types ------------------
+    
+    RecordType opcIn = {
+        name = "OpcIn",
+        fields = {
+        }
+    };
+    
+    RecordType opcOut = {
+        path = "Objects/Machines/BasicWoodworking",
+        name = "OpcOut",
+        fields = {
+            Field {
+                name = "State",
+                type = refBy(opcBwState)
+            }
+        }
+    };
+    
+    RecordType opcBwState = {
+        name = "OpcBwState",
+        fields = {
+            Field {
+                name = "Machine",
+                type = refBy(opcBwStateMachine)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachine = {
+        name = "OpcBwStateMachine",
+        fields = {
+            Field {
+                name = "Flags",
+                type = refBy(opcBwStateMachineFlags)
+            }, Field {
+                name = "Overview",
+                type = refBy(opcBwStateMachineOverview)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachineFlags = {
+        name = "OpcBwStateMachineFlags",
+        fields = {
+            Field {
+                name = "Alarm",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Calibrated",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Emergency",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Error",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "MachineInitialized",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "MachineOn",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PowerPresent",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "RecipeInRun",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Warning",
+                type = refBy(BooleanType)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachineOverview = {
+        name = "OpcBwStateMachineOverview",
+        fields = {
+            Field {
+                name = "CurrentMode",
+                type = refBy(IntegerType) // TODO !!! ENUM
+            }, Field {
+                name = "CurrentState",
+                type = refBy(IntegerType) // TODO !!! ENUM
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+    
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myOpcConn",
+        name = "myOpcConn example",
+        description = "",
+        ver = "0.1.0",
+        host = "opcua.umati.app",
+        port = 4840, // default localhost
+        
+        input = {{type=refBy(opcIn)}},
+        output = {{type=refBy(opcOut)}},
+        inInterface = refBy(opcIn), 
+        outInterface = refBy(opcOut)
+        /*operations = {
+          FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }*/
+    };
+    
+
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "VdwOpcApp",
+        name = "Simple VDW OPC Demo App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    ServiceMesh myMesh = {
+        description = "VDW Service Net",
+        sources = {refBy(mqttOpcSource)}
+    };
+
+    MeshSource mqttOpcSource = {
+       impl = refBy(myOpcUaConn)
+    };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.VdwOpcAppInterfaces:" + iipVer; // for testing all-in-one
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

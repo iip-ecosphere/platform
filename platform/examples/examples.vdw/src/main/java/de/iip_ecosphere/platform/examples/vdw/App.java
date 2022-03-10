@@ -21,6 +21,8 @@ import de.iip_ecosphere.platform.connectors.opcuav1.DataItem;
 import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
@@ -37,6 +39,7 @@ public class App {
      * @throws IOException if the connector fails (preliminary)
      */
     public static void main(String... args) throws IOException {
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
         Connector<DataItem, Object, MachineData, MachineCommand> connector = 
             new OpcUaConnector<MachineData, MachineCommand>(
                 new TranslatingProtocolAdapter<DataItem, Object, MachineData, MachineCommand>(
