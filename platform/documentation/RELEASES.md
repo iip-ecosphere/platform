@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (winter 2021):
+### Next release (winter 2021, expected end of March 2022):
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
@@ -11,7 +11,7 @@
 * Simple deployment plans for the CLI.
 * Python service execution environment (command-line based approach) and model-based automated integration of Python services.
 * Automatic build of demo containers on github, deployment to dockerhub.
-* Extended model-based integration of both connector types 
+* Extended model-based integration of MQTT, OPC UA and AAS connectors
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package

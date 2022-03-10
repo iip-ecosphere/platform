@@ -12,11 +12,13 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 
 ## News
 
+* Increased focus on use cases and evaluation
+* Updated Dockerhub containers (2022/03/10)
+* Model-based IoT connector creation
 * Python Service Execution Environment and model-based Python Service integration
 * Generic integration of the anonymization and pseudonymization tool [KODEX](https://heykodex.com/)
 * Distributed service execution via CLI scripts
 * Initial device management
-* Pre-built containers to experiment with the platform on Dockerhub.
 * Security fixes for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228)
 
 ## Documentation
