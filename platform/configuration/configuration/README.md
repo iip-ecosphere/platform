@@ -50,10 +50,9 @@ For running the tests locally, you need a Python 3.9 installed. On Windows, this
 ## missing
 
 - variability model: resources, resource assignment to ServiceMeshes
-- generation of containers
+- generation of containers (in progress)
 - AAS-based interface to the configuration, reasoning, instantiation 
-- generated Java service instantiation: connector adapter type code
-- generated Python service instantiation: inclusion of environment zip, data connection, serializer registration, ...
+- Connectors: object array types, object list types, enums, full-cycle test
 - optional: included micrometer gauges, timers, counters
 
 **For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/03/03** or newer is required. Use `mvn -U exec:java ...`
