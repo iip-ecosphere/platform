@@ -73,6 +73,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             if (not(cfg.sharedInterfaces)) {
                 javaDatatypesSrc.mkdir();
                 javaSerializersSrc.mkdir();
+                generateEnums(javaDatatypesSrc, pySrc);    
                 for (RecordType r : recordTypes) {
                     // generate for all languages and according to serializer settings
                     String clsName = asTypeName(r.name);
@@ -297,7 +298,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         setOf(String) bins = {}; 
         setOf(String) assemblies = {}; 
         sequenceOf(MeshElement) elements = {};
-        
+    
+        generateEnums(javaDatatypesSrc, pySrc);    
         for (RecordType r : recordTypes) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
@@ -338,6 +340,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         maven("${appRoot}", true);
 
         artifacts.add(cfg.sharedArtifact);
+    }
+    
+    generateEnums(Path javaDatatypesSrc, Path pySrc) = {
+        setOf(EnumType) enumTypes = EnumType.allInstances();
+        for (EnumType e: enumTypes) {
+            String clsName = asTypeName(e.name);
+            vilTemplateProcessor("JavaEnum", config, "${javaDatatypesSrc}/${clsName}.java", type=e, 
+                pkg=javaDatatypesPackage);
+            vilTemplateProcessor("PythonEnum", config, "${pySrc}/datatypes/${clsName}.py", type=e);
+        }
     }
     
     // ------------------------------------------ gen interfaces: service interfaces ---------------------------------------------------------

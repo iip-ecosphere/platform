@@ -1,0 +1,6 @@
+DataTypes::EnumLiteral::name = The name of an enumeration literal. Used to derive a corresponding programming language identifier.
+DataTypes::EnumLiteral::ordinal = The unique numeric identifier of an enumeration literal within its enum.
+DataTypes::EnumLiteral::description = Optional description of an enumeration literal. [optional]
+DataTypes::EnumType::literals = The declared literals of an enumeration.
+DataTYpes::EnumType::enumLiteralNamesUnique = All declared names within an enumeration type must be unique.
+DataTYpes::EnumType::enumLiteralOrdinalsUnique = All declared ordinals within an enumeration type must be unique.

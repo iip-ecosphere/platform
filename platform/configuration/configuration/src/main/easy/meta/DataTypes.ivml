@@ -26,6 +26,18 @@ project DataTypes {
     compound ArrayType refines PrimitiveType {
         refTo(DataType) type;
     }
+    
+    compound EnumLiteral {
+        NonEmptyString name;
+        Integer ordinal;
+        String description = "";
+    }
+    
+    compound EnumType refines PrimitiveType {
+        sequenceOf(EnumLiteral) literals;
+        Constraint enumLiteralNamesUnique = literals->isUnique(l|l.name);
+        Constraint enumLiteralOrdinalsUnique = literals->isUnique(l|l.ordinal);
+    }
 
     compound ListType refines PrimitiveType {
         refTo(DataType) type;

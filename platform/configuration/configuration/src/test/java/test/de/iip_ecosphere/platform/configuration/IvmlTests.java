@@ -559,6 +559,7 @@ public class IvmlTests {
         File srcMain = new File(base, "src/main");
         File srcMainPython = new File(srcMain, "python");
         pythonSourceCodeCheck(srcMainPython, "datatypes/TestType.py");
+        pythonSourceCodeCheck(srcMainPython, "datatypes/MyTestEnum.py");
     }
     
     /**

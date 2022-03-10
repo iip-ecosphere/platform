@@ -52,6 +52,19 @@ project SerializerConfig1 {
 
     // ------------ data types ------------------
     
+    EnumType myTestEnum = EnumType {
+        name = "myTestEnum",
+        literals = {
+            EnumLiteral {
+                name = "Lit1",
+                ordinal = 25
+            }, EnumLiteral {
+                name = "Lit2",
+                ordinal = 100
+            }
+        }
+    };
+    
     RecordType rec1 = {
         name = "Rec1",
         fields = {

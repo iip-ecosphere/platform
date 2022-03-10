@@ -68,7 +68,20 @@ project SerializerConfig1Old {
     };
     
     // ------------ individual, reusable services ------------------
-        
+    
+    EnumType myTestEnum = EnumType {
+        name = "myTestEnum",
+        literals = {
+            EnumLiteral {
+                name = "Lit1",
+                ordinal = 25
+            }, EnumLiteral {
+                name = "Lit2",
+                ordinal = 100
+            }
+        }
+    };
+    
     Service mySourceService = JavaService {
         id = "mySource",
         name = "mySource example",
