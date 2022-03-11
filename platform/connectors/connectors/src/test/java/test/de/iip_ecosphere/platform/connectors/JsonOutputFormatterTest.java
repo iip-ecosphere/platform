@@ -50,6 +50,8 @@ public class JsonOutputFormatterTest {
         formatter.add("nest.name", fConv.fromString("abba"));
         formatter.add("nest.value", fConv.fromDouble(1.234));
         formatter.add("fieldX", fConv.fromInteger(20));
+        formatter.add("enum", fConv.fromEnum(MyEnum.TEST2));
+        formatter.add("enumName", fConv.fromEnumAsName(MyEnum.TEST1));
         Date now = Calendar.getInstance().getTime();
         formatter.add("time", fConv.fromDate(now, iec61131u3DateTime));
         byte[] chunk = formatter.chunkCompleted();
@@ -65,6 +67,8 @@ public class JsonOutputFormatterTest {
         Assert.assertEquals(1.234, pConv.toDouble(pr.getData("", 1, 1)), 0.01);
         Assert.assertEquals(20, pConv.toInteger(pr.getData("fieldX", 0)));
         Assert.assertEquals(now, pConv.toDate(pr.getData("time", 0), iec61131u3DateTime));
+        Assert.assertEquals(MyEnum.TEST2, pConv.toEnum(pr.getData("enum", 0), MyEnum.class));
+        Assert.assertEquals(MyEnum.TEST1, pConv.toEnum(pr.getData("enumName", 0), MyEnum.class));
     }
 
 }

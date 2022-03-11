@@ -26,11 +26,11 @@ import de.iip_ecosphere.platform.connectors.parser.ParserUtils;
 import de.iip_ecosphere.platform.connectors.parser.TextLineParser;
 
 /**
- * Tests the {@link InputParser}.
+ * Tests the {@link TextLineParser}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class InputParserTest {
+public class TextLineParserTest {
     
     /**
      * Tests basic successful text line parsing with different charsets and separators.
@@ -40,7 +40,7 @@ public class InputParserTest {
     @Test
     public void testTextLineParser() throws IOException {
         String charset = StandardCharsets.UTF_8.name();
-        final String[] parts = new String[]{"123", "bbb", "true", "0.45", "0.56", "12345"};
+        final String[] parts = new String[]{"123", "bbb", "true", "0.45", "0.56", "12345", "20", "TEST1"};
         testTextLineParser(parts, charset, "#");
         ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
         Assert.assertEquals("", pr.getFieldName()); // must hold always, no deeper indexes supported
@@ -52,6 +52,8 @@ public class InputParserTest {
         Assert.assertEquals(0.45, conv.toDouble(pr.getData("f", 1, 2)), 0.01);
         Assert.assertEquals(0.56, conv.toDouble(pr.getData("", 4)), 0.01);
         Assert.assertEquals(12345, conv.toInteger(pr.getData("", 5)));
+        Assert.assertEquals(MyEnum.TEST2, conv.toEnum(pr.getData("", 6), MyEnum.class));
+        Assert.assertEquals(MyEnum.TEST1, conv.toEnum(pr.getData("", 7), MyEnum.class));
         try {
             pr.getData("f", 10);
             Assert.fail("No Exception");
@@ -174,7 +176,7 @@ public class InputParserTest {
      */
     @Test
     public void testCreateInstance() {
-        ClassLoader loader = InputParserTest.class.getClassLoader();
+        ClassLoader loader = TextLineParserTest.class.getClassLoader();
         Assert.assertNull(ParserUtils.createInstance(loader, "me.here.Parser", "UTF-8"));
         
         Assert.assertNotNull(ParserUtils.createInstance(loader, CustomBaseParser.class.getName(), "UTF-8"));

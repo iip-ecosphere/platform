@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
+import de.iip_ecosphere.platform.transport.serialization.IipEnum;
 
 /**
  * Generic output formatter. You may add information to one chunk until {@link #chunkCompleted()} is called.
@@ -123,7 +124,29 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public T fromDate(Date data, String format) throws IOException;
-        
+
+        /**
+         * Converts data from an IIP enum literal to the output format using {@link IipEnum#getModelOrdinal()}.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public default T fromEnum(IipEnum data) throws IOException {
+            return fromInteger(data.getModelOrdinal());
+        }
+
+        /**
+         * Converts data from an IIP enum literal to the output format using {@link Enum#name()}.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public default T fromEnumAsName(Enum<?> data) throws IOException {
+            return fromString(data.name());
+        }
+
         /**
          * Converts data from an object the output format. [fallback dummy]
          * 

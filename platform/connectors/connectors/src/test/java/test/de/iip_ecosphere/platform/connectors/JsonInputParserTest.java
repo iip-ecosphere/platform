@@ -29,18 +29,20 @@ import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
  * @author Holger Eichelberger, SSE
  */
 public class JsonInputParserTest {
-
+    
     /**
      * Tests {@link JsonInputParser}.
      */
     @Test
     public void testJsonInputParser() throws IOException {
         JsonInputParser parser = new JsonInputParser();
-        String data = "{\"name\": \"abc\", \"value\": 1}";
+        String data = "{\"name\": \"abc\", \"value\": 1, \"enum\":20, \"enumName\":\"TEST1\"}";
         ParseResult<Any> res = parser.parse(data.getBytes());
         InputConverter<Any> conv = parser.getConverter();
         Assert.assertEquals("abc", conv.toString(res.getData("name", 0)));
         Assert.assertEquals(1, conv.toInteger(res.getData("value", 0)));
+        Assert.assertEquals(MyEnum.TEST2, conv.toEnum(res.getData("enum", 2), MyEnum.class));
+        Assert.assertEquals(MyEnum.TEST1, conv.toEnum(res.getData("enumName", 3), MyEnum.class));
         
         Assert.assertEquals("", res.getFieldName());
         Assert.assertEquals("name", res.getFieldName(0));

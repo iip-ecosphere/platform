@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.transport.serialization.IipEnum;
 
 /**
  * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
@@ -192,6 +193,36 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public Date toDate(T data, String format) throws IOException;
+        
+        /**
+         * Converts parsed data returned by {@link ParseResult} to an instance of {@code enumType}. Primarily, a 
+         * conversion to {@link #toInteger(Object)} and {@link IipEnum#getModelOrdinal()} is performed. If this fails, 
+         * a name-based enum conversion is applied.
+         *  
+         * @param <E> the enum type
+         * @param data the obtained data
+         * @param enumType enumeration target type
+         * @return the converted enum instance
+         * @throws IOException if the conversion fails
+         */
+        public default <E extends Enum<E> & IipEnum> E toEnum(T data, Class<E> enumType) throws IOException {
+            E result = null;
+            try {
+                result = IipEnum.valueByModelOrdinal(enumType, toInteger(data)); // result may be null
+            } catch (IOException e) {
+                // ok, result stays null
+            }
+            if (null == result) {
+                try {
+                    result = Enum.valueOf(enumType, toString(data));
+                } catch (IllegalArgumentException e) {
+                    throw new IOException("Cannot convert to enum " + enumType.getName() + ": " + e.getMessage());
+                } catch (NullPointerException e) { // can be thrown offically
+                    throw new IOException("Cannot convert to enum " + enumType.getName());
+                }
+            }
+            return result;
+        }
         
         /**
          * Converts parsed data returned by {@link ParseResult} to an object. [fallback dummy]

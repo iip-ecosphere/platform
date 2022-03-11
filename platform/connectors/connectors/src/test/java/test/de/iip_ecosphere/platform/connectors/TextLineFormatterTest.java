@@ -26,11 +26,11 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter;
 
 /**
- * Tests {@link OutputFormatter} functionality.
+ * Tests {@link TextLineFormatter} functionality.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class OutputFormatterTest {
+public class TextLineFormatterTest {
     
     /**
      * Tests the formatter.
@@ -41,16 +41,20 @@ public class OutputFormatterTest {
         TextLineFormatter formatter = new TextLineFormatter(charset, "#");
         OutputConverter<String> conv = formatter.getConverter();
         Assert.assertNotNull(conv);
-        formatter.add("field1", conv.fromString("abba"));
+        formatter.add("field1", conv.fromString("abba")); // field names are ignored here
         formatter.add("field2", conv.fromInteger(21));
         formatter.add("field2", conv.fromDouble(1.234));
         formatter.add("field2", conv.fromFloat(1.235f));
         formatter.add("field2", conv.fromLong(3456L));
         formatter.add("field2", conv.fromBoolean(true));
+        formatter.add("field3", conv.fromEnum(MyEnum.TEST2));
+        formatter.add("field3", conv.fromEnumAsName(MyEnum.TEST1));
         byte[] data = formatter.chunkCompleted();
 
         String text = new String(data, charset);
-        Assert.assertEquals("abba#21#1.234#1.235#3456#true", text);
+        Assert.assertEquals("abba#21#1.234#1.235#3456#true#" 
+            + MyEnum.TEST2.getModelOrdinal() + "#"
+            + MyEnum.TEST1.name(), text);
     }
 
     
@@ -111,7 +115,7 @@ public class OutputFormatterTest {
      */
     @Test
     public void testCreateInstance() {
-        ClassLoader loader = OutputFormatterTest.class.getClassLoader();
+        ClassLoader loader = TextLineFormatterTest.class.getClassLoader();
         Assert.assertTrue(FormatterUtils.createInstance(loader, "me.here.Parser", "UTF-8") instanceof DummyFormatter);
         
         Assert.assertNotNull(FormatterUtils.createInstance(loader, CustomBaseFormatter.class.getName(), "UTF-8"));

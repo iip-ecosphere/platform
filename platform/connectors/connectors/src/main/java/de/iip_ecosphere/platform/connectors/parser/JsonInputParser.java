@@ -22,6 +22,7 @@ import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
+import com.jsoniter.spi.JsonException;
 
 import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
@@ -156,32 +157,56 @@ public class JsonInputParser implements InputParser<Any> {
 
         @Override
         public int toInteger(Any data) throws IOException {
-            return data.toInt();
+            try {
+                return data.toInt();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
         public long toLong(Any data) throws IOException {
-            return data.toLong();
+            try {
+                return data.toLong();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
         public String toString(Any data) throws IOException {
-            return data.toString();
+            try {
+                return data.toString();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
         public double toDouble(Any data) throws IOException {
-            return data.toDouble();
+            try {
+                return data.toDouble();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
         public float toFloat(Any data) throws IOException {
-            return data.toFloat();
+            try {
+                return data.toFloat();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
         public boolean toBoolean(Any data) throws IOException {
-            return data.toBoolean();
+            try {
+                return data.toBoolean();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
         @Override
@@ -190,7 +215,7 @@ public class JsonInputParser implements InputParser<Any> {
             for (int j = 0; j < dta.length; j++) {
                 dta[j] = data.get(j).toInt();
             }
-            return dta;
+            return dta; // exception?
         }
 
         @Override
@@ -200,7 +225,7 @@ public class JsonInputParser implements InputParser<Any> {
             for (int j = 0; j < dta.length; j++) {
                 dta[j] = data.get(j).toDouble();
             }
-            return dta;
+            return dta; // exception?
         }
 
         @Override
