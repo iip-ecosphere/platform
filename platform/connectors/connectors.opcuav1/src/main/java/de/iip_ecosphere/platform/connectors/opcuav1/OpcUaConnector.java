@@ -545,6 +545,33 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 }
             } catch (UaException e) {
                 throw new IOException(e);
+            } catch (IOException e) {
+                result = DUMMY;
+                int pos = qName.lastIndexOf(SEPARATOR_CHAR); // try to handle buildins
+                if (pos > 0) {
+                    try {
+                        String slot = qName.substring(pos + 1);
+                        UaVariableNode node = retrieveVariableNode(qName.substring(0, pos));
+                        DataValue value = node.getValue();
+                        Variant r = value.getValue();
+                        if (null != r) {
+                            Object tmp = r.getValue();
+                            if (tmp instanceof LocalizedText) {
+                                LocalizedText txt = (LocalizedText) tmp;
+                                if (slot.equals("locale")) {
+                                    result = txt.getLocale();
+                                } else if (slot.equals("text")) {
+                                    result = txt.getText();
+                                }
+                            }
+                        }
+                    } catch (UaException e1) {
+                        // ignore
+                    }
+                }
+                if (DUMMY == result) {
+                    throw e;
+                }
             }
             return result;
         }
@@ -554,6 +581,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             try {
                 UaVariableNode node = retrieveVariableNode(qName);
                 node.writeValue(new DataValue(new Variant(value)));
+                // TODO handle built-ins
             } catch (UaException e) {
                 throw new IOException(e);
             }
