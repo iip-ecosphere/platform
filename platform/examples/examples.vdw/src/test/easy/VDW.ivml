@@ -2,6 +2,8 @@ project VDW {
 
     import IIPEcosphere;
     import DataTypes;
+    
+    import OpcWoodworking;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -65,76 +67,9 @@ project VDW {
             Field {
                 name = "State",
                 type = refBy(opcBwState)
-            }
-        }
-    };
-    
-    RecordType opcBwState = {
-        name = "OpcBwState",
-        fields = {
-            Field {
-                name = "Machine",
-                type = refBy(opcBwStateMachine)
-            }
-        }
-    };
-
-    RecordType opcBwStateMachine = {
-        name = "OpcBwStateMachine",
-        fields = {
-            Field {
-                name = "Flags",
-                type = refBy(opcBwStateMachineFlags)
             }, Field {
-                name = "Overview",
-                type = refBy(opcBwStateMachineOverview)
-            }
-        }
-    };
-
-    RecordType opcBwStateMachineFlags = {
-        name = "OpcBwStateMachineFlags",
-        fields = {
-            Field {
-                name = "Alarm",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "Calibrated",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "Emergency",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "Error",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "MachineInitialized",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "MachineOn",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "PowerPresent",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "RecipeInRun",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "Warning",
-                type = refBy(BooleanType)
-            }
-        }
-    };
-
-    RecordType opcBwStateMachineOverview = {
-        name = "OpcBwStateMachineOverview",
-        fields = {
-            Field {
-                name = "CurrentMode",
-                type = refBy(IntegerType) // TODO !!! ENUM
-            }, Field {
-                name = "CurrentState",
-                type = refBy(IntegerType) // TODO !!! ENUM
+                name = "Identification",
+                type = refBy(opcBwIdentification)
             }
         }
     };
@@ -163,7 +98,6 @@ project VDW {
           }
         }*/
     };
-    
 
     // ------------ application and service nets ------------------
     

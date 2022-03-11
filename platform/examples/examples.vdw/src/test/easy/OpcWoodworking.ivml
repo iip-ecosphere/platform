@@ -1,0 +1,150 @@
+project OpcWoodworking {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType opcBwIdentification = {
+        name = "OpcBwIdentification",
+        fields = {
+            // TODO manufacturer, localized text, array?
+            // TODO model, localized text, array?
+            Field {
+                name = "DeviceClass",
+                type = refBy(StringType)
+            }, Field {
+                name = "ProductInstanceUri",
+                type = refBy(StringType)
+            }, Field {
+                name = "SerialNumber",
+                type = refBy(StringType)
+            }, Field {
+                name = "YearOfConstruction",
+                type = refBy(IntegerType) // TODO UInt16
+            }
+        }
+    };
+    
+    RecordType opcBwState = {
+        name = "OpcBwState",
+        fields = {
+            Field {
+                name = "Machine",
+                type = refBy(opcBwStateMachine)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachine = {
+        name = "OpcBwStateMachine",
+        fields = {
+            Field {
+                name = "Flags",
+                type = refBy(opcBwStateMachineFlags)
+            }, Field {
+                name = "Overview",
+                type = refBy(opcBwStateMachineOverview)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachineFlags = {
+        name = "OpcBwStateMachineFlags",
+        fields = {
+            Field {
+                name = "Alarm",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Calibrated",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Emergency",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Error",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "MachineInitialized",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "MachineOn",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PowerPresent",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "RecipeInRun",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "Warning",
+                type = refBy(BooleanType)
+            }
+        }
+    };
+
+    RecordType opcBwStateMachineOverview = {
+        name = "OpcBwStateMachineOverview",
+        fields = {
+            Field {
+                name = "CurrentMode",
+                type = refBy(WwUnitModeEnumeration)
+            }, Field {
+                name = "CurrentState",
+                type = refBy(WwUnitStateEnumeration)
+            }
+        }
+    };
+
+    EnumType WwUnitModeEnumeration = {
+        name = "opcWwUnitModeEnumeration",
+        literals = {
+            EnumLiteral {
+                name = "OTHER",
+                ordinal = 0
+            }, EnumLiteral {
+                name = "AUTOMATIC",
+                ordinal = 1
+            }, EnumLiteral {
+                name = "SEMIAUTOMATIC",
+                ordinal = 2
+            }, EnumLiteral {
+                name = "MANUAL",
+                ordinal = 3
+            }, EnumLiteral {
+                name = "SETUP",
+                ordinal = 4
+            }, EnumLiteral {
+                name = "SLEEP",
+                ordinal = 5
+            }
+        }
+    };
+    
+    EnumType WwUnitStateEnumeration = {
+        name = "opcWwUnitStateEnumeration",
+        literals = {
+            EnumLiteral {
+                name = "OFFLINE",
+                ordinal = 0
+            }, EnumLiteral {
+                name = "STANDBY",
+                ordinal = 1
+            }, EnumLiteral {
+                name = "READY",
+                ordinal = 2
+            }, EnumLiteral {
+                name = "WORKING",
+                ordinal = 3
+            }, EnumLiteral {
+                name = "ERROR",
+                ordinal = 4
+            }
+        }
+    };
+    
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

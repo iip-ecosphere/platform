@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import iip.datatypes.OpcBwIdentification;
 import iip.datatypes.OpcBwStateMachine;
 import iip.datatypes.OpcBwStateMachineFlags;
 import iip.datatypes.OpcBwStateMachineOverview;
@@ -127,7 +128,9 @@ public class OpcUaModelTest {
 
             @Override
             public void received(OpcOut data) {
-                System.out.println("RCV " + toString(data.getState().getMachine()));
+                System.out.println("RCV " 
+                    + toString(data.getState().getMachine()) + "\n" 
+                    + toString(data.getIdentification()));
             }
             
             /**
@@ -158,6 +161,20 @@ public class OpcUaModelTest {
                     + " - recInRun:" + flags.getRecipeInRun() + "\n" 
                     + " - warning:" + flags.getWarning();
             }
+            
+            /**
+             * Turns an identification instance into a string for display.
+             * 
+             * @param id the identification instance
+             * @return the string representation
+             */
+            private String toString(OpcBwIdentification id) {
+                return "id:\n"
+                    + " - deviceCls: " + id.getDeviceClass() + "\n" 
+                    + " - instanceUri: " + id.getProductInstanceUri() + "\n" 
+                    + " - serNr: " + id.getSerialNumber() + "\n"
+                    + " - yearOfConstr: " + id.getYearOfConstruction();
+            }
 
             /**
              * Turns a machine overview instance into a string for display.
@@ -167,8 +184,8 @@ public class OpcUaModelTest {
              */
             private String toString(OpcBwStateMachineOverview overview) {
                 return "overview:\n"
-                    + " - : " + overview.getCurrentMode() + "\n"
-                    + " - : " + overview.getCurrentState();
+                    + " - mode: " + overview.getCurrentMode() + "\n"
+                    + " - state: " + overview.getCurrentState();
             }
 
             @Override
