@@ -33,6 +33,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
         type.name; // fallback
     }
     
+    def String toTypeName(EnumType type) {
+        asTypeName(type.name);
+    }
+    
     def String toTypeName(IntegerTypeType type) {
         "int";
     }

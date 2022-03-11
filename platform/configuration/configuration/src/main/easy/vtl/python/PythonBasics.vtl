@@ -17,6 +17,14 @@ template PythonBasics(Configuration config, FileArtifact target) {
         type.name;
     }
     
+    def String toTypeName(RecordType type) {
+        asTypeName(type.name);
+    }
+    
+    def String toTypeName(EnumType type) {
+        asTypeName(type.name);
+    }
+    
     def String toTypeName(PrimitiveType type) {
         type.name; // fallback
     }

@@ -216,13 +216,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // ------------------------------------ produce data transfer -----------------------------------
     // to be used with mapPaths; the idea is to hash over the target datatype (mapPaths, target = to write to) and to 
     // produce for the input data type (to read from). Thus we have to build up both access path.
-	// Currently the default Java implementation focuses on object transfers from temporary instances.
+    // Currently the default Java implementation focuses on object transfers from temporary instances.
     
-	// dispatch basis, do nothing on plain types
+    // dispatch basis, do nothing on plain types
     def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
     }
 
-	// typical top-level entry point, produce data transfer for RecordType
+    // typical top-level entry point, produce data transfer for RecordType
     def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
@@ -308,6 +308,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
          "Byte"
     }
 
+    def convName(EnumType type) {
+         "Enum"
+    }
+
     /*def convName(ObjectTypeType type) { // currently no method in interface, needed?
     }
 
@@ -327,12 +331,20 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     // dispatch basis, additional parameter to be passed to the parser/formatter conversion method, usually empty
-    def convParam(DataType type) {
+    def convParam(DataType type, Boolean convFrom) {
         "" // no param
     }
     
-    def convParam(IEC61131_3DateTimeTypeType type) {
+    def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom) {
         "'DT#'YYYY-MM-dd-HH:mm:ss.SS"
+    }
+    
+    def convParam(EnumType type, Boolean convFrom) {
+        if (convFrom) {
+            toTypeName(type) + ".class";
+        } else {
+            ""
+        }
     }
     
     // generates a formatter/parser conversion operation call
@@ -342,7 +354,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // - data the actual data to be converted, may be a parameter name    
     def genConvertOp(String converter, DataType type, String prefix, String data) {
         String convertOp = prefix + convName(type);
-        String convP = convParam(type);
+        String convP = convParam(type, prefix=="from");
         if (convP.length() > 0) {
             convP = ", \"${convP}\"";
         }

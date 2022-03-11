@@ -206,13 +206,34 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        if (set) {
            "access.set(\"" + path + "/" + field.name +"\", " + value + ")${setEnd}"; 
        } else {
-           String ex = "access.get(\"" + path + "/" + field.name +"\")"; 
-           String c = cast(field.type);
-           if (c.length() > 0) {
-               ex = "(" + c + " " + ex + ")";
+           String ex = "access.get(\"" + path + "/" + field.name +"\")";
+           if (field.type.isTypeOf(EnumType)) { // PRELIMINARY!!!
+              ex = "IipEnum.valueByModelOrdinal(${toTypeName(field.type)}.class, (int)${ex})";
+           } else {
+               String c = cast(field.type);
+               if (c.length() > 0) {
+                   ex = "(" + c + " " + ex + ")";
+               }
            }
            ex;
        }
+    }
+    
+    // TODO Unify genFieldAccess and produceDataTransfer when changing the modelaccess interface 
+    
+    // called via produceDataTransfer
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        if (genFrom) {
+            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${getterPath(tgtQual, tgt)});";
+        } else {
+            if (tgt.type.isTypeOf(EnumType)) {
+                "\n" + setterPath(tgtQual, tgt, 'IipEnum.valueByModelOrdinal(${toTypeName(tgt.type)}.class, (int)access.get("${mapSourcePath(srcQual, src)}"))') + ";";
+            } else if (tgt.type.isTypeOf(RecordType)) {
+                "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
+            } else {
+                "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
+            }
+        }
     }
     
     // called via mapPaths and produceDataTransfer
@@ -228,8 +249,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         true; // do recursive as we do not have temporary instance before
     }
     
-	// overwrite internal dispatch basis to allow for data transfer generation on all fields. Object fields are used below to initalize
-	// object fields of data instances
+    // overwrite internal dispatch basis to allow for data transfer generation on all fields. Object fields are used below to initalize
+    // object fields of data instances
     def produceDataTransfer(Field f, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
@@ -244,19 +265,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
     
-    // called via produceDataTransfer
-    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
-        if (genFrom) {
-            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${getterPath(tgtQual, tgt)});";
-        } else {
-            if (tgt.type.isTypeOf(RecordType)) {
-                "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
-            } else {
-                "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
-            }
-        }
-    }
-
     def genOutputTransFrom(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng) {
         ''
     }
