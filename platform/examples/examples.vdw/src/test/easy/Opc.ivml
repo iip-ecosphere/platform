@@ -1,0 +1,25 @@
+project Opc {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType opcLocalizedText = {
+        name = "OpcLocalizedText",
+        fields = {
+            Field {
+                name = "locale",
+                type = refBy(StringType)
+            }, Field {
+                name = "text",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

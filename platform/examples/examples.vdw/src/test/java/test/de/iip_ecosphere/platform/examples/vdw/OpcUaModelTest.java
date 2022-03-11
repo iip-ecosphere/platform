@@ -33,6 +33,7 @@ import iip.datatypes.OpcBwStateMachine;
 import iip.datatypes.OpcBwStateMachineFlags;
 import iip.datatypes.OpcBwStateMachineOverview;
 import iip.datatypes.OpcIn;
+import iip.datatypes.OpcLocalizedText;
 import iip.datatypes.OpcOut;
 import iip.nodes.MyOpcConnExample;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -129,65 +130,10 @@ public class OpcUaModelTest {
             @Override
             public void received(OpcOut data) {
                 System.out.println("RCV " 
-                    + toString(data.getState().getMachine()) + "\n" 
-                    + toString(data.getIdentification()));
+                    + OpcUaModelTest.toString(data.getState().getMachine()) + "\n" 
+                    + OpcUaModelTest.toString(data.getIdentification()));
             }
             
-            /**
-             * Turns a machine state into a string for display.
-             * 
-             * @param machine the machine instance
-             * @param the string representation
-             */
-            private String toString(OpcBwStateMachine machine) {
-                return toString(machine.getFlags()) + "\n" + toString(machine.getOverview());
-            }
-            
-            /**
-             * Turns a machine flags instance into a string for display.
-             * 
-             * @param flags the machine flags instance
-             * @param the string representation
-             */
-            private String toString(OpcBwStateMachineFlags flags) {
-                return "flags:\n" 
-                    + " - alarm: " + flags.getAlarm() + "\n" 
-                    + " - cal: " + flags.getCalibrated() + "\n" 
-                    + " - emergency:" + flags.getEmergency() + "\n" 
-                    + " - error:" + flags.getError() + "\n" 
-                    + " - init:" + flags.getMachineInitialized() + "\n" 
-                    + " - on:" + flags.getMachineOn() + "\n" 
-                    + " - power:" + flags.getPowerPresent() + "\n" 
-                    + " - recInRun:" + flags.getRecipeInRun() + "\n" 
-                    + " - warning:" + flags.getWarning();
-            }
-            
-            /**
-             * Turns an identification instance into a string for display.
-             * 
-             * @param id the identification instance
-             * @return the string representation
-             */
-            private String toString(OpcBwIdentification id) {
-                return "id:\n"
-                    + " - deviceCls: " + id.getDeviceClass() + "\n" 
-                    + " - instanceUri: " + id.getProductInstanceUri() + "\n" 
-                    + " - serNr: " + id.getSerialNumber() + "\n"
-                    + " - yearOfConstr: " + id.getYearOfConstruction();
-            }
-
-            /**
-             * Turns a machine overview instance into a string for display.
-             * 
-             * @param flags the machine overview instance
-             * @param the string representation
-             */
-            private String toString(OpcBwStateMachineOverview overview) {
-                return "overview:\n"
-                    + " - mode: " + overview.getCurrentMode() + "\n"
-                    + " - state: " + overview.getCurrentState();
-            }
-
             @Override
             public Class<OpcOut> getType() {
                 return OpcOut.class;
@@ -198,6 +144,73 @@ public class OpcUaModelTest {
         OpcUaConnector<OpcOut, OpcIn> conn = createPlatformConnector(cb);
         conn.request(true);
         conn.disconnect();
+    }
+    
+    /**
+     * Turns a machine state into a string for display.
+     * 
+     * @param machine the machine instance
+     * @return the string representation
+     */
+    private static String toString(OpcBwStateMachine machine) {
+        return toString(machine.getFlags()) + "\n" + toString(machine.getOverview());
+    }
+    
+    /**
+     * Turns a machine flags instance into a string for display.
+     * 
+     * @param flags the machine flags instance
+     * @return the string representation
+     */
+    private static String toString(OpcBwStateMachineFlags flags) {
+        return "flags:\n" 
+            + " - alarm: " + flags.getAlarm() + "\n" 
+            + " - cal: " + flags.getCalibrated() + "\n" 
+            + " - emergency:" + flags.getEmergency() + "\n" 
+            + " - error:" + flags.getError() + "\n" 
+            + " - init:" + flags.getMachineInitialized() + "\n" 
+            + " - on:" + flags.getMachineOn() + "\n" 
+            + " - power:" + flags.getPowerPresent() + "\n" 
+            + " - recInRun:" + flags.getRecipeInRun() + "\n" 
+            + " - warning:" + flags.getWarning();
+    }
+    
+    /**
+     * Turns an identification instance into a string for display.
+     * 
+     * @param id the identification instance
+     * @return the string representation
+     */
+    private static String toString(OpcBwIdentification id) {
+        return "id:\n"
+            + " - manufacturer: " + toString(id.getManufacturer()) + "\n"
+            + " - model: " + toString(id.getModel()) + "\n"
+            + " - deviceCls: " + id.getDeviceClass() + "\n" 
+            + " - instanceUri: " + id.getProductInstanceUri() + "\n" 
+            + " - serNr: " + id.getSerialNumber() + "\n"
+            + " - yearOfConstr: " + id.getYearOfConstruction();
+    }
+
+    /**
+     * Turns a localized text instance into a string for display.
+     * 
+     * @param text the localized text instance
+     * @return the string representation
+     */
+    private static String toString(OpcLocalizedText text) {
+        return "(loc " + text.getLocale() + " text " + text.getText() + ")";
+    }
+
+    /**
+     * Turns a machine overview instance into a string for display.
+     * 
+     * @param overview the machine overview instance
+     * @return the string representation
+     */
+    private static String toString(OpcBwStateMachineOverview overview) {
+        return "overview:\n"
+            + " - mode: " + overview.getCurrentMode() + "\n"
+            + " - state: " + overview.getCurrentState();
     }
 
     /**

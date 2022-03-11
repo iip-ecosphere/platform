@@ -2,17 +2,23 @@ project OpcWoodworking {
 
     import IIPEcosphere;
     import DataTypes;
+    
+    import Opc;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
     RecordType opcBwIdentification = {
         name = "OpcBwIdentification",
         fields = {
-            // TODO manufacturer, localized text, array?
-            // TODO model, localized text, array?
             Field {
                 name = "DeviceClass",
                 type = refBy(StringType)
+            }, Field {
+                name = "Manufacturer",
+                type = refBy(opcLocalizedText)
+            }, Field {
+                name = "Model",
+                type = refBy(opcLocalizedText)
             }, Field {
                 name = "ProductInstanceUri",
                 type = refBy(StringType)
@@ -21,7 +27,7 @@ project OpcWoodworking {
                 type = refBy(StringType)
             }, Field {
                 name = "YearOfConstruction",
-                type = refBy(IntegerType) // TODO UInt16
+                type = refBy(UInt16Type)
             }
         }
     };
