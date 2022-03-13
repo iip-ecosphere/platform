@@ -19,15 +19,11 @@ import java.util.Date;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.jsoniter.any.Any;
-
 import de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter;
-import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
-import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
-import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
+import de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter.JsonOutputConverter;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
-import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter;
+import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult;
 
 /**
  * Tests {@link JsonOutputFormatter}.
@@ -45,7 +41,7 @@ public class JsonOutputFormatterTest {
     public void testFormatter() throws IOException {
         final String iec61131u3DateTime = "'DT#'yyyy-MM-dd-HH:mm:ss.SS"; 
         JsonOutputFormatter formatter = new JsonOutputFormatter();
-        OutputConverter<IOConsumer<JsonGenerator>> fConv = formatter.getConverter();
+        JsonOutputConverter fConv = formatter.getConverter();
         formatter.add("field", fConv.fromInteger(10));
         formatter.add("nest.name", fConv.fromString("abba"));
         formatter.add("nest.value", fConv.fromDouble(1.234));
@@ -59,8 +55,8 @@ public class JsonOutputFormatterTest {
         System.out.println("OUT " + tmp);
         
         JsonInputParser parser = new JsonInputParser();
-        InputConverter<Any> pConv = parser.getConverter();
-        ParseResult<Any> pr = parser.parse(chunk);
+        JsonInputConverter pConv = parser.getConverter();
+        JsonParseResult pr = parser.parse(chunk);
         Assert.assertEquals(10, pConv.toInteger(pr.getData("field", 0)));
         Assert.assertEquals("abba", pConv.toString(pr.getData("nest.name")));
         Assert.assertEquals(1.234, pConv.toDouble(pr.getData("nest.value", 0)), 0.01);

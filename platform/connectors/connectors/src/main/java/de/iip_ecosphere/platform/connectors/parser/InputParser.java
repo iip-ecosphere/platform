@@ -25,6 +25,11 @@ import de.iip_ecosphere.platform.transport.serialization.IipEnum;
  * payload is given as string but the (field) access indicates that there shall be an object inside, the parser 
  * implementation may "deserialize" the string and look for the field.
  * 
+ * Implementing classes shall use their specific rather than generic return types for {@link #parse(byte[])} and 
+ * {@link #getConverter()} to reduce dependencies on {@code <T>}. Moreover, methods of {@link ParseResult} shall
+ * be directly used in combination with {@link InputConverter} to avoid exposing {@code <T>} unless explicitly 
+ * necessary.
+ * 
  * This interface is used to generate connector code against.
  * <b>Warning:</b> This interface is not stable and may change during performance optimization.
  * 

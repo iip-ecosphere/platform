@@ -22,7 +22,33 @@ import java.io.IOException;
  */
 public class TextLineParser implements InputParser<String> {
 
-    public static final InputConverter<String> CONVERTER = new ConverterFromString();
+    /**
+     * Own parser converter type to hide implementing class for future modifications.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TextLineParserConverter extends ConverterFromString {
+    }
+
+    /**
+     * Own parser result type to hide implementing class for future modifications.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TextLineParseResult extends ArrayParseResult {
+
+        /**
+         * Creates an array-based parse result.
+         * 
+         * @param data the parsed data
+         */
+        protected TextLineParseResult(String[] data) {
+            super(data);
+        }
+
+    }
+    
+    public static final TextLineParserConverter CONVERTER = new TextLineParserConverter();
     private String charset;
     private String separator;
     
@@ -38,13 +64,13 @@ public class TextLineParser implements InputParser<String> {
     }
     
     @Override
-    public ParseResult<String> parse(byte[] data) throws IOException {
+    public TextLineParseResult parse(byte[] data) throws IOException {
         String s = new String(data, charset); // unsupportedencoding -> IOException
-        return new ArrayParseResult(s.split(separator)); // we may pool this...
+        return new TextLineParseResult(s.split(separator)); // we may pool this...
     }
 
     @Override
-    public InputConverter<String> getConverter() {
+    public TextLineParserConverter getConverter() {
         return CONVERTER;
     }
 

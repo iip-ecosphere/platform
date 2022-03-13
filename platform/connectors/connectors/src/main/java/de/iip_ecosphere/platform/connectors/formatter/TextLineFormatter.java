@@ -21,7 +21,15 @@ import java.io.IOException;
  */
 public class TextLineFormatter implements OutputFormatter<String> {
 
-    public static final OutputConverter<String> CONVERTER = new ConverterToString();
+    /**
+     * Own parser converter type to hide implementing class for future modifications.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TextLineFormatterConverter extends ConverterToString {
+    }
+    
+    public static final TextLineFormatterConverter CONVERTER = new TextLineFormatterConverter();
     private String charset;
     private String separator;
     private StringBuilder tmp = new StringBuilder();
@@ -53,7 +61,7 @@ public class TextLineFormatter implements OutputFormatter<String> {
     }
 
     @Override
-    public OutputConverter<String> getConverter() {
+    public TextLineFormatterConverter getConverter() {
         return CONVERTER;
     }
 

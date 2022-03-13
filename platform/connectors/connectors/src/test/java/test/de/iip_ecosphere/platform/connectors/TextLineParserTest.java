@@ -17,13 +17,13 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
-import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.parser.ParserUtils;
 import de.iip_ecosphere.platform.connectors.parser.TextLineParser;
+import de.iip_ecosphere.platform.connectors.parser.TextLineParser.TextLineParseResult;
+import de.iip_ecosphere.platform.connectors.parser.TextLineParser.TextLineParserConverter;
 
 /**
  * Tests the {@link TextLineParser}.
@@ -42,10 +42,10 @@ public class TextLineParserTest {
         String charset = StandardCharsets.UTF_8.name();
         final String[] parts = new String[]{"123", "bbb", "true", "0.45", "0.56", "12345", "20", "TEST1"};
         testTextLineParser(parts, charset, "#");
-        ParseResult<String> pr = testTextLineParser(parts, charset, "#-#");
+        TextLineParseResult pr = testTextLineParser(parts, charset, "#-#");
         Assert.assertEquals("", pr.getFieldName()); // must hold always, no deeper indexes supported
 
-        InputConverter<String> conv = TextLineParser.CONVERTER;
+        TextLineParserConverter conv = TextLineParser.CONVERTER; // unusual, ask parser, just for test
         Assert.assertEquals(parts[0], conv.toString(pr.getData("fieldX", 0)));
         Assert.assertEquals(parts[1], conv.toString(pr.getData("field2", 1)));
         Assert.assertEquals(parts[1], conv.toString(pr.getData("f", 1)));
@@ -74,7 +74,7 @@ public class TextLineParserTest {
      * @return the parse result for further tests
      * @throws IOException in case that parsing fails
      */
-    private ParseResult<String> testTextLineParser(String[] parts, String charset, String separator) 
+    private TextLineParseResult testTextLineParser(String[] parts, String charset, String separator) 
         throws IOException {
         String testString = "";
         for (String p: parts) {
@@ -85,7 +85,7 @@ public class TextLineParserTest {
         }
         TextLineParser parser = new TextLineParser(charset, separator);
         Assert.assertNotNull(parser.getConverter());
-        ParseResult<String> result = parser.parse(testString.getBytes(charset));
+        TextLineParseResult result = parser.parse(testString.getBytes(charset));
         Assert.assertNotNull(result);
         Assert.assertEquals(parts.length, result.getDataCount());
         return result;
@@ -96,7 +96,7 @@ public class TextLineParserTest {
      */
     @Test
     public void testConverterFail() {
-        InputConverter<String> conv = TextLineParser.CONVERTER;
+        TextLineParserConverter conv = TextLineParser.CONVERTER;
 
         try {
             conv.toInteger("abba");

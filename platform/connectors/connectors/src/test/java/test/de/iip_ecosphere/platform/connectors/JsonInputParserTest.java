@@ -17,11 +17,9 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.jsoniter.any.Any;
-
-import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
-import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
+import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter;
+import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult;
 
 /**
  * Tests {@link JsonInputParser}.
@@ -37,8 +35,8 @@ public class JsonInputParserTest {
     public void testJsonInputParser() throws IOException {
         JsonInputParser parser = new JsonInputParser();
         String data = "{\"name\": \"abc\", \"value\": 1, \"enum\":20, \"enumName\":\"TEST1\"}";
-        ParseResult<Any> res = parser.parse(data.getBytes());
-        InputConverter<Any> conv = parser.getConverter();
+        JsonParseResult res = parser.parse(data.getBytes());
+        JsonInputConverter conv = parser.getConverter();
         Assert.assertEquals("abc", conv.toString(res.getData("name", 0)));
         Assert.assertEquals(1, conv.toInteger(res.getData("value", 0)));
         Assert.assertEquals(MyEnum.TEST2, conv.toEnum(res.getData("enum", 2), MyEnum.class));

@@ -18,12 +18,12 @@ import java.nio.charset.StandardCharsets;
 import de.iip_ecosphere.platform.connectors.formatter.DummyFormatter;
 import de.iip_ecosphere.platform.connectors.formatter.FormatterUtils;
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter;
-import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter;
+import de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter.TextLineFormatterConverter;
 
 /**
  * Tests {@link TextLineFormatter} functionality.
@@ -39,7 +39,7 @@ public class TextLineFormatterTest {
     public void testFormatter() throws IOException {
         String charset = StandardCharsets.UTF_8.name();
         TextLineFormatter formatter = new TextLineFormatter(charset, "#");
-        OutputConverter<String> conv = formatter.getConverter();
+        TextLineFormatterConverter conv = formatter.getConverter();
         Assert.assertNotNull(conv);
         formatter.add("field1", conv.fromString("abba")); // field names are ignored here
         formatter.add("field2", conv.fromInteger(21));

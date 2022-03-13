@@ -44,7 +44,7 @@ public class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class JsonParseResult implements ParseResult<Any> {
+    public static class JsonParseResult implements ParseResult<Any> {
 
         private Any any;
         private byte[] data;
@@ -153,7 +153,7 @@ public class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class JsonInputConverter implements InputConverter<Any> {
+    public static class JsonInputConverter implements InputConverter<Any> {
 
         @Override
         public int toInteger(Any data) throws IOException {
@@ -246,12 +246,12 @@ public class JsonInputParser implements InputParser<Any> {
     }
     
     @Override
-    public ParseResult<Any> parse(byte[] data) throws IOException {
+    public JsonParseResult parse(byte[] data) throws IOException {
         return new JsonParseResult(data);
     }
 
     @Override
-    public InputConverter<Any> getConverter() {
+    public JsonInputConverter getConverter() {
         return CONVERTER;
     }
 

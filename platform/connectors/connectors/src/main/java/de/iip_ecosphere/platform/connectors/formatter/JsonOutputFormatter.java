@@ -35,7 +35,7 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
     private JsonGenerator gen; // temporary
     private String parentName = ""; // temporary, initial top-level
     
-    private static class JsonOutputConverter implements OutputConverter<IOConsumer<JsonGenerator>> {
+    public static class JsonOutputConverter implements OutputConverter<IOConsumer<JsonGenerator>> {
 
         @Override
         public IOConsumer<JsonGenerator> fromInteger(int data) throws IOException {
@@ -169,7 +169,7 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
     }
 
     @Override
-    public OutputConverter<IOConsumer<JsonGenerator>> getConverter() {
+    public JsonOutputConverter getConverter() {
         return new JsonOutputConverter();
     }
 
