@@ -135,22 +135,93 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
-    // ------------------------- transfer types ---------------------------
+    // ------------------------- parser types ---------------------------
     
-    def String getParserTransferType(MachineParser parser) {
-        "String";
-    }
-    
-    def String getParserTransferType(JsonParser parser) {
-        "com.jsoniter.any.Any";
+    // dispatch basis
+    def String getParserType(MachineParser parser) {
+        "";
     }
 
-    def String getFormatterTransferType(MachineFormatter parser) {
-        "String";
+    // dispatch basis
+    def String getParserConverterType(MachineParser parser) {
+        "";
     }
 
-    def String getFormatterTransferType(JsonFormatter parser) {
-        "IOConsumer<com.fasterxml.jackson.core.JsonGenerator>"
+    // dispatch basis
+    def String getParserResultType(MachineParser parser) {
+        "";
+    }
+
+    def String getParserType(JavaMachineParser parser) {
+        parser.class;
+    }
+
+    def String getParserConverterType(JavaMachineParser parser) {
+        parser.converterClass;
+    }
+
+    def String getParserResultType(JavaMachineParser parser) {
+        parser.resultClass;
+    }
+    
+    def String getParserType(JsonParser parser) {
+        "JsonInputParser";
+    }
+
+    def String getParserConverterType(JsonParser parser) {
+        "JsonInputParser.JsonInputConverter";
+    }
+
+    def String getParserResultType(JsonParser parser) {
+        "JsonInputParser.JsonParseResult";
+    }
+
+    def String getParserType(TextLineParser parser) {
+        "TextLineParser";
+    }
+
+    def String getParserConverterType(TextLineParser parser) {
+        "TextLineParser.TextLineParserConverter";
+    }
+
+    def String getParserResultType(TextLineParser parser) {
+        "TextLineParser.TextLineParseResult";
+    }
+    
+    // ------------------------- formatter types ---------------------------
+
+    // dispatch basis
+    def String getFormatterType(MachineFormatter formatter) {
+        "";
+    }
+
+    // dispatch basis
+    def String getFormatterConverterType(MachineFormatter formatter) {
+        "";
+    }
+
+    def String getFormatterType(JavaMachineFormatter formatter) {
+        formatter.class;
+    }
+
+    def String getFormatterConverterType(JavaMachineFormatter formatter) {
+        formatter.converterClass;
+    }
+
+    def String getFormatterType(TextLineFormatter formatter) {
+        "TextLineFormatter";
+    }
+
+    def String getFormatterConverterType(TextLineFormatter formatter) {
+        "TextLineFormatter.TextLineFormatterConverter";
+    }
+
+    def String getFormatterType(JsonFormatter formatter) {
+        "JsonOutputFormatter";
+    }
+
+    def String getFormatterConverterType(JsonFormatter formatter) {
+        "JsonOutputFormatter.JsonOutputConverter";
     }
     
     // ---------------------------- inits ---------------------------------
@@ -176,8 +247,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def generateInitParser(JavaMachineParser parser, String className) {
-        'parser = (InputParser<${getParserTransferType(parser)}>) ParserUtils.createInstance(
-            ${className}.class.getClassLoader(), "${parser.class}", encoding);'
+        'parser = (${getParserType(parser)}) ParserUtils.createInstance(
+            ${className}.class.getClassLoader(), "${getParserType(parser)}", encoding);'
     }
     
     def generateInitFormatter(String className) {
@@ -201,15 +272,15 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def generateInitFormatter(JavaMachineFormatter formatter, String className) {
-        'formatter = (OutputFormatter<${getFormatterTransferType(formatter)}>) FormatterUtils.createInstance(
-            ${className}.class.getClassLoader(), "${formatter.class}", encoding);'
+        'formatter = (${getFormatterType(formatter)}) FormatterUtils.createInstance(
+            ${className}.class.getClassLoader(), "${getFormatterType(formatter)}", encoding);'
     }
     
     // ---------------------------- attributes ---------------------------------
     
     def generateParserAttribute() {
         if (parser <> null) {
-            'private InputParser<${getParserTransferType(parser)}> parser;'
+            'private ${getParserType(parser)} parser;'
         } else {
             ''
         }
@@ -217,8 +288,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def generateParserFrom(String imTypeName, String pltfTypeName) {
         if (parser <> null) {
-            'ParseResult<${getParserTransferType(parser)}> pr = parser.parse(data);
-            InputConverter<${getParserTransferType(parser)}> inConverter = parser.getConverter(); 
+            '${getParserResultType(parser)} pr = parser.parse(data);
+            ${getParserConverterType(parser)} inConverter = parser.getConverter(); 
             ${pltfTypeName} result = new ${pltfTypeName}${add}();
             ${genFrom(imType, imTypeName, pltfType, pltfTypeName)}
             return result;'
@@ -229,7 +300,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterAttribute() {
         if (formatter <> null) {
-            'private OutputFormatter<${getFormatterTransferType(formatter)}> formatter;'
+            'private ${getFormatterType(formatter)} formatter;'
         } else {
             ''
         }
@@ -237,7 +308,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
-            'OutputConverter<${getFormatterTransferType(formatter)}> outConverter = formatter.getConverter();
+            '${getFormatterConverterType(formatter)} outConverter = formatter.getConverter();
             ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
             return formatter.chunkCompleted();'
         } else {

@@ -34,7 +34,9 @@ project Connectors {
     }
     
     compound JavaMachineParser refines MachineParser {
-       String class; // optional class name, must comply with parser.InputParser 
+       NonEmptyString class; // optional class name, must comply with parser.InputParser 
+       NonEmptyString converterClass;
+       NonEmptyString resultClass;
        String artifact; // optional maven artifact
     }
     
@@ -58,7 +60,8 @@ project Connectors {
     }
     
     compound JavaMachineFormatter refines MachineFormatter {
-       String class; // optional class name, must comply with formatter.OutputFormatter
+       NonEmptyString class; // optional class name, must comply with formatter.OutputFormatter
+       NonEmptyString converterClass;
        String artifact; // optional maven artifact
     }
 

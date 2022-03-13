@@ -168,8 +168,8 @@ project SerializerConfig1 {
         outChannel = "OUT",
         inInterface = refBy(myConnMachineIn), 
         outInterface = refBy(myConnMachineOut),
-        machineFormatter = JavaMachineFormatter{class="my.class.DoesNotExistFormatter", artifact=""},
-        machineParser = JavaMachineParser{class="my.class.DoesNotExistParser", artifact=""}
+        machineFormatter = JavaMachineFormatter{class="TextLineFormatter", converterClass="TextLineFormatter.TextLineFormatterConverter", artifact=""},
+        machineParser = JavaMachineParser{class="JsonInputParser", converterClass="JsonInputParser.JsonInputConverter", resultClass="JsonInputParser.JsonParseResult", artifact=""}
     };
 
     Service myAnonymizerService = JavaService {
