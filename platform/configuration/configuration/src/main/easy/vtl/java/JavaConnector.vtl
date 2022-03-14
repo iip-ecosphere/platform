@@ -219,29 +219,21 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
            "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")${setEnd}"; 
        } else {
            String ex = "access.get(\"" + p +"\")";
-           ex = '${genConvertOp("inConverter", field.type, "to", ex)}';
-           ex;
+           '${genConvertOp("inConverter", field.type, "to", ex)}';
        }
     }
     
-    // TODO Unify genFieldAccess and produceDataTransfer when changing the modelaccess interface 
-    
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
-        String p = mapSourcePath(srcQual, src);
-        if (optWithStepIn) {
-            p = suffixPath(p, "/");
-        }
-        if (genFrom) {
-            "\n" + "access.set(\"${p}\", ${genConvertOp(\"outConverter\", tgt.type, \"from\", getterPath(tgtQual, tgt))});";
-        } else {
-            if (tgt.type.isTypeOf(RecordType)) {
-                "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
+        String acc = genFieldAccess(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt));
+        if (not(genFrom)) {
+            if (tgt.type.isKindOf(RecordType)) {
+                acc = "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
             } else {
-                String ex = 'access.get("${p}")';
-                "\n" + setterPath(tgtQual, tgt, '${genConvertOp("inConverter", tgt.type, "to", ex)}') + ";";
+                acc = "\n" + setterPath(tgtQual, tgt, '${acc}') + ";";
             }            
         }
+        '${acc}'
     }
     
     // called via produceDataTransfer
@@ -257,7 +249,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             '\n\naccess = access.stepInto("${path}");' !<CR>;
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done)}'
-        if (not(genFrom) and optWithStepIn) {
+        if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
             nestedStepCount = nestedStepCount - 1;
             'access = access.stepOut();\n'
         }

@@ -9,6 +9,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     String index = ""; // temporary
     String add = "";
+    Integer nestedStepCount = 0;
     
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -74,6 +75,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         if (fieldName.length() > 0) { // fieldName == "" on top level
             '${q}.set${asMethodNameSuffix(fieldName)}(new ${asTypeName(type.name)}${add}());\n'
             if (optWithStepIn) {
+                nestedStepCount = nestedStepCount + 1;
                 'pr = pr.stepInto("${fieldName}", ${suffixPath(iQual, ",")});\n'
             }
             q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
@@ -94,7 +96,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             index = index + 1;
             '${genFromField(q, n, f.name, tq, f.type, iq)}'
         }
-        if (optWithStepIn) {
+        if (optWithStepIn and nestedStepCount > 0) {
+            nestedStepCount = nestedStepCount - 1;
             'pr = pr.stepOut();\n'
         }
     }
