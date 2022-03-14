@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
@@ -182,34 +184,57 @@ public class JsonInputParser implements InputParser<Any> {
         @Override
         public JsonParseResult stepInto(String name, int index) throws IOException {
             Any nested = any.get(name);
+            boolean deserialized = false;
             if (nested.valueType() == ValueType.INVALID) { // fallback
                 EntryIterator it = findBy(index);
                 if (null != it) {
                     nested = it.value();
-                    if (nested.valueType() == ValueType.STRING) { // step into assumes an object, try to parse
-                        nested = JsonIterator.deserialize(nested.toString());
-                    }
                 } else {
                     throw new IndexOutOfBoundsException("No entry found for " + index);
                 }
             }
-            byte[] dta = data;
-            try { // no direct access but we need the correct slice of the underlying input data
-                Class<?> cls = Class.forName("com.jsoniter.any.LazyAny");
-                if (cls.isInstance(nested)) {
-                    Field headField = cls.getDeclaredField("head");
-                    headField.setAccessible(true);
-                    Field tailField = cls.getDeclaredField("tail");
-                    tailField.setAccessible(true);
-                    int head = (int) headField.get(nested);
-                    int tail = (int) tailField.get(nested);
-                    dta = new byte[tail - head]; // exclude tail
-                    System.arraycopy(data, head, dta, 0, dta.length);
+            if (nested.valueType() != ValueType.INVALID) { // fallback
+                if (nested.valueType() == ValueType.STRING) { // step into assumes an object, try to parse
+                    nested = JsonIterator.deserialize(nested.toString());
+                    deserialized = true;
                 }
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
+                byte[] topData = getTopData();
+                byte[] actData = topData; // jsoniter parsing happens on the same array
+                try { // no direct access but we need the correct slice of the underlying input data for indexes
+                    Class<?> cls = Class.forName("com.jsoniter.any.LazyAny");
+                    if (cls.isInstance(nested)) {
+                        Field headField = cls.getDeclaredField("head");
+                        headField.setAccessible(true);
+                        Field tailField = cls.getDeclaredField("tail");
+                        tailField.setAccessible(true);
+                        int head = (int) headField.get(nested);
+                        int tail = (int) tailField.get(nested);
+                        actData = new byte[tail - head]; // exclude tail
+                        System.arraycopy(topData, head, actData, 0, actData.length);
+                        if (deserialized) {
+                            String tmp = StringEscapeUtils.unescapeJson(new String(actData));
+                            actData = tmp.getBytes();
+                        }
+                    }
+                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                    throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
+                }
+                return new JsonParseResult(actData, nested, this);
+            } else {
+                throw new IOException("Cannot determine element for " + name + " index: " + index);
             }
-            return new JsonParseResult(dta, nested, this);
+        }
+
+        /**
+         * Returns the original input data array from the top-level parser result. 
+         * @return the data
+         */
+        private byte[] getTopData() {
+            JsonParseResult ptr = this;
+            while (ptr.parent != null) {
+                ptr = ptr.parent;
+            }
+            return ptr.data;
         }
 
         @Override
