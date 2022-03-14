@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -48,6 +49,7 @@ public class JsonInputParser implements InputParser<Any> {
 
         private Any any;
         private byte[] data;
+        private JsonParseResult parent;
 
         /**
          * Creates a parse result instance.
@@ -55,10 +57,22 @@ public class JsonInputParser implements InputParser<Any> {
          * @param data the data to parse/deserialize
          */
         private JsonParseResult(byte[] data) {
-            this.any = JsonIterator.deserialize(data);
-            this.data = data;
+            this(data, JsonIterator.deserialize(data), null);
         }
-        
+
+        /**
+         * Creates a parse result instance.
+         * 
+         * @param data the data to parse/deserialize
+         * @param any the jsoniter object representing the context
+         * @param parent the parent parse result to jump back to in {@link #stepOut()}.
+         */
+        private JsonParseResult(byte[] data, Any any, JsonParseResult parent) {
+            this.any = any;
+            this.data = data;
+            this.parent = parent;
+        }
+
         @Override
         public int getDataCount() {
             return any.size();
@@ -108,6 +122,25 @@ public class JsonInputParser implements InputParser<Any> {
             }
             return result;
         }
+        
+        /**
+         * Searches for the entry at position {@code index}.
+         * 
+         * @param index the index to search for
+         * @return the entry iterator pointing to the index or <b>null</b> for none
+         */
+        private EntryIterator findBy(int index) {
+            EntryIterator result = null;
+            Any tmp = JsonIterator.deserialize(data); // ensure (lazy) iterator :(
+            EntryIterator it = tmp.entries();
+            while (index >= 0 && it.next()) {
+                if (index == 0) {
+                    result = it;
+                }
+                index--;
+            }                    
+            return result;
+        }
 
         @Override
         public Any getData(String name, int... indexes) {
@@ -144,6 +177,44 @@ public class JsonInputParser implements InputParser<Any> {
                 throw new IndexOutOfBoundsException("No entry found for " + name);
             }
             return result;
+        }
+
+        @Override
+        public JsonParseResult stepInto(String name, int index) throws IOException {
+            Any nested = any.get(name);
+            if (nested.valueType() == ValueType.INVALID) { // fallback
+                EntryIterator it = findBy(index);
+                if (null != it) {
+                    nested = it.value();
+                    if (nested.valueType() == ValueType.STRING) { // step into assumes an object, try to parse
+                        nested = JsonIterator.deserialize(nested.toString());
+                    }
+                } else {
+                    throw new IndexOutOfBoundsException("No entry found for " + index);
+                }
+            }
+            byte[] dta = data;
+            try { // no direct access but we need the correct slice of the underlying input data
+                Class<?> cls = Class.forName("com.jsoniter.any.LazyAny");
+                if (cls.isInstance(nested)) {
+                    Field headField = cls.getDeclaredField("head");
+                    headField.setAccessible(true);
+                    Field tailField = cls.getDeclaredField("tail");
+                    tailField.setAccessible(true);
+                    int head = (int) headField.get(nested);
+                    int tail = (int) tailField.get(nested);
+                    dta = new byte[tail - head]; // exclude tail
+                    System.arraycopy(data, head, dta, 0, dta.length);
+                }
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
+            }
+            return new JsonParseResult(dta, nested, this);
+        }
+
+        @Override
+        public JsonParseResult stepOut() {
+            return parent;
         }
         
     }

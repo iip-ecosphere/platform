@@ -118,8 +118,8 @@ public class MachineDataOutputTranslator<S> extends AbstractConnectorOutputTypeT
         }
         String vendor = customizer.getVendor(access);
         return new MachineData(
-            (int) access.get(customizer.getQNameVarLotSize()), 
-            (double) access.get(customizer.getQNameVarPowerConsumption()), 
+            access.getInputConverter().toInteger(access.get(customizer.getQNameVarLotSize())),
+            access.getInputConverter().toDouble(access.get(customizer.getQNameVarPowerConsumption())),
             vendor);
     }
 

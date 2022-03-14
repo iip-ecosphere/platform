@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
+import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
 /**
@@ -264,6 +265,16 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         @Override
         protected ConnectorParameter getConnectorParameter() {
             return params;
+        }
+
+        @Override
+        public ModelAccess stepInto(String name) throws IOException {
+            return this; // so far untested here
+        }
+
+        @Override
+        public ModelAccess stepOut() {
+            return this;  // so far untested here
         }
         
     }

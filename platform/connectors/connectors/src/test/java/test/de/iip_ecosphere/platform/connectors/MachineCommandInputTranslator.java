@@ -99,7 +99,7 @@ public class MachineCommandInputTranslator<O> extends AbstractConnectorInputType
             access.call(customizer.getQNameOperationStopMachine());
         }
         if (data.getLotSize() > 0) {
-            access.set(customizer.getQNameVarLotSize(), data.getLotSize());
+            access.set(customizer.getQNameVarLotSize(), access.getOutputConverter().fromInteger(data.getLotSize()));
         }
         customizer.additionalFromActions(access, data);
         try {  // property does not exist

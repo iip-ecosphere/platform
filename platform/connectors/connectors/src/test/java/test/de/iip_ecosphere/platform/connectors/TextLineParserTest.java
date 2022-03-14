@@ -63,6 +63,12 @@ public class TextLineParserTest {
         charset = StandardCharsets.ISO_8859_1.name();
         testTextLineParser(parts, charset, "#");
         testTextLineParser(parts, charset, "#-#");
+        
+        pr = pr.stepInto("x", 1); // relocate 1 to 0
+        Assert.assertEquals(parts[1], conv.toString(pr.getData("field2", 0)));
+        Assert.assertEquals(0.45, conv.toDouble(pr.getData("f", 2)), 0.01);
+        pr = pr.stepOut(); // reset relocation
+        Assert.assertEquals(parts[0], conv.toString(pr.getData("fieldX", 0)));
     }
     
     /**

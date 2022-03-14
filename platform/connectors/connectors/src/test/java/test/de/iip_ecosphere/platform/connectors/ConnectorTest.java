@@ -27,6 +27,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParamete
 import de.iip_ecosphere.platform.connectors.ConnectorRegistry;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
+import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
+import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
@@ -174,11 +176,13 @@ public class ConnectorTest {
         public Object from(Command data) throws IOException {
             // the actual job - translate the command
             ModelAccess acc = getModelAccess();
-            acc.set("sProp", data.getCommand());
+            ModelInputConverter inConv = acc.getInputConverter(); 
+            ModelOutputConverter outConv = acc.getOutputConverter(); 
+            acc.set("sProp", outConv.fromString(data.getCommand()));
             // and some testing
-            Assert.assertEquals(10, acc.get("iProp"));
-            Assert.assertEquals(data.getCommand(), acc.get("sProp"));
-            Assert.assertEquals(2.3, (double) acc.get("dProp"), 0.01);
+            Assert.assertEquals(10, inConv.toInteger(acc.get("iProp")));
+            Assert.assertEquals(data.getCommand(), inConv.toString(acc.get("sProp")));
+            Assert.assertEquals(2.3, inConv.toDouble(acc.get("dProp")), 0.01);
             MyStruct s = acc.getStruct("struct", MyStruct.class);
             Assert.assertNotNull(s);
             Assert.assertEquals("xmas", s.data);
@@ -219,10 +223,11 @@ public class ConnectorTest {
         @Override
         public void initializeModelAccess() throws IOException {
             ModelAccess acc = getModelAccess();
+            ModelOutputConverter oConv = acc.getOutputConverter();
             // for test - populate the model
-            acc.set("iProp", 10);
-            acc.set("sProp", "HERE");
-            acc.set("dProp", 2.3);
+            acc.set("iProp", oConv.fromInteger(10));
+            acc.set("sProp", oConv.fromString("HERE"));
+            acc.set("dProp", oConv.fromDouble(2.3));
             acc.setStruct("struct", new MyStruct("xmas"));
             acc.useNotifications(withEvents);
         }
@@ -230,6 +235,7 @@ public class ConnectorTest {
         @Override
         public Product to(Object source) throws IOException {
             ModelAccess acc = getModelAccess();
+            ModelInputConverter iConv = acc.getInputConverter();
             // some testing
             Assert.assertTrue(acc.getQSeparator().length() > 0);
             Assert.assertEquals("", acc.qName());
@@ -244,12 +250,12 @@ public class ConnectorTest {
             Assert.assertEquals("a" + acc.getQSeparator() + "b", acc.iqName("a", "", "b"));
             Assert.assertEquals("", acc.iqName());
             Assert.assertEquals("", acc.iqName(""));
-            Assert.assertEquals(10, acc.get("iProp"));
+            Assert.assertEquals(10, iConv.toInteger(acc.get("iProp")));
             MyStruct s = acc.getStruct("struct", MyStruct.class);
             Assert.assertNotNull(s);
             Assert.assertEquals("xmas", s.data);
             // and the actual job
-            return new Product((String) acc.get("sProp"), (double) acc.get("dProp"));
+            return new Product(iConv.toString(acc.get("sProp")), iConv.toDouble(acc.get("dProp")));
         }
 
         @Override
@@ -319,6 +325,16 @@ public class ConnectorTest {
             @Override
             protected ConnectorParameter getConnectorParameter() {
                 return null; // unused
+            }
+
+            @Override
+            public ModelAccess stepInto(String name) throws IOException {
+                return this;
+            }
+
+            @Override
+            public ModelAccess stepOut() {
+                return this;
             }
         };
 

@@ -45,6 +45,28 @@ public class TextLineParser implements InputParser<String> {
         protected TextLineParseResult(String[] data) {
             super(data);
         }
+        
+        /**
+         * Creates an array-based parse result.
+         * 
+         * @param data the parsed data
+         * @param baseIndex the base index set as context root, {code 0} for top-level
+         * @param parent the parent result representing the context where a {@code #stepInto(String, int)} happened, 
+         *     <b>null</b> for the top context
+         */
+        protected TextLineParseResult(String[] data, int baseIndex, ArrayParseResult parent) {
+            super(data, baseIndex, parent);
+        }
+
+        @Override
+        public TextLineParseResult stepInto(String name, int index) {
+            return new TextLineParseResult(getData(), index, this);
+        }
+
+        @Override
+        public TextLineParseResult stepOut() {
+            return (TextLineParseResult) super.stepOut();
+        }
 
     }
     

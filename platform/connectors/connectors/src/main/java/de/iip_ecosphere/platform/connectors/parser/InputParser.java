@@ -74,6 +74,25 @@ public interface InputParser<T> {
          *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
          */
         public T getData(String name, int... indexes);
+        
+        /**
+         * Sets the hierarchical substructure denoted by {@code name} as current scope for further resolution.
+         * When overriding, declare the actual type as result type.
+         * 
+         * @param name non-hierarchical name of contained substructure
+         * @param index the 0-based indexes to the field, must be less than {@link #getDataCount()}
+         * @return the sub parse-result taking {@code name} as context, use {@code #stepOut()} to leave that context
+         * @throws IOException if stepping into fails for some reason
+         */
+        public ParseResult<T> stepInto(String name, int index) throws IOException;
+        
+        /**
+         * Steps out of the actual context set by {@link #stepInto(String, int)}.
+         * When overriding, declare the actual type as result type.
+         * 
+         * @return the actual (parent) context, may be <b>null</b> if this step out was illegal in a non-nested context
+         */
+        public ParseResult<T> stepOut();
 
         /**
          * Returns the name of the field. This operation may not be efficient on all input parsers, in particular

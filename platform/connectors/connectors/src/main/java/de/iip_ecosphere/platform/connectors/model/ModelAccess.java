@@ -198,5 +198,41 @@ public interface ModelAccess {
      * @param notifications {@code true} for notifications, {@code false} for polling
      */
     public void useNotifications(boolean notifications);
+
+    /**
+     * Returns the input converter instance.
+     * 
+     * @return the input converter
+     */
+    public default ModelInputConverter getInputConverter() {
+        return ModelInputConverter.INSTANCE;
+    }
+
+    /**
+     * Returns the output converter instance.
+     * 
+     * @return the output converter
+     */
+    public default ModelOutputConverter getOutputConverter() {
+        return ModelOutputConverter.INSTANCE;
+    }
+
+    /**
+     * Sets the hierarchical substructure denoted by {@code name} as current scope for further resolution.
+     * When overriding, declare the actual type as result type.
+     * 
+     * @param name non-hierarchical name of contained substructure
+     * @return the sub parse-result taking {@code name} as context, use {@code #stepOut()} to leave that context
+     * @throws IOException if stepping into fails for some reason
+     */
+    public ModelAccess stepInto(String name) throws IOException;
+    
+    /**
+     * Steps out of the actual context set by {@link #stepInto(String)}.
+     * When overriding, declare the actual type as result type.
+     * 
+     * @return the actual (parent) context, may be <b>null</b> if this step out was illegal in a non-nested context
+     */
+    public ModelAccess stepOut();
     
 }
