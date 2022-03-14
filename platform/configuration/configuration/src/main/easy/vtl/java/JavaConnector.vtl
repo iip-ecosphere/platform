@@ -204,18 +204,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // called via translateDataOperations
     def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value) {
        if (set) {
-           "access.set(\"" + path + "/" + field.name +"\", " + value + ")${setEnd}"; 
+           "access.set(\"" + path + "/" + field.name +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")${setEnd}"; 
        } else {
            String ex = "access.get(\"" + path + "/" + field.name +"\")";
            ex = '${genConvertOp("inConverter", field.type, "to", ex)}';
-           /*if (field.type.isTypeOf(EnumType)) { // PRELIMINARY!!!
-              ex = "IipEnum.valueByModelOrdinal(${toTypeName(field.type)}.class, (int)${ex})";
-           } else {
-               String c = cast(field.type);
-               if (c.length() > 0) {
-                   ex = "(" + c + " " + ex + ")";
-               }
-           }*/
            ex;
        }
     }
@@ -225,15 +217,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
         if (genFrom) {
-            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${getterPath(tgtQual, tgt)});";
+            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${genConvertOp(\"outConverter\", tgt.type, \"from\", getterPath(tgtQual, tgt))});";
         } else {
-            /*if (tgt.type.isTypeOf(EnumType)) {
-                "\n" + setterPath(tgtQual, tgt, 'IipEnum.valueByModelOrdinal(${toTypeName(tgt.type)}.class, (int)access.get("${mapSourcePath(srcQual, src)}"))') + ";";
-            } else if (tgt.type.isTypeOf(RecordType)) {
-                "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
-            } else {
-                "\n" + setterPath(tgtQual, tgt, '${cast(src.type)}access.get("${mapSourcePath(srcQual, src)}")') + ";";
-            }*/
             if (tgt.type.isTypeOf(RecordType)) {
                 "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
             } else {
@@ -308,6 +293,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             public ${coType} to(${oType} source) throws IOException {
                 ModelAccess access = getModelAccess();
                 ModelInputConverter inConverter = access.getInputConverter();
+                ModelOutputConverter outConverter = access.getOutputConverter();
                 ${coType} result = new ${coType}${add}();
                 ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations)}
                 return result; 
@@ -347,6 +333,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public ${iType} from(${ciType} data) throws IOException {
                 ModelAccess access = getModelAccess();
+                ModelInputConverter inConverter = access.getInputConverter();
                 ModelOutputConverter outConverter = access.getOutputConverter();
                 ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations)}
                 return null; // done, no instance of pseudo type
