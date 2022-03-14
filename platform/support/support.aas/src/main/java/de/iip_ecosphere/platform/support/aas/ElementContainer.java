@@ -3,7 +3,7 @@ package de.iip_ecosphere.platform.support.aas;
 /**
  * Represents an element container.
  */
-public interface ElementContainer {
+public interface ElementContainer extends ElementsAccess {
 
     /**
      * Returns all sub-model elements in the element container.

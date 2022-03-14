@@ -17,7 +17,7 @@ package de.iip_ecosphere.platform.support.aas;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface SubmodelElementCollection extends SubmodelElement {
+public interface SubmodelElementCollection extends SubmodelElement, ElementsAccess {
     
     /**
      * The submodel element collection builder.
@@ -42,54 +42,6 @@ public interface SubmodelElementCollection extends SubmodelElement {
      * @return all elements
      */
     public Iterable<SubmodelElement> elements();
-
-    /**
-     * Returns a data element with the given name.
-     * 
-     * @param idShort the short id of the data element
-     * @return the data element, <b>null</b> for none
-     */
-    public DataElement getDataElement(String idShort);
-
-    /**
-     * Returns a property with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the property, <b>null</b> for none
-     */
-    public Property getProperty(String idShort);
-
-    /**
-     * Returns an operation with the given name.
-     * 
-     * @param idShort the short id of the operation
-     * @return the operation, <b>null</b> for none
-     */
-    public Operation getOperation(String idShort);
-
-    /**
-     * Returns a reference element with the given name.
-     * 
-     * @param idShort the short id of the reference element
-     * @return the property, <b>null</b> for none
-     */
-    public ReferenceElement getReferenceElement(String idShort);
-
-    /**
-     * Returns a submodel element with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the submodel element, <b>null</b> for none
-     */
-    public SubmodelElement getElement(String idShort);
-
-    /**
-     * Returns a sub-model element collection with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the sub-model collection element, <b>null</b> for none
-     */
-    public SubmodelElementCollection getSubmodelElementCollection(String idShort);
     
     /**
      * Returns the number of elements.
@@ -98,6 +50,14 @@ public interface SubmodelElementCollection extends SubmodelElement {
      */
     public int getElementsCount();
 
+    /**
+     * Returns a submodel element with the given name.
+     * 
+     * @param idShort the short id of the property
+     * @return the submodel element, <b>null</b> for none
+     */
+    public SubmodelElement getElement(String idShort);
+    
     /**
      * Creates a reference to this collection.
      * 

@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
  * @author Holger Eichelberger, SSE
 */
 public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiable, HasDataSpecification, HasKind, 
-    ElementContainer, DeferredParent {
+    ElementContainer, DeferredParent, ElementsAccess {
 
     /**
      * Encapsulated logic to build a sub-model.
@@ -40,52 +40,12 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     }
 
     /**
-     * Returns a data element with the given name.
-     * 
-     * @param idShort the short id of the data element
-     * @return the data element, <b>null</b> for none
-     */
-    public DataElement getDataElement(String idShort);
-
-    /**
-     * Returns a property with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the property, <b>null</b> for none
-     */
-    public Property getProperty(String idShort);
-
-    /**
-     * Returns a reference element with the given name.
-     * 
-     * @param idShort the short id of the reference element
-     * @return the property, <b>null</b> for none
-     */
-    public ReferenceElement getReferenceElement(String idShort);
-
-    /**
-     * Returns an operation with the given short name.
-     * 
-     * @param idShort the short id of the property
-     * @return the operation, <b>null</b> for none
-     */
-    public Operation getOperation(String idShort);
-
-    /**
      * Returns a sub-model element with the given name.
      * 
      * @param idShort the short id of the property
      * @return the sub-model element, <b>null</b> for none
      */
     public SubmodelElement getSubmodelElement(String idShort);
-
-    /**
-     * Returns a sub-model element collection with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the sub-model collection element, <b>null</b> for none
-     */
-    public SubmodelElementCollection getSubmodelElementCollection(String idShort);
 
     /**
      * Returns a sub-model elements collection builder either by providing access to an existing collection or through 
