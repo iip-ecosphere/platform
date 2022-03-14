@@ -83,9 +83,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             } else {
                 iq = "" + index;
             }
-            String s = genFromField(q, n, f.name, tq, f.type, iq);
             index = index + 1;
-            '${s}'
+            '${genFromField(q, n, f.name, tq, f.type, iq)}'
         }
     }
     
