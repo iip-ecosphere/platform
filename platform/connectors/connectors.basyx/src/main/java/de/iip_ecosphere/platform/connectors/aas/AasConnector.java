@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +30,11 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
  * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
@@ -184,12 +188,28 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
+        private ElementsAccess base;
+        private AasModelAccess parent;
+        private Map<String, ElementsAccess> elements = new HashMap<>();
 
         /**
          * Creates the instance and binds the listener to the creating connector instance.
          */
         protected AasModelAccess() {
             super(AasConnector.this);
+        }
+        
+        /**
+         * Creates the instance and binds the listener to the creating connector instance.
+         * Sets a resolution context by the given submodel/collection.
+         * 
+         * @param base the element to resolve on
+         * @param parent the return parent for {@link #stepOut()}
+         */
+        protected AasModelAccess(ElementsAccess base, AasModelAccess parent) {
+            this();
+            this.base = base;
+            this.parent = parent;
         }
         
         @Override
@@ -211,23 +231,86 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          */
         private Property findProperty(String qName) throws IOException {
             Property result = null;
-            int pos = qName.indexOf(SEPARATOR_CHAR);
+            int pos = qName.lastIndexOf(SEPARATOR_CHAR);
+            ElementsAccess element;
+            String propName = qName;
             if (pos > 1) {
-                String subModelName = qName.substring(0, pos);
-                String elementName = qName.substring(pos + 1);
-                Submodel subModel = connectedAAS.getSubmodel(subModelName);
-                if (null != subModel) {
-                    Property prop = subModel.getProperty(elementName);
-                    if (null == prop) {
-                        throw new IOException("Property " + elementName + " in " + qName + " does not exist");
+                element = retrieveElement(qName.substring(0, pos));
+                propName = qName.substring(pos + 1);
+            } else {
+                element = base; // context case
+            }
+            if (element != null) {
+                result = element.getProperty(propName);
+            } 
+            if (null == result) {
+                throw new IOException("Cannot find property " + qName);
+            }
+            return result;
+        }
+        
+        /**
+         * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
+         * Takes into account {@link #nodes the nodes cache}.
+         * 
+         * @param qName the qualified node name
+         * @return the node
+         * @throws IOException if no node can be found for {@code qName}
+         */
+        private ElementsAccess retrieveElement(String qName) throws IOException {
+            ElementsAccess result = elements.get(qName);
+            if (null == result) {
+                result = base;
+                String path = qName;
+                if (null == result) {
+                    int pos = qName.indexOf(SEPARATOR_CHAR);
+                    if (pos > 0) {
+                        result = connectedAAS.getSubmodel(qName.substring(0, pos));
+                        path = qName.substring(pos + 1);
                     } else {
-                        result = prop;
+                        result = connectedAAS.getSubmodel(qName);
+                        path = null;
                     }
+                } 
+                if (path != null && result != null) {
+                    result = retrieveElement(result, path);    
+                }
+                if (null == result) {
+                    throw new IOException("No element found for " + qName);
                 } else {
-                    throw new IOException("Submodel " + subModelName + " in " + qName + " does not exist");    
+                    elements.put(qName, result);
+                }
+            }
+            return result;
+        }
+        
+        /**
+         * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
+         * 
+         * @param current the current not to start searching for
+         * @param qName the qualified node name
+         * @return the node or <b>null</b> for none found
+         */
+        private ElementsAccess retrieveElement(ElementsAccess current, String qName) {
+            ElementsAccess result = null;
+            int pos = qName.indexOf(SEPARATOR_CHAR);
+            String nodeName;
+            String remainder = null;
+            if (pos > 0) {
+                nodeName = qName.substring(0, pos);
+                if (pos + 1 < qName.length()) {
+                    remainder = qName.substring(pos + 1);
                 }
             } else {
-                throw new IOException("No qualification/submodel given in " + qName);
+                nodeName = qName;
+            }
+            ElementsAccess tmp = current.getSubmodelElementCollection(nodeName);
+            if (null != tmp) {
+                if (null == remainder) {
+                    result = tmp;
+                } else {
+                    result = retrieveElement(tmp, remainder);
+                }
             }
             return result;
         }
@@ -237,27 +320,27 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         @Override
         public Object call(String qName, Object... args) throws IOException {
             Object result = null;
-            int pos = qName.indexOf(SEPARATOR_CHAR);
+            Operation operation = null;
+            int pos = qName.lastIndexOf(SEPARATOR_CHAR);
+            ElementsAccess element;
+            String opName = qName;
             if (pos > 1) {
-                String subModelName = qName.substring(0, pos);
-                String operationName = qName.substring(pos + 1);
-                Submodel subModel = connectedAAS.getSubmodel(subModelName);
-                if (null != subModel) {
-                    Operation operation = subModel.getOperation(operationName);
-                    if (null != operation) {
-                        try {
-                            result = operation.invoke(args);
-                        } catch (Exception e) {
-                            throw new IOException("While calling " + operationName + ": " + e.getMessage(), e);
-                        }
-                    } else {
-                        throw new IOException("Operation " + operationName + " in " + qName + " does not exist");
-                    }
-                } else {
-                    throw new IOException("Submodel " + subModelName + "in " + qName + " does not exist");    
+                element = retrieveElement(qName.substring(0, pos));
+                opName = qName.substring(pos + 1);
+            } else {
+                element = base; // context case
+            }
+            if (element != null) {
+                operation = element.getOperation(opName);
+            }
+            if (operation != null) {
+                try {
+                    result = operation.invoke(args);
+                } catch (Exception e) {
+                    throw new IOException("While calling " + qName + ": " + e.getMessage(), e);
                 }
             } else {
-                throw new IOException("No qualification/submodel given in " + qName);
+                throw new IOException("Cannot find operation " + qName);
             }
             return result;
         }
@@ -310,6 +393,30 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         @Override
         protected ConnectorParameter getConnectorParameter() {
             return params;
+        }
+
+        @Override
+        public AasModelAccess stepInto(String name) throws IOException {
+            AasModelAccess result = null;
+            if (null == base) {
+                Submodel submodel = connectedAAS.getSubmodel(name);
+                if (null == submodel) {
+                    throw new IOException("Submodel " + name + " not found. Cannot resolve further.");
+                }
+                result = new AasModelAccess(submodel, this);
+            } else {
+                SubmodelElementCollection coll = base.getSubmodelElementCollection(name);
+                if (null == coll) {
+                    throw new IOException("Collection " + name + " not found. Cannot resolve further.");
+                }
+                result = new AasModelAccess(coll, this);
+            }
+            return result;
+        }
+
+        @Override
+        public AasModelAccess stepOut() {
+            return parent;
         }
         
     }

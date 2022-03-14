@@ -358,13 +358,27 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      */
     protected class OpcUaModelAccess extends AbstractModelAccess {
 
-        private Map<String, UaNode> nodes = new HashMap<String, UaNode>();
+        private Map<String, UaNode> nodes = new HashMap<>();
+        private UaNode base;
+        private OpcUaModelAccess parent;
         
         /**
          * Creates the instance and binds the listener to the creating connector instance.
          */
         protected OpcUaModelAccess() {
             super(OpcUaConnector.this);
+        }
+        
+        /**
+         * Creates the instance and binds the listener to the creating connector instance.
+         * 
+         * @param base the context node to resolve non-nested names on
+         * @param parent the parent to return to in {@link #stepOut()}
+         */
+        protected OpcUaModelAccess(UaNode base, OpcUaModelAccess parent) {
+            this();
+            this.base = base;
+            this.parent = parent;
         }
 
         @Override
@@ -476,7 +490,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         private UaNode retrieveNode(String qName) throws UaException, IOException {
             UaNode result = nodes.get(qName);
             if (null == result) {
-                result = retrieveNode(null, qName);
+                result = retrieveNode(base, qName);
                 if (null == result) {
                     throw new IOException("No node found for " + qName);
                 } else {
@@ -824,6 +838,20 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             } catch (IOException e) {
                 LOGGER.info("While triggering reception", e);
             }
+        }
+
+        @Override
+        public OpcUaModelAccess stepInto(String name) throws IOException {
+            try {
+                return new OpcUaModelAccess(retrieveNode(name), this);
+            } catch (UaException e) {
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public OpcUaModelAccess stepOut() {
+            return parent;
         }
         
     }
