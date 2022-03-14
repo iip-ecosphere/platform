@@ -340,14 +340,14 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom) {
-        "'DT#'YYYY-MM-dd-HH:mm:ss.SS"
+        "\"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
     }
     
     def convParam(EnumType type, Boolean convFrom) {
         if (convFrom) {
-            toTypeName(type) + ".class";
-        } else {
             ""
+        } else {
+            toTypeName(type) + ".class";
         }
     }
     
@@ -360,7 +360,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         String convertOp = prefix + convName(type);
         String convP = convParam(type, prefix=="from");
         if (convP.length() > 0) {
-            convP = ", \"${convP}\"";
+            convP = ", ${convP}";
         }
         '${converter}.${prefix}${convName(type)}(${data}${convP})'
     }
