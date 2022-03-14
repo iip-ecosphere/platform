@@ -60,19 +60,21 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type, String iQual) {
-        String data = "pr.getData(\"${name}\", ${iQual})";
+        //String data = "pr.getData(\"${ame}\", ${iQual})";
+        String data = 'pr.getData(\"${fieldName}\", ${suffixPath(iQual, ",")})';
         '${qual}.set${asMethodNameSuffix(fieldName)}(${genConvertOp("inConverter", type, "to", data)});'
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
-           '${q}.set${asMethodNameSuffix(fieldName)}(new ${asTypeName(type.name)}${add}());\n'
-           q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
+            '${q}.set${asMethodNameSuffix(fieldName)}(new ${asTypeName(type.name)}${add}());\n
+            pr = pr.stepInto("${fieldName}", ${suffixPath(iQual, ",")});\n'
+            q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
         }
         String tq = type.name + ".";
         int index = 0;
-        for (Field f : type.fields, "\n") {
+        for (Field f : type.fields) {
             String n = f.name;
             if (name.length() > 0) {
                n = name + "." + n;
@@ -86,6 +88,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             index = index + 1;
             '${genFromField(q, n, f.name, tq, f.type, iq)}'
         }
+        'pr = pr.stepOut();\n'
     }
     
     // ---------------------------------- genTo -------------------------------------

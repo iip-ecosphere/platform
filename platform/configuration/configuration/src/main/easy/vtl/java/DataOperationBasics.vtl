@@ -255,12 +255,23 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         false; // do recursive as we currently assume temporary instance before
     }
     
+    // returns the prefix before the last sep in path
     def prefixPath(String path, String sep) {
         Integer pos = path.rfind(sep);
         if (pos <= 0) {
             "";
         } else {
             path.substring(0, pos);
+        }
+    }
+    
+    // returns the tail after the last sep in path
+    def suffixPath(String path, String sep) {
+        Integer pos = path.rfind(sep);
+        if (pos <= 0) {
+            path;
+        } else {
+            path.substring(pos + 1);
         }
     } 
     
