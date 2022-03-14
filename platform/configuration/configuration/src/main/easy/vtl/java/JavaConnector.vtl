@@ -7,6 +7,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     Boolean genFrom = false; // temporary
     String add = "";
+    String topPath = "";
+    Integer nestedStepCount = 0;
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
     // dispatch basis
@@ -194,7 +196,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
         genFrom = false;
         setOf(String) done = {};
-        String imTypePath = imType.path;
+        topPath = imType.path;
+        String imTypePath = "";
+        if (not(optWithStepIn)) {
+             imTypePath = topPath;
+        }
         '${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}'
         mapOf(String, Field) mapping = {};
         mapSourcePaths(imType, mapping, imTypePath);
@@ -203,10 +209,16 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // called via translateDataOperations
     def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value) {
-       if (set) {
-           "access.set(\"" + path + "/" + field.name +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")${setEnd}"; 
+       String p;
+       if (optWithStepIn) {
+           p = field.name;
        } else {
-           String ex = "access.get(\"" + path + "/" + field.name +"\")";
+           p = path + "/" + field.name;
+       }
+       if (set) {
+           "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")${setEnd}"; 
+       } else {
+           String ex = "access.get(\"" + p +"\")";
            ex = '${genConvertOp("inConverter", field.type, "to", ex)}';
            ex;
        }
@@ -216,15 +228,38 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+        String p = mapSourcePath(srcQual, src);
+        if (optWithStepIn) {
+            p = suffixPath(p, "/");
+        }
         if (genFrom) {
-            "\n" + "access.set(\"${mapSourcePath(srcQual, src)}\", ${genConvertOp(\"outConverter\", tgt.type, \"from\", getterPath(tgtQual, tgt))});";
+            "\n" + "access.set(\"${p}\", ${genConvertOp(\"outConverter\", tgt.type, \"from\", getterPath(tgtQual, tgt))});";
         } else {
             if (tgt.type.isTypeOf(RecordType)) {
                 "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
             } else {
-                String ex = 'access.get("${mapSourcePath(srcQual, src)}")';
+                String ex = 'access.get("${p}")';
                 "\n" + setterPath(tgtQual, tgt, '${genConvertOp("inConverter", tgt.type, "to", ex)}') + ";";
             }            
+        }
+    }
+    
+    // called via produceDataTransfer
+    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+        if (not(genFrom) and optWithStepIn) {
+            String path = topPath;
+            if (nestedStepCount == 0 and path.length() > 0) {
+                path = path + "/" + field.name;
+            } else {
+                path = field.name;
+            }
+            nestedStepCount = nestedStepCount + 1;
+            '\n\naccess = access.stepInto("${path}");' !<CR>;
+        }
+        '${produceDataTransfer(type, mapping, typeQual, mapQual, done)}'
+        if (not(genFrom) and optWithStepIn) {
+            nestedStepCount = nestedStepCount - 1;
+            'access = access.stepOut();\n'
         }
     }
     
@@ -265,7 +300,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
         genFrom = true;
         setOf(String) done = {};
-        String imTypePath = imType.path;
+        topPath = imType.path;
+        String imTypePath = "";
+        if (not(optWithStepIn)) {
+             imTypePath = topPath;
+        }
         '${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}'
         mapOf(String, Field) mapping = {};
         mapSourcePaths(imType, mapping, imTypePath);
