@@ -44,7 +44,8 @@ import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
     ServiceLoaderUtilsTest.class,
     NoOpServerTest.class,
     LocalInvocationTest.class, 
-    ClassLoaderUtilsTest.class
+    ClassLoaderUtilsTest.class,
+    OsUtilsTest.class
 })
 public class AllTests {
 }
