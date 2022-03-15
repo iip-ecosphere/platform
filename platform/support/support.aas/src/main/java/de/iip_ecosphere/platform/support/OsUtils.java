@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.support;
 
 /**
- * Access to operating system level information.
+ * Access to static operating system level information.
  * 
  * @author Holger Eichelberger, SSE
  */
