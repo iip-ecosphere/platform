@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
+import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Measurement;
@@ -69,15 +70,15 @@ public class MetricsProvider {
     public static final String SIMPLE_METER_LIST = "simplemeterlist";
     
     // Some of the system metrics that we want to expose
-    public static final String SYS_MEM_TOTAL = "system.memory.total";
-    public static final String SYS_MEM_FREE = "system.memory.free";
-    public static final String SYS_MEM_USED = "system.memory.used";
-    public static final String SYS_MEM_USAGE = "system.memory.usage";
+    public static final String SYS_MEM_TOTAL = "Memory_Capacity"; // IDTA
+    public static final String SYS_MEM_FREE = "Memory_Free";
+    public static final String SYS_MEM_USED = "Memory_Used";
+    public static final String SYS_MEM_USAGE = "Allocated_Memory"; // IDTA
 
-    public static final String SYS_DISK_TOTAL = "system.disk.total";
-    public static final String SYS_DISK_FREE = "system.disk.free";
-    public static final String SYS_DISK_USABLE = "system.disk.usable";
-    public static final String SYS_DISK_USED = "system.disk.used";
+    public static final String SYS_DISK_TOTAL = "Storage_Capacity"; // IDTA
+    public static final String SYS_DISK_FREE = "Storage_Free";
+    public static final String SYS_DISK_USABLE = "Storage_Usable";
+    public static final String SYS_DISK_USED = "Allocated_Storage"; // IDTA
 
     // Error Messages
     protected static final String ID_NOT_FOUND_ERRMSG = ": no item found with this identifier!";
@@ -90,6 +91,7 @@ public class MetricsProvider {
 
     // Flag required for correct initialization of system metrics
     private boolean init;
+    private Clock clock;
     
     /* By default, the base unit for the memory metrics is bytes */
     private CapacityBaseUnit memoryBaseUnit = CapacityBaseUnit.BYTES;
@@ -131,6 +133,7 @@ public class MetricsProvider {
 
         // Obtain references for the tools
         this.registry = registry;
+        this.clock = registry.config().clock();
         osmxb = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
         // Initiate the containers
@@ -139,6 +142,15 @@ public class MetricsProvider {
         timers = new HashMap<String, Timer>();
 
         init = true;
+    }
+    
+    /**
+     * Returns the clock used in the underlying meter registry.
+     * 
+     * @return the clock
+     */
+    public Clock getClock() {
+        return clock;
     }
     
     /**

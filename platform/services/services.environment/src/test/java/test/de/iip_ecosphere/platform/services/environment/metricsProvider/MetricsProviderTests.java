@@ -37,7 +37,9 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.metri
     MetricsProviderTest.class,
     
     MetricsExtractorRestClientTest.class,
-    MetricsAasConstructionBundleTest.class
+    MetricsAasConstructionBundleTest.class,
+    
+    MonitoredTranslatingProtocolAdapterTest.class
 })
 public class MetricsProviderTests {
 }

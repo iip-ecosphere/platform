@@ -381,7 +381,7 @@ public class MetricsAasConstructor {
     public static boolean containsMetrics(SubmodelElementCollection sub) {
         return sub.getElement(SYSTEM_DISK_FREE) != null;
     }
-
+    
     /**
      * Adds metrics to the submodel/elements. Metric values are bound against a transport connector receiver.
      * 
@@ -395,7 +395,7 @@ public class MetricsAasConstructor {
         Predicate<String> filter, String channel, String id, TransportSetup setup) {
         
         /* Meter lists */
-        smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
+        /*smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
             .bind(new ListGetter(channel, id, setup, MetricsProvider.GAUGE_LIST), InvocablesCreator.READ_ONLY).build();
         smBuilder.createPropertyBuilder(COUNTER_LIST).setType(Type.STRING)
             .bind(new ListGetter(channel, id, setup, MetricsProvider.COUNTER_LIST), InvocablesCreator.READ_ONLY)
@@ -407,7 +407,7 @@ public class MetricsAasConstructor {
             .build();
         smBuilder.createPropertyBuilder(SIMPLE_METER_LIST).setType(Type.STRING)
             .bind(new ListGetter(channel, id, setup, MetricsProvider.SIMPLE_METER_LIST), InvocablesCreator.READ_ONLY)
-            .build();
+            .build();*/
 
         /* System Disk Capacity metrics, string as JSON meter is transferred  */
         smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
