@@ -17,6 +17,7 @@ import com.profesorfalken.jsensors.model.components.Components;
 import com.profesorfalken.jsensors.model.components.Cpu;
 import com.profesorfalken.jsensors.model.sensors.Temperature;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 
 /**
@@ -65,7 +66,8 @@ public class DefaultSystemMetrics implements SystemMetrics {
     
     @Override
     public int getNumCpuCores() {
-        return null != components.cpus ? components.cpus.size() : 0;
+        // for consistency, neiter seems to work on VMs
+        return null != components.cpus ? components.cpus.size() : OsUtils.getNumCpuCores();
     }
 
 }
