@@ -75,7 +75,7 @@ public class LogRunnable implements Runnable {
                 out.println(rec.activity + "\t" + rec.duration);
                 out.flush();
             }
-            TimeUtils.sleep(100);
+            TimeUtils.sleep(2);
         }
     }
 
