@@ -317,10 +317,9 @@ public class JsonInputParser implements InputParser<Any> {
 
         @Override
         public double[] toDoubleArray(Any data) throws IOException {
-            // Preliminary, performance?
             double[] dta = new double[data.size()]; 
             for (int j = 0; j < dta.length; j++) {
-                dta[j] = data.get(j).toDouble();
+                dta[j] = Double.parseDouble(data.get(j).toString());
             }
             return dta; // exception?
         }
