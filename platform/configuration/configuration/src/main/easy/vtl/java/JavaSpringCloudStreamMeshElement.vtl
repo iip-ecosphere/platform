@@ -309,8 +309,21 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the connector adapter
         */
-        public static ${adapterType(conn)} createConnectorAdapter() {
-            ${adapterCreationFragment(conn, "adapter")};
+        public static ${adapterType(conn, false)} createConnectorAdapter() {
+            return createConnectorAdapter(null, null);
+        }
+        
+        /**
+        * Creates the connector adapter. [public for testing]
+        *
+        * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+        * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
+        *      Only becomes active if {@code metrics} is not <b>null</b>
+        * @return the connector adapter
+        */
+        public static ${adapterType(conn, false)} createConnectorAdapter(
+            de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log) {
+            ${adapterCreationFragment(conn, "adapter", "metrics", "log")};
             return adapter;
         }'
     }
@@ -546,7 +559,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ServiceBase impl = elt.impl;
         'package ${pkg};
         
-        import java.io.IOException;
+        import java.io.*;
         import java.util.*;
         import java.util.function.*;
         import java.util.concurrent.ExecutionException;
@@ -563,6 +576,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
         import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
         import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.services.environment.metricsProvider.MonitoredTranslatingProtocolAdapter;
         import de.iip_ecosphere.platform.services.environment.spring.Starter;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter;
