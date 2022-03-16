@@ -67,18 +67,22 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         } else {
             data = "pr.getData(\"${ame}\", ${iQual})";
         }
-        '${qual}.set${asMethodNameSuffix(fieldName)}(${genConvertOp("inConverter", type, "to", data)});'
+        '${getTemporaryVariable(qual, qual)}.set${asMethodNameSuffix(fieldName)}(${genConvertOp("inConverter", type, "to", data)});'
     }
 
     def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
-            '${q}.set${asMethodNameSuffix(fieldName)}(new ${asTypeName(type.name)}${add}());\n'
+            String nextQ = q + ".get" + asMethodNameSuffix(fieldName) + "()";
+            String cons = "new ${asTypeName(type.name)}${add}()";
+            String stepInto = "\n";
             if (optWithStepIn) {
                 nestedStepCount = nestedStepCount + 1;
-                'pr = pr.stepInto("${fieldName}", ${suffixPath(iQual, ",")});\n'
+                stepInto = '\npr = pr.stepInto("${fieldName}", ${suffixPath(iQual, ",")});';
             }
-            q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
+            '\n${createTemporaryVariable(nextQ, mapSourceSeparator(), type, "${cons}")|e}
+            ${getTemporaryVariable(q, q)}.set${asMethodNameSuffix(fieldName)}(${getTemporaryVariable(nextQ, cons)});${stepInto}'
+            q = nextQ;
         }
         String tq = type.name + ".";
         int index = 0;
@@ -98,7 +102,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
         if (optWithStepIn and nestedStepCount > 0) {
             nestedStepCount = nestedStepCount - 1;
-            'pr = pr.stepOut();\n'
+            'pr = pr.stepOut();'
         }
     }
     
@@ -301,6 +305,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def generateParserFrom(String imTypeName, String pltfTypeName) {
         if (parser <> null) {
+            clearTemporaryVariables();
             '${getParserResultType(parser)} pr = parser.parse(data);
             ${getParserConverterType(parser)} inConverter = parser.getConverter(); 
             ${pltfTypeName} result = new ${pltfTypeName}${add}();
@@ -321,6 +326,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
+            clearTemporaryVariables();
             '${getFormatterConverterType(formatter)} outConverter = formatter.getConverter();
             ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
             return formatter.chunkCompleted();'

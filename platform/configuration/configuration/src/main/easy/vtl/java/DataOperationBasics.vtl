@@ -8,6 +8,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     setOf(String) dummy = {}; // not nice
     Boolean optWithStepIn = true;
+    mapOf(String, String) variables = {};
 
     def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
@@ -375,6 +376,37 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             convP = ", ${convP}";
         }
         '${converter}.${prefix}${convName(type)}(${data}${convP})'
+    }
+    
+    // temporary variables
+    def String createTemporaryVariable(String path, String sep, DataType type, String init) {
+        if (not(variables.containsKey(path))) {
+            String name = suffixPath(path, sep);
+            if (name.length() == 0) {
+                name = "tmp";
+            }
+            name = name.toIdentifier() + variables.size();
+            variables.add(path, name);
+            String ini = "";
+            if (init.length() > 0) {
+                ini = " = ${init}";
+            }
+            '${asTypeName(type.name)} ${name}$ini;'
+        } else {
+            ''
+        }
+    }
+    
+    def String getTemporaryVariable(String path, String fallback) {
+        if (variables.containsKey(path)) {
+            variables.get(path); 
+        } else {
+            fallback;
+        }
+    }
+    
+    def clearTemporaryVariables() {
+        variables.clear();
     }
 
 }

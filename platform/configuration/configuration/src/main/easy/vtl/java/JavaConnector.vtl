@@ -254,12 +254,16 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         String acc = genFieldAccess(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt));
         if (not(genFrom)) {
             if (tgt.type.isKindOf(RecordType)) {
-                acc = "\n" + setterPath(tgtQual, tgt, 'new ${toTypeName(tgt.type)}${add}()') + ";";
+                String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
+                String cons = "new ${toTypeName(tgt.type)}${add}()";
+                '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
+                ${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons))};'
             } else {
-                acc = "\n" + setterPath(tgtQual, tgt, '${acc}') + ";";
+                '\n${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc)};'
             }            
+        } else {
+            '${acc}'
         }
-        '${acc}'
     }
     
     // called via produceDataTransfer
@@ -339,6 +343,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
 
     def generateMachineOutputTranslator(Connector conn) {
+        clearTemporaryVariables();
         if (conn.inAdapterClass.length() == 0) {
             setAdd(config);
             String coType = asTypeName(getFirstTypeName(conn.output));
@@ -380,6 +385,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
 
     def generateMachineInputTranslator(Connector conn) {
+        clearTemporaryVariables();
         if (conn.outAdapterClass.length() == 0) {
             setAdd(config);
             String ciType = asTypeName(getFirstTypeName(conn.input));
