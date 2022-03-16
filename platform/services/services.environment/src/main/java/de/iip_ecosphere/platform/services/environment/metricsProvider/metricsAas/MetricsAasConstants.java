@@ -65,16 +65,16 @@ public class MetricsAasConstants {
     public static final String SYSTEM_CPU_USAGE = "systemcpuusage";
 
     /* System Disk Capacity metrics */
-    public static final String SYSTEM_DISK_FREE = "systemdiskfree";
-    public static final String SYSTEM_DISK_TOTAL = "systemdisktotal";
-    public static final String SYSTEM_DISK_USABLE = "systemdiskusable";
-    public static final String SYSTEM_DISK_USED = "systemdiskused";
-
+    public static final String SYSTEM_DISK_FREE = "Storage_Free";
+    public static final String SYSTEM_DISK_TOTAL = "Storage_Capacity"; // IDTA
+    public static final String SYSTEM_DISK_USABLE = "Storage_Usable";
+    public static final String SYSTEM_DISK_USED = "Allocated_Storage"; // IDTA
+    
     /* System Physical Memory metrics */
-    public static final String SYSTEM_MEMORY_FREE = "systemmemoryfree";
-    public static final String SYSTEM_MEMORY_TOTAL = "systemmemorytotal";
-    public static final String SYSTEM_MEMORY_USAGE = "systemmemoryusage";
-    public static final String SYSTEM_MEMORY_USED = "systemmemoryused";
+    public static final String SYSTEM_MEMORY_FREE = "Memory_Free";
+    public static final String SYSTEM_MEMORY_TOTAL = "Memory_Capacity"; // IDTA
+    public static final String SYSTEM_MEMORY_USAGE = "Allocated_Memory";
+    public static final String SYSTEM_MEMORY_USED = "Memory_Used"; // IDTA
 
     /* Custom tags */
     public static final String UPDATE = "update";

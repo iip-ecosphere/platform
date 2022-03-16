@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
@@ -33,7 +34,7 @@ import io.micrometer.core.instrument.Clock;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends TranslatingProtocolAdapter<O, I, CO, CI> {
+public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTranslatingProtocolAdapter<O, I, CO, CI> {
 
     public static final String ADAPT_INPUT_TIME = "adaptInputTime";
     public static final String ADAPT_OUTPUT_TIME = "adaptOutputTime";
@@ -42,16 +43,36 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends Translati
     private LogRunnable logger;
 
     /**
-     * Creates a monitored translating protocol adapter.
+     * Creates a monitored translating protocol adapter with empty channels.
      * 
      * @param outputTranslator the output translator
      * @param inputTranslator the input translator
      * @param metrics the metrics provider used to measure
      * @param log optional file to log individual values to (may be <b>null</b> for none)
      */
-    public MonitoredTranslatingProtocolAdapter(ConnectorOutputTypeTranslator<O, CO> outputTranslator,
+    public MonitoredTranslatingProtocolAdapter(ConnectorOutputTypeTranslator<O, CO> outputTranslator, 
+            ConnectorInputTypeTranslator<CI, I> inputTranslator, MetricsProvider metrics, File log) {
+        this("", outputTranslator, "", inputTranslator, metrics, log);
+    }
+    
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Creates a monitored translating protocol adapter.
+     * 
+     * @param outputChannel the name of the input channel. Further semantics is 
+     *   implied/restrictions are imposed by the underlying protocol.
+     * @param outputTranslator the output translator
+     * @param inputChannel the name of the input channel. Further semantics is 
+     *   implied/restrictions are imposed by the underlying protocol.
+     * @param inputTranslator the input translator
+     * @param metrics the metrics provider used to measure
+     * @param log optional file to log individual values to (may be <b>null</b> for none)
+     */
+    public MonitoredTranslatingProtocolAdapter(String outputChannel, 
+        ConnectorOutputTypeTranslator<O, CO> outputTranslator, String inputChannel,
         ConnectorInputTypeTranslator<CI, I> inputTranslator, MetricsProvider metrics, File log) {
-        super(outputTranslator, inputTranslator);
+        super(outputChannel, outputTranslator, inputChannel, inputTranslator);
         this.metrics = metrics;
         this.clock = metrics.getClock();
         if (null != log) {
@@ -65,7 +86,9 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends Translati
             }
         }
     }
-    
+
+    // checkstyle: resume parameter number check
+
     /**
      * Logs an activity if there is a logger.
      * 

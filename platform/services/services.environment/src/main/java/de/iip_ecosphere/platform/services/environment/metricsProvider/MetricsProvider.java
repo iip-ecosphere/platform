@@ -70,15 +70,15 @@ public class MetricsProvider {
     public static final String SIMPLE_METER_LIST = "simplemeterlist";
     
     // Some of the system metrics that we want to expose
-    public static final String SYS_MEM_TOTAL = "Memory_Capacity"; // IDTA
-    public static final String SYS_MEM_FREE = "Memory_Free";
-    public static final String SYS_MEM_USED = "Memory_Used";
-    public static final String SYS_MEM_USAGE = "Allocated_Memory"; // IDTA
+    public static final String SYS_MEM_TOTAL = "system.memory.total";
+    public static final String SYS_MEM_FREE = "system.memory.free";
+    public static final String SYS_MEM_USED = "system.memory.used";
+    public static final String SYS_MEM_USAGE = "system.memory.usage";
 
-    public static final String SYS_DISK_TOTAL = "Storage_Capacity"; // IDTA
-    public static final String SYS_DISK_FREE = "Storage_Free";
-    public static final String SYS_DISK_USABLE = "Storage_Usable";
-    public static final String SYS_DISK_USED = "Allocated_Storage"; // IDTA
+    public static final String SYS_DISK_TOTAL = "system.disk.total";
+    public static final String SYS_DISK_FREE = "system.disk.free";
+    public static final String SYS_DISK_USABLE = "system.disk.usable";
+    public static final String SYS_DISK_USED = "system.disk.used";
 
     // Error Messages
     protected static final String ID_NOT_FOUND_ERRMSG = ": no item found with this identifier!";
