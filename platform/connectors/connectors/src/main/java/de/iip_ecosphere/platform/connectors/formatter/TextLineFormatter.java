@@ -19,6 +19,7 @@ import java.io.IOException;
  * 
  * @author Holger Eichelberger, SSE
  */
+@MachineFormatter
 public class TextLineFormatter implements OutputFormatter<String> {
 
     /**

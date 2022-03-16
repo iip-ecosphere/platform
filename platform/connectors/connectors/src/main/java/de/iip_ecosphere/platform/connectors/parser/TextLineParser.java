@@ -20,6 +20,7 @@ import java.io.IOException;
  * 
  * @author Holger Eichelberger, SSE
  */
+@MachineParser(supportsHierarchicalNames = false)
 public class TextLineParser implements InputParser<String> {
 
     /**

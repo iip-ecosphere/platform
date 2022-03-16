@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
  * 
  * @author Holger Eichelberger, SSE
  */
+@MachineFormatter
 public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGenerator>> {
 
     private ObjectMapper objectMapper = new ObjectMapper();
