@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -36,6 +37,7 @@ import iip.datatypes.OpcIn;
 import iip.datatypes.OpcLocalizedText;
 import iip.datatypes.OpcOut;
 import iip.nodes.MyOpcConnExample;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import test.de.iip_ecosphere.platform.configuration.IvmlTests;
@@ -46,6 +48,8 @@ import test.de.iip_ecosphere.platform.configuration.IvmlTests;
  * @author Holger Eichelberger, SSE
  */
 public class OpcUaModelTest {
+
+    private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
 
     /**
      * Reusable test configuration/setup.
@@ -142,7 +146,11 @@ public class OpcUaModelTest {
             
         };
         OpcUaConnector<OpcOut, OpcIn> conn = createPlatformConnector(cb);
-        conn.request(true);
+        for (int i = 0; i < 100; i++) {
+            System.out.println("REQUEST " + i);
+            conn.request(true);
+        }
+        System.out.println("Disconnecting");
         conn.disconnect();
     }
     
@@ -222,7 +230,8 @@ public class OpcUaModelTest {
      */
     private static OpcUaConnector<OpcOut, OpcIn> createPlatformConnector(
         ReceptionCallback<OpcOut> callback) throws IOException {
-        OpcUaConnector<OpcOut, OpcIn> conn = new OpcUaConnector<>(MyOpcConnExample.createConnectorAdapter());
+        OpcUaConnector<OpcOut, OpcIn> conn = new OpcUaConnector<>(
+            MyOpcConnExample.createConnectorAdapter(metrics, new File("opcTest.txt")));
         conn.connect(MyOpcConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
         return conn;
