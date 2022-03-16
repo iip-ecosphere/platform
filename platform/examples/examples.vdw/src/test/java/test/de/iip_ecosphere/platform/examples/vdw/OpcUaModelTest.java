@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.examples.vdw;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -129,6 +131,7 @@ public class OpcUaModelTest {
      */
     public static void main(String[] args) throws IOException {
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
+        AtomicInteger count = new AtomicInteger(0);
         ReceptionCallback<OpcOut> cb = new ReceptionCallback<OpcOut>() {
 
             @Override
@@ -136,6 +139,7 @@ public class OpcUaModelTest {
                 System.out.println("RCV " 
                     + OpcUaModelTest.toString(data.getState().getMachine()) + "\n" 
                     + OpcUaModelTest.toString(data.getIdentification()));
+                count.incrementAndGet();
             }
             
             @Override
@@ -146,12 +150,17 @@ public class OpcUaModelTest {
             
         };
         OpcUaConnector<OpcOut, OpcIn> conn = createPlatformConnector(cb);
-        for (int i = 0; i < 100; i++) {
+        final int maxRequests = 1;
+        for (int i = 0; i < maxRequests; i++) {
             System.out.println("REQUEST " + i);
             conn.request(true);
         }
-        System.out.println("Disconnecting");
+        System.out.println("Sleeping to flush...");
+        TimeUtils.sleep(1000);
+        System.out.println("Disconnecting...");
         conn.disconnect();
+        System.out.println("Received: " + count);
+        System.exit(0);
     }
     
     /**
