@@ -19,6 +19,8 @@ import java.io.PrintStream;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.apache.commons.io.FileUtils;
+
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
@@ -61,6 +63,7 @@ public class LogRunnable implements Runnable {
      * @throws IOException if the log file cannot be created
      */
     public LogRunnable(File file) throws IOException {
+        FileUtils.deleteQuietly(file);
         out = new PrintStream(new FileOutputStream(file));
     }
     
