@@ -132,6 +132,8 @@ project Services {
        Parameters parameter = {};
        setOf(refTo(EcsDevice)) requires;
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
+       Boolean monitorRcvCount = true;
+       Boolean monitorSentCount = true;
 
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
        kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;

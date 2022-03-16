@@ -55,6 +55,38 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             generateIngestor(base, methodSuffix, conn, type, "in");
         }
     }
+    
+    // ----------------------------------- metrics / probes -------------------------------
+    
+    // generates a sent probe expression (if configured) for the given functional expression 
+    def genSentProbe(ServiceBase base, String expr, Boolean needsReturn) {
+        if (base.monitorSentCount) {
+            String ret;
+            if (needsReturn) {
+               ret = "return ";
+            } else {
+               ret = "";
+            }
+            '{
+                metrics.increaseCounter(sentCounterId);
+                ${ret}${expr}; 
+            }'
+        } else {
+            '${expr}'
+        }
+    }
+    
+    // generates a received probe expression (if configured) for the given functional expression 
+    def genRcvProbe(ServiceBase base, String expr) {
+        if (base.monitorRcvCount) {
+            '{
+                ${expr}; 
+                metrics.increaseCounter(rcvCounterId); 
+            }'
+        } else {
+            '${expr}'
+        }
+    }
 
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
@@ -77,8 +109,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             methodName = "attach${type.firstToUpperCase()}Ingestor";
         } else {
             methodName = "attach${methodSuffix}Ingestor";
-        }    
-        'service.${methodName}(data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data));'
+        }
+        String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+        'service.${methodName}(data -> ${genSentProbe(base, expr, false)});'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -112,13 +145,15 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 });
             }'
         } else {
-            'public Supplier<${type}> ${methodSuffixWithServiceId}() {
-                return () -> ${fallbackToNull(src, "service.${methodName}()", true)}; 
+            String expr = '${fallbackToNull(src, "service.${methodName}()", true)}';
+            '\npublic Supplier<${type}> ${methodSuffixWithServiceId}() {
+                return () -> ${genSentProbe(service, expr, true)}; 
             }'
         }
     }
 
     def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        String expr = '${fallbackToNull(src, "service.send(data)", false)}';
         '/**
         * Called when data arrived that shall be passed on to the connector.
         *
@@ -126,7 +161,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         @Bean
         public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(src, "service.send(data)", false)};
+            return data -> ${genRcvProbe(conn, expr)};
         }'    
     }
     
@@ -158,7 +193,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         } else {
             methodName = methodSuffix;
         }
-        'return data -> ${fallbackToNull(proc, "service.${methodName}(data)", false)};'
+        String expr = '${fallbackToNull(proc, "service.${methodName}(data)", false)}';
+        'return data -> ${genRcvProbe(base, expr)};'
     }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
@@ -613,6 +649,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             private MetricsProvider metrics;
+            private String sentCounterId = "service.sent";
+            private String rcvCounterId = "service.received";
 
             ${generateReceptionCallback(elt, elt.impl)|e}
         
