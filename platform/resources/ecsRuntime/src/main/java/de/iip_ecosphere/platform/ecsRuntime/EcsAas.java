@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -42,6 +43,8 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
+import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 
 /**
  * Implements the AAS for the ECS runtime. Container ids used as short AAS ids may be translated into ids that are
@@ -63,6 +66,11 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_RESOURCE = "resource";
     public static final String NAME_PROP_RUNTIME_NAME = "runtimeName";
     public static final String NAME_PROP_RUNTIME_VERSION = "runtimeVersion";
+    
+    public static final String NAME_PROP_OPERATING_SYSTEM = "OS"; // IDTA
+    public static final String NAME_PROP_CPU_ARCHITECTURE = "CPU_Architecture"; // IDTA
+    public static final String NAME_PROP_CPU_CAPACITY = "CPU_Capachity"; // IDTA
+    public static final String NAME_PROP_GPU_CAPACITY = "GPU_Capachity";
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
@@ -94,7 +102,22 @@ public class EcsAas implements AasContributor {
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
             .build();
-
+        
+        SystemMetrics sysM = SystemMetricsFactory.getSystemMetrics();
+        // this may require an ECS plugin if Java cannot detect
+        jB.createPropertyBuilder(NAME_PROP_OPERATING_SYSTEM)
+            .setValue(Type.STRING, sysM.getOsName())
+            .build();
+        jB.createPropertyBuilder(NAME_PROP_CPU_ARCHITECTURE)
+            .setValue(Type.STRING, sysM.getOsArch())
+            .build();
+        jB.createPropertyBuilder(NAME_PROP_CPU_CAPACITY)
+            .setValue(Type.INTEGER, sysM.getNumCpuCores())
+            .build();
+        jB.createPropertyBuilder(NAME_PROP_GPU_CAPACITY)
+            .setValue(Type.INTEGER, sysM.getNumGpuCores())
+            .build();
+        
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
             .setValue(Type.STRING, "defaultEcsRuntime")
             .build();
