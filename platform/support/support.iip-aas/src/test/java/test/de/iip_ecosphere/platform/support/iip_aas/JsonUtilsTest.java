@@ -125,6 +125,28 @@ public class JsonUtilsTest {
         Assert.assertEquals(addr.getSchema(), tmp.getSchema());
         Assert.assertEquals(addr.getHost(), tmp.getHost());
         Assert.assertEquals(addr.getPort(), tmp.getPort());
-    }    
+    }
+    
+    /**
+     * Tests {@link JsonUtils#escape(String)} and {@link JsonUtils#unescape(String)}.
+     */
+    @Test
+    public void testEscapeUnescape() {
+        // external code, just some basic tests
+        assertEscapeUnescape("");
+        assertEscapeUnescape("aaa");
+        assertEscapeUnescape("{}");
+        assertEscapeUnescape("{\"name\": \"abc\", \"value\": 1, \"enum\":20, \"enumName\":\"TEST1\"}");
+        assertEscapeUnescape("{\"obj\": {\"name\": \"abc\", \"value\": 1}}");
+    }
+    
+    /**
+     * Asserts that escaping and unescaping leads back to the input {@code string}.
+     * 
+     * @param string the string to use
+     */
+    private static void assertEscapeUnescape(String string) {
+        Assert.assertEquals(string, JsonUtils.unescape(JsonUtils.escape(string)));
+    }
 
 }
