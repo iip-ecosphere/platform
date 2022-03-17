@@ -19,14 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
 import com.jsoniter.spi.JsonException;
 
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
@@ -39,7 +38,7 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
  * @author Holger Eichelberger, SSE
  */
 @MachineParser
-public class JsonInputParser implements InputParser<Any> {
+public final class JsonInputParser implements InputParser<Any> {
     
     private static final JsonInputConverter CONVERTER = new JsonInputConverter();
 
@@ -48,7 +47,7 @@ public class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class JsonParseResult implements ParseResult<Any> {
+    public static final class JsonParseResult implements ParseResult<Any> {
 
         private Any any;
         private byte[] data;
@@ -107,14 +106,14 @@ public class JsonInputParser implements InputParser<Any> {
                 Any tmp = JsonIterator.deserialize(data); // ensure (lazy) iterator :(
                 for (int i = 0; i < indexes.length; i++) {
                     int pos = indexes[i];
-                    if (tmp.valueType() == ValueType.STRING) { // index assumes an object, try to parse
-                        tmp = JsonIterator.deserialize(tmp.toString());
-                    }
                     EntryIterator it = tmp.entries();
                     while (pos >= 0 && it.next()) {
                         if (pos == 0) {
                             if (i < indexes.length - 1) {
                                 tmp = it.value();
+                                if (tmp.valueType() == ValueType.STRING) { // index assumes an object, try to parse
+                                    tmp = JsonIterator.deserialize(tmp.toString());
+                                }
                             } else {
                                 result = it;
                             }
@@ -213,7 +212,7 @@ public class JsonInputParser implements InputParser<Any> {
                         actData = new byte[tail - head]; // exclude tail
                         System.arraycopy(topData, head, actData, 0, actData.length);
                         if (deserialized) {
-                            String tmp = StringEscapeUtils.unescapeJson(new String(actData));
+                            String tmp = JsonUtils.unescape(new String(actData));
                             actData = tmp.getBytes();
                         }
                     }
@@ -250,7 +249,7 @@ public class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class JsonInputConverter implements InputConverter<Any> {
+    public static final class JsonInputConverter implements InputConverter<Any> {
 
         @Override
         public int toInteger(Any data) throws IOException {
