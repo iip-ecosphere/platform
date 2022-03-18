@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.slf4j.LoggerFactory;
+
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
@@ -42,6 +44,33 @@ public final class JsonInputParser implements InputParser<Any> {
     
     private static final JsonInputConverter CONVERTER = new JsonInputConverter();
 
+    private static final Class<?> LAZY_ANY_CLS;
+    private static final Field LAZY_ANY_HEAD_FIELD;
+    private static final Field LAZY_ANY_TAIL_FIELD;
+    
+    static {
+        Class<?> cls = JsonInputConverter.class; // a class that is not instance of LazyAny
+        Field hf = null;
+        Field tf = null;
+        try {
+            cls = Class.forName("com.jsoniter.any.LazyAny");
+            hf = cls.getDeclaredField("head");
+            hf.setAccessible(true);
+            tf = cls.getDeclaredField("tail");
+            tf.setAccessible(true);
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            LoggerFactory.getLogger(JsonInputParser.class).error("Cannot find LazyAny class or its fields: " 
+                + e.getMessage() + " Disabling JSON stepIn-slicing.");
+        }
+        if (tf == null) {
+            cls = JsonInputConverter.class; // a class that is not instance of LazyAny
+            tf = null;
+        }
+        LAZY_ANY_CLS = cls;
+        LAZY_ANY_HEAD_FIELD = hf;
+        LAZY_ANY_TAIL_FIELD = tf;
+    }
+    
     /**
      * Defines a parse result instance for JSON.
      * 
@@ -200,24 +229,19 @@ public final class JsonInputParser implements InputParser<Any> {
                 }
                 byte[] topData = getTopData();
                 byte[] actData = topData; // jsoniter parsing happens on the same array
-                try { // no direct access but we need the correct slice of the underlying input data for indexes
-                    Class<?> cls = Class.forName("com.jsoniter.any.LazyAny");
-                    if (cls.isInstance(nested)) {
-                        Field headField = cls.getDeclaredField("head");
-                        headField.setAccessible(true);
-                        Field tailField = cls.getDeclaredField("tail");
-                        tailField.setAccessible(true);
-                        int head = (int) headField.get(nested);
-                        int tail = (int) tailField.get(nested);
+                if (LAZY_ANY_CLS.isInstance(nested)) {
+                    try { // no direct access but we need the correct slice of the underlying input data for indexes
+                        int head = (int) LAZY_ANY_HEAD_FIELD.get(nested);
+                        int tail = (int) LAZY_ANY_TAIL_FIELD.get(nested);
                         actData = new byte[tail - head]; // exclude tail
                         System.arraycopy(topData, head, actData, 0, actData.length);
                         if (deserialized) {
                             String tmp = JsonUtils.unescape(new String(actData));
                             actData = tmp.getBytes();
                         }
+                    } catch (IllegalAccessException e) {
+                        throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
                     }
-                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                    throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
                 }
                 return new JsonParseResult(actData, nested, this);
             } else {
