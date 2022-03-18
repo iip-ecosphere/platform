@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -617,7 +616,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 Variant variant = value.getValue();
                 ExtensionObject xo = (ExtensionObject) variant.getValue();
                 T decoded = type.cast(xo.decode(
-                    client.getSerializationContext()
+                    client.getDynamicSerializationContext()
                 ));
                 return decoded;
             } catch (UaException e) {
@@ -631,7 +630,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 ExpandedNodeId encodingId = getEncodingId(value.getClass());
                 UaVariableNode node = retrieveVariableNode(qName);
                 ExtensionObject modifiedXo = ExtensionObject.encode(
-                    client.getSerializationContext(),
+                    client.getDynamicSerializationContext(),
                     value,
                     encodingId,
                     OpcUaDefaultBinaryEncoding.getInstance()
@@ -689,7 +688,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             }
             if (null != codec) {
                 // Register codec with the client DataTypeManager instance
-                client.getDataTypeManager().registerCodec(
+                client.getDynamicDataTypeManager().registerCodec(
                     binaryEncodingId,
                     codec.asBinaryCodec()
                 );
@@ -732,7 +731,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     requests.add(request);
                 }
 
-                BiConsumer<UaMonitoredItem, Integer> onItemCreated =
+                UaSubscription.ItemCreationCallback onItemCreated =
                     (item, id) -> item.setValueConsumer(this::onSubscriptionValue); 
 
                 List<UaMonitoredItem> items = subscription.createMonitoredItems(
@@ -775,7 +774,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 MonitoringParameters parameters = new MonitoringParameters(
                     clientHandle,
                     (double) params.getNotificationInterval(), // sampling interval
-                    ExtensionObject.encode(client.getSerializationContext(), eventFilter),
+                    ExtensionObject.encode(client.getDynamicSerializationContext(), eventFilter),
                     uint(10),   // queue size
                     true        // discard oldest
                 );
@@ -790,7 +789,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 );
                 requests.add(request);
                 
-                BiConsumer<UaMonitoredItem, Integer> onItemCreated =
+                UaSubscription.ItemCreationCallback onItemCreated =
                     (item, id) -> item.setEventConsumer(this::onEvent);
 
                 List<UaMonitoredItem> items = subscription.createMonitoredItems(
