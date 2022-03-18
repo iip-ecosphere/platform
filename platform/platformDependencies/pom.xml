@@ -113,7 +113,7 @@
     <com.jsoniter.version>0.9.23</com.jsoniter.version>
     <apache.commons.version>2.6</apache.commons.version>    
     <apache.commons.text.version>1.9</apache.commons.text.version>    
-    <eclipse.milo.version>0.5.2</eclipse.milo.version>
+    <eclipse.milo.version>0.6.4</eclipse.milo.version>
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
     <!-- If changed, check against forced JUnit provider -->
