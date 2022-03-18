@@ -27,7 +27,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def String translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (fields.containsKey(assng.field)) {
-            translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true);
+            translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true, indexes);
         } else {
             ""
         }
@@ -36,7 +36,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) {
             String fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
-            translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true);
+            translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true, indexes);
         } else {
             ""
         }
@@ -52,7 +52,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        translateFieldAccess(op.field, fields, false, "", "", dummy, false);
+        translateFieldAccess(op.field, fields, false, "", "", dummy, false, indexes);
     }
     
     def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
@@ -63,19 +63,19 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String setEnd, String value, setOf(String) done, Boolean recordDone) {
-        if (fields.containsKey(field)) {
+    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String setEnd, String value, setOf(String) done, Boolean recordDone, mapOf(Field, String) indexes) {
+        if (fields.containsKey(field) and indexes.containsKey(field)) {
            if (recordDone) {
                done.add(mapTargetPath(fields.get(field), field));
            }
-           genFieldAccess(fields.get(field), field, set, setEnd, value);
+           genFieldAccess(fields.get(field), field, set, setEnd, value, indexes.get(field));
         } else {
            ""
         }
     }
         
     // can be overridden
-    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value) {
+    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value, String indexes) {
        if (set) {
            path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")${setEnd}";
        } else {
@@ -191,6 +191,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         for (Field f : type.fields) {
             String fn = mapSourcePath(qual, f);
             result.add(fn, f);
+println("MAP " + fn);            
             mapSourcePaths(f.type, result, fn);
         }
     }
@@ -221,22 +222,34 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // Currently the default Java implementation focuses on object transfers from temporary instances.
     
     // dispatch basis, do nothing on plain types
-    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
     }
 
     // typical top-level entry point, produce data transfer for RecordType
-    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
+        int index = 0;
         for (Field f : type.fields) {
+            String iq;
+            if (indexes.length() > 0) {
+                iq = indexes + ", " + index;
+            } else {
+                iq = "" + index;
+            }
+            String p = f.name;
+            if (paths.length() > 0) {
+               p = paths + targetSep + p;
+            }
+            index = index + 1;
             String tn = mapTargetPath(typeQual, f);
             String mq = mapSourcePath(mapQual, f);
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
                 Integer tnPos = tn.rfind(targetSep);
                 Integer mqPos = mq.rfind(sourceSep);
-                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep))}' 
+                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p)}' 
                 if (produceDataTransferRec(f.type)) {
-                    '${produceDataTransfer(f, f.type, mapping, tn, mq, done)}'
+                    '${produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p)}'
                 }
             } else {
                 ''
@@ -245,12 +258,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     // internal dispatch basis, akin produceDataTransfer(DataType), but carries actual field that is not present at top-level call
-    def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
+    def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+        ''
     }
 
     // akin produceDataTransfer(RecordType), but carries actual field that is not present at top-level call, calls produceDataTransfer(RecordType)
-    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done) {
-         produceDataTransfer(type, mapping, typeQual, mapQual, done);
+    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+         produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths);
     }
     
     def Boolean produceDataTransferRec(DataType type) {
@@ -277,7 +291,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
     } 
     
-    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual) {
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {
         "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
     }
     
