@@ -1,7 +1,5 @@
 package test.de.iip_ecopshere.platform.monitoring.prometheus.service;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.ServiceLoader;
 

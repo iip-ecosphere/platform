@@ -24,9 +24,6 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     private Process proc;  
     private File prometheusWorkingDirectory;
     
-    //We don't want to keep the binaries after testing.
-    private boolean deleteBinariesForDebug = true;
-    
     @Override
     public void startup(String[] args) {
         
@@ -38,7 +35,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         String targetLinux = "src/main/resources";
         unzip(zipWindows, targetWindows);
         unzip(zipLinux, targetLinux);
-        TimeUtils.sleep(3000);
+        TimeUtils.sleep(5000);
         InputStream in = getClass().getClassLoader().getResourceAsStream(exeName);
         InputStream inYml = getClass().getClassLoader().getResourceAsStream("prometheus.yml");
         prometheusWorkingDirectory = FileUtils.createTmpFolder("iip-prometheus");
@@ -74,8 +71,8 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
      * @param linuxBinary
      * @throws IOException 
      */
-    public void deleteBinaries(File windowsBinary, File linuxBinary) throws IOException {
-        if (deleteBinariesForDebug) {
+    public static void deleteBinaries(File windowsBinary, File linuxBinary) throws IOException {
+        if (true) {
             if (windowsBinary != null) {
                 if (windowsBinary.isDirectory()) {
                     File[] files = windowsBinary.listFiles();
@@ -99,7 +96,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
      * @param file
      * @throws IOException 
      */
-    private void deleteFile(File file) throws IOException {
+    private static void deleteFile(File file) throws IOException {
         Files.deleteIfExists(file.toPath());
     }
 
@@ -145,7 +142,14 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     public void shutdown() {
         proc.destroyForcibly();
         LoggerFactory.getLogger(PrometheusLifecycleDescriptor.class).info(PROMETHEUS + " " +  VERSION + " shutdown");
-
+        try {
+            deleteBinaries(
+                    new File("src/main/resources/prometheus-2.34.0-win64.exe"),
+                    new File("src/main/resources/prometheus-2.34.0-linux64"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
