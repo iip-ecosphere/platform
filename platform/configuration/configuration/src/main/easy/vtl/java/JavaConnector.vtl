@@ -298,10 +298,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         "/";
     }
     
-    def Boolean produceDataTransferRec(DataType type) {
-        true; // do recursive as we do not have temporary instance before
-    }
-    
     // overwrite internal dispatch basis to allow for data transfer generation on all fields. Object fields are used below to initalize
     // object fields of data instances
     def produceDataTransfer(Field f, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {

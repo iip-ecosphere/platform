@@ -248,9 +248,7 @@ println("MAP " + fn);
                 Integer tnPos = tn.rfind(targetSep);
                 Integer mqPos = mq.rfind(sourceSep);
                 '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p)}' 
-                if (produceDataTransferRec(f.type)) {
-                    '${produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p)}'
-                }
+                '${produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p)}'
             } else {
                 ''
             }
@@ -266,11 +264,7 @@ println("MAP " + fn);
     def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
          produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths);
     }
-    
-    def Boolean produceDataTransferRec(DataType type) {
-        false; // do recursive as we currently assume temporary instance before
-    }
-    
+        
     // returns the prefix before the last sep in path
     def prefixPath(String path, String sep) {
         Integer pos = path.rfind(sep);

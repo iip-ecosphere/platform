@@ -47,8 +47,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         index = "";
         if (parser <> null) {
             setOf(String) done = {};
-            //'${imTypeName} tmp = new ${imTypeName}();'
-            //'${genFromField("tmp", "", "", "", imType, "")}'
             '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
             mapOf(String, Field) mapping = {};
             mapSourcePaths(imType, mapping, "tmp");
@@ -57,12 +55,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             ''
         }
     }
-    
-    def Boolean produceDataTransferRec(DataType type) {
-        true; // do recursive as we do not have temporary instance before
-    }
-    
-// ---------------------
 
     // called via translateDataOperations
     def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value, String indexes) {
@@ -131,58 +123,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
 
-// ---------------------
-    
-    def genFromField(String qual, String name, String fieldName, String typeQual, DataType type, String iQual) {
-        ''
-    }
-
-    def genFromField(String qual, String name, String fieldName, String typeQual, PrimitiveType type, String iQual) {
-        String data;
-        if (optWithStepIn) {
-            data = 'pr.getData(\"${fieldName}\", ${suffixPath(iQual, ",")})';
-        } else {
-            data = "pr.getData(\"${ame}\", ${iQual})";
-        }
-        '${getTemporaryVariable(qual, qual)}.set${asMethodNameSuffix(fieldName)}(${genConvertOp("inConverter", type, "to", data)});'
-    }
-
-    def genFromField(String qual, String name, String fieldName, String typeQual, RecordType type, String iQual) {
-        String q = qual;
-        if (fieldName.length() > 0) { // fieldName == "" on top level
-            String nextQ = q + ".get" + asMethodNameSuffix(fieldName) + "()";
-            String cons = "new ${asTypeName(type.name)}${add}()";
-            String stepInto = "\n";
-            if (optWithStepIn) {
-                nestedStepCount = nestedStepCount + 1;
-                stepInto = '\npr = pr.stepInto("${fieldName}", ${suffixPath(iQual, ",")});';
-            }
-            '\n${createTemporaryVariable(nextQ, mapSourceSeparator(), type, "${cons}")|e}
-            ${getTemporaryVariable(q, q)}.set${asMethodNameSuffix(fieldName)}(${getTemporaryVariable(nextQ, cons)});${stepInto}'
-            q = nextQ;
-        }
-        String tq = type.name + ".";
-        int index = 0;
-        for (Field f : type.fields) {
-            String n = f.name;
-            if (name.length() > 0) {
-               n = name + "." + n;
-            }
-            String iq;
-            if (iQual.length() > 0) {
-                iq = iQual + ", " + index;
-            } else {
-                iq = "" + index;
-            }
-            index = index + 1;
-            '${genFromField(q, n, f.name, tq, f.type, iq)}'
-        }
-        if (optWithStepIn and nestedStepCount > 0) {
-            nestedStepCount = nestedStepCount - 1;
-            'pr = pr.stepOut();'
-        }
-    }
-    
     // ---------------------------------- genTo -------------------------------------
     
     def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
