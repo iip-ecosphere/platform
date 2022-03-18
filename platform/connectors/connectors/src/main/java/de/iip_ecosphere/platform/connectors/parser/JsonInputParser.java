@@ -112,13 +112,20 @@ public final class JsonInputParser implements InputParser<Any> {
         @Override
         public String getFieldName(IOConsumer<Any> valueCons, int... indexes) throws IOException {
             String result = "";
-            EntryIterator it = findBy(indexes);
-            if (null != it) {
-                result = it.key();
+            if (any.size() == 1 && indexes.length == 1) {
+                result = any.asMap().keySet().iterator().next().toString(); // :(
                 if (null != valueCons) {
-                    valueCons.accept(it.value());
+                    valueCons.accept(any.get(result));
                 }
-            }
+            } else {
+                EntryIterator it = findBy(indexes);
+                if (null != it) {
+                    result = it.key();
+                    if (null != valueCons) {
+                        valueCons.accept(it.value());
+                    }
+                }
+            }            
             return result;
         }
         
@@ -132,7 +139,8 @@ public final class JsonInputParser implements InputParser<Any> {
         private EntryIterator findBy(int[] indexes) {
             EntryIterator result = null;
             if (indexes.length > 0) {
-                Any tmp = JsonIterator.deserialize(data); // ensure (lazy) iterator :(
+                // ensure (lazy) iterator :( // LazyIterator#parse ??
+                Any tmp = Any.lazyObject(data, 0, data.length - 1);
                 for (int i = 0; i < indexes.length; i++) {
                     int pos = indexes[i];
                     EntryIterator it = tmp.entries();
@@ -162,7 +170,8 @@ public final class JsonInputParser implements InputParser<Any> {
          */
         private EntryIterator findBy(int index) {
             EntryIterator result = null;
-            Any tmp = JsonIterator.deserialize(data); // ensure (lazy) iterator :(
+            // ensure (lazy) iterator :( // LazyIterator#parse ??
+            Any tmp = Any.lazyObject(data, 0, data.length - 1);
             EntryIterator it = tmp.entries();
             while (index >= 0 && it.next()) {
                 if (index == 0) {
@@ -229,7 +238,7 @@ public final class JsonInputParser implements InputParser<Any> {
                 }
                 byte[] topData = getTopData();
                 byte[] actData = topData; // jsoniter parsing happens on the same array
-                if (LAZY_ANY_CLS.isInstance(nested)) {
+                if (LAZY_ANY_CLS.isInstance(nested)) { // LazyIterator#parse -> JsonIterator may help but not available
                     try { // no direct access but we need the correct slice of the underlying input data for indexes
                         int head = (int) LAZY_ANY_HEAD_FIELD.get(nested);
                         int tail = (int) LAZY_ANY_TAIL_FIELD.get(nested);
