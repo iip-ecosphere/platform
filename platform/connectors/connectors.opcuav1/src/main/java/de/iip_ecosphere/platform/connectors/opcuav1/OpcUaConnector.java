@@ -357,8 +357,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      */
     protected class OpcUaModelAccess extends AbstractModelAccess {
 
-        private Map<String, UaNode> nodes = new HashMap<>();
+        private Map<String, UaNode> nodes;
         private UaNode base;
+        private String basePath;
         private OpcUaModelAccess parent;
         
         /**
@@ -366,18 +367,24 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          */
         protected OpcUaModelAccess() {
             super(OpcUaConnector.this);
+            nodes = new HashMap<>();
+            basePath = "";
         }
         
         /**
          * Creates the instance and binds the listener to the creating connector instance.
          * 
          * @param base the context node to resolve non-nested names on
+         * @param basePath the base path this context represente
          * @param parent the parent to return to in {@link #stepOut()}
+         * @param nodes the (parent) nodes cache to use
          */
-        protected OpcUaModelAccess(UaNode base, OpcUaModelAccess parent) {
+        protected OpcUaModelAccess(UaNode base, String basePath, OpcUaModelAccess parent, Map<String, UaNode> nodes) {
             this();
             this.base = base;
             this.parent = parent;
+            this.nodes = nodes;
+            this.basePath = basePath;
         }
 
         @Override
@@ -488,6 +495,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          */
         private UaNode retrieveNode(String qName) throws UaException, IOException {
             UaNode result = nodes.get(qName);
+            if (null == result && basePath.length() > 0) { 
+                result = nodes.get(basePath + "/" + result);
+            }
             if (null == result) {
                 result = retrieveNode(base, qName);
                 if (null == result) {
@@ -528,6 +538,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             }
             for (int n = 0; null == result && n < nodes.size(); n++) {
                 UaNode tmp = nodes.get(n);
+                String nn = tmp.getBrowseName().getName();                
+                String qn = basePath + "/" + nn;
+                if (!this.nodes.containsKey(qn)) { // implicit caching
+                    this.nodes.put(qn, tmp);
+                }
                 if (nodeName.equals(tmp.getBrowseName().getName())) {
                     if (null == remainder) {
                         result = tmp;
@@ -850,7 +865,13 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public OpcUaModelAccess stepInto(String name) throws IOException {
             try {
-                return new OpcUaModelAccess(retrieveNode(name), this);
+                String n = basePath;
+                if (n.length() == 0) {
+                    n = name;
+                } else {
+                    n = n + "/" + name;
+                }
+                return new OpcUaModelAccess(retrieveNode(name), n, this, nodes);
             } catch (UaException e) {
                 throw new IOException(e);
             }
