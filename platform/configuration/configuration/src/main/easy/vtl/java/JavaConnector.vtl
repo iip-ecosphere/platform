@@ -243,9 +243,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        }
        if (set) {
            if (not(genFrom)) {
-               path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")${setEnd}"; 
+               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")") + "${setEnd}"; 
            } else {
-               "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")${setEnd}"; 
+               wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")") + "${setEnd}"; 
            }
        } else {
            String ex = "access.get(\"" + p +"\")";
@@ -261,9 +261,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
                 String cons = "new ${toTypeName(tgt.type)}${add}()";
                 '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                ${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons))};'
+                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)))};'
             } else {
-                '\n${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc)};'
+                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc))};'
             }            
         } else {
             '${acc}'

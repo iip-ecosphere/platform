@@ -79,7 +79,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            } else {
                ex = genConvertOp("outConverter", field.type, "from", value);
            }
-           path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")${setEnd}"; 
+           wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")") + "${setEnd}"; 
        } else {
            String ex;
            if (not(genFrom) and ix.length() > 0) {
@@ -98,9 +98,9 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
                 String cons = "new ${toTypeName(tgt.type)}${add}()";
                 '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                ${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons))};'
+                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)))};'
             } else {
-                '\n${setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc)};'
+                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc))};'
             }            
         } else {
             '\n${acc}'
@@ -379,6 +379,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         
         import java.io.IOException;
         import java.util.*;
+        import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.function.*;
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
