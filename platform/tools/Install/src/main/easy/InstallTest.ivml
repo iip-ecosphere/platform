@@ -39,6 +39,8 @@ project InstallTest {
         password = "pwd"
     };
     
+    serviceProtocol = ServiceProtocolAMQP {};
+    
     // ------------------ resources/devicemgt ----------------
     
     deviceRegistry = BasicDeviceRegistry {
