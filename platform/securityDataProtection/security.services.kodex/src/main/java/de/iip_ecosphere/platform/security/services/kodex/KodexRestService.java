@@ -12,16 +12,12 @@
 
 package de.iip_ecosphere.platform.security.services.kodex;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +25,11 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
-import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
-import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -45,15 +41,16 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <O> the output type
  * @author Holger Eichelberger, SSE
  */
-public class KodexRestService<I, O> extends AbstractStringProcessService<I, O>  {
+public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
     public static final int WAITING_TIME_WIN = 120000; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = "0.0.7";
     private static final boolean DEBUG = false;
-    
-    private HttpURLConnection connection;
+   
     private String dataSpec;
+    private String bearerToken;
+    private File home;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON. Data file is 
@@ -85,88 +82,13 @@ public class KodexRestService<I, O> extends AbstractStringProcessService<I, O>  
         this.dataSpec = dataSpec;
     }
     
-    /**
-     * Get Connection to local server.
-     *
-     * @param quiet shall a connector error be logged or not (quiet) 
-     * @throws IOException in case of I/O related problems
-     */
-    private void obtainConnection(boolean quiet) throws IOException {
-        try {
-            // TODO: port number and api path are fixed but depend on api.yaml file. Also the bearer.
-            // Please read yaml file from s.getHomePath() or fallback new File("./src/test/resources")
-            // upon start, store information in attributes and use here
-            URL url = new URL("http://localhost:8000/v1/configs/abcdef/transform");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer aabbccdd");
-            connection.connect();
-        } catch (ConnectException con) {
-            if (quiet) {
-                LoggerFactory.getLogger(KodexRestService.class).error(con.getMessage(), con);
-                try {
-                    setState(ServiceState.FAILED);
-                } catch (ExecutionException e) {
-                    throw new IOException(e);
-                }
-            }
-        }
-    }
-    
-    @Override
-    protected void stop() {
-        if (null != connection) {
-            connection.disconnect();
-            connection = null;
-        }
-        super.stop();
-    }
-    
-    @Override
-    public void process(I data) throws IOException {
-        // unclear whether obtaining/sending shall only happen if service is running.
-        obtainConnection(true);
-        OutputStream os = connection.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        String input = "{\"items\":[" + getInputTranslator().to(data) + "]}";
-        osw.write(input);
-        osw.flush();
-        osw.close();
-        os.close();
-
-        // TODO This is now forced synchronous processing. We need this as a parallel thread starting in 
-        // obtainConnection if successful.
-        String result;
-        BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        int read = bis.read();
-        while (read != -1) {
-            buf.write((byte) read);
-            read = bis.read();
-        }
-        result = buf.toString();
-        bis.close();
-        buf.close();
-        result = result.replace("{\"data\":{\"errors\":[],\"items\":[", "");
-        result = result.replace("],\"messages\":[],\"warnings\":[]}}", "");
-        
-        ReceptionCallback<O> callback = getReceptionCallback();
-        try {
-            callback.received(getOutputTranslator().to(result));
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
-        }
-    }
-    
     @Override
     protected void start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
         File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/")); 
-        File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
+        home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
         exe = new File(exe, executable); 
         home = home.getAbsoluteFile();
         
@@ -179,20 +101,60 @@ public class KodexRestService<I, O> extends AbstractStringProcessService<I, O>  
         args.add("run");
         args.add(dataSpec);
         addProcessSpecCmdArg(args);
-
+        
         createAndConfigureProcess(exe, false, home, args);
         boolean portAvailable = false;
         while (!portAvailable) {
             try {
-                obtainConnection(false); // quiet, check whether connection exists
-                if (connection.getResponseCode() == 400) {
+                getNewConnectionInstanceQuiet(); // quiet, check whether connection exists
+                if (getConnection().getResponseCode() == 400) {
                     portAvailable = true;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // be quiet, checking connections
             }
             TimeUtils.sleep(100);
         }
+    }
+    
+    @Override
+    protected String getApiPath() {
+        return "http://localhost:8000/v1/configs/abcdef/transform";
+    }
+    
+    @Override
+    protected String getBearerToken() {
+        if (null == bearerToken) {
+            try {
+                InputStream inputStream = new FileInputStream(new File(home, "api.yml"));
+                Yaml yaml = new Yaml();
+                Map<String, Object> data = yaml.load(inputStream);
+                Object users = data.get("users"); 
+                String[] usersSplit = users.toString().split(",");
+                String accessToken = null;
+                for (String item : usersSplit) {
+                    if (item.contains("accessToken")) {
+                        accessToken = item;
+                    }
+                }
+                String[] accesTokenSplit = accessToken.split("=");
+                String token = null;
+                for (String item : accesTokenSplit) {
+                    token = item;
+                }
+                bearerToken = "Bearer " + token;
+            } catch (FileNotFoundException e) {
+                LoggerFactory.getLogger(AbstractRestProcessService.class).error("Reading bearer " + e.getMessage(), e);
+            }
+        }
+        return bearerToken;
+    }
+    
+    @Override
+    protected String adjustRestResponse(String response) {
+        String result = response.replace("{\"data\":{\"errors\":[],\"items\":[", "");
+        result = result.replace("],\"messages\":[],\"warnings\":[]}}", "");
+        return result;
     }
 
     @Override
@@ -216,5 +178,8 @@ public class KodexRestService<I, O> extends AbstractStringProcessService<I, O>  
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
     }
-    
+
+    @Override
+    protected void handleInputStream(InputStream in) { 
+    }
 }

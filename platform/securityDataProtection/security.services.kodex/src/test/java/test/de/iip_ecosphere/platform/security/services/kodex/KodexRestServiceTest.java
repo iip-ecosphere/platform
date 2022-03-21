@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
@@ -98,6 +99,7 @@ public class KodexRestServiceTest {
         process(service, new InData("test", "test"));
         process(service, new InData("test", "test"));
         process(service, new InData("test", "test"));
+        TimeUtils.sleep(500);
         LoggerFactory.getLogger(KodexRestServiceTest.class).info("Stopping service, may take two minutes on Windows");
         service.setState(ServiceState.STOPPING);     
         Assert.assertEquals(3, receivedCount.get());
