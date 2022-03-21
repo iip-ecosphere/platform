@@ -34,6 +34,8 @@ project SerializerConfig1 {
         password = "pwd"
     };
     
+    serviceProtocol = ServiceProtocolAMQP {};
+    
     // ------------------ resources/devicemgt ----------------
     
     deviceRegistry = BasicDeviceRegistry {

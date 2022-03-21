@@ -34,6 +34,7 @@ project SimpleMesh3 {
         password = "pwd"
     };
     
+    serviceProtocol = ServiceProtocolAMQP {};
         
     // ------------------ resources/devicemgt ----------------
     
