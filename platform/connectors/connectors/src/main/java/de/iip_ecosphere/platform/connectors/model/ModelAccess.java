@@ -91,6 +91,19 @@ public interface ModelAccess {
     public Object get(String qName) throws IOException;
 
     /**
+     * Returns a property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value (may be <b>null</b> for void)
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @throws IOException in case that the access fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default Object get(String qName, int lifetime) throws IOException {
+        return get(qName);
+    }
+
+    /**
      * Changes a property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
