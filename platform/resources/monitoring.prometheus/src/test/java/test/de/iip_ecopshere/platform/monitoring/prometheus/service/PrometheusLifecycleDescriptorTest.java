@@ -25,23 +25,8 @@ public class PrometheusLifecycleDescriptorTest {
             .findFirst();
         Assert.assertTrue(pml.isPresent());
         pml.get().startup(new String[] {});
-        TimeUtils.sleep(25000);
+        TimeUtils.sleep(10000);
         pml.get().shutdown();
+        pml.get().deleteWorkingFiles();
     }
-  
-    /*@Test
-    public void mkdirTest()
-    {
-        try {
-            Path path = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), "prometheus");
-            String tmpdir = Files.createDirectories(path).toFile().getAbsolutePath();
-            File theDir = new File(tmpdir);
-            if (!theDir.exists()){
-                theDir.mkdirs();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-    }*/
 }
