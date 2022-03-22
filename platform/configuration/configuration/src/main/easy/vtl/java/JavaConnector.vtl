@@ -248,9 +248,17 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")") + "${setEnd}"; 
            }
        } else {
-           String ex = "access.get(\"" + p +"\")";
+           String ex = "access.get(\"" + p +"\", ${cachingTime(field)})";
            '${genConvertOp("inConverter", field.type, "to", ex)}';
        }
+    }
+    
+    def cachingTime(Field field) {
+        if (isDefined(field.cachingTime)) { // EASy
+            field.cachingTime;
+        } else {
+            -1; // endless
+        }
     }
     
     // called via produceDataTransfer

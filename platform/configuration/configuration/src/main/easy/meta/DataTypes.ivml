@@ -53,6 +53,7 @@ project DataTypes {
         refTo(DataType) type;
         String description = "";
         Boolean optional = false;
+        Integer cachingTime = -1; 
     }
 
     typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);
