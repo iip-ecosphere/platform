@@ -351,14 +351,84 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     }
     
     /**
+     * Realizes a node cache entry with value lifetime.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class NodeCacheEntry {
+        private UaNode node;
+        private long valueLifetime = 0;
+        private long valueTimestamp;
+        private Object value;
+        
+        /**
+         * Creates a cache entry for a pseudo node, e.g., a built-in property.
+         */
+        private NodeCacheEntry() {
+        }
+        
+        /**
+         * Creates a cache entry for a given {@code node}.
+         * 
+         * @param node the node
+         */
+        private NodeCacheEntry(UaNode node) {
+            this.node = node;
+        }
+
+        /**
+         * Sets the cached value.
+         * 
+         * @param value
+         */
+        private void setValue(Object value) {
+            if (valueLifetime != 0) { // no caching
+                this.value = value;
+                valueTimestamp = System.currentTimeMillis();
+            }
+        }
+        
+        /**
+         * Changes the value of a cached entry.
+         * @param value
+         * @param lifetime
+         * @return
+         */
+        private void setValue(Object value, int lifetime) {
+            this.valueLifetime = lifetime;
+            setValue(value);
+        }
+
+        /**
+         * Returns the value of this node considering the caching lifetime.
+         * 
+         * @return the value of this node
+         */
+        private Object getValue() {
+            Object result = null;
+            if (valueLifetime < 0) { // always valid
+                result = value;
+            } else if (valueLifetime > 0) { // there is a limit
+                if ((System.currentTimeMillis() - valueTimestamp) < valueLifetime) {
+                    result = value;
+                } else { // outdated, reset
+                    value = null;
+                }
+            }
+            return result;
+        }
+        
+    }
+    
+    /**
      * Implements the model access for OPC UA.
      * 
      * @author Holger Eichelberger, SSE
      */
     protected class OpcUaModelAccess extends AbstractModelAccess {
 
-        private Map<String, UaNode> nodes;
-        private UaNode base;
+        private Map<String, NodeCacheEntry> nodes;
+        private NodeCacheEntry base;
         private String basePath;
         private OpcUaModelAccess parent;
         
@@ -379,7 +449,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          * @param parent the parent to return to in {@link #stepOut()}
          * @param nodes the (parent) nodes cache to use
          */
-        protected OpcUaModelAccess(UaNode base, String basePath, OpcUaModelAccess parent, Map<String, UaNode> nodes) {
+        protected OpcUaModelAccess(NodeCacheEntry base, String basePath, OpcUaModelAccess parent, 
+            Map<String, NodeCacheEntry> nodes) {
             this();
             this.base = base;
             this.parent = parent;
@@ -408,7 +479,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 }
                 try {
                     String nodeName = qName.substring(0, pos);
-                    UaNode node = retrieveNode(nodeName);
+                    UaNode node = retrieveCacheEntry(nodeName).node;
                     String methodName = qName.substring(pos + 1);
                     UaNode methodNode = retrieveNode(node, methodName);
                     if (null == methodNode) {
@@ -465,21 +536,22 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }*/
 
         /**
-         * Retrieves an OPC UA variable node using {@link #retrieveNode(String)}.
+         * Retrieves an OPC UA variable node from a cache node entry.
          * 
-         * @param qName the qualified node name
+         * @param qName the qualified node name (for exception message)
+         * @param entry the cache entry to read the variable node from
          * @return the variable node
          * @throws IOException if no node can be found for {@code qName} or if the found node is not a variable node 
          * @throws UaException if accessing/browsing the OPC UA model fails
          */
-        private UaVariableNode retrieveVariableNode(String qName) throws UaException, IOException {
+        private UaVariableNode retrieveVariableNode(String qName, NodeCacheEntry entry) 
+            throws UaException, IOException {
             UaVariableNode result = null;
-            UaNode n = retrieveNode(qName);
+            UaNode n = null == entry ? null : entry.node;
             if (n instanceof UaVariableNode) {
                 result = (UaVariableNode) n;
             } else {
-                throw new IOException("'" + qName + "' does not point to a variable, rather than a " 
-                    + n.getClass().getSimpleName());
+                throw new IOException("'" + qName + "' does not point to a variable");
             }
             return result;
         }
@@ -493,26 +565,27 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          * @throws IOException if no node can be found for {@code qName}
          * @throws UaException if accessing/browsing the OPC UA model fails
          */
-        private UaNode retrieveNode(String qName) throws UaException, IOException {
-            UaNode result = nodes.get(qName);
-            if (null == result && basePath.length() > 0) { 
-                result = nodes.get(basePath + "/" + result);
+        private NodeCacheEntry retrieveCacheEntry(String qName) throws UaException, IOException {
+            NodeCacheEntry cached = nodes.get(qName);
+            if (null == cached && basePath.length() > 0) {
+                cached = nodes.get(basePath + "/" + qName);
             }
-            if (null == result) {
-                result = retrieveNode(base, qName);
+            if (null == cached) {
+                UaNode result = retrieveNode(null == base ? null : base.node, qName);
                 if (null == result) {
                     throw new IOException("No node found for " + qName);
                 } else {
-                    nodes.put(qName, result);
+                    cached = new NodeCacheEntry(result);
+                    nodes.put(qName, cached);
                 }
             }
-            return result;
+            return cached;
         }
-
+        
         /**
          * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
          * 
-         * @param current the current not to start searching for
+         * @param current the current node to start searching for, may be <b>null</b> for top-level
          * @param qName the qualified node name
          * @return the node or <b>null</b> for none found
          * @throws UaException if accessing/browsing the OPC UA model fails
@@ -541,7 +614,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 String nn = tmp.getBrowseName().getName();                
                 String qn = basePath + "/" + nn;
                 if (!this.nodes.containsKey(qn)) { // implicit caching
-                    this.nodes.put(qn, tmp);
+                    this.nodes.put(qn, new NodeCacheEntry(tmp));
                 }
                 if (nodeName.equals(tmp.getBrowseName().getName())) {
                     if (null == remainder) {
@@ -553,23 +626,33 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             }
             return result;
         }
-        
+
         @Override
         public Object get(String qName) throws IOException {
-            Object result;
+            return get(qName, 0);
+        }
+        
+        @Override
+        public Object get(String qName, int lifetime) throws IOException {
+            Object result = null;
             try {
-                UaVariableNode node = retrieveVariableNode(qName);
-                DataValue value = node.readValue();
-                Variant r = value.getValue();
-                if (null != r) {
-                    result = r.getValue();
-                    if (result instanceof UNumber) { // simplfied
-                        result = ((UNumber) result).intValue();
-                    } else if (result instanceof NodeId) {
-                        result = result.toString();
+                NodeCacheEntry cached = retrieveCacheEntry(qName);
+                result = cached.getValue();
+                if (null == result) {
+                    UaVariableNode node = retrieveVariableNode(qName, cached);
+                    DataValue value = node.readValue();
+                    Variant r = value.getValue();
+                    if (null != r) {
+                        result = r.getValue();
+                        if (result instanceof UNumber) { // simplfied
+                            result = ((UNumber) result).intValue();
+                        } else if (result instanceof NodeId) {
+                            result = result.toString();
+                        }
+                        cached.setValue(result, lifetime);
+                    } else {
+                        result = null;
                     }
-                } else {
-                    result = null;
                 }
             } catch (UaException e) {
                 throw new IOException(e);
@@ -577,30 +660,40 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 result = DUMMY;
                 int pos = qName.lastIndexOf(SEPARATOR_CHAR); // try to handle buildins
                 String slot = qName;
+                String nodeName;
                 try {
-                    UaVariableNode node = null;
+                    NodeCacheEntry cached;
                     if (pos > 0) {
                         slot = qName.substring(pos + 1);
-                        node = retrieveVariableNode(qName.substring(0, pos));
+                        nodeName = qName.substring(0, pos);
+                        cached = retrieveCacheEntry(nodeName);
                     } else {
-                        if (base instanceof UaVariableNode) {
-                            node = (UaVariableNode) base;
-                        } else {
-                            throw new UaException(0);
+                        cached = base;
+                        nodeName = basePath;
+                    }
+                    Object tmp = null == cached ? null : cached.getValue();
+                    if (null == tmp) {
+                        UaVariableNode node = retrieveVariableNode(nodeName, cached);
+                        DataValue value = node.getValue();
+                        Variant r = value.getValue();
+                        if (null != r) {
+                            tmp = r.getValue();
                         }
                     }
-                    DataValue value = node.getValue();
-                    Variant r = value.getValue();
-                    if (null != r) {
-                        Object tmp = r.getValue();
-                        if (tmp instanceof LocalizedText) {
-                            LocalizedText txt = (LocalizedText) tmp;
-                            if (slot.equals("locale")) {
-                                result = txt.getLocale();
-                            } else if (slot.equals("text")) {
-                                result = txt.getText();
-                            }
+                    if (tmp instanceof LocalizedText) {
+                        LocalizedText txt = (LocalizedText) tmp;
+                        if (slot.equals("locale")) {
+                            result = txt.getLocale();
+                        } else if (slot.equals("text")) {
+                            result = txt.getText();
                         }
+                        if (null != result) {
+                            NodeCacheEntry ent = new NodeCacheEntry();
+                            ent.setValue(result, lifetime);
+                            nodes.put(qName, ent);
+                        }
+                    } else {
+                        cached.setValue(tmp, lifetime);
                     }
                 } catch (UaException e1) {
                     // ignore
@@ -615,7 +708,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public void set(String qName, Object value) throws IOException {
             try {
-                UaVariableNode node = retrieveVariableNode(qName);
+                NodeCacheEntry cached = retrieveCacheEntry(qName);
+                cached.setValue(value);
+                UaVariableNode node = retrieveVariableNode(qName, cached);
                 node.writeValue(new DataValue(new Variant(value)));
                 // TODO handle built-ins
             } catch (UaException e) {
@@ -626,7 +721,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public <T> T getStruct(String qName, Class<T> type) throws IOException {
             try {
-                UaVariableNode node = retrieveVariableNode(qName);
+                NodeCacheEntry cached = retrieveCacheEntry(qName);
+                UaVariableNode node = retrieveVariableNode(qName, cached);
                 DataValue value = node.readValue();
                 Variant variant = value.getValue();
                 ExtensionObject xo = (ExtensionObject) variant.getValue();
@@ -643,7 +739,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         public void setStruct(String qName, Object value) throws IOException {
             try {
                 ExpandedNodeId encodingId = getEncodingId(value.getClass());
-                UaVariableNode node = retrieveVariableNode(qName);
+                NodeCacheEntry cached = retrieveCacheEntry(qName);
+                UaVariableNode node = retrieveVariableNode(qName, cached);
                 ExtensionObject modifiedXo = ExtensionObject.encode(
                     client.getDynamicSerializationContext(),
                     value,
@@ -735,7 +832,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
                 List<MonitoredItemCreateRequest> requests = new ArrayList<MonitoredItemCreateRequest>();
                 for (String n: qName) {
-                    UaNode node = retrieveNode(n);
+                    UaNode node = retrieveCacheEntry(n).node;
                     ReadValueId readValueId = new ReadValueId(node.getNodeId(), AttributeId.Value.uid(), 
                         null, QualifiedName.NULL_VALUE);
                     MonitoredItemCreateRequest request = new MonitoredItemCreateRequest(
@@ -871,7 +968,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 } else {
                     n = n + "/" + name;
                 }
-                return new OpcUaModelAccess(retrieveNode(name), n, this, nodes);
+                return new OpcUaModelAccess(retrieveCacheEntry(name), n, this, nodes);
             } catch (UaException e) {
                 throw new IOException(e);
             }
