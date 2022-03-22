@@ -134,31 +134,6 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             os.close();
         }
     }
-    /** Deletion method for testing purposes.
-     * @param windowsBinary
-     * @param linuxBinary
-     * @throws IOException 
-     */
-    public static void deleteBinaries(File windowsBinary, File linuxBinary) throws IOException {
-        if (true) {
-            if (windowsBinary != null) {
-                if (windowsBinary.isDirectory()) {
-                    File[] files = windowsBinary.listFiles();
-                    for (File f: files) {
-                        deleteFile(f);
-                    }
-                }
-            }
-            if (windowsBinary != null) {
-                if (windowsBinary.isDirectory()) {
-                    File[] files = windowsBinary.listFiles();
-                    for (File f: files) {
-                        deleteFile(f);
-                    }
-                }
-            }
-        }
-    }
     /**
      * Deletes all files used in prometheus run.
      */
@@ -228,14 +203,6 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         proc.destroyForcibly();
         LoggerFactory.getLogger(PrometheusLifecycleDescriptor.class)
             .info(PROMETHEUS + " " +  PROMETHEUS_VERSION + " shutdown");
-        try {
-            deleteBinaries(
-                    new File("src/main/resources/prometheus-2.34.0-win64.exe"),
-                    new File("src/main/resources/prometheus-2.34.0-linux64"));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     @Override
