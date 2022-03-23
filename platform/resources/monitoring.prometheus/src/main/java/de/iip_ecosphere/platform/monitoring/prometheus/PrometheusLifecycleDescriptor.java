@@ -29,63 +29,60 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     private static final String PROMETHEUS_BINARY_WINDOWS = "src/main/resources";
     private static final String PROMETHEUS_ZIP_LINUX = "src/main/resources/prometheus-2.34.0.zip";
     private static final String PROMETHEUS_BINARY_LINUX = "src/main/resources";
-    private Process proc;  
-    private File prometheusWorkingDirectory;
     private String exeName;
+    private File prometheusWorkingDirectory;
+    private File prometheusFile;
     private Path fromBinary;
     private Path toBinary;
     private Path fromYml;
     private Path toYml;
+    private InputStream in;
+    private InputStream inYml;
+    private Process prometheusProcess;  
+    private ProcessBuilder prometheusProcessBuilder;
+    //Only needed in development, determines which copy-function to use.
+    private boolean inProduction = false;
+     
     @Override
     public void startup(String[] args) {
+        //Only unzip the binary needed
         if (SystemUtils.IS_OS_WINDOWS) {
-            exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);   
             unzip(PROMETHEUS_ZIP_WINDOWS, PROMETHEUS_BINARY_WINDOWS);
         } else if (SystemUtils.IS_OS_LINUX) {
-            exeName = PROMETHEUS + "-" + PROMETHEUS_VERSION + "-linux64";
             unzip(PROMETHEUS_ZIP_LINUX, PROMETHEUS_BINARY_LINUX);
         } else {
             LoggerFactory
             .getLogger(PrometheusLifecycleDescriptor.class)
                 .info("Other OS other than Windows and Linux not supported.");
         }
+        exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
+        //Set working directory in a temporary directory
         prometheusWorkingDirectory = FileUtils.createTmpFolder("iip-prometheus");
-        try {   
-            LoggerFactory
-            .getLogger(PrometheusLifecycleDescriptor.class)
-                .info(prometheusWorkingDirectory.getAbsolutePath());
-            fromBinary = Paths.get(PROMETHEUS_BINARY_WINDOWS, exeName);            
-            toBinary = Paths.get(prometheusWorkingDirectory.getAbsolutePath(), exeName);
-            fromYml = Paths.get(PROMETHEUS_BINARY_WINDOWS, PROMETHEUS_CONFIG);                
-            toYml = Paths.get(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG);
-            copy(fromBinary.toFile(), toBinary.toFile());
-            copy(fromYml.toFile(), toYml.toFile());
-            ProcessBuilder processBuilder = null;
-            if (SystemUtils.IS_OS_WINDOWS) { 
-                processBuilder = new ProcessBuilder(
-                        new File(prometheusWorkingDirectory, exeName)
-                        .getAbsolutePath()
-                        , "--config.file=prometheus.yml"
-                        );        
-                processBuilder.directory(prometheusWorkingDirectory);
-                processBuilder.inheritIO();   
-            } else if (SystemUtils.IS_OS_LINUX) {
-                @SuppressWarnings("unused")
-                Process p = Runtime.getRuntime().exec(
-                        "chmod u+x " + new File(prometheusWorkingDirectory, exeName)
-                        .getAbsolutePath());
-                processBuilder = new ProcessBuilder(
-                        new File(prometheusWorkingDirectory, exeName)
-                        .getAbsolutePath()
-                        , "--config.file=prometheus.yml");
-                processBuilder.directory(prometheusWorkingDirectory);
-                processBuilder.inheritIO();
+        //Storing the paths of both files (inside project and tmp-folder) for better readability.
+        fromBinary = Paths.get(PROMETHEUS_BINARY_WINDOWS, exeName);            
+        toBinary = Paths.get(prometheusWorkingDirectory.getAbsolutePath(), exeName);
+        fromYml = Paths.get(PROMETHEUS_BINARY_WINDOWS, PROMETHEUS_CONFIG);                
+        toYml = Paths.get(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG);
+        try {
+            //Currently fallback methods, in production filesCopy()-method should be used.
+            if (inProduction) {
+                in = getClass().getClassLoader().getResourceAsStream(exeName);
+                inYml = getClass().getClassLoader().getResourceAsStream(PROMETHEUS_CONFIG);
+                copyFromStream(in, inYml, prometheusWorkingDirectory, exeName);
             } else {
-                LoggerFactory.getLogger(
-                        PrometheusLifecycleDescriptor.class)
-                        .info("Other OS other than Windows and Linux not supported.");
-            }
-            proc = processBuilder.start();
+                copy(fromBinary.toFile(), toBinary.toFile());
+                copy(fromYml.toFile(), toYml.toFile());                
+            }  
+            prometheusFile = new File(prometheusWorkingDirectory, exeName);
+            //Making the binary executable, only needed for linux.
+            prometheusFile.setExecutable(true);
+            //Using the process builder to create the process
+            prometheusProcessBuilder = new ProcessBuilder(prometheusFile.getAbsolutePath(),
+                    "--config.file=prometheus.yml");
+            prometheusProcessBuilder.directory(prometheusWorkingDirectory);
+            prometheusProcessBuilder.inheritIO();
+            //Starting prometheus
+            prometheusProcess = prometheusProcessBuilder.start();
             LoggerFactory.getLogger(PrometheusLifecycleDescriptor.class)
                 .info(PROMETHEUS + " " +  PROMETHEUS_VERSION + " started");
         } catch (IOException e) {
@@ -93,14 +90,14 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         }
     } 
     /**
-     * Alternative copy method.
+     * Copy-method that should be used in production.
      * @param inBin
      * @param inYml
      * @param promWorkingDirectory
      * @param exeName
      * @throws IOException 
      */
-    public static void filesCopy(
+    public static void copyFromStream(
             InputStream inBin, InputStream inYml, File promWorkingDirectory, String exeName) throws IOException {
         java.nio.file.Files.copy(
                 inBin, 
@@ -195,21 +192,17 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
     }
-    
     @Override
     public void shutdown() {
-        proc.destroyForcibly();
+        prometheusProcess.destroyForcibly();
         LoggerFactory.getLogger(PrometheusLifecycleDescriptor.class)
             .info(PROMETHEUS + " " +  PROMETHEUS_VERSION + " shutdown");
     }
-
     @Override
     public Thread getShutdownHook() {
         return null;
     }
-
     @Override
     public int priority() {
         return LifecycleDescriptor.INIT_PRIORITY;
