@@ -420,7 +420,7 @@ println("MAP " + fn);
     // wraps a function expression (without considering ";") so that IOExceptions are 
     // caught, requires static import of de.iip_ecosphere.platform.support.function.IOVoidFunction.optional
     def wrapOptional(Field field, String ex) {
-        if (isDefined(field.optional) and field.optional) {
+        if (field.optional) {
             "optional(() -> ${ex})"
         } else {
             ex;

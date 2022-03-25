@@ -48,12 +48,15 @@ project DataTypes {
         Fields fields;
     }
     
+    const Integer CACHE_ALWAYS = -1;
+    const Integer CACHE_NONE = 0;
+    
     compound Field {
         NonEmptyString name;
         refTo(DataType) type;
         String description = "";
         Boolean optional = false;
-        Integer cachingTime = -1; 
+        Integer cachingTime = CACHE_ALWAYS; 
     }
 
     typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);
