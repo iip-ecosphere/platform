@@ -29,7 +29,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                  * Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
+                  * Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                   * 
                   * @return the value
                   */'
@@ -50,7 +50,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                 * Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", getDescription(f))}
+                 * Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                  * 
                  * @param value the new value
                  */'

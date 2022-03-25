@@ -9,7 +9,7 @@ template PythonEnum(Configuration config, FileArtifact target, EnumType type) {
     def literals(EnumType type) {
         for (EnumLiteral l: type.literals) {
             '${asIdentifier(l.name)} = ${l.ordinal}
-            """Defines the literal ${l.name}.${prependIfNotEmpty(" ", getDescription(l))}"""\n'
+            """Defines the literal ${l.name}.${prependIfNotEmpty(" ", l.description)}"""\n'
         }
     }
 

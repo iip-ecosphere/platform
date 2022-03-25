@@ -48,22 +48,6 @@ template Basics(Configuration config, FileArtifact target) {
         IOType f = types.first();
         f.type;
     }
-	
-	def String getDescription(Field field) {
-        //if (isDefined(field.description) and field.description.length() > 0) {
-        field.description;
-        //} else {
-        //    "";
-        //}  
-    }
-    
-    def String getDescription(EnumLiteral literal) {
-        //if (isDefined(literal.description) and literal.description.length() > 0) {
-        literal.description;
-        //} else {
-        //    "";
-        //}  
-    }
     
     def String prependIfNotEmpty(String prefix, String text) {
         if (text.length() > 0) {

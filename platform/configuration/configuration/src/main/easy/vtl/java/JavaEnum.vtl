@@ -9,7 +9,7 @@ template JavaEnum(Configuration config, FileArtifact target, EnumType type, Stri
     def literals(EnumType type) {
         for (EnumLiteral l: type.literals, ",\n", ";\n") {
             '/**
-            * Defines the literal ${l.name}.${prependIfNotEmpty(" ", getDescription(l))}
+            * Defines the literal ${l.name}.${prependIfNotEmpty(" ", l.description)}
             */
             ${asIdentifier(l.name)}(${l.ordinal})'
         }
