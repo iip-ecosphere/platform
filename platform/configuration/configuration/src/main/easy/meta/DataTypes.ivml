@@ -52,10 +52,12 @@ project DataTypes {
     const Integer CACHE_NONE = 0;
     
     compound Field {
-        NonEmptyString name;
-        refTo(DataType) type;
-        String description = "";
-        Boolean optional = false;
+        assign(bindingTime = BindingTime::specify) to { // may require staged freezing
+            NonEmptyString name;
+            refTo(DataType) type;
+            String description = "";
+            Boolean optional = false;
+        }
         Integer cachingTime = CACHE_ALWAYS; 
     }
 
@@ -144,6 +146,45 @@ project DataTypes {
     };
     
     // actions for new types, see above!
+
+    // ------------------------------------- type operations --------------------------------------
+    
+    // Helper that turns everything into a "constraint"; helpful for developing complex expressions
+    def Boolean constraint(Any any) = 
+        true;
+
+    // field access operations to compose statements like fields(field(field(myType, "field1"), 0))->forAll(Field f|f.cachingTime=500);    
+
+    // dispatch basis, access field in type by name
+    def Field field(DataType type, String fieldName) = 
+        null;
+
+    def Field field(RecordType type, String fieldName) = 
+        type.fields->select(Field f|f.name == fieldName).first();
+
+    // dispatch basis, access field in type by index
+    def Field field(DataType type, Integer index) = 
+        null;
+
+    def Field field(RecordType type, Integer index) = 
+        type.fields[index];
+
+    // dispatch basis, access fields in type
+    def Fields fields(DataType type) = 
+        null;
+    
+    def Fields fields(RecordType type) = 
+        type.fields;
+
+    // return type of specified field via dynamic dispatch access
+    def refTo(DataType) type(DataType type, String fieldName) = 
+        field(type, fieldName).type;
+
+    // return type of specified field via dynamic dispatch access
+    def refTo(DataType) type(DataType type, Integer index) = 
+        field(type, index).type;
+    
+    // -------------------------------- freeze fixed stuff ----------------------------------------
     
     // freeze all primitives
     freeze {
