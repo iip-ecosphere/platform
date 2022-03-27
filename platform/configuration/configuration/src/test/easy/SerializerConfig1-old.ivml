@@ -190,10 +190,10 @@ project SerializerConfig1Old {
         inInterface = refBy(myConnMachineIn), 
         outInterface = refBy(myConnMachineOut),
         operations = {
-          FieldAssignmentOperation{field=myConnPltfIn.fields[0], 
+          FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[0]), 
             operation=AddDataTranslationOperation{
                 arguments={
-                    DataFieldAccess{field=myConnMachineOut.fields[2]},
+                    DataFieldAccess{field=refBy(myConnMachineOut.fields[2])},
                     IntegerConstantDataOperation{value=100}}
             }
           }
@@ -216,10 +216,10 @@ project SerializerConfig1Old {
         machineFormatter = TextLineFormatter{separator=","},
         machineParser = TextLineParser{separator=","},
         operations = {
-          FieldAssignmentOperation{field=myConnPltfIn.fields[0], 
+          FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[0]), 
             operation=AddDataTranslationOperation{
                 arguments={
-                    DataFieldAccess{field=myConnMachineOut.fields[2]},
+                    DataFieldAccess{field=refBy(myConnMachineOut.fields[2])},
                     IntegerConstantDataOperation{value=100}}
             }
           }
