@@ -150,7 +150,7 @@ public class OpcUaModelTest {
             
         };
         OpcUaConnector<OpcOut, OpcIn> conn = createPlatformConnector(cb);
-        final int maxRequests = 1;
+        final int maxRequests = 10;
         for (int i = 0; i < maxRequests; i++) {
             System.out.println("REQUEST " + i);
             conn.request(true);

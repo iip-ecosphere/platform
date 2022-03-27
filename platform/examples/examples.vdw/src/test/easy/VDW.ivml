@@ -66,15 +66,20 @@ project VDW {
         fields = {
             Field {
                 name = "State",
-                type = refBy(opcBwState)
+                type = refBy(opcBwState),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "Identification",
-                type = refBy(opcBwIdentification)
+                type = refBy(opcBwIdentification),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };
     
     // ------------ individual, reusable services ------------------
+    
+    fields(type(type(type(opcOut, "State"), "Machine"), "Flags"))->forAll(Field f | f.cachingTime = 500);
+    fields(type(type(type(opcOut, "State"), "Machine"), "Overview"))->forAll(Field f | f.cachingTime = 500);
     
     OpcUaV1Connector myOpcUaConn = {
         id = "myOpcConn",
@@ -145,6 +150,8 @@ project VDW {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        Opc; // now freeze also cachingTime
+        OpcWoodworking; // now freeze also cachingTime
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

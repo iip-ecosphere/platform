@@ -102,6 +102,14 @@
            <cleanupDaemonThreads>false</cleanupDaemonThreads>
          </configuration>
        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>test.de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest</mainClass>
+            </configuration>
+        </plugin>
     </plugins>
     <pluginManagement>
         <plugins>

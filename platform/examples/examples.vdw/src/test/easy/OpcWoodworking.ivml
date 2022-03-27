@@ -12,22 +12,28 @@ project OpcWoodworking {
         fields = {
             Field {
                 name = "DeviceClass",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "Manufacturer",
-                type = refBy(opcLocalizedText)
+                type = refBy(opcLocalizedText),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "Model",
-                type = refBy(opcLocalizedText)
+                type = refBy(opcLocalizedText),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "ProductInstanceUri",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "SerialNumber",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "YearOfConstruction",
-                type = refBy(UInt16Type)
+                type = refBy(UInt16Type),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };
@@ -37,7 +43,8 @@ project OpcWoodworking {
         fields = {
             Field {
                 name = "Machine",
-                type = refBy(opcBwStateMachine)
+                type = refBy(opcBwStateMachine),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };
@@ -47,10 +54,12 @@ project OpcWoodworking {
         fields = {
             Field {
                 name = "Flags",
-                type = refBy(opcBwStateMachineFlags)
+                type = refBy(opcBwStateMachineFlags),
+                cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "Overview",
-                type = refBy(opcBwStateMachineOverview)
+                type = refBy(opcBwStateMachineOverview),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };
@@ -60,31 +69,40 @@ project OpcWoodworking {
         fields = {
             Field {
                 name = "Alarm",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "Calibrated",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "Emergency",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "Error",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "MachineInitialized",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "MachineOn",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "PowerPresent",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "RecipeInRun",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "Warning",
-                type = refBy(BooleanType)
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
             }
         }
     };
@@ -94,10 +112,12 @@ project OpcWoodworking {
         fields = {
             Field {
                 name = "CurrentMode",
-                type = refBy(WwUnitModeEnumeration)
+                type = refBy(WwUnitModeEnumeration),
+                cachingTime = CACHE_NONE
             }, Field {
                 name = "CurrentState",
-                type = refBy(WwUnitStateEnumeration)
+                type = refBy(WwUnitStateEnumeration),
+                cachingTime = CACHE_NONE
             }
         }
     };
@@ -151,6 +171,6 @@ project OpcWoodworking {
     
     freeze {
         .; // every variable declared in this project
-    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+    } but (f|f.bindingTime >= BindingTime.compile);
 
 }
