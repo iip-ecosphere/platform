@@ -104,7 +104,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         try {
             getNewConnectionInstance();
         } catch (IOException con) {
-            LoggerFactory.getLogger(AbstractRestProcessService.class).error(con.getMessage(), con);
+            LoggerFactory.getLogger(AbstractRestProcessService.class).error(con.getMessage());
             try {
                 setState(ServiceState.FAILED);
             } catch (ExecutionException e) {
@@ -119,11 +119,19 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         OutputStream os = connection.getOutputStream();
         OutputStreamWriter osw;
         osw = new OutputStreamWriter(os, "UTF-8");
-        String input = "{\"items\":[" + getInputTranslator().to(data) + "]}";
+        String input = adjustRestQuery(getInputTranslator().to(data));
         osw.write(input);
         osw.flush();
         redirectRest(connection, getReceptionCallback());
     }
+    
+    /**
+     * Adjusts the input produced by {@link #getInputTranslator()} to the actual receiver.
+     *  
+     * @param input the input
+     * @return the adjusted input
+     */
+    protected abstract String adjustRestQuery(String input);
     
     /**
      * The rest response.
