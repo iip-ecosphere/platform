@@ -9,6 +9,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     String add = "";
     String topPath = "";
     Integer nestedStepCount = 0;
+    mapOf(Field, Integer) cachingTimes = {};
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
     // dispatch basis
@@ -254,10 +255,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
     
     def cachingTime(Field field) {
-        if (isDefined(field.cachingTime)) { // EASy
-            field.cachingTime;
+        if (cachingTimes.containsKey(field)) {
+            cachingTimes.get(field);
         } else {
-            -1; // endless
+            field.cachingTime;
         }
     }
     
@@ -352,6 +353,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineOutputTranslator(Connector conn) {
         clearTemporaryVariables();
+        cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.inAdapterClass.length() == 0) {
             setAdd(config);
             String coType = asTypeName(getFirstTypeName(conn.output));
@@ -394,6 +396,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineInputTranslator(Connector conn) {
         clearTemporaryVariables();
+        cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.outAdapterClass.length() == 0) {
             setAdd(config);
             String ciType = asTypeName(getFirstTypeName(conn.input));

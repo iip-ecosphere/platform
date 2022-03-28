@@ -426,5 +426,15 @@ println("MAP " + fn);
             ex;
         }
     }
+    
+    // ------------------------------------------- mapping support ------------------------------------
+    
+    def mapOf(Field, Integer) mappedCachingTimes(setOf(MappingEntry) mapping) {
+        mapOf(Field, Integer) result = {};
+        for (CachingTimeMappingEntry e: mapping->selectByType(CachingTimeMappingEntry)) {
+            result.add(e.field, e.cachingTime);
+        }
+        result;
+    }
 
 }

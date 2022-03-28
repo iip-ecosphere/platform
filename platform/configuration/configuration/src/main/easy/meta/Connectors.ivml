@@ -13,8 +13,8 @@ project Connectors {
     abstract compound MappingEntry {
     }
 
-    compound MachineParserMappingEntry refines MappingEntry {
-        Integer position;
+    compound CachingTimeMappingEntry refines MappingEntry {
+        Integer cachingTime;
         refTo(Field) field;
     }
 
