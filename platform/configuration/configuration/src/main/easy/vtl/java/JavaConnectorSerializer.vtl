@@ -7,11 +7,13 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
     String className, setOf(AssignmentOperation) assng) extends DataOperationBasics {
 
-    String index = ""; // temporary
     String add = "";
+
+    // temporary
+    String index = "";
     Integer nestedStepCount = 0;
-    
-    Boolean genFrom = false; // temporary
+    Boolean optionalFound = false;
+    Boolean genFrom = false;
     
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -40,11 +42,13 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = "";
+        optionalFound = false;
         '' // TODO unclear for now
     }
     
     def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
         index = "";
+        optionalFound = false;
         if (parser <> null) {
             setOf(String) done = {};
             '${translateDataOperations(assng, imType, "tmp", pltfType, "result", done)}'
@@ -72,6 +76,10 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            p = paths + "." + field.name;
            ix = indexes;
        }
+       if (field.optional) {
+           optionalFound = true; // disable getData via index after first optional as indexes "jump"
+       }
+       
        if (set) {
            String ex;
            if (not(genFrom)) {
@@ -82,8 +90,12 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")") + "${setEnd}"; 
        } else {
            String ex;
-           if (not(genFrom) and ix.length() > 0) {
-               ex = "pr.getData(\"${p}\", ${ix})";
+           if (not(genFrom)) {
+               if (ix.length() > 0 and not(optionalFound)) {
+                   ex = "pr.getData(\"${p}\", ${ix})";
+               } else {
+                   ex = "pr.getData(\"${p}\")";
+               }
            } else {
                ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
            }
