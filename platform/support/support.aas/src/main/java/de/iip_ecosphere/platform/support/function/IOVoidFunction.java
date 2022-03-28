@@ -17,7 +17,8 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple (optional) function that may throw an {@code IOException}.
+ * A simple (optional) function that may throw an {@link IOException}. {@link IndexOutOfBoundsException}
+ * is also considered as serializer parsers may throw that also.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -27,8 +28,9 @@ public interface IOVoidFunction {
      * Executes the function.
      * 
      * @throws IOException may be thrown but also caught in {@link #optional(IOVoidFunction)}
+     * @throws IndexOutOfBoundsException may be thrown but also caught in {@link #optional(IOVoidFunction)}
      */
-    public void execute() throws IOException;
+    public void execute() throws IOException, IndexOutOfBoundsException;
 
     /**
      * Executes {@code func} but consumes {@link IOException} as execution is considered optional.
@@ -40,7 +42,7 @@ public interface IOVoidFunction {
         boolean success = true;
         try {
             func.execute();
-        } catch (IOException e) {
+        } catch (IOException | IndexOutOfBoundsException e) {
             LoggerFactory.getLogger(IOVoidFunction.class).debug(
                 "Function call failed, but considered optional. " + e.getMessage());
             success = false;
