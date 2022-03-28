@@ -149,6 +149,11 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         }
         return bearerToken;
     }
+
+    @Override
+    protected String adjustRestQuery(String input) {
+        return "{\"items\":[" + input + "]}";
+    }
     
     @Override
     protected String adjustRestResponse(String response) {
