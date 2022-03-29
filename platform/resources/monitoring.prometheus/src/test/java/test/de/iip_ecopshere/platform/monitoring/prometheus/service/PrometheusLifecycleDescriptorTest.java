@@ -25,7 +25,7 @@ public class PrometheusLifecycleDescriptorTest {
             .findFirst();
         Assert.assertTrue(pml.isPresent());
         pml.get().startup(new String[] {});
-        TimeUtils.sleep(50000);
+        TimeUtils.sleep(60000);
         pml.get().shutdown();
         pml.get().deleteWorkingFiles();
     }
