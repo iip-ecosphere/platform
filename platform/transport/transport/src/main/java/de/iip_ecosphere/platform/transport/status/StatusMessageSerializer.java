@@ -146,7 +146,8 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
 
     @Override
     public StatusMessage clone(StatusMessage origin) throws IOException {
-        return new StatusMessage(origin.getType(), origin.getAction(), origin.getId(), origin.getAliasIds());
+        return new StatusMessage(origin.getComponentType(), origin.getAction(), origin.getId(), origin.getDeviceId(),
+            origin.getAliasIds());
     }
 
     @Override

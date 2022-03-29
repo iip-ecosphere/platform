@@ -246,10 +246,18 @@ public class DirectMemoryTransportConnectorTest {
         
         StatusMessage rcv = received.get();
         Assert.assertNotNull(rcv);
-        Assert.assertEquals(msg.getType(), rcv.getType());
+        Assert.assertEquals(msg.getComponentType(), rcv.getComponentType());
         Assert.assertEquals(msg.getAction(), rcv.getAction());
         Assert.assertEquals(msg.getId(), rcv.getId());
+        Assert.assertEquals(msg.getDeviceId(), rcv.getDeviceId());
         Assert.assertArrayEquals(msg.getAliasIds(), rcv.getAliasIds());
+        
+        msg = new StatusMessage(ActionTypes.REMOVED, "AAA", "BBB", "CCC");
+        Assert.assertEquals(msg.getComponentType(), ComponentTypes.DEVICE);
+        Assert.assertEquals(msg.getAction(), ActionTypes.REMOVED);
+        Assert.assertEquals(msg.getId(), "AAA");
+        Assert.assertEquals(msg.getDeviceId(), "AAA");
+        Assert.assertArrayEquals(msg.getAliasIds(), new String[]{"BBB", "CCC"});
     }
 
 }

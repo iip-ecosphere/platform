@@ -17,7 +17,10 @@ import java.io.IOException;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 
 /**
- * Represents a status message.
+ * Represents a status message for a component. A component is denoted by the device id (of the ECS runtime) the 
+ * component is running on, the component id (in the context of a device) and optional alias ids, e.g., introduced
+ * by a specific device management approach. If the component to notify about is a device, the device id and the 
+ * component id shall be equal.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -25,29 +28,45 @@ public class StatusMessage {
 
     public static final String STATUS_STREAM = "ComponentStatus";
     
-    private ComponentType type;
+    private ComponentType componentType;
     private ActionType action;
     private String id;
     private String[] aliasIds;
+    private String deviceId;
 
     /**
      * Creates an empty status message. [deserialization]
      */
     StatusMessage() {
     }
-    
+
     /**
-     * Creates a new status message.
+     * Creates a new status message for devices, i.e., {@link ComponentTypes#DEVICE}. 
      * 
-     * @param type the type
      * @param action the action
      * @param id the id of the component
      * @param aliasIds optional alias ids
      */
-    public StatusMessage(ComponentType type, ActionType action, String id, String... aliasIds) {
-        this.type = type;
+    public StatusMessage(ActionType action, String id, String... aliasIds) {
+        this(ComponentTypes.DEVICE, action, id, id, aliasIds);
+    }
+    
+    /**
+     * Creates a new status message.
+     * 
+     * @param componentType the component type
+     * @param action the action
+     * @param id the id of the component
+     * @param deviceId the id of device providing the context, shall be equal to {@code id} if {@code componentType}
+     *     is {@link ComponentTypes#DEVICE}.  
+     * @param aliasIds optional alias ids
+     */
+    public StatusMessage(ComponentType componentType, ActionType action, String id, String deviceId, 
+        String... aliasIds) {
+        this.componentType = componentType;
         this.action = action;
         this.id = id;
+        this.deviceId = deviceId;
         this.aliasIds = aliasIds;
     }
 
@@ -56,17 +75,17 @@ public class StatusMessage {
      * 
      * @return the component type
      */
-    public ComponentType getType() {
-        return type;
+    public ComponentType getComponentType() {
+        return componentType;
     }
 
     /**
      * Changes the component type. [deserialization]
      * 
-     * @param type the new component type
+     * @param componentType the new component type
      */
-    void setType(ComponentType type) {
-        this.type = type;
+    void setComponentType(ComponentType componentType) {
+        this.componentType = componentType;
     }
 
     /**
@@ -90,7 +109,8 @@ public class StatusMessage {
     /**
      * Returns the primary id of the component.
      * 
-     * @return the primary id
+     * @return the primary id, may be equal to {@link #getDeviceId()} if {@link #getType()} is 
+     *    {@link #getComponentType()} is {@link ComponentTypes#DEVICE}.
      */
     public String getId() {
         return id;
@@ -103,6 +123,25 @@ public class StatusMessage {
      */
     void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * Returns the device (context) id of the component.
+     * 
+     * @return the device id, shall be equal to {@link #getId()} if {@link #getType()} is {@link #getComponentType()} 
+     *    is {@link ComponentTypes#DEVICE}.
+     */
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    /**
+     * Changes the device (context) id of the component. [deserialization]
+     * 
+     * @param deviceId the device id
+     */
+    void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     /**
