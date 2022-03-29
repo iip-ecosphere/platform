@@ -4,6 +4,7 @@ import JavaBasics;
 // May be called direcly for Java-based access, but also can be extended and individual (marked) parts
 // overridden to generate different access styles, e.g., for model access paths.
 @advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
 template DataOperationBasics(Configuration config, FileArtifact target) {
 
     setOf(String) dummy = {}; // not nice

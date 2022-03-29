@@ -2,6 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
 template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {

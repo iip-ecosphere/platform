@@ -2,6 +2,7 @@ import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
 template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
 
     def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
