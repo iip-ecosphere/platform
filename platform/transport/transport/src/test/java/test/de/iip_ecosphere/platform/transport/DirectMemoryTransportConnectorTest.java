@@ -13,6 +13,7 @@ package test.de.iip_ecosphere.platform.transport;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
@@ -26,22 +27,29 @@ import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
+import de.iip_ecosphere.platform.transport.status.Monitor;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
 
 import org.junit.Assert;
 
 /**
- * A transport connector that uses the memory for transport communication.
+ * A transport connector that uses the memory for transport communication. Tests also {@link StatusMessage} 
+ * and {@link StatusMessageSerializer} as well as {@link Monitor} as a simple, working transport connector is
+ * available in this test.
  * 
  * @author Holger Eichelberger, SSE
  */
 @ExcludeFirst
 public class DirectMemoryTransportConnectorTest {
+    
+    private static boolean factoryUseDmcAsTransport = false;
 
     /**
      * Does nothing, just for testing the creation.
@@ -165,7 +173,7 @@ public class DirectMemoryTransportConnectorTest {
 
             @Override
             public TransportConnector createConnector() {
-                return MY_FAKE_CONNECTOR;
+                return factoryUseDmcAsTransport ? MY_DM_CONNECTOR : MY_FAKE_CONNECTOR;
             }
 
             @Override
@@ -251,13 +259,51 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertEquals(msg.getId(), rcv.getId());
         Assert.assertEquals(msg.getDeviceId(), rcv.getDeviceId());
         Assert.assertArrayEquals(msg.getAliasIds(), rcv.getAliasIds());
-        
-        msg = new StatusMessage(ActionTypes.REMOVED, "AAA", "BBB", "CCC");
+    }
+
+    /**
+     * Tests a singular resource status message (different creation).
+     */
+    @Test
+    public void testResourceStatusMessage() {
+        StatusMessage msg = new StatusMessage(ActionTypes.REMOVED, "AAA", "BBB", "CCC");
         Assert.assertEquals(msg.getComponentType(), ComponentTypes.DEVICE);
         Assert.assertEquals(msg.getAction(), ActionTypes.REMOVED);
         Assert.assertEquals(msg.getId(), "AAA");
         Assert.assertEquals(msg.getDeviceId(), "AAA");
         Assert.assertArrayEquals(msg.getAliasIds(), new String[]{"BBB", "CCC"});
+    }
+    
+    /**
+     * Tests {@link Monitor}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testMonitor() throws IOException {
+        factoryUseDmcAsTransport = true; // use a different default connector as required by Monitor
+        Monitor.setTransportSetup(null); // not needed here
+        AtomicInteger receivedCount = new AtomicInteger();
+        MY_DM_CONNECTOR.setReceptionCallback(StatusMessage.STATUS_STREAM, new ReceptionCallback<StatusMessage>() {
+
+            @Override
+            public void received(StatusMessage data) {
+                receivedCount.getAndIncrement();
+            }
+
+            @Override
+            public Class<StatusMessage> getType() {
+                return StatusMessage.class;
+            }
+        });
+        Monitor.setTransportSetup(new TransportSetup()); // information not needed by connector, just the instance
+        Monitor.sendResourceStatus(ActionTypes.ADDED);
+        Monitor.sendContainerStatus(ActionTypes.CHANGED, "Container-1");
+        Monitor.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
+        Monitor.releaseConnector(); // prevent reconnects by default
+        Monitor.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
+        factoryUseDmcAsTransport = false;
+        Assert.assertEquals(3, receivedCount.get());
     }
 
 }
