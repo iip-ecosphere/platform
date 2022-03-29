@@ -183,7 +183,25 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public Any getData(String name, int... indexes) {
+        public Any getData(String name, int... indexes) throws IOException {
+            Any result = get(name, indexes);
+            if (result != null) {
+                return result;
+            } else {
+                throw new IOException("No entry found for " + name + " / " + Arrays.toString(indexes));
+            }
+        }
+
+        /**
+         * Returns the JSON object representing {@code name} or {@code indexes}.
+         * 
+         * @param name the name of the data field, may contain hierarchical names separated by 
+         *     {@link InputParser#SEPARATOR}, may be based on the scope set by {@link #stepInto(String, int)}
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the JSON object, may be <b>null</b> for not found
+         */
+        private Any get(String name, int... indexes) {
             Any result = null;
             Any obj = any;
             int start = 0;
@@ -204,19 +222,64 @@ public final class JsonInputParser implements InputParser<Any> {
                     }
                 }
             } while (end > 0);
-            if (obj.valueType() == ValueType.INVALID) { // fallback
+            if (obj.valueType() == ValueType.INVALID && indexes.length > 0) { // fallback
                 EntryIterator it = findBy(indexes);
                 if (null != it) {
                     result = it.value();
-                } else {
-                    throw new IndexOutOfBoundsException("No entry found for " + Arrays.toString(indexes));
                 }
-            } else if (obj != any) {
+            } else if (obj.valueType() != ValueType.INVALID && obj != any) {
                 result = obj;
+            } 
+            return result;
+        }
+        
+        @Override
+        public void getData(IOConsumer<Any> ifPresent, String name, int... indexes) throws IOException {
+            Any result = get(name, indexes);
+            if (null != result) {
+                ifPresent.accept(result);
+            }
+        }
+
+        /**
+         * Returns the JSON object representing {@code name} or {@code indexes} without hierarchical name 
+         * interpretation.
+         * 
+         * @param name the name of the data field
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the JSON object, may be <b>null</b> for not found
+         */
+        private Any getLocal(String name, int[] indexes) {
+            Any result = null;
+            if (any.keys().contains(name)) { // seems to be faster than direct access
+                result = any.get(name);    
             } else {
-                throw new IndexOutOfBoundsException("No entry found for " + name);
+                if (indexes.length > 0) {
+                    EntryIterator it = findBy(indexes);
+                    if (null != it) {
+                        result = it.value();
+                    }
+                }
             }
             return result;
+        }
+
+        @Override
+        public Any getLocalData(String name, int... indexes) throws IOException {
+            Any result = getLocal(name, indexes);
+            if (null == result) {
+                throw new IOException("No entry found for " + name + " / " + Arrays.toString(indexes));
+            }
+            return result;
+        }
+
+        @Override
+        public void getLocalData(IOConsumer<Any> ifPresent, String name, int... indexes) throws IOException {
+            Any result = getLocal(name, indexes);
+            if (null != result) {
+                ifPresent.accept(result);
+            }
         }
 
         @Override

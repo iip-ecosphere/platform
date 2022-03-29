@@ -59,22 +59,70 @@ public interface InputParser<T> {
         public int getDataCount();
 
         /**
-         * Returns the value of the data field for the given field {@code name} from {@code mapping} or with 
+         * Returns the value of the data field for the given field {@code name} or with 
          * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
          * access shall be used as fallback. Names may be hierarchical. May be overridden if direct access to names 
          * is provided by the parsed structure, e.g., in JSON. Thus, no index-access is provided in the first place
          * by this interface.
          * 
          * @param name the name of the data field, may contain hierarchical names separated by 
-         *     {@link InputParser#SEPARATOR}
+         *     {@link InputParser#SEPARATOR}, may be based on the scope set by {@link #stepInto(String, int)}
          * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
          *     {@link #getDataCount()}
          * @return the data value
-         * @throws IndexOutOfBoundsException if the mapped index or the given 
+         * @throws IOException if the mapped index or the given 
          *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
          */
-        public T getData(String name, int... indexes);
-        
+        public T getData(String name, int... indexes) throws IOException;
+
+        /**
+         * Returns the value of the data field for the given field {@code name} or with 
+         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
+         * access shall be used as fallback. Names may be hierarchical. May be overridden if direct access to names 
+         * is provided by the parsed structure, e.g., in JSON. Thus, no index-access is provided in the first place
+         * by this interface. This method shall not throw any exception.
+         * 
+         * @param ifPresent consumer called if a data value was found. The value is passed to {@code ifPresent}
+         *     for further processing
+         * @param name the name of the data field, may contain hierarchical names separated by 
+         *     {@link InputParser#SEPARATOR}, may be based on the scope set by {@link #stepInto(String, int)}
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @throws IOException if an 
+         */
+        public void getData(IOConsumer<T> ifPresent, String name, int... indexes) throws IOException;
+
+        /**
+         * Returns the value of the data field for the given field {@code name} or with 
+         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
+         * access shall be used as fallback. No hierarchical name interpretation happens here (local). In combination
+         * with {@link #stepInto(String, int)}, this method shall be faster than {@link #getData(String, int...)}.
+         * 
+         * @param name the name of the data field
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @return the data value
+         * @throws IOException if the mapped index or the given 
+         *     {@code index}&lt;0 || index &gt;= {@link #getDataCount()}
+         */
+        public T getLocalData(String name, int... indexes) throws IOException;
+
+        /**
+         * Returns the value of the data field for the given field {@code name} or with 
+         * via the given {@code index}. Primary index goes via name and if not given/mapped, index-based 
+         * access shall be used as fallback. No hierarchical name interpretation happens here (local). In combination
+         * with {@link #stepInto(String, int)}, this method shall be faster than 
+         * {@link #getData(IOConsumer, String, int...)}.
+         * 
+         * @param ifPresent consumer called if a data value was found. The value is passed to {@code ifPresent}
+         *     for further processing
+         * @param name the name of the data field
+         * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+         *     {@link #getDataCount()}
+         * @throws IOException if an exception occurred in {@code ifPresent} 
+         */
+        public void getLocalData(IOConsumer<T> ifPresent, String name, int... indexes) throws IOException;
+
         /**
          * Sets the hierarchical substructure denoted by {@code name} as current scope for further resolution.
          * When overriding, declare the actual type as result type.

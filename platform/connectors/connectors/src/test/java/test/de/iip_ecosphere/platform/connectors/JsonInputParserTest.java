@@ -38,9 +38,14 @@ public class JsonInputParserTest {
         JsonParseResult res = parser.parse(data.getBytes());
         JsonInputConverter conv = parser.getConverter();
         Assert.assertEquals("abc", conv.toString(res.getData("name", 0)));
+        Assert.assertEquals("abc", conv.toString(res.getLocalData("name", 0)));
         Assert.assertEquals(1, conv.toInteger(res.getData("value", 0)));
         Assert.assertEquals(MyEnum.TEST2, conv.toEnum(res.getData("enum", 2), MyEnum.class));
         Assert.assertEquals(MyEnum.TEST1, conv.toEnum(res.getData("enumName", 3), MyEnum.class));
+        res.getData(v -> Assert.assertEquals(1, conv.toInteger(v)), "value", 0);
+        res.getData(v -> Assert.fail(), "value0");
+        res.getLocalData(v -> Assert.assertEquals(1, conv.toInteger(v)), "value", 0);
+        res.getLocalData(v -> Assert.fail(), "value0");
         
         Assert.assertEquals("", res.getFieldName());
         Assert.assertEquals("name", res.getFieldName(0));
@@ -60,6 +65,8 @@ public class JsonInputParserTest {
         
         res = res.stepInto("obj", 0);
         Assert.assertEquals("abc", conv.toString(res.getData("name", 0)));
+        Assert.assertEquals("abc", conv.toString(res.getLocalData("name", 0)));
+        res.getLocalData(d -> Assert.assertEquals("abc", conv.toString(d)), "name", 0);
         Assert.assertEquals(1, conv.toInteger(res.getData("value", 0)));
         Assert.assertEquals(1, conv.toInteger(res.getData("x", 1)));
         Assert.assertEquals("name", res.getFieldName(0));

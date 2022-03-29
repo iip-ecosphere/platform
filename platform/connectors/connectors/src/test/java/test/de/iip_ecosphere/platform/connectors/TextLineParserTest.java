@@ -48,17 +48,23 @@ public class TextLineParserTest {
         TextLineParserConverter conv = TextLineParser.CONVERTER; // unusual, ask parser, just for test
         Assert.assertEquals(parts[0], conv.toString(pr.getData("fieldX", 0)));
         Assert.assertEquals(parts[1], conv.toString(pr.getData("field2", 1)));
+        Assert.assertEquals(parts[1], conv.toString(pr.getLocalData("field2", 1)));
+        pr.getData(d -> Assert.assertEquals(parts[1], conv.toString(d)), "field2", 1);
+        pr.getLocalData(d -> Assert.assertEquals(parts[1], conv.toString(d)), "field2", 1);
         Assert.assertEquals(parts[1], conv.toString(pr.getData("f", 1)));
         Assert.assertEquals(0.45, conv.toDouble(pr.getData("f", 1, 2)), 0.01);
         Assert.assertEquals(0.56, conv.toDouble(pr.getData("", 4)), 0.01);
         Assert.assertEquals(12345, conv.toInteger(pr.getData("", 5)));
         Assert.assertEquals(MyEnum.TEST2, conv.toEnum(pr.getData("", 6), MyEnum.class));
         Assert.assertEquals(MyEnum.TEST1, conv.toEnum(pr.getData("", 7), MyEnum.class));
+        Assert.assertEquals(MyEnum.TEST1, conv.toEnum(pr.getLocalData("", 7), MyEnum.class));
         try {
             pr.getData("f", 10);
             Assert.fail("No Exception");
-        } catch (IndexOutOfBoundsException e) {
+        } catch (IOException e) {
         }
+        pr.getData(d -> Assert.fail(), "f", 10);
+        pr.getLocalData(d -> Assert.fail(), "f", 10);
 
         charset = StandardCharsets.ISO_8859_1.name();
         testTextLineParser(parts, charset, "#");

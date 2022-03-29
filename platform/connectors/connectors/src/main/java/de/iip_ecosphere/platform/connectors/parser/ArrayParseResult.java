@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.connectors.parser;
 
+import java.io.IOException;
+
 import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
@@ -60,7 +62,28 @@ public class ArrayParseResult implements ParseResult<String> {
     }
 
     @Override
-    public String getData(String name, int... indexes) {
+    public String getData(String name, int... indexes) throws IOException {
+        return getLocalData(name, indexes); // anyway no name interpretation here
+    }
+    
+    @Override
+    public String getLocalData(String name, int... indexes) throws IOException {
+        int index = getIndex(indexes);
+        if (index >= 0 && index < data.length) { // prevent exception, call consumer
+            return data[index];
+        } else {
+            throw new IOException();
+        }
+    }
+    
+    /**
+     * Returns the one-dimensional array index into the data.
+     * 
+     * @param indexes the path of (nested) 0-based indexes to the field, the sum must be less than 
+     *     {@link #getDataCount()}
+     * @return the 0-based index
+     */
+    private int getIndex(int[] indexes) {
         int index;
         if (indexes.length == 1) {
             index = baseIndex + indexes[0];
@@ -70,7 +93,20 @@ public class ArrayParseResult implements ParseResult<String> {
                 index += indexes[i];
             }
         }
-        return data[index];
+        return index;
+    }
+
+    @Override
+    public void getLocalData(IOConsumer<String> ifPresent, String name, int... indexes) throws IOException {
+        int index = getIndex(indexes);
+        if (index >= 0 && index < data.length) { // prevent exception, call consumer
+            ifPresent.accept(data[index]);
+        }
+    }
+    
+    @Override
+    public void getData(IOConsumer<String> ifPresent, String name, int... indexes) throws IOException {
+        getLocalData(ifPresent, name, indexes); // anyway no name interpretation here
     }
 
     @Override
