@@ -11,6 +11,9 @@
 package test.de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
@@ -24,6 +27,12 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
+import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
+import de.iip_ecosphere.platform.transport.status.ComponentTypes;
+import de.iip_ecosphere.platform.transport.status.StatusMessage;
+
 import org.junit.Assert;
 
 /**
@@ -41,33 +50,72 @@ public class DirectMemoryTransportConnectorTest {
      */
     private static class FakeConnector implements TransportConnector {
 
+        private Map<String, ReceptionCallback<?>> callbacks = new HashMap<>();
+        
         @Override
         public void syncSend(String stream, Object data) throws IOException {
+            serializeDeserializeNotify(stream, data);
         }
 
         @Override
         public void asyncSend(String stream, Object data) throws IOException {
+            serializeDeserializeNotify(stream, data);
+        }
+        
+        /**
+         * Does a full round-trip what a usual connector does in at least two steps: serialize, look for callback,
+         * take callback deserializer, deserialize and notify. Notification happens in sequence, not in parallel.
+         * 
+         * @param <T> the data type
+         * @param stream the stream name
+         * @param data the data to handle
+         * @throws IOException if serialization/deserialization fails for some reason
+         */
+        @SuppressWarnings("unchecked")
+        private <T> void serializeDeserializeNotify(String stream, T data) throws IOException {
+            Class<T> cls = (Class<T>) data.getClass();
+            Serializer<T> serializer = SerializerRegistry.getSerializer(cls);
+            if (null != serializer) {
+                byte[] tmp = serializer.to(data);
+                ReceptionCallback<T> callback = (ReceptionCallback<T>) callbacks.get(stream);
+                if (null != callback) {
+                    Serializer<T> deserializer = SerializerRegistry.getSerializer(callback.getType());
+                    if (null != deserializer) {
+                        callback.received(deserializer.from(tmp));
+                    } else {
+                        System.out.println("No deserializer found for " + callback.getType().getName());
+                    }
+                } else {
+                    System.out.println("No callback found for " + stream);
+                }
+            } else {
+                System.out.println("No serializer found for " + cls.getName());
+            }
         }
 
         @Override
         public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
+            callbacks.put(stream, callback);
         }
 
         @Override
         public void unsubscribe(String stream, boolean delete) throws IOException {
+            callbacks.remove(stream);
         }
 
         @Override
         public String composeStreamName(String parent, String name) {
-            return null;
+            return parent + "/" + name;
         }
 
         @Override
         public void connect(TransportParameter params) throws IOException {
+            // ignore
         }
 
         @Override
         public void disconnect() throws IOException {
+            // ignore
         }
         
         @Override
@@ -165,6 +213,43 @@ public class DirectMemoryTransportConnectorTest {
         AbstractTransportConnectorTest.doTest(addr, ProductJsonSerializer.class);
         MY_DM_CONNECTOR.clear(); // just as we want to have constants
         AbstractTransportConnectorTest.doTest(addr, ProductProtobufSerializer.class);
+    }
+    
+    /**
+     * Tests "sending"/"receiving" {@link StatusMessage} via a direct memory connector. Involves serialization.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testStatusMessage() throws IOException {
+        // Assuming that TestFactoryDescriptor has been loaded
+        
+        AtomicReference<StatusMessage> received = new AtomicReference<>();
+        TransportConnector conn = TransportFactory.createDirectMemoryConnector();
+        ReceptionCallback<StatusMessage> callback = new ReceptionCallback<StatusMessage>() {
+
+            @Override
+            public void received(StatusMessage data) {
+                received.set(data);
+            }
+
+            @Override
+            public Class<StatusMessage> getType() {
+                return StatusMessage.class;
+            }
+        };
+        conn.setReceptionCallback(StatusMessage.STATUS_STREAM, callback);
+        // no connect needed, direct transfer
+        StatusMessage msg = new StatusMessage(ComponentTypes.CONTAINER, ActionTypes.ADDED, "AAA", "BBB", "CCC");
+        msg.send(conn);
+        // no disconnect needed, direct transfer
+        
+        StatusMessage rcv = received.get();
+        Assert.assertNotNull(rcv);
+        Assert.assertEquals(msg.getType(), rcv.getType());
+        Assert.assertEquals(msg.getAction(), rcv.getAction());
+        Assert.assertEquals(msg.getId(), rcv.getId());
+        Assert.assertArrayEquals(msg.getAliasIds(), rcv.getAliasIds());
     }
 
 }
