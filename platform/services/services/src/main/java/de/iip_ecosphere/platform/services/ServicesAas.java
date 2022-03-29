@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
@@ -357,6 +358,7 @@ public class ServicesAas implements AasContributor {
         descriptorBuilder.build();
         
         serviceBuilder.build();
+        Monitor.sendServiceStatus(ActionTypes.ADDED, desc.getId());
     }
 
     /**
@@ -466,6 +468,7 @@ public class ServicesAas implements AasContributor {
             }
             builder.build();
         });
+        Monitor.sendServiceArtifactStatus(ActionTypes.ADDED, desc.getId());
     }
 
     /**
@@ -496,6 +499,7 @@ public class ServicesAas implements AasContributor {
         for (ServiceDescriptor s : desc.getServices()) {
             removeRelations(s, sub, coll);
         }
+        Monitor.sendServiceArtifactStatus(ActionTypes.REMOVED, desc.getId());
     }
     
     /**
@@ -608,12 +612,15 @@ public class ServicesAas implements AasContributor {
                         Id.getDeviceId(), ServiceFactory.getTransport());
                     subB.build();
                 }
+                Monitor.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
+                Monitor.sendServiceStatus(ActionTypes.REMOVED, desc.getId());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {
                 MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
+                Monitor.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             }
         });
     }

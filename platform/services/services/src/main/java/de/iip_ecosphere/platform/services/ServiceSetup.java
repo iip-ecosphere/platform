@@ -91,6 +91,7 @@ public class ServiceSetup {
      */
     public void setTransport(TransportSetup transport) {
         this.transport = transport;
+        Monitor.setTransportSetup(transport);
     }
 
     

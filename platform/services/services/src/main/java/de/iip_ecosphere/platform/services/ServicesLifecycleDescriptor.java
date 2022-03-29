@@ -41,4 +41,10 @@ public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor 
         NetworkManagerFactory.configure(ServiceFactory.getNetworkManagerSetup());
     }
     
+    @Override
+    public void shutdown() {
+        Monitor.releaseConnector();
+        super.shutdown();
+    }
+    
 }
