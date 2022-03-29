@@ -191,7 +191,6 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         for (Field f : type.fields) {
             String fn = mapSourcePath(qual, f);
             result.add(fn, f);
-println("MAP " + fn);            
             mapSourcePaths(f.type, result, fn);
         }
     }

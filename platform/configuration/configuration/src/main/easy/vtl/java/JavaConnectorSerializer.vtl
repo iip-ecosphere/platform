@@ -69,12 +69,15 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def genFieldAcc(String path, Field field, Boolean set, String setEnd, String value, String indexes, String paths) {
        String p;
        String ix;
+       String getOp;
        if (optWithStepIn) {
            p = field.name;
            ix = suffixPath(indexes, ",");
+           getOp = "getLocalData";
        } else {
            p = paths + "." + field.name;
            ix = indexes;
+           getOp = "getData";
        }
        if (field.optional) {
            optionalFound = true; // disable getData via index after first optional as indexes "jump"
@@ -92,9 +95,9 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            String ex;
            if (not(genFrom)) {
                if (ix.length() > 0 and not(optionalFound)) {
-                   ex = "pr.getData(\"${p}\", ${ix})";
+                   ex = "pr.${getOp}(\"${p}\", ${ix})";
                } else {
-                   ex = "pr.getData(\"${p}\")";
+                   ex = "pr.${getOp}(\"${p}\")";
                }
            } else {
                ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
