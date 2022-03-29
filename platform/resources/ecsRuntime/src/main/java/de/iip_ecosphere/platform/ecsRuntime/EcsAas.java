@@ -155,7 +155,6 @@ public class EcsAas implements AasContributor {
                 addContainer(smB, desc);
             }
         }
-        Monitor.sendResourceStatus(ActionTypes.ADDED); // TODO preliminary -> DeviceManagement
 
         smB.defer(); // join with services if present, build done by AAS
         return null;
@@ -300,6 +299,7 @@ public class EcsAas implements AasContributor {
         dBuilder.build();
         
         cBuilder.build();
+        Monitor.sendContainerStatus(ActionTypes.ADDED, desc.getId());
     }
     
     /**
@@ -312,7 +312,6 @@ public class EcsAas implements AasContributor {
             SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
             addContainer(builder, desc);
             builder.build();
-            Monitor.sendContainerStatus(ActionTypes.ADDED, desc.getId());
         });
     }
 
@@ -345,7 +344,6 @@ public class EcsAas implements AasContributor {
                     sub.delete(elt);
                 }
             }
-            Monitor.sendResourceStatus(ActionTypes.REMOVED); // TODO preliminary -> DeviceManagement
         });
     }
 

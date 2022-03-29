@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -73,6 +74,7 @@ public class DeviceManagement {
             if (onboard) {
                 String ip = NetUtils.getOwnIP();
                 result = registryClient.addDevice(Id.getDeviceIdAas(), ip);
+                Monitor.sendResourceStatus(ActionTypes.ADDED);
             } else {
                 throw new ExecutionException("This decvice was not onboarded before. Stopping.", null);
             }
@@ -96,6 +98,7 @@ public class DeviceManagement {
             if (null != device) {
                 if (offboard) {
                     registryClient.removeDevice(Id.getDeviceIdAas());
+                    Monitor.sendResourceStatus(ActionTypes.REMOVED);
                 } 
             } else {
                 throw new ExecutionException("Device was not registered.", null);
