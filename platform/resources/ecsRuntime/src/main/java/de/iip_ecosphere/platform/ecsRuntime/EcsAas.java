@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
-import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
@@ -45,6 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
 
 /**
  * Implements the AAS for the ECS runtime. Container ids used as short AAS ids may be translated into ids that are
@@ -155,6 +155,7 @@ public class EcsAas implements AasContributor {
                 addContainer(smB, desc);
             }
         }
+        Monitor.sendResourceStatus(ActionTypes.ADDED); // TODO preliminary -> DeviceManagement
 
         smB.defer(); // join with services if present, build done by AAS
         return null;
@@ -311,6 +312,7 @@ public class EcsAas implements AasContributor {
             SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
             addContainer(builder, desc);
             builder.build();
+            Monitor.sendContainerStatus(ActionTypes.ADDED, desc.getId());
         });
     }
 
@@ -323,6 +325,7 @@ public class EcsAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
             coll.deleteElement(fixId(desc.getId()));
+            Monitor.sendContainerStatus(ActionTypes.REMOVED, desc.getId());
         });
     }
 
@@ -342,6 +345,7 @@ public class EcsAas implements AasContributor {
                     sub.delete(elt);
                 }
             }
+            Monitor.sendResourceStatus(ActionTypes.REMOVED); // TODO preliminary -> DeviceManagement
         });
     }
 
@@ -371,6 +375,7 @@ public class EcsAas implements AasContributor {
             } else {
                 getLogger().error("Container state change - cannot find container `" + desc.getId() + "`");
             }
+            Monitor.sendContainerStatus(ActionTypes.CHANGED, desc.getId());
         });
     }
 

@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
@@ -31,12 +28,11 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  * 
  * @author Holger Eichelberger, SSE
  */
-class Monitor {
+class Monitor extends de.iip_ecosphere.platform.transport.status.Monitor {
     
     public static final String TRANSPORT_METRICS_CHANNEL = "EcsMetrics";
     private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
     private static Timer timer = new Timer();
-    private static TransportConnector connector;
     private static boolean update = false;
 
     /**
@@ -53,25 +49,15 @@ class Monitor {
      */
     static void startScheduling() {
         final String id = Id.getDeviceId();
-        EcsSetup config = EcsFactory.getSetup();
-        TransportSetup transport = config.getTransport();
-        if (null != transport) {
-            try {
-                connector = TransportFactory.createConnector();
-                connector.connect(transport.createParameter());
-            } catch (IOException e) {
-                LoggerFactory.getLogger(Monitor.class).error("Cannot create transport connector: " + e.getMessage());
-                connector = null;
-            }
-        }
+        createConnector();
         timer.schedule(new TimerTask() {
 
             @Override
             public void run() {
                 provider.calculateNonNativeSystemMetrics();
-                if (null != connector) {
+                if (null != getConnector()) {
                     try {
-                        connector.asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
+                        getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Monitor.class).error(
                             "Cannot sent monitoring message: " + e.getMessage());
@@ -80,7 +66,7 @@ class Monitor {
                 }
             }
             
-        }, 0, config.getMonitoringUpdatePeriod());
+        }, 0, EcsFactory.getSetup().getMonitoringUpdatePeriod());
     }
 
     /**
@@ -89,14 +75,7 @@ class Monitor {
     static void stopScheduling() {
         MetricsAasConstructor.clear();
         timer.cancel();
-        if (null != connector) {
-            try {
-                connector.disconnect();
-            } catch (IOException e) {
-                LoggerFactory.getLogger(Monitor.class).error(
-                    "Cannot disconnect transport connector: " + e.getMessage());
-            }
-        }
+        releaseConnector();
     }
 
 }

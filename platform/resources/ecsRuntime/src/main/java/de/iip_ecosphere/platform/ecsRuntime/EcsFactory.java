@@ -58,6 +58,7 @@ public class EcsFactory {
                     LOGGER.error("No configuration, falling back to default " + e.getMessage());
                 }
             }
+            Monitor.setTransportSetup(conf.getTransport());
         }
     }
 
