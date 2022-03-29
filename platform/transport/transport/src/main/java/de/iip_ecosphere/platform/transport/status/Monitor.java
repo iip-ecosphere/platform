@@ -36,14 +36,25 @@ public class Monitor {
     /**
      * Sends a service status message. Uses {@link Id#getDeviceId()}.
      * 
-     * @param action the action on the container
+     * @param action the action on the service
      * @param serviceId the service Id
      * @param aliasIds optional alias ids for the service 
      */
     public static void sendServiceStatus(ActionType action, String serviceId, String... aliasIds) {
         sendStatus(new StatusMessage(ComponentTypes.SERVICE, action, serviceId, Id.getDeviceId(), aliasIds));
     }
-    
+
+    /**
+     * Sends a service artifact status message. Uses {@link Id#getDeviceId()}.
+     * 
+     * @param action the action on the artifact
+     * @param artifactId the artifact Id
+     * @param aliasIds optional alias ids for the artifact 
+     */
+    public static void sendServiceArtifactStatus(ActionType action, String artifactId, String... aliasIds) {
+        sendStatus(new StatusMessage(ComponentTypes.SERVICE_ARTIFACT, action, artifactId, Id.getDeviceId(), aliasIds));
+    }
+
     /**
      * Sends a container status message. Uses {@link Id#getDeviceId()}.
      * 

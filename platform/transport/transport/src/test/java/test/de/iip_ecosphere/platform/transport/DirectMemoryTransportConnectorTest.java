@@ -300,10 +300,11 @@ public class DirectMemoryTransportConnectorTest {
         Monitor.sendResourceStatus(ActionTypes.ADDED);
         Monitor.sendContainerStatus(ActionTypes.CHANGED, "Container-1");
         Monitor.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
+        Monitor.sendServiceArtifactStatus(ActionTypes.REMOVED, "ServiceArtifact-1");
         Monitor.releaseConnector(); // prevent reconnects by default
         Monitor.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
         factoryUseDmcAsTransport = false;
-        Assert.assertEquals(3, receivedCount.get());
+        Assert.assertEquals(4, receivedCount.get());
     }
 
 }
