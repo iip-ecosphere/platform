@@ -76,7 +76,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     /**
      * Returns the bearer token for authentication.
      * 
-     * @return the bearer token
+     * @return the bearer token, may be <b>null</b> for none
      */
     protected abstract String getBearerToken();
     
@@ -92,7 +92,10 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Authorization", getBearerToken());
+        String bearer = getBearerToken();
+        if (null != bearer) {
+            connection.setRequestProperty("Authorization", bearer);
+        }
         connection.connect();
         return connection;
     }
