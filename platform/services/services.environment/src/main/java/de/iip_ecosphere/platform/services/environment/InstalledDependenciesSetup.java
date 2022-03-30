@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -49,6 +50,10 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      */
     public static final String KEY_PREFIX_JAVA = "JAVA";
     
+    public static final String KEY_JAVA_8 = KEY_PREFIX_JAVA + 8;
+    public static final String KEY_JAVA_11 = KEY_PREFIX_JAVA + 11;
+    
+    private static InstalledDependenciesSetup instance;
     private Map<String, File> locations = new HashMap<String, File>();
     
     /**
@@ -62,7 +67,11 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      * Sets up the default values.
      */
     private void setupDefaults() {
-        addDefaultEntry(getJavaKey(), SystemUtils.getJavaHome());
+        String exeSuffix = "";
+        if (SystemUtils.IS_OS_WINDOWS) {
+            exeSuffix = ".exe";
+        }
+        addDefaultEntry(getJavaKey(), new File(SystemUtils.getJavaHome(), "bin/java" + exeSuffix));
     }
     
     /**
@@ -140,6 +149,34 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      */
     public static InstalledDependenciesSetup readFromYaml() {
         return readFromYaml(DEFAULT_FNAME);
+    }
+    
+    /**
+     * Returns a singleton instance via {@link #readFromYaml()}.
+     *  
+     * @return the instance
+     */
+    public static InstalledDependenciesSetup getInstance() {
+        if (null == instance) {
+            instance = readFromYaml();
+        }
+        return instance;
+    }
+    
+    /**
+     * Returns a location from {@link #getInstance()} via {@link #getLocation(String)}, throws an exception if no
+     * such location is present.
+     * 
+     * @param key the key to look for
+     * @return the location
+     * @throws ExecutionException if the key cannot be found
+     */
+    public static File location(String key) throws ExecutionException {
+        File location = getInstance().getLocation(key);
+        if (null == location) {
+            throw new ExecutionException("No installed dependency for key '" + key + "'", null);
+        }
+        return location;
     }
 
 }

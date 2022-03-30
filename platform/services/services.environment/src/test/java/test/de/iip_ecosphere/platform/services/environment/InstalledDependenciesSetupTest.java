@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.services.environment;
 
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,9 +28,11 @@ public class InstalledDependenciesSetupTest {
     
     /**
      * Tests the dependency setup.
+     * 
+     * @throws ExecutionException shall not occur
      */
     @Test
-    public void testDependenciesSetup() {
+    public void testDependenciesSetup() throws ExecutionException {
         Assert.assertTrue(InstalledDependenciesSetup.getJavaKey().length() > 0);
         Assert.assertTrue(InstalledDependenciesSetup.getJavaKey().startsWith(
             InstalledDependenciesSetup.KEY_PREFIX_JAVA));
@@ -43,6 +47,7 @@ public class InstalledDependenciesSetupTest {
         Assert.assertNotNull(inst.getLocation("PYTHON3"));
         Assert.assertNotNull(inst.getLocation("JAVA99"));
         Assert.assertNull(inst.getLocation("JAVA0"));
+        Assert.assertTrue(InstalledDependenciesSetup.location(InstalledDependenciesSetup.getJavaKey()).isFile());
     }
 
 }
