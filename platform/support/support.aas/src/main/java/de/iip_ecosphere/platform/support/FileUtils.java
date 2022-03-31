@@ -101,4 +101,39 @@ public class FileUtils {
         }
     }
     
+    /**
+     * Composes a path and returns the canonical/absolute path (single-time use).
+     * 
+     * @param path the path
+     * @param name the name to be added (may be a path, may be empty or <b>null</b>)
+     * @return the canonical/absolute path
+     */
+    public static String getResolvedPath(File path, String name) {
+        File f;
+        if (null != name && name.length() > 0) {
+            f = new File(path, name);
+        } else {
+            f = path;
+        }
+        try {
+            return f.getCanonicalPath();
+        } catch (IOException e) {
+            return f.getAbsolutePath();
+        }
+    }
+
+    /**
+     * Resolves a path and returns the canonical/absolute path.
+     * 
+     * @param path the path
+     * @return the canonical/absolute path
+     */
+    public static File getResolvedFile(File path) {
+        try {
+            return path.getCanonicalFile();
+        } catch (IOException e) {
+            return path.getAbsoluteFile();
+        }
+    }
+    
 }

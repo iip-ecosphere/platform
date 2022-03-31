@@ -69,5 +69,15 @@ public class FileUtilsTest {
 
         Assert.assertEquals(2, fileCount.get());
     }
+    
+    /**
+     * Tests file resolution methods.
+     */
+    @Test
+    public void testResolution() {
+        Assert.assertNotNull(FileUtils.getResolvedFile(new File(".")));
+        Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), ""));
+        Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), "test.txt"));
+    }
 
 }
