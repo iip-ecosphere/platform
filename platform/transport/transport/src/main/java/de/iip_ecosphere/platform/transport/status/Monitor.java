@@ -100,6 +100,9 @@ public class Monitor {
             } catch (IOException e) {
                 LoggerFactory.getLogger(Monitor.class).error(
                     "Cannot sent status message: " + e.getMessage());
+            } catch (NullPointerException e) { // preliminary, may occur if the connector is not yet connected
+                LoggerFactory.getLogger(Monitor.class).error(
+                        "Cannot sent status message: " + e.getMessage());
             }
         } else {
             LoggerFactory.getLogger(Monitor.class).error(
