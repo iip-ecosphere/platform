@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.examples.vdw.App;
+import de.iip_ecosphere.platform.examples.vdw.ManualConnector;
 
 /**
  * Tests the connector parts/plugins for the VDW OPC UA server.
@@ -32,7 +32,7 @@ public class OpcUaConnectorTest {
      */
     @Test
     public void testConnector() throws IOException {
-        App.main();
+        ManualConnector.main();
     }
     
 }

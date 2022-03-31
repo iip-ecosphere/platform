@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class App {
+public class ManualConnector {
     
     /**
      * Executes the connector.
