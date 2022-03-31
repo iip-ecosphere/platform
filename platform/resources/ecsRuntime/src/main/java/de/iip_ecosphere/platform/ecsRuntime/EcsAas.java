@@ -69,8 +69,8 @@ public class EcsAas implements AasContributor {
     
     public static final String NAME_PROP_OPERATING_SYSTEM = "OS"; // IDTA
     public static final String NAME_PROP_CPU_ARCHITECTURE = "CPU_Architecture"; // IDTA
-    public static final String NAME_PROP_CPU_CAPACITY = "CPU_Capachity"; // IDTA
-    public static final String NAME_PROP_GPU_CAPACITY = "GPU_Capachity";
+    public static final String NAME_PROP_CPU_CAPACITY = "CPU_Capacity"; // IDTA
+    public static final String NAME_PROP_GPU_CAPACITY = "GPU_Capacity";
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
