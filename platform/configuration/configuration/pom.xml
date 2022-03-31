@@ -70,6 +70,10 @@
         <groupId>net.ssehub.easy.instantiation</groupId>
         <artifactId>ant</artifactId>
     </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>docker</artifactId>
+    </dependency>
   
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
