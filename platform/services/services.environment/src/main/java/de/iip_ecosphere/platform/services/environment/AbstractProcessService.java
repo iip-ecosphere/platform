@@ -94,18 +94,6 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     protected YamlProcess getProcessSpec() {
         return null == serviceSpec ? null : serviceSpec.getProcess();
     }
-
-    /**
-     * Composes a path and returns the absolute path (single-time use).
-     * 
-     * @param path the path
-     * @param name the name to be added (may be a path)
-     * @return the absolute path
-     */
-    protected String getAbsolutePath(File path, String name) {
-        File f = new File(path, name);
-        return f.getAbsolutePath();
-    }
     
     /**
      * Adds the command line arguments from {@code #getProcessSpec()} to {@code args}.
