@@ -55,4 +55,4 @@ For running the tests locally, you need a Python 3.9 installed. On Windows, this
 - Connectors: object array types, object list types, enums, full-cycle test
 - optional: included micrometer gauges, timers, counters
 
-**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/03/24** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/03/31** or newer is required. Use `mvn -U exec:java ...`
