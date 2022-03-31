@@ -1,0 +1,152 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2022} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.YamlProcess;
+import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+
+/**
+ * Tests the RTSA local server. The utilized REST framework is just for testing, no production use!
+ * 
+ * @author Holger Eichelberger
+ */
+public class RtsaRestServiceTest {
+    
+    /**
+     * Customized RTSA REST service for testing the integration without RTSA.
+     *
+     * @param <I> the input type
+     * @param <O> the output type
+     * @author Holger Eichelberger, SSE
+     */
+    private static class FakeRtsaRestService<I, O> extends RtsaRestService<I, O> {
+
+        /**
+         * Creates an instance of the service with the required type translators to/from JSON.
+         * 
+         * @param inTrans the input translator
+         * @param outTrans the output translator
+         * @param callback called when a processed item is received from the service
+         * @param yaml the service description
+         */
+        public FakeRtsaRestService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans,
+            ReceptionCallback<O> callback, YamlService yaml) {
+            super(inTrans, outTrans, callback, yaml);
+        }
+
+        @Override
+        protected String getMainClass() {
+            return "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
+        }
+        
+        @Override
+        protected String getClasspath(File rtsaPath) {
+            return FileUtils.getResolvedPath(new File("."), "target/test-classes");
+        }
+        
+    }
+    
+    /**
+     * Processes {@code data} on {@code service} and logs the sent input.
+     * 
+     * @param service the service instance
+     * @param data the input data
+     * @throws IOException if processing/serializing the input data fails
+     */
+    private static void process(RtsaRestService<InData, OutData> service, InData data) throws IOException {
+        LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Input: {"
+            + "id=" + data.getId() + " value1=" + data.getValue1() + " value2 = " + data.getValue2() + "}");
+        service.process(data);
+    }
+    
+    /**
+     * Tests the KODEX local server.
+     * 
+     * @throws IOException if reading test data fails, shall not occur
+     * @throws ExecutionException shall not occur 
+     */
+    @Test(timeout = 60000)
+    public void testRtsaRestService() throws IOException, ExecutionException {
+        AtomicInteger receivedCount = new AtomicInteger(0);
+        ReceptionCallback<OutData> rcp = new ReceptionCallback<OutData>() {
+
+            @Override
+            public void received(OutData data) {
+//                Assert.assertTrue(data.getId() != 0);
+//                Assert.assertTrue(data.getValue1() != 0);
+//                Assert.assertTrue(data.getValue2() != 0);
+//                Assert.assertTrue(data.getPrecision() != 0);
+                receivedCount.incrementAndGet();
+                LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Received result: {id=" + data.getId() 
+                    + " value1=" + data.getValue1() + " value2=" + data.getValue2() + " precision = " 
+                    + data.getConfidence() + " prediction=" + data.isPrediction());
+            }
+
+            @Override
+            public Class<OutData> getType() {
+                return OutData.class;
+            }
+        };
+
+        // mock the YAML service instance, as if read from a descriptor
+        YamlService sDesc = new YamlService();
+        sDesc.setName("RtsaRestTest");
+        sDesc.setVersion(new Version(RtsaRestService.VERSION));
+        sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
+        sDesc.setId("RtsaRestTest");
+        sDesc.setDeployable(true);
+        YamlProcess pDesc = new YamlProcess();
+        sDesc.setProcess(pDesc);
+        
+        RtsaRestService<InData, OutData> service;
+        File rtsa = new File("src/main/resources/rtsa");
+        if (rtsa.exists()) {
+            service = new RtsaRestService<>(
+                new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
+        } else {
+            service = new FakeRtsaRestService<>(
+                new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
+        }
+        service.setState(ServiceState.STARTING);
+        while (service.getState() != ServiceState.RUNNING) {
+            TimeUtils.sleep(500);
+        }
+        process(service, new InData(1, 1.3, 3));
+        TimeUtils.sleep(500);
+        LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Stopping service, may take two minutes on Windows");
+        service.setState(ServiceState.STOPPING);     
+        Assert.assertEquals(1, receivedCount.get());
+        LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Activating/Passivating");
+        service.activate();
+        LoggerFactory.getLogger(RtsaRestServiceTest.class).info(
+            "Passivating service, may take two minutes on Windows");
+        service.passivate();
+    }
+}
