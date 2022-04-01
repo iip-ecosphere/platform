@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
@@ -28,7 +29,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  * 
  * @author Holger Eichelberger, SSE
  */
-class Monitor extends de.iip_ecosphere.platform.transport.status.Monitor {
+class Monitor extends Transport {
     
     public static final String TRANSPORT_METRICS_CHANNEL = "EcsMetrics";
     private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
