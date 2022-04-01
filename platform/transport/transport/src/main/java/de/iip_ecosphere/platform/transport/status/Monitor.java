@@ -13,22 +13,25 @@
 package de.iip_ecosphere.platform.transport.status;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
- * Basic class to support monitoring activities. Call {@link #setTransportSetup(TransportSetup)} first to allow
+ * Basic class to support monitoring activities. Call {@link #setTransportSetup(Supplier)}to allow
  * for automated creation of a transport connector when needed.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class Monitor {
 
+    private static Supplier<TransportSetup> transportSupplier;
     private static TransportSetup transportSetup;
     private static TransportConnector connector;
     private static boolean stayOffline = false;
@@ -115,22 +118,38 @@ public class Monitor {
      * 
      * @param setup the setup instance
      */
+    @Deprecated
     public static void setTransportSetup(TransportSetup setup) {
         transportSetup = setup;
+    }
+
+    /**
+     * Sets up the transport information.
+     * 
+     * @param supplier the transport supplier
+     */
+    public static void setTransportSetup(Supplier<TransportSetup> supplier) {
+        transportSupplier = supplier;
     }
 
     /**
      * Tries creating a connector. If successful, {@link #connector} will be initialized afterwards. However,
      * there is no guarantee that a connector can be created.
      * 
-     * @see #setTransportSetup(TransportSetup)
+     * @see #setTransportSetup(Supplier)
      */
     public static void createConnector() {
         if (null == connector && !stayOffline) {
-            if (null != transportSetup) {
+            TransportParameter params = null;
+            if (null != transportSupplier) {
+                params = transportSupplier.get().createParameter();
+            } else if (null != transportSetup ) {
+                transportSetup.createParameter();
+            }
+            if (null != params) {
                 try {
                     connector = TransportFactory.createConnector();
-                    connector.connect(transportSetup.createParameter());
+                    connector.connect(params);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(Monitor.class).error(
                         "Cannot create transport connector: " + e.getMessage());

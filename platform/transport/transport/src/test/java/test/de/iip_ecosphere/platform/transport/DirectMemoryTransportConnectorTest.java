@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.transport.DefaultTransportFactoryDescriptor;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory.ConnectorCreator;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -275,14 +276,14 @@ public class DirectMemoryTransportConnectorTest {
     }
     
     /**
-     * Tests {@link Monitor}.
+     * Tests {@link Transport}.
      * 
      * @throws IOException shall not occur
      */
     @Test
-    public void testMonitor() throws IOException {
+    public void testTransport() throws IOException {
         factoryUseDmcAsTransport = true; // use a different default connector as required by Monitor
-        Monitor.setTransportSetup(null); // not needed here
+        Transport.setTransportSetup(() -> null); // not needed here
         AtomicInteger receivedCount = new AtomicInteger();
         MY_DM_CONNECTOR.setReceptionCallback(StatusMessage.STATUS_STREAM, new ReceptionCallback<StatusMessage>() {
 
@@ -296,13 +297,13 @@ public class DirectMemoryTransportConnectorTest {
                 return StatusMessage.class;
             }
         });
-        Monitor.setTransportSetup(new TransportSetup()); // information not needed by connector, just the instance
-        Monitor.sendResourceStatus(ActionTypes.ADDED);
-        Monitor.sendContainerStatus(ActionTypes.CHANGED, "Container-1");
-        Monitor.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
-        Monitor.sendServiceArtifactStatus(ActionTypes.REMOVED, "ServiceArtifact-1");
-        Monitor.releaseConnector(); // prevent reconnects by default
-        Monitor.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
+        Transport.setTransportSetup(() -> new TransportSetup()); // info not needed by connector, just the instance
+        Transport.sendResourceStatus(ActionTypes.ADDED);
+        Transport.sendContainerStatus(ActionTypes.CHANGED, "Container-1");
+        Transport.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
+        Transport.sendServiceArtifactStatus(ActionTypes.REMOVED, "ServiceArtifact-1");
+        Transport.releaseConnector(); // prevent reconnects by default
+        Transport.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
         factoryUseDmcAsTransport = false;
         Assert.assertEquals(4, receivedCount.get());
     }
