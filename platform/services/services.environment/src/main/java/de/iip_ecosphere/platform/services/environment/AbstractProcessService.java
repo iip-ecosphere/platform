@@ -57,7 +57,8 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * 
      * @param inTrans the input translator
      * @param outTrans the output translator
-     * @param callback called when data from the service is available
+     * @param callback called when data from the service is available (may be <b>null</b> if 
+     * {@link #attachIngestor(Class, DataIngestor)} is called before first data processing).
      * @param serviceSpec the service description 
      */
     protected AbstractProcessService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
@@ -68,6 +69,42 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         this.callback = callback;
         this.serviceSpec = serviceSpec;
     }
+    
+    /**
+     * Requests asynchronous processing of a data item. Calls {@link #process(Object)} and handles potential
+     * exceptions.
+     * 
+     * @param data the data item to be processed
+     */
+    public void processQuiet(I data) {
+        try {
+            process(data);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Processing failed: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Attaches an asynchronous result data ingestor as callback.
+     * 
+     * @param outCls the class representing the type
+     * @param ingestor the ingestor instance
+     */
+    public void attachIngestor(Class<O> outCls, DataIngestor<O> ingestor) {
+        callback = new ReceptionCallback<O>() {
+
+            @Override
+            public void received(O data) {
+                ingestor.ingest(data);
+            }
+
+            @Override
+            public Class<O> getType() {
+                return outCls;
+            }
+        };
+    }
+
     
     /**
      * Requests to process the given data item.
