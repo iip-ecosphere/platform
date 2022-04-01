@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.transport.Transport;
 
 /**
  * Implements the generic lifecycle descriptor for the service manager.
@@ -37,13 +38,14 @@ public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor 
     
     @Override
     public void startup(String[] args) {
+        Transport.setTransportSetup(() -> ServiceFactory.getTransport());
         super.startup(args);
         NetworkManagerFactory.configure(ServiceFactory.getNetworkManagerSetup());
     }
     
     @Override
     public void shutdown() {
-        Monitor.releaseConnector();
+        Transport.releaseConnector();
         super.shutdown();
     }
     

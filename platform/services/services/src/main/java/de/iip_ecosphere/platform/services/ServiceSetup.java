@@ -83,7 +83,6 @@ public class ServiceSetup {
         this.serviceProtocol = serviceProtocol;
     }
 
-
     /**
      * Defines the transport setup. [required by snakeyaml]
      * 
@@ -91,9 +90,7 @@ public class ServiceSetup {
      */
     public void setTransport(TransportSetup transport) {
         this.transport = transport;
-        Monitor.setTransportSetup(transport);
     }
-
     
     /**
      * Defines the network manager setup. [required snakeyaml]
