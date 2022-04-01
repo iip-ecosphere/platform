@@ -34,7 +34,6 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
-import de.iip_ecosphere.platform.transport.status.Monitor;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
 
@@ -42,7 +41,7 @@ import org.junit.Assert;
 
 /**
  * A transport connector that uses the memory for transport communication. Tests also {@link StatusMessage} 
- * and {@link StatusMessageSerializer} as well as {@link Monitor} as a simple, working transport connector is
+ * and {@link StatusMessageSerializer} as well as {@link Transport} as a simple, working transport connector is
  * available in this test.
  * 
  * @author Holger Eichelberger, SSE
