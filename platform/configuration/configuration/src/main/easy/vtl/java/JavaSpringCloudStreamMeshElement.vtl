@@ -8,6 +8,14 @@ import JavaConnector;
 template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) extends MeshBasics {
 
     Boolean isConnector = false;
+    mapOf(IOType, IOType) pairs = {};
+
+    def initPairs(MeshElement elt) {
+    }
+    
+    def initPairs(MeshProcessor elt) {
+        pairs = ioPairs(elt);
+    }
 
     // -------------- special case no service allowed for convenience when building up a configuration ------------------
 
@@ -87,7 +95,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '${expr}'
         }
     }
-
+    
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
     def attachIngestors(ServiceBase base) {
@@ -320,7 +328,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, JavaService service) {
         if (service.class.length() > 0) {
-            String serviceType = getServiceType(elt, service);
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
             'Starter.mapService(service);'
             '${generateParameterInit(service)|e}'
@@ -329,9 +336,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '// NO service defined, no initialization possible'
         }
     }
-    
-    // TODO connector connect
-    // TODO connector protocol adapter
     
     def initialService(MeshElement elt, Connector conn) {
         String connGen = getConnectorGenerics(conn, false);
@@ -383,142 +387,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ''
     }
     
-    // --------------- service type -------------------------
-    
-    def String getClsName(MeshElement elt) {
-        asTypeName(elt.name);
-    }
-    
-    def getServiceType(MeshElement elt, ServiceBase base) {
-        if (sharedInterfaces) {
-            "${getClsName(elt)}Interface";
-        } else {
-            "${getClsName(elt)}Service";
-        }
-    }
-    
-    def getServiceType(MeshElement elt, Connector conn) {
-        isConnector = true;
-        "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
-    }
-    
-    def generateImports(ServiceBase base) {
-        if (base.kind == ServiceKind::SOURCE_SERVICE) {
-            'import reactor.core.publisher.Flux;'
-        } else {
-            ''
-        }
-    }
-    
-    def generateServiceAttribute(MeshElement elt, ServiceBase base) {
-        String serviceType = getServiceType(elt, base);
-        'private ${serviceType} service;'
-    }
-        
-    // -------------------- Python --------------------------
-
-    def initialService(MeshElement elt, PythonService service) {
-        '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
-        'Starter.mapService(service);'
-        '${attachMetricsProvider("service")}'
-    }
-    
-    def getServiceType(MeshElement elt, PythonService service) {
-        if (service.integrationMode == PythonIntegrationMode::console_continuous) {
-            "PythonAsyncProcessService"
-        } else {
-            "PythonSyncProcessService"
-        }
-    }
-    
-    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir) {
-        'service.attachIngestor(${type}.class, "${type}", data -> SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data));'
-    }
-
-    def generateAsyncProcessorBody(MeshProcessor proc, PythonService base, String methodSuffix, String type) {
-        'return data -> service.processQuiet("${type}", data);'
-    }
-    
-    def generateSyncProcessorBody(MeshProcessor proc, PythonService base, String methodSuffix, String inType, String outType) {
-        'return data -> service.processQuiet("${type}", data);'
-    }
-
-    // -------------------- KODEX ---------------------------
-
-    def String kodexServiceName(IOType in, IOType out) {
-        "service${toTypeName(in.type)}${toTypeName(out.type)}";
-    }
-    
-    def getServiceType(MeshElement elt, KodexService service) {
-        "de.iip_ecosphere.platform.security.services.kodex.KodexService";
-    }
-    
-    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir) {
-        ''
-    }
-
-    def generateImports(KodexService service) {
-        'import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;'
-    }
-    
-    def generateServiceAttribute(MeshProcessor elt, KodexService service) {
-        String serviceType = getServiceType(elt, service);
-        mapOf(IOType, IOType) pairs = ioPairs(elt);
-        for (IOType in : pairs.keys()) {
-            String inType = toTypeName(in.type);
-            IOType out = pairs.get(in);
-            String outType = toTypeName(out.type);
-            'private ${serviceType}<${inType},${outType}> ${kodexServiceName(in, out)};'
-        }
-    }
-    
-    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String type) {
-        mapOf(IOType, IOType) pairs = ioPairs(proc);
-        setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
-        if (ins.size() > 0) {
-            IOType in = ins.toSequence().first();
-            if (pairs.containsKey(in)) {
-                IOType out = pairs.get(in);
-                'return data -> { 
-                    try {
-                        ${kodexServiceName(in, out)}.process(data);
-                    } catch (IOException e) {
-                        LoggerFactory.getLogger(getClass()).error("Processing data: " + e.getMessage());
-                    }
-                };'
-            } else {
-                'return null;'
-            }
-        } else {
-            'return null;'
-        }
-    }
-
-    def initialService(MeshProcessor elt, KodexService service) {
-        String clsName = getClsName(elt);
-        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
-        mapOf(IOType, IOType) pairs = ioPairs(elt);
-        for (IOType in : pairs.keys()) {
-            String inType = toTypeName(in.type);
-            IOType out = pairs.get(in);
-            String outType = toTypeName(out.type);
-            '${kodexServiceName(in, out)} = new ${getServiceType(elt, elt.impl)}(
-                new ${inType}InputTranslator(), 
-                new ${outType}OutputTranslator(), 
-                new ${outType}ReceptionCallback(), 
-                serviceData);
-            Starter.mapService(${kodexServiceName(in, out)});
-            ${attachMetricsProvider(kodexServiceName(in, out))}'
-        }
-    }
-
-    def generateReceptionCallback(MeshProcessor elt, KodexService service) {
-        String serviceId = "_" + toIdentifier(service.id);
-
+    def generateReceptionCallback(MeshProcessor elt, ServiceBase service, String serviceId) {
         for (IOType out : elt.output) {
              String type = toTypeName(out.type);
              String methodSuffix = "create" + type.firstToUpperCase() + serviceId;
+             String sendEx = 'streamBridge.send("${methodSuffix}", data)';
 
             '/**
              * Reception callback.
@@ -529,7 +402,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
                 @Override
                 public void received(${type} data) {
-                    streamBridge.send("${methodSuffix}", data);
+                    ${genRcvProbe(service, sendEx)}
                 }
 
                 @Override
@@ -540,7 +413,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             }
             '
         }
+    }
         
+    def generateTypeTranslators(MeshProcessor elt, ServiceBase service, String serviceId) {
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
             '/**
@@ -597,10 +472,199 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          }
     }
     
+    // --------------- service type -------------------------
+    
+    def String getClsName(MeshElement elt) {
+        asTypeName(elt.name);
+    }
+    
+    def getServiceType(MeshElement elt, ServiceBase base) {
+        if (sharedInterfaces) {
+            "${getClsName(elt)}Interface";
+        } else {
+            "${getClsName(elt)}Service";
+        }
+    }
+    
+    def getServiceType(MeshElement elt, Connector conn) {
+        isConnector = true;
+        "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
+    }
+    
+    def generateImports(ServiceBase base) {
+        if (base.kind == ServiceKind::SOURCE_SERVICE) {
+            'import reactor.core.publisher.Flux;'
+        } else {
+            ''
+        }
+    }
+    
+    def generateServiceAttribute(MeshElement elt, ServiceBase base) {
+        String serviceType = getServiceType(elt, base);
+        'private ${serviceType} service;'
+    }
+        
+    // -------------------- Python --------------------------
+
+    def initialService(MeshElement elt, PythonService service) {
+        '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
+        'Starter.mapService(service);'
+        '${attachMetricsProvider("service")}'
+    }
+    
+    def getServiceType(MeshElement elt, PythonService service) {
+        if (service.integrationMode == PythonIntegrationMode::console_continuous) {
+            "PythonAsyncProcessService"
+        } else {
+            "PythonSyncProcessService"
+        }
+    }
+    
+    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir) {
+        String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+        'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false)});'
+    }
+
+    def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String type) {
+        String expr = 'service.processQuiet("${type}", data)';
+        'return data -> ${genSentProbe(service, expr, false)};'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String inType, String outType) {
+        String expr = 'service.processQuiet("${type}", data)';
+        'return data -> ${genSentProbe(service, expr, true)};'
+    }
+
+    // -------------------- KODEX (-> to own file) ---------------------------
+
+    def String kodexServiceName(IOType in, IOType out) {
+        "service${toTypeName(in.type)}${toTypeName(out.type)}";
+    }
+    
+    def getServiceType(MeshElement elt, KodexService service) {
+        "de.iip_ecosphere.platform.security.services.kodex.KodexService";
+    }
+    
+    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir) {
+        for (IOType in : pairs.keys()) {
+            IOType out = pairs.get(in);
+            String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+            '${kodexServiceName(in, out)}.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false)});'
+        }
+    }
+
+    def generateImports(KodexService service) {
+        'import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;'
+    }
+    
+    def generateServiceAttribute(MeshProcessor elt, KodexService service) {
+        String serviceType = getServiceType(elt, service);
+        for (IOType in : pairs.keys()) {
+            String inType = toTypeName(in.type);
+            IOType out = pairs.get(in);
+            String outType = toTypeName(out.type);
+            'private ${serviceType}<${inType},${outType}> ${kodexServiceName(in, out)};'
+        }
+    }
+    
+    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String type) {
+        setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
+        if (ins.size() > 0) {
+            IOType in = ins.toSequence().first();
+            if (pairs.containsKey(in)) {
+                IOType out = pairs.get(in);
+                String procExpr = "${kodexServiceName(in, out)}.processQuiet(data)";
+                'return data -> {
+                    ${genSentProbe(kodex, procExpr, false)};
+                };'
+            } else {
+                'return null;'
+            }
+        } else {
+            'return null;'
+        }
+    }
+
+    def initialService(MeshProcessor elt, KodexService service) {
+        String clsName = getClsName(elt);
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        for (IOType in : pairs.keys()) {
+            String inType = toTypeName(in.type);
+            IOType out = pairs.get(in);
+            String outType = toTypeName(out.type);
+            '${kodexServiceName(in, out)} = new ${getServiceType(elt, elt.impl)}(
+                new ${inType}InputTranslator(), 
+                new ${outType}OutputTranslator(), 
+                null, // via attachIngestor
+                serviceData);
+            Starter.mapService(${kodexServiceName(in, out)});
+            ${attachMetricsProvider(kodexServiceName(in, out))}'
+        }
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, KodexService service) {
+        String serviceId = "_" + toIdentifier(service.id);
+        '${generateTypeTranslators(elt, service, serviceId)}'
+    }
+    
+    // --------------------------- RapidMiner (-> to own file) ----------------------------------
+    
+    def initialService(MeshElement elt, RtsaService service) {
+        String clsName = "RtsaRestService";
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        IOType in = service.input.first();
+        String inType = toTypeName(in.type);
+        IOType out = service.output.first();
+        String outType = toTypeName(out.type);
+        'service = new RtsaRestService(
+            new ${inType}InputTranslator(), 
+            new ${outType}OutputTranslator(), 
+            null, // via attachIngestor
+            serviceData);
+        Starter.mapService(service);
+        ${attachMetricsProvider("service")}'
+    }
+    
+    def generateImports(RtsaService service) {
+        'import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;'
+    }
+
+    def generateServiceAttribute(MeshElement elt, RtsaService service) {
+        'private RtsaRestService service;'
+    }
+    
+    def getServiceType(MeshElement elt, RtsaService service) {
+        "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService";
+    }
+
+    def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String type) {
+        String expr = 'service.processQuiet(data)';
+        'return data -> ${genSentProbe(service, expr, false)};'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
+        String expr = 'service.processQuiet(data)';
+        'return data -> ${genSentProbe(service, expr, true)};'
+    }
+
+    def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir) {
+        String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+        'service.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false)});'
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, RtsaService service) {
+        String serviceId = "_" + toIdentifier(service.id);
+        '${generateTypeTranslators(elt, service, serviceId)}'
+    }
+    
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) {
+        initPairs(elt);
         String clsName = getClsName(elt);
         ServiceBase impl = elt.impl;
         'package ${pkg};

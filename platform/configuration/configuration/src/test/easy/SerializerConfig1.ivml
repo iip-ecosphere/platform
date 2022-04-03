@@ -212,6 +212,55 @@ project SerializerConfig1 {
           }
         }
     };
+    
+    // fixed for now, becomes generic with advanced integration    
+    RecordType RtsaTestInput = {
+        name = "RtsaTestInput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    // fixed for now, becomes generic with advanced integration    
+    RecordType RtsaTestOutput = {
+        name = "RtsaTestOutput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "confidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "prediction",
+                type = refBy(BooleanType)
+            }
+        }
+    };    
+    
+    Service myRtsaService = RtsaService {
+        id = "myRtsa",
+        name = "myRtsa example",
+        deployable = true,
+        input = {{type=refBy(RtsaTestInput)}},
+        output = {{type=refBy(RtsaTestOutput)}}
+        // preliminary, no specific data here so far
+    };
 
     // ------------ application and service nets ------------------
     
@@ -257,7 +306,17 @@ project SerializerConfig1 {
     };
 
     MeshProcessor myKi = {
-        impl = refBy(myKiService)
+        impl = refBy(myKiService),
+        next = {refBy(myConnMyKiMyRtsa)}
+    };
+
+    MeshConnector myConnMyKiMyRtsa = {
+        name = "MyKi->MyRtsa",
+        next = refBy(myRtsa)
+    };
+
+    MeshProcessor myRtsa = {
+        impl = refBy(myRtsaService)
     };
 
     // ---------- generation setup ------------

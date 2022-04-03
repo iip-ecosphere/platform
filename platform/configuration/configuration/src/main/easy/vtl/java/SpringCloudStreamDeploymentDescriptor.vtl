@@ -77,7 +77,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             ""
         }
     }
-    
+
+    // preliminary in here, move out    
     def generateProcess(MeshElement elt, KodexService service) {
         String id = toFolderName(service.id);
         'process: 
@@ -86,6 +87,18 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
               - /kodex_${id}.zip
             homePath: \\${tmp}/${id}/kodex
             executablePath: \\${tmp}/${id}/kodex 
+            started: true'
+    }
+    
+    // preliminary in here, move out    
+    def generateProcess(MeshElement elt, RtsaService service) {
+        String id = toFolderName(service.id);
+        'process: 
+            artifacts:
+              - /rtsa.zip
+              - /rtsa_${id}.zip
+            homePath: \\${tmp}/${id}/rtsa
+            executablePath: \\${tmp}/${id}/rtsa 
             started: true'
     }
     

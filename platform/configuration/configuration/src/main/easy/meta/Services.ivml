@@ -134,6 +134,7 @@ project Services {
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
        Boolean monitorRcvCount = true;
        Boolean monitorSentCount = true;
+       setOf(refTo(Dependency)) dependencies = {};
 
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
        kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
@@ -151,10 +152,35 @@ project Services {
    abstract compound CompleteService refines Service {
        String artifact = ""; // optional maven artifact
    }
-   
+
+   abstract compound Dependency {
+   }
+
+   // must be installed on system level
+   // Instantiation shall create installedDependencies.yml with this key and install path!
+   compound SystemDependency refines Dependency {
+       String key; 
+   }
+      
    // ------------------------------ Java services -------------------------------
    
-   enum JavaVersion {jdk11, jdk16}; 
+   enum JavaVersion {jdk8, jdk11, jdk16}; 
+
+   SystemDependency JRE8 = {
+       key = "JAVA8"
+   };
+   
+   SystemDependency JDK8 = {
+       key = "JAVA8"
+   };
+
+   SystemDependency JRE11 = {
+       key = "JAVA11"
+   };
+
+   SystemDependency JDK11 = {
+       key = "JAVA11"
+   };
    
    compound JavaService refines Service { // not implemented service as not necessarily shipped with platform
        String class; // optional class name, if not given do not generate service binding
@@ -163,12 +189,24 @@ project Services {
        isDefined(class); // must be defined, not necessarily with a value
        isDefined(artifact); // must be defined, not necessarily with a value
        
-       JavaVersion javaVersion; // minimum requirement
+       JavaVersion javaVersion; // minimum requirement, todo remove
    }
    
    // ------------------------------- python (integrated) services -----------------
+
+   SystemDependency PYTHON2 = {
+       key = "PYTHON2"
+   };
+
+   SystemDependency PYTHON3 = {
+       key = "PYTHON3"
+   };
+
+   SystemDependency PYTHON39 = {
+       key = "PYTHON39"
+   };
    
-   compound PythonDependency {      //e.g. numpy 1.21.5
+   compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
        String name;
        String version;
    }
@@ -181,11 +219,11 @@ project Services {
    compound PythonService refines Service {
        String entrypointModule; // optional, would override default ServiceEnvironment.py
        String artifact;
-       setOf(PythonDependency) dependencies;
+       setOf(refTo(PythonDependency)) dependencies = {}; // TODO remove, VIL dynamic dispatch 
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
    }
    
-   // ------------------------------- integrated KODEX service -----------------------
+   // ------------------------------- integrated KODEX service (-> own project, VIL?) -----------------------
    
    // initial, unclear, input missing
    enum KodexAction {
@@ -212,6 +250,17 @@ project Services {
        // TODO #input=#output
        // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
    }
+   
+   // ------------------------------- integrated RapidMiner RTSA service (-> own project, VIL?) -----------------------
+   
+   // preliminary, own module as kind of "extension"?
+   compound RtsaService refines CompleteService {
+       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
+       IipVersion ver = "0.14.5";
+       String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
+       setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
+       // TODO constraint: flat input/output, not hierarchical
+   }
       
    // ------------------------ families -----------------
    
@@ -220,5 +269,16 @@ project Services {
         Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
         kind == members.asSequence().first().kind; // propagate
    }
+   
+    // preliminary, as long as RTSA integration is not complete
+    freeze {
+        JRE8;
+        JDK8;
+        JRE11;
+        JDK11;
+        PYTHON2;
+        PYTHON3;
+        PYTHON39;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
       
 }
