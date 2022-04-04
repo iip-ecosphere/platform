@@ -37,7 +37,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - endpoint:
               portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
               hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-            ${generateRelations(elt)}\n
+            ${generateRelations(elt)}
           ${generateProcess(elt, service)|e}'
     }
     
@@ -136,20 +136,24 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         returnType = false;
         '- channel: ${eltMet}-out-0
           direction: OUT
-          type: ${eltType}' <CR>;
-        for (MeshConnector conn : conns) {
-            MeshInnerElement next = conn.next;
-            String nextMeth = generateDataMethods(next);
-            returnType = true;
-            inputType = true;
-            String nextType = generateDataMethods(next);
-            returnType = false;
-            '
-            - channel: ${nextMeth}-in-0
-              id: ${conn.name}
-              service: ${next.impl.id}
-              direction: IN
-              type: ${nextType}' <CR>;
+          type: ${eltType}'
+        if (conns.size() > 0) {
+            for (MeshConnector conn : conns) {
+                MeshInnerElement next = conn.next;
+                String nextMeth = generateDataMethods(next);
+                returnType = true;
+                inputType = true;
+                String nextType = generateDataMethods(next);
+                returnType = false;
+                '
+                - channel: ${nextMeth}-in-0
+                  id: ${conn.name}
+                  service: ${next.impl.id}
+                  direction: IN
+                  type: ${nextType}' <CR>;
+            }
+        } else {
+            '\n'
         }
     }
 
