@@ -8,6 +8,8 @@ This example currently contains two parts:
     * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
     * Obtain the platform configuration meta-model, which is intentionally not included here: `mvn -f pom-model.xml generate-sources`` (use `-U` to update it if it is already in place) 
     * Instantiate the pseudo-application using the OPC UA connector: `mvn -f pom-model.xml exec:java -Dexec.args="VDW src/test/easy gen/vdw generateApps"`
+    * If you try the example from within Eclipse, we would now need here now a Maven project refresh.
+    * Compile the project with `mvn compile`
     * Run the generated connector with `mvn exec:java`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
 * A hand-crafted connector for comparison: `mvn exec:java -Dexec.mainClass="de.iip_ecosphere.platform.examples.vdw.ManualConnector"` 
