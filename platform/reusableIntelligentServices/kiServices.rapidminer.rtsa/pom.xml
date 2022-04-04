@@ -48,5 +48,50 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+	  	<artifactId>maven-antrun-plugin</artifactId>
+	    <version>1.8</version>
+	    <executions>
+	        <execution>
+	            <phase>package</phase>
+	            <configuration>
+	                <target>
+                        <mkdir dir="${project.build.directory}/fake" />
+	                    
+                        <mkdir dir="${project.build.directory}/fake/rtsa" />
+	                    <mkdir dir="${project.build.directory}/fake/rtsa/bin" />
+                        <mkdir dir="${project.build.directory}/fake/rtsa/home" />
+                        <mkdir dir="${project.build.directory}/fake/rtsa/deployments" />
+                        <mkdir dir="${project.build.directory}/fake/rtsa/lib" />
+                        <jar destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar"
+                            basedir="${project.build.directory}/test-classes"
+                            includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/FakeRtsa.class">
+                        </jar>
+                        <zip destfile="${project.build.directory}/fake/RTSA-0.14.5.zip" 
+                            basedir="${project.build.directory}/fake/rtsa"/>
+
+                        <mkdir dir="${project.build.directory}/fake/empty" />
+                        
+                        <mkdir dir="${project.build.directory}/fake/deployment" />
+                        <mkdir dir="${project.build.directory}/fake/deployment/home" />
+                        <mkdir dir="${project.build.directory}/fake/deployment/deployments" />
+                        <jar destfile="${project.build.directory}/fake/deployment/deployments/fakeDeployment.jar"
+                            basedir="${project.build.directory}/fake/empty">
+                        </jar>
+                        <zip destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" 
+                            basedir="${project.build.directory}/fake/deployment"/>
+	                </target>
+	            </configuration>
+	            <goals>
+	                <goal>run</goal>
+	            </goals>
+	        </execution>
+	    </executions>      
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
