@@ -132,7 +132,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         returnType = false;
         '- channel: ${eltMet}-out-0
           direction: OUT
-          type: ${eltType}'
+          type: ${eltType}' <CR>;
         for (MeshConnector conn : conns) {
             MeshInnerElement next = conn.next;
             String nextMeth = generateDataMethods(next);
