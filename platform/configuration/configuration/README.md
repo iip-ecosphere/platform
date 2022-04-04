@@ -47,6 +47,8 @@ The configuration model is written in the languages of EASy-Producer, namely Int
 
 For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
 
+Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
+
 ## missing
 
 - variability model: resources, resource assignment to ServiceMeshes

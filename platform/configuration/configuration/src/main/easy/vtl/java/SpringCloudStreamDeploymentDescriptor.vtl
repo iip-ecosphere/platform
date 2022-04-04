@@ -95,7 +95,6 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     // preliminary in here, move out    
     def generateProcess(MeshElement elt, RtsaService service) {
         String id = toFolderName(service.id);
-println("HERE " + rtsaResources()+"|"+rtsaBin(service)+"|"+rtsaInstance(service));        
         'process: 
             artifacts:
               - /${rtsaBin(service)}
