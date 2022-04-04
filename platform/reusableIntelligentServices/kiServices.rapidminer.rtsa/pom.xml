@@ -77,8 +77,8 @@
                         
                         <mkdir dir="${project.build.directory}/fake/deployment" />
                         <mkdir dir="${project.build.directory}/fake/deployment/home" />
-                        <mkdir dir="${project.build.directory}/fake/deployment/deployments" />
-                        <jar destfile="${project.build.directory}/fake/deployment/deployments/fakeDeployment.jar"
+                        <mkdir dir="${project.build.directory}/fake/deployment/home/deployments" />
+                        <jar destfile="${project.build.directory}/fake/deployment/home/deployments/fakeDeployment.jar"
                             basedir="${project.build.directory}/fake/empty">
                         </jar>
                         <zip destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" 
