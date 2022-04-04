@@ -37,7 +37,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - endpoint:
               portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
               hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-            ${generateRelations(elt)}
+            ${generateRelations(elt)}\n
           ${generateProcess(elt, service)|e}'
     }
     
@@ -101,6 +101,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
               - /${rtsaInstance(service)}
             homePath: \\${tmp}/${id}/rtsa
             executablePath: \\${tmp}/${id}/rtsa 
+            cmdArg:
+              - --iip.rtsa.path=${service.path}
             started: true'
     }
     

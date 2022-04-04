@@ -261,7 +261,8 @@ project SerializerConfig1 {
         ver = "0.1.0",
         deployable = true,
         input = {{type=refBy(RtsaTestInput)}},
-        output = {{type=refBy(RtsaTestOutput)}}
+        output = {{type=refBy(RtsaTestOutput)}},
+        path = "iip_basic/score_v1"
         // preliminary, no specific data here so far
     };
 
