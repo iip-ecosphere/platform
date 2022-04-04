@@ -275,11 +275,12 @@ public class IvmlTests {
      */
     private void assertDeploymentYaml(File base, String name) {
         assertFile(base, name);
-        try (FileInputStream in = new FileInputStream(new File(base, name))) {
+        File f = new File(base, name);
+        try (FileInputStream in = new FileInputStream(f)) {
             YamlArtifact.readFromYaml(in);
             in.close();
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            Assert.fail(f.getAbsolutePath() + ":" + e.getMessage());
         }
     }
 

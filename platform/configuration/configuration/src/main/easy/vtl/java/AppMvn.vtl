@@ -76,7 +76,6 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
             }            
             appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir=outDir, finalName=fName, phase=phase);
         }
-println("PACKAGE " + springPackaging+" "+starterCls);        
         if (springPackaging) {
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
         }
