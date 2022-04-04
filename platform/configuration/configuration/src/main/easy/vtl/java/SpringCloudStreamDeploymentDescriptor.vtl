@@ -95,10 +95,12 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     // preliminary in here, move out    
     def generateProcess(MeshElement elt, RtsaService service) {
         String id = toFolderName(service.id);
+        String bin = rtsaBin(service);
+        String instance = rtsaInstance(service);
         'process: 
             artifacts:
-              - /${rtsaBin(service)}
-              - /${rtsaInstance(service)}
+              - /${bin}
+              - /${instance}
             homePath: \\${tmp}/${id}/rtsa
             executablePath: \\${tmp}/${id}/rtsa 
             cmdArg:
