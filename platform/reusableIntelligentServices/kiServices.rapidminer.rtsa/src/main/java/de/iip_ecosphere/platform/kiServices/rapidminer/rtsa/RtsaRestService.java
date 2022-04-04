@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
@@ -46,6 +47,8 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
    
     private File home;
     private Process proc;
+    private String instancePath = "iip_basic/score_v1";
+    private int instancePort = 8090;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON.
@@ -79,10 +82,21 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         args.add(getClasspath(rtsaPath));
         args.add(getMainClass());
         addProcessSpecCmdArg(args);
+        parseArgs(args.toArray(new String[] {}));
         // TODO change spring Server port
         // TODO change RTSA port
+        // TODO change path
         
         proc = createAndConfigureProcess(exe, false, home, args);
+    }
+
+    /**
+     * Takes over command line arguments.
+     * 
+     * @param args the arguments
+     */
+    private void parseArgs(String[] args) {
+        instancePath = CmdLine.getArg(args, "iip.rtsa.path", instancePath);
     }
     
     /**
@@ -106,7 +120,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     
     @Override
     protected String getApiPath() {
-        return "http://localhost:8090/services/iip_basic/score_v1";
+        return "http://localhost:" + instancePort + "/services/" + instancePath;
     }
     
     @Override
