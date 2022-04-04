@@ -4,6 +4,8 @@ import MavenBasics;
 import JavaMapping;
 import MeshBasics;
 
+import Rtsa;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) extends MeshBasics {
@@ -93,10 +95,11 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     // preliminary in here, move out    
     def generateProcess(MeshElement elt, RtsaService service) {
         String id = toFolderName(service.id);
+println("HERE " + rtsaResources()+"|"+rtsaBin(service)+"|"+rtsaInstance(service));        
         'process: 
             artifacts:
-              - /rtsa.zip
-              - /rtsa_${id}.zip
+              - /${rtsaBin(service)}
+              - /${rtsaInstance(service)}
             homePath: \\${tmp}/${id}/rtsa
             executablePath: \\${tmp}/${id}/rtsa 
             started: true'

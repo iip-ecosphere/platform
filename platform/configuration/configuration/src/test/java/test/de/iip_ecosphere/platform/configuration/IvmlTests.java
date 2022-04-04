@@ -59,6 +59,13 @@ public class IvmlTests {
         ASSERT_FILE_EXTENSIONS.add(".xml");
         
         ASSERT_FILE_NAME_EXCLUSIONS.add("__init__.py");
+
+        // setup binary resources for testing (fallback) and if IPR-based resources are available
+        File f = new File("resources.ipr");
+        if (!f.exists()) {
+            f = new File("resources");
+        }
+        System.setProperty("iip.resources", f.getAbsolutePath());
     }
 
     /**

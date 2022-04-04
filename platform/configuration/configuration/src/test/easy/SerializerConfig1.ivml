@@ -254,8 +254,11 @@ project SerializerConfig1 {
     };    
     
     Service myRtsaService = RtsaService {
+        // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
         id = "myRtsa",
         name = "myRtsa example",
+        description = "Test RapidMiner RTSA integration",
+        ver = "0.1.0",
         deployable = true,
         input = {{type=refBy(RtsaTestInput)}},
         output = {{type=refBy(RtsaTestOutput)}}

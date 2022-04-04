@@ -2,6 +2,9 @@ import JavaBasics;
 import JavaMapping;
 import Basics;
 
+// TODO services, dynamic; similar Kodex
+import Rtsa;
+
 @advice(IIPEcosphere)
 vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
@@ -92,6 +95,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             // generate service classes and service integration
             setOf(String) bins = {}; 
             setOf(String) assemblies = {}; 
+            setOf(String) resources = {}; 
             sequenceOf(MeshElement) elements = {};
             artifacts.add(a.artifact);
             mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
@@ -105,7 +109,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
                     artifacts.add(getArtifact(no));
                     elements.add(no);
-                    generateServiceResources(no, no.impl, appRoot, bins, assemblies, artifacts);
+                    generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts);
                 };
             };
             elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -130,7 +134,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             if (a.snapshot) {
                 appVersion = appVersion + "-SNAPSHOT";
             }
-            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);
             
@@ -238,15 +242,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     // dispatch basis    
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
     }
 
     // RTSA (preliminary in here)
-    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
+        resources.add(rtsaResources()+"|"+rtsaBin(service));
+        resources.add(rtsaResources()+"|"+rtsaInstance(service));
     }
     
     // KODEX (preliminary in here)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
         String kodexServiceFolderName = "kodex_" + serviceFolderName;
@@ -261,7 +267,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
@@ -301,6 +307,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         
         setOf(String) bins = {}; 
         setOf(String) assemblies = {}; 
+        setOf(String) resources = {}; 
         sequenceOf(MeshElement) elements = {};
     
         generateEnums(javaDatatypesSrc, pySrc);    
@@ -337,7 +344,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // partition according to container strategy
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, starterCls="iip.Starter", 
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", 
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             

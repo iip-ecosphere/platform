@@ -117,6 +117,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(project, "dependencies");
     }
 
+    def appendExecutionsParent(XmlElement parent) {
+        new XmlElement(parent, "executions");
+    }
+
     def appendExecutions(XmlElement parent) {
         new XmlElement(new XmlElement(parent, "executions"), "execution");
     }
@@ -124,6 +128,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def appendGoal(XmlElement execution, String goal) {
         new XmlElement(new XmlElement(execution, "goals"), "goal", goal);
     }
+    
+    // ---------------------------------- maven jar plugin ------------------------------------------------------
     
     def XmlElement appendMavenJarPlugin(XmlElement plugins, String ver, Boolean addClassPath, String mainClass="", String goal="") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-jar-plugin", ver, false);
@@ -141,6 +147,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
             appendGoal(appendExecutions(plugin), goal);
         }
     }   
+    
+    // ----------------------------------- maven dependency plugin ---------------------------------------------
     
     def XmlElement appendMavenDependencyPlugin(XmlElement plugins, String ver="3.2.0") {
         appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
@@ -259,6 +267,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
         exec;
     }
+    
+    // ------------------------------------------- maven shade plugin --------------------------------------------
 
     def XmlElement appendMavenShadePlugin(XmlElement plugins, String ver="2.3", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-shade-plugin", ver, false);
@@ -273,6 +283,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlElement(t, "mainClass", mainClass);
         }
     }
+    
+    // ------------------------------------------- maven assembly plugin --------------------------------------------------
 
     // use appendAssemblyDescriptor on result    
     def XmlElement appendAssemblyPlugin(XmlElement plugins, String ver="3.1.1") {
@@ -295,6 +307,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    // ------------------------------------------- maven Java compiler plugin -------------------------------------------------
+    
     def XmlElement appendCompilerPlugin(XmlElement plugins, String ver="3.7.0", String javaVer="1.8", String encoding="Cp1252") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-compiler-plugin", ver, false);
         XmlElement cfg = appendConfiguration(plugin);
@@ -302,6 +316,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(cfg, "target", javaVer);
         new XmlElement(cfg, "encoding", encoding);
     }
+    
+    // ------------------------------------------- maven Java testing (surefire) -----------------------------------------------
     
     def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="3.0.0-M3", String include="**/AllTests.class", String depArtifact="surefire-junit47", Boolean tests=true) {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-surefire-plugin", ver, false);
@@ -320,6 +336,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
     }    
     
+    // ------------------------------------------- maven clean plugin -----------------------------------------------------
+    
     def XmlElement appendCleanPlugin(XmlElement plugins, String ver="2.5", String phase="initialize", String goal="clean", String dir="\\${project.build.directory}", String include="*.jar") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-clean-plugin", ver, false);
         XmlElement exec = appendExecutions(plugin);
@@ -337,7 +355,40 @@ template MavenBasics(Configuration config, FileArtifact target) {
         plugin;
     }
     
-    // ---------------------------- specific to IIP-Ecosphere ------------------------
+    // --------------------------------------------- maven resources plugin ------------------------------------------------
+    
+    def XmlElement appendMavenResourcesPlugin(XmlElement plugins, String ver="3.2.0") {
+        appendPlugin(plugins, "org.apache.maven.plugins", "maven-resources-plugin", ver, false);
+    } 
+
+    def XmlElement appendMavenResourcesCopyResources(XmlElement plugins, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String ver="3.2.0", String phase="validate") {
+        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        XmlElement execs = appendExecutions(plugin);
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", outputDirectory, resourceDirectory, files, phase=phase);
+        execs;
+    }
+    
+    def XmlElement appendMavenResourcesCopyResourcesExecution(XmlElement execs, String goal, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String phase="validate", String id="") {
+        XmlElement exec = new XmlElement(execs, "execution");
+        if (length(id) == 0) { // fallback
+            id = goal;
+        }
+        new XmlElement(exec, "id", id);
+        appendGoal(exec, goal);
+        new XmlElement(exec, "phase", phase);
+        XmlElement config = appendConfiguration(exec);
+        new XmlElement(config, "outputDirectory", outputDirectory);
+        XmlElement resources = new XmlElement(config, "resources");
+        XmlElement resource = new XmlElement(resources, "resource");
+        new XmlElement(resource, "directory", resourceDirectory);
+        new XmlElement(resource, "filtering", "false");
+        for (String f: files) {
+            new XmlElement(resource, "include", f);
+        }
+        config;
+    }
+    
+    // ---------------------------- specific for IIP-Ecosphere ------------------------
 
     // append some common base dependencies to avoid repetition
     def appendIipBaseDependencies(XmlElement parent, Boolean forAas=true, Boolean includeJUnit=true) {

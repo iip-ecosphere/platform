@@ -143,7 +143,7 @@ project Services {
    }
    
    abstract compound Service refines ServiceBase {
-       String description;
+       String description; // TODO Constraint: NonEmptyString
        IipVersion ver;
        Boolean deployable;
    }
@@ -256,7 +256,8 @@ project Services {
    // preliminary, own module as kind of "extension"?
    compound RtsaService refines CompleteService {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion ver = "0.14.5";
+       IipVersion rtsaVer = "0.14.5";
+       // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
        String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
        setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
        // TODO constraint: flat input/output, not hierarchical

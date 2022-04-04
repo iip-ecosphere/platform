@@ -1,0 +1,19 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Rtsa(Configuration config, FileArtifact target) {
+
+    def String rtsaResources() {
+        getResourcesFolder() + "/rtsa";
+    }
+
+    def String rtsaBin(RtsaService service) {
+        "RTSA-" + service.rtsaVer + ".zip";
+    }
+    
+    def String rtsaInstance(RtsaService service) {
+        toFolderName(service.name) + "-" + service.ver + ".zip";
+    }
+    
+}
