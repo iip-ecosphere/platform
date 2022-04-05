@@ -26,6 +26,49 @@ import com.sun.net.httpserver.HttpServer;
 @SuppressWarnings("restriction")
 public class FakeRtsa {
 
+    public static final String PARAM_PREFIX = "--";
+    public static final String PARAM_ARG_NAME_SEP = ".";
+    public static final String PARAM_VALUE_SEP = "=";
+    
+    /**
+     * Emulates reading a Spring-like parameter if the configuration is not yet in place.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code deflt}
+     */
+    public static String getArg(String[] args, String argName, String dflt) {
+        String result = dflt;
+        String prefix = PARAM_PREFIX + argName + PARAM_VALUE_SEP;
+        for (int a = 0; a < args.length; a++) {
+            String arg = args[a];
+            if (arg.startsWith(prefix)) {
+                result = arg.substring(prefix.length());
+                break;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns an int command line argument.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code deflt}
+     */
+    public static int getIntArg(String[] args, String argName, int dflt) {
+        int result;
+        try {
+            result = Integer.parseInt(getArg(args, argName, String.valueOf(dflt)));
+        } catch (NumberFormatException e) {
+            result = dflt;
+        }
+        return result;
+    }
+    
     /**
      * Executes the fake server.
      * 
@@ -33,7 +76,8 @@ public class FakeRtsa {
      * @throws IOException shall not occur
      */
     public static void main(String[] args) throws IOException {
-        int serverPort = 8090;
+        int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
+        System.out.println("This is FakeRtsa on port: " + serverPort);
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
         server.createContext("/services/iip_basic/score_v1", (exchange -> {
             System.out.println("Received Request");
