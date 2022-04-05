@@ -69,7 +69,7 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
     * Resource optimization
     * Adaptation
- * [Management UI] (https://github.com/iip-ecosphere/platform/tree/main/platform/managementUI/README.md)
+ * [Management UI](https://github.com/iip-ecosphere/platform/tree/main/platform/managementUI/README.md)
     
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
