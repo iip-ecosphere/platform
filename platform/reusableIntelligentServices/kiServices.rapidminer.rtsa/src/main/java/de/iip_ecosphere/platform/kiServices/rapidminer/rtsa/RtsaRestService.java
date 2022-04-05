@@ -146,7 +146,8 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
                     Scanner sc = new Scanner(in);
                     while (sc.hasNextLine()) {
                         String line = sc.nextLine();
-                        LoggerFactory.getLogger(getClass()).info(line);
+                        //LoggerFactory.getLogger(getClass()).info(line);
+                        System.out.println(line);
                         if (line.contains("Started Application in")) {
                             try {
                                 setState(ServiceState.RUNNING);
