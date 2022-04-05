@@ -129,6 +129,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     
     @Override
     protected String getApiPath() {
+        System.out.println("http://localhost:" + instancePort + "/services/" + instancePath);        
         return "http://localhost:" + instancePort + "/services/" + instancePath;
     }
     
