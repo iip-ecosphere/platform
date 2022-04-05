@@ -15,19 +15,29 @@ package test.de.iip_ecosphere.platform.platform;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.platform.PersistentAasSetup.ConfiguredPersistenceType;
+import de.iip_ecosphere.platform.platform.PlatformAas;
+import de.iip_ecosphere.platform.platform.ArtifactsManager;
+import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
+import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup;
 import de.iip_ecosphere.platform.platform.PlatformSetup;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 /**
@@ -86,12 +96,69 @@ public class PlatformTest {
 
         LifecycleHandler.startup(new String[] {});
 
-        // we do not have a client here to test
+        testArtifactManager();
         
         LifecycleHandler.shutdown();
 
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * Tests the artifact manager.
+     */
+    private void testArtifactManager() throws IOException {
+        ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        ArtifactsManager mgr = ArtifactsManager.getInstance();
+        Assert.assertNotNull(mgr);
+        Assert.assertTrue(mgr.getArtifactCount() > 0);
+
+        Assert.assertNull(mgr.getArtifact(""));
+        Artifact a = mgr.getArtifact("art");
+        Assert.assertNotNull(a);
+        Assert.assertEquals("art", a.getId());
+        Assert.assertEquals(ArtifactKind.SERVICE_ARTIFACT, a.getKind());
+        Assert.assertNotNull(a.getName());
+        Assert.assertNotNull(a.getDescription());
+        Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
+
+        a = mgr.getArtifact("art1");
+        Assert.assertNotNull(a);
+        Assert.assertEquals("art1", a.getId());
+        Assert.assertEquals(ArtifactKind.SERVICE_ARTIFACT, a.getKind());
+        Assert.assertNotNull(a.getName());
+        Assert.assertNotNull(a.getDescription());
+        Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
+
+        Assert.assertEquals(mgr.getArtifactCount(), CollectionUtils.toList(mgr.artifacts().iterator()).size());
+        int count = mgr.getArtifactCount();
+        
+        SubmodelElementsCollectionClient sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
+            PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
+        SubmodelElementCollection coll = sc.getSubmodel().getSubmodelElementCollection(
+            PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
+        Assert.assertEquals(2, coll.getElementsCount());
+        Assert.assertNotNull(coll.getElement("art"));
+        Assert.assertNotNull(coll.getElement("art1"));
+        
+        // preliminary, not nice
+        FileUtils.copyFile(
+            new File("src/test/resources/service3.jar"), 
+            new File("src/test/resources/artifacts/service3.jar"));
+        TimeUtils.sleep(1000); // wait for watcher
+        Assert.assertEquals(count + 1, mgr.getArtifactCount());
+        
+        sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
+            PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
+        coll = sc.getSubmodel().getSubmodelElementCollection(
+            PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);        
+        Assert.assertEquals(count + 1, coll.getElementsCount()); // added, but not changed, unclear
+
+        FileUtils.deleteQuietly(new File("src/test/resources/artifacts/service3.jar"));
+        TimeUtils.sleep(1000); // wait for watcher
+        
+        //Assert.assertEquals(count, mgr.getArtifactCount()); // watcher unclear although file is gone
+        //Assert.assertEquals(count, coll.getElementsCount());
     }
     
 }

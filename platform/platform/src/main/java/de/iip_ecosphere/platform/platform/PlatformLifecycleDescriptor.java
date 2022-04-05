@@ -39,11 +39,11 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     
     @Override
     public void startup(String[] args) {
-        PlatformSetup cfg = PlatformSetup.getInstance();
-        AasSetup aasSetup = cfg.getAas();
+        PlatformSetup setup = PlatformSetup.getInstance();
+        AasSetup aasSetup = setup.getAas();
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
-        PersistenceType pType = rcp.toPersistenceType(cfg.getAas().getPersistence().name());
+        PersistenceType pType = rcp.toPersistenceType(setup.getAas().getPersistence().name());
         LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();

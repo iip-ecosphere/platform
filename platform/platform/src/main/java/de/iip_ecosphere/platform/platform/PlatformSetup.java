@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.platform;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,8 @@ public class PlatformSetup extends AbstractSetup {
     private static PlatformSetup instance;
     private PersistentAasSetup aas = new PersistentAasSetup();
     private TransportSetup transport;
+    private File artifactsFolder = new File("artifacts");
+    private String artifactsUriPrefix = "";
     
     /**
      * Returns the AAS setup.
@@ -57,6 +60,24 @@ public class PlatformSetup extends AbstractSetup {
     public TransportSetup getTransport() {
         return transport;
     }
+    
+    /**
+     * Returns the folder containing installable artifacts.
+     * 
+     * @return the folder
+     */
+    public File getArtifactsFolder() {
+        return artifactsFolder;
+    }
+    
+    /**
+     * Returns the artifacts URI prefix.
+     * 
+     * @return the prefix with protocol, may be empty for none
+     */
+    public String getArtifactsUriPrefix() {
+        return artifactsUriPrefix;
+    }
 
     /**
      * Defines the transport setup. [snakeyaml]
@@ -74,6 +95,24 @@ public class PlatformSetup extends AbstractSetup {
      */
     public void setAas(PersistentAasSetup aas) {
         this.aas = aas;
+    }
+    
+    /**
+     * Changes the folder containing installable artifacts. [snakeyaml]
+     * 
+     * @param artifactsFolder the folder
+     */
+    public void setArtifactsFolder(File artifactsFolder) {
+        this.artifactsFolder = artifactsFolder;
+    }
+    
+    /**
+     * Changes the artifacts URI prefix. [snakeyaml]
+     * 
+     * @param artifactsUriPrefix the prefix with protocol, may be empty for none
+     */
+    public void setArtifactsUriPrefix(String artifactsUriPrefix) {
+        this.artifactsUriPrefix = artifactsUriPrefix;
     }
     
     /**

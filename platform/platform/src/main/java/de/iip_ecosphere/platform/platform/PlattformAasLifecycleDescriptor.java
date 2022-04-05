@@ -36,6 +36,13 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere Platform Server.");
         super.startup(args);
+        ArtifactsManager.startWatching();
+    }
+    
+    @Override
+    public void shutdown() {
+        ArtifactsManager.stopWatching();
+        super.shutdown();
     }
 
 }

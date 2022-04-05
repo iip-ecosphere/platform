@@ -20,3 +20,5 @@ transport:
     port: 8883
     password: pwd
     user: user  
+artifactsFolder: src/test/resources/artifacts
+artifactsUriPrefix: https://localhost/files/
