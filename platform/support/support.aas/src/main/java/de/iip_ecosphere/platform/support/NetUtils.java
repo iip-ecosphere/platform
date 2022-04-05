@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -100,7 +101,7 @@ public class NetUtils {
         try (final DatagramSocket socket = new DatagramSocket()) {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ip = socket.getLocalAddress().getHostAddress();
-        } catch (UnknownHostException | SocketException e) {
+        } catch (UnknownHostException | SocketException | UncheckedIOException e) {
             ip = "127.0.0.1";
         }
         return ip;
