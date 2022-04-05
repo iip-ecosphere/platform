@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
@@ -49,6 +50,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     private Process proc;
     private String instancePath = "iip_basic/score_v1";
     private int instancePort = 8090;
+    private String networkPortKey;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON.
@@ -73,9 +75,11 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         home = getResolvedFile(home);
         
         List<String> args = new ArrayList<>();
-        
+        networkPortKey = "rtsa_" + getServiceSpec().getId();
+        instancePort = NetworkManagerFactory.getInstance().obtainPort(networkPortKey).getPort();
         args.add("-Dspring.config.location=" + getResolvedPath(rtsaPath, "/home/config/agent.properties"));
         args.add("-Dscoring-agent.baseDir=" + getResolvedPath(rtsaPath, ""));
+        args.add("-Dserver.port=" + instancePort);
         args.add("-Dspring.pid.file=" + getResolvedPath(rtsaPath, "/home/pid"));
         args.add("-Dlog4j2.formatMsgNoLookups=true");
         args.add("-classpath");
@@ -83,11 +87,16 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         args.add(getMainClass());
         addProcessSpecCmdArg(args);
         parseArgs(args.toArray(new String[] {}));
-        // TODO change spring Server port
-        // TODO change RTSA port
-        // TODO change path
-        
         proc = createAndConfigureProcess(exe, false, home, args);
+    }
+    
+    @Override
+    protected void stop() {
+        if (null != networkPortKey) {
+            NetworkManagerFactory.getInstance().releasePort(networkPortKey);
+            networkPortKey = null;
+        }
+        super.stop();
     }
 
     /**
