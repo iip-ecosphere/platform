@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.support.net;
 
 import java.util.Optional;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
@@ -24,7 +26,6 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
  */
 public class NetworkManagerFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(NetworkManagerFactory.class.getName());
     private static NetworkManager instance;
 
     /**
@@ -38,13 +39,24 @@ public class NetworkManagerFactory {
             if (first.isPresent()) {
                 instance = first.get().createInstance();
                 if (null != instance) {
-                    LOGGER.fine("Network manager implementation registered: " + instance.getClass().getName());
+                    getLogger().info("Network manager implementation registered: " + instance.getClass().getName());
                 }
             } else {
-                LOGGER.severe("No Network manager implementation known.");
+                getLogger().warn("No Network manager descriptor/implementation known. "
+                    + "Falling back to local network manager.");
+                instance = new LocalNetworkManagerImpl();
             }
         }
         return instance;
+    }
+    
+    /**
+     * Returns the logger instance.
+     * 
+     * @return the logger instance
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(NetworkManagerFactory.class);
     }
     
     /**
