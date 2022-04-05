@@ -35,7 +35,7 @@ public class PlatformAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "Artifacts";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
-    public static final String NAME_COLL_CONTAINER = "ServiceArtifacts";
+    public static final String NAME_COLL_CONTAINER = "Container";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_URI = "uri";
