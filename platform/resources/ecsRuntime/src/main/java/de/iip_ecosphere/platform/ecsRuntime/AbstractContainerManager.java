@@ -102,7 +102,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
      * @param state the new state
      * @throws ExecutionException if changing the state fails
      */
-    protected void setState(AbstractContainerDescriptor container, ContainerState state) throws ExecutionException {
+    protected void setState(BasicContainerDescriptor container, ContainerState state) throws ExecutionException {
         container.setState(state);
         EcsAas.notifyContainerStateChanged(container);
     }

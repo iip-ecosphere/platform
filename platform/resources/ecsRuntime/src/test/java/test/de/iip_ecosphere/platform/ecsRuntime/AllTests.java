@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    BasicContainerDescriptorTest.class,
     ConfigurationTest.class,
     ContainerManagerTest.class,
     EcsAasTest.class

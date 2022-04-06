@@ -14,8 +14,7 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import java.net.URI;
 
-import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
-import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
+import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -23,7 +22,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-class MyContainerDesciptor extends AbstractContainerDescriptor {
+class MyContainerDesciptor extends BasicContainerDescriptor {
 
     /**
      * Creates a container descriptor instance.
@@ -37,11 +36,6 @@ class MyContainerDesciptor extends AbstractContainerDescriptor {
      */
     MyContainerDesciptor(String id, String name, Version version, URI uri) {
         super(id, name, version, uri);
-    }
-    
-    @Override
-    protected void setState(ContainerState state) {
-        super.setState(state);
     }
     
 }
