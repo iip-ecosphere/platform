@@ -43,7 +43,7 @@ public class SpringInstances {
      * 
      * @return the configuration instance
      */
-    static SpringCloudServiceSetup getConfig() {
+    public static SpringCloudServiceSetup getConfig() {
         return config;
     }
     
@@ -64,8 +64,10 @@ public class SpringInstances {
      */
     public static void setConfig(SpringCloudServiceSetup cfg) {
         config = cfg;
-        ServiceFactory.setAasSetup(cfg.getAas());
-        ServiceFactory.setNetworkManagerSetup(cfg.getNetMgr());
+        if (null != cfg) {
+            ServiceFactory.setAasSetup(cfg.getAas());
+            ServiceFactory.setNetworkManagerSetup(cfg.getNetMgr());
+        }
     }
 
 }

@@ -24,7 +24,9 @@ import org.junit.runners.Suite;
     TestServiceManager.class,
     ArtifactInfoTest.class,
     TestLifecycleDescriptor.class,
-    ServiceMgrAndDescriptorTest.class
+    ServiceMgrAndDescriptorTest.class,
+    
+    DescriptorUtilsTest.class
 })
 public class AllTests {
 }

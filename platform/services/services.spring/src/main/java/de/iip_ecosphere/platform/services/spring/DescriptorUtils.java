@@ -47,10 +47,7 @@ public class DescriptorUtils {
         YamlArtifact result = null;
         if (file.getName().endsWith(".jar") || file.getName().endsWith(".zip")) {
             try {
-                String descName = "deployment.yml";
-                if (null != getConfig()) { // null in case of standalone/non-spring execution
-                    descName = getConfig().getDescriptorName();
-                }
+                String descName = getDescriptorName();
                 getLogger().info("Reading artifact " + file + ", descriptor " + descName);
                 InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
                 if (null == descStream) {
@@ -68,6 +65,45 @@ public class DescriptorUtils {
         } else {
             throwExecutionException("Reading artifact " + file, file + " is not considered as service "
                 + "artifact (JAR, ZIP)");
+        }
+        return result;
+    }
+
+    /**
+     * Returns the deployment descriptor file name to use.
+     * 
+     * @return the descriptor file name
+     */
+    private static String getDescriptorName() {
+        String descName = "deployment.yml";
+        if (null != getConfig()) { // null in case of standalone/non-spring execution
+            descName = getConfig().getDescriptorName();
+        }
+        return descName;
+    }
+    
+    /**
+     * Reads the YAML deployment descriptor from {@code file}.
+     * 
+     * @return the parsed descriptor
+     * @throws ExecutionException if reading fails for some reason
+     */
+    public static YamlArtifact readFromClasspath() throws ExecutionException {
+        YamlArtifact result = null;
+        String descName = getDescriptorName();
+        InputStream descStream = DescriptorUtils.class.getResourceAsStream("/BOOT-INF/classes/" + descName);
+        if (null == descStream) {
+            descStream = DescriptorUtils.class.getResourceAsStream("/" + descName);
+        }
+        if (null != descStream) {
+            try {
+                result = YamlArtifact.readFromYaml(descStream);
+            } catch (IOException e) {
+                throwExecutionException("Reading deployment descriptor " + descName, e);
+            }
+            FileUtils.closeQuietly(descStream);
+        } else {
+            throwExecutionException("Reading deployment descriptor", descName + " not found on classpath");
         }
         return result;
     }
