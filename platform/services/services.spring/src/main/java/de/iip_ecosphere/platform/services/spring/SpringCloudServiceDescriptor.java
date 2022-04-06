@@ -13,9 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +43,6 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -288,44 +285,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
         int result = -1;
         try {
-            // take over / create process home dir
-            processDir = pSpec.getHomePath();
-            if (null == processDir) {
-                processDir = new File(SpringInstances.getConfig().getDownloadDir(), 
-                    Starter.normalizeServiceId(getId()) + "-" + System.currentTimeMillis());
-            }
-            if (!pSpec.isStarted()) {
-                FileUtils.deleteQuietly(processDir); // unlikely, just to be sure
-            }
-            processDir.mkdirs();
-
-            // unpack artifacts to home
-            for (String artPath : pSpec.getArtifacts()) {
-                while (artPath.startsWith("/")) {
-                    artPath = artPath.substring(1);
-                }
-                FileInputStream fis = null;
-                InputStream artifact = SpringCloudServiceDescriptor.class.getResourceAsStream(artPath);
-                if (null == artifact) { // spring packaging fallback
-                    try {
-                        fis = new FileInputStream(getArtifact().getJar());
-                        artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
-                        if (null == artifact) {
-                            fis = new FileInputStream(getArtifact().getJar()); // TODO preliminary, use predicate 
-                            artifact = JarUtils.findFile(fis, artPath);
-                        }
-                    } catch (IOException e) {
-                        getLogger().info("Cannot open " + getArtifact().getJar() + ": " + e.getMessage());
-                    }
-                }
-                if (null == artifact) {
-                    throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
-                }
-                JarUtils.extractZip(artifact, processDir.toPath());
-                getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
-                FileUtils.closeQuietly(artifact);
-                FileUtils.closeQuietly(fis);
-            }
+            processDir = DescriptorUtils.extractProcessArtifacts(getId(), pSpec, getArtifact().getJar(), 
+                SpringInstances.getConfig().getDownloadDir());
 
             if (!pSpec.isStarted()) {
                 // compose start arguments and start service implementation

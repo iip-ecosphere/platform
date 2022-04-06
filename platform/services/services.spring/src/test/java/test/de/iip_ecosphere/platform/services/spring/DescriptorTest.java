@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
+import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 
 /**
@@ -42,7 +42,7 @@ public class DescriptorTest {
                     System.out.println("Testing service descriptor in " + f);
                     try {
                         if (f.getName().endsWith(".jar")) {
-                            SpringCloudServiceManager.readFromFile(f);
+                            DescriptorUtils.readFromFile(f);
                         } else if (f.getName().endsWith(".xml")) {
                             try (FileInputStream fis = new FileInputStream(f)) {
                                 YamlArtifact.readFromYaml(fis);

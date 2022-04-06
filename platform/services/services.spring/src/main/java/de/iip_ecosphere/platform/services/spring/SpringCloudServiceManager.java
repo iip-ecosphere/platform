@@ -13,9 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +41,6 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -116,85 +113,26 @@ public class SpringCloudServiceManager
             File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
             YamlArtifact yamlArtifact = null;
             if (null != jarFile) {
-                yamlArtifact = readFromFile(jarFile);
+                yamlArtifact = DescriptorUtils.readFromFile(jarFile);
             } else {
-                throwExecutionException("Adding " + location, 
+                DescriptorUtils.throwExecutionException("Adding " + location, 
                     "Cannot load " + location + ". Must be a (resolved) file.");
             }
             Validator val = new Validator();
             val.validate(yamlArtifact);
             if (val.hasMessages()) {
-                throwExecutionException("Adding " + location, "Problems in descriptor:\n" + val.getMessages());
+                DescriptorUtils.throwExecutionException("Adding " + location, 
+                    "Problems in descriptor:\n" + val.getMessages());
             }
             SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
                 yamlArtifact, location, jarFile);
             return super.addArtifact(artifact.getId(), artifact);
         } catch (IOException e) {
-            throwExecutionException("Adding " + location, e);
+            DescriptorUtils.throwExecutionException("Adding " + location, e);
             return null;
         }
     }
-    
-    /**
-     * Throws an execution exception for the given throwable.
-     * @param action the actual action to log
-     * @param th the throwable
-     * @throws ExecutionException
-     */
-    private static void throwExecutionException(String action, Throwable th) throws ExecutionException {
-        LOGGER.error(action + ": " + th.getMessage());
-        throw new ExecutionException(th);
-    }
 
-    // checkstyle: stop exception type check
-
-    /**
-     * Throws an execution exception for the given message.
-     * @param action the actual action to log
-     * @param message the message for the exception
-     * @throws ExecutionException
-     */
-    private static void throwExecutionException(String action, String message) throws ExecutionException {
-        LOGGER.error(action + ": " + message);
-        throw new ExecutionException(message, null);
-    }
-    
-    /**
-     * Reads the YAML deployment descriptor from {@code file}.
-     * 
-     * @param file the file to read from
-     * @return the parsed descriptor
-     * @throws ExecutionException if reading fails for some reason
-     */
-    public static YamlArtifact readFromFile(File file) throws ExecutionException {
-        YamlArtifact result = null;
-        if (file.getName().endsWith(".jar") || file.getName().endsWith(".zip")) {
-            try {
-                String descName = "deployment.yml";
-                if (null != getConfig()) { // null in case of standalone/non-spring execution
-                    descName = getConfig().getDescriptorName();
-                }
-                LOGGER.info("Reading artifact " + file + ", descriptor " + descName);
-                InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
-                if (null == descStream) {
-                    descStream = JarUtils.findFile(new FileInputStream(file), descName);                    
-                }
-                if (null != descStream) {
-                    result = YamlArtifact.readFromYaml(descStream);
-                    FileUtils.closeQuietly(descStream);
-                } else {
-                    throwExecutionException("Reading artifact " + file, descName + " does not exist in " + file);
-                }
-            } catch (IOException e) {
-                throwExecutionException("Reading artifact " + file, e);
-            }
-        } else {
-            throwExecutionException("Reading artifact " + file, file + " is not considered as service "
-                + "artifact (JAR, ZIP)");
-        }
-        return result;
-    }
-    
     /**
      * Determines the command line arguments to adjust service connections from "internal" to "external" binder.
      * 
