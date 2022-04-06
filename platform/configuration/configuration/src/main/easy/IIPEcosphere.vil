@@ -58,7 +58,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         }
         
         for (Application a : applications) {
-            String appName = asTypeName(a.name);
+            String appName = getAppMvnName(a);
             Path appRoot = "${target}/${appName}";
             appRoot.mkdir();
             Path javaSrc = "${appRoot}/src/main/java";
@@ -130,10 +130,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             }
             
             // partition according to container strategy
-            String appVersion = "${a.ver}";
-            if (a.snapshot) {
-                appVersion = appVersion + "-SNAPSHOT";
-            }
+            String appVersion = getAppMvnVersion(a);
             vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
             vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
             generateServiceContainer(appRoot, config, a, elements);

@@ -20,6 +20,18 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    def String getAppMvnVersion(Application app) {
+        String appVersion = "${app.ver}";
+        if (app.snapshot) {
+            appVersion = appVersion + "-SNAPSHOT";
+        }
+        appVersion;
+    }
+
+    def String getAppMvnName(Application app) {
+        asTypeName(app.name);
+    }
+    
     // ------------------------------------------ type name access -------------------------------------
 
     def String toTypeName(IOType type) {
