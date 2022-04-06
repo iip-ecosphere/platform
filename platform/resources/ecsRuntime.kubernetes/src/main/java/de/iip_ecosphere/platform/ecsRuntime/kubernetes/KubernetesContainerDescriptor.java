@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.net.URI;
 
-import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * 
  * @author Ahmad Alomosh, SSE
  */
-public class KubernetesContainerDescriptor extends AbstractContainerDescriptor {
+public class KubernetesContainerDescriptor extends BasicContainerDescriptor {
     
     /**
      * Creates a container descriptor instance.

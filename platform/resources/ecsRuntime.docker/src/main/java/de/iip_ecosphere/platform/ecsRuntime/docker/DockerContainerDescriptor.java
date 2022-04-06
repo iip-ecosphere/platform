@@ -26,8 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.InternetProtocol;
 
-import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerDescriptor;
-import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
+import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
@@ -37,7 +36,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * 
  * @author Monika Staciwa, SSE
  */
-public class DockerContainerDescriptor extends AbstractContainerDescriptor {
+public class DockerContainerDescriptor extends BasicContainerDescriptor {
     
     public static final String PORT_PLACEHOLDER = "${port}";
     private static int instanceCount = 0;
@@ -49,7 +48,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
 
     // configurable
     private String dockerImageName;
-    private String dockerImageZipfile;
     private boolean dood = false;
     private boolean attachStdIn = false;
     private boolean attachStdOut = false;
@@ -80,30 +78,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
         super(id, name, version, uri);
     }
     
-    // [required by SnakeYaml]
-    @Override
-    public void setId(String id) {
-        super.setId(id);
-    }
-    
-    // [required by SnakeYaml]
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-    }
-    
-    // [required by SnakeYaml]
-    @Override
-    public void setVersion(Version version) {
-        super.setVersion(version);
-    }
-    
-    // [required by SnakeYaml]
-    @Override
-    public void setState(ContainerState state) {
-        super.setState(state);
-    }
-    
     /**
      * Defines the Docker container's id.
      * @param dockerId
@@ -118,22 +92,6 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
      */
     public String getDockerId() {
         return this.dockerId;
-    }
-    
-    /**
-     * Defines the name of the compressed file with the Docker image. [required by SnakeYaml]
-     * @param dockerImageZipfile
-     */
-    public void setDockerImageZipfile(String dockerImageZipfile) {
-        this.dockerImageZipfile = dockerImageZipfile;
-    }
-    
-    /**
-     * Returns the name of the compressed file with the Docker image.
-     * @return name
-     */
-    public String getDockerImageZipfile() {
-        return this.dockerImageZipfile;
     }
     
     /**
@@ -425,7 +383,8 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
             in = new FileInputStream(file);
             result = readFromYaml(in, file.toURI());
         } catch (FileNotFoundException e) {
-            LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
+            LoggerFactory.getLogger(DockerContainerDescriptor.class).error(
+                "Reading container descriptor: " + e.getMessage());
         }
         return result;
     }
@@ -443,7 +402,8 @@ public class DockerContainerDescriptor extends AbstractContainerDescriptor {
                 result = AbstractSetup.readFromYaml(DockerContainerDescriptor.class, in);
                 result.setUri(uri);
             } catch (IOException e) {
-                LoggerFactory.getLogger(DockerContainerDescriptor.class).error("Reading setup: " + e.getMessage());
+                LoggerFactory.getLogger(DockerContainerDescriptor.class).error(
+                    "Reading container descriptor: " + e.getMessage());
             }
         }
         return result;
