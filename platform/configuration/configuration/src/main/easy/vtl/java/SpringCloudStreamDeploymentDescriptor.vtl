@@ -37,7 +37,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - endpoint:
               portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
               hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-            ${generateRelations(elt)}
+            ${generateRelations(elt)|e}
           ${generateProcess(elt, service)|e}'
     }
     
@@ -138,7 +138,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           direction: OUT
           type: ${eltType}'
         if (conns.size() > 0) {
-            for (MeshConnector conn : conns) {
+            for (MeshConnector conn : conns, "\n") {
                 MeshInnerElement next = conn.next;
                 String nextMeth = generateDataMethods(next);
                 returnType = true;
@@ -150,10 +150,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
                   id: ${conn.name}
                   service: ${next.impl.id}
                   direction: IN
-                  type: ${nextType}' <CR>;
+                  type: ${nextType}'
             }
-        } else {
-            '\n'
         }
     }
 
