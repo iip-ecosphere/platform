@@ -38,6 +38,7 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
 
 /**
@@ -130,8 +131,19 @@ public class PlatformTest {
         Assert.assertNotNull(a.getDescription());
         Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
 
+        a = mgr.getArtifact("cnt1");
+        Assert.assertNotNull(a);
+        Assert.assertEquals("cnt1", a.getId());
+        Assert.assertEquals(ArtifactKind.CONTAINER, a.getKind());
+        Assert.assertNotNull(a.getName());
+        Assert.assertNotNull(a.getDescription());
+        Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
+
         Assert.assertEquals(mgr.getArtifactCount(), CollectionUtils.toList(mgr.artifacts().iterator()).size());
-        int count = mgr.getArtifactCount();
+        for (Artifact ar: mgr.artifacts()) {
+            System.out.println(" - " + ar.getId() + " " + ar.getName() + " " + ar.getKind() + " " + ar.getVersion() 
+                + " " + ar.getAccessUri());
+        }
         
         SubmodelElementsCollectionClient sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
@@ -141,24 +153,41 @@ public class PlatformTest {
         Assert.assertNotNull(coll.getElement("art"));
         Assert.assertNotNull(coll.getElement("art1"));
         
+        coll = sc.getSubmodel().getSubmodelElementCollection(
+            PlatformAas.NAME_COLL_CONTAINER);
+        Assert.assertEquals(1, coll.getElementsCount());
+        Assert.assertNotNull(coll.getElement("cnt1"));
+        
         // preliminary, not nice
         FileUtils.copyFile(
             new File("src/test/resources/service3.jar"), 
             new File("src/test/resources/artifacts/service3.jar"));
         TimeUtils.sleep(1000); // wait for watcher
-        Assert.assertEquals(count + 1, mgr.getArtifactCount());
+        Assert.assertEquals(4, mgr.getArtifactCount());
         
         sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);        
-        Assert.assertEquals(count + 1, coll.getElementsCount()); // added, but not changed, unclear
+        Assert.assertEquals(3, coll.getElementsCount());
+
+        coll = sc.getSubmodel().getSubmodelElementCollection(
+            PlatformAas.NAME_COLL_CONTAINER);
+        Assert.assertEquals(1, coll.getElementsCount()); // unchanged
 
         FileUtils.deleteQuietly(new File("src/test/resources/artifacts/service3.jar"));
         TimeUtils.sleep(1000); // wait for watcher
         
         //Assert.assertEquals(count, mgr.getArtifactCount()); // watcher unclear although file is gone
         //Assert.assertEquals(count, coll.getElementsCount());
+    }
+
+    /**
+     * Cleanup.
+     */
+    @AfterClass
+    public static void shutdown() {
+        FileUtils.deleteQuietly(new File("src/test/resources/artifacts/service3.jar"));
     }
     
 }

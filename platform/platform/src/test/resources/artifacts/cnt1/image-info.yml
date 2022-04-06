@@ -1,0 +1,4 @@
+id: cnt1
+name: test-container
+version: 1.0
+imageFile: cnt1.zip

@@ -33,9 +33,11 @@ import java.util.TreeMap;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -104,6 +106,38 @@ public class ArtifactsManager {
          */
         public URI getAccessUri();
 
+        /**
+         * Returns the version of the artifact.
+         * 
+         * @return the version
+         */
+        public Version getVersion();
+        
+    }
+
+    /**
+     * Basic abstract artifact implementation.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected abstract static class AbstractArtifact implements Artifact {
+
+        private URI accessUri;
+
+        /**
+         * Creates a service artifact instance.
+         * 
+         * @param accessUri the access URI for the devices
+         */
+        protected AbstractArtifact(URI accessUri) {
+            this.accessUri = accessUri;
+        }
+
+        @Override
+        public URI getAccessUri() {
+            return accessUri;
+        }
+
     }
 
     /**
@@ -111,10 +145,9 @@ public class ArtifactsManager {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class ServiceArtifact implements Artifact {
+    public static class ServiceArtifact extends AbstractArtifact {
         
         private YamlArtifact descriptor;
-        private URI accessUri;
         
         /**
          * Creates a service artifact instance.
@@ -123,8 +156,8 @@ public class ArtifactsManager {
          * @param accessUri the access URI for the devices
          */
         private ServiceArtifact(YamlArtifact descriptor, URI accessUri) {
+            super(accessUri);
             this.descriptor = descriptor;
-            this.accessUri = accessUri;
         }
 
         @Override
@@ -146,14 +179,61 @@ public class ArtifactsManager {
         public String getDescription() {
             return "";
         }
+        
+        @Override
+        public Version getVersion() {
+            return descriptor.getVersion();
+        }
+
+    }
+
+    /**
+     * Represents a service artifact.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ContainerArtifact extends AbstractArtifact {
+        
+        private BasicContainerDescriptor descriptor;
+        
+        /**
+         * Creates a service artifact instance.
+         * 
+         * @param descriptor the YAML descriptor
+         * @param accessUri the access URI for the devices
+         */
+        private ContainerArtifact(BasicContainerDescriptor descriptor, URI accessUri) {
+            super(accessUri);
+            this.descriptor = descriptor;
+        }
 
         @Override
-        public URI getAccessUri() {
-            return accessUri;
+        public ArtifactKind getKind() {
+            return ArtifactKind.CONTAINER;
+        }
+
+        @Override
+        public String getId() {
+            return descriptor.getId();
+        }
+
+        @Override
+        public String getName() {
+            return descriptor.getName();
+        }
+
+        @Override
+        public String getDescription() {
+            return "";
+        }
+        
+        @Override
+        public Version getVersion() {
+            return descriptor.getVersion();
         }
         
     }
-    
+
     /**
      * Returns the instance of the artifacts manager.
      * 
@@ -237,7 +317,7 @@ public class ArtifactsManager {
                     watch.close();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ArtifactsManager.class)
-                        .error("While stop watching for artifacts: " + e.getMessage());
+                        .error("While stop watching for artifacts: {}", e.getMessage());
                 }
             }
         }
@@ -288,12 +368,12 @@ public class ArtifactsManager {
                 new Thread(runnable).start();
             } catch (IOException e) {
                 LoggerFactory.getLogger(ArtifactsManager.class)
-                    .error("While stop watching for artifacts: " + e.getMessage());
+                    .error("While stop watching for artifacts: {}", e.getMessage());
             }
         } else {
             LoggerFactory.getLogger(ArtifactsManager.class)
-                .error("Configured artifacts folder " + artifactsFolder.getAbsolutePath() 
-                    + " does not exist. Disabling watching for artifacts");
+                .error("Configured artifacts folder {} does not exist. Disabling watching for artifacts", 
+                    artifactsFolder.getAbsolutePath());
         }
     }
 
@@ -331,7 +411,7 @@ public class ArtifactsManager {
                             accessUri = new URI(prefix + path.toString().replace('\\', '/'));
                         } catch (URISyntaxException e) {
                             LoggerFactory.getLogger(ArtifactsManager.class)
-                                .warn("While creating artifact " + path + ": " + e.getMessage());
+                                .warn("While creating artifact {}: {}", path, e.getMessage());
                         }
                     }
                     if (null == accessUri) {
@@ -339,25 +419,62 @@ public class ArtifactsManager {
                     }
                 }
                 if (name.endsWith(".zip") || name.endsWith(".jar")) { // could be a service artifact
-                    try {
-                        InputStream is = JarUtils.findFile(new FileInputStream(pn.toFile()), "deployment.yml");
-                        if (null != is) {
-                            YamlArtifact yml = YamlArtifact.readFromYaml(is);
-                            result = new ServiceArtifact(yml, accessUri);
-                        }
-                    } catch (IOException e) {
-                        LoggerFactory.getLogger(ArtifactsManager.class)
-                            .error("Cannot read artifact " + path + ": " + e.getMessage());
-                    }
+                    result = createForZip(path, accessUri);
                 }
-                //if (name.endsWith(".yml")) { // could be a container descriptor
-                    // requires generic creation of container descriptor
-                //}
+                if (name.endsWith(".yml")) { // could be a container descriptor
+                    result = createForYaml(file, accessUri);
+                }
             }
             if (null != result) {
                 artifacts.put(result.getId(), result);
                 artifactPaths.put(pn, result);
                 PlatformAas.notifyArtifactCreated(result);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Tries to create an artifact instance for a ZIP/JAR file.
+     * 
+     * @param path the path to the file
+     * @param accessUri the access URI for the devices
+     * @return the artifact, may be <b>null</b> if none can be created
+     */
+    private Artifact createForZip(Path path, URI accessUri) {
+        Artifact result = null;
+        try {
+            FileInputStream fis = new FileInputStream(path.toFile());
+            InputStream is = JarUtils.findFile(fis, "deployment.yml");
+            if (null != is) {
+                YamlArtifact yml = YamlArtifact.readFromYaml(is); // closes is
+                result = new ServiceArtifact(yml, accessUri);
+            }
+            fis.close();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(ArtifactsManager.class)
+                .error("Cannot read artifact {}: {}", path, e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Tries to create an artifact instance for a YAML file.
+     * 
+     * @param file the file to create the artifact for
+     * @param accessUri the access URI for the devices
+     * @return the artifact, may be <b>null</b> if none can be created
+     */
+    private Artifact createForYaml(File file, URI accessUri) {
+        Artifact result = null;
+        BasicContainerDescriptor desc = BasicContainerDescriptor.readFromYamlFile(file);
+        if (null != desc.getImageFile() && desc.getImageFile().length() > 0) {
+            File f = new File(file.getParentFile(), desc.getImageFile());
+            if (f.exists()) {
+                result = new ContainerArtifact(desc, accessUri);
+            } else {
+                LoggerFactory.getLogger(ArtifactsManager.class).info("Cannot create container descriptor for {}: "
+                    + "Container image file {} not found in same directory", file, desc.getImageFile());
             }
         }
         return result;
@@ -430,6 +547,5 @@ public class ArtifactsManager {
     public int getArtifactCount() {
         return artifacts.size();
     }
-
 
 }
