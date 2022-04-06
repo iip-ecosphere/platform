@@ -105,11 +105,19 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     }
 
     def protocolConfig(TransportProtocolAMQP protocol, Boolean global) {
+        String usr = "";
+        if (isDefined(protocol.user)) {
+            usr = 'user: ${protocol.user}';
+        }
+        String pw = "";
+        if (isDefined(protocol.password)) {
+            pw = 'password: ${protocol.password}';
+        }
         'amqp:
             host: ${protocolHost(protocol, global)}
             port: ${protocol.port}
-            user: ${protocol.user}
-            password: ${protocol.password}'
+            ${usr|e}
+            ${pw|e}'
     }
 
     def protocolConfig(TransportProtocolMQTTv3 protocol, Boolean global) {
