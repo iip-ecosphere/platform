@@ -1,0 +1,18 @@
+<button (click)="getData()">Aktualisieren</button>
+
+<div *ngIf="Data && Data.submodelElements" style="display: flex;">
+  <div *ngFor="let element of Data.submodelElements">
+    <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
+      <mat-card-title>{{ element.kind }} {{ element.idShort }}</mat-card-title>
+      <mat-card-content>
+        <div *ngFor="let element2 of element.value">
+          <div *ngIf="!element2.invokable">
+            <span class="shortId">{{ element2.idShort }}: </span>
+            <span *ngIf="element2.value"> {{ element2.value }} </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
