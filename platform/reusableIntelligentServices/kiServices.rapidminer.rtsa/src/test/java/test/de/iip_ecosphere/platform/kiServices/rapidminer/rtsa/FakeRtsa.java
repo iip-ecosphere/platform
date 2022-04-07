@@ -12,9 +12,13 @@
 
 package test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -29,7 +33,10 @@ public class FakeRtsa {
     public static final String PARAM_PREFIX = "--";
     public static final String PARAM_ARG_NAME_SEP = ".";
     public static final String PARAM_VALUE_SEP = "=";
-    
+
+    private static final String ENDING = "}]}";
+    private static Random random = new Random();
+
     /**
      * Emulates reading a Spring-like parameter if the configuration is not yet in place.
      * 
@@ -70,6 +77,18 @@ public class FakeRtsa {
     }
     
     /**
+     * Returns a Boolean command line argument.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code deflt}
+     */
+    public static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
+        return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
+    }    
+    
+    /**
      * Executes the fake server.
      * 
      * @param args ignored
@@ -77,12 +96,18 @@ public class FakeRtsa {
      */
     public static void main(String[] args) throws IOException {
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
+        String path = getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
+        boolean verbose = getBooleanArg(args, "verbose", true);
+        boolean waitAtStart = getBooleanArg(args, "waitAtStart", true);
         System.out.println("This is FakeRtsa on port: " + serverPort);
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-        server.createContext("/services/iip_basic/score_v1", (exchange -> {
-            System.out.println("Received Request");
-            String respText = "{\"data\":[{\"value2\":3.0,\"value1\":1.3,"
-                + "\"confidence\":0.863,\"prediction\":\"false\",\"id\":1.0}]}";
+        server.createContext("/services/" + path, (exchange -> {
+            String request = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
+                .lines().collect(Collectors.joining("\n"));            
+            if (verbose) {
+                System.out.println("FakeRtsa Received Request: " + request);
+            }
+            String respText = createResponse(request);
             exchange.sendResponseHeaders(200, respText.getBytes().length);
             OutputStream output = exchange.getResponseBody();
             output.write(respText.getBytes());
@@ -91,14 +116,35 @@ public class FakeRtsa {
         }));
         server.setExecutor(null); // creates a default executor
         new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // puuh
+            if (waitAtStart) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    // puuh
+                }
+                System.out.println("Started Application in 2500 ms"); // we need some output for state change
+            } else {
+                System.out.println("Started Application in 50 ms"); // we need some output for state change
             }
-            System.out.println("Started Application in 2500 ms"); // we need some output for state change
         }).start();
         server.start();
+    }
+    
+    /**
+     * Creates a fake response. We do not have a JSON parser available unless we add libraries to the fake RTSA.
+     * 
+     * @param request the request
+     * @return the response
+     */
+    private static String createResponse(String request) {
+        String result = request;
+        if (request.endsWith(ENDING)) {
+            double conf = random.nextDouble();
+            boolean pred = conf > 0.75;
+            String predResp = String.format(",\"confidence\":%.3f,\"prediction\":\"%b\"", conf, pred);
+            result = request.substring(0, request.length() - ENDING.length()) + predResp + ENDING;
+        }
+        return result;
     }
 
 }

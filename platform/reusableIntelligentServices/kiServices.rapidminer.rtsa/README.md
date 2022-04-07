@@ -6,6 +6,6 @@ So far, the integration is preliminary, i.e., separating mechanisms, ports and t
 
 For test packaging in the platform/application instantiation, the build process of this package creates two fake ZIP files in `target/fake`, one for RTSA and one for a deployment. The fake RTSA contains the respective class from testing, the deployment zip is intentionally more or less empty.
 
-Manual building may require `mvn package -DskipTests -Djacoco.skip=true`.
+Manual building may require `mvn package -DskipTests -Djacoco.skip=true`
 
 

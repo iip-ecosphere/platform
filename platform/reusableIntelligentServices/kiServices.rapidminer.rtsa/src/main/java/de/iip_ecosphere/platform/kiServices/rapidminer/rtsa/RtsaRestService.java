@@ -84,7 +84,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         args.add("-Dlog4j2.formatMsgNoLookups=true");
         args.add("-classpath");
         args.add(getClasspath(rtsaPath));
-        args.add(getMainClass());
+        args.add(getMainClass(rtsaPath));
         addProcessSpecCmdArg(args);
         parseArgs(args.toArray(new String[] {}));
         proc = createAndConfigureProcess(exe, false, home, args);
@@ -121,10 +121,18 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     /**
      * Returns the main class of RTSA. [for testing]
      * 
+     * @param rtsaPath the path to the installed RTSA
      * @return the main class
      */
-    protected String getMainClass() {
-        return "com.rapidminer.execution.scoring.Application";
+    protected String getMainClass(File rtsaPath) {
+        String result;
+        File libsFake = new File(rtsaPath, "lib/fakeRtsa.jar");
+        if (libsFake.exists()) {
+            result = "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
+        } else {
+            result = "com.rapidminer.execution.scoring.Application";
+        }
+        return result;
     }
     
     @Override

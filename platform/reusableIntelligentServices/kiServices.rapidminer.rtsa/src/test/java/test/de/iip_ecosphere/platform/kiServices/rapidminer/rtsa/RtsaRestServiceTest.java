@@ -62,7 +62,7 @@ public class RtsaRestServiceTest {
         }
 
         @Override
-        protected String getMainClass() {
+        protected String getMainClass(File rtsaPath) {
             return "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
         }
         
@@ -99,13 +99,10 @@ public class RtsaRestServiceTest {
 
             @Override
             public void received(OutData data) {
-//                Assert.assertTrue(data.getId() != 0);
-//                Assert.assertTrue(data.getValue1() != 0);
-//                Assert.assertTrue(data.getValue2() != 0);
-//                Assert.assertTrue(data.getPrecision() != 0);
+                // don't care for the values as long we received something
                 receivedCount.incrementAndGet();
-                LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Received result: {id=" + data.getId() 
-                    + " value1=" + data.getValue1() + " value2=" + data.getValue2() + " precision = " 
+                LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Received result: id=" + data.getId() 
+                    + " value1=" + data.getValue1() + " value2=" + data.getValue2() + " confidence = " 
                     + data.getConfidence() + " prediction=" + data.isPrediction());
             }
 
