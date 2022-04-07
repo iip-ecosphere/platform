@@ -520,9 +520,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def getServiceType(MeshElement elt, PythonService service) {
         if (service.integrationMode == PythonIntegrationMode::console_continuous) {
-            "PythonAsyncProcessService"
+            "de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService"
         } else {
-            "PythonSyncProcessService"
+            "de.iip_ecosphere.platform.services.environment.PythonSyncProcessService"
         }
     }
     
