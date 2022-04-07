@@ -40,39 +40,6 @@ public class Starter {
         String serviceProtocol = "";
         
         File f = new File("gen/rtsa/SimpleRTSADemoFlowApp/target/SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar");
-        /*if (!f.exists()) {
-            LogManager.getLogger(Starter.class).error("Cannot find Spring service binary " + f.getAbsolutePath() 
-                + ". Did you run the instantiation process?");
-        }
-        try {
-            // This shall not occur in normal applications. Usually, we do not know what the service execution
-            // is. Here we rely on spring, also because the descriptors are not yet abstracted. 
-            YamlArtifact art = DescriptorUtils.readFromFile(f);
-            List<String> cmdLine = new ArrayList<String>();
-            cmdLine.add("java");
-            cmdLine.add("-jar");
-            cmdLine.add("-Dlog4j2.formatMsgNoLookups=true");
-            cmdLine.add(f.getAbsolutePath());
-            cmdLine.add("--iip.test.service.autostart=true"); // only for testing
-            for (YamlService service : art.getServices()) {
-                YamlProcess proc = service.getProcess();
-                if (null != proc) {
-                    File d = DescriptorUtils.extractProcessArtifacts(service.getId(), proc, f, null);
-                    d.deleteOnExit();
-                }
-                for (Relation r : service.getRelations()) {
-                    // simplification, don't think about relations
-                    DescriptorUtils.addEndpointArgs(cmdLine, r.getEndpoint(), brokerPort, brokerHost);
-                }
-                cmdLine.addAll(service.getCmdArg(adminPort, serviceProtocol));
-            }
-            LogManager.getLogger(Starter.class).info("Starting with arguments: " + cmdLine);
-            ProcessBuilder builder = new ProcessBuilder(cmdLine);
-            builder.inheritIO().start().waitFor();
-        } catch (ExecutionException | InterruptedException | IOException e) {
-            LogManager.getLogger(Starter.class).error("Running the app: " + e.getMessage());
-        }*/
-
         try {
             List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(f, brokerPort, brokerHost, adminPort, 
                 serviceProtocol);
