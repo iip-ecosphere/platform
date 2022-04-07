@@ -219,7 +219,7 @@ project Services {
    compound PythonService refines Service {
        String entrypointModule; // optional, would override default ServiceEnvironment.py
        String artifact;
-       setOf(refTo(PythonDependency)) dependencies = {}; // TODO remove, VIL dynamic dispatch 
+       //dependency refinement removed -> system dependencies, use VIL dynamic dispatch 
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
    }
    
