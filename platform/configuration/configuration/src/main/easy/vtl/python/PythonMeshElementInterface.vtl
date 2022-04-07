@@ -1,4 +1,4 @@
-import JavaBasics;
+import PythonBasics;
 import MeshBasics;
 
 @advice(IIPEcosphere)
@@ -75,7 +75,7 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
     
     def produceSuper(PythonService service) {
         String sId = "'${service.id}'";
-        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${service.deployable}, ServiceKind.${service.kind})
+        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})
         Registry.services[${sId}] = self'
     }
     

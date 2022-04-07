@@ -1,4 +1,4 @@
-import JavaBasics;
+import PythonBasics;
 import MeshBasics;
 import ServiceBasics;
 
@@ -69,7 +69,7 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
     
     def produceSuper(PythonService service) {
         String sId = "'${service.id}'";
-        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${service.deployable}, ServiceKind.${service.kind})
+        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})
         Registry.services[${sId}] = self'
     }
     
@@ -84,7 +84,7 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
     def main(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
         String clsName = asTypeName(service.name);
         'from iip.AbstractService import AbstractService
-        import iip.Registry
+        import Registry
         from iip.Version import Version
         from iip.Service import ServiceState
         from iip.Service import ServiceKind

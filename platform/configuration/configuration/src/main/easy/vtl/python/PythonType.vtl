@@ -61,7 +61,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
                 add = "Impl";
                 comment = "Implementation";
                 ext = "(${clsName})";
-                imp = "import ${clsName}\n";
+                imp = "from datatypes.${clsName} import ${clsName}\n";                
             }
         } else {
             comment = "Implementation";

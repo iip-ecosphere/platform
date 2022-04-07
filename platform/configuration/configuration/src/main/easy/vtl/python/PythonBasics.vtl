@@ -2,6 +2,14 @@
 @indent(indentation = 4, additional = 0)
 template PythonBasics(Configuration config, FileArtifact target) {
 
+    def String toBoolean(Boolean b) {
+        if (b) {
+            "True";
+        } else {
+            "False";
+        }
+    }
+
     def String asIdentifier(String s) {
         s.replace(" ", "").replace("$","D").toIdentifier();
     }
@@ -12,6 +20,10 @@ template PythonBasics(Configuration config, FileArtifact target) {
     
     def String asTypeName(String s) {
         s.asIdentifier().firstToUpperCase();
+    }
+    
+    def String toTypeName(IOType type) {
+        toTypeName(type.type);
     }
     
     def String toTypeName(DataType type) {
