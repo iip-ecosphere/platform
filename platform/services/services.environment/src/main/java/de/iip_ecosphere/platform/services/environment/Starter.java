@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +35,12 @@ public class Starter {
     
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
+    public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
     private static Map<String, Integer> servicePorts = new HashMap<>();
+    private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
 
     /**
      * Returns the network manager key used by this descriptor to allocate dynamic network ports for service commands.
@@ -114,6 +117,7 @@ public class Starter {
         if (port < 0) {
             port = NetUtils.getEphemeralPort();
         }
+        serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, false);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);
         boolean found = false;
         for (String p : factory.getProtocols()) {
@@ -194,8 +198,25 @@ public class Starter {
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      */
     public static void mapService(ServiceMapper mapper, Service service) {
-        if (null != service && null != mapper && null != Starter.getProtocolBuilder()) {
-            mapper.mapService(service);
+        if (null != service) {
+            if (null != mapper && null != Starter.getProtocolBuilder()) {
+                mapper.mapService(service);
+            }
+            if (serviceAutostart) {
+                try {
+                    getLogger().info("Service autostart: '{}'", service.getId());
+                    service.setState(ServiceState.STARTING);
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        try {
+                            service.setState(ServiceState.STOPPING);
+                        } catch (ExecutionException e) {
+                            getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
+                        }
+                    }));
+                } catch (ExecutionException e) {
+                    getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
+                }
+            }
         }
     }
 
