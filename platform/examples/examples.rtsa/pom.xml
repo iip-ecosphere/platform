@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>examples.rtsa</artifactId>
+  <packaging>jar</packaging>
+  <name>RTSA example</name>
+  <description>Utilizing the RTSA platform service in a simple service chain for validation.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.3.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors.opcuav1</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>configuration.configuration</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- This is not needed in normal programs! Here we know that the test shall be Spring-based,
+         but in normal settings it's even not known what the service execution framework is. -->
+    <dependency>
+      <artifactId>services.spring</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <!-- the application itself, generated code -->
+    <dependency>
+      <artifactId>apps.ExampleRTSAAppInterfaces</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <artifactId>SimpleRTSADemoFlowApp</artifactId>
+      <groupId>de.iip-ecosphere.platform.apps</groupId>
+      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+    </dependency>
+      
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <optional>true</optional>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>configuration.configuration</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <build>
+    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>3.2.0</version>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>generate-sources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>de.iip-ecosphere.platform</groupId>
+                   <artifactId>configuration.configuration</artifactId>
+                   <version>${project.version}</version>
+                   <classifier>easy</classifier>
+                   <type>zip</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
+                   <destFileName>model.jar</destFileName>
+                 </artifactItem>
+               </artifactItems>
+               <overWriteReleases>false</overWriteReleases>
+               <overWriteSnapshots>true</overWriteSnapshots>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>de.iip_ecosphere.platform.examples.rtsa.Starter</mainClass>
+            </configuration>
+        </plugin>
+    </plugins>
+    <pluginManagement>
+        <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        org.apache.maven.plugins
+                                    </groupId>
+                                    <artifactId>
+                                        maven-dependency-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [3.1.2,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore></ignore>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+  </build> 
+
+</project>
