@@ -12,6 +12,9 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
@@ -46,5 +49,29 @@ public class DescriptorUtilsTest {
 
         SpringInstances.setConfig(setup);
     }
+    
+    /**
+     * Tests creating standalone command line arguments.
+     *  
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testCreateStandaloneCommandArgs() throws ExecutionException {
+        File f = new File("src/main/resources/void.jar");
+        try {
+            DescriptorUtils.createStandaloneCommandArgs(f, 6234, "localhost", 6235, "");
+            Assert.fail("No exception thrown");
+        } catch (IOException e) {
+            // exception ok
+        }
+        f = new File("src/main/resources/descriptorUtilsTest.jar");
+        try {
+            List<String> args = DescriptorUtils.createStandaloneCommandArgs(f, 6234, "localhost", 6235, "");
+            Assert.assertNotNull(args);
+            Assert.assertTrue(args.size() > 0);
+        } catch (IOException e) {
+            // exception ok
+        }
+    } 
     
 }

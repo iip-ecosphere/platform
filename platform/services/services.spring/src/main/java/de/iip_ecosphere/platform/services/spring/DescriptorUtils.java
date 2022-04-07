@@ -18,16 +18,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.Starter;
+import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
+import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
  * Descriptor and artifact utility functions that may be used standalone.
@@ -182,6 +191,78 @@ public class DescriptorUtils {
             FileUtils.closeQuietly(fis);
         }
         return processDir;
+    }
+    
+    /**
+     * Adds commandline args for a given {@code endpoint}.
+     * 
+     * @param cmdLine the command line arguments to modify as a side effect
+     * @param endpoint the endpoint to turn into command line arguments
+     * @param addr the address containing port number and host (for substitution in results delivered 
+     *     by {@code endpoint})
+     */
+    public static void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, ServerAddress addr) {
+        addEndpointArgs(cmdLine, endpoint, addr.getPort(), addr.getHost());
+    }
+
+    /**
+     * Adds commandline args for a given {@code endpoint}.
+     * 
+     * @param cmdLine the command line arguments to modify as a side effect
+     * @param endpoint the endpoint to turn into command line arguments
+     * @param port the port number (for substitution in results delivered by {@code endpoint})
+     * @param host the host name (for substitution in results delivered by {@code endpoint})
+     */
+    public static void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, int port, String host) {
+        if (null != endpoint) { // endpoints are optional
+            CmdLine.parseToArgs(endpoint.getPortArg(port), cmdLine);
+            if (endpoint.getHostArg().length() > 0) {
+                CmdLine.parseToArgs(endpoint.getHostArg(host), cmdLine);
+            }
+        }
+    }
+    
+    /**
+     * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner.
+     *   
+     * @param jar the JAR file to read
+     * @param brokerPort the port where the transport broker is running 
+     * @param brokerHost the host where the transport broker is running (usually "localhost")
+     * @param adminPort the port where to run the AAS command server, for -1 an emphemeral port will be used 
+     * @param serviceProtocol the protocol to run for the AAS command server (see {@link AasFactory})
+     * @return the list of command line args to use 
+     * @throws IOException if {@code jar} cannot be found or reading {@code jar} fails
+     * @throws ExecutionException if extracting process artifacts fails
+     */
+    public static List<String> createStandaloneCommandArgs(File jar, int brokerPort, String brokerHost, 
+        int adminPort, String serviceProtocol) throws IOException, ExecutionException {
+        List<String> result;
+        if (!jar.exists()) {
+            throw new IOException("Cannot find Spring service binary '" + jar.getAbsolutePath() 
+                + "'. Did you run the instantiation process?");
+        } 
+        // This shall not occur in normal applications. Usually, we do not know what the service execution
+        // is. Here we rely on spring, also because the descriptors are not yet abstracted. 
+        YamlArtifact art = readFromFile(jar);
+        result = new ArrayList<String>();
+        result.add("java");
+        result.add("-jar");
+        result.add("-Dlog4j2.formatMsgNoLookups=true");
+        result.add(jar.getAbsolutePath());
+        result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
+        for (YamlService service : art.getServices()) {
+            YamlProcess proc = service.getProcess();
+            if (null != proc) {
+                File d = extractProcessArtifacts(service.getId(), proc, jar, null);
+                d.deleteOnExit();
+            }
+            for (Relation r : service.getRelations()) {
+                // simplification, don't think about relations
+                DescriptorUtils.addEndpointArgs(result, r.getEndpoint(), brokerPort, brokerHost);
+            }
+            result.addAll(service.getCmdArg(adminPort, serviceProtocol));
+        }
+        return result;
     }
 
     /**

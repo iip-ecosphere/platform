@@ -43,11 +43,9 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -202,23 +200,23 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
-                    addEndpointArgs(cmdLine, endpoint, config.getBrokerPort(), config.getBrokerHost());
+                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, config.getBrokerPort(), config.getBrokerHost());
                 } else {
                     ManagedServerAddress adr = registerPort(mgr, r.getChannel());
-                    addEndpointArgs(cmdLine, endpoint, adr);
+                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, adr);
                 }
             }
             ProcessSpec pSpec = service.getProcess();
             if (null != pSpec) {
                 ManagedServerAddress adr = registerPort(mgr, getStreamingNetmanagerKey());
-                addEndpointArgs(cmdLine, pSpec.getServiceStreamEndpoint(), adr);
+                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getServiceStreamEndpoint(), adr);
 
                 List<String> procCmdLine = new ArrayList<String>();
                 procCmdLine.addAll(pSpec.getCmdArg());
-                addEndpointArgs(cmdLine, pSpec.getStreamEndpoint(), adr);
+                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getStreamEndpoint(), adr);
 
                 ManagedServerAddress adrAas = registerPort(mgr, getAasNetmanagerKey());
-                addEndpointArgs(cmdLine, pSpec.getAasEndpoint(), adrAas);
+                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getAasEndpoint(), adrAas);
                 
                 int procPort = startProcess(config, pSpec);
                 if (procPort > 0) {
@@ -328,35 +326,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     String getAasNetmanagerKey() {
         return getId() + "_aas"; // preliminary
-    }
-
-    /**
-     * Adds commandline args for a given {@code endpoint}.
-     * 
-     * @param cmdLine the command line arguments to modify as a side effect
-     * @param endpoint the endpoint to turn into command line arguments
-     * @param addr the address containing port number and host (for substitution in results delivered 
-     *     by {@code endpoint})
-     */
-    private void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, ServerAddress addr) {
-        addEndpointArgs(cmdLine, endpoint, addr.getPort(), addr.getHost());
-    }
-
-    /**
-     * Adds commandline args for a given {@code endpoint}.
-     * 
-     * @param cmdLine the command line arguments to modify as a side effect
-     * @param endpoint the endpoint to turn into command line arguments
-     * @param port the port number (for substitution in results delivered by {@code endpoint})
-     * @param host the host name (for substitution in results delivered by {@code endpoint})
-     */
-    private void addEndpointArgs(List<String> cmdLine, Endpoint endpoint, int port, String host) {
-        if (null != endpoint) { // endpoints are optional
-            CmdLine.parseToArgs(endpoint.getPortArg(port), cmdLine);
-            if (endpoint.getHostArg().length() > 0) {
-                CmdLine.parseToArgs(endpoint.getHostArg(host), cmdLine);
-            }
-        }
     }
     
     /**
