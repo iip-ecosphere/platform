@@ -13,15 +13,14 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 ## News
 
 * Increased focus on use cases and evaluation
-* Integration of RapidMiner RTSA for AI
-* Start of Angular-based Platform Management UI (first commit in the next few days)
-* Model-based IoT connector creation (MQTT in various formats, OPC UA)
+* Integration of RapidMiner RTSA for AI (with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.rtsa))
+* Start of Angular-based Platform Management UI
+* Model-based IoT connector creation (MQTT in various formats, OPC UA with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.vdw))
 * Python Service Execution Environment and model-based Python Service integration
 * Updated Dockerhub containers (2022/03/10)
 * Generic integration of the anonymization and pseudonymization tool [KODEX](https://heykodex.com/)
 * Distributed service execution via CLI scripts
 * Initial device management
-* Security fixes for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228)
 
 ## Documentation
 
