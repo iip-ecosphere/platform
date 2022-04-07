@@ -191,4 +191,16 @@ template MeshBasics(Configuration config, FileArtifact target) {
         collectRecordTypesFromSet(sink.input, types);
     }
     
+    def setOf(MeshConnector) nextConnectors(MeshElement elt) {
+        {};
+    }
+
+    def setOf(MeshConnector) nextConnectors(MeshSource source) {
+        source.next;
+    }
+
+    def setOf(MeshConnector) nextConnectors(MeshInnerElement elt) {
+        elt.next;
+    }
+    
 }

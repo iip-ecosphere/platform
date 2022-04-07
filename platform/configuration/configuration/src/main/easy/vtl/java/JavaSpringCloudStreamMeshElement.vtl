@@ -9,6 +9,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     Boolean isConnector = false;
     mapOf(IOType, IOType) pairs = {};
+    String typeAdd = "";
 
     def initPairs(MeshElement elt) {
     }
@@ -98,13 +99,18 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
-    def attachIngestors(ServiceBase base) {
+    def attachIngestors(MeshElement elt, ServiceBase base) {
          if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
              for (String methodSuffix : ingestors.getKeys()) {
                  // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
                  if (asyncIngestors.containsKey(methodSuffix)) {
                      if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
-                         '${generateIngestor(base, methodSuffix, methodSuffix, ingestors.get(methodSuffix), "in")}'
+                         String type = ingestors.get(methodSuffix);
+                         for (MeshConnector c: nextConnectors(elt)) {                     
+                             MeshElement target = c.next;
+                             String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+                             '${generateIngestor(base, methodSuffix, conn, type, "in")}'
+                         }
                      }
                  }
              }
@@ -462,7 +468,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                  public ${type} to(String source) throws IOException {
                      try {
                          ObjectMapper objectMapper = new ObjectMapper();
-                         return objectMapper.readValue(source, ${type}.class);
+                         return objectMapper.readValue(source, ${type}${typeAdd}.class);
                      } catch (JsonProcessingException e) {
                          throw new IOException(e);
                      }
@@ -665,6 +671,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) {
         initPairs(elt);
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }
         String clsName = getClsName(elt);
         ServiceBase impl = elt.impl;
         'package ${pkg};
@@ -735,7 +747,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             @PostConstruct 
             public void attachIngestors() {
-                ${attachIngestors(elt.impl)}
+                ${attachIngestors(elt, elt.impl)}
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}

@@ -45,17 +45,22 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // ------------------------------------------ generating apps ----------------------------------------
 
-    // called from tests, don't change signature
+    // called from tests/platform instantiator, don't change signature
     generateInterfaces(Project source, Configuration config, Project target) = {
-        generateApps(source, config, target, false);
+        generateApps(source, config, target, false, false);
     }
 
-    // called from tests, don't change signature
+    // called from tests/platform instantiator, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
-        generateApps(source, config, target, true);
+        generateApps(source, config, target, true, false);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateAppsNoDeps(Project source, Configuration config, Project target) = {
+        generateApps(source, config, target, true, true);
     }
     
-    protected generateApps(Project source, Configuration config, Project target, Boolean apps) = {
+    protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(Application) applications = Application.allInstances(); // VTL interference?
@@ -117,7 +122,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                             elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
-                        artifacts.add(getArtifact(no));
+                        if (not(noDeps)) {    
+                            artifacts.add(getArtifact(no));
+                        }
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts);
                     };

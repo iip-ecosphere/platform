@@ -184,6 +184,11 @@ public class PlatformInstantiator {
             System.out.println(" - folder the model is located in, src/main/easy is used for the metamodel");
             System.out.println(" - output folder where to place the generated artifacts");
             System.out.println(" - optional VIL start rule name (\"main\", \"generateApps\", \"generateInterfaces\"");
+            System.out.println("   - main: app interfaces, apps, platform components (default)");
+            System.out.println("   - generateInterfaces: app interfaces, no apps");
+            System.out.println("   - generateAppsNoDeps: app interfaces, apps without artifact dependencies");
+            System.out.println("   - generateApps: app interfaces, apps with artifact dependencies");
+            System.out.println("   - generatePlatform: platform components only");
         } else {
             InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
             if (args.length == 4) {
