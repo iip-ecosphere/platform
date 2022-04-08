@@ -1,4 +1,4 @@
-class TypeTransatorToString:
+class TypeTranslatorToString:
     """String representation serializer interface."""
 
     def readFrom(self, data: str):

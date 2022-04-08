@@ -1,4 +1,4 @@
-from TypeTransatorToString import TypeTransatorToString
+from TypeTranslatorToString import TypeTranslatorToString
 import Registry
 from json import JSONEncoder
 import json
@@ -18,7 +18,7 @@ class Rec13Encoder(JSONEncoder):
         """
         return o.__dict__
 
-class Rec13TransformerToString(TypeTransatorToString):
+class Rec13TransformerToString(TypeTranslatorToString):
     """Rec13<->JSON transformer."""
 
     def __init__(self):

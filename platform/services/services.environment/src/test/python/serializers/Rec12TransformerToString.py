@@ -1,10 +1,10 @@
-from TypeTransatorToString import TypeTransatorToString
+from TypeTranslatorToString import TypeTranslatorToString
 import Registry
 from json import JSONEncoder
 import json
 from datatypes.Rec12 import Rec12
 
-class Rec12TransformerToString(TypeTransatorToString):
+class Rec12TransformerToString(TypeTranslatorToString):
     """Rec12<->JSON transformer."""
 
     class Rec12Encoder(JSONEncoder):

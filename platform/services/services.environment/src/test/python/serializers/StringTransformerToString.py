@@ -1,9 +1,9 @@
-from TypeTransatorToString import TypeTransatorToString
+from TypeTranslatorToString import TypeTranslatorToString
 import Registry
 
 import sys
 
-class StringTransformerToString(TypeTransatorToString):
+class StringTransformerToString(TypeTranslatorToString):
     """String->String transformer."""
 
     def __init__(self):

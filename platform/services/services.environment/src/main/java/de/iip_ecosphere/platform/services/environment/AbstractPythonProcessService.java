@@ -43,6 +43,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     
     private File home;
     private List<String> pythonArgs;
+    private String locationKey;
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
     
@@ -172,13 +173,15 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
         YamlProcess pSpec = yaml.getProcess();
         pythonArgs = new ArrayList<>();
         if (pSpec != null) {
+            locationKey = pSpec.getLocationKey();
             home = pSpec.getHomePath();
-            pythonArgs.add(getPythonModule(pSpec.getExecutable(), yaml));
-            if (null != pSpec.getCmdArg()) {
-                pythonArgs.addAll(pSpec.getCmdArg());
+            pythonArgs.add(getPythonModule(pSpec.getExecutable(), yaml, home));
+            List<String> cmdArg = pSpec.getSubstCmdArg();
+            if (null != cmdArg) {
+                pythonArgs.addAll(cmdArg);
             }
         } else {
-            pythonArgs.add(getPythonModule(null, yaml));
+            pythonArgs.add(getPythonModule(null, yaml, null));
         }
         if (null == home) { // shall not occur
             getLogger().warn("No home path given for service " + yaml.getId() + ". Falling back to temporary folder");
@@ -191,12 +194,19 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      * 
      * @param module the module name, may be empty or <b>null</b>
      * @param yaml the YAML service deployment information
+     * @param homePath optional home path to check for the module first if not given
      * @return the Python module name
      */
-    private static String getPythonModule(String module, YamlService yaml) {
+    private static String getPythonModule(String module, YamlService yaml, File homePath) {
         String result = module;
         if (null == result || result.length() == 0) {
-            result = "ServiceEnvironment.py";
+            if (homePath != null) {
+                result = "ServiceEnvironment.py"; // testing
+                File f = new File(homePath, "iip/ServiceEnvironment.py"); // the "official" one
+                if (f.exists()) {
+                    result = "iip/ServiceEnvironment.py";
+                }
+            }
         }
         return result;
     }
@@ -383,13 +393,40 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
                 args.add("--data");
                 args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
-            Process proc = AbstractProcessService.createProcess(PythonUtils.getPythonExecutable(), 
+            Process proc = AbstractProcessService.createProcess(getPythonExecutable(), 
                 startExecutableByName(), home, args);
             handleErrorStream(proc.getErrorStream());
             return proc;
         } catch (IOException e) {
             throw new ExecutionException(e);
         }
+    }
+    
+    /**
+     * Returns the location key for access into {@link InstalledDependenciesSetup}.
+     * 
+     * @return the key, may be <b>null</b> for fallback
+     */
+    protected String getLocationKey() { // could be abstracted into parent class
+        return locationKey;
+    }
+
+    /**
+     * Returns the Python executable, either via {@link InstalledDependenciesSetup} and {@link #getLocationKey()}
+     * or as fallback via {@link PythonUtils#getPythonExecutable()}.
+     * 
+     * @return the Python executable
+     */
+    protected File getPythonExecutable() {
+        File result = null;
+        String key = getLocationKey();
+        if (null != key) {
+            result = InstalledDependenciesSetup.getInstance().getLocation(key);
+        }
+        if (null == result) { // fallback
+            result = PythonUtils.getPythonExecutable();
+        }
+        return result;
     }
     
     /**

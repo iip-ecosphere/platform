@@ -29,6 +29,7 @@ public class YamlProcess {
     private String executable;
     private String executablePath;
     private String homePath;
+    private String locationKey;
     private List<String> cmdArg = new ArrayList<>();
     
     /**
@@ -38,6 +39,15 @@ public class YamlProcess {
      */
     public String getExecutable() {
         return executable;
+    }
+
+    /**
+     * Returns the location key for lookup in {@link InstalledDependenciesSetup}.
+     * 
+     * @return the location key, may be <b>null</b>
+     */
+    public String getLocationKey() {
+        return locationKey;
     }
 
     /**
@@ -97,6 +107,20 @@ public class YamlProcess {
     public List<String> getCmdArg() {
         return cmdArg;
     }
+    
+    /**
+     * Returns {@link #getCmdArg()} with substitutions from {@link #toSubstFileName(String)}
+     * for all arguments.
+     * 
+     * @return the substitutions
+     */
+    public List<String> getSubstCmdArg() {
+        List<String> result = new ArrayList<>();
+        for (String s : cmdArg) {
+            result.add(toSubstFileName(s));
+        }
+        return result;
+    }
 
     /**
      * Defines the system command or relative path to be executed. [required by SnakeYaml]
@@ -105,6 +129,15 @@ public class YamlProcess {
      */
     public void setExecutable(String executable) {
         this.executable = executable;
+    }
+    
+    /**
+     * Changes the location key for lookup in {@link InstalledDependenciesSetup}.
+     * 
+     * @param locationKey the location key, may be <b>null</b>
+     */
+    public void setLocationKey(String locationKey) {
+        this.locationKey = locationKey;
     }
     
     /**
