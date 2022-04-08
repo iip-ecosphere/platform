@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#Explanation see README.MD
+
+mvn -U -f pom-model.xml generate-sources
+mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateAppsNoDeps" -Diip.resources="$PWD/resources"
+mvn -U install -DskipTests
+mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateApps" -Diip.resources="$PWD/resources"
+#mvn exec:java
