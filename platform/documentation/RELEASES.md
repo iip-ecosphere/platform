@@ -13,7 +13,7 @@
 * Automatic build of demo containers on github, deployment to dockerhub.
 * Extended model-based integration of MQTT, OPC UA and AAS connectors
 * Internal status channel for added/removed/changed components
-* Examples for OPC UA connector creation and RTSA service chain.
+* Examples for OPC UA connector creation, RapidMiner RTSA service chain and Python service integration. RTSA and Python examples include application-specific Java services.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package

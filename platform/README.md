@@ -5,8 +5,8 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.448580)
-  * The IIP-Ecosphere [platform requirements(functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
-  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.5168946) [link may be updated some days after code releases]
+  * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
+  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.5168946) [link may be updated some days after platform releases]
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
@@ -14,6 +14,7 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 
 * Increased focus on use cases and evaluation
 * Integration of RapidMiner RTSA for AI (with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.rtsa))
+* [Example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python) for Python service integration 
 * Start of Angular-based Platform Management UI
 * Model-based IoT connector creation (MQTT in various formats, OPC UA with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.vdw))
 * Python Service Execution Environment and model-based Python Service integration
