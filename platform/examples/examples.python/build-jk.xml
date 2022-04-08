@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="examples.rtsa" default="maven" basedir=".">
+<project name="examples.python" default="maven" basedir=".">
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
 	<include file="${user.home}/macros.xml"/>
 	
-    <!-- deploy to SSE Mvn repo -->
+    <!-- intentionally no deployment here -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-examples.rtsa" pomFile="pom.xml" jarFolder="target" artifactPattern="examples.rtsa-*.*.*.jar" />
+        <maven pomFile="pom-model.xml" goal="generate-sources"/>
+        <maven pomFile="pom-model.xml" goal="exec:java">
+            <arg value='-Dexec.args="ExamplePython src/test/easy gen/py generateAppsNoDeps"'/>
+        </maven>
+        <maven pomFile="pom.xml" goal="install">
+            <arg value="-DskipTests"/>
+        </maven>
+        <maven pomFile="pom-model.xml" goal="exec:java">
+            <arg value='-Dexec.args="ExamplePython src/test/easy gen/py generateApps"'/>
+        </maven>        
+        <!-- Runs endless...
+        <maven pomFile="pom.xml" goal="exec:java">
+            <arg value="-DskipTests"/>
+        </maven>-->	
 	</target>
 </project>

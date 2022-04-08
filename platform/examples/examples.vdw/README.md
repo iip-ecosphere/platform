@@ -6,7 +6,7 @@ This example currently contains two parts:
 
 * A generated connector based on a preliminary model.  Please note the `-f pom-model.xml` on the first commands.
     * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
-    * Obtain the platform configuration meta-model, which is intentionally not included here: `mvn -f pom-model.xml generate-sources`` (use `-U` to update it if it is already in place) 
+    * Obtain the platform configuration meta-model, which is intentionally not included here: `mvn -f pom-model.xml generate-sources` (use `-U` to update it if it is already in place) 
     * Instantiate the pseudo-application using the OPC UA connector: `mvn -f pom-model.xml exec:java -Dexec.args="VDW src/test/easy gen/vdw generateApps"`
     * If you try the example from within Eclipse, we would now need here now a Maven project refresh.
     * Compile the project with `mvn compile`

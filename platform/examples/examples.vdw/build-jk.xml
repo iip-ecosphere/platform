@@ -5,9 +5,8 @@
 	<property file="${user.home}/qualimaster-build.properties"/>
 	<include file="${user.home}/macros.xml"/>
 	
-    <!-- deploy to SSE Mvn repo -->
+    <!-- intentionally nothing here; shall not be deployed, shall not be tested as unsnure whether VDW server is 
+    operational at that point in time; only manual testing so far -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-examples.vdw" pomFile="pom.xml" jarFolder="target" artifactPattern="examples.vdw-*.*.*.jar" />
 	</target>
 </project>
