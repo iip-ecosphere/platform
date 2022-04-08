@@ -21,6 +21,15 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         return o.__dict__
     '
     }
+    
+    def generateImplRegs(Boolean sharedInterfaces, String clsName) {
+        if (sharedInterfaces) {
+            'Registry.serializers["${clsName}Impl"] = self # there is a serializer for the Impl
+            Registry.types[${clsName}Impl] = "${clsName}" # the Impl maps back to the type name'
+        } else {
+            ''
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean sharedInterfaces) {
         String clsName = asTypeName(type.name);
@@ -31,9 +40,10 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         'from json import JSONEncoder
         import json
         from datetime import datetime
-        from iip.TypeTransatorToString import TypeTransatorToString
+        from iip.TypeTranslatorToString import TypeTranslatorToString
         import Registry
         from datatypes.${clsName} import ${clsName}
+        from datatypes.${clsName}Impl import ${clsName}Impl
         
         ${encoder(clsName)}
         
@@ -44,7 +54,8 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
             def __init__(self):
                 """Initializes the transformer.""" 
                 Registry.serializers["${clsName}"] = self
-                Registry.types[${clsName}] = "${clsName}"         
+                Registry.types[${clsName}] = "${clsName}"
+                ${generateImplRegs(sharedInterfaces, clsName)|e}
             
             def readFrom(self, data: str) -> ${clsName}:
                 """Turns bytes into a String.

@@ -329,7 +329,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def attachMetricsProvider(String serviceVarName) {
         'if (${serviceVarName} instanceof MonitoringService) {
             ((MonitoringService) ${serviceVarName}).attachMetricsProvider(metrics);
-        }'
+        }
+        '
     }
 
     def initialService(MeshElement elt, JavaService service) {
@@ -516,6 +517,19 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
         'Starter.mapService(service);'
         '${attachMetricsProvider("service")}'
+        for (IOType in: service.input) {
+            String type = toTypeName(in);
+            'service.registerInputTypeTranslator(${type}.class, "${type}", new ${type}InputTranslator());\n'
+        }
+        for (IOType out: service.output) {
+            String type = toTypeName(out);
+            'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
+        }
+    }
+    
+    def generateImports(PythonService service) {
+        'import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;'
     }
     
     def getServiceType(MeshElement elt, PythonService service) {
@@ -539,6 +553,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String inType, String outType) {
         String expr = 'service.processQuiet("${type}", data)';
         'return data -> ${genSentProbe(service, expr, true)};'
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, PythonService service) {
+        String serviceId = "_" + toIdentifier(service.id);
+        '${generateTypeTranslators(elt, service, serviceId)}'
     }
 
     // -------------------- KODEX (-> to own file) ---------------------------
