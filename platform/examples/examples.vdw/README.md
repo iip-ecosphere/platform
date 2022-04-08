@@ -23,3 +23,6 @@ For all executions, the VDW/UMATI OPC UA server must be accessible via Internet.
 
 See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration) for details on the state of the generation and the required version of EASy-Producer.
 
+## Desirable
+
+Explaining slides, may be a video.

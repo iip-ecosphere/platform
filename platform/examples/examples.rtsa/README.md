@@ -35,3 +35,7 @@ If you want to execute the example in a platform installation, add `gen/rtsa/Sim
 Hint: Without advanced service control of the platform, it may be the case that when the (fake) RTSA takes longer to start, the first data items cannot be processed and a `Processing failed: Connection refused: connect` message occurs. And, as usual, *** do not modify generated code ***.
 
 See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). 
+
+## Desirable
+
+Explaining slides, may be a video.
