@@ -122,11 +122,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                             elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
-                        if (not(noDeps)) {    
+                        if (not(noDeps)) {
                             artifacts.add(getArtifact(no));
                         }
                         elements.add(no);
-                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts);
+                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                     };
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -257,17 +257,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     // dispatch basis    
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
     }
 
     // RTSA (preliminary in here)
-    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         resources.add(rtsaResources()+"|"+rtsaBin(service));
         resources.add(rtsaResources()+"|"+rtsaInstance(service));
     }
     
     // KODEX (preliminary in here)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
         String kodexServiceFolderName = "kodex_" + serviceFolderName;
@@ -282,13 +282,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
         sequenceOf(String) tmp = service.artifact.split(":");
-        String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
-        artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+        if (not(noDeps)) {
+            String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+            artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+        }
         
         if (cfg.sharedInterfaces) {
             bins.add(cfg.sharedArtifact+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
