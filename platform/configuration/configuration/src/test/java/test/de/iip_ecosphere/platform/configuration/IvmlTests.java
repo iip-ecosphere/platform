@@ -571,6 +571,20 @@ public class IvmlTests {
     }
     
     /**
+     * Tests loading, reasoning and instantiating "ContainerTest", a simple, generated service chain for testing 
+     * container creation. Here, we instantiate the full platform as basis for container creation.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testContainerTest() throws ExecutionException, IOException {
+        File gen = new File("gen/tests/ContainerCreation");
+        PlatformInstantiator.instantiate(new TestConfigurer("ContainerCreation", new File("src/test/easy"), gen));
+        assertAllFiles(gen);
+    }
+    
+    /**
      * Helper method to configure for partial instantiation, i.e., apps only and no platform components.
      * 
      * @param cfg the configurer instance
