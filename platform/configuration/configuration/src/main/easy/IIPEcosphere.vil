@@ -291,15 +291,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
         if (not(noDeps)) {
             artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
+            if (cfg.sharedInterfaces) {
+                bins.add(cfg.sharedArtifact+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+                bins.add(tmp[0]+":"+tmp[1]+":"+tmp[2]+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+            }
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
+            if (not(noDeps)) {
+                assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
+            }
         }
-        
-        if (cfg.sharedInterfaces) {
-            bins.add(cfg.sharedArtifact+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
-            bins.add(tmp[0]+":"+tmp[1]+":"+tmp[2]+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
-        }
-        
-        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
-        assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
     }
     
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
