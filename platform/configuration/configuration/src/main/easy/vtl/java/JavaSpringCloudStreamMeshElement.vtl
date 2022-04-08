@@ -68,8 +68,21 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // ----------------------------------- metrics / probes -------------------------------
     
     // generates a sent probe expression (if configured) for the given functional expression 
-    def genSentProbe(ServiceBase base, String expr, Boolean needsReturn) {
-        if (base.monitorSentCount) {
+    def genSentProbe(ServiceBase base, String expr, Boolean needsReturn, String exprType, String data) {
+        if (base.monitorSentCount or base.traceSent) {
+            String mon = "";
+            String trace = "";
+            if (base.monitorSentCount) {
+                mon = "metrics.increaseCounter(sentCounterId);";
+            }
+            if (base.traceSent) {
+                if (data.length() > 0) {
+                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${data}));';
+                } else { // take from expression, store in local variable
+                    trace = '${exprType} r = ${expr};\nTransport.sendTraceRecord(new TraceRecord("${base.id}", "sending", r));';
+                    expr = "r";
+                }
+            } 
             String ret;
             if (needsReturn) {
                ret = "return ";
@@ -77,7 +90,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                ret = "";
             }
             '{
-                metrics.increaseCounter(sentCounterId);
+                ${mon|e}
+                ${trace|e} 
                 ${ret}${expr}; 
             }'
         } else {
@@ -86,11 +100,25 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     // generates a received probe expression (if configured) for the given functional expression 
-    def genRcvProbe(ServiceBase base, String expr) {
-        if (base.monitorRcvCount) {
+    def genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
+        if (base.monitorRcvCount or base.traceRcv) {
+            String mon = "";
+            String trace = "";
+            if (base.monitorRcvCount) {
+                mon = "metrics.increaseCounter(rcvCounterId);";
+            }
+            if (base.traceRcv) {
+                if (data.length() > 0) {
+                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "reception", ${data}));';
+                } else { // take from expression, store in local variable
+                    expr = "${type} r = ${expr}";
+                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "reception", r));';
+                }
+            } 
             '{
                 ${expr}; 
-                metrics.increaseCounter(rcvCounterId); 
+                ${mon|e}
+                ${trace|e} 
             }'
         } else {
             '${expr}'
@@ -125,7 +153,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             methodName = "attach${methodSuffix}Ingestor";
         }
         String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
-        'service.${methodName}(data -> ${genSentProbe(base, expr, false)});'
+        'service.${methodName}(data -> ${genSentProbe(base, expr, false, type, "data")});'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -161,7 +189,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         } else {
             String expr = '${fallbackToNull(src, "service.${methodName}()", true)}';
             '\npublic Supplier<${type}> ${methodSuffixWithServiceId}() {
-                return () -> ${genSentProbe(service, expr, true)}; 
+                return () -> ${genSentProbe(service, expr, true, type, "")}; 
             }'
         }
     }
@@ -175,7 +203,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         @Bean
         public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}() {
-            return data -> ${genRcvProbe(conn, expr)};
+            return data -> ${genRcvProbe(conn, expr, type, "data")};
         }'    
     }
     
@@ -208,7 +236,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             methodName = methodSuffix;
         }
         String expr = '${fallbackToNull(proc, "service.${methodName}(data)", false)}';
-        'return data -> ${genRcvProbe(base, expr)};'
+        'return data -> ${genRcvProbe(base, expr, type, "data")};'
     }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
@@ -409,7 +437,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
                 @Override
                 public void received(${type} data) {
-                    ${genRcvProbe(service, sendEx)}
+                    ${genRcvProbe(service, sendEx, type, "data")}
                 }
 
                 @Override
@@ -542,17 +570,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir) {
         String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
-        'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false)});'
+        'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
     def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String type) {
         String expr = 'service.processQuiet("${type}", data)';
-        'return data -> ${genSentProbe(service, expr, false)};'
+        'return data -> ${genSentProbe(service, expr, false, type, "data")};'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String inType, String outType) {
-        String expr = 'service.processQuiet("${type}", data)';
-        'return data -> ${genSentProbe(service, expr, true)};'
+        String expr = 'service.processQuiet("${inType}", data)';
+        'return data -> ${genSentProbe(service, expr, true, inType, "data")};'
     }
 
     def generateReceptionCallback(MeshProcessor elt, PythonService service) {
@@ -574,7 +602,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         for (IOType in : pairs.keys()) {
             IOType out = pairs.get(in);
             String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
-            '${kodexServiceName(in, out)}.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false)});'
+            '${kodexServiceName(in, out)}.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
         }
     }
 
@@ -601,7 +629,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 IOType out = pairs.get(in);
                 String procExpr = "${kodexServiceName(in, out)}.processQuiet(data)";
                 'return data -> {
-                    ${genSentProbe(kodex, procExpr, false)};
+                    ${genSentProbe(kodex, procExpr, false, type, "data")};
                 };'
             } else {
                 'return null;'
@@ -667,17 +695,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String type) {
         String expr = 'service.processQuiet(data)';
-        'return data -> ${genSentProbe(service, expr, false)};'
+        'return data -> ${genSentProbe(service, expr, false, type, "data")};'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
         String expr = 'service.processQuiet(data)';
-        'return data -> ${genSentProbe(service, expr, true)};'
+        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
     }
 
     def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir) {
         String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
-        'service.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false)});'
+        'service.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
     def generateReceptionCallback(MeshProcessor elt, RtsaService service) {
@@ -714,6 +742,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import org.springframework.context.annotation.Import;
         import org.springframework.scheduling.annotation.EnableScheduling;
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
+        import de.iip_ecosphere.platform.transport.Transport;
+        import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
         import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;

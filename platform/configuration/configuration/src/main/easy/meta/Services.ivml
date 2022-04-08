@@ -134,6 +134,8 @@ project Services {
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
        Boolean monitorRcvCount = true;
        Boolean monitorSentCount = true;
+       Boolean traceRcv = false;
+       Boolean traceSent = false;
        setOf(refTo(Dependency)) dependencies = {};
 
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
