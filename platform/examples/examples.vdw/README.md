@@ -19,7 +19,9 @@ Shortcuts for Eclipse:
   * Run then `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` 
   as Java program to execute the generated connector.
 
-For all executions, the VDW/UMATI OPC UA server must be accessible via Internet. And, as usual, *** do not modify generated code ***.
+For all executions, the VDW/UMATI OPC UA server must be accessible via Internet. And, as usual, ** do not modify generated code **.
+
+## Required Updates
 
 See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration) for details on the state of the generation and the required version of EASy-Producer.
 
