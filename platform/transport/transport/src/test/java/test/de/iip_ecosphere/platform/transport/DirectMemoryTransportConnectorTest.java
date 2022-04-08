@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
+import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 import org.junit.Assert;
 
@@ -283,12 +284,13 @@ public class DirectMemoryTransportConnectorTest {
     public void testTransport() throws IOException {
         factoryUseDmcAsTransport = true; // use a different default connector as required by Monitor
         Transport.setTransportSetup(() -> null); // not needed here
-        AtomicInteger receivedCount = new AtomicInteger();
+        AtomicInteger statusReceivedCount = new AtomicInteger();
+        AtomicInteger traceReceivedCount = new AtomicInteger();
         MY_DM_CONNECTOR.setReceptionCallback(StatusMessage.STATUS_STREAM, new ReceptionCallback<StatusMessage>() {
 
             @Override
             public void received(StatusMessage data) {
-                receivedCount.getAndIncrement();
+                statusReceivedCount.getAndIncrement();
             }
 
             @Override
@@ -296,15 +298,29 @@ public class DirectMemoryTransportConnectorTest {
                 return StatusMessage.class;
             }
         });
+        MY_DM_CONNECTOR.setReceptionCallback(TraceRecord.TRACE_STREAM, new ReceptionCallback<TraceRecord>() {
+
+            @Override
+            public void received(TraceRecord data) {
+                traceReceivedCount.getAndIncrement();
+            }
+
+            @Override
+            public Class<TraceRecord> getType() {
+                return TraceRecord.class;
+            }
+        });
         Transport.setTransportSetup(() -> new TransportSetup()); // info not needed by connector, just the instance
         Transport.sendResourceStatus(ActionTypes.ADDED);
         Transport.sendContainerStatus(ActionTypes.CHANGED, "Container-1");
         Transport.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
         Transport.sendServiceArtifactStatus(ActionTypes.REMOVED, "ServiceArtifact-1");
+        Transport.sendTraceRecord(new TraceRecord("src", "act", null));
         Transport.releaseConnector(); // prevent reconnects by default
         Transport.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
         factoryUseDmcAsTransport = false;
-        Assert.assertEquals(4, receivedCount.get());
+        Assert.assertEquals(4, statusReceivedCount.get());
+        Assert.assertEquals(1, traceReceivedCount.get());
     }
 
 }

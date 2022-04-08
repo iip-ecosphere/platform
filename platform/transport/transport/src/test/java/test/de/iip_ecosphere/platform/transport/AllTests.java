@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TypeTranslatorsTest.class,
+    TraceRecordTest.class,
     TransportParameterTest.class,
     DirectMemoryTransportConnectorTest.class,
     SerializerRegistryTest.class,

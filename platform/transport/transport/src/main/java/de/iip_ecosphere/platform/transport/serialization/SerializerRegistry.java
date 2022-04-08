@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
+import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 
 /**
  * A registry for serializers to be able to handle also nested types on-demand.
@@ -38,6 +39,7 @@ public class SerializerRegistry {
     public static void resetDefaults() {
         registerSerializer(StringSerializer.class);
         registerSerializer(StatusMessageSerializer.class);
+        registerSerializer(TraceRecordSerializer.class);
     }
 
     /**

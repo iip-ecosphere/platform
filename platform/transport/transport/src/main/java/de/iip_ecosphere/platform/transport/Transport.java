@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.ActionType;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 /**
  * Preliminary, for name change of "Monitor". At startup of the platform, sending messages and creating a connector
@@ -100,6 +101,31 @@ public class Transport {
     public static void sendResourceStatus(ActionType action, String deviceId, String... aliasIds) {
         sendStatus(new StatusMessage(action, null == deviceId ? Id.getDeviceId() : deviceId, aliasIds));
     }
+    
+    /**
+     * Sends a trace record. Calls {@link #createConnector()} to obtain
+     * a connector instance on demand. Caches messages if no connector is available.
+     * 
+     * @param record the record to be sent
+     */
+    public static void sendTraceRecord(TraceRecord record) {
+        createConnector();
+        if (null != connector) {
+            try {
+                record.send(connector);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(Transport.class).error(
+                    "Cannot sent trace record: " + e.getMessage());
+            } catch (NullPointerException e) { // preliminary, may occur if the connector is not yet connected
+                LoggerFactory.getLogger(Transport.class).error(
+                    "Cannot sent trace record: " + e.getMessage());
+            }
+        } else {
+            queue.add(c -> record.send(c));
+            LoggerFactory.getLogger(Transport.class).error(
+                "Cannot sent trace record now. Queued record until connector becomes available.");
+        }
+    }
 
     /**
      * Sends a status message. Calls {@link #createConnector()} to obtain
@@ -122,7 +148,7 @@ public class Transport {
         } else {
             queue.add(c -> msg.send(c));
             LoggerFactory.getLogger(Transport.class).error(
-                "Cannot sent status message: No connector available (see above)");
+                "Cannot sent status message now. Queued message until connector becomes available.");
         }
     }
     
