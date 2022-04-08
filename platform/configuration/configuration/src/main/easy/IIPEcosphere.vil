@@ -287,8 +287,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
         sequenceOf(String) tmp = service.artifact.split(":");
+        String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
         if (not(noDeps)) {
-            String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
             artifacts.add(artifact); // assembly descriptor dependency set requires the python-zip-artifact
         }
         
