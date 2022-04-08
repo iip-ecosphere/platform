@@ -188,6 +188,7 @@ public class PlatformInstantiator {
             System.out.println("   - generateInterfaces: app interfaces, no apps");
             System.out.println("   - generateAppsNoDeps: app interfaces, apps without artifact dependencies");
             System.out.println("   - generateApps: app interfaces, apps with artifact dependencies");
+            System.out.println("   - generateBroker: create a sample broker");
             System.out.println("   - generatePlatform: platform components only");
         } else {
             InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));

@@ -406,13 +406,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
-    
-    // called from tests, don't change signature
-    generatePlatform(Project source, Configuration config, Project target) = {
+
+    generateBroker(Project source, Configuration config, Project target) = {
         IIPEcosphere cfg = config;
 
         brokerRoot.mkdir();
         generateBroker(cfg, cfg.transportProtocol);
+    }
+    
+    // called from tests, don't change signature
+    generatePlatform(Project source, Configuration config, Project target) = {
+        IIPEcosphere cfg = config;
+        generateBroker(source, config, target);
         
         // cleanup, reuse, ...
         ecsRuntimeRoot.mkdir();
