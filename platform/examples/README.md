@@ -7,4 +7,6 @@ To demonstrate and validate the IIP-Ecosphere platform, we collect in this folde
 * [RapidMiner RTSA example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.rtsa/README.md): Automated integration of RapidMiner Real Time Scoring Agent (RTSA) AI environment into a platform application. Please note - the RTSA is a commercial product and not included in this example rather than a simple fake of RTSA.
 * [Python service example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/README.md): Integrating a Python (pseudo AI) service into a service chain.
 
+The [examples](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples/README.md) component contains helpful reusable basic functionality.
+
 More to come soon.
