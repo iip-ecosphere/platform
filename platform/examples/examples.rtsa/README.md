@@ -14,7 +14,7 @@ This example consists of several pieces:
   * A specific starter class for the example `src/main/java` so that the example can run even without a running platform. Please note that the starter class is not part of an usual service implementation.
   * Two Maven files, `pom-model.xml` for obtaining the configuration meta-model and for performing the instantiation as well as `pom.xml` for the application itself. 
   
-As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place:
+As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
 
   * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
   * Obtain the actual platform configuration meta-model, which is intentionally not included here: `mvn -f pom-model.xml generate-sources`.

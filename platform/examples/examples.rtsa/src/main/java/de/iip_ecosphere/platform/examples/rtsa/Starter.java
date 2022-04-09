@@ -38,10 +38,10 @@ public class Starter {
      */
     public static void main(String[] args) {
         String brokerHost = "localHost";
-        int brokerPort = 8883;
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
         
+        int brokerPort = CmdLine.getIntArg(args, "iip.test.brokerPort", 8883);
         int stop = CmdLine.getIntArg(args, "iip.test.stop", 0);
         File f = new File("gen/rtsa/SimpleRTSADemoFlowApp/target/SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar");
         try {
