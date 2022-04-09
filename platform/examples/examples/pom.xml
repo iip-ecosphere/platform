@@ -14,11 +14,6 @@
   </parent>
 
   <dependencies>
-    <dependency>
-      <artifactId>configuration.configuration</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- This is not needed in normal programs! Here we know that the test shall be Spring-based,
          but in normal settings it's even not known what the service execution framework is. -->
     <dependency>

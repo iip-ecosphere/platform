@@ -19,7 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.LogManager;
+import org.apache.logging.log4j.LogManager;
 
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
