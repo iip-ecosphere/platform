@@ -411,7 +411,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         IIPEcosphere cfg = config;
 
         brokerRoot.mkdir();
-        generateBroker(cfg, cfg.transportProtocol);
+        generateBrokerScripts(cfg, cfg.transportProtocol);
     }
     
     // called from tests, don't change signature
@@ -472,11 +472,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }
     
-    generateBroker(Configuration config, TransportProtocol protocol) = {
+    generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
         vilTemplateProcessor("NoBroker", config, "${brokerRoot}/README.txt");
     }
     
-    generateBroker(Configuration config, TransportProtocolAMQP protocol) = {
+    generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
         vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/amqp.sh");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
