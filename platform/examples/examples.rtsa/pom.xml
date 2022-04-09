@@ -15,24 +15,12 @@
 
   <dependencies>
     <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>connectors</artifactId>
-     <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>connectors.opcuav1</artifactId>
-     <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <artifactId>configuration.configuration</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency>
-    <!-- This is not needed in normal programs! Here we know that the test shall be Spring-based,
-         but in normal settings it's even not known what the service execution framework is. -->
     <dependency>
-      <artifactId>services.spring</artifactId>
+      <artifactId>examples</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency>

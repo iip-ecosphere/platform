@@ -13,16 +13,8 @@
 package de.iip_ecosphere.platform.examples.rtsa;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.LogManager;
-
-import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.examples.SpringStartup;
 
 /**
  * Starts the application by emulating a bit platform functionality (Spring Cloud Stream service manager).
@@ -37,37 +29,8 @@ public class Starter {
      * @param args ignored
      */
     public static void main(String[] args) {
-        String brokerHost = "localHost";
-        int adminPort = -1; // ephemeral
-        String serviceProtocol = "";
-        
-        int brokerPort = CmdLine.getIntArg(args, "iip.test.brokerPort", 8883);
-        int stop = CmdLine.getIntArg(args, "iip.test.stop", 0);
         File f = new File("gen/rtsa/SimpleRTSADemoFlowApp/target/SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar");
-        try {
-            List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(f, brokerPort, brokerHost, adminPort, 
-                serviceProtocol);
-            LogManager.getLogger(Starter.class).info("Starting with arguments: " + cmdLine);
-            ProcessBuilder builder = new ProcessBuilder(cmdLine);
-            Process proc = builder.inheritIO().start();
-            if (stop > 0) {
-                LogManager.getLogger(Starter.class).info("Scheduling for auto-stop after " + stop + " ms");
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    
-                    @Override
-                    public void run() {
-                        LogManager.getLogger(Starter.class).info("Auto-stop after: " + stop + " ms");
-                        proc.destroyForcibly();
-                        timer.cancel();
-                        System.exit(0);
-                    }
-                }, stop);
-            }    
-            proc.waitFor();
-        } catch (ExecutionException | InterruptedException | IOException e) {
-            LogManager.getLogger(Starter.class).error("Running the app: " + e.getMessage());
-        }
+        SpringStartup.start(f, args);
     }
 
 }
