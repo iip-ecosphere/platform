@@ -19,7 +19,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -250,6 +252,7 @@ public class DescriptorUtils {
         result.add("-Dlog4j2.formatMsgNoLookups=true");
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
+        List<String> tmp = new ArrayList<String>();
         for (YamlService service : art.getServices()) {
             YamlProcess proc = service.getProcess();
             if (null != proc) {
@@ -258,10 +261,12 @@ public class DescriptorUtils {
             }
             for (Relation r : service.getRelations()) {
                 // simplification, don't think about relations
-                DescriptorUtils.addEndpointArgs(result, r.getEndpoint(), brokerPort, brokerHost);
+                DescriptorUtils.addEndpointArgs(tmp, r.getEndpoint(), brokerPort, brokerHost);
             }
-            result.addAll(service.getCmdArg(adminPort, serviceProtocol));
+            tmp.addAll(service.getCmdArg(adminPort, serviceProtocol));
         }
+        Set<String> tmp2 = new HashSet<String>(tmp); // spring deployment does this implicitly via requests
+        result.addAll(tmp2);
         return result;
     }
 
