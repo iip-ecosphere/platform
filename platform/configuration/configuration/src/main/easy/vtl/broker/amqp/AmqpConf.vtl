@@ -4,7 +4,7 @@ template AmqpConf(Configuration config, FileArtifact target) {
 	
     def main(Configuration config, FileArtifact target) {
 '{
-  "name": "${broker.name}",
+  "name": "\\${broker.name}",
   "modelVersion": "8.0",
   "authenticationproviders" : [ {
       "name" : "plain",
@@ -19,7 +19,7 @@ template AmqpConf(Configuration config, FileArtifact target) {
     "brokerloggers" : [ {
     "name" : "logfile",
     "type" : "File",
-    "fileName" : "${qpid.work_dir}${file.separator}log${file.separator}qpid.log",
+    "fileName" : "\\${qpid.work_dir}\\${file.separator}log\\${file.separator}qpid.log",
     "brokerloginclusionrules" : [ {
       "name" : "Root",
       "type" : "NameAndLevel",
@@ -58,7 +58,7 @@ template AmqpConf(Configuration config, FileArtifact target) {
   } ],
   "ports" : [  {
     "name" : "AMQP",
-    "port" : "${qpid.amqp_port}",
+    "port" : "\\${qpid.amqp_port}",
     "authenticationProvider" : "plain",
     "virtualhostaliases" : [ {
        "name" : "nameAlias",
@@ -75,7 +75,7 @@ template AmqpConf(Configuration config, FileArtifact target) {
     "name" : "default",
     "type" : "JSON",
     "defaultVirtualHostNode" : "true",
-    "virtualHostInitialConfiguration" : "{\"type\":\"BDB\",\"nodeAutoCreationPolicies\":[{\"pattern\":\".*\",\"createdOnPublish\":\"true\",\"createdOnConsume\":\"true\",\"nodeType\":\"queue\"}]}"
+    "virtualHostInitialConfiguration" : "{\\"type\\":\\"BDB\\",\\"nodeAutoCreationPolicies\\":[{\\"pattern\\":\\".*\\",\\"createdOnPublish\\":\\"true\\",\\"createdOnConsume\\":\\"true\\",\\"nodeType\\":\\"queue\\"}]}"
   } ],
   "plugins" : [ {
     "type" : "MANAGEMENT-HTTP",

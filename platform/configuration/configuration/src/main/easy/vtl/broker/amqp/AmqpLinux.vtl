@@ -4,7 +4,7 @@ template AmqpLinux(Configuration config, FileArtifact target) {
 	
     def main(Configuration config, FileArtifact target) {
         '#!/bin/bash
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer $*'
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer \\$*'
     }
 	
 }

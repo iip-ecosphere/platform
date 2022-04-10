@@ -35,8 +35,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             ${generateMemLimitOpt(service)|e}
           relations:
             - endpoint:
-              portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
-              hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+                portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
+                hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
             ${generateRelations(elt)|e}
           ${generateProcess(elt, service)|e}'
     }
