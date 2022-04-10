@@ -491,6 +491,26 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
         maven("${brokerRoot}", true);
     }
+
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
+        generateBrokerScriptsHiveMq(config);
+    }
+
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
+        generateBrokerScriptsHiveMq(config);
+    }
+    
+    generateBrokerScriptsHiveMq(Configuration config) = {
+        vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml");
+        vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh");
+        FileArtifact f = "${brokerRoot}/broker.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat");
+        Path c = "${brokerRoot}/extensions";
+        c.mkdir();
+        vilTemplateProcessor("MqttConf", config, "config.xml");
+        maven("${brokerRoot}", true);
+    }
     
     generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="") = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);

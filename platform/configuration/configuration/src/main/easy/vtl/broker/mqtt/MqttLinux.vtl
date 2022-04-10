@@ -1,0 +1,10 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template MqttLinux(Configuration config, FileArtifact target) {
+	
+    def main(Configuration config, FileArtifact target) {
+        '#!/bin/bash
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer \\$*'
+    }
+	
+}
