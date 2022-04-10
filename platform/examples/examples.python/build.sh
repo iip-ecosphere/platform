@@ -5,24 +5,32 @@
 #build with broker
 
 mvn -U -f pom-model.xml generate-sources
-mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateBroker"
+mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/broker generateBroker"
 mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateAppsNoDeps"
 mvn -U install -DskipTests
 mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateApps"
 
 #execute and test
 
-read lower_port upper_port < /proc/sys/net/ipv4/ip_local_port_range
-brokerPort=8883
-while :; do
-    for (( port = lower_port ; port <= upper_port ; port++ )); do
-        if timeout 5 bash -c '</dev/tcp/localhost/$port &>/dev/null'
-        then
-            brokerPort = $brokerPort
-            break
-        fi
-    done
-done
-#sh gen/py/broker/broker.sh $brokerPort
-#mvn exec:java -Dexec.args="--iip.test.stop=10000 --iip.test.brokerPort=$brokerPort" > log
+#brokerPort=8883
+#read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range
+#while :
+#do
+#        brokerPort="`shuf -i $LOWERPORT-$UPPERPORT -n 1`"
+#        ss -lpn | grep -q ":$PORT " || break
+#done
+#echo "Using Broker Port: $brokerPort"
+#
+#dir=$PWD
+#cd gen/broker/broker
+#./broker.sh $brokerPort &
+#pidBroker=$!
+#cd $dir
+#
+#mvn exec:java -Dexec.args="--iip.test.stop=10000 --iip.test.brokerPort=$brokerPort" > log &
+#pidTest=$!
+#
+#sleep 60 && kill "$pidTest"
+#kill "$pidBroker"
+#
 #grep -Fxq "RECEIVED" log
