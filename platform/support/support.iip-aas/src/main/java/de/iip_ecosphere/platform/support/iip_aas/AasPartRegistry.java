@@ -527,13 +527,26 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveIipAas() throws IOException {
+        return retrieveAas(setup, URN_AAS);
+    }
+
+    /**
+     * Obtains an AAS instance. Be careful with the returned instance, as if
+     * the AAS is modified in the mean time, you may hold an outdated instance.
+     * 
+     * @param setup the AAS setup
+     * @param urn the URN of the AAS
+     * @return the platform AAS (may be <b>null</b> for none)
+     * @throws IOException if the AAS cannot be read due to connection errors
+     */
+    public static Aas retrieveAas(AasSetup setup, String urn) throws IOException {
         Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint(), 
             setup.getServer().getSchema());
         if (null == reg) {
             throw new IOException("No AAS registry at " + setup.getRegistryEndpoint().toUri());
         }
         try {
-            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(URN_AAS);
+            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(urn);
         } catch (Throwable t) {
             throw new IOException(t);
         }
@@ -601,6 +614,17 @@ public class AasPartRegistry {
      * @throws IOException if the deployment of an AAS fails or access to the AAS registry fails
      */
     public static void remoteDeploy(List<Aas> aas) throws IOException {
+        remoteDeploy(setup, aas);
+    }
+
+    /**
+     * Performs a remote deployment of the given {@code aas}. Assumes that server and registry are up and running.
+     * 
+     * @param setup the AAS setup to use
+     * @param aas the list of AAS, e.g., from {@link #build()}
+     * @throws IOException if the deployment of an AAS fails or access to the AAS registry fails
+     */
+    public static void remoteDeploy(AasSetup setup, List<Aas> aas) throws IOException {
         Endpoint aasEndpoint = setup.getServerEndpoint();
         RegistryDeploymentRecipe regD = AasFactory.getInstance()
             .createDeploymentRecipe(aasEndpoint, setup.getServer().getKeystoreDescriptor())
