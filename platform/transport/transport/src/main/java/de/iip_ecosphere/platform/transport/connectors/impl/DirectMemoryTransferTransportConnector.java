@@ -76,18 +76,23 @@ public class DirectMemoryTransferTransportConnector extends AbstractTransportCon
         List<DirectMemoryTransferTransportConnector> list = subscriptions.get(stream);
         if (null != list) {
             for (DirectMemoryTransferTransportConnector c : list) {
-                ReceptionCallback<T> callback = (ReceptionCallback<T>) c.getCallback(stream);
-                if (null != callback) {
-                    Class<T> type = callback.getType();
-                    Serializer<T> serializer = SerializerRegistry.getSerializer(type);
-                    T received;
-                    if (null != serializer) {
-                        received = serializer.clone(type.cast(data));
-                    } else {
-                        // Potentially dangerous... in case that there is no serializer, we use the same instance
-                        received = type.cast(data);
+                List<ReceptionCallback<?>> callbacks = c.getCallback(stream);
+                if (null != callbacks) {
+                    for (int i = 0; i < callbacks.size(); i++) {
+                        ReceptionCallback<T> callback = (ReceptionCallback<T>) callbacks.get(i);
+                        if (null != callback) {
+                            Class<T> type = callback.getType();
+                            Serializer<T> serializer = SerializerRegistry.getSerializer(type);
+                            T received;
+                            if (null != serializer) {
+                                received = serializer.clone(type.cast(data));
+                            } else {
+                                // Potentially dangerous... if there is no serializer, we use the same instance
+                                received = type.cast(data);
+                            }
+                            callback.received(received);
+                        }
                     }
-                    callback.received(received);
                 }
             }
         }

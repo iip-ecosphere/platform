@@ -34,12 +34,17 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public abstract class AbstractTransportConnector implements TransportConnector {
 
-    private Map<String, ReceptionCallback<?>> callbacks = Collections.synchronizedMap(new HashMap<>());
+    private Map<String, List<ReceptionCallback<?>>> callbacks = Collections.synchronizedMap(new HashMap<>());
     private TransportParameter params;
 
     @Override
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
-        callbacks.put(stream, callback);
+        List<ReceptionCallback<?>> l = callbacks.get(stream);
+        if (null == l) {
+            l = new ArrayList<ReceptionCallback<?>>();
+            callbacks.put(stream, l);
+        }
+        l.add(callback);
     }
 
     @Override
@@ -143,7 +148,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @param stream the stream to return the callback for
      * @return the callback (may be <b>null</b> for none)
      */
-    protected ReceptionCallback<?> getCallback(String stream) {
+    protected List<ReceptionCallback<?>> getCallback(String stream) {
         return callbacks.get(stream);
     }
     
@@ -175,15 +180,24 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @param <T>    the type of data
      * @param stream the stream to notify the callback for
      * @param data   the received serialized data
-     * @throws IOException in case that deserialization fails
      */
     @SuppressWarnings("unchecked")
-    protected <T> void notifyCallback(String stream, byte[] data) throws IOException {
-        ReceptionCallback<T> callback = (ReceptionCallback<T>) getCallback(stream);
-        if (null != callback) {
-            Serializer<T> serializer = SerializerRegistry.getSerializer(callback.getType());
-            if (null != serializer) {
-                callback.received(serializer.from(data));
+    protected <T> void notifyCallback(String stream, byte[] data) {
+        List<ReceptionCallback<?>> callbacks = getCallback(stream);
+        if (null != callbacks) {
+            for (int c = 0; c < callbacks.size(); c++) {
+                ReceptionCallback<T> callback = (ReceptionCallback<T>) callbacks.get(c);
+                Serializer<T> serializer = SerializerRegistry.getSerializer(callback.getType());
+                if (null != serializer) {
+                    try {
+                        callback.received(serializer.from(data));
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(getClass()).error("Cannot deserialize: %s", e.getMessage());
+                    }
+                } else {
+                    LoggerFactory.getLogger(getClass()).warn("No serializer registered for %s", 
+                        callback.getType().getName());
+                }
             }
         }
     }
