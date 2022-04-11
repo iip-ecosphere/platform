@@ -33,15 +33,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Boolean tests = true;
     
     main(Project source, Configuration config, Project target) = {
+        generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
-        generatePlatform(source, config, target);
     }
     
     // called from Platform Instantiator, don't change signature
     mainCli(Project source, Configuration config, Project target) = {
         tests = false;
+        generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
-        generatePlatform(source, config, target);
     }
 
     // ------------------------------------------ generating apps ----------------------------------------
@@ -151,9 +151,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
-                generateServiceContainer(appRoot, config, a, elements);
                 
                 maven("${appRoot}", true);
+
+                generateServiceContainer(appRoot, config, a, elements);
             }
         };
     }

@@ -265,7 +265,7 @@ project Services {
        NonEmptyString path;
        // TODO constraint: flat input/output, not hierarchical
    }
-      
+   
    // ------------------------ families -----------------
    
    abstract compound ServiceFamily refines ServiceBase, CFamily {

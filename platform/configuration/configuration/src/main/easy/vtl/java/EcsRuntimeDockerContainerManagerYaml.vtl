@@ -20,23 +20,23 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         '${produceDocker(config)}'
         }
         'aas:
-            server:
-                port: ${aasServer.port}
-                host: ${aasServer.host}
-                schema: ${aasServer.schema}
-                path: ${aasServer.path}
-            registry:
-                port: ${aasRegistryServer.port}
-                host: ${aasRegistryServer.host}
-                schema: ${aasRegistryServer.schema}
-                path: ${aasRegistryServer.path}
-            implementation:
-                port: ${aasImplServerPort}
-                host: ${aasImplServerHost}
-                netmask: ${aasImplNetmask}
-                schema: ${aasImplServer.schema}
-                protocol: ${aasProtocolName(aasImplServer.protocol)}
-            ${produceAasPersistence(aasPersistence)|e}'
+          server:
+            port: ${aasServer.port}
+            host: ${aasServer.host}
+            schema: ${aasServer.schema}
+            path: ${aasServer.path}
+          registry:
+            port: ${aasRegistryServer.port}
+            host: ${aasRegistryServer.host}
+            schema: ${aasRegistryServer.schema}
+            path: ${aasRegistryServer.path}
+          implementation:
+            port: ${aasImplServerPort}
+            host: ${aasImplServerHost}
+            netmask: ${aasImplNetmask}
+            schema: ${aasImplServer.schema}
+            protocol: ${aasProtocolName(aasImplServer.protocol)}
+          ${produceAasPersistence(aasPersistence)|e}'
     }
     
     def produceDocker(IIPEcosphere config) {

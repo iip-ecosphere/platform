@@ -188,6 +188,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
         '${protocolConfig(config, false)}'
         '${produceTransport(config)}'
+        '${produceAas(config, withDocker=false, implLocalEphemerial=true)}'
         '${produceBinders(config)}'
         'metricsprovider:
             schedulerrate: 3000

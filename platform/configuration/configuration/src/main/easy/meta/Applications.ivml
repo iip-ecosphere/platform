@@ -67,4 +67,18 @@ project Applications {
         kind == ServiceKind::SINK_SERVICE;
     }
 
+
+   // ------------------------------ platform trace -> AAS service -------------------
+
+   // data ignored for now, only tracing   
+   compound TraceToAasService refines CompleteService {
+       ServiceKind kind = ServiceKind::SINK_SERVICE;
+       IipVersion rtsaVer = "0.1.0";
+       String artifact = ""; // ships with platform in service environment
+       refTo(Application) application;
+       Parameters parameter = {
+         LongParameter{name="timeout", defaultValue="3600000"}
+       };
+   }
+   
 }
