@@ -1,2 +1,4 @@
 /target/
 **/__pycache__/
+/work/
+/derby.log

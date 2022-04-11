@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +25,8 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.transport.Transport;
+
 import static de.iip_ecosphere.platform.support.iip_aas.config.CmdLine.*;
 
 /**
@@ -41,6 +44,7 @@ public class Starter {
     private static Server server;
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
+    private static EnvironmentSetup setup;
 
     /**
      * Returns the network manager key used by this descriptor to allocate dynamic network ports for service commands.
@@ -241,6 +245,25 @@ public class Starter {
             server.stop(false); 
         }
     }
+    
+    /**
+     * Returns the environment setup.
+     * 
+     * @return the setup
+     */
+    public static EnvironmentSetup getSetup() {
+        if (null == setup) {
+            try {
+                setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
+                    Starter.class.getResourceAsStream("/application.yml"));
+                Transport.setTransportSetup(() -> setup.getTransport());
+            } catch (IOException e) {
+                setup = new EnvironmentSetup();
+                LoggerFactory.getLogger(Starter.class).warn("Cannot read application.yml. Aas/Transport setup invalid");
+            }
+        }
+        return setup;
+    }
 
     /**
      * Simple default start main program without mapping any services before startup. This can be done on-demand
@@ -250,6 +273,7 @@ public class Starter {
      */
     public static void main(String[] args) {
         Starter.parse(args);
+        getSetup(); // ensure instance
         Starter.start();
     }
 
