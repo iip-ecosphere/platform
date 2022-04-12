@@ -55,6 +55,7 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 - generation of containers (in progress)
 - AAS-based interface to the configuration, reasoning, instantiation 
 - Connectors: object array types, object list types, enums, full-cycle test
-- optional: included micrometer gauges, timers, counters
 
-**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/03/31** or newer is required. Use `mvn -U exec:java ...`
+**Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
+
+**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/04/08** or newer is required. Use `mvn -U exec:java ...`

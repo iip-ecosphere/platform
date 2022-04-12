@@ -15,6 +15,23 @@ project Applications {
         Boolean snapshot = true;
         String artifact = "";
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
+        refTo(Manufacturer) manufacturer;
+        Boolean createContainer = false;
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound Manufacturer {
+        String manufacturerName = "";
+        String manufacturerProductDesignation = "";
+        ManufacturerAddress address; // ref really needed?
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound ManufacturerAddress {
+        String department = "";
+        String street = "";
+        String zipCode = "";
+        String cityTown = "";
     }
     
     compound ServiceMesh {
