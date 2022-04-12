@@ -255,10 +255,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
     	
-    	String appName = getAppMvnName(a);
-    	
-    	// only for the project "ContainerCreation"
-    	if (appName == "SimpleMeshTestingContainerApp") {
+    	if (a.createContainer) {
     		
     		// Wrapper-Skript 
     		Path ws = "${appRoot}/../wrapper_script.sh";
@@ -277,7 +274,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 	    	// Remove image
 	    	dockerRemoveImage(imageId);
     	}
-    	    	
+    	
     }
 
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
