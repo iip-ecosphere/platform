@@ -246,12 +246,12 @@ public class TraceToAasService extends AbstractService {
                                     .build();
                             } catch (SecurityException | InvocationTargetException | IllegalAccessException e) {
                                 LoggerFactory.getLogger(getClass()).error(
-                                    "Cannot map value of operation %s/field %s to AAS: %s", 
+                                    "Cannot map value of operation {}/field {} to AAS: {}", 
                                     m.getName(), field, e.getMessage());
                             }
                         } else {
                             LoggerFactory.getLogger(getClass()).warn(
-                                "Cannot map value of operation %s/field %s to AAS: No converter is defined", 
+                                "Cannot map value of operation {}/field {} to AAS: No converter is defined", 
                                 m.getName(), field);
                         }
                     }
@@ -263,7 +263,7 @@ public class TraceToAasService extends AbstractService {
             cleanup(aas);
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error(
-                "Cannot obtain AAS %s: %s", getAasUrn(), e.getMessage());
+                "Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
         }
     }
     

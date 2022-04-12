@@ -21,6 +21,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     private String apiPath;
     private HttpURLConnection connection;
+    private ExecutorService executor = Executors.newFixedThreadPool(5);
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -102,16 +105,20 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     /**
      * Get Connection to local server.
+     * 
+     * @param changeState whether the state shall be changed if the connection creation fails
      */
-    protected void getNewConnectionInstanceQuiet() {
+    protected void getNewConnectionInstanceQuiet(boolean changeState) {
         try {
             getNewConnectionInstance();
         } catch (IOException con) {
-            LoggerFactory.getLogger(AbstractRestProcessService.class).error(con.getMessage());
-            try {
-                setState(ServiceState.FAILED);
-            } catch (ExecutionException e) {
-                LoggerFactory.getLogger(AbstractRestProcessService.class).error(e.getMessage(), e);
+            LoggerFactory.getLogger(AbstractRestProcessService.class).warn(con.getMessage() + " " + getApiPath());
+            if (changeState) {
+                try {
+                    setState(ServiceState.FAILED);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(AbstractRestProcessService.class).error(e.getMessage(), e);
+                }
             }
         }
     }
@@ -153,7 +160,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      */
     public void redirectRest(final HttpURLConnection connection, ReceptionCallback<O> callback) {
         if (null != callback) {
-            new Thread(new Runnable() {
+            executor.execute(new Runnable() {
                 public void run() {
                     try {
                         BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
@@ -177,7 +184,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                         e1.printStackTrace();
                     }
                 }
-            }).start();
+            });
         }
     }
 
@@ -187,12 +194,12 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     }
     
     @Override
-    protected void stop() {
+    protected ServiceState stop() {
         if (null != connection) {
             connection.disconnect();
             connection = null;
         }
-        super.stop();
+        return super.stop();
     }
     
 }

@@ -83,7 +83,7 @@ public class AbstractProcessService4PythonTest {
         }
 
         @Override
-        protected void start() throws ExecutionException {
+        protected ServiceState start() throws ExecutionException {
             YamlProcess sSpec = getProcessSpec();
             File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("python3")); 
             File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("src/test/python"));
@@ -92,6 +92,7 @@ public class AbstractProcessService4PythonTest {
             args.add("ForwardingApp.py");
             addProcessSpecCmdArg(args);
             createAndConfigureProcess(exe, true, home, args);
+            return null; 
         }
         
     }

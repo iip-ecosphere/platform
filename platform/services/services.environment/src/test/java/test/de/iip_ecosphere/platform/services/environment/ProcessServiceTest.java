@@ -83,7 +83,7 @@ public class ProcessServiceTest {
         }
 
         @Override
-        protected void start() throws ExecutionException {
+        protected ServiceState start() throws ExecutionException {
             YamlProcess sSpec = getProcessSpec();
             File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("java")); 
             File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("target/test-classes"));
@@ -92,6 +92,7 @@ public class ProcessServiceTest {
             args.add("test.de.iip_ecosphere.platform.services.environment.ForwardingApp");
             addProcessSpecCmdArg(args);
             createAndConfigureProcess(exe, true, home, args);
+            return null;
         }
         
     }

@@ -332,30 +332,37 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
+        ServiceState next = null;
+        super.setState(state);
         switch (state) {
         case STARTING:
-            start();
+            next = start();
             break;
         case STOPPING:
-            stop();
+            next = stop();
             break;
         default:
             break;
         }
-        super.setState(state);
+        if (null != next) {
+            super.setState(next);
+        }
     }
 
     /**
      * Preliminary: Starts the service and the background process.
      * 
+     * @return the state to transition to, may be <b>null</b> for none
      * @throws ExecutionException if starting the process fails
      */
-    protected abstract void start() throws ExecutionException;
+    protected abstract ServiceState start() throws ExecutionException;
 
     /**
      * Preliminary: Stops the service and the background process.
+     * 
+     * @return the state to transition to, may be <b>null</b> for none
      */
-    protected void stop() {
+    protected ServiceState stop() {
         if (null != serviceIn) {
             serviceIn.flush();
             serviceIn = null;
@@ -367,6 +374,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
                 proc = null;
             }
         }
+        return ServiceState.STOPPED;
     }
 
     /**
