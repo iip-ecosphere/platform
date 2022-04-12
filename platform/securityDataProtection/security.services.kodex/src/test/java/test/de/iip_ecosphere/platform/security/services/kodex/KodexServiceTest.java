@@ -13,13 +13,17 @@
 package test.de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 
 import de.iip_ecosphere.platform.security.services.kodex.KodexService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -36,6 +40,126 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  */
 public class KodexServiceTest {
 
+    private static boolean measure = Boolean.valueOf(System.getProperty("kodex.measure", "false"));
+    private long startTime;
+    private long endTime;
+    private long count = 0;
+    private ArrayList<Long[]> runtime = new ArrayList<Long[]>();
+    
+    /**
+     * Set the start time of the service.
+     * 
+     * @param start the start time
+     */
+    private void setStartTime(long start) {
+        startTime = start;
+    }
+    
+    /**
+     * Set the new end time of the service.
+     * 
+     * @param end the end time
+     */
+    private void setEndTime(long end) {
+        endTime = end;
+    }
+    
+    /**
+     * Set the new count of the tuple.
+     * 
+     * @param newCount the count value
+     */
+    private void setCount(long newCount) {
+        count = newCount;
+    }
+    
+    /**
+     * Returns the start time of the service.
+     * 
+     * @return startTime
+     */
+    private long getStartTime() {
+        return startTime;
+    }
+    
+    /**
+     * Returns the end time of the service.
+     * 
+     * @return endTime
+     */
+    private long getEndTime() {
+        return endTime;
+    }
+    
+    /**
+     * Returns counter of the tuple.
+     * 
+     * @return endTime
+     */
+    private long getCount() {
+        return count;
+    }
+    
+    /**
+     * Calculate the runtime.
+     * 
+     * @return the runtime
+     */
+    private long calcRuntime() {
+        return getEndTime() - getStartTime();
+    }
+    
+    /**
+     * Save runtime results as excel-file.
+     * 
+     * @param runtimeList list of runtime measures
+     * @throws IOException if creating the file fails
+     */
+    private void createExcelFile(ArrayList<Long[]> runtimeList) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("IORuntime");
+        String[] columnHeadings = {"Tupel amount", "Runtime in ms"}; 
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerFont.setColor(IndexedColors.BLACK.index);
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < columnHeadings.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columnHeadings[i]);
+            cell.setCellStyle(headerStyle);
+        }
+        CellStyle contentStyle = workbook.createCellStyle();
+        contentStyle.setAlignment(HorizontalAlignment.CENTER);
+        int rowCount = 1;
+        for (Long[] item : runtime) {
+            Row row = sheet.createRow(rowCount++);
+            Cell tupelAmount = row.createCell(0);
+            tupelAmount.setCellValue(item[0]);
+            tupelAmount.setCellStyle(contentStyle);
+            Cell runtime = row.createCell(1);
+            runtime.setCellValue(item[1]);
+            runtime.setCellStyle(contentStyle);
+        }
+        for (int i = 0; i < columnHeadings.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        File folder = new File("./measures");
+        folder.mkdirs();
+        File output = new File(folder, "IORestRuntime.xlsx");
+        FileOutputStream fileOutputStream = new FileOutputStream(output);
+        workbook.write(fileOutputStream);
+        fileOutputStream.close();
+        workbook.close();
+        LoggerFactory.getLogger(KodexRestServiceTest.class).info(
+            "Excel file (RestRuntime.xlsx) with runtime measures created in {}", output);
+    }
+    
     /**
      * Processes {@code data} on {@code service} and logs the sent input.
      * 
@@ -44,8 +168,10 @@ public class KodexServiceTest {
      * @throws IOException if processing/serializing the input data fails
      */
     private static void process(KodexService<InData, OutData> service, InData data) throws IOException {
-        LoggerFactory.getLogger(KodexServiceTest.class).info("Input: {"
-            + "id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
+        if (!measure) {
+            LoggerFactory.getLogger(KodexServiceTest.class).info("Input: {"
+                + "id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
+        }
         service.process(data);
     }
     
@@ -66,8 +192,17 @@ public class KodexServiceTest {
                 Assert.assertTrue(data.getName() != null && data.getName().length() > 0);
                 Assert.assertTrue(data.getKip() != null && data.getKip().length() > 0);
                 receivedCount.incrementAndGet();
-                LoggerFactory.getLogger(KodexServiceTest.class).info("Received result: {kip=\"" + data.getKip() 
-                    + "\" id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
+                if (!measure) {
+                    LoggerFactory.getLogger(KodexServiceTest.class).info("Received result: {kip=\"" + data.getKip() 
+                        + "\" id=\"" + data.getId() + "\" name=\"" + data.getName() + "\"}");
+                }
+                setCount(getCount() + 1);
+                boolean smallCount = getCount() == 1 || getCount() == 10 || getCount() == 100;
+                if (smallCount || getCount() == 1000 || getCount() == 10000 || getCount() == 15000) {
+                    setEndTime(System.currentTimeMillis());
+                    Long[] tmp = {getCount(), calcRuntime()};
+                    runtime.add(tmp);
+                }
             }
 
             @Override
@@ -94,17 +229,20 @@ public class KodexServiceTest {
         KodexService<InData, OutData> service = new KodexService<>(
             new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc, "example-data.yml");
         service.setState(ServiceState.STARTING);
-        process(service, new InData("test", "test"));
-        process(service, new InData("test", "test"));
-        process(service, new InData("test", "test"));
+        setCount(0);
+        setStartTime(System.currentTimeMillis());
+        int max = measure ? 15000 : 100;
+        for (int i = 0; i < max; i++) {
+            process(service, new InData("test", "test"));
+        }
         LoggerFactory.getLogger(KodexServiceTest.class).info("Stopping service, may take two minutes on Windows");
         service.setState(ServiceState.STOPPING);
-        Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
-
+        Assert.assertEquals(max, receivedCount.get());
         LoggerFactory.getLogger(KodexServiceTest.class).info("Activating/Passivating");
         service.activate();
         LoggerFactory.getLogger(KodexServiceTest.class).info("Passivating service, may take two minutes on Windows");
         service.passivate();
+        createExcelFile(runtime);
     }
     
 }

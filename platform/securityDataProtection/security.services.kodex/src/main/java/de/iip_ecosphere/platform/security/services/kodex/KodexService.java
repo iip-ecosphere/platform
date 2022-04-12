@@ -23,6 +23,7 @@ import org.apache.commons.lang.SystemUtils;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -74,7 +75,7 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
     }
     
     @Override
-    protected void start() throws ExecutionException {
+    protected ServiceState start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
@@ -93,6 +94,7 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         addProcessSpecCmdArg(args);
         
         createAndConfigureProcess(exe, false, home, args);
+        return ServiceState.RUNNING;
     }
 
     @Override

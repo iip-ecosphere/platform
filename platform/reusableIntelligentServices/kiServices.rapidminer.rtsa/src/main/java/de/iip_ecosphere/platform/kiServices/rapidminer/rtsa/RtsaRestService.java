@@ -66,7 +66,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     @Override
-    protected void start() throws ExecutionException {
+    protected ServiceState start() throws ExecutionException {
         YamlProcess sSpec = getProcessSpec();
 
         File exe = InstalledDependenciesSetup.location(InstalledDependenciesSetup.KEY_JAVA_8);
@@ -88,15 +88,16 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         addProcessSpecCmdArg(args);
         parseArgs(args.toArray(new String[] {}));
         proc = createAndConfigureProcess(exe, false, home, args);
+        return null; // don't change state
     }
     
     @Override
-    protected void stop() {
+    protected ServiceState stop() {
         if (null != networkPortKey) {
             NetworkManagerFactory.getInstance().releasePort(networkPortKey);
             networkPortKey = null;
         }
-        super.stop();
+        return super.stop();
     }
 
     /**
@@ -149,7 +150,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     protected void handleInputStream(InputStream in) { // better via Spring Tomcat?
         new Thread(new Runnable() {
             public void run() {
-                while (getState() == ServiceState.AVAILABLE || (null != proc && proc.isAlive())) {
+                while (getState() == ServiceState.STARTING || (null != proc && proc.isAlive())) {
                     Scanner sc = new Scanner(in);
                     while (sc.hasNextLine()) {
                         String line = sc.nextLine();

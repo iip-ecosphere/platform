@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.Yaml;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -83,7 +84,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     @Override
-    protected void start() throws ExecutionException {
+    protected ServiceState start() throws ExecutionException {
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
@@ -106,7 +107,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         boolean portAvailable = false;
         while (!portAvailable) {
             try {
-                getNewConnectionInstanceQuiet(); // quiet, check whether connection exists
+                getNewConnectionInstanceQuiet(false); // quiet, check whether connection exists
                 if (getConnection().getResponseCode() == 400) {
                     portAvailable = true;
                 }
@@ -115,6 +116,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
             }
             TimeUtils.sleep(100);
         }
+        return ServiceState.RUNNING;
     }
     
     @Override
