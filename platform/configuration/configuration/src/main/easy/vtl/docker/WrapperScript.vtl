@@ -1,0 +1,16 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template WrapperScript(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+    	    	
+    	'#!/bin/bash'
+	''
+	'bash amqp.sh &'
+	'sleep 4;'
+	'bash serviceMgr.sh'
+          
+    }	
+}

@@ -1,4 +1,4 @@
-project ContainerCreation {
+project SimpleMeshContainer {
 
     import IIPEcosphere;
     import DataTypes;
@@ -97,10 +97,8 @@ project ContainerCreation {
     // ------------ application and service nets ------------------
     
     Application myApp = {
-        //id = "SimpleMeshApp",
         id = "SimpleMeshContainerApp",
         name = "Simple Mesh Testing Container App",
-        //name = "Simple Mesh Testing App",
         ver = "0.1.0",
         description = "",
         services = {refBy(myMesh)}        

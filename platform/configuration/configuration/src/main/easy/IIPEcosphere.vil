@@ -254,6 +254,30 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
+    	
+    	String appName = getAppMvnName(a);
+    	
+    	// only for the project "ContainerCreation"
+    	if (appName == "SimpleMeshTestingContainerApp") {
+    		
+    		// Wrapper-Skript 
+    		Path ws = "${appRoot}/../wrapper_script.sh";
+		vilTemplateProcessor("WrapperScript", config, ws); 
+	    	
+	    	// DOCKERFILE 
+	    	Path df = "${appRoot}/../Dockerfile.txt";
+	    	vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
+	    	df.rename("Dockerfile");
+	    	
+	    	// Create image 
+	    	Path b = "${appRoot}/../";
+	    	Path d = "${appRoot}/../Dockerfile";
+	    	String imageId = dockerBuildImage(b, d, "testapp:01");  
+	    	
+	    	// Remove image
+	    	dockerRemoveImage(imageId);
+    	}
+    	    	
     }
 
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
