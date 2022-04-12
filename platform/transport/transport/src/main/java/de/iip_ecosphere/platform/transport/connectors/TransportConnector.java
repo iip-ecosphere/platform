@@ -59,6 +59,15 @@ public interface TransportConnector {
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException;
     
     /**
+     * Detaches a reception {@code callback} to {@code stream}.
+     * 
+     * @param stream   the stream to detach the reception callback from
+     * @param callback the callback to detach
+     * @throws IOException in case that problems during detaching the callback
+     */
+    public void detachReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException;    
+    
+    /**
      * Unsubscribes from a channel implicitly subscribed with {@link #setReceptionCallback(String, ReceptionCallback)}.
      * 
      * @param stream the stream to unsubscribe from

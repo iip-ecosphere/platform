@@ -141,6 +141,11 @@ public class DirectMemoryTransportConnectorTest {
         public String enabledEncryption() {
             return null;
         }
+
+        @Override
+        public void detachReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
+            unsubscribe(stream, true);
+        }
         
     }
     

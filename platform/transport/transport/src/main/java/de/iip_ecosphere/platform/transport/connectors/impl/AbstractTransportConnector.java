@@ -46,6 +46,18 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         }
         l.add(callback);
     }
+    
+    @Override
+    public void detachReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
+        List<ReceptionCallback<?>> l = callbacks.get(stream);
+        if (l != null) {
+            boolean removed = l.remove(callback);
+            if (removed && callbacks.isEmpty()) {
+                callbacks.remove(stream);
+                unsubscribe(stream, true);
+            }
+        }
+    }
 
     @Override
     public void connect(TransportParameter params) throws IOException {
