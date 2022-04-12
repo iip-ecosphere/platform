@@ -109,7 +109,7 @@ public class PlatformAas implements AasContributor {
     }
 
     /**
-     * Creates the "nameplate".
+     * Creates the "nameplate". A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
      * 
      * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
      * @param appSetup application setup
@@ -136,7 +136,7 @@ public class PlatformAas implements AasContributor {
     }
     
     /**
-     * Creates (part) of a nameplate address.
+     * Creates (part) of a nameplate address. A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
      * 
      * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
      * @param address the address to use

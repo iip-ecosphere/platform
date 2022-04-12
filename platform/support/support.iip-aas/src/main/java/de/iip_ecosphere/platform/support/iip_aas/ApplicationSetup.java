@@ -16,6 +16,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
  * Describes static information about an application, e.g., taken from the configuration. May be read from yaml,
  * therefore already in snakeyaml style.
  * 
+ * A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
+ * 
  * @author Holger Eichelberger, SSE
  */
 public class ApplicationSetup {
@@ -28,7 +30,7 @@ public class ApplicationSetup {
     private Address address = new Address();
 
     /**
-     * Represents part of an address.
+     * Represents part of an address. 
      * 
      * @author Holger Eichelberger, SSE
      */
