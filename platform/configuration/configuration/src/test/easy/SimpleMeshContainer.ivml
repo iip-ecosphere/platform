@@ -101,6 +101,7 @@ project SimpleMeshContainer {
         name = "Simple Mesh Testing Container App",
         ver = "0.1.0",
         description = "",
+        createContainer = true, 
         services = {refBy(myMesh)}        
     };
     
