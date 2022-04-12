@@ -29,18 +29,22 @@ public class Version implements Comparable<Version> {
     /**
      * Creates a new version by parsing a string.
      * 
-     * @param version the version string in form i(.i)* with i integer numbers 
+     * @param version the version string in form empty or i(.i)* with i integer numbers 
      * @throws IllegalArgumentException in case of format problems
      */
     public Version(String version) throws IllegalArgumentException {
         if (null != version) { // may occur during parsing
-            String[] tmp = version.split("\\" + SEPARATOR);
-            segments = new int[tmp.length];
-            for (int i = 0; i < tmp.length; i++) {
-                try {
-                    segments[i] = Integer.parseInt(tmp[i]);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(version + "is not valid");
+            if (version.trim().length() == 0) {
+                segments = new int[0];
+            } else {
+                String[] tmp = version.split("\\" + SEPARATOR);
+                segments = new int[tmp.length];
+                for (int i = 0; i < tmp.length; i++) {
+                    try {
+                        segments[i] = Integer.parseInt(tmp[i]);
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException(version + "is not valid");
+                    }
                 }
             }
         } else {

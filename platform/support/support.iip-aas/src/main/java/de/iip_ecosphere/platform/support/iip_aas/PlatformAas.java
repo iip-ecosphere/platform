@@ -27,7 +27,10 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
@@ -43,13 +46,22 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
     public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
+    public static final String NAME_PROPERTY_ID = "Id";
+    public static final String NAME_PROPERTY_MANUFACTURER_NAME = "ManufacturerName";
+    public static final String NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION = "ManufacturerProductDesignation";
+    public static final String NAME_SMC_ADDRESS = "Address";
+    public static final String NAME_PROPERTY_CITYTOWN = "CityTown";
+    public static final String NAME_PROPERTY_DEPARTMENT = "Department";
+    public static final String NAME_PROPERTY_STREET = "Street";
+    public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
+    
     private static final String MAVEN_SNAPSHOT_POSTFIX = "-SNAPSHOT";
-
+    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
-            String ver = "??";
+            String ver = "";
             String buildId = "??";
             boolean isRelease = false;
             InputStream is = getClass().getClassLoader().getResourceAsStream("iip-version.properties");
@@ -68,12 +80,19 @@ public class PlatformAas implements AasContributor {
                 }
                 buildId = prop.getOrDefault("buildId", buildId).toString();
             }
-            smB.createPropertyBuilder(NAME_PROPERTY_NAME)
-                .setValue(Type.STRING, "IIP-Ecosphere platform")
-                .build();
-            smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
-                .setValue(Type.STRING, ver)
-                .build();
+            ApplicationSetup setup = new ApplicationSetup();
+            setup.setVersion(ver);
+            setup.setName("IIP-Ecosphere platform");
+            setup.setManufacturerName("IIP-Ecosphere Consortium@DE");
+            setup.setDescription("The IIP-Ecosphere AI-enabled I4.0 platform.@DE");
+            Address addr = new Address();
+            addr.setDepartment("University of Hildesheim, SSE - Software Systems Engineering@DE");
+            addr.setStreet("Universitätsplatz 1@DE");
+            addr.setZipCode("31141@DE");
+            addr.setCityTown("Hildesheim/Hannover@DE");
+            setup.setAddress(addr);
+            
+            createNameplate(smB, setup);
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, isRelease)
                 .build();
@@ -88,6 +107,60 @@ public class PlatformAas implements AasContributor {
         }
         return null;
     }
+
+    /**
+     * Creates the "nameplate".
+     * 
+     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
+     * @param appSetup application setup
+     */
+    public static void createNameplate(SubmodelElementContainerBuilder smBuilder, ApplicationSetup appSetup) {
+        if (null != appSetup.getId()) {
+            smBuilder.createPropertyBuilder(NAME_PROPERTY_ID)
+                .setValue(Type.STRING, appSetup.getId())
+                .build();
+        }
+        smBuilder.createPropertyBuilder(NAME_PROPERTY_NAME)
+            .setValue(Type.STRING, appSetup.getName())
+            .build();
+        smBuilder.createPropertyBuilder(NAME_PROPERTY_VERSION)
+            .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
+            .build();
+        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
+            .setValue(Type.LANG_STRING, "")
+            .build();
+        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
+            .setValue(Type.LANG_STRING, "")
+            .build();
+        createAddress(smBuilder, appSetup.getAddress());
+    }
+    
+    /**
+     * Creates (part) of a nameplate address.
+     * 
+     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
+     * @param address the address to use
+     */
+    protected static void createAddress(SubmodelElementContainerBuilder smBuilder, Address address) {
+        if (null != address) {
+            SubmodelElementCollectionBuilder aBuilder 
+                = smBuilder.createSubmodelElementCollectionBuilder(NAME_SMC_ADDRESS, false, false);
+            aBuilder.createPropertyBuilder(NAME_PROPERTY_CITYTOWN)
+                .setValue(Type.LANG_STRING, address.getCityTown())
+                .build();
+            aBuilder.createPropertyBuilder(NAME_PROPERTY_DEPARTMENT)
+                .setValue(Type.LANG_STRING, address.getDepartment())
+                .build();
+            aBuilder.createPropertyBuilder(NAME_PROPERTY_STREET)
+                .setValue(Type.LANG_STRING, address.getStreet())
+                .build();
+            aBuilder.createPropertyBuilder(NAME_PROPERTY_ZIPCODE)
+                .setValue(Type.LANG_STRING, address.getZipCode())
+                .build();
+            aBuilder.build();
+        }
+    }
+
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
