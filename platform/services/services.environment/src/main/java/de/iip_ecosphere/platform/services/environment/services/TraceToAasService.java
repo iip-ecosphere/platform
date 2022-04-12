@@ -231,7 +231,7 @@ public class TraceToAasService extends AbstractService {
             if (null != data.getPayload()) {
                 Class<?> cls = data.getPayload().getClass();
                 smcBuilder.createPropertyBuilder(PROPERTY_PAYLOAD_TYPE)
-                    .setValue(Type.STRING, cls.getName())
+                    .setValue(Type.STRING, mapPayloadType(cls))
                     .build();
                 SubmodelElementCollectionBuilder payloadBuilder = smcBuilder
                     .createSubmodelElementCollectionBuilder(PROPERTY_PAYLOAD, false, false);
@@ -265,6 +265,16 @@ public class TraceToAasService extends AbstractService {
             LoggerFactory.getLogger(getClass()).error(
                 "Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
         }
+    }
+    
+    /**
+     * Allows for application specific payload type names.
+     * 
+     * @param cls the type
+     * @return the mapped name
+     */
+    protected String mapPayloadType(Class<?> cls) {
+        return cls.getName();
     }
     
     /**
