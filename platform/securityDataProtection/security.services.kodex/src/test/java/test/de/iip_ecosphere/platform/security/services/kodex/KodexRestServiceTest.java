@@ -236,7 +236,7 @@ public class KodexRestServiceTest {
         for (int i = 0; i < max; i++) {
             process(service, new InData("test", "test"));
         }
-        TimeUtils.sleep(500);
+        TimeUtils.sleep(1500);
         LoggerFactory.getLogger(KodexRestServiceTest.class).info("Stopping service, may take two minutes on Windows");
         service.setState(ServiceState.STOPPING);     
         Assert.assertEquals(max, receivedCount.get());
