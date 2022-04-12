@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -210,8 +211,15 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
 
     @Override
     public void delete(Submodel submodel) {
-        submodels.remove(submodel.getIdShort());
-        getAas().removeSubmodel(((AbstractSubmodel<?>) submodel).getSubmodel().getIdentification());
+        if (null != submodel) {
+            try {
+                submodels.remove(submodel.getIdShort());
+                getAas().removeSubmodel(((AbstractSubmodel<?>) submodel).getSubmodel().getIdentification());
+            } catch (ResourceNotFoundException e) {
+                LoggerFactory.getLogger(getClass()).error("Deleting submodel %s: %s", 
+                    submodel.getIdShort(), e.getMessage());
+            }
+        }
     }
 
     /**
