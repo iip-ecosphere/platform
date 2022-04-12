@@ -27,7 +27,6 @@ import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.services.environment.services.ApplicationSetup;
 import de.iip_ecosphere.platform.services.environment.services.TraceToAasService;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -46,6 +45,9 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
+import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -195,6 +197,11 @@ public class TraceToAasServiceTest {
         ApplicationSetup app = new ApplicationSetup();
         app.setName("myApp");
         app.setId("app-0");
+        app.setVersion("1.2.3");
+        app.setDescription("");
+        app.setManufacturerName("UHi");
+        Address addr = new Address();
+        app.setAddress(addr);
         
         YamlService sDesc = new YamlService();
         sDesc.setName("TraceAasTest");
@@ -218,10 +225,10 @@ public class TraceToAasServiceTest {
         Assert.assertNotNull(aas);
         Submodel submodel = aas.getSubmodel(TraceToAasService.SUBMODEL_NAMEPLATE);
         Assert.assertNotNull(submodel);
-        Property prop = submodel.getProperty(TraceToAasService.PROPERTY_APP_ID);
+        Property prop = submodel.getProperty(PlatformAas.NAME_PROPERTY_ID);
         Assert.assertNotNull(prop);
         Assert.assertEquals(app.getId(), prop.getValue());
-        prop = submodel.getProperty(TraceToAasService.PROPERTY_APP_NAME);
+        prop = submodel.getProperty(PlatformAas.NAME_PROPERTY_NAME);
         Assert.assertNotNull(prop);
         Assert.assertEquals(app.getName(), prop.getValue());
 

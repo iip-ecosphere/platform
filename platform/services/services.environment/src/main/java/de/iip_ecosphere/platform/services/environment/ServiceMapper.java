@@ -14,10 +14,14 @@ package de.iip_ecosphere.platform.services.environment;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
+import java.util.Map;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 /**
  * Template.
@@ -102,7 +106,9 @@ public class ServiceMapper {
             ));
             builder.defineOperation(getQName(service, NAME_OP_RECONF), 
                 new JsonResultWrapper(p -> {
-                    service.reconfigure(readMap(p, 0, null)); 
+                    Map<String, String> values = readMap(p, 0, null);
+                    Transport.sendTraceRecord(new TraceRecord(service.getId(), "reconfigure", values)); // disable?
+                    service.reconfigure(values); 
                     return null;
                 }
             ));

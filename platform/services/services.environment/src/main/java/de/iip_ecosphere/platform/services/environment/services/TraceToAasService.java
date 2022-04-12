@@ -43,9 +43,12 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
+import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
@@ -65,13 +68,12 @@ public class TraceToAasService extends AbstractService {
     
     public static final String SUBMODEL_TRACES = "Traces";
     public static final String SUBMODEL_NAMEPLATE = "Nameplate"; // the app "Nameplate"
+    public static final String SUBMODEL_COMMANDS = "Commands"; // commands from extern towards platform
     public static final String PROPERTY_SOURCE = "Source";
     public static final String PROPERTY_ACTION = "Action";
     public static final String PROPERTY_TIMESTAMP = "Timestamp";
     public static final String PROPERTY_PAYLOAD_TYPE = "PayloadType";
     public static final String PROPERTY_PAYLOAD = "Payload";
-    public static final String PROPERTY_APP_NAME = "Name";
-    public static final String PROPERTY_APP_ID = "Id";
 
     public static final ValueConverter IDENTITY_CONVERTER = v -> v;
     public static final ValueConverter JSON_CONVERTER = v -> JsonUtils.toJson(v);
@@ -85,6 +87,7 @@ public class TraceToAasService extends AbstractService {
     private long timeout = 60 * 60 * 1000; // cleanup after 1 hour
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000;
+    private TraceRecordReceptionCallback callback;
     
     static {
         DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
@@ -344,19 +347,18 @@ public class TraceToAasService extends AbstractService {
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
                 SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
-                smBuilder.createPropertyBuilder(PROPERTY_APP_ID)
-                    .setValue(Type.STRING, appSetup.getId())
-                    .build();
-                smBuilder.createPropertyBuilder(PROPERTY_APP_NAME)
-                    .setValue(Type.STRING, appSetup.getName())
-                    .build();
+                PlatformAas.createNameplate(smBuilder, appSetup);
+                augmentNameplateSubmodel(smBuilder);
                 smBuilder.build();
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
+                augmentCommandsSubmodel(smBuilder);
+                smBuilder.build();                
                 smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null);
                 smBuilder.build();
                 List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
                 AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
-                Transport.createConnector().setReceptionCallback(TraceRecord.TRACE_STREAM, 
-                    new TraceRecordReceptionCallback());
+                callback = new TraceRecordReceptionCallback();
+                Transport.createConnector().setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
                 super.setState(ServiceState.RUNNING);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
@@ -365,12 +367,46 @@ public class TraceToAasService extends AbstractService {
             break;
         case STOPPING:
             super.setState(state);
-            // TODO release descriptor, unset callback
+            try {
+                TransportConnector conn = Transport.getConnector();
+                if (null != conn) {
+                    conn.detachReceptionCallback(TraceRecord.TRACE_STREAM, callback);
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
+            }
+            try {
+                // unclear how to get rid of AAS itself
+                Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
+                aas.delete(aas.getSubmodel(SUBMODEL_TRACES));
+                aas.delete(aas.getSubmodel(SUBMODEL_NAMEPLATE));
+                aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
+            } catch (IOException e ) {
+                LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
+                super.setState(ServiceState.FAILED);
+            }
+            super.setState(ServiceState.STOPPED);
             break;
         default:
             super.setState(state);
             break;
         }
+    }
+
+    /**
+     * Allows adding application-specific elements to the nameplate submodel.
+     * 
+     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
+     */
+    protected void augmentNameplateSubmodel(SubmodelBuilder smBuilder) {
+    }
+
+    /**
+     * Allows adding application-specific elements to the command submodel, e.g., operations.
+     * 
+     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
+     */
+    protected void augmentCommandsSubmodel(SubmodelBuilder smBuilder) {
     }
 
     @Override
