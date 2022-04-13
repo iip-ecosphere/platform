@@ -27,6 +27,8 @@ public class ApplicationSetup {
     private Version version;
     private String description = "";
     private String manufacturerName;
+    private String manufacturerProductDesignation;
+    private String image = "";
     private Address address = new Address();
 
     /**
@@ -236,6 +238,24 @@ public class ApplicationSetup {
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
     }
+    
+    /**
+     * Returns the manufacturer product designation.
+     * 
+     * @return the designation
+     */
+    public String getManufacturerProductDesignation() {
+        return manufacturerProductDesignation;
+    }
+
+    /**
+     * Changes the manufacturer product designation.
+     * 
+     * @param manufacturerProductDesignation the designation
+     */
+    public void setManufacturerProductDesignation(String manufacturerProductDesignation) {
+        this.manufacturerProductDesignation = manufacturerProductDesignation;
+    } 
 
     /**
      * Returns the address.
@@ -253,6 +273,24 @@ public class ApplicationSetup {
      */
     public void setAddress(Address address) {
         this.address = address;
-    } 
+    }
+
+    /**
+     * Returns the optional image.
+     * 
+     * @return the image (serialized image data as string or URI to image)
+     */
+    public String getImage() {
+        return image;
+    }
+
+    /**
+     * Changes the optional image.
+     * 
+     * @param image the image (serialized image data as string or URI to image)
+     */
+    public void setImage(String image) {
+        this.image = image;
+    }
 
 }

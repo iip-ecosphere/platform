@@ -127,10 +127,10 @@ public class PlatformAas implements AasContributor {
             .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
             .build();
         smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
-            .setValue(Type.LANG_STRING, "")
+            .setValue(Type.LANG_STRING, appSetup.getManufacturerName())
             .build();
         smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
-            .setValue(Type.LANG_STRING, "")
+            .setValue(Type.LANG_STRING, appSetup.getManufacturerProductDesignation())
             .build();
         createAddress(smBuilder, appSetup.getAddress());
     }
