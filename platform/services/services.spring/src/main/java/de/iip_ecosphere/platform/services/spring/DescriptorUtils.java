@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
@@ -223,9 +224,10 @@ public class DescriptorUtils {
             }
         }
     }
-    
+
     /**
-     * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner.
+     * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner requesting
+     * the spring web server to be executed on an ephemeral port by default.
      *   
      * @param jar the JAR file to read
      * @param brokerPort the port where the transport broker is running 
@@ -238,6 +240,31 @@ public class DescriptorUtils {
      */
     public static List<String> createStandaloneCommandArgs(File jar, int brokerPort, String brokerHost, 
         int adminPort, String serviceProtocol) throws IOException, ExecutionException {
+        return createStandaloneCommandArgs(jar, brokerPort, brokerHost, 
+            adminPort, serviceProtocol, -1);
+    }
+    
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner.
+     *   
+     * @param jar the JAR file to read
+     * @param brokerPort the port where the transport broker is running 
+     * @param brokerHost the host where the transport broker is running (usually "localhost")
+     * @param adminPort the port where to run the AAS command server, for -1 an emphemeral port will be used 
+     * @param serviceProtocol the protocol to run for the AAS command server (see {@link AasFactory})
+     * @param springPort the port to run the spring application server on, usually 8080, if negative an ephemeral 
+     *     port will be used
+     * @return the list of command line args to use 
+     * @throws IOException if {@code jar} cannot be found or reading {@code jar} fails
+     * @throws ExecutionException if extracting process artifacts fails
+     */
+    public static List<String> createStandaloneCommandArgs(File jar, int brokerPort, String brokerHost, 
+        int adminPort, String serviceProtocol, int springPort) throws IOException, ExecutionException {
+        if (springPort < 0) {
+            springPort = NetUtils.getEphemeralPort();
+        }
         List<String> result;
         if (!jar.exists()) {
             throw new IOException("Cannot find Spring service binary '" + jar.getAbsolutePath() 
@@ -252,6 +279,7 @@ public class DescriptorUtils {
         result.add("-Dlog4j2.formatMsgNoLookups=true");
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
+        result.add("--server.port=" + springPort);
         List<String> tmp = new ArrayList<String>();
         for (YamlService service : art.getServices()) {
             YamlProcess proc = service.getProcess();
@@ -269,6 +297,8 @@ public class DescriptorUtils {
         result.addAll(tmp2);
         return result;
     }
+
+    // checkstyle: resume parameter number check
 
     /**
      * Returns the logger.
