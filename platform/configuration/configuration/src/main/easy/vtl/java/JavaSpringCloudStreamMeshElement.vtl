@@ -281,9 +281,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         @Bean
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            return data -> ${fallbackToNull(snk, "service.${methodName}(data)", false)};
+            ${generateSinkMethodBody(snk, snk.impl, methodName)}
         }'
     } 
+    
+    def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName) {
+        'return data -> ${fallbackToNull(snk, "service.${methodName}(data)", false)};'
+    }
     
     // ----------------------- initial service parameters -----------------------------------------------
     
@@ -711,6 +715,48 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def generateReceptionCallback(MeshProcessor elt, RtsaService service) {
         String serviceId = "_" + toIdentifier(service.id);
         '${generateTypeTranslators(elt, service, serviceId)}'
+    }
+    
+    // --------------------------- TraceToAasService (-> to own file) ----------------------------------
+    
+    def initialService(MeshElement elt, TraceToAasService service) {
+        String clsName = "TraceToAasService";
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}", appVar="app")};\n'
+        'service = new TraceToAasService(app, serviceData);
+        Starter.mapService(service);
+        ${attachMetricsProvider("service")}'
+    }
+    
+    def generateImports(TraceToAasService service) {
+        'import de.iip_ecosphere.platform.services.environment.services.TraceToAasService;
+        import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
+        import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;'
+    }
+
+    def generateServiceAttribute(MeshElement elt, TraceToAasService service) {
+        'private TraceToAasService service;'
+    }
+    
+    def getServiceType(MeshElement elt, TraceToAasService service) {
+        "de.iip_ecosphere.platform.services.environment.services.TraceToAasService";
+    }
+
+    def generateAsyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String type) {
+        'return data -> {}; // ignore, shall not be called'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String inType, String outType) {
+        'return data -> null; // ignore, shall not be called'
+    }
+
+    def generateIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir) {
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, TraceToAasService service) {
+    }
+    
+    def generateSinkMethodBody(MeshSink snk, TraceToAasService service, String methodName) {
+        'return data -> {}; // ignore'
     }
     
     // --------------------- main ---------------------------

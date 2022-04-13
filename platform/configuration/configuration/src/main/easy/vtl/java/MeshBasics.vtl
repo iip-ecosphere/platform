@@ -53,9 +53,13 @@ template MeshBasics(Configuration config, FileArtifact target) {
         "/deployment.yml";
     }
     
-    def String getYamlServiceFragment(String varName, String clsName, String serviceId) {
-        'YamlService ${varName} = YamlArtifact.readFromYamlSafe(${clsName}.class
-            .getResourceAsStream("${getDeploymentDescriptorPath()}")).getServiceSafe("${serviceId}")'
+    def String getYamlServiceFragment(String varName, String clsName, String serviceId, String artifactVarName="art", String appVar="") {
+        'YamlArtifact ${artifactVarName} = YamlArtifact.readFromYamlSafe(${clsName}.class
+            .getResourceAsStream("${getDeploymentDescriptorPath()}"));'
+        if (appVar.length() > 0) {
+            'ApplicationSetup ${appVar} = ${artifactVarName}.getApplication();'
+        }
+        'YamlService ${varName} = ${artifactVarName}.getServiceSafe("${serviceId}")'
     }
 
     def generateDataMethods(MeshElement elt) {

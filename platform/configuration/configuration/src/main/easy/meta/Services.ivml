@@ -5,6 +5,7 @@ project Services {
    import Devices;
    import Resources;
    import Transport;
+   import Nameplate;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
@@ -101,7 +102,7 @@ project Services {
     }
     
     compound LongParameter refines Parameter {
-        Real defaultValue;
+        Integer defaultValue;
         /*assign(bindingTime = BindingTime.runtimeEnact) to {
             Real value;
         }*/
@@ -137,6 +138,7 @@ project Services {
        Boolean traceRcv = false;
        Boolean traceSent = false;
        setOf(refTo(Dependency)) dependencies = {};
+       refTo(Manufacturer) manufacturer;
 
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
        kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
@@ -145,7 +147,7 @@ project Services {
    }
    
    abstract compound Service refines ServiceBase {
-       String description; // TODO Constraint: NonEmptyString
+       String description = ""; // TODO Constraint: must be configured
        IipVersion ver;
        Boolean deployable;
    }

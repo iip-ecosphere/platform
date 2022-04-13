@@ -265,6 +265,15 @@ project SerializerConfig1 {
         path = "iip_basic/score_v1"
         // preliminary, no specific data here so far
     };
+    
+    Service myAasSinkService = TraceToAasService {
+        id = "aasSink",
+        name = "aasSink",
+        description = "Test AAS sink",
+        deployable = true,
+        application = refBy(myApp),
+        input = {{type=refBy(RtsaTestOutput)}}
+    };
 
     // ------------ application and service nets ------------------
     
@@ -273,7 +282,19 @@ project SerializerConfig1 {
         name = "myApp example",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myMesh)},
+        manufacturer = refBy(sse)
+    };
+    
+    Manufacturer sse = {
+        manufacturerName = "Universitaet Hildesheim@DE",
+        manufacturerProductDesignation = "IIP-Ecosphere plattform test application@DE",
+        address = {
+            department = "Software Systems Engineering@DE",
+            street = "Universitaetsplatz 1@DE",
+            zipCode = "31141@DE",
+            cityTown = "Hildesheim@DE"
+        }
     };
     
     ServiceMesh myMesh = {
@@ -320,7 +341,17 @@ project SerializerConfig1 {
     };
 
     MeshProcessor myRtsa = {
-        impl = refBy(myRtsaService)
+        impl = refBy(myRtsaService),
+        next = {refBy(myConnMyRtsaMyAasSink)}
+    };
+
+    MeshConnector myConnMyRtsaMyAasSink = {
+        name = "MyRtsa->AasSink",
+        next = refBy(myAasSink)
+    };
+
+    MeshSink myAasSink = {
+        impl = refBy(myAasSinkService)
     };
 
     // ---------- generation setup ------------

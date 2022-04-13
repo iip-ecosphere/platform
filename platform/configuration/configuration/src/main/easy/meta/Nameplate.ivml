@@ -1,0 +1,22 @@
+project Nameplate {
+
+    import DataTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound Manufacturer {
+        String manufacturerName = "";
+        String manufacturerProductDesignation = "";
+        ManufacturerAddress address; // ref really needed?
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound ManufacturerAddress {
+        String department = "";
+        String street = "";
+        String zipCode = "";
+        String cityTown = "";
+    }
+        
+}

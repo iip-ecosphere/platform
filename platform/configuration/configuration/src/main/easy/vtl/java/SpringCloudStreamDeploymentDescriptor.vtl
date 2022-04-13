@@ -38,7 +38,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
                 portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
                 hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
             ${generateRelations(elt)|e}
-          ${generateProcess(elt, service)|e}'
+          ${generateProcess(elt, service)|e}
+          ${generateAppSetup(service)|e}'
     }
     
     def generateProcess(MeshElement elt, Service service) {
@@ -251,7 +252,44 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         for (Field f: type.fields) {
             types.add(f.type);
         }
+    }
+    
+    def generateAppSetup(ServiceBase service) {
+        ''
+    }
+
+    def generateAppSetup(Service service) {
+        if (isDefined(service.manufacturer) and service.manufacturer <> null) {
+            generateAppSetup(service.id, service.name, service.ver, service.manufacturer);
+        } else {
+            ''
+        }
     } 
+    
+    def generateAppSetup(Application app) {
+        if (isDefined(app.manufacturer) and app.manufacturer <> null) {
+            generateAppSetup(app.id, app.name, app.ver, app.manufacturer);
+        } else {
+            ''
+        }
+    } 
+    
+    def generateAppSetup(String id, String name, String ver, Manufacturer m) {
+        if (m <> null) {
+            ManufacturerAddress ad = m.address;
+            'application:
+              id: ${id}
+              name: ${name}
+              version: ${ver}
+              manufacturerName: ${m.manufacturerName}
+              manufacturerProductDesignation: ${m.manufacturerProductDesignation}
+              address:
+                department: ${ad.department}
+                street: ${ad.street}
+                zipCode: ${ad.zipCode}
+                cityTown: ${ad.cityTown}'
+        }
+    }
 
     // ----------------------------------- main -----------------------------------
     
@@ -259,6 +297,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         'id: ${app.id}
         name: ${app.name}
         version: ${app.ver}
+        ${generateAppSetup(app)|e}
         ${generateTypes(elements)}
         services:
            ${generateServices(elements)}
