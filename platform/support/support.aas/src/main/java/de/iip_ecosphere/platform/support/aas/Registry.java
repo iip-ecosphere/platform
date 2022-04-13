@@ -69,5 +69,30 @@ public interface Registry {
      *    the <code>submodel</code> is used
      */
     public void register(Aas aas, Submodel submodel, String endpointUrl);
+    
+    /**
+     * Returns the URI of a (deployed) AAS.
+     * 
+     * @param aasIdShort the short Id of the AAS to look for
+     * @return the URI within this registry
+     */
+    public String getEndpoint(String aasIdShort);
+    
+    /**
+     * Returns the URI of a (deployed) AAS.
+     * 
+     * @param aas the AAS
+     * @return the URI within this registry
+     */
+    public String getEndpoint(Aas aas);
+
+    /**
+     * Returns the URI of a (deployed) submodel.
+     * 
+     * @param aas the AAS
+     * @param submodel the submodel
+     * @return the URI within this registry
+     */
+    public String getEndpoint(Aas aas, Submodel submodel);
 
 }

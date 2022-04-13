@@ -103,6 +103,21 @@ public abstract class AasFactory {
                 @Override
                 public void register(Aas aas, Submodel submodel, String endpointUrl) {
                 }
+
+                @Override
+                public String getEndpoint(Aas aas) {
+                    return null;
+                }
+
+                @Override
+                public String getEndpoint(Aas aas, Submodel submodel) {
+                    return null;
+                }
+
+                @Override
+                public String getEndpoint(String aasIdShort) {
+                    return null;
+                }
             };
         }
         
