@@ -15,11 +15,13 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.io.IOException;
 
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -119,6 +121,45 @@ public class BaSyxRegistry implements Registry {
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
         registry.register(aasIdentifier, new SubmodelDescriptor(submodel.getIdShort(), 
             ((BaSyxSubmodel) submodel).getSubmodel().getIdentification(), endpointUrl));
+    }
+    
+    @Override
+    public String getEndpoint(String aasIdShort) {
+        String result = null;
+        for (AASDescriptor desc : registry.lookupAll()) {
+            if (desc.getIdShort().equals(aasIdShort)) {
+                result = desc.getFirstEndpoint();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String getEndpoint(Aas aas) {
+        String result = null;
+        if (aas instanceof BaSyxAas) {
+            try {
+                AASDescriptor desc = registry.lookupAAS(((BaSyxAas) aas).getAas().getIdentification());
+                result = desc.getFirstEndpoint();
+            } catch (ProviderException e) {
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String getEndpoint(Aas aas, Submodel submodel) {
+        String result = null;
+        if (aas instanceof BaSyxAas && submodel instanceof BaSyxSubmodel) {
+            try {
+                SubmodelDescriptor desc = registry.lookupSubmodel(
+                    ((BaSyxAas) aas).getAas().getIdentification(), 
+                    ((BaSyxSubmodel) submodel).getSubmodel().getIdentification());
+                result = desc.getFirstEndpoint();
+            } catch (ProviderException e) {
+            }
+        }
+        return result;
     }
 
     // TODO delete
