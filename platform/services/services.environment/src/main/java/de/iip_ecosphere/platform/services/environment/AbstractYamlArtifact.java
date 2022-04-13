@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -23,9 +24,19 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public abstract class AbstractYamlArtifact {
 
-    private String id;
+    private String id; // duplicate in application, may be removed
     private String name;
     private Version version;
+    private ApplicationSetup application;
+
+    /**
+     * Returns the application setup.
+     * 
+     * @return the application setup
+     */
+    public ApplicationSetup getApplication() {
+        return application;
+    }
 
     /**
      * Returns the name of the service.
@@ -52,6 +63,15 @@ public abstract class AbstractYamlArtifact {
      */
     public Version getVersion() {
         return version;
+    }
+
+    /**
+     * Changes the application setup.
+     * 
+     * @param application the application setup
+     */
+    public void setApplication(ApplicationSetup application) {
+        this.application = application;
     }
     
     /**
