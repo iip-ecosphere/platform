@@ -10,27 +10,29 @@ mvn -f pom-model.xml exec:java -Dexec.args="ExampleRTSA src/test/easy gen/rtsa g
 mvn -U install -DskipTests
 mvn -f pom-model.xml exec:java -Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateApps" -Diip.resources="$PWD/resources"
 
-#execute
+#execute and test
 
-#brokerPort=8883
-#read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range
-#while :
-#do
-#        brokerPort="`shuf -i $LOWERPORT-$UPPERPORT -n 1`"
-#        ss -lpn | grep -q ":$PORT " || break
-#done
-#echo "Using Broker Port: $brokerPort"
-#
-#dir=$PWD
-#cd gen/broker/broker
-#./broker.sh $brokerPort &
-#pidBroker=$!
-#cd $dir
-#
-#mvn exec:java -Dexec.args="--iip.test.stop=10000 --iip.test.brokerPort=$brokerPort" > log &
-#pidTest=$!
-#
-#sleep 60 && kill "$pidTest"
-#kill "$pidBroker"
-#
-#grep -Fxq "RECEIVED" log
+brokerPort=8883
+read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range
+while :
+do
+        brokerPort="`shuf -i $LOWERPORT-$UPPERPORT -n 1`"
+        ss -lpn | grep -q ":$PORT " || break
+done
+echo "Using Broker Port: $brokerPort"
+
+dir=$PWD
+cd gen/broker/broker
+./broker.sh $brokerPort &
+pidBroker=$!
+cd $dir
+
+echo "Broker PID $pidBroker"
+mvn exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+pidTest=$!
+echo "Test started $pidTest"
+
+sleep 30 && pkill -P "$pidTest" && kill "$pidTest"
+pkill -P "$pidBroker" && kill "$pidBroker"
+
+grep -Fxq "RECEIVED" log
