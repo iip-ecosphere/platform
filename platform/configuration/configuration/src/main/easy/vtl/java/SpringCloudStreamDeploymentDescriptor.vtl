@@ -311,7 +311,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         'id: ${app.id}
         name: ${app.name}
         version: ${app.ver}
-        ${generateAppSetup(app)|e}
+        ${generateAppSetup(app)}
         ${generateTypes(elements)}
         services:
            ${generateServices(elements)}
