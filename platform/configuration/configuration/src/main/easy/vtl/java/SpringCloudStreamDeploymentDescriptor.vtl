@@ -269,26 +269,16 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         if (isDefined(app.nameplateInfo) and app.nameplateInfo <> null) {
             generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo);
         } else {
-            '\n'
+            ''
         }
     } 
     
     def generateAppSetup(String id, String name, String ver, NameplateInfo p) {
-        if (p <> null) {
-            Manufacturer m = p.manufacturer;
-            ManufacturerAddress ad = m.address;
-            'application:
-              id: ${id}
-              name: ${name}
-              version: ${ver}
-              manufacturerName: ${m.manufacturerName}
-              manufacturerProductDesignation: ${p.manufacturerProductDesignation}
-              address:
-                department: ${ad.department}
-                street: ${ad.street}
-                zipCode: ${ad.zipCode}
-                cityTown: ${ad.cityTown}'
-        }
+        'application:
+          id: ${id}
+          name: ${name}
+          version: ${ver}
+          ${generateNameplateInfoSetup(p, "", 2)|e}'
     }
     
     def generateNameplateInfoSetup(NameplateInfo p, String prefix, Integer indent) {
@@ -302,6 +292,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
               street: ${ad.street}
               zipCode: ${ad.zipCode}
               cityTown: ${ad.cityTown}' | indent;
+        } else {
+            ''
         }
     }
 
