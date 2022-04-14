@@ -38,8 +38,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
                 portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
                 hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
             ${generateRelations(elt)|e}
-          ${generateProcess(elt, service)|e}
-          ${generateAppSetup(service)|e}'
+          ${generateProcess(elt, service)|e}'
     }
     
     def generateProcess(MeshElement elt, Service service) {
@@ -259,35 +258,50 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
 
     def generateAppSetup(Service service) {
-        if (isDefined(service.manufacturer) and service.manufacturer <> null) {
-            generateAppSetup(service.id, service.name, service.ver, service.manufacturer);
+        if (isDefined(service.nameplateInfo) and service.nameplateInfo <> null) {
+            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo);
         } else {
             ''
         }
     } 
     
     def generateAppSetup(Application app) {
-        if (isDefined(app.manufacturer) and app.manufacturer <> null) {
-            generateAppSetup(app.id, app.name, app.ver, app.manufacturer);
+        if (isDefined(app.nameplateInfo) and app.nameplateInfo <> null) {
+            generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo);
         } else {
             ''
         }
     } 
     
-    def generateAppSetup(String id, String name, String ver, Manufacturer m) {
-        if (m <> null) {
+    def generateAppSetup(String id, String name, String ver, NameplateInfo p) {
+        if (p <> null) {
+            Manufacturer m = p.manufacturer;
             ManufacturerAddress ad = m.address;
             'application:
               id: ${id}
               name: ${name}
               version: ${ver}
               manufacturerName: ${m.manufacturerName}
-              manufacturerProductDesignation: ${m.manufacturerProductDesignation}
+              manufacturerProductDesignation: ${p.manufacturerProductDesignation}
               address:
                 department: ${ad.department}
                 street: ${ad.street}
                 zipCode: ${ad.zipCode}
                 cityTown: ${ad.cityTown}'
+        }
+    }
+    
+    def generateNameplateInfoSetup(NameplateInfo p, String prefix, Integer indent) {
+        if (p <> null) {
+            Manufacturer m = p.manufacturer;
+            ManufacturerAddress ad = m.address;
+            '${prefix}manufacturerName: ${m.manufacturerName}
+            manufacturerProductDesignation: ${p.manufacturerProductDesignation}
+            address:
+              department: ${ad.department}
+              street: ${ad.street}
+              zipCode: ${ad.zipCode}
+              cityTown: ${ad.cityTown}' | indent;
         }
     }
 

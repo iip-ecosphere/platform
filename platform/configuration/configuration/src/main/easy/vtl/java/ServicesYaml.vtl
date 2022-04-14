@@ -1,0 +1,18 @@
+import JavaBasics;
+import SpringCloudStreamDeploymentDescriptor;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template ServicesYaml(Configuration config, FileArtifact target) {
+
+    def main(Configuration config, FileArtifact target) {
+        setOf(Service) services = Service.allInstances();
+        'services:'
+        for (Service s: services) {
+            if (isDefined(s.nameplateInfo) and s.nameplateInfo <> null) {
+                '${generateNameplateInfoSetup(s.nameplateInfo, "- ", 2)|e}'
+            }
+        }
+    }
+    
+}

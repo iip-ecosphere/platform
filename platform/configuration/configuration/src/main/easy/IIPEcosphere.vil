@@ -123,9 +123,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                             elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
-                        if (not(noDeps)) {
-                            artifacts.add(getArtifact(no));
-                        }
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                     };
@@ -281,12 +278,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // dispatch basis    
     generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        if (not(noDeps)) {
+            artifacts.add(getArtifact(no));
+        }
     }
 
     // RTSA (preliminary in here)
     generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         resources.add(rtsaResources()+"|"+rtsaBin(service));
         resources.add(rtsaResources()+"|"+rtsaInstance(service));
+        artifacts.add(getArtifact(no));
     }
     
     // KODEX (preliminary in here)    
@@ -302,6 +303,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
         bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
         assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
+        artifacts.add(getArtifact(no));
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
@@ -321,6 +323,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             if (not(noDeps)) {
                 assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
             }
+            artifacts.add(getArtifact(no));
         }
     }
     
@@ -483,6 +486,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests);
         maven("${platformRoot}", true);

@@ -16,7 +16,7 @@ project Applications {
         Boolean snapshot = true;
         String artifact = "";
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
-        refTo(Manufacturer) manufacturer;
+        NameplateInfo nameplateInfo;
         Boolean createContainer = false;
     }
     
@@ -79,6 +79,10 @@ project Applications {
        IipVersion ver = "0.1.0";
        String artifact = ""; // ships with platform in service environment
        refTo(Application) application;
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "Application AAS with Trace embedding@EN",
+           manufacturer = refBy(manufacturer_sse)
+       };
        Parameters parameter = {
          LongParameter{name="timeout", defaultValue=3600000}
        };

@@ -283,18 +283,9 @@ project SerializerConfig1 {
         ver = "0.1.0",
         description = "",
         services = {refBy(myMesh)},
-        manufacturer = refBy(sse)
-    };
-    
-    Manufacturer sse = {
-        manufacturerName = "Universitaet Hildesheim@DE",
-        manufacturerProductDesignation = "IIP-Ecosphere plattform test application@DE",
-        address = {
-            department = "Software Systems Engineering@DE",
-            street = "Universitaetsplatz 1@DE",
-            zipCode = "31141@DE",
-            cityTown = "Hildesheim@DE"
-        }
+        nameplateInfo = {
+            manufacturerProductDesignation = "IIP-Ecosphere plattform test application@DE",
+            manufacturer = refBy(manufacturer_sse)}
     };
     
     ServiceMesh myMesh = {

@@ -138,7 +138,7 @@ project Services {
        Boolean traceRcv = false;
        Boolean traceSent = false;
        setOf(refTo(Dependency)) dependencies = {};
-       refTo(Manufacturer) manufacturer;
+       NameplateInfo nameplateInfo;
 
        kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
        kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
@@ -247,7 +247,10 @@ project Services {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        IipVersion ver = "0.7.0";
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
-       // asynchronous true
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@EN",
+           manufacturer = refBy(manufacturer_sse)
+       };       // asynchronous true
        // deployable may influcence integration type
        // integration type: CMD, REST, CENTRAL
        // TODO constraint all action fields must match input/output fieldsM actions must be defined
@@ -265,6 +268,10 @@ project Services {
        String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
        setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
        NonEmptyString path;
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "RTSA AI service@EN",
+           manufacturer = refBy(manufacturer_rapidminer)
+       };
        // TODO constraint: flat input/output, not hierarchical
    }
    

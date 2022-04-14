@@ -4,10 +4,14 @@ project Nameplate {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
+    compound NameplateInfo {
+        String manufacturerProductDesignation = "";
+        refTo(Manufacturer) manufacturer;
+    }
+    
     // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
     compound Manufacturer {
         String manufacturerName = "";
-        String manufacturerProductDesignation = "";
         ManufacturerAddress address; // ref really needed?
     }
     
@@ -18,5 +22,40 @@ project Nameplate {
         String zipCode = "";
         String cityTown = "";
     }
+    
+    Manufacturer manufacturer_sse = {
+        manufacturerName = "Universitaet Hildesheim@DE",
+        address = {
+            department = "Software Systems Engineering@DE",
+            street = "Universitaetsplatz 1@DE",
+            zipCode = "31141@DE",
+            cityTown = "Hildesheim@DE"
+        }
+    };
+
+    Manufacturer manufacturer_rapidminer = {
+        manufacturerName = "RapidMiner Germany@DE",
+        address = {
+            department = "RapidMiner GmbH@DE",
+            street = "Westfalendamm 87@DE",
+            zipCode = "44141@DE",
+            cityTown = "Dortmund@DE"
+        }
+    };
+    
+    Manufacturer manufacturer_kiprotect = {
+        manufacturerName = "KIPROTECT@DE",
+        address = {
+            department = "KIPROTECT@DE",
+            street = "Bismarckstr. 10-12@DE",
+            zipCode = "10625@DE",
+            cityTown = "Berlin@DE"
+        }
+    };
         
+    // unconditional for all IIP vendors
+    freeze {
+      .;
+    };
+    
 }
