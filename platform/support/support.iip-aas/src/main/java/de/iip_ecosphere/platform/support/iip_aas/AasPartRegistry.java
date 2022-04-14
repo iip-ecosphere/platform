@@ -312,42 +312,16 @@ public class AasPartRegistry {
     public static void setAasSupplier(Supplier<List<Aas>> supplier) {
         aasSupplier = supplier;
     }
+
+    /**
+     * Returns the AAS setup.
+     * 
+     * @return the setup
+     */
+    public static AasSetup getSetup() {
+        return setup;
+    }
     
-    /**
-     * Defines the AAS endpoint.
-     * 
-     * @param endpoint the registry endpoint 
-     * @return the endpoint before this call
-     * @deprecated use {@link #setAasSetup(AasSetup)} instead
-     */
-    @Deprecated
-    public static Endpoint setAasEndpoint(Endpoint endpoint) {
-        Endpoint aas = setup.getServerEndpoint();
-        Endpoint reg = setup.getRegistryEndpoint();
-        
-        Endpoint old = new Endpoint(aas.getSchema(), aas.getHost(), aas.getPort(), reg.getEndpoint());
-        setup.setServer(new EndpointHolder(endpoint.getSchema(), endpoint.getHost(), endpoint.getPort(), 
-            DEFAULT_AAS_ENDPOINT));
-        setup.setRegistry(new EndpointHolder(endpoint.getSchema(), endpoint.getHost(), endpoint.getPort(), 
-            endpoint.getEndpoint()));
-        return old;
-    }
-
-    /**
-     * Defines the operation/property implementation protocol address.
-     * 
-     * @param address the address
-     * @return the address before this call
-     * @deprecated use {@link #setAasSetup(AasSetup)} instead
-     */
-    @Deprecated
-    public static ServerAddress setProtocolAddress(ServerAddress address) {
-        ServerAddress old = setup.getImplementationServer();
-        setup.setImplementation(new ProtocolAddressHolder(address.getSchema(), address.getHost(), address.getPort(), 
-            DEFAULT_PROTOCOL));
-        return old;
-    }
-
     /**
      * Defines the AAS setup.
      * 
@@ -545,7 +519,19 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveIipAas() throws IOException {
-        return retrieveAas(setup, URN_AAS);
+        return retrieveAas(URN_AAS);
+    }
+
+    /**
+     * Obtains an AAS instance via the setup in this class. Be careful with the returned instance, as if
+     * the AAS is modified in the mean time, you may hold an outdated instance.
+     * 
+     * @param urn the URN of the AAS
+     * @return the platform AAS (may be <b>null</b> for none)
+     * @throws IOException if the AAS cannot be read due to connection errors
+     */
+    public static Aas retrieveAas(String urn) throws IOException {
+        return retrieveAas(setup, urn);
     }
 
     /**
