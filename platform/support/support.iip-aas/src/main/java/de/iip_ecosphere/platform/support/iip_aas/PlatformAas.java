@@ -41,12 +41,14 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 public class PlatformAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "platform";
+    public static final String SUBMODEL_NAMEPLATE = "Nameplate"; // the software "Nameplate"
     public static final String NAME_PROPERTY_NAME = "name";
     public static final String NAME_PROPERTY_VERSION = "version";
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
     public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
     public static final String NAME_PROPERTY_ID = "Id";
+    public static final String NAME_PROPERTY_IMAGE = "Image";
     public static final String NAME_PROPERTY_MANUFACTURER_NAME = "ManufacturerName";
     public static final String NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION = "ManufacturerProductDesignation";
     public static final String NAME_SMC_ADDRESS = "Address";
@@ -120,6 +122,9 @@ public class PlatformAas implements AasContributor {
                 .setValue(Type.STRING, appSetup.getId())
                 .build();
         }
+        smBuilder.createPropertyBuilder(NAME_PROPERTY_IMAGE)
+            .setValue(Type.STRING, appSetup.getImage())
+            .build();
         smBuilder.createPropertyBuilder(NAME_PROPERTY_NAME)
             .setValue(Type.STRING, appSetup.getName())
             .build();

@@ -49,6 +49,18 @@ public class ApplicationSetup {
          */
         public Address() {
         }
+        
+        /**
+         * Copy constructor.
+         * 
+         * @param addr the address to copy from
+         */
+        public Address(Address addr) {
+            this.department = addr.department;
+            this.cityTown = addr.cityTown;
+            this.zipCode = addr.zipCode;
+            this.cityTown = addr.cityTown;
+        }
 
         /**
          * Returns the department.
@@ -138,6 +150,11 @@ public class ApplicationSetup {
     public ApplicationSetup(ApplicationSetup setup) {
         this.id = setup.id;
         this.name = setup.name;
+        this.address = new Address(setup.address);
+        this.description = setup.description;
+        this.image = setup.image;
+        this.manufacturerName = setup.manufacturerName;
+        this.manufacturerProductDesignation = setup.manufacturerProductDesignation;
     }
 
     /**

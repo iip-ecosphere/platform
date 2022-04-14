@@ -121,6 +121,24 @@ public class AasPartRegistry {
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
         
         private AasMode mode = AasMode.REMOTE_DEPLOY;
+
+        /**
+         * Default constructor.
+         */
+        public AasSetup() {
+        }
+
+        /**
+         * Copy constructor.
+         * 
+         * @param setup the setup to copy from
+         */
+        public AasSetup(AasSetup setup) {
+            this.server = setup.server;
+            this.registry = setup.registry;
+            this.implementation = setup.implementation;
+            this.mode = setup.mode;
+        }
         
         /**
          * Returns the AAS server information as endpoint.
