@@ -254,7 +254,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def generateAppSetup(ServiceBase service) {
-        ''
+        '\n'
     }
 
     def generateAppSetup(Service service) {
@@ -269,7 +269,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         if (isDefined(app.nameplateInfo) and app.nameplateInfo <> null) {
             generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo);
         } else {
-            ''
+            '\n'
         }
     } 
     
