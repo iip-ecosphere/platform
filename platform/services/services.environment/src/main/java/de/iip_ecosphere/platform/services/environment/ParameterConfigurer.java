@@ -78,6 +78,15 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
     public Supplier<T> getGetter() {
         return getter;
     }
+    
+    /**
+     * Returns the name of the parameter.
+     * 
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * Adds the string representation of {@code value} to {@code values} in terms of the parameter represented by this 

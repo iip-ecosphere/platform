@@ -223,7 +223,7 @@ public class TraceToAasServiceTest {
 
         Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), service.getAasUrn());
         Assert.assertNotNull(aas);
-        Submodel submodel = aas.getSubmodel(TraceToAasService.SUBMODEL_NAMEPLATE);
+        Submodel submodel = aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE);
         Assert.assertNotNull(submodel);
         Property prop = submodel.getProperty(PlatformAas.NAME_PROPERTY_ID);
         Assert.assertNotNull(prop);

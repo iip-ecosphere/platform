@@ -29,12 +29,14 @@ import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ParameterConfigurer;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
+import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -67,8 +69,8 @@ public class TraceToAasService extends AbstractService {
     public static final String VERSION = "0.1.0";
     
     public static final String SUBMODEL_TRACES = "Traces";
-    public static final String SUBMODEL_NAMEPLATE = "Nameplate"; // the app "Nameplate"
     public static final String SUBMODEL_COMMANDS = "Commands"; // commands from extern towards platform
+    public static final String SUBMODEL_SERVICES = "Services";
     public static final String PROPERTY_SOURCE = "Source";
     public static final String PROPERTY_ACTION = "Action";
     public static final String PROPERTY_TIMESTAMP = "Timestamp";
@@ -84,6 +86,7 @@ public class TraceToAasService extends AbstractService {
     private Map<Class<?>, TypeConverter> converters = new HashMap<>();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
+    private YamlArtifact artifact;
     private long timeout = 60 * 60 * 1000; // cleanup after 1 hour
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000;
@@ -120,8 +123,31 @@ public class TraceToAasService extends AbstractService {
         this.converters.putAll(DEFAULT_CONVERTERS);
         this.appSetup = new ApplicationSetup(app); // prevent later changes in app
         // parameter must be declared in this form in model!
-        paramConfigurers.put("timeout", new ParameterConfigurer<>(
+        addParameterConfigurer(new ParameterConfigurer<>(
             "timeout", Long.class, TypeTranslators.LONG, t -> timeout = t));
+    }
+
+    /**
+     * Creates a service instance.
+     *
+     * @param artifact static information about the artifact this service is member of
+     * @param serviceId the id of the service
+     */
+    public TraceToAasService(YamlArtifact artifact, String serviceId) {
+        this(artifact.getApplication(), artifact.getService(serviceId));
+        this.artifact = artifact;
+    }
+
+    /**
+     * Adds a parameter configurer.
+     * 
+     * @param <T> the type of the parameter
+     * @param configurer the configurer instance, ignored if <b>null</b>
+     */
+    protected <T> void addParameterConfigurer(ParameterConfigurer<T> configurer) {
+        if (null != configurer) {
+            paramConfigurers.put(configurer.getName(), configurer);
+        }
     }
     
     /**
@@ -356,15 +382,17 @@ public class TraceToAasService extends AbstractService {
             try {
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
+                SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(PlatformAas.SUBMODEL_NAMEPLATE, null);
                 PlatformAas.createNameplate(smBuilder, appSetup);
                 augmentNameplateSubmodel(smBuilder);
                 smBuilder.build();
                 smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
                 augmentCommandsSubmodel(smBuilder);
                 smBuilder.build();                
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null);
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+                augmentServicesSubmodel(smBuilder);
                 smBuilder.build();
+                aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null).build();
                 List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
                 AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
                 callback = new TraceRecordReceptionCallback();
@@ -389,7 +417,7 @@ public class TraceToAasService extends AbstractService {
                 // unclear how to get rid of AAS itself
                 Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
                 aas.delete(aas.getSubmodel(SUBMODEL_TRACES));
-                aas.delete(aas.getSubmodel(SUBMODEL_NAMEPLATE));
+                aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
                 aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
             } catch (IOException e ) {
                 LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
@@ -400,6 +428,31 @@ public class TraceToAasService extends AbstractService {
         default:
             super.setState(state);
             break;
+        }
+    }
+
+    /**
+     * Adds elements to the services submodel if available.
+     * 
+     * @param smBuilder the submodel builder
+     */
+    private void augmentServicesSubmodel(SubmodelBuilder smBuilder) {
+        if (null != artifact) {
+            AasFactory factory = AasFactory.getInstance();
+            try {
+                Registry reg = factory.obtainRegistry(Starter.getSetup().getAas().getRegistryEndpoint());
+                for (YamlService s : artifact.getServices()) {
+                    String ep = reg.getEndpoint(AasUtils.fixId("service_" + s.getId()));
+                    if (null == ep) {
+                        ep = "";
+                    }
+                    smBuilder.createPropertyBuilder(AasUtils.fixId(s.getId()))
+                        .setValue(Type.STRING, ep)
+                        .build();
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Building services submodel: {}", e.getMessage());
+            }
         }
     }
 
