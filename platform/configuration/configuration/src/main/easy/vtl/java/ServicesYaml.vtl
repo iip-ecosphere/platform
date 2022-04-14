@@ -11,6 +11,8 @@ template ServicesYaml(Configuration config, FileArtifact target) {
         for (Service s: services) {
             if (isDefined(s.nameplateInfo) and s.nameplateInfo <> null) {
                 '${generateNameplateInfoSetup(s.nameplateInfo, "- ", 2)|e}'
+            } else {
+                ''
             }
         }
     }

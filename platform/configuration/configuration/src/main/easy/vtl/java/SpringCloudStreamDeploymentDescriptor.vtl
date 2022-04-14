@@ -259,7 +259,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
 
     def generateAppSetup(Service service) {
         if (isDefined(service.nameplateInfo) and service.nameplateInfo <> null) {
-            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo);
+            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo, indent=2);
         } else {
             ''
         }
@@ -273,12 +273,12 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         }
     } 
     
-    def generateAppSetup(String id, String name, String ver, NameplateInfo p) {
+    def generateAppSetup(String id, String name, String ver, NameplateInfo p, String prefix = "", Integer indent = 0) {
         'application:
           id: ${id}
           name: ${name}
           version: ${ver}
-          ${generateNameplateInfoSetup(p, "", 2)|e}'
+          ${generateNameplateInfoSetup(p, prefix, indent)|e}'
     }
     
     def generateNameplateInfoSetup(NameplateInfo p, String prefix, Integer indent) {
