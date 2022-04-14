@@ -17,6 +17,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -27,9 +28,11 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
@@ -95,6 +98,8 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_FROM = "from";
     public static final String NAME_PROP_TO = "to";
     public static final String NAME_PROP_ARTIFACT = "artifact";
+    public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
+    public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
@@ -350,6 +355,27 @@ public class ServicesAas implements AasContributor {
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
             .setValue(Type.STRING, Id.getDeviceIdAas())
+            .build();
+        Registry reg = null;
+        try {
+            reg = AasFactory.getInstance().obtainRegistry(ServiceFactory.getAasSetup().getRegistryEndpoint());
+        } catch (IOException e) {
+            LoggerFactory.getLogger(ServicesAas.class).error("Obtaining AAS registry: {}. No AAS linking possible.", 
+                e.getMessage());
+        }
+        String ep = null == reg ? null : reg.getEndpoint(AasUtils.fixId("service_" + desc.getId()));
+        if (null == ep) {
+            ep = "";
+        }
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_SERVICE_AAS)
+            .setValue(Type.STRING, ep)
+            .build();
+        ep = null == reg ? null : reg.getEndpoint(AasUtils.fixId("device_" + Id.getDeviceIdAas()));
+        if (null == ep) {
+            ep = "";
+        }
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_DEVICE_AAS)
+            .setValue(Type.STRING, ep)
             .build();
         
         addTypedData(descriptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
