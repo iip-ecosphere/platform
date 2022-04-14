@@ -358,7 +358,7 @@ public class ServicesAas implements AasContributor {
             .build();
         Registry reg = null;
         try {
-            reg = AasFactory.getInstance().obtainRegistry(ServiceFactory.getAasSetup().getRegistryEndpoint());
+            reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup().getRegistryEndpoint());
         } catch (IOException e) {
             LoggerFactory.getLogger(ServicesAas.class).error("Obtaining AAS registry: {}. No AAS linking possible.", 
                 e.getMessage());

@@ -90,7 +90,10 @@ public class ServicesAasTest {
     public void testAas() throws IOException, ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
-        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        AasSetup newSetup = AasSetup.createLocalEphemeralSetup();
+        System.out.println("Registry: " + newSetup.getRegistryEndpoint().toUri());
+        System.out.println("Servier: " + newSetup.getServerEndpoint().toUri());
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(newSetup);
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof ServicesAas);
         
         // active AAS require two server instances and a deployment
@@ -99,7 +102,6 @@ public class ServicesAasTest {
         Server aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
-        
         ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
         test(client);
         
