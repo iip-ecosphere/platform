@@ -35,4 +35,6 @@ echo "Test started $pidTest"
 sleep 30 && pkill -P "$pidTest" && kill "$pidTest"
 pkill -P "$pidBroker" && kill "$pidBroker"
 
-grep -Fxq "RECEIVED" log
+echo "Testing for RECEIVED in log"
+
+grep -Fq "RECEIVED" log
