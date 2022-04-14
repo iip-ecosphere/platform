@@ -12,7 +12,7 @@ This example currently contains two parts:
     * Compile the project with `mvn compile`
     * Run the generated connector with `mvn exec:java`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
-* A hand-crafted connector for comparison: `mvn exec:java -Dexec.mainClass="de.iip_ecosphere.platform.examples.vdw.ManualConnector"` 
+* A hand-crafted connector for comparison: `mvn exec:java -Dmain.class="de.iip_ecosphere.platform.examples.vdw.ManualConnector"`
 
 Shortcuts for Eclipse: 
   * Run `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 

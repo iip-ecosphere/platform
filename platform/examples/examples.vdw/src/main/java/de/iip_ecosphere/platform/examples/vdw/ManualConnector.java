@@ -65,7 +65,8 @@ public class ManualConnector {
         connector.connect(param);
         connector.request(true);
         TimeUtils.sleep(20000); // model monitoring shall trigger further output
-        connector.disconnect();        
+        connector.disconnect();    
+        System.exit(0);
     }
     
 }

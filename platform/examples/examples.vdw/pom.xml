@@ -60,6 +60,9 @@
     </dependency>
   </dependencies>
 
+  <properties>
+        <main.class>de.iip_ecosphere.platform.examples.vdw.GeneratedConnector</main.class>
+  </properties>
 
   <build>
     <plugins>
@@ -98,7 +101,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
-                <mainClass>de.iip_ecosphere.platform.examples.vdw.GeneratedConnector</mainClass>
+                <mainClass>${main.class}</mainClass>
             </configuration>
         </plugin>
     </plugins>
