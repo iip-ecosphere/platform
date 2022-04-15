@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.platform;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 
+import java.util.Map;
+
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -24,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 
 /**
@@ -36,6 +39,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_SUBMODEL = "Artifacts";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
+    public static final String NAME_COLL_KNOWN_SERVICES = "KnownServices";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_URI = "uri";
@@ -46,8 +50,16 @@ public class PlatformAas implements AasContributor {
 
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER, false, false).build();
-
+        SubmodelElementCollectionBuilder b = smB.createSubmodelElementCollectionBuilder(
+            NAME_COLL_KNOWN_SERVICES, false, false);
+        for (Map.Entry<String, String> ep : ServiceAas.createAas().entrySet()) {
+            b.createPropertyBuilder(AasUtils.fixId(ep.getKey()))
+                .setValue(Type.STRING, ep.getValue())
+                .build();
+        }
+        b.build();
         smB.build();
+        
         return null;
     }
 

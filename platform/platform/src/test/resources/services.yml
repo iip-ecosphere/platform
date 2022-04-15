@@ -1,0 +1,19 @@
+services:
+  - id: service-1
+    name: Service 1
+    manufacturerName: Universitaet Hildesheim@DE
+    manufacturerProductDesignation: IIP-Ecosphere plattform test service 1@DE
+    address:
+      department: Software Systems Engineering@DE
+      street: Universitaetsplatz 1@DE
+      zipCode: 31141@DE
+      cityTown: Hildesheim@DE
+  - id: service-2
+    name: Service 2
+    manufacturerName: Universitaet Hannover@DE
+    manufacturerProductDesignation: IIP-Ecosphere plattform test service 2@DE
+    address:
+      department: L3S@DE
+      street: Appelstraße 9a@DE
+      zipCode: 30167@DE
+      cityTown: Hannover@DE

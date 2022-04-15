@@ -42,6 +42,25 @@ public class PersistentAasSetup extends AasSetup {
     }
     
     /**
+     * Creates a setup from a given AAS setup with default persistence type.
+     * 
+     * @param setup the setup
+     */
+    public PersistentAasSetup(AasSetup setup) {
+        super(setup);
+    }
+
+    /**
+     * Copy constructor.
+     * 
+     * @param setup the instance to copy from
+     */
+    public PersistentAasSetup(PersistentAasSetup setup) {
+        super(setup);
+        this.persistence = setup.persistence;
+    }
+
+    /**
      * Returns the persistence type.
      * 
      * @return the persistence type
