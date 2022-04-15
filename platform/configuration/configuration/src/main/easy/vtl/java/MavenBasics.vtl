@@ -362,8 +362,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
     } 
 
     def XmlElement appendMavenResourcesCopyResources(XmlElement plugins, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String ver="3.2.0", String phase="validate") {
-        XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
-        XmlElement execs = appendExecutions(plugin);
+        XmlElement plugin = appendMavenResourcesPlugin(plugins, ver);
+        XmlElement execs = appendExecutionsParent(plugin);
         appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", outputDirectory, resourceDirectory, files, phase=phase);
         execs;
     }

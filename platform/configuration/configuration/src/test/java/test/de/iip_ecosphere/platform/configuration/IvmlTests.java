@@ -185,11 +185,11 @@ public class IvmlTests {
         //File srcMainAssembly = new File(srcMain, "assembly");
         File srcMainJavaIip = new File(srcMainJava, "iip");
 
-        assertJavaNode(srcMainJavaIip, "MyAnonymizerExample");
-        assertJavaNode(srcMainJavaIip, "MyKiExample");
-        assertJavaNode(srcMainJavaIip, "MyMqttConnExample");
-        assertJavaNode(srcMainJavaIip, "MyOpcConnExample");
-        assertJavaNode(srcMainJavaIip, "MySourceExample");
+        assertJavaNode(srcMainJavaIip, "MyAnonymizerExample", false);
+        assertJavaNode(srcMainJavaIip, "MyKiExample", false);
+        assertJavaNode(srcMainJavaIip, "MyMqttConnExample", true);
+        assertJavaNode(srcMainJavaIip, "MyOpcConnExample", true);
+        assertJavaNode(srcMainJavaIip, "MySourceExample", false);
         
         assertFile(srcMainResources, "application.yml");
         assertDeploymentYaml(srcMainResources, "deployment.yml");
@@ -216,11 +216,11 @@ public class IvmlTests {
         assertJavaDatatype(srcMainJavaIip, "MyConnMachineIn");
         assertJavaDatatype(srcMainJavaIip, "MyConnMachineOut");
 
-        assertJavaInterface(srcMainJavaIip, "MyAnonymizerExample", old);
-        assertJavaInterface(srcMainJavaIip, "MyKiExample", old);
-        assertJavaInterface(srcMainJavaIip, "MyMqttConnExample", old);
-        assertJavaInterface(srcMainJavaIip, "MyOpcConnExample", old);
-        assertJavaInterface(srcMainJavaIip, "MySourceExample", old);
+        assertJavaInterface(srcMainJavaIip, "MyAnonymizerExample", old, false);
+        assertJavaInterface(srcMainJavaIip, "MyKiExample", old, false);
+        assertJavaInterface(srcMainJavaIip, "MyMqttConnExample", old, true);
+        assertJavaInterface(srcMainJavaIip, "MyOpcConnExample", old, true);
+        assertJavaInterface(srcMainJavaIip, "MySourceExample", old, false);
         
         assertPythonDatatype(srcMainPython, "Rec1");
         if (!old) {
@@ -290,10 +290,13 @@ public class IvmlTests {
      * @param folder the basic source folder including base package
      * @param name the name of the service (as identifier)
      * @param old old (separated) or new shared interface style
+     * @param connector whether the node is a connector
      */
-    private void assertJavaInterface(File folder, String name, boolean old) {
-        String add = old ? "Service" : "Interface";
-        assertFile(new File(folder, "interfaces"), name + add + ".java");
+    private void assertJavaInterface(File folder, String name, boolean old, boolean connector) {
+        if (!connector) {
+            String add = old ? "Service" : "Interface";
+            assertFile(new File(folder, "interfaces"), name + add + ".java");
+        }
     }
     
     /**
@@ -301,10 +304,13 @@ public class IvmlTests {
      * 
      * @param folder the basic source folder including base package
      * @param name the name of the service (as identifier)
+     * @param connector whether the node is a connector
      */
-    private void assertJavaNode(File folder, String name) {
+    private void assertJavaNode(File folder, String name, boolean connector) {
         assertFile(new File(folder, "nodes"), name + ".java");
-        assertFile(new File(folder, "stubs"), name + "Stub.java");
+        if (!connector) {
+            assertFile(new File(folder, "stubs"), name + "Stub.java");
+        }
     }
 
     /**

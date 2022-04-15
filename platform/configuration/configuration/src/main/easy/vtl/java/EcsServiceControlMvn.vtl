@@ -1,3 +1,4 @@
+import Basics;
 import MavenBasics;
 import JavaMapping;
 
@@ -30,6 +31,8 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
         appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
+        sequenceOf(String) files = {"*.yml"};
+        appendMavenResourcesCopyResources(plugins, "\\${project.build.outputDirectory}", getResourcesFolder()+"/devices", files);
     }
 
 }

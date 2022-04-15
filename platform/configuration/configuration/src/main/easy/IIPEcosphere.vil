@@ -197,11 +197,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     }
 
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, Connector conn) = {
-        generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+        //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
     }
 
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ChannelConnector conn) = {
-        generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+        //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
         IIPEcosphere cfg = config;
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
