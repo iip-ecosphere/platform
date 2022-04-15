@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
     BasicContainerDescriptorTest.class,
     ConfigurationTest.class,
     ContainerManagerTest.class,
-    EcsAasTest.class
+    EcsAasTest.class,
+    SelfDeviceAasProviderTest.class
 })
 public class AllTests {
 }

@@ -24,6 +24,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.ContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
@@ -48,9 +49,12 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
@@ -84,6 +88,7 @@ public class EcsAasTest {
         qpid = new TestQpidServer(broker);
         EcsFactory.getSetup().getTransport().setPort(broker.getPort());
         qpid.start();
+        Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
     }
     
     /**
@@ -92,6 +97,7 @@ public class EcsAasTest {
     @AfterClass
     public static void shutdown() {
         qpid.stop(true);
+        Transport.setTransportSetup(null);
     }
     
     /**
@@ -107,14 +113,27 @@ public class EcsAasTest {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(EcsAas.class));
         
         EcsAas.enable();
-        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(null, false));
+        // like in an usual platform - platform server goes first
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Endpoint regEndpoint = AasPartRegistry.getSetup().getRegistryEndpoint();
+        PersistenceType pType = LocalPersistenceType.INMEMORY;
+        LoggerFactory.getLogger(SelfDeviceAasProviderTest.class).info(
+            "Starting " + pType + " AAS registry on " + regEndpoint.toUri());
+        Server registryServer = rcp.createRegistryServer(regEndpoint, pType);
+        registryServer.start();
+        Endpoint serverEndpoint = AasPartRegistry.getSetup().getServerEndpoint();
+        LoggerFactory.getLogger(SelfDeviceAasProviderTest.class).info(
+            "Starting " + pType + " AAS server on " + serverEndpoint.toUri());
+        Server aasServer = rcp.createAasServer(serverEndpoint, pType, regEndpoint);
+        aasServer.start();
+        
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof EcsAas);
         
         // active AAS require two server instances and a deployment
         Server implServer = res.getProtocolServerBuilder().build();
         implServer.start();
-        Server aasServer = AasPartRegistry.deploy(res.getAas()); 
-        aasServer.start();
+        AasPartRegistry.remoteDeploy(res.getAas()); 
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
         EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());

@@ -66,6 +66,7 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_RESOURCE = "resource";
     public static final String NAME_PROP_RUNTIME_NAME = "runtimeName";
     public static final String NAME_PROP_RUNTIME_VERSION = "runtimeVersion";
+    public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     
     public static final String NAME_PROP_OPERATING_SYSTEM = "OS"; // IDTA
     public static final String NAME_PROP_CPU_ARCHITECTURE = "CPU_Architecture"; // IDTA
@@ -123,6 +124,9 @@ public class EcsAas implements AasContributor {
             .build();
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
             .setValue(Type.INTEGER, 1)
+            .build();
+        jB.createPropertyBuilder(NAME_PROP_DEVICE_AAS)
+            .setValue(Type.STRING, DeviceAasProvider.getInstance().getDeviceAasAddress())
             .build();
         jB.createOperationBuilder(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)))
