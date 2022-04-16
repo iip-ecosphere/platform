@@ -532,9 +532,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
         vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat");
-        Path c = "${brokerRoot}/extensions";
+        Path c = "${brokerRoot}/src/test";
         c.mkdir();
-        vilTemplateProcessor("MqttConf", config, "config.xml");
+        vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
+        c = "${c}/extensions";
+        c.mkdir();
         maven("${brokerRoot}", true);
     }
     

@@ -1,10 +1,12 @@
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MqttLinux(Configuration config, FileArtifact target) {
+template MqttLinux(IIPEcosphere config, FileArtifact target) {
 	
-    def main(Configuration config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = config.transportProtocol.port;
         '#!/bin/bash
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer \\$*'
+        echo "This Broker requires at least Java 11!"
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port} \\$*'
     }
 	
 }

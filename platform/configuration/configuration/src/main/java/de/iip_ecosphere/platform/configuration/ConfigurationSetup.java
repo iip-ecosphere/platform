@@ -104,7 +104,7 @@ public class ConfigurationSetup extends AbstractSetup {
             try {
                 instance = readFromYaml(ConfigurationSetup.class);
             } catch (IOException e) {
-                LoggerFactory.getLogger(ConfigurationSetup.class).error(e.getMessage(), e);
+                LoggerFactory.getLogger(ConfigurationSetup.class).warn("Fallback to default config: " + e.getMessage());
                 instance = new ConfigurationSetup();
             }
         }

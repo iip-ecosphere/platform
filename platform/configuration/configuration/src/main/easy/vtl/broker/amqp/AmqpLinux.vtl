@@ -1,10 +1,11 @@
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AmqpLinux(Configuration config, FileArtifact target) {
+template AmqpLinux(IIPEcosphere config, FileArtifact target) {
 	
-    def main(Configuration config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = config.transportProtocol.port;
         '#!/bin/bash
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer \\$*'
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port} \\$*'
     }
 	
 }
