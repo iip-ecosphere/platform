@@ -1,6 +1,5 @@
 project Devices {
 
-    import Services;
     import MetaConcepts;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;

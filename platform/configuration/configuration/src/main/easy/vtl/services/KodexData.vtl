@@ -10,7 +10,7 @@ template KodexData(Configuration config, FileArtifact target, MeshElement elt) {
 
     def main(Configuration config, FileArtifact target, MeshElement elt) {
         '# actions and forms for ${elt.name}
-        $include:
+        \\$include:
           - actions.yml
           - api.yml
         # sources that we want to read from
