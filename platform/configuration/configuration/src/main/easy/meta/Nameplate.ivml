@@ -5,6 +5,7 @@ project Nameplate {
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
     compound NameplateInfo {
+        String productImage = ""; // URL or local -> resources
         String manufacturerProductDesignation = "";
         refTo(Manufacturer) manufacturer;
     }
@@ -12,6 +13,7 @@ project Nameplate {
     // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
     compound Manufacturer {
         String manufacturerName = "";
+        String manufacturerLogo = ""; // URL or local -> resources
         ManufacturerAddress address; // ref really needed?
     }
     
@@ -24,32 +26,32 @@ project Nameplate {
     }
     
     Manufacturer manufacturer_sse = {
-        manufacturerName = "Universitaet Hildesheim@DE",
+        manufacturerName = "Universitaet Hildesheim@de",
         address = {
-            department = "Software Systems Engineering@DE",
-            street = "Universitaetsplatz 1@DE",
-            zipCode = "31141@DE",
-            cityTown = "Hildesheim@DE"
+            department = "Software Systems Engineering@de",
+            street = "Universitaetsplatz 1@de",
+            zipCode = "31141@de",
+            cityTown = "Hildesheim@de"
         }
     };
 
     Manufacturer manufacturer_rapidminer = {
-        manufacturerName = "RapidMiner Germany@DE",
+        manufacturerName = "RapidMiner Germany@de",
         address = {
-            department = "RapidMiner GmbH@DE",
-            street = "Westfalendamm 87@DE",
-            zipCode = "44141@DE",
-            cityTown = "Dortmund@DE"
+            department = "RapidMiner GmbH@de",
+            street = "Westfalendamm 87@de",
+            zipCode = "44141@de",
+            cityTown = "Dortmund@de"
         }
     };
     
     Manufacturer manufacturer_kiprotect = {
-        manufacturerName = "KIPROTECT@DE",
+        manufacturerName = "KIPROTECT@de",
         address = {
-            department = "KIPROTECT@DE",
-            street = "Bismarckstr. 10-12@DE",
-            zipCode = "10625@DE",
-            cityTown = "Berlin@DE"
+            department = "KIPROTECT@de",
+            street = "Bismarckstr. 10-12@de",
+            zipCode = "10625@de",
+            cityTown = "Berlin@de"
         }
     };
         

@@ -284,7 +284,7 @@ project SerializerConfig1 {
         description = "",
         services = {refBy(myMesh)},
         nameplateInfo = {
-            manufacturerProductDesignation = "IIP-Ecosphere plattform test application@DE",
+            manufacturerProductDesignation = "IIP-Ecosphere plattform test application@de",
             manufacturer = refBy(manufacturer_sse)}
     };
     
