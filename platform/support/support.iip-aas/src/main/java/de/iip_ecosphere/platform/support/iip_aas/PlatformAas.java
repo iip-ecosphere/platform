@@ -41,14 +41,15 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 public class PlatformAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = "platform";
-    public static final String SUBMODEL_NAMEPLATE = "Nameplate"; // the software "Nameplate"
+    public static final String SUBMODEL_NAMEPLATE = "TechnicalData"; // preliminary, the software "Nameplate"
     public static final String NAME_PROPERTY_NAME = "name";
     public static final String NAME_PROPERTY_VERSION = "version";
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
     public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
     public static final String NAME_PROPERTY_ID = "Id";
-    public static final String NAME_PROPERTY_IMAGE = "Image";
+    public static final String NAME_PROPERTY_PRODUCTIMAGE = "ProductImage";
+    public static final String NAME_PROPERTY_MANUFACTURER_LOGO = "ManufacturerLogo";
     public static final String NAME_PROPERTY_MANUFACTURER_NAME = "ManufacturerName";
     public static final String NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION = "ManufacturerProductDesignation";
     public static final String NAME_SMC_ADDRESS = "Address";
@@ -85,23 +86,28 @@ public class PlatformAas implements AasContributor {
             ApplicationSetup setup = new ApplicationSetup();
             setup.setVersion(ver);
             setup.setName("IIP-Ecosphere platform");
-            setup.setManufacturerName("IIP-Ecosphere Consortium@DE");
-            setup.setDescription("The IIP-Ecosphere AI-enabled I4.0 platform.@DE");
+            setup.setManufacturerName("IIP-Ecosphere Consortium@de");
+            setup.setManufacturerLogo("IIP-Ecosphere-Logo.png"); // in software
+            setup.setProductImage("IIP-Ecosphere-Platform.png");
+            setup.setDescription("The IIP-Ecosphere AI-enabled I4.0 platform.@de");
             Address addr = new Address();
-            addr.setDepartment("University of Hildesheim, SSE - Software Systems Engineering@DE");
-            addr.setStreet("Universitätsplatz 1@DE");
-            addr.setZipCode("31141@DE");
-            addr.setCityTown("Hildesheim/Hannover@DE");
+            addr.setDepartment("University of Hildesheim, SSE - Software Systems Engineering@de");
+            addr.setStreet("Universitätsplatz 1@de");
+            addr.setZipCode("31141@de");
+            addr.setCityTown("Hildesheim/Hannover@de");
             setup.setAddress(addr);
             
-            createNameplate(smB, setup);
+            SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup);
+            addSoftwareInfo(smBuilder, setup);
+            smBuilder.build();
+            addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, isRelease)
                 .build();
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
                 .setValue(Type.STRING, buildId)
                 .build();
-            smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS)
+            smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS) // TODO restrict access
                 .addInputVariable("id", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_SNAPSHOTAAS))
                 .build(Type.STRING);
@@ -109,35 +115,50 @@ public class PlatformAas implements AasContributor {
         }
         return null;
     }
+    
+    /**
+     * Add software-related information to the given submodel.
+     * 
+     * @param smB the submodel builder
+     * @param appSetup the application setup
+     */
+    public static void addSoftwareInfo(SubmodelBuilder smB, ApplicationSetup appSetup) {
+        if (null != appSetup.getId()) {
+            smB.createPropertyBuilder(NAME_PROPERTY_ID)
+                .setValue(Type.STRING, appSetup.getId())
+                .build();
+        }
+        smB.createPropertyBuilder(NAME_PROPERTY_NAME)
+            .setValue(Type.STRING, appSetup.getName())
+            .build();
+        smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
+            .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
+            .build();
+    }
 
     /**
      * Creates the "nameplate". A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
      * 
-     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
+     * @param aasBuilder the AAS builder, do not call {@link AasBuilder#build()} in here!
      * @param appSetup application setup
+     * @return submodel builder if something needs to be added
      */
-    public static void createNameplate(SubmodelElementContainerBuilder smBuilder, ApplicationSetup appSetup) {
-        if (null != appSetup.getId()) {
-            smBuilder.createPropertyBuilder(NAME_PROPERTY_ID)
-                .setValue(Type.STRING, appSetup.getId())
-                .build();
-        }
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_IMAGE)
-            .setValue(Type.STRING, appSetup.getImage())
-            .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_NAME)
-            .setValue(Type.STRING, appSetup.getName())
-            .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_VERSION)
-            .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
-            .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
+    public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
+        SubmodelBuilder sBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
+        AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
+            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m).build();
+        });
+        AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
+            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m).build();
+        });
+        sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerName())
             .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
+        sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerProductDesignation())
             .build();
-        createAddress(smBuilder, appSetup.getAddress());
+        createAddress(sBuilder, appSetup.getAddress());
+        return sBuilder;
     }
     
     /**
@@ -146,7 +167,7 @@ public class PlatformAas implements AasContributor {
      * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
      * @param address the address to use
      */
-    protected static void createAddress(SubmodelElementContainerBuilder smBuilder, Address address) {
+    public static void createAddress(SubmodelElementContainerBuilder smBuilder, Address address) {
         if (null != address) {
             SubmodelElementCollectionBuilder aBuilder 
                 = smBuilder.createSubmodelElementCollectionBuilder(NAME_SMC_ADDRESS, false, false);

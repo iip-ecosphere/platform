@@ -28,7 +28,8 @@ public class ApplicationSetup {
     private String description = "";
     private String manufacturerName;
     private String manufacturerProductDesignation;
-    private String image = "";
+    private String productImage = "";
+    private String manufacturerLogo = "";
     private Address address = new Address();
 
     /**
@@ -152,7 +153,8 @@ public class ApplicationSetup {
         this.name = setup.name;
         this.address = new Address(setup.address);
         this.description = setup.description;
-        this.image = setup.image;
+        this.productImage = setup.productImage;
+        this.manufacturerLogo = setup.manufacturerLogo;
         this.manufacturerName = setup.manufacturerName;
         this.manufacturerProductDesignation = setup.manufacturerProductDesignation;
     }
@@ -293,21 +295,39 @@ public class ApplicationSetup {
     }
 
     /**
-     * Returns the optional image.
+     * Returns the optional product image.
      * 
-     * @return the image (serialized image data as string or URI to image)
+     * @return the image (local resolvable name or URI to image)
      */
-    public String getImage() {
-        return image;
+    public String getProductImage() {
+        return productImage;
     }
 
     /**
-     * Changes the optional image.
+     * Changes the optional product image.
      * 
-     * @param image the image (serialized image data as string or URI to image)
+     * @param productImage the image (local resolvable name or URI to image)
      */
-    public void setImage(String image) {
-        this.image = image;
+    public void setProductImage(String productImage) {
+        this.productImage = productImage;
+    }
+
+    /**
+     * Returns the optional manufacturer logo.
+     * 
+     * @return the logo (local resolvable name or URI to image)
+     */
+    public String getManufacturerLogo() {
+        return manufacturerLogo;
+    }
+
+    /**
+     * Defines the optional manufacturer logo.
+     * 
+     * @param manufacturerLogo the logo (local resolvable name or URI to image)
+     */
+    public void setManufacturerLogo(String manufacturerLogo) {
+        this.manufacturerLogo = manufacturerLogo;
     }
 
 }

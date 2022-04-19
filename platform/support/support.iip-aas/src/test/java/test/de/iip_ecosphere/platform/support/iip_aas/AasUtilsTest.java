@@ -97,4 +97,29 @@ public class AasUtilsTest {
         Assert.assertEquals("id", AasUtils.fixId("id"));
     }
 
+    /**
+     * Tests {@link AasUtils#resolveImage(String, de.iip_ecosphere.platform.support.iip_aas.AasUtils.ResourceResolver, 
+     * boolean, de.iip_ecosphere.platform.support.iip_aas.AasUtils.ResourceHandler)}.
+     */
+    @Test
+    public void resolveImageTest() {
+        AasUtils.resolveImage("nix.png", AasUtils.CLASSPATH_RESOLVER, false, 
+            (n, r, m) -> { Assert.fail("Shall not be called. Not resolved."); });
+        AasUtils.resolveImage("nix.png", null, true, 
+            (n, r, m) -> { Assert.assertEquals("", r); });
+        String uri = "https://www.iip-ecosphere.de/wp-content/uploads/2020/08/Picture4.jpg";
+        AasUtils.resolveImage(uri, AasUtils.CLASSPATH_RESOLVER, true, (n, r, m) -> { 
+            Assert.assertEquals("text/x-uri", m);
+            Assert.assertEquals(uri, r); 
+        });
+        AasUtils.resolveImage("IIP-Ecosphere-Platform.png", AasUtils.CLASSPATH_RESOLVER, false, (n, r, m) -> { 
+            Assert.assertTrue(r.length() > 0); 
+            Assert.assertEquals("image/png", m); 
+        });
+        AasUtils.resolveImage("IIP-Ecosphere-Platform.png", AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, (n, r, m) -> { 
+            Assert.assertTrue(r.length() > 0); 
+            Assert.assertEquals("image/png", m); 
+        });
+    }
+
 }

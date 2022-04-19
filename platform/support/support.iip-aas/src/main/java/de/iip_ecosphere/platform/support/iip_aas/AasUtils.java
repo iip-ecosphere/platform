@@ -12,9 +12,18 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
@@ -30,7 +39,32 @@ public class AasUtils {
      * An empty URI for {@link #readUri(Object[], int, URI)}.
      */
     public static final URI EMPTY_URI;
-    
+
+    /**
+     * Resolves a resource from the main classpath.
+     */
+    public static final ResourceResolver CLASSPATH_RESOLVER = 
+        n -> PlatformAas.class.getResourceAsStream(prependSlash(n));
+
+    /**
+     * Resolves a resource from the resources directory in the main classpath.
+     */
+    public static final ResourceResolver CLASSPATH_RESOURCE_RESOLVER = 
+        n -> PlatformAas.class.getResourceAsStream("/resources" + prependSlash(n));
+
+    /**
+     * Prepends a "/" if there is none at the beginning of {@code text}.
+     * 
+     * @param text the text to use as basis
+     * @return test with "/" prepended
+     */
+    public static final String prependSlash(String text) {
+        if (!text.startsWith("/")) {
+            text = "/" + text;
+        }
+        return text;
+    }
+        
     static {
         URI tmp;
         try {
@@ -170,6 +204,91 @@ public class AasUtils {
      */
     public static String writeMap(Map<String, String> map) {
         return JsonUtils.toJson(map);
+    }
+    
+    /**
+     * Resolves resources.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ResourceResolver {
+        
+        /**
+         * Resolves a resource to an input stream.
+         * 
+         * @param resource the name of the resource
+         * @return the related input stream, may be <b>null</b> for none
+         */
+        public InputStream resolve(String resource);
+        
+    }
+    
+    /**
+     * Handles a resolved resource.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ResourceHandler {
+
+        /**
+         * Handle the resource. All arguments could be empty if there is no resolution result but the 
+         * handler shall be called always.
+         * 
+         * @param name the name of the resource
+         * @param resolved the resolved file contents/URI
+         * @param mimeType the mime type
+         */
+        public void handle(String name, String resolved, String mimeType);
+        
+    }
+
+    /**
+     * Resolves an image from a nameplate/application JAML file. May call {@link #upload(File, String)}
+     * to upload the file to the AAS server.
+     * 
+     * @param image the image as URL or as local resource name (may be <b>null</b> or empty)
+     * @param resolver the resolver to use, {@link #CLASSPATH_RESOURCE_RESOLVER} used as default
+     * @param handleAlways whether the handler shall also be called for an empty/no resolution result
+     * @param handler handles the resolved resource
+     */
+    public static void resolveImage(String image, ResourceResolver resolver, boolean handleAlways, 
+        ResourceHandler handler) {
+        boolean resolved = false;
+        if (null == resolver) {
+            resolver = CLASSPATH_RESOURCE_RESOLVER;
+        }
+        if (null != image && image.length() > 0) {
+            try {
+                String fName = de.iip_ecosphere.platform.support.FileUtils.sanitizeFileName(image);
+                File f = new File(FileUtils.getTempDirectory(), fName);
+                f.deleteOnExit();
+                InputStream is = resolver.resolve(image);
+                if (null != is) {
+                    FileUtils.copyInputStreamToFile(is, f); // closes is
+                    String contents = de.iip_ecosphere.platform.support.FileUtils.fileToBase64(f);
+                    String mimeType = Files.probeContentType(f.toPath());
+                    handler.handle(fName, contents, mimeType);
+                    resolved = true;
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(PlatformAas.class).error("Cannot resolve image '{}': {}", 
+                    image, e.getMessage());
+            }
+            if (!resolved) {
+                try {
+                    URL url = new URL(image);
+                    if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
+                        handler.handle(url.getFile(), url.toString(), "text/x-uri");
+                        resolved = true;
+                    }
+                } catch (MalformedURLException e) {
+                    // ok, we will go on below
+                }
+            }
+        }
+        if (!resolved && handleAlways) {
+            handler.handle("", "", "");
+        }
     }
 
 }
