@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.ecsRuntime;
 
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 
 /**
  * Describes static information about a device in the style of an ZVEI Digital Nameplate for industrial equipment V1.0.
@@ -26,113 +27,9 @@ public class NameplateSetup {
     private String manufacturerName;
     private String manufacturerProductDesignation;
     // TODO complete me
-    private String image = "";
-    private Address address = new Address();
-
-    /**
-     * Represents part of an address. 
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class Address {
-        
-        private String department = "";
-        private String street = "";
-        private String zipCode = "";
-        // TODO complete me
-        private String cityTown = "";
-
-        /**
-         * Creates an address instance. [snakeyaml]
-         */
-        public Address() {
-        }
-        
-        /**
-         * Copy constructor.
-         * 
-         * @param addr the address to copy from
-         */
-        public Address(Address addr) {
-            this.department = addr.department;
-            this.cityTown = addr.cityTown;
-            this.zipCode = addr.zipCode;
-            this.cityTown = addr.cityTown;
-        }        
-
-        /**
-         * Returns the department.
-         * 
-         * @return the department
-         */
-        public String getDepartment() {
-            return department;
-        }
-
-        /**
-         * Changes the department. [snakeyaml]
-         * 
-         * @param department the department
-         */
-        public void setDepartment(String department) {
-            this.department = department;
-        }
-
-        /**
-         * Returns the street.
-         * 
-         * @return the street
-         */
-        public String getStreet() {
-            return street;
-        }
-
-        /**
-         * Changes the street. [snakeyaml]
-         * 
-         * @param street the street
-         */
-        public void setStreet(String street) {
-            this.street = street;
-        }
-
-        /**
-         * Returns the ZIP code.
-         * 
-         * @return the ZIP code
-         */
-        public String getZipCode() {
-            return zipCode;
-        }
-
-        /**
-         * Changes the ZIP code. [snakeyaml]
-         * 
-         * @param zipCode the ZIP code
-         */
-        public void setZipCode(String zipCode) {
-            this.zipCode = zipCode;
-        }
-
-        /**
-         * Returns the city/town.
-         * 
-         * @return the city/town
-         */
-        public String getCityTown() {
-            return cityTown;
-        }
-
-        /**
-         * Changes the city/town. [snakeyaml]
-         * 
-         * @param cityTown the city/town
-         */
-        public void setCityTown(String cityTown) {
-            this.cityTown = cityTown;
-        }
-        
-    }
+    private String productImage = "";
+    private String manufacturerLogo = "";
+    private Address address = new Address(); // not official
     
     /**
      * For snakeyaml.
@@ -147,7 +44,8 @@ public class NameplateSetup {
      */
     public NameplateSetup(NameplateSetup setup) {
         this.address = new Address(setup.address);
-        this.image = setup.image;
+        this.productImage = setup.productImage;
+        this.manufacturerLogo = setup.manufacturerLogo;
         this.manufacturerName = setup.manufacturerName;
         this.manufacturerProductDesignation = setup.manufacturerProductDesignation;
     }
@@ -207,21 +105,39 @@ public class NameplateSetup {
     }
 
     /**
-     * Returns the optional image.
+     * Returns the optional product image.
      * 
-     * @return the image (serialized image data as string or URI to image)
+     * @return the image (local resolvable name or URI to image)
      */
-    public String getImage() {
-        return image;
+    public String getProductImage() {
+        return productImage;
     }
 
     /**
-     * Changes the optional image.
+     * Changes the optional product image.
      * 
-     * @param image the image (serialized image data as string or URI to image)
+     * @param productImage the image (local resolvable name or URI to image)
      */
-    public void setImage(String image) {
-        this.image = image;
+    public void setProductImage(String productImage) {
+        this.productImage = productImage;
+    }
+
+    /**
+     * Returns the optional manufacturer logo.
+     * 
+     * @return the logo (local resolvable name or URI to image)
+     */
+    public String getManufacturerLogo() {
+        return manufacturerLogo;
+    }
+
+    /**
+     * Defines the optional manufacturer logo.
+     * 
+     * @param manufacturerLogo the logo (local resolvable name or URI to image)
+     */
+    public void setManufacturerLogo(String manufacturerLogo) {
+        this.manufacturerLogo = manufacturerLogo;
     }
     
     // complete

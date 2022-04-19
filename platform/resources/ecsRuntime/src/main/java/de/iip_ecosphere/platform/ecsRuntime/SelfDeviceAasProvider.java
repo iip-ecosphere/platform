@@ -15,44 +15,46 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Registry;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
-import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.ecsRuntime.NameplateSetup.Address;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * Creates an AAS for this device, deploys it to the platform AAS server and returns the address of the AAS. This may
  * be useful for devices that do not provide an AAS by themselves.
  * 
+ * Based on BaSyx / Generic Frame for Technical Data for Industrial Equipment in Manufacturing (Version 1.1)
+ * and for address a bit of ZVEI Digital Nameplate for industrial equipment V1.0.
+ * 
+ * 
  * @author Holger Eichelberger, SSE
  */
 public class SelfDeviceAasProvider extends DeviceAasProvider {
 
     public static final String SUBMODEL_NAMEPLATE = "Nameplate";
-    public static final String NAME_PROPERTY_IMAGE = "Image";
-    public static final String NAME_PROPERTY_MANUFACTURER_NAME = "ManufacturerName";
-    public static final String NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION = "ManufacturerProductDesignation";
-    public static final String NAME_SMC_ADDRESS = "Address";
-    public static final String NAME_PROPERTY_CITYTOWN = "CityTown";
-    public static final String NAME_PROPERTY_DEPARTMENT = "Department";
-    public static final String NAME_PROPERTY_STREET = "Street";
-    public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
-    
+    public static final String NAME_PROPERTY_PRODUCTIMAGE = "ProductImage";
+   
     private String aasAddress = null;
     
     @Override
@@ -78,14 +80,28 @@ public class SelfDeviceAasProvider extends DeviceAasProvider {
             } catch (IOException e) {
                 // not there, ok
                 try {
-                    AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                    SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
                     NameplateSetup nSetup = obtainNameplateSetup(); 
-                    createNameplate(smBuilder, nSetup);
-                    smBuilder.build();
+                    AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
+                    TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(null);
+                    GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
+                        nSetup.getManufacturerName(), 
+                        LangString.create(nSetup.getManufacturerProductDesignation()), "", "");
+                    PlatformAas.createAddress(giBuilder, nSetup.getAddress()); // inofficial, not in Generic Frame
+                    AasUtils.resolveImage(nSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
+                        (n, r, m) -> giBuilder.addProductImageFile(n, r, m));
+                    AasUtils.resolveImage(nSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
+                        (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
+                    giBuilder.build();
+                    final GregorianCalendar now = new GregorianCalendar();
+                    XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
+                    FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(cal);
+                    fiBuilder.build();
+                    tdBuilder.createTechnicalPropertiesBuilder().build();
+                    tdBuilder.createProductClassificationsBuilder().build();
+                    tdBuilder.build();
                     aas = aasBuilder.build();
                     AasPartRegistry.remoteDeploy(CollectionUtils.addAll(new ArrayList<Aas>(), aas));
-                } catch (IOException e1) {
+                } catch (IOException | DatatypeConfigurationException e1) {
                     LoggerFactory.getLogger(getClass()).error("Creating nameplate AAS: {}", e.getMessage());
                 }
             }
@@ -108,60 +124,15 @@ public class SelfDeviceAasProvider extends DeviceAasProvider {
      * @throws IOException if the setup file cannot be read
      */
     public static NameplateSetup obtainNameplateSetup() throws IOException {
-        InputStream is = SelfDeviceAasProvider.class.getResourceAsStream("/nameplate.yml"); // TODO preliminary
+        InputStream is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve("nameplate.yml"); // preliminary
         if (null == is) {
             try {
                 is = new FileInputStream("src/test/resources/nameplate.yml");
             } catch (IOException e) {
-                is = SelfDeviceAasProvider.class.getResourceAsStream("/" + Id.getDeviceIdAas() + ".yml");
+                is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(Id.getDeviceIdAas() + ".yml");
             }
         }
         return AbstractSetup.readFromYaml(NameplateSetup.class, is); // closes is
-    }
-    
-    /**
-     * Creates the "nameplate". A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
-     * 
-     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
-     * @param appSetup application setup
-     */
-    public static void createNameplate(SubmodelElementContainerBuilder smBuilder, NameplateSetup appSetup) {
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_IMAGE)
-            .setValue(Type.LANG_STRING, appSetup.getImage())
-            .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
-            .setValue(Type.LANG_STRING, appSetup.getManufacturerName())
-            .build();
-        smBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
-            .setValue(Type.LANG_STRING, appSetup.getManufacturerProductDesignation())
-            .build();
-        createAddress(smBuilder, appSetup.getAddress());
-    }
-    
-    /**
-     * Creates (part) of a nameplate address. A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
-     * 
-     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
-     * @param address the address to use
-     */
-    protected static void createAddress(SubmodelElementContainerBuilder smBuilder, Address address) {
-        if (null != address) {
-            SubmodelElementCollectionBuilder aBuilder 
-                = smBuilder.createSubmodelElementCollectionBuilder(NAME_SMC_ADDRESS, false, false);
-            aBuilder.createPropertyBuilder(NAME_PROPERTY_CITYTOWN)
-                .setValue(Type.LANG_STRING, address.getCityTown())
-                .build();
-            aBuilder.createPropertyBuilder(NAME_PROPERTY_DEPARTMENT)
-                .setValue(Type.LANG_STRING, address.getDepartment())
-                .build();
-            aBuilder.createPropertyBuilder(NAME_PROPERTY_STREET)
-                .setValue(Type.LANG_STRING, address.getStreet())
-                .build();
-            aBuilder.createPropertyBuilder(NAME_PROPERTY_ZIPCODE)
-                .setValue(Type.LANG_STRING, address.getZipCode())
-                .build();
-            aBuilder.build();
-        }
     }
 
 }
