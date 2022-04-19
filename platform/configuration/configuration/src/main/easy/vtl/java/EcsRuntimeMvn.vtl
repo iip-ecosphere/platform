@@ -26,8 +26,9 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
-        sequenceOf(String) files = {"*.yml"};
-        appendMavenResourcesCopyResources(plugins, "\\${project.build.outputDirectory}", getResourcesFolder()+"/devices", files);
+        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        XmlElement ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
+        appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }
 
 }

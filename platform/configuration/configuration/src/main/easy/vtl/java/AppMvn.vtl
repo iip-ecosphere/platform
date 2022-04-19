@@ -1,3 +1,4 @@
+import Basics;
 import MavenBasics;
 import JavaMapping;
 
@@ -98,9 +99,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
             }
         }
         
+        XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
+        XmlElement rExecs = appendExecutionsParent(depPlugin);
         if (resources.size() > 0) {
-            XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
-            XmlElement execs = appendExecutionsParent(depPlugin);
             mapOf(String, sequenceOf(String)) resMap = {};
             for (String res: resources.toSequence()->sortedBy(b|b)) { // sortedBy for testing
                 sequenceOf(String) tmp = res.split("\\|"); // escape |, splits into chars
@@ -112,9 +113,13 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
                 resMap.get(srcDir).add(file);
             }
             for (String res: resMap.keys().toSequence()->sortedBy(b|b)) { // sortedBy for testing
-                appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
+                appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
             }
         }
+
+        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
         
         // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
         String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";

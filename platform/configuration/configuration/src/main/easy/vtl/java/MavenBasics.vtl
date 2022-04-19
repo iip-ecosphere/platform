@@ -361,10 +361,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendPlugin(plugins, "org.apache.maven.plugins", "maven-resources-plugin", ver, false);
     } 
 
-    def XmlElement appendMavenResourcesCopyResources(XmlElement plugins, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String ver="3.2.0", String phase="validate") {
+    def XmlElement appendMavenResourcesCopyResources(XmlElement plugins, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String ver="3.2.0", String phase="validate", String id="") {
         XmlElement plugin = appendMavenResourcesPlugin(plugins, ver);
         XmlElement execs = appendExecutionsParent(plugin);
-        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", outputDirectory, resourceDirectory, files, phase=phase);
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", outputDirectory, resourceDirectory, files, phase=phase, id=id);
         execs;
     }
     
@@ -386,6 +386,14 @@ template MavenBasics(Configuration config, FileArtifact target) {
             new XmlElement(resource, "include", f);
         }
         config;
+    }
+    
+    def String mavenBuildOutputDir() {
+        "\\${project.build.outputDirectory}";
+    }
+    
+    def String mavenBuildOutputResourcesDir() {
+        mavenBuildOutputDir() + "/resources";
     }
     
     // ---------------------------- specific for IIP-Ecosphere ------------------------

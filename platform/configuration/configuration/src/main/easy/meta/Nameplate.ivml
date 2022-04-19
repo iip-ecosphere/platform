@@ -27,6 +27,7 @@ project Nameplate {
     
     Manufacturer manufacturer_sse = {
         manufacturerName = "Universitaet Hildesheim@de",
+        manufacturerLogo = "SSE-Logo.png",
         address = {
             department = "Software Systems Engineering@de",
             street = "Universitaetsplatz 1@de",
