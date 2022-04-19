@@ -49,6 +49,11 @@ public class GeneratedConnector {
      * @throws IOException in case that the VDW server cannot be accessed
      */
     public static void main(String[] args) throws IOException {
+        if (args.length > 0 && "--skip".equals(args[0])) {
+            // our Jenkins cannot contact the umati server. well let's figure out whether it could run at all
+            System.out.println("UMATI OPCUA Connector test");
+            System.exit(0);
+        }
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
         AtomicInteger count = new AtomicInteger(0);
         ReceptionCallback<OpcOut> cb = new ReceptionCallback<OpcOut>() {
