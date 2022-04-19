@@ -382,9 +382,8 @@ public class TraceToAasService extends AbstractService {
             try {
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(PlatformAas.SUBMODEL_NAMEPLATE, null);
-                PlatformAas.createNameplate(smBuilder, appSetup);
-                augmentNameplateSubmodel(smBuilder);
+                SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
+                PlatformAas.addSoftwareInfo(smBuilder, appSetup);
                 smBuilder.build();
                 smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
                 augmentCommandsSubmodel(smBuilder);
@@ -454,14 +453,6 @@ public class TraceToAasService extends AbstractService {
                 LoggerFactory.getLogger(getClass()).error("Building services submodel: {}", e.getMessage());
             }
         }
-    }
-
-    /**
-     * Allows adding application-specific elements to the nameplate submodel.
-     * 
-     * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
-     */
-    protected void augmentNameplateSubmodel(SubmodelBuilder smBuilder) {
     }
 
     /**

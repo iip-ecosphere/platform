@@ -185,7 +185,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
         }
         if (null == home) { // shall not occur
             getLogger().warn("No home path given for service " + yaml.getId() + ". Falling back to temporary folder");
-            home = FileUtils.createTmpFolder(AbstractProcessService.sanitizeFileName(yaml.getId(), true));
+            home = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(yaml.getId(), true));
         }
     }
     

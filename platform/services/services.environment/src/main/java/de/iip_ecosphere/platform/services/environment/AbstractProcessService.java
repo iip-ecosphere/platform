@@ -172,29 +172,6 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     }
     
     /**
-     * Turns an arbitrary string into something that can be used as a file name. 
-     * 
-     * @param str the string to use
-     * @return the file name
-     */
-    public static String sanitizeFileName(String str) {
-        return str.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
-    }
-    
-    /**
-     * Turns an arbitrary string into something that can be used as a file name. 
-     * 
-     * @param str the string to use
-     * @param addTimestamp whether the current timestamp shall be added to {@code str}
-     * @return the file name
-     * @see #sanitizeFileName(String)
-     */
-    public static String sanitizeFileName(String str, boolean addTimestamp) {
-        String tmp = addTimestamp ? str + "-" + System.currentTimeMillis() : str;
-        return sanitizeFileName(tmp);
-    }
-    
-    /**
      * Returns the operating system and architecture in typical form, e.g, win32, win, win64 or linux32, linux, linux64.
      * 
      * @param name32 shall the method add 32 in case of a 32 bit operating system (explicit) or be quite (implicit) and 
