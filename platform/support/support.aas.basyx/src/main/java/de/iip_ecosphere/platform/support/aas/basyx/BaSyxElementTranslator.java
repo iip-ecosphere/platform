@@ -46,7 +46,15 @@ public class BaSyxElementTranslator {
          * @return {@code property}
          */
         BaSyxProperty register(BaSyxProperty property);
-        
+
+        /**
+         * Registers a file data element.
+         * 
+         * @param file the file data element
+         * @return {@code file}
+         */
+        BaSyxFile register(BaSyxFile file);
+
         /**
          * Registers an operation.
          * 

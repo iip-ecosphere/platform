@@ -197,7 +197,8 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     @Override
     public Object invoke(Object... args) throws ExecutionException {
         try {
-            return operation.invoke(args);
+            // TODO param translate needed but sequence of in/inout unclear
+            return Tools.translateValueFromBaSyx(operation.invoke(args));
         } catch (Exception e) {
             throw new ExecutionException(e);
         }

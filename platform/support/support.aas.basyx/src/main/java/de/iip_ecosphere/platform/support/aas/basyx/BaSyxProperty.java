@@ -41,7 +41,6 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaSyxOperation.class);
     private ISubmodelElement property;
 
-    // TODO can we distinguish the three types; static, dynamic, ?
     /**
      * Builder for {@link BaSyxProperty}.
      * 
@@ -109,7 +108,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
 
         @Override
         public PropertyBuilder setValue(Object value) {
-            property.setValue(value);
+            property.setValue(Tools.translateValueToBaSyx(Tools.getType(property), value));
             return this;
         }
 
@@ -161,7 +160,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     @Override
     public Object getValue() throws ExecutionException {
         try {
-            return property.getValue();
+            return Tools.translateValueFromBaSyx(property.getValue());
         } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
             throw new ExecutionException(e);
         } catch (Exception e) {
@@ -173,7 +172,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     
     @Override
     public void setValue(Object value) throws ExecutionException {
-        property.setValue(value);
+        property.setValue(Tools.translateValueToBaSyx(Tools.getType(property), value));
     }
 
     @Override

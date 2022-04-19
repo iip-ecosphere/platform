@@ -24,6 +24,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangString;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
@@ -317,6 +318,54 @@ public class Tools {
      */
     public static de.iip_ecosphere.platform.support.aas.LangString translate(LangString ls) {
         return new de.iip_ecosphere.platform.support.aas.LangString(ls.getLanguage(), ls.getDescription());
+    }
+
+    /**
+     * Translates a value for a given target type.
+     * 
+     * @param type the BaSyx type
+     * @param value the value to translate
+     * @return the translated value
+     */
+    public static Object translateValueToBaSyx(ValueType type, Object value) {
+        if (type == ValueType.LangString) {
+            if (value instanceof String) {
+                value = de.iip_ecosphere.platform.support.aas.LangString.create((String) value);
+            } 
+            if (value instanceof de.iip_ecosphere.platform.support.aas.LangString) {
+                value = Tools.translate((de.iip_ecosphere.platform.support.aas.LangString) value);
+            }
+        }
+        return value;
+    }
+    
+    /**
+     * Translates a BaSyx value back.
+     * 
+     * @param val the value to be translated
+     * @return the translated value
+     */
+    @SuppressWarnings("unchecked")
+    public static Object translateValueFromBaSyx(Object val) {
+        if (LangString.isLangString(val)) {
+            val = Tools.translate(LangString.createAsFacade((Map<String, Object>) val));
+        }
+        return val;
+    }
+    
+    /**
+     * Returns the value type of a submodel element.
+     * 
+     * @param elt the element
+     * @return the value type or <b>null</b> if not available
+     */
+    public static ValueType getType(ISubmodelElement elt) {
+        ValueType result = null;
+        if (elt instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property) {
+            result = ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property) elt)
+                .getValueType();
+        }
+        return result;
     }
 
 }

@@ -75,7 +75,19 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     private void warn(String msg) {
         LoggerFactory.getLogger(getClass()).warn(msg);
     }
-    
+
+    @Override
+    public BaSyxFile register(BaSyxFile file) {
+        String id = file.getIdShort();
+        if (dataElements.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already an element with short id '" + id + "'. "
+                + "The element may be redefined.");
+        }
+        dataElements.put(id, file);
+        submodelElements.put(id, file);
+        return file;
+    }
+
     @Override
     public BaSyxOperation register(BaSyxOperation operation) {
         String id = operation.getIdShort();

@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 
@@ -50,6 +51,11 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
         return new BaSyxOperation.BaSxyOperationBuilder(this, idShort);
     }
     
+    @Override
+    public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
+        return new BaSyxFile.BaSyxFileDataElementBuilder(this, idShort, contents, mimeType);
+    }
+    
     /**
      * Creates a reference to the sub-model under creation.
      * 
@@ -65,7 +71,18 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
      * @return the instance
      */
     protected abstract AbstractSubmodel<S> getInstance();
-    
+
+    /**
+     * Registers a file data element.
+     * 
+     * @param file the file data element
+     * @return {@code file}
+     */
+    BaSyxFile register(BaSyxFile file) {
+        getInstance().getSubmodel().addSubmodelElement(file.getSubmodelElement());
+        return getInstance().register(file);
+    }
+
     /**
      * Registers an operation.
      * 

@@ -181,6 +181,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
+        protected BaSyxFile register(BaSyxFile file) {
+            this.collection.addSubmodelElement(file.getSubmodelElement());
+            return instance.register(file);
+        }
+
+        @Override
         protected BaSyxOperation register(BaSyxOperation operation) {
             this.collection.addSubmodelElement(operation.getSubmodelElement());
             return instance.register(operation);
@@ -424,6 +430,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public BaSyxProperty register(BaSyxProperty property) {
         elements.put(property.getIdShort(), property);
         return property;
+    }
+
+    @Override
+    public BaSyxFile register(BaSyxFile file) {
+        elements.put(file.getIdShort(), file);
+        return file;
     }
 
     @Override

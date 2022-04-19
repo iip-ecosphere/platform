@@ -23,15 +23,41 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement;
  */
 public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement {
 
+    public static class BaSyxFileDataElementBuilder implements FileDataElementBuilder {
+
+        private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
+        private BaSyxFile instance;
+        
+        /**
+         * Creates a file data element builder.
+         * 
+         * @param parentBuilder the parent builder
+         * @param idShort the short id
+         * @param contents the contents
+         * @param mimeType the mime type
+         */
+        BaSyxFileDataElementBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort, 
+            String contents, String mimeType) {
+            this.parentBuilder = parentBuilder;
+            this.instance = new BaSyxFile(idShort, contents, mimeType);
+        }
+
+        @Override
+        public FileDataElement build() {
+            return parentBuilder.register(instance);
+        }
+        
+    }
+    
     /**
      * Creates a BaSyx file.
      * 
      * @param idShort the short id of the data element
-     * @param file the file name, relative or absolute with extension
+     * @param value the file contents/value
      * @param mimeType the mime type of the file
      */
-    public BaSyxFile(String idShort, String file, String mimeType) {
-        super(new File(file, mimeType));
+    public BaSyxFile(String idShort, String value, String mimeType) {
+        super(new File(value, mimeType));
         getDataElement().setIdShort(idShort);
     }
 
@@ -45,13 +71,13 @@ public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement
     }
     
     @Override
-    public String getFile() {
+    public String getContents() {
         return getDataElement().getValue();
     }
     
     @Override
-    public void setFile(String file) {
-        getDataElement().setValue(file);
+    public void setContents(String contents) {
+        getDataElement().setValue(contents);
     }
     
     @Override
