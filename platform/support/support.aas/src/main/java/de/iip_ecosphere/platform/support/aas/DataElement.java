@@ -12,11 +12,24 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Builder;
+
 /**
  * Defines the interface of a data element.
  * 
  * @author Holger Eichelberger, SSE
  */
 public interface DataElement extends SubmodelElement {
+
+    /**
+     * Builds a data element.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface DataElementBuilder<T extends DataElement> extends Builder<T> {
+        
+        // incomplete
+        
+    }
 
 }

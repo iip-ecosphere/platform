@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
@@ -39,6 +40,16 @@ public interface SubmodelElementContainerBuilder {
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
      */
     public OperationBuilder createOperationBuilder(String idShort);
+    
+    /**
+     * Adds an image data element.
+     * 
+     * @param idShort the short id of the data element
+     * @param contents the file contents/value
+     * @param mimeType the mime type of the file
+     * @return the data element builder
+     */
+    public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType);
 
     /**
      * Creates a builder for a contained sub-model element collection. Calling this method again with the same name 

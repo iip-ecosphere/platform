@@ -292,7 +292,7 @@ public abstract class TechnicalDataSubmodelTest {
         } else {
             Assert.assertNotNull(actual);
             Assert.assertEquals(id, actual.getIdShort());
-            Assert.assertEquals(file, actual.getFile());
+            Assert.assertEquals(file, actual.getContents());
             Assert.assertEquals(mime, actual.getMimeType());
         }
     }

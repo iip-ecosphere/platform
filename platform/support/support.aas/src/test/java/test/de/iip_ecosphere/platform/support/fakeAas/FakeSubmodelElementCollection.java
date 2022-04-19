@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -140,6 +141,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         @Override
         public boolean isNew() {
             return isNew;
+        }
+        
+        @Override
+        public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
+            return null; // ignore
         }
         
         @Override

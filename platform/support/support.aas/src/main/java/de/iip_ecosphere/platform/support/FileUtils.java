@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -136,4 +137,51 @@ public class FileUtils {
         }
     }
     
+    /**
+     * Turn {@code file} into a base64 encoded string.
+     * 
+     * @param file the file
+     * @return the base64 encoded string
+     * @throws IOException if {@code file} cannot be read
+     */
+    public static String fileToBase64(File file) throws IOException {
+        byte[] fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(file);
+        return Base64.getEncoder().encodeToString(fileContent);        
+    }
+
+    /**
+     * Turn base64 encoded {@code string] into a {@code file}.
+     * 
+     * @param string the base64 encoded string
+     * @param file the file
+     * @throws IOException if {@code file} cannot be written
+     */
+    public static void base64ToFile(String string, File file) throws IOException {
+        byte[] decodedBytes = Base64.getDecoder().decode(string);
+        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, decodedBytes);   
+    }
+    
+    /**
+     * Turns an arbitrary string into something that can be used as a file name. 
+     * 
+     * @param str the string to use
+     * @return the file name
+     */
+    public static String sanitizeFileName(String str) {
+        return str.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+    }
+    
+    /**
+     * Turns an arbitrary string into something that can be used as a file name. 
+     * 
+     * @param str the string to use
+     * @param addTimestamp whether the current timestamp shall be added to {@code str}
+     * @return the file name
+     * @see #sanitizeFileName(String)
+     */
+    public static String sanitizeFileName(String str, boolean addTimestamp) {
+        String tmp = addTimestamp ? str + "-" + System.currentTimeMillis() : str;
+        return sanitizeFileName(tmp);
+    }
+
 }

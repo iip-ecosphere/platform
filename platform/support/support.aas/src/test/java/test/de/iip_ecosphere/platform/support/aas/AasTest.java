@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -71,6 +72,8 @@ public class AasTest {
     private static final String NAME_VAR_LOTSIZE = "lotSize";
     private static final String NAME_VAR_VENDOR = "vendor";
     private static final String NAME_VAR_POWCONSUMPTION = "powerConsumption";
+    private static final String NAME_VAR_DESCRIPTION1 = "description1";
+    private static final String NAME_VAR_DESCRIPTION2 = "description2";
     private static final String NAME_OP_STARTMACHINE = "startMachine";
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
     private static final String NAME_OP_STOPMACHINE = "stopMachine";
@@ -265,6 +268,12 @@ public class AasTest {
         createAasOperationsElements(subModelBuilder, VAB_SERVER, protocol);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
+        subModelBuilder.createPropertyBuilder(NAME_VAR_DESCRIPTION1)
+            .setValue(Type.LANG_STRING, LangString.create("test@de"))
+            .build();
+        subModelBuilder.createPropertyBuilder(NAME_VAR_DESCRIPTION2)
+            .setValue(Type.LANG_STRING, "test2@en")
+            .build();
         
         SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_OUTER, false, true);
@@ -291,10 +300,10 @@ public class AasTest {
         Submodel submodel = subModelBuilder.build();
         assertSize(3, submodel.operations());
         assertSize(0, submodel.dataElements());
-        assertSize(3, submodel.properties());
-        assertSize(7, submodel.submodelElements());
+        assertSize(5, submodel.properties());
+        assertSize(9, submodel.submodelElements());
         Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE));
-        Assert.assertEquals(7, submodel.getSubmodelElementsCount());
+        Assert.assertEquals(9, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
         
@@ -312,6 +321,19 @@ public class AasTest {
     }
     
     /**
+     * Asserts lang string equality.
+     * 
+     * @param val the value of a property
+     * @param str the (composed) lang string to test for
+     */
+    private static void assertLangString(Object val, String str) {
+        Assert.assertNotNull(val);
+        Assert.assertTrue(val instanceof LangString);
+        LangString ls2 = LangString.create(str);
+        Assert.assertEquals(ls2, val);
+    }
+    
+    /**
      * Queries the created AAS.
      * 
      * @param machine the test machine as reference
@@ -325,13 +347,16 @@ public class AasTest {
         Assert.assertEquals(2, aas.getSubmodelCount());
         Submodel subm = aas.submodels().iterator().next();
         Assert.assertNotNull(subm);
-        Assert.assertEquals(3, subm.getPropertiesCount());
+        Assert.assertEquals(5, subm.getPropertiesCount());
         Property lotSize = subm.getProperty(NAME_VAR_LOTSIZE);
         Assert.assertNotNull(lotSize);
         Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
         Property powConsumption = subm.getProperty(NAME_VAR_POWCONSUMPTION);
         Assert.assertNotNull(powConsumption);
         Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+
+        assertLangString(subm.getProperty(NAME_VAR_DESCRIPTION1).getValue(), "test@de");
+        assertLangString(subm.getProperty(NAME_VAR_DESCRIPTION2).getValue(), "test2@en");
 
         Assert.assertEquals(3, subm.getOperationsCount());
         Operation op = subm.getOperation(NAME_OP_STARTMACHINE);

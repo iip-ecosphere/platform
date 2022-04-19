@@ -20,20 +20,26 @@ package de.iip_ecosphere.platform.support.aas;
 public interface FileDataElement extends DataElement {
 
     /**
-     * Returns the file name.
+     * Builds a data element.
      * 
-     * @return path and name of the referenced file (with file extension). The path can
-     *  be absolute or relative.
+     * @author Holger Eichelberger, SSE
      */
-    public String getFile();
+    public interface FileDataElementBuilder extends DataElementBuilder<FileDataElement> {
+    }
+    
+    /**
+     * Returns the file contents.
+     * 
+     * @return the contents/value.
+     */
+    public String getContents();
 
     /**
-     * Changes the file name.
+     * Changes the file contents.
      * 
-     * @param file path and name of the referenced file (with file extension). The path can
-     *  be absolute or relative.
+     * @param contents the new file contents/value.
      */
-    public void setFile(String file);
+    public void setContents(String contents);
     
     /**
      * Returns mime type of the content of the file.

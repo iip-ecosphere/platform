@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.Locale;
+
 /**
  * Represents an AAS string in a certain language.
  * 
@@ -19,6 +21,7 @@ package de.iip_ecosphere.platform.support.aas;
  */
 public class LangString {
 
+    private static String defaultLanguage = formatLanguage(Locale.getDefault().getLanguage());
     private String language;
     private String description;
 
@@ -29,8 +32,67 @@ public class LangString {
      * @param description the text/description/string
      */
     public LangString(String language, String description) {
-        this.language = language;
+        this.language = formatLanguage(language);
         this.description = description;
+    }
+    
+    /**
+     * Formats the language so that it starts (like in RDF) with a lower case letter.
+     * 
+     * @param language the language string
+     * @return the formattet string
+     */
+    public static String formatLanguage(String language) {
+        String result = language;
+        if (language != null && language.length() > 0 
+            && Character.isUpperCase(language.charAt(0))) {
+            // https://www.w3.org/TR/rdf-schema/#ch_langstring
+            // https://github.com/admin-shell/aasx-package-explorer/issues/23
+            result = String.valueOf(Character.toLowerCase(language.charAt(0)));
+            if (language.length() > 1) {
+                result += language.substring(1);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Creates a {@link LangString] from a composed description@language string. Inspired by ZVEI nameplate
+     * for industrial equipment V1.0.
+     * 
+     * @param descLang the composed string, last @ separates language
+     * @return the {@link LangString} object
+     */
+    public static LangString create(String descLang) {
+        String language;
+        String description;
+        int pos = descLang.lastIndexOf('@');
+        if (pos > 0 & pos < descLang.length()) {
+            description = descLang.substring(0, pos);
+            language = descLang.substring(pos + 1);
+        } else {
+            description = descLang;
+            language = defaultLanguage;
+        }
+        return new LangString(language, description);
+    }
+    
+    /**
+     * Defines the default language.
+     * 
+     * @param language the default language
+     */
+    public static void setDefaultLanguage(String language) {
+        defaultLanguage = language;
+    }
+
+    /**
+     * Returns the default language.
+     * 
+     * @return the default language
+     */
+    public static String getDefaultLanguage() {
+        return defaultLanguage;
     }
     
     /**

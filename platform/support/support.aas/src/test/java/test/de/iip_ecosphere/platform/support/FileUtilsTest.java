@@ -60,14 +60,14 @@ public class FileUtilsTest {
             fileCount.incrementAndGet();
         });
 
-        Assert.assertEquals(7, fileCount.get());
+        Assert.assertEquals(8, fileCount.get());
         fileCount.set(0);
 
         FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
             fileCount.incrementAndGet();
         });
 
-        Assert.assertEquals(2, fileCount.get());
+        Assert.assertEquals(3, fileCount.get());
     }
     
     /**
@@ -78,6 +78,32 @@ public class FileUtilsTest {
         Assert.assertNotNull(FileUtils.getResolvedFile(new File(".")));
         Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), ""));
         Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), "test.txt"));
+    }
+
+    /**
+     * Tests the base64 functions.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testBase64() throws IOException {
+        File src = new File("src/test/resources/Logo.jpg");
+        File tgt = new File(org.apache.commons.io.FileUtils.getTempDirectory(), "base64.tst");
+        tgt.delete();
+        String enc = FileUtils.fileToBase64(src);
+        FileUtils.base64ToFile(enc, tgt);
+        Assert.assertTrue(org.apache.commons.io.FileUtils.contentEquals(src, tgt));
+        tgt.delete();
+    }
+    
+    /**
+     * Tests sanitizing file names.
+     */
+    @Test
+    public void testSanitize() {
+        Assert.assertEquals("a", FileUtils.sanitizeFileName("a"));
+        Assert.assertEquals("a", FileUtils.sanitizeFileName("a", false));
+        Assert.assertTrue(FileUtils.sanitizeFileName("a", true).startsWith("a"));
     }
 
 }

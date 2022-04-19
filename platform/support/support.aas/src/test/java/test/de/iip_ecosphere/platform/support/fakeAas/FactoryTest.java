@@ -235,7 +235,7 @@ public class FactoryTest {
     @Test
     public void langStringTest() {
         LangString ls = new LangString("EN", "Desig");
-        Assert.assertEquals("EN", ls.getLanguage());
+        Assert.assertEquals(LangString.formatLanguage("EN"), ls.getLanguage()); // converted to first lower case
         Assert.assertEquals("Desig", ls.getDescription());
         Assert.assertTrue(ls.toString().length() > 0);
         ls.hashCode(); // shall not be null but overflow

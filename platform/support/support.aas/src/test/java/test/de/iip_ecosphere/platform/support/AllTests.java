@@ -13,6 +13,7 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
@@ -47,7 +48,10 @@ import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
     ClassLoaderUtilsTest.class,
     OsUtilsTest.class, 
     SystemMetricsTest.class,
-    IOVoidFunctionTest.class
+    IOVoidFunctionTest.class,
+    
+    // non-generic AAS 
+    LangStringTest.class
 })
 public class AllTests {
 }
