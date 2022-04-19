@@ -145,9 +145,10 @@ public class ServiceAas {
             // not there, ok
             AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
             SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(
-                PlatformAas.SUBMODEL_NAMEPLATE, null);
-            PlatformAas.createNameplate(smBuilder, se);
+                "Software", null);
+            PlatformAas.addSoftwareInfo(smBuilder, se);
             smBuilder.build();
+            PlatformAas.createNameplate(aasBuilder, se).build();
             result = aasBuilder.build();
         }
         return result;
