@@ -130,7 +130,7 @@ project ContainerCreation {
     // ---------- generation setup ------------
     
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh:" + iipVer; // for testing all-in-one
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesContainerCreation:" + iipVer; // for testing all-in-one
 
     // ------------ freezing ------------------
     
