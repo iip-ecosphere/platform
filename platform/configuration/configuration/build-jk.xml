@@ -13,6 +13,7 @@
 		<ant dir="gen/tests/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/KodexMesh/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/tests/ContainerCreation/ApplicationInterfaces" antfile="build-jk.xml" />
 
 		<ant dir="gen/tests/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
 		<ant dir="gen/tests/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
