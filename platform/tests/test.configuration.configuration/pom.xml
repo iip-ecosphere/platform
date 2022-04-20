@@ -41,6 +41,12 @@
      <groupId>de.iip-ecosphere.platform</groupId>
      <version>${project.version}</version>
     </dependency>    
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>    
   
     <dependency>
       <groupId>junit</groupId>
@@ -73,6 +79,16 @@
                             <artifactItem>
                                 <groupId>de.iip-ecosphere.platform</groupId>
                                 <artifactId>apps.AppInterfacesKodex</artifactId>
+                                <version>${project.version}</version>
+                                <type>zip</type>
+                                <classifier>python</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.basedir}/src/main/python</outputDirectory>
+                                <destFileName>pythonEnv.zip</destFileName>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>de.iip-ecosphere.platform</groupId>
+                                <artifactId>apps.AppInterfacesContainerCreation</artifactId>
                                 <version>${project.version}</version>
                                 <type>zip</type>
                                 <classifier>python</classifier>
