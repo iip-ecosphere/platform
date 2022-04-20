@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
+import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -60,8 +61,21 @@ public class ArtifactsManager {
      * @author Holger Eichelberger, SSE
      */
     public enum ArtifactKind {
+        
+        /**
+         * A service implementation artifact (ZIP/JAR).
+         */
         SERVICE_ARTIFACT,
-        CONTAINER;
+        
+        /**
+         * A (generated) container and its descriptor.
+         */
+        CONTAINER,
+        
+        /**
+         * Deployment plan for multiple services/resources, like in the CLI.
+         */
+        DEPLOYMENT_PLAN;
     }
 
     /**
@@ -183,6 +197,53 @@ public class ArtifactsManager {
         @Override
         public Version getVersion() {
             return descriptor.getVersion();
+        }
+
+    }
+    
+    /**
+     * Represents a service artifact.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class DeploymentPlanArtifact extends AbstractArtifact {
+        
+        private ServiceDeploymentPlan plan;
+        
+        /**
+         * Creates a service deployment plan instance.
+         * 
+         * @param plan the service deployment plan
+         * @param accessUri the access URI for the devices
+         */
+        private DeploymentPlanArtifact(ServiceDeploymentPlan plan, URI accessUri) {
+            super(accessUri);
+            this.plan = plan;
+        }
+
+        @Override
+        public ArtifactKind getKind() {
+            return ArtifactKind.DEPLOYMENT_PLAN;
+        }
+
+        @Override
+        public String getId() {
+            return plan.getId();
+        }
+
+        @Override
+        public String getName() {
+            return plan.getApplication();
+        }
+
+        @Override
+        public String getDescription() {
+            return plan.getDescription();
+        }
+        
+        @Override
+        public Version getVersion() {
+            return plan.getVersion();
         }
 
     }
@@ -475,6 +536,17 @@ public class ArtifactsManager {
             } else {
                 LoggerFactory.getLogger(ArtifactsManager.class).info("Cannot create container descriptor for {}: "
                     + "Container image file {} not found in same directory", file, desc.getImageFile());
+            }
+        }
+        if (null == result) {
+            try {
+                ServiceDeploymentPlan plan = ServiceDeploymentPlan.readFromYaml(
+                    ServiceDeploymentPlan.class, new FileInputStream(file));
+                if (plan.getAssignments().size() > 0) {
+                    result = new DeploymentPlanArtifact(plan, accessUri);
+                }
+            } catch (IOException e) {
+                // cannot read, may just be a wrong thing
             }
         }
         return result;

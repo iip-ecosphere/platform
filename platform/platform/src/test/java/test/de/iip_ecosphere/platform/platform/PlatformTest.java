@@ -113,6 +113,10 @@ public class PlatformTest {
         ArtifactsManager mgr = ArtifactsManager.getInstance();
         Assert.assertNotNull(mgr);
         Assert.assertTrue(mgr.getArtifactCount() > 0);
+        for (Artifact ar: mgr.artifacts()) {
+            System.out.println(" - " + ar.getId() + " " + ar.getName() + " " + ar.getKind() + " " + ar.getVersion() 
+                + " " + ar.getAccessUri());
+        }
 
         Assert.assertNull(mgr.getArtifact(""));
         Artifact a = mgr.getArtifact("art");
@@ -139,11 +143,15 @@ public class PlatformTest {
         Assert.assertNotNull(a.getDescription());
         Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
 
+        a = mgr.getArtifact("appDesc-1");
+        Assert.assertNotNull(a);
+        Assert.assertEquals("appDesc-1", a.getId());
+        Assert.assertEquals(ArtifactKind.DEPLOYMENT_PLAN, a.getKind());
+        Assert.assertNotNull(a.getName());
+        Assert.assertNotNull(a.getDescription());
+        Assert.assertTrue(a.getAccessUri().toString().startsWith(PlatformSetup.getInstance().getArtifactsUriPrefix()));
+        
         Assert.assertEquals(mgr.getArtifactCount(), CollectionUtils.toList(mgr.artifacts().iterator()).size());
-        for (Artifact ar: mgr.artifacts()) {
-            System.out.println(" - " + ar.getId() + " " + ar.getName() + " " + ar.getKind() + " " + ar.getVersion() 
-                + " " + ar.getAccessUri());
-        }
         
         SubmodelElementsCollectionClient sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
@@ -153,9 +161,8 @@ public class PlatformTest {
         Assert.assertNotNull(coll.getElement("art"));
         Assert.assertNotNull(coll.getElement("art1"));
         
-        coll = sc.getSubmodel().getSubmodelElementCollection(
-            PlatformAas.NAME_COLL_CONTAINER);
-        Assert.assertEquals(1, coll.getElementsCount());
+        coll = sc.getSubmodel().getSubmodelElementCollection(PlatformAas.NAME_COLL_CONTAINER);
+        Assert.assertEquals(2, coll.getElementsCount());
         Assert.assertNotNull(coll.getElement("cnt1"));
         
         // preliminary, not nice
@@ -163,7 +170,7 @@ public class PlatformTest {
             new File("src/test/resources/service3.jar"), 
             new File("src/test/resources/artifacts/service3.jar"));
         TimeUtils.sleep(1000); // wait for watcher
-        Assert.assertEquals(4, mgr.getArtifactCount());
+        Assert.assertEquals(5, mgr.getArtifactCount());
         
         sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
@@ -173,7 +180,7 @@ public class PlatformTest {
 
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_CONTAINER);
-        Assert.assertEquals(1, coll.getElementsCount()); // unchanged
+        Assert.assertEquals(2, coll.getElementsCount()); // unchanged
 
         FileUtils.deleteQuietly(new File("src/test/resources/artifacts/service3.jar"));
         TimeUtils.sleep(1000); // wait for watcher

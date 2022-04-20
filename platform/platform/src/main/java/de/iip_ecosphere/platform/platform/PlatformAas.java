@@ -39,6 +39,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_SUBMODEL = "Artifacts";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
+    public static final String NAME_DEPLOYMENT_PLANS = "DeploymentPlans";
     public static final String NAME_COLL_KNOWN_SERVICES = "KnownServices";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
@@ -50,6 +51,7 @@ public class PlatformAas implements AasContributor {
 
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER, false, false).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_DEPLOYMENT_PLANS, false, false).build();
         SubmodelElementCollectionBuilder b = smB.createSubmodelElementCollectionBuilder(
             NAME_COLL_KNOWN_SERVICES, false, false);
         for (Map.Entry<String, String> ep : ServiceAas.createAas().entrySet()) {
@@ -93,27 +95,32 @@ public class PlatformAas implements AasContributor {
             case CONTAINER:
                 collName = NAME_COLL_CONTAINER;
                 break;
+            case DEPLOYMENT_PLAN:
+                collName = NAME_COLL_CONTAINER;
+                break;
             default:
                 collName = null;
                 break;
             }
-            SubmodelElementCollectionBuilder cBuilder // get or create
-                = sub.createSubmodelElementCollectionBuilder(collName, false, false);
-
-            SubmodelElementCollectionBuilder dBuilder 
-                = cBuilder.createSubmodelElementCollectionBuilder(fixId(art.getId()), false, false);
-            dBuilder.createPropertyBuilder(NAME_PROP_ID)
-                .setValue(Type.STRING, art.getId())
-                .build();
-            dBuilder.createPropertyBuilder(NAME_PROP_NAME)
-                .setValue(Type.STRING, art.getName())
-                .build();
-            dBuilder.createPropertyBuilder(NAME_PROP_URI)
-                .setValue(Type.STRING, art.getAccessUri().toString())
-                .build();
-            dBuilder.build();
-
-            cBuilder.build();
+            if (null != collName) {
+                SubmodelElementCollectionBuilder cBuilder // get or create
+                    = sub.createSubmodelElementCollectionBuilder(collName, false, false);
+    
+                SubmodelElementCollectionBuilder dBuilder 
+                    = cBuilder.createSubmodelElementCollectionBuilder(fixId(art.getId()), false, false);
+                dBuilder.createPropertyBuilder(NAME_PROP_ID)
+                    .setValue(Type.STRING, art.getId())
+                    .build();
+                dBuilder.createPropertyBuilder(NAME_PROP_NAME)
+                    .setValue(Type.STRING, art.getName())
+                    .build();
+                dBuilder.createPropertyBuilder(NAME_PROP_URI)
+                    .setValue(Type.STRING, art.getAccessUri().toString())
+                    .build();
+                dBuilder.build();
+    
+                cBuilder.build();
+            }
         });
     }
 

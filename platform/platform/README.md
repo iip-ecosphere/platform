@@ -49,6 +49,11 @@ Main functionality of the CLI:
 
 Deploying multiple services, in particular across devices, can be tedious and error-prone using just the low level commands mentioned above. Therefore, the CLI offers the execution of simple deployment plans given as YAML files.
 
+    application: <String>
+    id: <String>
+    appId: <String>
+    version: <String>
+    description: <String>
     artifact: <path/URI>
     parallelize: <Boolean>
     onUndeployRemoveArtifact: <Boolean>
@@ -63,7 +68,7 @@ Deploying multiple services, in particular across devices, can be tedious and er
       - resource: <ResourceId>
         containerDesc: <path/URI>
 
-A deployment plan specifies the service implementation `artifact` containing the services, either as local path or as URI. The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services to be started with their respective service ids must be given. If not otherwise specified by an assignment-specific `artifact` (within `assignments` as shown above), the global `artifact` will be used. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required. 
+A deployment plan may specify the `application` (name), the plan `id`, the application `id` (e.g., to retrieve the application AAS), the `version` of the plan as well as the `description` of the application/plan, all five optional and indented for display in the CLI/UI. Further, a deployment plan specifies the service implementation `artifact` containing the services, either as local path or as URI. The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services to be started with their respective service ids must be given. If not otherwise specified by an assignment-specific `artifact` (within `assignments` as shown above), the global `artifact` will be used. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required. 
 
 Moreover, if the CLI shall also start containers containing the respective service manager (if adequate providing containing also the service artifacts, i.e., `artifact` would be then a local path/URL within those containers), the containers and their startup sequence can be stated in the `container` section. An entry there names the `resource` id where to start the container and the container descriptor (`containerDesc`) detailing the container to be started. The container image must be located in the same folder as the container descriptor. Upon undeployment, the containers will be stopped in reversed sequence, and, if `onUndeployRemoveArtifact` is enabled, the container will also be removed from the device.
 

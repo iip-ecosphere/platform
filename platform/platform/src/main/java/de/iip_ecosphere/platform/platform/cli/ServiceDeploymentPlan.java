@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
@@ -144,13 +145,63 @@ public class ServiceDeploymentPlan extends AbstractSetup {
 
     }
     
+    private String application = "";
+    private String id = "";
+    private String appId = "";
+    private Version version = new Version();
+    private String description = "";
     private String artifact;
     private List<ContainerResourceAssignment> container = new ArrayList<>();
     // naming: initially only for services without container!
     private List<ServiceResourceAssignment> assignments  = new ArrayList<>();
     private boolean parallelize = false;
     private boolean onUndeployRemoveArtifact = true;
-    
+
+    /**
+     * Returns the name of the application.
+     * 
+     * @return the name
+     */
+    public String getApplication() {
+        return application;
+    }
+
+    /**
+     * Returns the id of the plan.
+     * 
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Returns the id of the application (can be used to find its AAS).
+     * 
+     * @return the id
+     */
+    public String getAppId() {
+        return appId;
+    }
+
+    /**
+     * Returns the version of the plan.
+     * 
+     * @return the version
+     */
+    public Version getVersion() {
+        return version;
+    }
+
+    /**
+     * Returns the description of the application for the CLI/UI to display.
+     * 
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
     /**
      * Returns the path/URI of the artifact.
      * 
@@ -194,6 +245,51 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public List<ContainerResourceAssignment> getContainer() {
         return container;
+    }
+
+    /**
+     * Changes the name of the application. [snakeyaml]
+     * 
+     * @param application the name
+     */
+    public void setApplication(String application) {
+        this.application = application;
+    }
+
+    /**
+     * Changes the id of the plan. [snakeyaml]
+     * 
+     * @param id the id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Changes the id of the application, may be used to retrieve its AAS. [snakeyaml]
+     * 
+     * @param appId the id
+     */
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    /**
+     * Changes the version of the plan. [snakeyaml]
+     * 
+     * @param version the version
+     */
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    /**
+     * Changes the description of the application for the CLI/UI to display. [snakeyaml]
+     * 
+     * @param description the description
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     /**
