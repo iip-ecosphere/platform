@@ -1,16 +1,16 @@
 export interface PlatformResources {
-  submodelElements?: SubmodelElement[]
+  submodelElements?: ResourceSubmodelElement[]
 }
 
-export interface SubmodelElement {
+export interface ResourceSubmodelElement {
   idShort?: string;
   kind?: string;
-  value?: SubmodelElementValue[];
+  value?: ResourceValue[];
   description?: any;
 
 }
 
-export interface SubmodelElementValue {
+export interface ResourceValue {
   idShort?: string;
   kind?: string;
   valueType?: string;
@@ -18,4 +18,39 @@ export interface SubmodelElementValue {
   description?: any;
   inoutputVariables?: any;
   invokable?: any;
+}
+
+export interface PlatformServices {
+  submodelElements?: ServiceSubmodelElement[]
+}
+
+export interface ServiceSubmodelElement {
+  idShort?: string;
+  kind?: string;
+  value?: ServiceValue[];
+  description?: any;
+}
+
+export interface ServiceValue {
+  idShort?: string;
+  kind?: string;
+  valueType?: string;
+  value?: any[];
+  description?: any;
+  inoutputVariables?: any;
+  invokable?: any;
+}
+
+export interface ServiceValueEntry {
+  idShort?: string;
+  kind?: string;
+  valueType?: string;
+  value?: any[];
+  description?: any;
+  inoutputVariables?: any;
+  invokable?: any;
+}
+
+export interface PlatformData {
+  value?: any[];
 }

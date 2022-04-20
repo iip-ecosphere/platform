@@ -7,8 +7,16 @@
       <mat-card-content>
         <div *ngFor="let element2 of element.value">
           <div *ngIf="!element2.invokable">
-            <span class="shortId">{{ element2.idShort }}: </span>
-            <span> {{ element2.value }} </span>
+            <span class="service">{{ element2.idShort }}: </span>
+              <div *ngFor="let element3 of element2.value">
+                <span class="shortId"> {{ element3.idShort }}</span>
+                <span *ngIf="!isObject(element3.value); else isobject"> {{ element3.value }} </span>
+                <ng-template #isobject>
+                  <div *ngFor="let element4 of element3.value">
+                    <span *ngIf="element4.idShort != 'type'"> {{ element4.idShort }}:  {{ element4.value }}</span>
+                  </div>
+                </ng-template>
+              </div>
           </div>
         </div>
       </mat-card-content>

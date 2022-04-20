@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources } from 'src/interfaces';
+import { PlatformData, PlatformResources, PlatformServices } from 'src/interfaces';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -24,12 +24,12 @@ export class ApiService {
   }
 
   public async getServices() {
-    const Data = await this.getData('aas/submodels/services/submodel') as PlatformResources;
+    const Data = await this.getData('aas/submodels/services/submodel') as PlatformServices;
     return Data;
   }
 
   private async getData(url: string) {
-    let Data: any;
+    let Data;
     try {
       Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urlPart + '/' + url));
       console.log(Data);
