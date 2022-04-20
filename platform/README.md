@@ -13,6 +13,8 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 ## News
 
 * Increased focus on use cases and evaluation
+* Individual AAS for devices, services and Apps.
+* Templates for application creation.
 * Integration of RapidMiner RTSA for AI (with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.rtsa))
 * [Example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python) for Python service integration 
 * Start of Angular-based Platform Management UI
