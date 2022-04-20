@@ -39,6 +39,14 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
     public OperationBuilder createOperationBuilder(String idShort) {
         return new FakeOperation.FakeOperationBuilder(this, idShort);
     }
+
+    /**
+     * Registers an element.
+     * 
+     * @param element the element
+     * @return {@code element}
+     */
+    abstract FakeFileDataElement register(FakeFileDataElement element);
     
     /**
      * Registers an operation.

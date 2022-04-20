@@ -135,6 +135,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         }
 
         @Override
+        FakeFileDataElement register(FakeFileDataElement element) {
+            instance.elements.put(element.getIdShort(), element);
+            return element;
+        }
+
+        @Override
         FakeOperation register(FakeOperation operation) {
             instance.elements.put(operation.getIdShort(), operation);
             return operation;
@@ -185,7 +191,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
         @Override
         public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
-            return null; // ignore
+            return new FakeFileDataElement.FakeFileDataElementBuilder(this, idShort, contents, mimeType);
         }
 
     }
