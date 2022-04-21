@@ -167,6 +167,11 @@ public class BaSyxAasFactory extends AasFactory {
         }
         return new BaSyxRegistry(endpoint, cFactory);
     }
+    
+    @Override
+    public String getFullRegistryUri(Endpoint regEndpoint) {
+        return regEndpoint.toUri() + "/api/v1/registry";
+    }
 
     @Override
     public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
