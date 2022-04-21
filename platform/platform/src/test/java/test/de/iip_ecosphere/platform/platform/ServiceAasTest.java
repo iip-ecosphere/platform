@@ -51,7 +51,8 @@ public class ServiceAasTest {
     public static void startup() {
         // adjust the setup 
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
-        System.out.println(aasSetup.getRegistryEndpoint().toServerUri() + "/registry/api/v1/registry");
+        String fullRegUri = AasFactory.getInstance().getFullRegistryUri(aasSetup.getRegistryEndpoint());
+        System.out.println("Registry: " + fullRegUri);
         
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
