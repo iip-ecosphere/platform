@@ -12,7 +12,7 @@
         <zip destFile="install.zip">
             <fileset dir="." includes="pom.xml README.md"/>
             <fileset dir="." includes="platformDependencies/**/*.*" />
-            <fileset dir="." includes="broker/**/*.*" />
+            <!--<fileset dir="." includes="broker/**/*.*" />-->
             <fileset dir="." includes="src/**/*.*" />
             <fileset dir="." includes="gen/**/*.*" />
             <fileset dir="." includes="container/**/*.*" />
@@ -21,7 +21,7 @@
             <fileset dir="." includes="pom.xml README.md"/>
             <tarfileset dir="." filemode="755" includes="**/*.sh" />
             <fileset dir="." includes="platformDependencies/**/*.*" />
-            <fileset dir="." includes="broker/**/*.*" excludes="**/*.sh" />
+            <!--<fileset dir="." includes="broker/**/*.*" excludes="**/*.sh" />-->
             <fileset dir="." includes="src/**/*.*" />
         	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh" />
         </tar>
