@@ -47,8 +47,9 @@ public class SelfDeviceAasProviderTest {
     public static void startup() {
         // adjust the setup 
         orig = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(null, false));
-        System.out.println(AasPartRegistry.getSetup().getRegistryEndpoint().toServerUri() 
-            + "/registry/api/v1/registry");
+        String fullRegUri = AasFactory.getInstance().getFullRegistryUri(
+            AasPartRegistry.getSetup().getRegistryEndpoint());
+        System.out.println("Registry: " + fullRegUri);
         
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = AasPartRegistry.getSetup().getRegistryEndpoint();
