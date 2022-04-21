@@ -1,3 +1,4 @@
+import Basics;
 import MavenBasics;
 import JavaMapping;
 
@@ -30,6 +31,10 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
+
+        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        XmlElement ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
+        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }
 
 }

@@ -190,7 +190,7 @@ project Connectors {
         String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
         String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
         NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic OPC UA connector@EN",
+           manufacturerProductDesignation = "Generic OPC UA connector@en",
            manufacturer = refBy(manufacturer_sse)
         };
    }
@@ -199,7 +199,7 @@ project Connectors {
         String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
         String artifact ="de.iip-ecosphere.platform:connectors.aas:";
         NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic AAS connector@EN",
+           manufacturerProductDesignation = "Generic AAS connector@en",
            manufacturer = refBy(manufacturer_sse)
         };
    }
@@ -208,7 +208,7 @@ project Connectors {
         String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
         String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
         NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic MQTT v3 connector@EN",
+           manufacturerProductDesignation = "Generic MQTT v3 connector@en",
            manufacturer = refBy(manufacturer_sse)
         };
    }
@@ -217,7 +217,7 @@ project Connectors {
         String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
         String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
         NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic MQTT v5 connector@EN",
+           manufacturerProductDesignation = "Generic MQTT v5 connector@en",
            manufacturer = refBy(manufacturer_sse)
         };
    }

@@ -248,7 +248,7 @@ project Services {
        IipVersion ver = "0.7.0";
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@EN",
+           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
            manufacturer = refBy(manufacturer_sse)
        };       // asynchronous true
        // deployable may influcence integration type
@@ -269,7 +269,7 @@ project Services {
        setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
        NonEmptyString path;
        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "RTSA AI service@EN",
+           manufacturerProductDesignation = "RTSA AI service@en",
            manufacturer = refBy(manufacturer_rapidminer)
        };
        // TODO constraint: flat input/output, not hierarchical

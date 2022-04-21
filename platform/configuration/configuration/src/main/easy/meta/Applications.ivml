@@ -80,7 +80,7 @@ project Applications {
        String artifact = ""; // ships with platform in service environment
        refTo(Application) application;
        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Application AAS with Trace embedding@EN",
+           manufacturerProductDesignation = "Application AAS with Trace embedding@en",
            manufacturer = refBy(manufacturer_sse)
        };
        Parameters parameter = {
