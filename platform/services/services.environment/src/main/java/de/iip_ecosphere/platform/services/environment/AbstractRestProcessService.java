@@ -150,12 +150,16 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                         post.setHeader("Accept", "application/json");
                         post.setHeader("Content-type", "application/json");
                         post.setHeader("Authorization", bearer);
-                        CloseableHttpResponse response = client.execute(post);
-                        String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
-                        try {
-                            callback.received(getOutputTranslator().to(result));
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
+                        if (client != null) {
+                            CloseableHttpResponse response = client.execute(post);
+                            String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
+                            try {
+                                callback.received(getOutputTranslator().to(result));
+                            } catch (IOException e) {
+                                LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
+                            }
+                        } else {
+                            LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");
                         }
                     } catch (IOException e1) {
                         LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
