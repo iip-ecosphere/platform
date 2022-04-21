@@ -269,6 +269,9 @@ public class AasUtils {
                     String mimeType = Files.probeContentType(f.toPath());
                     handler.handle(fName, contents, mimeType);
                     resolved = true;
+                } else {
+                    LoggerFactory.getLogger(PlatformAas.class).warn("Cannot resolve image '{}'", 
+                        image);
                 }
             } catch (IOException e) {
                 LoggerFactory.getLogger(PlatformAas.class).error("Cannot resolve image '{}': {}", 
