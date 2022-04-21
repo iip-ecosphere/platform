@@ -49,6 +49,19 @@
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
     </dependency>    
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+    </dependency>
+    <dependency> <!-- transitive from commons-pool2 -->
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>

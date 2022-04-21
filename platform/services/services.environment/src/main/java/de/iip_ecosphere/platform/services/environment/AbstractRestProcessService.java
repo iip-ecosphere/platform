@@ -16,14 +16,20 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -31,7 +37,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * Implements an abstract asynchronous process-based service which require a Rest-based communication with
- * the actual service process for a single pair of input-output types, e.g., via JSON.
+ * the actual service process for a single pair of input-output types, e.g., via JSON. Call 
+ * {@link #setupConnectionManager()} at the end of your {@link #start()} method implementation.
  * 
  * @author Marcel Nöhre
  *
@@ -43,6 +50,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     private String apiPath;
     private HttpURLConnection connection;
     private ExecutorService executor = Executors.newFixedThreadPool(5);
+    private CloseableHttpClient client;
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -104,6 +112,14 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     }
     
     /**
+     * Sets up the connection manager and creates a new httpClient based on a connection pool.
+     */
+    protected void setupConnectionManager() {
+        HttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
+        client = HttpClients.custom().setConnectionManager(poolingConnectionManager).build();
+    }
+    
+    /**
      * Get Connection to local server.
      * 
      * @param changeState whether the state shall be changed if the connection creation fails
@@ -125,14 +141,32 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     @Override
     public void process(I data) throws IOException {
-        connection = getNewConnectionInstance();
-        OutputStream os = connection.getOutputStream();
-        OutputStreamWriter osw;
-        osw = new OutputStreamWriter(os, "UTF-8");
-        String input = adjustRestQuery(getInputTranslator().to(data));
-        osw.write(input);
-        osw.flush();
-        redirectRest(connection, getReceptionCallback());
+        ReceptionCallback<O> callback = getReceptionCallback();
+        if (null != callback) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    try {
+                        HttpPost post = new HttpPost(getApiPath());
+                        String bearer = getBearerToken();
+                        String input = adjustRestQuery(getInputTranslator().to(data));
+                        StringEntity entity = new StringEntity(input);
+                        post.setEntity(entity);
+                        post.setHeader("Accept", "application/json");
+                        post.setHeader("Content-type", "application/json");
+                        post.setHeader("Authorization", bearer);
+                        CloseableHttpResponse response = client.execute(post);
+                        String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
+                        try {
+                            callback.received(getOutputTranslator().to(result));
+                        } catch (IOException e) {
+                            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
+        }
     }
     
     /**
@@ -201,5 +235,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         }
         return super.stop();
     }
+
+
     
 }
