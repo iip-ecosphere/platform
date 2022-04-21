@@ -148,7 +148,7 @@ public class PlatformAas implements AasContributor {
         AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
             sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m).build();
         });
-        AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
+        AasUtils.resolveImage(appSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
             sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m).build();
         });
         sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
