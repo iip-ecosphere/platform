@@ -99,11 +99,14 @@ public class ServiceAas {
         try {
             List<Aas> aasList = new ArrayList<Aas>();
             Map<Aas, String> aasSIds = new HashMap<>();
-            for (ApplicationSetup s : obtainNameplateSetup().getServices()) {
-                Aas aas = createAas(s);
-                if (null != aas) {
-                    aasList.add(aas);
-                    aasSIds.put(aas, s.getId());
+            ServiceAasSetup setup = obtainNameplateSetup();
+            if (null != setup && null != setup.getServices()) {
+                for (ApplicationSetup s : setup.getServices()) {
+                    Aas aas = createAas(s);
+                    if (null != aas) {
+                        aasList.add(aas);
+                        aasSIds.put(aas, s.getId());
+                    }
                 }
             }
             AasSetup aasSetup = PlatformSetup.getInstance().getAas();
