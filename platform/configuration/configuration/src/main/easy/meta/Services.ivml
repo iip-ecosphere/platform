@@ -249,7 +249,7 @@ project Services {
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
-           manufacturer = refBy(manufacturer_sse)
+           manufacturer = refBy(manufacturer_kiprotect)
        };       // asynchronous true
        // deployable may influcence integration type
        // integration type: CMD, REST, CENTRAL
