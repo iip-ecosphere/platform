@@ -88,6 +88,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         addProcessSpecCmdArg(args);
         parseArgs(args.toArray(new String[] {}));
         proc = createAndConfigureProcess(exe, false, home, args);
+        setupConnectionManager();
         return null; // don't change state
     }
     
