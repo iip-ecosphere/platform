@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources } from 'src/interfaces';
+import { PlatformServices } from 'src/interfaces';
 
 @Component({
   selector: 'app-services',
@@ -12,7 +12,7 @@ export class ServicesComponent implements OnInit {
 
   constructor(public http: HttpClient, public api: ApiService) { }
 
-  Data: PlatformResources = {}
+  Data: PlatformServices = {}
 
   ngOnInit(): void {
     this.getData();
@@ -20,5 +20,9 @@ export class ServicesComponent implements OnInit {
   public async getData() {
 
     this.Data = await this.api.getServices();
+  }
+
+  public isObject(value: any) {
+    return (typeof value === 'object');
   }
 }
