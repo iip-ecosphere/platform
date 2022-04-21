@@ -41,7 +41,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  */
 public class KodexRestServiceTest {
     
-    private static boolean measure = Boolean.valueOf(System.getProperty("kodex.measure", "false"));
+    private static boolean measure = Boolean.valueOf(System.getProperty("kodex.measure", "true"));
     private long startTime;
     private long endTime;
     private long count = 0;

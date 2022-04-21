@@ -116,6 +116,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
             }
             TimeUtils.sleep(100);
         }
+        setupConnectionManager();
         return ServiceState.RUNNING;
     }
     
