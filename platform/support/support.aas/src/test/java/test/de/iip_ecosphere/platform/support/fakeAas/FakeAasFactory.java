@@ -116,4 +116,9 @@ public class FakeAasFactory extends AasFactory {
         return null;
     }
 
+    @Override
+    public String getFullRegistryUri(Endpoint regEndpoint) {
+        return regEndpoint.toUri();
+    }
+
 }

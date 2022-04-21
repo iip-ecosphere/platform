@@ -146,6 +146,11 @@ public abstract class AasFactory {
             return true; // allow the fake test protocol creator for testing
         }
 
+        @Override
+        public String getFullRegistryUri(Endpoint regEndpoint) {
+            return regEndpoint.toUri();
+        }
+
     };
     
     /**
@@ -392,6 +397,14 @@ public abstract class AasFactory {
      * @throws IOException in case that the recipe/connection cannot be created
      */
     public abstract Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException;
+    
+    /**
+     * Returns the full registry URI (without obtaining a registry).
+     * 
+     * @param regEndpoint the endpoint
+     * @return the full address/URI
+     */
+    public abstract String getFullRegistryUri(Endpoint regEndpoint);
     
     /**
      * Creates a deployment recipe for unencrypted deployment.

@@ -44,86 +44,97 @@ import de.iip_ecosphere.platform.support.aas.Type;
 public class FactoryTest {
     
     /**
+     * A factory that reacts like the DUMMY factory but is a different instance.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class DisabledFactory extends AasFactory {
+
+        @Override
+        public String getName() {
+            return DUMMY.getName();
+        }
+
+        @Override
+        public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
+            return DUMMY.createSubmodelBuilder(idShort, urn);
+        }
+        
+        @Override
+        protected ServerRecipe createDefaultServerRecipe() {
+            return new FakeServerReceipe();
+        }
+
+        @Override
+        public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
+            return DUMMY.obtainRegistry(regEndpoint);
+        }
+
+        @Override
+        public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
+            return DUMMY.obtainRegistry(regEndpoint, aasSchema);
+        }
+
+        @Override
+        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
+            return DUMMY.createDeploymentRecipe(endpoint);
+        }
+        
+        @Override
+        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
+            return DUMMY.createDeploymentRecipe(endpoint, kstore);
+        }
+        
+        @Override
+        public AasBuilder createAasBuilder(String idShort, String urn) {
+            return DUMMY.createAasBuilder(idShort, urn);
+        }
+
+        @Override
+        public PersistenceRecipe createPersistenceRecipe() {
+            return DUMMY.createPersistenceRecipe();
+        }
+
+        @Override
+        public String[] getProtocols() {
+            return DUMMY.getProtocols();
+        }
+
+        @Override
+        public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
+            return DUMMY.createInvocablesCreator(protocol, host, port);
+        }
+
+        @Override
+        public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
+            return DUMMY.createProtocolServerBuilder(protocol, port);
+        }
+        
+        @Override
+        public String fixId(String id) {
+            return DUMMY.fixId(id);
+        }
+        
+        @Override
+        protected boolean accept(ProtocolDescriptor creator) {
+            return true; // allow the fake test protocol creator for testing
+        }
+
+        @Override
+        public String getFullRegistryUri(Endpoint regEndpoint) {
+            return DUMMY.getFullRegistryUri(regEndpoint);
+        }
+
+    }
+    
+    /**
      * Creates a factory instance that does nothing. The instance delegates to {@link AasFactory#DUMMY} to keep
      * this instance in the testing loop.
      * 
      * @return the factory instance
      */
     public static AasFactory createDisabledFactory() {
-        return new AasFactory() {
-            
-            @Override
-            public String getName() {
-                return DUMMY.getName();
-            }
-
-            @Override
-            public SubmodelBuilder createSubmodelBuilder(String idShort, String urn) {
-                return DUMMY.createSubmodelBuilder(idShort, urn);
-            }
-            
-            @Override
-            protected ServerRecipe createDefaultServerRecipe() {
-                return new FakeServerReceipe();
-            }
-
-            @Override
-            public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
-                return DUMMY.obtainRegistry(regEndpoint);
-            }
-
-            @Override
-            public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
-                return DUMMY.obtainRegistry(regEndpoint, aasSchema);
-            }
-
-            @Override
-            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-                return DUMMY.createDeploymentRecipe(endpoint);
-            }
-            
-            @Override
-            public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
-                return DUMMY.createDeploymentRecipe(endpoint, kstore);
-            }
-            
-            @Override
-            public AasBuilder createAasBuilder(String idShort, String urn) {
-                return DUMMY.createAasBuilder(idShort, urn);
-            }
-
-            @Override
-            public PersistenceRecipe createPersistenceRecipe() {
-                return DUMMY.createPersistenceRecipe();
-            }
-
-            @Override
-            public String[] getProtocols() {
-                return DUMMY.getProtocols();
-            }
-
-            @Override
-            public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-                return DUMMY.createInvocablesCreator(protocol, host, port);
-            }
-
-            @Override
-            public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-                return DUMMY.createProtocolServerBuilder(protocol, port);
-            }
-            
-            @Override
-            public String fixId(String id) {
-                return DUMMY.fixId(id);
-            }
-            
-            @Override
-            protected boolean accept(ProtocolDescriptor creator) {
-                return true; // allow the fake test protocol creator for testing
-            }
-
-        };
-        
+        return new DisabledFactory();        
     }
     
     /**
@@ -163,6 +174,8 @@ public class FactoryTest {
         Assert.assertEquals(LocalPersistenceType.INMEMORY, serverRecipe.toPersistenceType("")); // fallback
         Assert.assertEquals(LocalPersistenceType.INMEMORY, 
             serverRecipe.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
+        
+        Assert.assertTrue(instance.getFullRegistryUri(regEp).length() > 0);
     }
 
     /**
