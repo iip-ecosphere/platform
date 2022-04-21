@@ -47,7 +47,6 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public abstract class AbstractRestProcessService<I, O> extends AbstractProcessService<I, String, String, O> {
     
-    private String apiPath;
     private HttpURLConnection connection;
     private ExecutorService executor = Executors.newFixedThreadPool(5);
     private CloseableHttpClient client;
@@ -70,10 +69,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * 
      * @return the path
      */
-    protected String getApiPath() {
-        apiPath = "http://localhost:8000/v1/configs/abcdef/transform";
-        return apiPath;
-    }
+    protected abstract String getApiPath();
     
     /**
      * Returns the connection instance.
@@ -159,10 +155,10 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                         try {
                             callback.received(getOutputTranslator().to(result));
                         } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
+                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
                         }
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
                     }
                 }
             });
@@ -211,11 +207,15 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                             callback.received(getOutputTranslator().to(result));
                             connection.disconnect();
                         } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
+                            if (ServiceState.RUNNING == getState()) {
+                                LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
+                            }
                             connection.disconnect();
                         }
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        if (ServiceState.RUNNING == getState()) {
+                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
+                        }
                     }
                 }
             });
