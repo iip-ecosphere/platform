@@ -52,7 +52,6 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
 		<groupId>com.sparkjava</groupId>
 		<artifactId>spark-core</artifactId>

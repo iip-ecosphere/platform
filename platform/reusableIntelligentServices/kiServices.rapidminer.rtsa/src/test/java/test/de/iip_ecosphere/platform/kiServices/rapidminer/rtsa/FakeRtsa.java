@@ -122,6 +122,7 @@ public class FakeRtsa {
 //            output.flush();
 //            exchange.close();
 //        }));
+        
         Spark.port(serverPort);
         post("/services/" + path, (req, res) -> { 
             String request = req.body().lines().collect(Collectors.joining("\n"));
