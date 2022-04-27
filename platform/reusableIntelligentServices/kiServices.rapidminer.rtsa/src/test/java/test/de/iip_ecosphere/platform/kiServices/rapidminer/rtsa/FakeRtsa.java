@@ -22,6 +22,14 @@ import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpServer;
 
+import spark.Spark;
+
+import static spark.Spark.get;
+import static spark.Spark.post;
+import static spark.Spark.put;
+import static spark.Spark.delete;
+import static spark.Spark.options;
+
 /**
  * A very simple RTSA fake server as we are not allowed to publish RTSA.
  * 
@@ -100,21 +108,65 @@ public class FakeRtsa {
         boolean verbose = getBooleanArg(args, "verbose", true);
         boolean waitAtStart = getBooleanArg(args, "waitAtStart", true);
         System.out.println("This is FakeRtsa on port: " + serverPort);
-        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-        server.createContext("/services/" + path, (exchange -> {
-            String request = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
-                .lines().collect(Collectors.joining("\n"));            
+//        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
+//        server.createContext("/services/" + path, (exchange -> {
+//            String request = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
+//                .lines().collect(Collectors.joining("\n"));            
+//            if (verbose) {
+//                System.out.println("FakeRtsa Received Request: " + request);
+//            }
+//            String respText = createResponse(request);
+//            exchange.sendResponseHeaders(200, respText.getBytes().length);
+//            OutputStream output = exchange.getResponseBody();
+//            output.write(respText.getBytes());
+//            output.flush();
+//            exchange.close();
+//        }));
+        Spark.port(serverPort);
+        post("/services/" + path, (req, res) -> { 
+            String request = req.body().lines().collect(Collectors.joining("\n"));
             if (verbose) {
                 System.out.println("FakeRtsa Received Request: " + request);
             }
             String respText = createResponse(request);
-            exchange.sendResponseHeaders(200, respText.getBytes().length);
-            OutputStream output = exchange.getResponseBody();
-            output.write(respText.getBytes());
-            output.flush();
-            exchange.close();
-        }));
-        server.setExecutor(null); // creates a default executor
+            res.body(respText);
+            res.status(200);
+            return res.body();
+        });
+        
+        get("/services/" + path, (req, res) -> { 
+            String request = req.body().lines().collect(Collectors.joining("\n"));
+            if (verbose) {
+                System.out.println("FakeRtsa Received Request: " + request);
+            }
+            String respText = createResponse(request);
+            res.body(respText);
+            res.status(200);
+            return res.body();
+        });
+        
+        put("/services/" + path, (req, res) -> { 
+            String request = req.body().lines().collect(Collectors.joining("\n"));
+            if (verbose) {
+                System.out.println("FakeRtsa Received Request: " + request);
+            }
+            String respText = createResponse(request);
+            res.body(respText);
+            res.status(200);
+            return res.body();
+        });
+
+        delete("/services/" + path, (req, res) -> { 
+            String request = req.body().lines().collect(Collectors.joining("\n"));
+            if (verbose) {
+                System.out.println("FakeRtsa Received Request: " + request);
+            }
+            String respText = createResponse(request);
+            res.body(respText);
+            res.status(200);
+            return res.body();
+        });
+        
         new Thread(() -> {
             if (waitAtStart) {
                 try {
@@ -127,7 +179,7 @@ public class FakeRtsa {
                 System.out.println("Started Application in 50 ms"); // we need some output for state change
             }
         }).start();
-        server.start();
+
     }
     
     /**
