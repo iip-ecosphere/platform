@@ -12,15 +12,10 @@
 
 package test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.util.Random;
 import java.util.stream.Collectors;
-
-import com.sun.net.httpserver.HttpServer;
+import java.util.stream.Stream;
 
 import spark.Spark;
 
@@ -28,14 +23,12 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
 import static spark.Spark.delete;
-import static spark.Spark.options;
 
 /**
  * A very simple RTSA fake server as we are not allowed to publish RTSA.
  * 
  * @author Holger Eichelberger, SSE
  */
-@SuppressWarnings("restriction")
 public class FakeRtsa {
 
     public static final String PARAM_PREFIX = "--";
@@ -125,7 +118,7 @@ public class FakeRtsa {
         
         Spark.port(serverPort);
         post("/services/" + path, (req, res) -> { 
-            String request = req.body().lines().collect(Collectors.joining("\n"));
+            String request = lines(req.body()).collect(Collectors.joining("\n"));
             if (verbose) {
                 System.out.println("FakeRtsa Received Request: " + request);
             }
@@ -136,7 +129,7 @@ public class FakeRtsa {
         });
         
         get("/services/" + path, (req, res) -> { 
-            String request = req.body().lines().collect(Collectors.joining("\n"));
+            String request = lines(req.body()).collect(Collectors.joining("\n"));
             if (verbose) {
                 System.out.println("FakeRtsa Received Request: " + request);
             }
@@ -147,7 +140,7 @@ public class FakeRtsa {
         });
         
         put("/services/" + path, (req, res) -> { 
-            String request = req.body().lines().collect(Collectors.joining("\n"));
+            String request = lines(req.body()).collect(Collectors.joining("\n"));
             if (verbose) {
                 System.out.println("FakeRtsa Received Request: " + request);
             }
@@ -158,7 +151,7 @@ public class FakeRtsa {
         });
 
         delete("/services/" + path, (req, res) -> { 
-            String request = req.body().lines().collect(Collectors.joining("\n"));
+            String request = lines(req.body()).collect(Collectors.joining("\n"));
             if (verbose) {
                 System.out.println("FakeRtsa Received Request: " + request);
             }
@@ -181,6 +174,16 @@ public class FakeRtsa {
             }
         }).start();
 
+    }
+    
+    /**
+     * Replacement for Java 11 {@code String.lines()}.
+     * 
+     * @param string the string to stream
+     * @return the streamed string in terms of individual lines
+     */
+    public static Stream<String> lines(String string) {
+        return Stream.of(string.replace("\r\n", "\n").split("\n"));
     }
     
     /**
