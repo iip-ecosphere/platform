@@ -15,10 +15,12 @@ package de.iip_ecosphere.platform.security.services.kodex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -26,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
+
+import com.esotericsoftware.yamlbeans.YamlWriter;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -46,12 +50,14 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
     public static final int WAITING_TIME_WIN = 120000; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
-    public static final String VERSION = "0.0.7";
+    public static final String VERSION = "0.0.8";
     private static final boolean DEBUG = false;
    
     private String dataSpec;
     private String bearerToken;
     private File home;
+    private int port;
+    private String host;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON. Data file is 
@@ -81,6 +87,15 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         ReceptionCallback<O> callback, YamlService yaml, String dataSpec) {
         super(inTrans, outTrans, callback, yaml);
         this.dataSpec = dataSpec;
+        setNetworkDefaults();
+    }
+    
+    /**
+     * Sets network settings to KODEX defaults.
+     */
+    private void setNetworkDefaults() {
+        port = 8000;
+        host = "0.0.0.0";
     }
     
     @Override
@@ -88,10 +103,24 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
+        // TODO change port to ephemeral when KODEX port change is working
         File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/")); 
         home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
         exe = new File(exe, executable); 
         home = home.getAbsoluteFile();
+        Map<String, Object> apiSettings = new HashMap<>();
+        apiSettings.put("port", port);
+        apiSettings.put("host", host);
+        File settingFile = new File(home, "apiSettings.yml");
+        try {
+            YamlWriter writer = new YamlWriter(new FileWriter(settingFile));
+            writer.write(apiSettings);
+            writer.close();
+        } catch (IOException e) {
+            setNetworkDefaults();
+            LoggerFactory.getLogger(getClass()).error("Cannot write kodex setting file '{}': {}. Falling back "
+                + "to KODEX defaults. May clash on used port.", settingFile.getAbsolutePath(), e.getMessage());
+        }
         
         List<String> args = new ArrayList<>();
         if (DEBUG) {
@@ -121,8 +150,15 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     @Override
+    protected void configure(ProcessBuilder builder) {
+        // TODO enable if KODEX works with that
+        //Map<String, String> env = builder.environment();
+        //env.put("KODEX_SETTINGS", "apiSettings.yml");
+    }
+    
+    @Override
     protected String getApiPath() {
-        return "http://localhost:8000/v1/configs/abcdef/transform";
+        return "http://" + host + ":" + port + "/v1/configs/abcdef/transform";
     }
     
     @Override
@@ -147,7 +183,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
                 }
                 bearerToken = "Bearer " + token;
             } catch (FileNotFoundException e) {
-                LoggerFactory.getLogger(AbstractRestProcessService.class).error("Reading bearer " + e.getMessage(), e);
+                LoggerFactory.getLogger(getClass()).error("Reading bearer " + e.getMessage(), e);
             }
         }
         return bearerToken;
