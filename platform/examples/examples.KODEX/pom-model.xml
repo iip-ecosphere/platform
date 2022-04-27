@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>examples.KODEX</artifactId>
+  <packaging>jar</packaging>
+  <name>KODEX example</name>
+  <description>Utilizing the KODEX platform service.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.3.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    
+    <dependency>
+      <artifactId>configuration.configuration</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>
+      
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <optional>true</optional>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>configuration.configuration</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <build>
+    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>3.2.0</version>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>generate-sources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>de.iip-ecosphere.platform</groupId>
+                   <artifactId>configuration.configuration</artifactId>
+                   <version>${project.version}</version>
+                   <classifier>easy</classifier>
+                   <type>zip</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
+                   <destFileName>model.jar</destFileName>
+                 </artifactItem>
+               </artifactItems>
+               <overWriteReleases>false</overWriteReleases>
+               <overWriteSnapshots>true</overWriteSnapshots>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+       <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>exec-maven-plugin</artifactId>
+         <version>3.0.0</version>
+         <configuration>
+           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
+           <cleanupDaemonThreads>false</cleanupDaemonThreads>
+         </configuration>
+       </plugin>
+    </plugins>
+  </build> 
+
+</project>
