@@ -71,7 +71,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
         File rtsaPath = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/rtsa"));
         String javaKey = isFakeRtsa(rtsaPath) 
-            ? InstalledDependenciesSetup.getJavaKey() 
+            ? InstalledDependenciesSetup.getJavaKey() // fake shall (soon) run with any java
             : InstalledDependenciesSetup.KEY_JAVA_8; // fixed restriction for RTSA - do not change!
         File exe = InstalledDependenciesSetup.location(javaKey);
         home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
