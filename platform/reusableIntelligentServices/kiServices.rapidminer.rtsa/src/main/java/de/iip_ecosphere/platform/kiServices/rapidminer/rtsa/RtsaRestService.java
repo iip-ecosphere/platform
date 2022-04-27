@@ -69,8 +69,11 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     protected ServiceState start() throws ExecutionException {
         YamlProcess sSpec = getProcessSpec();
 
-        File exe = InstalledDependenciesSetup.location(InstalledDependenciesSetup.KEY_JAVA_8);
         File rtsaPath = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/rtsa"));
+        String javaKey = isFakeRtsa(rtsaPath) 
+            ? InstalledDependenciesSetup.getJavaKey() // fake shall (soon) run with any java
+            : InstalledDependenciesSetup.KEY_JAVA_8; // fixed restriction for RTSA - do not change!
+        File exe = InstalledDependenciesSetup.location(javaKey);
         home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
         home = getResolvedFile(home);
         
@@ -121,6 +124,17 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     /**
+     * REturns whether we try to run a fake RTSA. [testing, running without license]
+     * 
+     * @param rtsaPath the path to the installed RTSA
+     * @return {@code true} for fake RTSA, {@code false} for real RTSA
+     */
+    protected boolean isFakeRtsa(File rtsaPath) {
+        File libsFake = new File(rtsaPath, "lib/fakeRtsa.jar");
+        return libsFake.exists();
+    }
+    
+    /**
      * Returns the main class of RTSA. [for testing]
      * 
      * @param rtsaPath the path to the installed RTSA
@@ -128,8 +142,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
      */
     protected String getMainClass(File rtsaPath) {
         String result;
-        File libsFake = new File(rtsaPath, "lib/fakeRtsa.jar");
-        if (libsFake.exists()) {
+        if (isFakeRtsa(rtsaPath)) {
             result = "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
         } else {
             result = "com.rapidminer.execution.scoring.Application";

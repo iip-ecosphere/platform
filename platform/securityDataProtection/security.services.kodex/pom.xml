@@ -22,7 +22,13 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>services.environment</artifactId>
       <version>${project.version}</version>
-    </dependency>    
+    </dependency>
+   <!-- currently used only in here, may become global -->
+   <dependency>
+     <groupId>com.esotericsoftware.yamlbeans</groupId>
+     <artifactId>yamlbeans</artifactId>
+     <version>1.15</version>
+    </dependency> 
   
     <dependency>
       <groupId>junit</groupId>

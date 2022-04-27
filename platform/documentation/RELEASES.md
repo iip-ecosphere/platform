@@ -4,7 +4,7 @@
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
-* Model-based of KODEX as platform service for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
+* Model-based of KODEX as platform service (and upgrade to 0.0.8) for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
 * Initial mapping of the AAS product name/typeplate into the AAS abstraction and the default BaSyx implementation.
 * Initial version of service execution with multiple brokers and data paths between multiple devices.
 * More flexible device ids via IdProvider and, if permitted, overriding the device id via command line parameter `--iip.id`.

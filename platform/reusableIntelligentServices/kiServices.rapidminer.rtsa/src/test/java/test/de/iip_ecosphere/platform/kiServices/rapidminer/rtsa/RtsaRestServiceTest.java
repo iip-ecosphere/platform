@@ -138,7 +138,8 @@ public class RtsaRestServiceTest {
         process(service, new InData(1, 1.3, 3));
         TimeUtils.sleep(500);
         LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Stopping service, may take two minutes on Windows");
-        service.setState(ServiceState.STOPPING);     
+        service.setState(ServiceState.STOPPING);
+        TimeUtils.sleep(500);
         Assert.assertEquals(1, receivedCount.get());
         LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Activating/Passivating");
         service.activate();

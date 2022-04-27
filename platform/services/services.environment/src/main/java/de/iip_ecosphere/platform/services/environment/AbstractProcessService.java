@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.lang.SystemUtils;
@@ -255,8 +256,26 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param args the process arguments (may be <b>null</b> for none) 
      * @return the created process instance
      * @throws IOException if process creation fails
+     * @see #createProcess(File, boolean, File, List, Consumer)
      */
     public static Process createProcess(File exe, boolean byName, File dir, List<String> args) throws IOException {
+        return createProcess(exe, byName, dir, args, null);
+    }
+    
+    /**
+     * Creates and starts a command line process.
+     * 
+     * @param exe the executable to run
+     * @param byName add the {@code exe} by name or (if {@code false}) by absolute name
+     * @param dir the home dir where to execute the process within
+     * @param args the process arguments (may be <b>null</b> for none) 
+     * @param customizer allows for further customization of the process builder created in this method, may be 
+     *     <b>null</b> for none
+     * @return the created process instance
+     * @throws IOException if process creation fails
+     */
+    public static Process createProcess(File exe, boolean byName, File dir, List<String> args, 
+        Consumer<ProcessBuilder> customizer) throws IOException {
         List<String> tmp = new ArrayList<String>();
         if (byName) {
             tmp.add(exe.getName());
@@ -268,8 +287,11 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         }
         
         LoggerFactory.getLogger(AbstractProcessService.class).info("Cmd line: " + tmp + " in " + dir);
-        ProcessBuilder processBuilder = new ProcessBuilder(tmp);        
+        ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
+        if (null != customizer) {
+            customizer.accept(processBuilder);
+        }
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         return processBuilder.start();
     }
@@ -403,11 +425,12 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @see #handleInputStream(InputStream)
      * @see #handleErrorStream(InputStream)
      * @see #handleOutputStream(OutputStream)
+     * @see #getProcessBuilderConfigurer()
      */
     protected Process createAndConfigureProcess(File exe, boolean byName, File dir, List<String> args) 
         throws ExecutionException {
         try {
-            proc = createProcess(exe, byName, dir, args);
+            proc = createProcess(exe, byName, dir, args, p -> configure(p));
             handleOutputStream(proc.getOutputStream());
             handleInputStream(proc.getInputStream());
             handleErrorStream(proc.getErrorStream());
@@ -416,6 +439,15 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             throw new ExecutionException(e);
         }        
         return proc;
+    }
+    
+    /**
+     * Allows to configure a process builder for this service.
+     * Called from {@link #createAndConfigureProcess(File, boolean, File, List)}
+     * 
+     * @param builder the process builder to configure
+     */
+    protected void configure(ProcessBuilder builder) {
     }
     
     /**
