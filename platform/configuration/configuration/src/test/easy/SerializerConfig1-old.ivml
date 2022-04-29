@@ -93,8 +93,8 @@ project SerializerConfig1Old {
         class = "MySourceImpl",
         artifact = "",
         kind = ServiceKind::SOURCE_SERVICE,
-        traceRcv = true,
-        traceSent = true,        
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,        
         output = {{type=refBy(StringType)}}
         // TODO parameter
     };
@@ -191,8 +191,8 @@ project SerializerConfig1Old {
         output = {{type=refBy(myConnPltfIn)}},
         inInterface = refBy(myConnMachineIn), 
         outInterface = refBy(myConnMachineOut),
-        traceRcv = true,
-        traceSent = true,        
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,        
         operations = {
           FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[0]), 
             operation=AddDataTranslationOperation{
@@ -219,8 +219,8 @@ project SerializerConfig1Old {
         outInterface = refBy(myConnMachineOut),
         machineFormatter = TextLineFormatter{separator=","},
         machineParser = TextLineParser{separator=","},
-        traceRcv = true,
-        traceSent = true,        
+        traceRcv = TraceKind::LOG,
+        traceSent = TraceKind::LOG,        
         operations = {
           FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[0]), 
             operation=AddDataTranslationOperation{
@@ -241,8 +241,8 @@ project SerializerConfig1Old {
         class = "MyAnonymizerImpl",
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        traceRcv = true,
-        traceSent = true,        
+        traceRcv = TraceKind::LOG,
+        traceSent = TraceKind::LOG,        
         input = {{type=refBy(StringType)}},
         output = {{type=refBy(rec1)}}
         // TODO parameter
@@ -258,8 +258,8 @@ project SerializerConfig1Old {
         class = "MyKiImpl",
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        traceRcv = true,
-        traceSent = true,        
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,        
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(StringType)}}
         // TODO parameter

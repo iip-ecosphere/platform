@@ -84,6 +84,15 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             }'        
         }
     }
+    
+    def toString(String kw) {
+        if (kw == "class") {
+            '@Override
+            public String toString() {
+                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this);
+            }'
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
@@ -130,6 +139,8 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             ${getters(type)}
             
             ${setters(type)}
+            
+            ${toString(kw)|e}
 
         }'
     }

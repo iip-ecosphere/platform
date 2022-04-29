@@ -69,18 +69,25 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // generates a sent probe expression (if configured) for the given functional expression 
     def genSentProbe(ServiceBase base, String expr, Boolean needsReturn, String exprType, String data) {
-        if (base.monitorSentCount or base.traceSent) {
+        if (base.monitorSentCount or base.traceSent <> TraceKind::NONE) {
             String mon = "";
             String trace = "";
             if (base.monitorSentCount) {
                 mon = "metrics.increaseCounter(sentCounterId);";
             }
-            if (base.traceSent) {
+            if (base.traceSent <> TraceKind::NONE) {
+                String d;                
                 if (data.length() > 0) {
-                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${data}));';
+                    d = data;
                 } else { // take from expression, store in local variable
-                    trace = '${exprType} r = ${expr};\nTransport.sendTraceRecord(new TraceRecord("${base.id}", "sending", r));';
+                    trace = '${exprType} r = ${expr};\n';
                     expr = "r";
+                    d = expr;
+                }
+                if (base.traceRcv == TraceKind::TRACE) {
+                    trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${d}));';
+                } else { // LOG
+                    trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}: {}", "${base.id}", ${d});';
                 }
             } 
             String ret;
@@ -101,20 +108,26 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // generates a received probe expression (if configured) for the given functional expression 
     def genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
-        if (base.monitorRcvCount or base.traceRcv) {
+        if (base.monitorRcvCount or base.traceRcv <> TraceKind::NONE) {
             String mon = "";
             String trace = "";
             if (base.monitorRcvCount) {
                 mon = "metrics.increaseCounter(rcvCounterId);";
             }
-            if (base.traceRcv) {
+            if (base.traceRcv <> TraceKind::NONE) {
+                String d;
                 if (data.length() > 0) {
-                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "reception", ${data}));';
+                    d = data;
                 } else { // take from expression, store in local variable
                     expr = "${type} r = ${expr}";
-                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "reception", r));';
+                    d = "r";
                 }
-            } 
+                if (base.traceRcv == TraceKind::TRACE) {
+                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", ${d}));';
+                } else { // LOG
+                    trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}: {}", "${base.id}", ${d});';
+                }
+            }
             '{
                 ${expr}; 
                 ${mon|e}
