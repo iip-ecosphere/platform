@@ -108,7 +108,7 @@ project DataTypes {
     };
     compound ByteTypeType refines PrimitiveType {
     }
-    DoubleTypeType ByteType = {
+    ByteTypeType ByteType = {
         name = "Byte"
     };
 
