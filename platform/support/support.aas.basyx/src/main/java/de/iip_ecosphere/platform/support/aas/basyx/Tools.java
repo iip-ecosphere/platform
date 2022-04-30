@@ -235,6 +235,16 @@ public class Tools {
         } // IRI, others?
         return result;
     }
+    
+    /**
+     * Translates an identifier back into its string notation.
+     * 
+     * @param identifier the identifier (may be <b>null</b>, result is also <b>null</b> then)
+     * @return the string notation
+     */
+    public static String translateIdentifier(IIdentifier identifier) {
+        return null == identifier ? null : identifier.toString(); // preliminary
+    }
 
     /**
      * Translates a reference. (supports IRDI)

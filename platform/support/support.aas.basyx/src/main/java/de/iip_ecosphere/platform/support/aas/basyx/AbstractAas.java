@@ -269,5 +269,10 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     public TechnicalDataSubmodel getTechnicalDataSubmodel() {
         return (TechnicalDataSubmodel) getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT);
     }
+
+    @Override
+    public String getIdentification() {
+        return Tools.translateIdentifier(aas.getIdentification());
+    }
     
 }

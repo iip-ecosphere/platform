@@ -324,4 +324,9 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 
+    @Override
+    public String getIdentification() {
+        return Tools.translateIdentifier(submodel.getIdentification());
+    }
+
 }
