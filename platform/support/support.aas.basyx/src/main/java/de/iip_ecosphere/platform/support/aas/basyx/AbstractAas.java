@@ -270,7 +270,12 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
         return (TechnicalDataSubmodel) getSubmodel(BaSyxTechnicalDataSubmodel.ID_SHORT);
     }
 
-    @Override
+    /**
+     * Returns the identification of the identifiable.
+     * 
+     * @return the identification (for now as string, like URNs are passed into)
+     */
+    //@Override // JDK8
     public String getIdentification() {
         return Tools.translateIdentifier(aas.getIdentification());
     }

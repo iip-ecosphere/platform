@@ -324,7 +324,12 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
     }
 
-    @Override
+    /**
+     * Returns the identification of the identifiable.
+     * 
+     * @return the identification (for now as string, like URNs are passed into)
+     */
+    //@Override // JDK8
     public String getIdentification() {
         return Tools.translateIdentifier(submodel.getIdentification());
     }
