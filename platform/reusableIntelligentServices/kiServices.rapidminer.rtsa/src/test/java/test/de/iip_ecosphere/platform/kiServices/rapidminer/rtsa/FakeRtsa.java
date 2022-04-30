@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import spark.Route;
 import spark.Spark;
 
 import static spark.Spark.get;
@@ -29,6 +30,7 @@ import static spark.Spark.delete;
  * A very simple RTSA fake server as we are not allowed to publish RTSA.
  * 
  * @author Holger Eichelberger, SSE
+ * @author Ahmad Alamoush, SSE
  */
 public class FakeRtsa {
 
@@ -47,65 +49,23 @@ public class FakeRtsa {
         boolean verbose = CmdLine.getBooleanArg(args, "verbose", true);
         boolean waitAtStart = CmdLine.getBooleanArg(args, "waitAtStart", true);
         System.out.println("This is FakeRtsa on port: " + serverPort);
-//        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-//        server.createContext("/services/" + path, (exchange -> {
-//            String request = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
-//                .lines().collect(Collectors.joining("\n"));            
-//            if (verbose) {
-//                System.out.println("FakeRtsa Received Request: " + request);
-//            }
-//            String respText = createResponse(request);
-//            exchange.sendResponseHeaders(200, respText.getBytes().length);
-//            OutputStream output = exchange.getResponseBody();
-//            output.write(respText.getBytes());
-//            output.flush();
-//            exchange.close();
-//        }));
+        
+        Route defaultRoute = (req, res) -> { 
+            String request = lines(req.body()).collect(Collectors.joining("\n"));
+            if (verbose) {
+                System.out.println("FakeRtsa Received Request: " + request);
+            }
+            String respText = createResponse(request);
+            res.body(respText);
+            res.status(200);
+            return res.body();
+        };
         
         Spark.port(serverPort);
-        post("/services/" + path, (req, res) -> { 
-            String request = lines(req.body()).collect(Collectors.joining("\n"));
-            if (verbose) {
-                System.out.println("FakeRtsa Received Request: " + request);
-            }
-            String respText = createResponse(request);
-            res.body(respText);
-            res.status(200);
-            return res.body();
-        });
-        
-        get("/services/" + path, (req, res) -> { 
-            String request = lines(req.body()).collect(Collectors.joining("\n"));
-            if (verbose) {
-                System.out.println("FakeRtsa Received Request: " + request);
-            }
-            String respText = createResponse(request);
-            res.body(respText);
-            res.status(200);
-            return res.body();
-        });
-        
-        put("/services/" + path, (req, res) -> { 
-            String request = lines(req.body()).collect(Collectors.joining("\n"));
-            if (verbose) {
-                System.out.println("FakeRtsa Received Request: " + request);
-            }
-            String respText = createResponse(request);
-            res.body(respText);
-            res.status(200);
-            return res.body();
-        });
-
-        delete("/services/" + path, (req, res) -> { 
-            String request = lines(req.body()).collect(Collectors.joining("\n"));
-            if (verbose) {
-                System.out.println("FakeRtsa Received Request: " + request);
-            }
-            String respText = createResponse(request);
-            res.body(respText);
-            res.status(200);
-            return res.body();
-        });
+        post("/services/" + path, defaultRoute);
+        get("/services/" + path, defaultRoute);
+        put("/services/" + path, defaultRoute); // whyever
+        delete("/services/" + path, defaultRoute); // whyever
         
         new Thread(() -> {
             if (waitAtStart) {
