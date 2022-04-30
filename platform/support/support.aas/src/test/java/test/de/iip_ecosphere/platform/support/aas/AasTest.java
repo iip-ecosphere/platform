@@ -298,6 +298,7 @@ public class AasTest {
             NAME_SUBMODELC_OUTER, false, true)); // for modification
         
         Submodel submodel = subModelBuilder.build();
+        Assert.assertNotNull(submodel.getIdentification());
         assertSize(3, submodel.operations());
         assertSize(0, submodel.dataElements());
         assertSize(5, submodel.properties());
@@ -306,6 +307,7 @@ public class AasTest {
         Assert.assertEquals(9, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
+        Assert.assertNotNull(aas.getIdentification());
         
         // adding on local models
         Submodel subAdd = aas.createSubmodelBuilder("sub_add", null).build();

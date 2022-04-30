@@ -44,6 +44,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     private FakeAas parent;
     private Map<String, SubmodelElement> elements = new HashMap<>();
     private Map<String, Builder<?>> deferred;
+    private String identifier;
     
     /**
      * A fake sub-model builder.
@@ -76,7 +77,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          */
         FakeSubmodelBuilder(FakeAasBuilder parent, String idShort, String identifier) {
             this.parent = parent;
-            this.instance = createInstance(idShort);
+            this.instance = createInstance(idShort, identifier);
             this.instance.parent = null != parent ? parent.getInstance() : null;
         }
 
@@ -96,10 +97,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
          * Creates the instance.
          * 
          * @param idShort the short id
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          * @return the instance
          */
-        protected FakeSubmodel createInstance(String idShort) {
-            return new FakeSubmodel(idShort);
+        protected FakeSubmodel createInstance(String idShort, String identifier) {
+            return new FakeSubmodel(idShort, identifier);
         }
         
         @Override
@@ -200,9 +203,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
      * Creates the instance.
      * 
      * @param idShort the short id.
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      */
-    protected FakeSubmodel(String idShort) {
+    protected FakeSubmodel(String idShort, String identifier) {
         super(idShort);
+        this.identifier = identifier;
     }
 
     @Override
@@ -370,6 +376,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
      */
     <B extends Builder<?>> B getDeferred(String shortId, Class<B> cls) {
         return DeferredBuilder.getDeferred(shortId, cls, deferred);
+    }
+
+    @Override
+    public String getIdentification() {
+        return identifier;
     }
 
 }

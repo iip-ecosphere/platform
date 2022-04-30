@@ -38,6 +38,7 @@ public class FakeAas extends FakeElement implements Aas {
     private Map<String, Submodel> submodels = new HashMap<String, Submodel>();
     private Asset asset;
     private Map<String, Builder<?>> deferred;
+    private String identifier;
     
     /**
      * The Fake AAS builder.
@@ -52,10 +53,11 @@ public class FakeAas extends FakeElement implements Aas {
          * Creates an instance.
          * 
          * @param idShort the short id
-         * @param urn the URN
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          */
-        FakeAasBuilder(String idShort, String urn) {
-            instance = new FakeAas(idShort); // we do not return the URN so far, so we ignore it here
+        FakeAasBuilder(String idShort, String identifier) {
+            instance = new FakeAas(idShort, identifier);
         }
 
         /**
@@ -143,9 +145,12 @@ public class FakeAas extends FakeElement implements Aas {
      * Creates the instance.
      * 
      * @param idShort the short id.
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      */
-    FakeAas(String idShort) {
+    FakeAas(String idShort, String identifier) {
         super(idShort);
+        this.identifier = identifier;
     }
 
     @Override
@@ -248,6 +253,11 @@ public class FakeAas extends FakeElement implements Aas {
     @Override
     public TechnicalDataSubmodel getTechnicalDataSubmodel() {
         return null;
+    }
+
+    @Override
+    public String getIdentification() {
+        return identifier; 
     }
 
 }

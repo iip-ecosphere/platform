@@ -22,4 +22,11 @@ public interface Identifiable extends Referable {
  // TODO public IAdministrativeInformation getAdministration();
  // TODO public IIdentifier getIdentification();
     
+    /**
+     * Returns the identification of the identifiable.
+     * 
+     * @return the identification (for now as string, like URNs are passed into)
+     */
+    public String getIdentification();
+    
 }
