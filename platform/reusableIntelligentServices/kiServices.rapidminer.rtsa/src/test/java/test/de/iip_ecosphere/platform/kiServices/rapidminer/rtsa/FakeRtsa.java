@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import spark.Spark;
 
 import static spark.Spark.get;
@@ -31,64 +32,9 @@ import static spark.Spark.delete;
  */
 public class FakeRtsa {
 
-    public static final String PARAM_PREFIX = "--";
-    public static final String PARAM_ARG_NAME_SEP = ".";
-    public static final String PARAM_VALUE_SEP = "=";
-
     private static final String ENDING = "}]}";
     private static Random random = new Random();
 
-    /**
-     * Emulates reading a Spring-like parameter if the configuration is not yet in place.
-     * 
-     * @param args the arguments
-     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
-     */
-    public static String getArg(String[] args, String argName, String dflt) {
-        String result = dflt;
-        String prefix = PARAM_PREFIX + argName + PARAM_VALUE_SEP;
-        for (int a = 0; a < args.length; a++) {
-            String arg = args[a];
-            if (arg.startsWith(prefix)) {
-                result = arg.substring(prefix.length());
-                break;
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * Returns an int command line argument.
-     * 
-     * @param args the arguments
-     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
-     */
-    public static int getIntArg(String[] args, String argName, int dflt) {
-        int result;
-        try {
-            result = Integer.parseInt(getArg(args, argName, String.valueOf(dflt)));
-        } catch (NumberFormatException e) {
-            result = dflt;
-        }
-        return result;
-    }
-    
-    /**
-     * Returns a Boolean command line argument.
-     * 
-     * @param args the arguments
-     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
-     */
-    public static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
-        return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
-    }    
-    
     /**
      * Executes the fake server.
      * 
@@ -97,9 +43,9 @@ public class FakeRtsa {
      */
     public static void main(String[] args) throws IOException {
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
-        String path = getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
-        boolean verbose = getBooleanArg(args, "verbose", true);
-        boolean waitAtStart = getBooleanArg(args, "waitAtStart", true);
+        String path = CmdLine.getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
+        boolean verbose = CmdLine.getBooleanArg(args, "verbose", true);
+        boolean waitAtStart = CmdLine.getBooleanArg(args, "waitAtStart", true);
         System.out.println("This is FakeRtsa on port: " + serverPort);
 //        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
 //        server.createContext("/services/" + path, (exchange -> {
