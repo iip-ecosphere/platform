@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
-import de.iip_ecosphere.platform.ecsRuntime.DeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.NameplateSetup;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -65,6 +64,25 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
     public static final String NAME_PROPERTY_PRODUCTIMAGE = "ProductImage";
    
     private String aasAddress = null;
+    
+    /**
+     * Implements the JSL descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements DeviceAasProviderDescriptor {
+
+        @Override
+        public DeviceAasProvider createInstance() {
+            return new YamlDeviceAasProvider();
+        }
+
+        @Override
+        public boolean createsMultiProvider() {
+            return false;
+        }
+        
+    }
     
     @Override
     public String getURN() {

@@ -58,6 +58,15 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
 * `transport` defines the setup of the central transport server/broker. `password` and `user` are preliminary and may be removed in future versions.
 * `netMgr` sets up minimum or maximum port for automated ephemeral port assignment. Default range is 1024-65535 according to RFC 6056. The `netmask` has the same semantics as for `implementation`.
 
+## Device AAS
+
+The ECS runtime may create an AAS with nameplate for the actual device. As currently there is no standard where to get the device AAS from, the ECS runtime contains a device AAS provider returning the address of the AAS to use, its URN and its shortId. There must not be an AAS, but various mechanisms could be used to provide one. Two default mechanisms are
+
+* the Yaml provider, reading (a part of) the generic frame nameplate information from nameplate.yaml or *deviceId*.yaml from the classpath and constructs an AAS from that information. Related images must be located in the classpath and referenced in the YAML file.
+* the AASX provider, reading device.aasx or *deviceId*.aasx from the classpath and constructs an AAS from that information. Related images/PDFs must be as usual in the AASX file.
+
+Via the JSL for `DeviceAasProviderDescriptor` the actual approach may be determined. By default, we use a first matching device AAS provider searching either for the Yaml or the AASX file mentioned above. Other approaches may be utilized via JSL.
+
 ## Running
 
 This component must be bundled with further, e.g., upper layer components which pair themselves via JLS, in particular `LifecycleHandler`. To start this component, please use the functions of the `LifecycleHandler` or the default starter classes defined there.

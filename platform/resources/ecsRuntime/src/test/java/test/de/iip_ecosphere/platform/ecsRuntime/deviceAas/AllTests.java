@@ -1,6 +1,5 @@
-/**
- * ******************************************************************************
- * Copyright (c) {2022} The original author or authors
+/********************************************************************************
+ * Copyright (c) {2020} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -9,21 +8,21 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+package test.de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
-package de.iip_ecosphere.platform.ecsRuntime;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * JSL descriptor for {@link DeviceAasProvider}.
+ * Defines the tests to be executed.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface DeviceAasProviderDescriptor {
-
-    /**
-     * Creates a provider instance.
-     * 
-     * @return the instance
-     */
-    public DeviceAasProvider createInstance();
-    
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    YamlDeviceAasProviderTest.class,
+    AasxDeviceAasProviderTest.class,
+    FirstMatchingDeviceAasProviderTest.class
+})
+public class AllTests {
 }

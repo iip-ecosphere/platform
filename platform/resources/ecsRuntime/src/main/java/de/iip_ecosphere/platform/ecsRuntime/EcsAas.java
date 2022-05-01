@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
+import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;

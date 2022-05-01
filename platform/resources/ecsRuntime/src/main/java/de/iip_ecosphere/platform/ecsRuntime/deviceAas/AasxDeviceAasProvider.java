@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
-import de.iip_ecosphere.platform.ecsRuntime.DeviceAasProvider;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -52,6 +51,25 @@ public class AasxDeviceAasProvider extends DeviceAasProvider {
     private String aasAddress = null;
     private String identifier;
     private String idShort;
+
+    /**
+     * Implements the JSL descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class Descriptor implements DeviceAasProviderDescriptor {
+
+        @Override
+        public DeviceAasProvider createInstance() {
+            return new AasxDeviceAasProvider();
+        }
+
+        @Override
+        public boolean createsMultiProvider() {
+            return false;
+        }
+        
+    }
     
     @Override
     public String getURN() {

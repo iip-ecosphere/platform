@@ -10,15 +10,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.ecsRuntime;
+package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
-import java.util.Optional;
-
-import de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProvider;
-import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
- * Describes a simple device Aas provider.
+ * Describes a device AAS provider. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -48,16 +46,35 @@ public abstract class DeviceAasProvider {
     public abstract String getIdShort();
     
     /**
-     * Returns the default provider instance.
+     * Returns the actual provider instance. Either the first multi-provider delivered by
+     * JSL (with precedence) or the first single-provider is returned and installed. If
+     * no descriptor is specified, the {@link YamlDeviceAasProvider} is used as fallback.
      * 
-     * @return the default provider instance
+     * @return the provider instance
      */
     public static DeviceAasProvider getInstance() {
         if (null == instance) {
-            Optional<DeviceAasProviderDescriptor> desc 
-                = ServiceLoaderUtils.findFirst(DeviceAasProviderDescriptor.class);
-            if (desc.isPresent()) {
-                instance = desc.get().createInstance();
+            DeviceAasProviderDescriptor multi = null;
+            DeviceAasProviderDescriptor single = null;
+            Iterator<DeviceAasProviderDescriptor> iter = ServiceLoader
+                .load(DeviceAasProviderDescriptor.class)
+                .iterator();
+            while (iter.hasNext()) {
+                DeviceAasProviderDescriptor d = iter.next();
+                if (d.createsMultiProvider()) {
+                    if (null == multi) {
+                        multi = d;
+                    }
+                } else {
+                    if (null == single) {
+                        single = d;
+                    }
+                }
+            }
+            if (multi != null) {
+                instance = multi.createInstance();
+            } else if (single != null) {
+                instance = single.createInstance();
             } else {
                 instance = new YamlDeviceAasProvider();
             }

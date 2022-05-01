@@ -13,19 +13,20 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.ecsRuntime.deviceAas.AasxDeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
-import de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProvider;
-import org.junit.Assert;
+import de.iip_ecosphere.platform.ecsRuntime.deviceAas.FirstMatchingDeviceAasProvider;
 
 /**
- * Tests {@link YamlDeviceAasProvider}.
+ * Tests {@link FirstMatchingDeviceAasProvider}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlDeviceAasProviderTest extends AbstractDeviceProviderTest {
+public class FirstMatchingDeviceAasProviderTest extends AbstractDeviceProviderTest {
 
     /**
      * Initializes the test.
@@ -42,18 +43,24 @@ public class YamlDeviceAasProviderTest extends AbstractDeviceProviderTest {
     public static void shutdown() {
         AbstractDeviceProviderTest.shutdown();
     }
-    
+
     /**
-     * Tests the provider.
+     * Tests {@link AasxDeviceAasProvider}.
      */
     @Test
     public void testProvider() {
-        DeviceAasProvider instance = new YamlDeviceAasProvider();
-        String address = instance.getDeviceAasAddress();
-        Assert.assertTrue(null != address && address.length() > 0); // there is an AAS
-        Assert.assertTrue(instance.getIdShort().length() > 0);
-        Assert.assertTrue(instance.getURN().length() > 0);
+        DeviceAasProvider provider = DeviceAasProvider.getInstance();
+        Assert.assertTrue(provider instanceof FirstMatchingDeviceAasProvider);
+        String address = provider.getDeviceAasAddress();
+        
         System.out.println(address);
+        System.out.println(provider.getIdShort());
+        System.out.println(provider.getURN());
+
+        Assert.assertNotNull(address);
+        Assert.assertTrue(address.length() > 0);
+        Assert.assertNotNull(provider.getIdShort());
+        Assert.assertNotNull(provider.getURN());
     }
 
 }
