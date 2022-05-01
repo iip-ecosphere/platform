@@ -334,7 +334,7 @@ public abstract class AasFactory {
      * 
      * @param idShort the shortId of the AAS
      * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
-     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
      * 
      * @return the AAS builder instance (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty
@@ -347,7 +347,7 @@ public abstract class AasFactory {
      * 
      * @param idShort the short id of the sub-model
      * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 
-     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
      * @return the sub-model builder (may be <b>null</b> if no AAS implementation is registered)
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
      *   supported

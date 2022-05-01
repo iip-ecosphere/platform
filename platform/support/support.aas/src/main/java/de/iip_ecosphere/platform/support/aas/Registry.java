@@ -25,21 +25,25 @@ public interface Registry {
     /**
      * Retrieves an AAS.
      * 
-     * @param aasUrn the URN of the AAS
+     * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
      * @return the AAS (may be <b>null</b> if the AAS does not exist)
      * @throws IOException if accessing the AAS fails for some reason
      */
-    public Aas retrieveAas(String aasUrn) throws IOException;
+    public Aas retrieveAas(String identifier) throws IOException;
 
     /**
      * Retrieves a submodel for an AAS.
      * 
-     * @param aasUrn the URN of the AAS
-     * @param submodelUrn the URN of the submodel
+     * @param aasIdentifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
+     * @param submodelIdentifier the identifier of the submodel (may be <b>null</b> or empty for an identification 
+     *    based on {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} 
+     *    for others)
      * @return the AAS (may be <b>null</b> if the AAS does not exist)
      * @throws IOException if accessing the AAS fails for some reason
      */
-    public Submodel retrieveSubmodel(String aasUrn, String submodelUrn) throws IOException;
+    public Submodel retrieveSubmodel(String aasIdentifier, String submodelIdentifier) throws IOException;
 
     /**
      * Creates from the given {@code aas} an AAS at the specified qualified {@code endpoint}. In other words,

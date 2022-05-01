@@ -29,4 +29,14 @@ public interface IdentifierType {
      */
     public static final String URN_TEXT_PREFIX = "urnText:";
 
+    /**
+     * IRDI with valid syntax following the prefix. The prefix will be removed from the identifier.
+     */
+    public static final String IRDI_PREFIX = "irdi:";
+    
+    /**
+     * IRI with valid syntax following the prefix. The prefix will be removed from the identifier.
+     */
+    public static final String IRI_PREFIX = "iri:";
+    
 }

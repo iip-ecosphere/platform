@@ -20,12 +20,12 @@ package de.iip_ecosphere.platform.support.aas;
 public interface Identifiable extends Referable {
 
  // TODO public IAdministrativeInformation getAdministration();
- // TODO public IIdentifier getIdentification();
     
     /**
      * Returns the identification of the identifiable.
      * 
-     * @return the identification (for now as string, like URNs are passed into)
+     * @return the identification (prefixed according to {@link IdentifierType}, custom if none matches). Can e.g. be 
+     *     used with {@link Registry} if not <b>null</b>.
      */
     public String getIdentification();
     
