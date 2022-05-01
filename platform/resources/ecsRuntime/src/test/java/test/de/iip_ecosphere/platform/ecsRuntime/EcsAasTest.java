@@ -57,6 +57,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
+import test.de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProviderTest;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -118,12 +119,12 @@ public class EcsAasTest {
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = AasPartRegistry.getSetup().getRegistryEndpoint();
         PersistenceType pType = LocalPersistenceType.INMEMORY;
-        LoggerFactory.getLogger(SelfDeviceAasProviderTest.class).info(
+        LoggerFactory.getLogger(YamlDeviceAasProviderTest.class).info(
             "Starting " + pType + " AAS registry on " + regEndpoint.toUri());
         Server registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
         Endpoint serverEndpoint = AasPartRegistry.getSetup().getServerEndpoint();
-        LoggerFactory.getLogger(SelfDeviceAasProviderTest.class).info(
+        LoggerFactory.getLogger(YamlDeviceAasProviderTest.class).info(
             "Starting " + pType + " AAS server on " + serverEndpoint.toUri());
         Server aasServer = rcp.createAasServer(serverEndpoint, pType, regEndpoint);
         aasServer.start();

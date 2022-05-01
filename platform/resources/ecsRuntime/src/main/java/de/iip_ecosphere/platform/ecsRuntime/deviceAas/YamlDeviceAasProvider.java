@@ -10,8 +10,10 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.ecsRuntime;
+package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
+import de.iip_ecosphere.platform.ecsRuntime.DeviceAasProvider;
+import de.iip_ecosphere.platform.ecsRuntime.NameplateSetup;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -44,13 +46,20 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * Creates an AAS for this device, deploys it to the platform AAS server and returns the address of the AAS. This may
  * be useful for devices that do not provide an AAS by themselves.
  * 
+ * Resolution sequence:
+ * <ol>
+ *   <li>Classpath, <code>nameplate.yml</code></li>
+ *   <li><code>src/test/resources/nameplate.yml</code> (for testing)</li>
+ *   <li>Classpath, <code><i>deviceId</i>.yml</code></li>
+ * </ol>
+ * 
  * Based on BaSyx / Generic Frame for Technical Data for Industrial Equipment in Manufacturing (Version 1.1)
  * and for address a bit of ZVEI Digital Nameplate for industrial equipment V1.0.
  * 
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SelfDeviceAasProvider extends DeviceAasProvider {
+public class YamlDeviceAasProvider extends DeviceAasProvider {
 
     public static final String SUBMODEL_NAMEPLATE = "Nameplate";
     public static final String NAME_PROPERTY_PRODUCTIMAGE = "ProductImage";

@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.util.Optional;
 
+import de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProvider;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -28,21 +29,21 @@ public abstract class DeviceAasProvider {
     /**
      * Returns the device AAS address for this device.
      * 
-     * @return the device AAS address, may be <b>null</b> if none can be constructed
+     * @return the device AAS address, may be <b>null</b> if there is no AAS
      */
     public abstract String getDeviceAasAddress();
 
     /**
      * Returns the URN of the device AAS.
      *  
-     * @return the (envisioned) URN
+     * @return the (envisioned) URN, may be <b>null</b>, if there is no AAS
      */
     public abstract String getURN();
     
     /**
      * Returns the short ID of the device AAS.
      *  
-     * @return the (envisioned) short ID
+     * @return the (envisioned) short ID, may be <b>null</b>, if there is no AAS
      */
     public abstract String getIdShort();
     
@@ -58,7 +59,7 @@ public abstract class DeviceAasProvider {
             if (desc.isPresent()) {
                 instance = desc.get().createInstance();
             } else {
-                instance = new SelfDeviceAasProvider();
+                instance = new YamlDeviceAasProvider();
             }
         }
         return instance; 

@@ -13,6 +13,9 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.ecsRuntime.deviceAas.AasxDeviceAasProviderTest;
+import test.de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProviderTest;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -24,7 +27,8 @@ import org.junit.runners.Suite;
     ConfigurationTest.class,
     ContainerManagerTest.class,
     EcsAasTest.class,
-    SelfDeviceAasProviderTest.class
+    YamlDeviceAasProviderTest.class,
+    AasxDeviceAasProviderTest.class
 })
 public class AllTests {
 }

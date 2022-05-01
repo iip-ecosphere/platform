@@ -1,0 +1,1 @@
+File device.aasx is sample-zvei-techdata-V11 from [IDTA content hub](https://github.com/admin-shell-io/submodel-templates/blob/main/published/Technical_Data/1/1/sample-zvei-techdata-V11.aasx)
