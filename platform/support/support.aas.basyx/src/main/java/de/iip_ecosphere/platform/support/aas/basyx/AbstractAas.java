@@ -25,7 +25,9 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata.BaSyxTechnicalDataSubmodel;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel;
@@ -271,9 +273,10 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     }
 
     /**
-     * Returns the identification of the identifiable.
+     * Returns the identification of the AAS.
      * 
-     * @return the identification (for now as string, like URNs are passed into)
+     * @return the identification (prefixed according to {@link IdentifierType}, custom if none matches). Can e.g. be 
+     *     used with {@link Registry} if not <b>null</b>.
      */
     //@Override // JDK8
     public String getIdentification() {

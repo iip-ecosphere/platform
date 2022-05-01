@@ -25,6 +25,7 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangString;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
@@ -230,9 +231,15 @@ public class Tools {
             result = new ModelUrn(id);
         } else if (id.startsWith(IdentifierType.URN_TEXT_PREFIX)) {
             result = new ModelUrn(id.substring(IdentifierType.URN_TEXT_PREFIX.length()));
+        } else if (id.startsWith(IdentifierType.IRDI_PREFIX)) {
+            result = new Identifier(org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType.IRDI, 
+                id.substring(IdentifierType.IRDI_PREFIX.length()));
+        } else if (id.startsWith(IdentifierType.IRI_PREFIX)) {
+            result = new Identifier(org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType.IRI, 
+                id.substring(IdentifierType.IRI_PREFIX.length()));
         } else {
             result = new CustomId(id);
-        } // IRI, others?
+        }
         return result;
     }
     
@@ -243,7 +250,26 @@ public class Tools {
      * @return the string notation
      */
     public static String translateIdentifier(IIdentifier identifier) {
-        return null == identifier ? null : identifier.toString(); // preliminary
+        String result = null;
+        if (identifier instanceof ModelUrn) {
+            result = ((ModelUrn) identifier).getURN();
+            if (!result.startsWith(IdentifierType.URN_PREFIX)) {
+                result = IdentifierType.URN_PREFIX + result;
+            }
+        } else if (null != identifier) {
+            switch (identifier.getIdType()) {
+            case IRDI:
+                result = IdentifierType.IRDI_PREFIX + identifier.getId();
+                break;
+            case IRI:
+                result = IdentifierType.IRI_PREFIX + identifier.getId();
+                break;
+            default:
+                result = identifier.getId();
+                break;
+            }
+        }
+        return result;
     }
 
     /**

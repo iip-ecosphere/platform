@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
@@ -63,8 +62,8 @@ public class BaSyxRegistry implements Registry {
     // checkstyle: resume exception type check
 
     @Override
-    public Aas retrieveAas(String aasUrn) throws IOException {
-        return obtainAas(new ModelUrn(aasUrn));
+    public Aas retrieveAas(String identifier) throws IOException {
+        return obtainAas(Tools.translateIdentifier(identifier, ""));
     }
     
     /**
@@ -79,9 +78,10 @@ public class BaSyxRegistry implements Registry {
     }
 
     @Override
-    public Submodel retrieveSubmodel(String aasUrn, String submodelUrn) throws IOException {
-        ModelUrn aasURN = new ModelUrn(aasUrn);
-        return new BaSyxISubmodel(obtainAas(aasURN), manager.retrieveSubmodel(aasURN, new ModelUrn(submodelUrn)));
+    public Submodel retrieveSubmodel(String aasIdentifier, String submodelIdentifier) throws IOException {
+        IIdentifier aasId = Tools.translateIdentifier(aasIdentifier, "");
+        IIdentifier submodelId = Tools.translateIdentifier(submodelIdentifier, "");
+        return new BaSyxISubmodel(obtainAas(aasId), manager.retrieveSubmodel(aasId, submodelId));
     }
 
     @Override
