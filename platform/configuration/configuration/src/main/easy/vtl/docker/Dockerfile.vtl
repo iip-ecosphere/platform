@@ -30,7 +30,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
     	'# Broker'
     	'COPY broker/brokerJars/ brokerJars'
     	'COPY broker/src/ src'
-    	'COPY broker/amqp.sh amqp.sh'
+    	'COPY broker/broker.sh broker.sh'
     	
 	'RUN apk update && apk add bash'
 	'RUN chmod 777 wrapper_script.sh'
