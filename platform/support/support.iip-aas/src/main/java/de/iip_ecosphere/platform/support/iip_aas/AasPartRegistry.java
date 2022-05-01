@@ -526,12 +526,13 @@ public class AasPartRegistry {
      * Obtains an AAS instance via the setup in this class. Be careful with the returned instance, as if
      * the AAS is modified in the mean time, you may hold an outdated instance.
      * 
-     * @param urn the URN of the AAS
+     * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      * @return the platform AAS (may be <b>null</b> for none)
      * @throws IOException if the AAS cannot be read due to connection errors
      */
-    public static Aas retrieveAas(String urn) throws IOException {
-        return retrieveAas(setup, urn);
+    public static Aas retrieveAas(String identifier) throws IOException {
+        return retrieveAas(setup, identifier);
     }
 
     /**
@@ -539,18 +540,19 @@ public class AasPartRegistry {
      * the AAS is modified in the mean time, you may hold an outdated instance.
      * 
      * @param setup the AAS setup
-     * @param urn the URN of the AAS
+     * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
      * @return the platform AAS (may be <b>null</b> for none)
      * @throws IOException if the AAS cannot be read due to connection errors
      */
-    public static Aas retrieveAas(AasSetup setup, String urn) throws IOException {
+    public static Aas retrieveAas(AasSetup setup, String identifier) throws IOException {
         Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint(), 
             setup.getServer().getSchema());
         if (null == reg) {
             throw new IOException("No AAS registry at " + setup.getRegistryEndpoint().toUri());
         }
         try {
-            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(urn);
+            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint()).retrieveAas(identifier);
         } catch (Throwable t) {
             throw new IOException(t);
         }
