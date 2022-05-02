@@ -2,8 +2,8 @@
   
 # turn on bash's job control
 set -m
-echo ">>> Starting AMQP broker..."
-./amqp.sh &
+echo ">>> Starting broker..."
+./broker/broker.sh &
 echo ">>> Starting platform server..."
 ./platform.sh &
 while [ ! -f /run/iip-platform.pid ]
