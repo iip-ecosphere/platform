@@ -19,8 +19,10 @@ import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
@@ -82,6 +84,7 @@ public class TraceToAasService extends AbstractService {
 
     private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = new HashMap<>();
     private static final String PREFIX_GETTER = "get";
+    private static final Set<String> METHODS_TO_IGNORE = new HashSet<>();
 
     private Map<Class<?>, TypeConverter> converters = new HashMap<>();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
@@ -110,6 +113,8 @@ public class TraceToAasService extends AbstractService {
         DEFAULT_CONVERTERS.put(double[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(byte[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(boolean[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
+        
+        METHODS_TO_IGNORE.add("getClass");
     }
 
     /**
@@ -136,6 +141,15 @@ public class TraceToAasService extends AbstractService {
     public TraceToAasService(YamlArtifact artifact, String serviceId) {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
+    }
+    
+    /**
+     * Returns the application setup.
+     * 
+     * @return the application setup
+     */
+    public ApplicationSetup getApplicationSetup() {
+        return appSetup;
     }
 
     /**
@@ -276,9 +290,11 @@ public class TraceToAasService extends AbstractService {
                                     m.getName(), field, e.getMessage());
                             }
                         } else {
-                            LoggerFactory.getLogger(getClass()).warn(
-                                "Cannot map value of operation {}/field {} to AAS: No converter is defined", 
-                                m.getName(), field);
+                            if (!METHODS_TO_IGNORE.contains(m.getName())) {
+                                LoggerFactory.getLogger(getClass()).warn(
+                                    "Cannot map value of operation {}/field {} to AAS: No converter is defined", 
+                                    m.getName(), field);
+                            }
                         }
                     }
                 }

@@ -108,6 +108,28 @@
   
   <build>
     <plugins>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+              <execution>
+                  <id>copy-dependencies</id>
+                  <goals>
+                      <goal>copy-dependencies</goal>
+                  </goals>
+                  <phase>package</phase>
+                  <configuration>
+                      <prependGroupId>true</prependGroupId>
+                      <outputDirectory>${project.build.directory}/jars</outputDirectory>
+                      <overWriteReleases>false</overWriteReleases>
+                      <overWriteSnapshots>true</overWriteSnapshots>
+                      <overWriteIfNewer>true</overWriteIfNewer>
+                      <!-- sync exclusions with build-classpath -->
+                  </configuration>
+              </execution>
+          </executions>
+       </plugin>
        <plugin>
          <groupId>org.apache.maven.plugins</groupId>
          <artifactId>maven-assembly-plugin</artifactId>

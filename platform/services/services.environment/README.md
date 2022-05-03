@@ -24,7 +24,10 @@ Prerequisites/requirements:
 - Python at least version 3.5
 - pyyaml for YAML parsing 
 
+## Developing against the Application AAS
+
+The `TraceToAasService` is a hybrid (generic, extensible) plattform-supplied service to provide an AAS nameplate of an application as well as a trace of the operations (tracing must be enabled on the services to be traced in the configuration model). To develop against the service, we provide a simple AAS setup with the service (in `TraceToAasServiceMain` in testing scope) as well as two scripts to start the service (`traceToAas.bat`, `traceToAas.sh`, both requiring a `mvn package` before).
+
 ## missing
 
-* Python data streaming integration
 * Extended monitoring involving also implementation processes such as Python.
