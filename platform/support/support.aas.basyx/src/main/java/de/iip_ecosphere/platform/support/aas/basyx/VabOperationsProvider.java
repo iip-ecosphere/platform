@@ -210,6 +210,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
 
         @Override
         public Server build() {
+            System.out.println("Starting VAB server on " + port);
             BaSyxTCPServer<VABModelProvider> server = new BaSyxTCPServer<>(instance.createModelProvider(), port);
             Server result = new Server() {
 
