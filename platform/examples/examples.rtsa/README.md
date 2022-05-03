@@ -21,7 +21,7 @@ As stated above, directly after obtaining this project, the application will not
   * Instantiate the application. This creates the interfaces, the generic implementation of the services and data classes as well as the Spring Cloud Stream services, but it does not bind the service implementation against the application (not compilable so far, please note the `generateAppsNoDeps` argument).
     * Windows: `mvn -f pom-model.xml exec:java -Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateAppsNoDeps" -Diip.resources="%CD%\resources"`
     * Linux/MacOS: `mvn -f pom-model.xml exec:java -Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateAppsNoDeps" -Diip.resources="$PWD/resources"`
-  * If you try the example from an IDE, please perform a Maven project refresh.
+  * If you try the example from an IDE, please perform a Maven project refresh. In extreme cases, for the first run, you may even have to restart your IDE here.
   * Compile the project with `mvn install -DskipTests`. This makes the service implementations for source and receiver available to the instantiation.
   * Re-instantiate the application as done above. This step binds the service implementation provided by this project to the application (please note the `generateApps` argument).
     * Windows: `mvn -f pom-model.xml exec:java -Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateApps" -Diip.resources="%CD%\resources"`
