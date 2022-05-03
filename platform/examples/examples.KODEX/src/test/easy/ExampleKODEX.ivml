@@ -90,8 +90,8 @@ project ExampleKODEX {
         ver = "0.1.0",
         deployable = true,
         asynchronous = false,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceKodexImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        class = "de.iip_ecosphere.platform.examples.kodex.SimpleSourceKodexImpl",
+        artifact = "de.iip-ecosphere.platform:examples.KODEX:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}
         // TODO parameter
@@ -115,8 +115,8 @@ project ExampleKODEX {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.KodexReceiverImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        class = "de.iip_ecosphere.platform.examples.kodex.KodexReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.KODEX:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec2)}}
         // TODO parameter
