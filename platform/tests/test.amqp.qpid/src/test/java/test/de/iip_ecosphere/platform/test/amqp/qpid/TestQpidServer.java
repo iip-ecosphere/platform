@@ -76,7 +76,11 @@ public class TestQpidServer extends AbstractTestServer {
     @Override
     public void stop(boolean dispose) {
         if (null != systemLauncher) {
-            systemLauncher.shutdown();
+            try {
+                systemLauncher.shutdown();
+            } catch (IllegalStateException e) {
+                // we just ignore this
+            }
         }
     }
 
