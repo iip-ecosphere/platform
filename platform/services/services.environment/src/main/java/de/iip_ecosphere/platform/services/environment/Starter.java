@@ -207,7 +207,7 @@ public class Starter {
             }
             if (serviceAutostart) {
                 try {
-                    getLogger().info("Service autostart: '{}'", service.getId());
+                    getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
                     service.setState(ServiceState.STARTING);
                     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                         try {

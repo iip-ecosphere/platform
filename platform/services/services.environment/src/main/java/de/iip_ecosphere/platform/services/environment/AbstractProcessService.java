@@ -104,8 +104,8 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
                 return outCls;
             }
         };
+        handleInputStream(proc.getInputStream());
     }
-
     
     /**
      * Requests to process the given data item.
