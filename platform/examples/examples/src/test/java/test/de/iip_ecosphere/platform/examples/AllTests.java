@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     SpringStartupTest.class,
+    ConfigurationTests.class
 })
 public class AllTests {
 }

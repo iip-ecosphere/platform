@@ -27,6 +27,22 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+	  <dependency>
+	    <groupId>de.iip-ecosphere.platform</groupId>
+	    <artifactId>test.amqp.qpid</artifactId>
+	    <version>${project.version}</version>
+	    <type>test-jar</type>
+	  </dependency>
+	  <dependency>
+	    <groupId>de.iip-ecosphere.platform</groupId>
+	    <artifactId>transport</artifactId>
+	    <version>${project.version}</version>
+	    <type>test-jar</type>
+	  </dependency>
+	  <dependency>
+	   <groupId>org.apache.qpid</groupId>
+	   <artifactId>qpid-broker</artifactId>
+	  </dependency>    
   </dependencies>
 
 </project>
