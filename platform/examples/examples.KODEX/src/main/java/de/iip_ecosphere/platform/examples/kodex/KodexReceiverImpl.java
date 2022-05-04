@@ -44,7 +44,7 @@ public class KodexReceiverImpl extends KodexDataReceiverImpl {
 
     @Override
     public void processKRec13Anon(KRec13Anon data) {
-        System.out.println("RECEIVED " + data.getKip() + " " + data.getStringField() + " " + data.getIntField());
+        System.out.println("RECEIVED " + data.get_kip() + " " + data.getStringField() + " " + data.getIntField());
     }
 
 }

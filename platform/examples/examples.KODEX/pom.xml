@@ -65,7 +65,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
-                <mainClass>de.iip_ecosphere.platform.examples.rtsa.Starter</mainClass>
+                <mainClass>de.iip_ecosphere.platform.examples.kodex.Starter</mainClass>
             </configuration>
         </plugin>
     </plugins>
