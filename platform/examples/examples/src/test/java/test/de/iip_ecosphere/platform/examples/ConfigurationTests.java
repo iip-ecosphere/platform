@@ -19,7 +19,6 @@ import org.apache.qpid.server.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.examples.SpringStartup;
@@ -75,7 +74,7 @@ public class ConfigurationTests {
         SpringStartup.start(f, false, p -> p.redirectOutput(res), 
             "--iip.test.stop=" + stopTime, "--iip.test.brokerPort=" + broker.getPort());
         String procOut = FileUtils.readFileAsString(res);
-        Assert.assertTrue(procOut.indexOf("RECEIVED ") > 0);
+        Assert.assertTrue(procOut, procOut.indexOf("RECEIVED ") > 0);
         res.delete();
     }
 
@@ -94,7 +93,6 @@ public class ConfigurationTests {
      * 
      * @throws IOException if any I/O problem occurs
      */
-    @Ignore("Sync source")
     @Test
     public void testSimpleMesh3() throws IOException {
         testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 25000);
