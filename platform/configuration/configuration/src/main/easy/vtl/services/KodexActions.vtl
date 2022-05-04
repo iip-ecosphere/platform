@@ -39,22 +39,35 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
                         config:
                           method: ${actionMethod(action)}
                     ${typeValidator(f.type)|e}'
+            } else {
+                '- name: ${f.name}
+                  validators:
+                    ${typeValidator(f.type)|e}'
             }
         }
     }
     
     def typeValidator(DataType type) {
+        '- type: CanBeAnything'
     }
     
     def typeValidator(PrimitiveType type) {
+        //https://heykodex.com/docs/actions/form-validation
         switch(type.name) {
-            "Integer" : '', // TODO format unclear
-            "Long" : '', // TODO format unclear
+            "Integer" : 
+                '- type: IsInteger', 
+            "Long" : 
+                '- type: IsInteger', 
             "String" : 
-                '- type: IsString', // TODO config needed, maxLength
-            "Boolean" : '', // TODO format unclear
-            "Float" : '', // TODO format unclear
-            "Double" : '' // TODO format unclear
+                '- type: IsString', 
+            "Boolean" : 
+                '- type: IsBoolean',
+            "Float" : 
+                '- type: IsFloat', 
+            "Double" : 
+                '- type: IsFloat', 
+            default:
+                '- type: CanBeAnything'
         }
     }
     
@@ -80,7 +93,7 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
              fields:
                ${generateFields(elt, elt.impl)}
         actions:
-           - name: protect example data
+           - name: protect ${elt.name} data
              type: form
              config: *DataForm'
     }

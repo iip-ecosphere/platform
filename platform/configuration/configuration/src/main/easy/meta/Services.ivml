@@ -255,7 +255,7 @@ project Services {
        // deployable may influcence integration type
        // integration type: CMD, REST, CENTRAL
        // TODO constraint all action fields must match input/output fieldsM actions must be defined
-       // TODO #input=#output
+       // TODO #input=#output -> _kip
        // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
    }
    

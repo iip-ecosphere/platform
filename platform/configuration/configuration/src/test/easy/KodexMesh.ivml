@@ -69,7 +69,7 @@ project KodexMesh {
         name = "KRec13Anon",
         fields = {
             Field {
-                name = "kip",
+                name = "kip", // shall be _kip!
                 type = refBy(StringType)
             }, Field {
                 name = "intField",
