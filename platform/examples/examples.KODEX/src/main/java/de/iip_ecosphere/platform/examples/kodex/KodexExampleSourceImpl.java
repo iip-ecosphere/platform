@@ -14,10 +14,6 @@ package de.iip_ecosphere.platform.examples.kodex;
 
 import java.io.InputStream;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.KRec13;
 import iip.datatypes.KRec13Impl;
@@ -31,7 +27,6 @@ import iip.impl.SimpleKodexDataSourceImpl;
  */
 public class KodexExampleSourceImpl extends SimpleKodexDataSourceImpl {
 
-    private Timer timer = new Timer();
     private Random random = new Random();
     
     /**
@@ -51,38 +46,17 @@ public class KodexExampleSourceImpl extends SimpleKodexDataSourceImpl {
         super(serviceId, ymlFile);
     }
 
-    // no override here as createRec1 and attach... are alternatives
-    
     /**
     * Creates data to be ingested.
     *
     * @return the created data, <b>null</b> for no data
     */
+    @Override
     public KRec13 produceKRec13() {
         KRec13 rec = new KRec13Impl();
         rec.setIntField(random.nextInt());
         rec.setStringField("SYNC");
         return rec;
-    }
-
-    /**
-     * Called by the platform to attach an asynchronous data ingestor for type "Rec1".
-     *
-     * @param ingestor the "Rec13" ingestor instance
-     */
-    public void attachKRec13Ingestor(final DataIngestor<KRec13> ingestor) {
-        if (null != ingestor) {
-            timer.schedule(new TimerTask() {
-                
-                @Override
-                public void run() {
-                    KRec13 rec = new KRec13Impl();
-                    rec.setIntField(random.nextInt());
-                    rec.setStringField("ASYNC");
-                    ingestor.ingest(rec);
-                }
-            }, 0, 1000);
-        }
     }
 
 }
