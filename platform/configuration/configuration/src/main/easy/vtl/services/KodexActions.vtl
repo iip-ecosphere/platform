@@ -32,13 +32,13 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
                 KodexFieldAction fAction = actions.get(f);
                 KodexAction action = fAction.action;
                 '- name: ${f.name}
-                   validators:
-                     - type: IsAction
-                       config:
-                         type: ${actionType(action)}
-                         config:
-                           method: ${actionMethod(action)}
-                     ${typeValidator(f.type)|e}'
+                  validators:
+                    - type: IsAction
+                      config:
+                        type: ${actionType(action)}
+                        config:
+                          method: ${actionMethod(action)}
+                    ${typeValidator(f.type)|e}'
             }
         }
     }
@@ -79,7 +79,7 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
            DataForm: &DataForm
              fields:
                ${generateFields(elt, elt.impl)}
-         actions:
+        actions:
            - name: protect example data
              type: form
              config: *DataForm'

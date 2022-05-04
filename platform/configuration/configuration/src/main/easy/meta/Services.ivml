@@ -118,7 +118,7 @@ project Services {
    
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
-   enum TraceKind {NONE, TRACE, LOG};
+   enum TraceKind {NONE, TRACE, LOG, SYSOUT};
    
    // service base is the parent type of Service and ServiceFamily. They may be used in interchangable manner
    // in some situations while in others it is important to have a service not being a family avoiding potential

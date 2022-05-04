@@ -86,8 +86,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
                     trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${d}));';
-                } else { // LOG
+                } else if (base.traceRcv == TraceKind::LOG) {
                     trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}: {}", "${base.id}", ${d});';
+                } else { // SYSOUT
+                    trace = trace + 'System.out.println("sending in ${base.id}: " + ${d});';
                 }
             } 
             String ret;
@@ -124,8 +126,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
                     trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", ${d}));';
-                } else { // LOG
+                } else if (base.traceRcv == TraceKind::LOG) {
                     trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}: {}", "${base.id}", ${d});';
+                } else { // SYSOUT
+                    trace = 'System.out.println("received in ${base.id}: " + ${d});';
                 }
             }
             '{
