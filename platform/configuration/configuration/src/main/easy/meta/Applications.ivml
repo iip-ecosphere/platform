@@ -18,6 +18,7 @@ project Applications {
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
         NameplateInfo nameplateInfo;
         Boolean createContainer = false;
+        Boolean debug = false;
     }
     
     compound ServiceMesh {

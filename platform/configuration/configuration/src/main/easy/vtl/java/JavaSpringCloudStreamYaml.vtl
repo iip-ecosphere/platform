@@ -6,7 +6,7 @@ import EcsRuntimeDockerContainerManagerYaml;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) extends MeshBasics {
+template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) extends MeshBasics {
 
     def function(sequenceOf(MeshElement) nodes) {
         println(nodes);
@@ -185,11 +185,19 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     
     // ----------------------------------------- main -------------------------------------
  
-    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes) {
+    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) {
         '${protocolConfig(config, false)}'
         '${produceTransport(config)}'
         '${produceAas(config, withDocker=false, implLocalEphemerial=true)}'
         '${produceBinders(config)}'
+        if (debug) {
+            'logging: 
+               level: 
+                 org: 
+                   springframework: 
+                     cloud: DEBUG 
+                     integration: DEBUG'
+        }
         'metricsprovider:
             schedulerrate: 3000
             memorybaseunit: kilobytes

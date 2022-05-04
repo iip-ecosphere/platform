@@ -283,6 +283,7 @@ project SerializerConfig1 {
         ver = "0.1.0",
         description = "",
         services = {refBy(myMesh)},
+        debug = true,
         nameplateInfo = {
             manufacturerProductDesignation = "IIP-Ecosphere plattform test application@de",
             manufacturer = refBy(manufacturer_sse)}
