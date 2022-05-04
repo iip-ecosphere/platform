@@ -7,7 +7,7 @@ This example aims at running the anonymizer/pseudonymizer KODEX as part of an II
   
 As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
 
-  * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
+  * Ensure that the Maven platformDependencies are installed and up to date (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
   * Obtain the actual platform configuration meta-model, which is intentionally not included here: `mvn -f pom-model.xml generate-sources`.
   * Instantiate the application. This creates the interfaces, the generic implementation of the services and data classes as well as the Spring Cloud Stream services, but it does not bind the service implementation against the application (not compilable so far, please note the `generateAppsNoDeps` argument). `mvn -f pom-model.xml exec:java -Dexec.args="ExampleKODEX src/test/easy gen/KODEX generateAppsNoDeps"`
   * If you try the example from an IDE, please perform a Maven project refresh. In extreme cases, for the first run, you may even have to restart your IDE here.
