@@ -64,7 +64,10 @@ public class ConfigurationTests {
      * @throws IOException if any I/O reading problem occurs
      */
     private void testInstantiatedExample(String folder, String appName, int stopTime) throws IOException {
-        File cfg = new File("../../configuration/configuration/gen/tests");
+        File cfg = new File("../../configuration/configuration/gen/tests"); // git
+        if (!cfg.exists()) {
+            cfg = new File("../IIP_configuration.configuration/gen/tests"); // Jenkins
+        }
         Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
         File res = File.createTempFile("examples-test", ".out");
