@@ -82,6 +82,7 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         File exe = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/")); 
         File home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
         exe = new File(exe, executable); 
+        exe.setExecutable(true);
         home = home.getAbsoluteFile();
         
         List<String> args = new ArrayList<>();
