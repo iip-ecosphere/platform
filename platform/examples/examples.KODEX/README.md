@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform examples: KODEX
 
-This example aims at running the anonymizer/pseudonymizer KODEX as part of an IIP-Ecosphere pipeline. The example consists of several pieces:
+This example aims at running the anonymizer/pseudonymizer KODEX as part of an IIP-Ecosphere pipeliner. The example consists of several pieces:
   * An IVML configuration for the application in `src/test/easy/ExampleKODEX.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
   * Two Maven files, `pom-model.xml` for obtaining the configuration meta-model and for performing the instantiation as well as `pom.xml` for the application itself. 

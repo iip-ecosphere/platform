@@ -89,12 +89,11 @@ project ExampleKODEX {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        asynchronous = true,
-        class = "de.iip_ecosphere.platform.examples.kodex.SimpleSourceKodexImpl",
+        asynchronous = false, // intentionally
+        class = "de.iip_ecosphere.platform.examples.kodex.KodexExampleSourceImpl",
         artifact = "de.iip-ecosphere.platform:examples.KODEX:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
-        output = {{type=refBy(rec1)}},
-        traceSent = TraceKind::LOG
+        output = {{type=refBy(rec1)}}
     };
 
     Service myKodexService = KodexService {
@@ -105,9 +104,7 @@ project ExampleKODEX {
         deployable = true,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec2)}},
-        actions = {{field=refBy(rec1.fields[1]), action=KodexAction::PseudonymizeMerengue}}, 
-        traceRcv = TraceKind::LOG,
-        traceSent = TraceKind::LOG
+        actions = {{field=refBy(rec1.fields[1]), action=KodexAction::PseudonymizeMerengue}}
     };
     
     Service myReceiverService = JavaService {
@@ -116,11 +113,10 @@ project ExampleKODEX {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.examples.kodex.KodexReceiverImpl",
+        class = "de.iip_ecosphere.platform.examples.kodex.KodexExampleReceiverImpl",
         artifact = "de.iip-ecosphere.platform:examples.KODEX:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(rec2)}},
-        traceRcv = TraceKind::LOG
+        input = {{type=refBy(rec2)}}
     };
 
     // ------------ application and service nets ------------------

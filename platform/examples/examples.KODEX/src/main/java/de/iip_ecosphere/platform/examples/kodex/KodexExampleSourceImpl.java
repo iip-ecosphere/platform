@@ -29,7 +29,7 @@ import iip.impl.SimpleKodexDataSourceImpl;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceKodexImpl extends SimpleKodexDataSourceImpl {
+public class KodexExampleSourceImpl extends SimpleKodexDataSourceImpl {
 
     private Timer timer = new Timer();
     private Random random = new Random();
@@ -37,7 +37,7 @@ public class SimpleSourceKodexImpl extends SimpleKodexDataSourceImpl {
     /**
      * Fallback constructor.
      */
-    public SimpleSourceKodexImpl() {
+    public KodexExampleSourceImpl() {
         super(ServiceKind.SOURCE_SERVICE);
     }
     
@@ -47,7 +47,7 @@ public class SimpleSourceKodexImpl extends SimpleKodexDataSourceImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleSourceKodexImpl(String serviceId, InputStream ymlFile) {
+    public KodexExampleSourceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 

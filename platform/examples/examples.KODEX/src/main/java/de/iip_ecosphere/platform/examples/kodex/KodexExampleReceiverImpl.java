@@ -23,12 +23,12 @@ import iip.impl.KodexDataReceiverImpl;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class KodexReceiverImpl extends KodexDataReceiverImpl {
+public class KodexExampleReceiverImpl extends KodexDataReceiverImpl {
 
     /**
      * Fallback constructor.
      */
-    public KodexReceiverImpl() {
+    public KodexExampleReceiverImpl() {
         super(ServiceKind.SINK_SERVICE);
     }
     
@@ -38,7 +38,7 @@ public class KodexReceiverImpl extends KodexDataReceiverImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public KodexReceiverImpl(String serviceId, InputStream ymlFile) {
+    public KodexExampleReceiverImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 
