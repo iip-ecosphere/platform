@@ -421,11 +421,10 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param args the process arguments (may be <b>null</b> for none)
      * @return the created process instance
      * 
-     * @throws IOException if process creation fails
+     * @throws ExecutionException if process creation fails
      * @see #handleInputStream(InputStream)
      * @see #handleErrorStream(InputStream)
      * @see #handleOutputStream(OutputStream)
-     * @see #getProcessBuilderConfigurer()
      */
     protected Process createAndConfigureProcess(File exe, boolean byName, File dir, List<String> args) 
         throws ExecutionException {

@@ -35,7 +35,7 @@ public interface GenericMultiTypeService extends Service {
      * @param inCls the class representing the input type
      * @param inTypeName symbolic name of {@code inCls}, e.g. from configuration model
      * @param inTrans the input data type translator
-     * @see #registerOutputTypeTranslators(Class, String, TypeTranslator)
+     * @see #registerOutputTypeTranslator(Class, String, TypeTranslator)
      */
     public <I> void registerInputTypeTranslator(Class<I> inCls, String inTypeName, 
         TypeTranslator<I, String> inTrans);
@@ -47,7 +47,7 @@ public interface GenericMultiTypeService extends Service {
      * @param outCls the class representing the input type
      * @param outTypeName symbolic name of {@code outCls}, e.g. from configuration model
      * @param outTrans the output data type translator
-     * @see #registerInputTypeTranslators(Class, String, TypeTranslator)
+     * @see #registerInputTypeTranslator(Class, String, TypeTranslator)
      */
     public <O> void registerOutputTypeTranslator(Class<O> outCls, String outTypeName, 
         TypeTranslator<String, O> outTrans);

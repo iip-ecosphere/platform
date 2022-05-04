@@ -137,6 +137,9 @@ public class AbstractProcessService4PythonTest {
 
     /**
      * Tests the process-based service classes.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
     public void testProcessService() throws ExecutionException, IOException {

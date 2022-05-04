@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -230,8 +229,7 @@ public class Starter {
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * 
      * @see #getServiceMapper()
-     * @see #createMetricsClient()
-     * @see #mapService(ServiceMapper, Service, MetricsExtractorRestClient)
+     * @see #mapService(ServiceMapper, Service)
      */
     public static void mapService(Service service) {
         mapService(getServiceMapper(), service);

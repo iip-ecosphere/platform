@@ -9,8 +9,8 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Default service implementation realizing the left open methods of {@link AbstractService} empty. Uses 
- * {@link #reconfigure(Map, Map, boolean, ServiceState)}, {@link #setParameterConfigurer(Map)} and 
- * {@link #rollbackReconfigurationOnFailure()} to generically implement {@link #reconfigure(Map)}, i.e., define
+ * {@link #reconfigure(Map, ParameterConfigurerProvider, boolean, ServiceState)},  
+ * and {@link #rollbackReconfigurationOnFailure()} to generically implement {@link #reconfigure(Map)}, i.e., define
  * the relevant parameters for
  */
 public class DefaultServiceImpl extends AbstractService {

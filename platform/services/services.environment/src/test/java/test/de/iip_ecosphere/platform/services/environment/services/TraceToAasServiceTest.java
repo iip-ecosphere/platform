@@ -50,7 +50,7 @@ public class TraceToAasServiceTest {
      */
     @BeforeClass
     public static void startup() {
-        TraceToAasServiceMain.startup(-1, -1, -1);
+        TraceToAasServiceMain.startup(null, -1, -1, -1);
     }
     
     /**

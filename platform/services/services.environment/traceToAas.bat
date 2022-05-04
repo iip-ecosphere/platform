@@ -5,5 +5,6 @@ REM command line:
 REM  --aasServerPort=<int> determines the port of the AAS server, 
 REM  --aasRegistyPort=<int> the port of the AAS registry server
 REM  --aasProtocolPort=<int> the port of the AAS implementation/protocol server for implementing functions
+REM  --aasHost=<String> the host name/IP address of the server, else localhost
 
 java -cp target/*;target/jars/* test.de.iip_ecosphere.platform.services.environment.services.TraceToAasServiceMain %*

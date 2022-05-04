@@ -26,8 +26,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import org.junit.Assert;
 
 /**
- * Tests {@link AbstractService#reconfigure(java.util.Map, java.util.Map, boolean, 
- * de.iip_ecosphere.platform.services.environment.ServiceState)}.
+ * Tests {@link AbstractService#reconfigure(Map, 
+ * de.iip_ecosphere.platform.services.environment.ParameterConfigurerProvider, boolean, ServiceState)}.
  * 
  * @author Holger Eichelberger, SSE
  */

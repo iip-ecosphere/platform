@@ -6,5 +6,6 @@
 #   --aasServerPort=<int> determines the port of the AAS server, 
 #   --aasRegistyPort=<int> the port of the AAS registry server
 #   --aasProtocolPort=<int> the port of the AAS implementation/protocol server for implementing functions
+#   --aasHost=<String> the host name/IP address of the server, else localhost
 
 java -cp target/*:target/jars/* test.de.iip_ecosphere.platform.services.environment.services.TraceToAasServiceMain $*

@@ -37,7 +37,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * The three types of constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
  * {@link #createInstance(ClassLoader, String, Class, String, String)} to be used from generated service code.
  * {@link #reconfigure(Map)} is generically implemented via {@link #getParameterConfigurer(String)} (shall be 
- * overwritten), {@link #rollbackReconfigurationOnFailure()} and {@link #reconfigure(Map, Map, boolean, ServiceState)}
+ * overwritten), {@link #rollbackReconfigurationOnFailure()} and 
+ * {@link #reconfigure(Map, ParameterConfigurerProvider, boolean, ServiceState)}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -413,7 +414,7 @@ public abstract class AbstractService implements Service {
      * @param name the name of the parameter to reconfigure
      * @param value the value, may be <b>null</b>
      * @param rollbackMap the rollback
-     * @throws ExecutionException
+     * @throws ExecutionException if the re-configuration fails
      */
     protected static <T> void reconf(ParameterConfigurer<T> configurer, String name, String value, 
         Map<String, String> rollbackMap) throws ExecutionException {
@@ -443,7 +444,7 @@ public abstract class AbstractService implements Service {
      * @return {@code true}
      * 
      * @see #reconfigure(Map)
-     * @see #reconfigure(Map, Map, boolean, ServiceState)
+     * @see #reconfigure(Map, ParameterConfigurerProvider, boolean, ServiceState)
      */
     protected boolean rollbackReconfigurationOnFailure() {
         return true;

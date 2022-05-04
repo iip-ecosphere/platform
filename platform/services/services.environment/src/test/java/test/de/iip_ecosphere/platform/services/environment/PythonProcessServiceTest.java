@@ -67,6 +67,9 @@ public class PythonProcessServiceTest {
     
     /**
      * Tests the process-based service classes.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
     public void testAsyncProcessService() throws ExecutionException, IOException {
@@ -128,6 +131,9 @@ public class PythonProcessServiceTest {
     
     /**
      * Tests the process-based service classes.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
     public void testSyncProcessService() throws ExecutionException, IOException {

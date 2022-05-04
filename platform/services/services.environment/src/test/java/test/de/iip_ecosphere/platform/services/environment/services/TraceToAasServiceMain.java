@@ -78,12 +78,14 @@ public class TraceToAasServiceMain {
     /**
      * Initializes the test.
      * 
+     * @param host the host name / IP address of the server if the server shall be visible, may be <b>null</b> or 
+     *     empty for default ("localhost")
      * @param aasRegistryPort the port of the AAS registry, if {@code -1} use ephemeral ports for registry/server
      * @param aasServerPort the port of the AAS registry, if this or {@code aasRegistryPort} is {@code -1} use  
      *     ephemeral ports for registry/server
      * @param aasProtocolPort port for the AAS protocol server, may be {@code -1} for ephemeral
      */
-    public static void startup(int aasRegistryPort, int aasServerPort, int aasProtocolPort) {
+    public static void startup(String host, int aasRegistryPort, int aasServerPort, int aasProtocolPort) {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
         qpid = new TestQpidServer(broker);
         qpid.start();
@@ -94,6 +96,11 @@ public class TraceToAasServiceMain {
             aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         } else {
             aasSetup = new AasSetup(); // default setup
+            if (null != host && host.length() > 0) {
+                aasSetup.getServer().setHost(host);
+                aasSetup.getRegistry().setHost(host);
+                aasSetup.getImplementation().setHost(host);
+            }
             aasSetup.getServer().setPort(aasServerPort);
             aasSetup.getRegistry().setPort(aasRegistryPort);
             if (aasProtocolPort < 0) {
@@ -225,16 +232,19 @@ public class TraceToAasServiceMain {
      * A simple main program for tests starting up an AAS, the {@link TraceToAasService} with
      * two log entries and waiting for CTRL-C.
      * 
-     * @param args optional command line arguments, --aasServerPort=<int> determines the port of the AAS server, 
-     *   --aasRegistyPort=<int> the port of the AAS registry server and --aasProtocolPort=<int> the port of the 
-     *   AAS implementation/protocol server for implementing functions
+     * @param args optional command line arguments, --aasServerPort=&lt;int&gt; determines the port of the AAS server, 
+     *   --aasRegistyPort=&lt;int&gt; the port of the AAS registry server, --aasProtocolPort=&lt;int&gt; the port of the
+     *   AAS implementation/protocol server for implementing functions, --aasHost=&lt;String&gt; as the host name/IP of 
+     *   the server
+     * @throws ExecutionException if setting service states fails
      */
     public static void main(String[] args) throws ExecutionException {
         System.out.println("Starting AAS server/registry.");
         int aasServerPort = CmdLine.getIntArg(args, "aasServerPort", AasPartRegistry.DEFAULT_PORT); 
         int aasRegistryPort = CmdLine.getIntArg(args, "aasRegistryPort", AasPartRegistry.DEFAULT_REGISTRY_PORT);
         int aasProtocolPort = CmdLine.getIntArg(args, "aasProtocolPort", AasPartRegistry.DEFAULT_PROTOCOL_PORT);
-        startup(aasServerPort, aasRegistryPort, aasProtocolPort);
+        String aasHost = CmdLine.getArg(args, "aasHost", AasPartRegistry.DEFAULT_HOST);
+        startup(aasHost, aasServerPort, aasRegistryPort, aasProtocolPort);
         System.out.println("Creating TraceToAAS service.");
         TraceToAasService service = createService();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

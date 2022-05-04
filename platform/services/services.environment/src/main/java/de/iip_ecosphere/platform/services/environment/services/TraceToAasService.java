@@ -373,7 +373,7 @@ public class TraceToAasService extends AbstractService {
     }
 
     /**
-     * A trace reception callback calling {@link TraceToAas TraceToAasService#handleNew(TraceRecord)} in own threads.
+     * A trace reception callback calling {@link TraceToAasService#handleNew(TraceRecord) TraceToAas} in own threads.
      * 
      * @author Holger Eichelberger, SSE
      */
