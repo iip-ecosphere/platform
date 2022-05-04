@@ -133,9 +133,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 }
             }
             '{
-                ${expr}; 
                 ${mon|e}
                 ${trace|e} 
+                ${expr}; 
             }'
         } else {
             '${expr}'
@@ -596,7 +596,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String type) {
         String expr = 'service.processQuiet("${type}", data)';
-        'return data -> ${genSentProbe(service, expr, false, type, "data")};'
+        'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String inType, String outType) {
@@ -650,7 +650,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 IOType out = pairs.get(in);
                 String procExpr = "${kodexServiceName(in, out)}.processQuiet(data)";
                 'return data -> {
-                    ${genSentProbe(kodex, procExpr, false, type, "data")};
+                    ${genRcvProbe(kodex, procExpr, type, "data")};
                 };'
             } else {
                 'return null;'
@@ -716,7 +716,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String type) {
         String expr = 'service.processQuiet(data)';
-        'return data -> ${genSentProbe(service, expr, false, type, "data")};'
+        'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
