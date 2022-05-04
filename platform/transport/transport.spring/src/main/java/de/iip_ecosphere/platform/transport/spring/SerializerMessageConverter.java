@@ -37,17 +37,18 @@ public class SerializerMessageConverter extends AbstractMessageConverter {
     /**
      * The default mime type for IIP-Ecosphere serialized data types via the transport layer.
      */
-    public static final MimeType MIME_TYPE = new MimeType("application", "json");
+    public static final MimeType MIME_TYPE = new MimeType("application", "iip");
+    public static final MimeType MIME_TYPE_FALLBACK = new MimeType("application", "json");
     // before this was application/iip and it worked. suddenly, SpringCloudStream sets all messages to 
-    // application/json although application.yml states different default
+    // application/json although application.yml states different default; MIME_TYPE is required by
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerMessageConverter.class);
 
     /**
-     * Creates an instance for {@link #MIME_TYPE}.
+     * Creates an instance for {@link #MIME_TYPE} and {@link #MIME_TYPE_FALLBACK}.
      */
     public SerializerMessageConverter() {
-        super(MIME_TYPE);
+        super(MIME_TYPE, MIME_TYPE_FALLBACK);
     }
 
     /**
