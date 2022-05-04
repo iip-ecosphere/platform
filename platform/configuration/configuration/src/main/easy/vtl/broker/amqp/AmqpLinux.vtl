@@ -5,7 +5,12 @@ template AmqpLinux(IIPEcosphere config, FileArtifact target) {
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
         '#!/bin/bash
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port} \\$*'
+        PORT=${port}
+        if [ $# -gt 0 ]
+          then
+          PORT=$1
+        fi
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer \\$PORT \\$*'
     }
 	
 }

@@ -504,13 +504,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
         vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml");
-        vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/amqp.sh");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
-        FileArtifact f = "${brokerRoot}/amqp.sh";
+        FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
-        f = "${brokerRoot}/broker.sh";
-        f.setExecutable(false);
-        vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/amqp.bat");
         vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/broker.bat");
         Path c = "${brokerRoot}/src/test";
         c.mkdir();

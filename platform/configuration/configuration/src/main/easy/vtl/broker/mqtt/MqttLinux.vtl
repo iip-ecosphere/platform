@@ -5,8 +5,13 @@ template MqttLinux(IIPEcosphere config, FileArtifact target) {
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
         '#!/bin/bash
+        PORT=${port}
+        if [ $# -gt 0 ]
+          then
+          PORT=$1
+        fi        
         echo "This Broker requires at least Java 11!"
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port} \\$*'
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer \\$PORT \\$*'
     }
 	
 }

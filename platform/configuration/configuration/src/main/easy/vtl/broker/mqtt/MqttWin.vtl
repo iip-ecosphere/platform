@@ -4,8 +4,14 @@ template MqttWin(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
-        'echo "This Broker requires at least Java 11!"
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port} %*'
+        '@echo off
+        set PORT=${port}
+        if "%~1"=="" goto blank
+        set PORT=%~1
+        
+        :blank
+        echo "This Broker requires at least Java 11!"
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% %*'
     }
 	
 }

@@ -4,7 +4,13 @@ template AmqpWin(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
-        'java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port} %*'
+        '@echo off
+        set PORT=${port}
+        if "%~1"=="" goto blank
+        set PORT=%~1
+        
+        :blank
+        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer %PORT% %*'
     }
 	
 }

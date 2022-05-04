@@ -231,15 +231,21 @@ project Services {
    // ------------------------------- integrated KODEX service (-> own project, VIL?) -----------------------
    
    // initial, unclear, input missing
+   // https://heykodex.com/docs/actions/pseudonymization
    enum KodexAction {
-       PseudonymizeMerengue
+       PseudonymizeMerengue, PseudonymizeHmac, PseudonymizeStructured
    };
    
    // applies KodexAction to field
    compound KodexFieldAction {
        refTo(Field) field;
        KodexAction action;
-       // parameter needed?
+       // initial, not nice
+       String type = ""; // for Structured
+       String format = ""; // for Structured
+       Boolean preservePrefixes = false; // for Structured
+       Integer typeIntMin = 0; // for Structured
+       Integer typeIntMax = 0; // for Structured
    }
    
    // preliminary, own module as kind of "extension"?

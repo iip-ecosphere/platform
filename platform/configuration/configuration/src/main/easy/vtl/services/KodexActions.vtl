@@ -38,6 +38,7 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
                         type: ${actionType(action)}
                         config:
                           method: ${actionMethod(action)}
+                          ${actionParams(fAction)|e}
                     ${typeValidator(f.type)|e}'
             } else {
                 '- name: ${f.name}
@@ -75,13 +76,35 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
     
     def String actionType(KodexAction action) {
         switch (action) {
-            KodexAction::PseudonymizeMerengue: "pseudonymize"
+            KodexAction::PseudonymizeMerengue: "pseudonymize",
+            KodexAction::PseudonymizeHmac: "pseudonymize",
+            KodexAction::PseudonymizeStructured: "pseudonymize"
         }
     }
 
     def String actionMethod(KodexAction action) {
         switch (action) {
-            KodexAction::PseudonymizeMerengue: "merengue"
+            KodexAction::PseudonymizeMerengue: "merengue",
+            KodexAction::PseudonymizeHmac: "hmac",
+            KodexAction::PseudonymizeStructured: "structured"
+        }
+    }
+    
+    def String actionParams(KodexFieldAction action) {
+        if (action.action == KodexAction::PseudonymizeStructured) {
+            if (action.type == "date") {
+                'type: date
+                format: "${action.format}"'
+            } else if (action.type == "ipv4") {
+                'type: ipv4
+                preserve-prefixes: ${action.preservePrefixes}'
+            } else if (action.type == "integer") {
+                'type: integer
+                preserve-prefixes: ${action.preservePrefixes}
+                type-params:
+                   min: ${action.typeIntMin}
+                   max: ${action.typeIntMax}'
+            }
         }
     }
     
