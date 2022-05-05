@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.environment.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -130,6 +131,47 @@ public class TraceToAasService extends AbstractService {
         // parameter must be declared in this form in model!
         addParameterConfigurer(new ParameterConfigurer<>(
             "timeout", Long.class, TypeTranslators.LONG, t -> timeout = t));
+    }
+    
+    /**
+     * Creates a service instance from a service id and a YAML artifact.
+     * 
+     * @param serviceId the service id
+     * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+     */
+    public TraceToAasService(String serviceId, InputStream ymlFile) {
+        this(new YamlConstructionInfo(serviceId, ymlFile));
+    }
+    
+    /**
+     * Intermediary constructor based on {@link YamlConstructionInfo}.
+     * 
+     * @param info the information instance
+     */
+    private TraceToAasService(YamlConstructionInfo info) {
+        this(info.app, info.service);
+    }
+    
+    /**
+     * Represents construction information.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class YamlConstructionInfo {
+        private ApplicationSetup app;
+        private YamlService service;
+
+        /**
+         * Creates an instance by reading {@code yamlFile}.
+         * 
+         * @param serviceId the service id
+         * @param ymlFile the YML file containing the YAML artifact with the service descriptor
+         */
+        protected YamlConstructionInfo(String serviceId, InputStream ymlFile) {
+            YamlArtifact art = YamlArtifact.readFromYamlSafe(ymlFile);
+            this.app = art.getApplication();
+            this.service = art.getServiceSafe(serviceId);
+        }
     }
 
     /**
