@@ -89,6 +89,12 @@ project DataTypes {
         name = "String"
     };
 
+    compound StringBase64TypeType refines StringTypeType {
+    }
+    StringBase64TypeType StringBase64Type = {
+        name = "String Base64"
+    };
+
     compound BooleanTypeType refines PrimitiveType {
     }
     BooleanTypeType BooleanType = {
