@@ -158,18 +158,20 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             try {
                 //Currently fallback methods, in production filesCopy()-method should be used.
                 InputStream in = getClass().getClassLoader().getResourceAsStream(zipName);
-                if (null != in) {
+                if (in == null) {
                     in = new FileInputStream(new File(RESOURCES, zipName));
                 }
                 JarUtils.extractZip(in, prometheusWorkingDirectory.toPath());
+                in.close();
                 prometheusFile.setExecutable(true);
 
                 in = getClass().getClassLoader().getResourceAsStream(PROMETHEUS_CONFIG);
-                if (null != in) {
+                if (in == null) {
                     in = new FileInputStream(new File(RESOURCES, PROMETHEUS_CONFIG));
                 }
                 Path initCfgPath = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG_INITIAL).toPath();
                 Files.copy(in, initCfgPath,  StandardCopyOption.REPLACE_EXISTING);
+                in.close();
                 Files.copy(initCfgPath, new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG).toPath(),  
                     StandardCopyOption.REPLACE_EXISTING);
                 updateConfiguration(new ConfigModifier(DEFAULT_SCRAPEPOINTS), false);
