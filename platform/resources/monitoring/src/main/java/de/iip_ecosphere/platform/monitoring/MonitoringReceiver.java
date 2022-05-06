@@ -72,7 +72,6 @@ public abstract class MonitoringReceiver {
                     JsonObject obj = Json.createReader(new StringReader(data)).readObject();
                     String id = obj.getString("id");
                     notifyMeterReception(stream, id, obj);
-                    // TODO preprocess id?
                     if (null != id) {
                         obtainExporter(id).addMeters(obj.getJsonObject("meters"));
                     }
