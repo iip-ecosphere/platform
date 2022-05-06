@@ -117,6 +117,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
             Assert.assertTrue(meterCount > 0);
             Assert.assertTrue(meterCount2 > 0);
         }
+        
     }
 
     
