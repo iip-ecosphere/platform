@@ -25,6 +25,11 @@
      <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>services.environment</artifactId>
+      <version>${project.version}</version>
+     </dependency>
+    <dependency>
       <artifactId>configuration.configuration</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
