@@ -1,5 +1,4 @@
-package de.iip_ecosphere.platform.monitoring.prometheus;
-/** 
+/**
  * ******************************************************************************
  * Copyright (c) {2022} The original author or authors
  *
@@ -10,19 +9,20 @@ package de.iip_ecosphere.platform.monitoring.prometheus;
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-import io.prometheus.client.Counter;
 
-public class PrometheusCounter {
-    //Beispiel für einen Counter
-    static final Counter REQUESTS = Counter.build()
-        .name("requests_total").help("Total requests.").register();
-    static final Counter FAILEDREQUESTS = Counter.build()
-        .name("requests_failed_total").help("Total failed requests.").register();
+package test.de.iip_ecosphere.platform.monitoring.prometheus;
 
-    /** Runs the sample process.
-     * 
-     */
-    void processRequest() {
-        REQUESTS.inc();
-    }
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+/**
+ * Test suite. 
+ * 
+ * @author bettelsc
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    PrometheusLifecycleDescriptorTest.class
+})
+public class AllTests {
 }
