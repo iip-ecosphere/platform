@@ -34,8 +34,8 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
     private ServerAddressHolder prometheusServer = new ServerAddressHolder(
         Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSSERVERPORT);
 
-    private ServerAddressHolder prometheusPushGateway = new ServerAddressHolder(
-        Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSPUSHGATEWAYPORT);
+    /*private ServerAddressHolder prometheusPushGateway = new ServerAddressHolder(
+        Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSPUSHGATEWAYPORT);*/
     
     private boolean running = false;
     private int exporterPort = -1; // ephemeral
@@ -54,9 +54,9 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @return the Prometheus push gateway information
      */
-    public ServerAddressHolder getPrometheusPushGateway() {
+    /*public ServerAddressHolder getPrometheusPushGateway() {
         return prometheusPushGateway;
-    }
+    }*/
     
     /**
      * Returns whether Prometheus is already running.
@@ -81,9 +81,9 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @param prometheusPushGateway the Prometheus push gateway information
      */
-    public void getPrometheusPushGateway(ServerAddressHolder prometheusPushGateway) {
+    /*public void getPrometheusPushGateway(ServerAddressHolder prometheusPushGateway) {
         this.prometheusPushGateway = prometheusPushGateway;
-    }
+    }*/
     
     /**
      * Returns the port for the prometheus exporter.

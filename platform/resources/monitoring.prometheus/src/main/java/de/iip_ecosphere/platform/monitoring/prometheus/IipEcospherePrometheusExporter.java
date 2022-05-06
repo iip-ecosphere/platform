@@ -13,14 +13,19 @@
 package de.iip_ecosphere.platform.monitoring.prometheus;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +48,11 @@ import io.prometheus.client.exporter.common.TextFormat;
 public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
     private Tomcat server;
+    private Context context;
     private Supplier<ConfigModifier> modifier;
+    private Map<String, Context> contexts = Collections.synchronizedMap(new HashMap<>());
     private int port;
+    private File webapps;
     
     /**
      * Creates a prometheus exporter with config modifier.
@@ -69,6 +77,10 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             LoggerFactory.getLogger(getClass()).info("Starting prometheus export endpoint on port {}", port);
             server = new Tomcat();
             server.setPort(port);
+            File home = server.getEngine().getCatalinaHome();
+            webapps = new File(home, "webapps");
+            webapps.mkdirs();
+            context = server.addContext(server.getHost(), "", "");
             server.start();
         } catch (Exception  e) {
             LoggerFactory.getLogger(getClass()).error("Starting prometheus export endpoint: {}", e.getMessage());
@@ -162,9 +174,19 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
          */
         protected PrometheusExporter(String id) {
             super(id);
-            String path = "/iip/metrics/" + id;
+        }
+        
+        @Override
+        protected void initialize() {
+            String id = getId();
+            String path = "/" + id;
             entry = new ScrapeEndpoint(id, new Endpoint(Schema.HTTP, port, path));
-            //server.addServlet(path, id, servlet);
+            Context ctx = contexts.get(id);
+            if (null != ctx) {
+                ctx = server.addContext(path, "");
+                contexts.put(id, context);
+            }
+            Tomcat.addServlet(ctx, id, servlet);
         }
         
         /**

@@ -16,16 +16,19 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.prometheus.IipEcospherePrometheusExporter;
 import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import test.de.iip_ecosphere.platform.monitoring.AbstractMonitoringReceiverTest;
+//import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer; // QPID-8588
+import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
 
 /**
  * Testing {@link PrometheusLifecycleDescriptor}.
@@ -38,7 +41,6 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
     /** 
      * Tests the descriptor.
      */
-    @Ignore("Broker/Tomcat conflict")
     @Test
     public void testDescriptor() {
         runScenario(new MonitoringRecieverLifecycle() {
@@ -72,4 +74,11 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
         });
         
     }
+    
+    @Override
+    protected Server createBroker(ServerAddress broker) {
+        return new TestMoquetteServer(broker);
+        //return new TestQpidServer(broker);
+    }
+    
 }
