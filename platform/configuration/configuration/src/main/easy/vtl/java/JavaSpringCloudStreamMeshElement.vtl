@@ -789,6 +789,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
         String clsName = getClsName(elt);
         ServiceBase impl = elt.impl;
+        String implMonId = impl.id.toIdentifier();
         'package ${pkg};
         
         import java.io.*;
@@ -837,8 +838,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             private MetricsProvider metrics;
-            private String sentCounterId = "service.sent";
-            private String rcvCounterId = "service.received";
+            private String sentCounterId = "service.${implMonId}.sent";
+            private String rcvCounterId = "service.${implMonId}.received";
 
             ${generateReceptionCallback(elt, elt.impl)|e}
         
