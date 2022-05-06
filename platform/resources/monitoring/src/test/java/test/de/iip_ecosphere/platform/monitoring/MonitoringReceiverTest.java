@@ -21,11 +21,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Tests {@link MonitoringReceiver}.
@@ -62,6 +65,10 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
             protected MyExporter(String id) {
                 super(id);
                 createdExporterId = id;
+            }
+
+            @Override
+            protected void initialize() {
             }
 
             @Override
@@ -105,7 +112,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
 
     
     /**
-     * Simple internal montoring receiver lifecycle.
+     * Simple internal monitoring receiver lifecycle.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -135,6 +142,11 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
         
     }
 
+    @Override
+    protected Server createBroker(ServerAddress broker) {
+        return new TestQpidServer(broker);
+    }
+    
     /**
      * Tests the receiver.
      */

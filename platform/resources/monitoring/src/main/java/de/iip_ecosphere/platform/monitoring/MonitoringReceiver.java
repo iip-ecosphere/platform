@@ -30,8 +30,8 @@ import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
-import de.iip_ecosphere.platform.transport.status.ActionType;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
+import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
@@ -103,8 +103,7 @@ public abstract class MonitoringReceiver {
         public void received(StatusMessage msg) {
             notifyStatusReceived(msg);
             String id = msg.getDeviceId();
-            ActionType action = msg.getAction();
-            if (ActionTypes.REMOVED == action) {
+            if (ActionTypes.REMOVED == msg.getAction() && ComponentTypes.SERVICE != msg.getComponentType()) {
                 Exporter exporter = registry.remove(id);
                 notifyExporterRemoved(exporter);
                 if (null != exporter) {
@@ -129,10 +128,18 @@ public abstract class MonitoringReceiver {
      * @return the exporter
      */
     protected Exporter obtainExporter(String id) {
-        Exporter exporter = registry.get(id);
-        if (null == exporter) {
-            exporter = createExporter(id);
-            registry.put(id, exporter);
+        boolean isNew = false;
+        Exporter exporter;
+        synchronized (this) {
+            exporter = registry.get(id);
+            if (null == exporter) {
+                exporter = createExporter(id);
+                registry.put(id, exporter);
+                isNew = true;
+            }
+        }
+        if (isNew) {
+            exporter.initialize();
             notifyExporterAdded(exporter);
         }
         return exporter;
@@ -191,13 +198,18 @@ public abstract class MonitoringReceiver {
         private boolean valid;
 
         /**
-         * Creates an exporter.
+         * Creates an exporter. Do not longer initializations here rather than {@link #initialize()}.
          * 
          * @param id the source id
          */
         protected Exporter(String id) {
             this.id = id;
         }
+
+        /**
+         * Do longer initialization here.
+         */
+        protected abstract void initialize();
         
         /**
          * Adds a set of received meters.

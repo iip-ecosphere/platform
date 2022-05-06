@@ -20,13 +20,13 @@ import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
  * Tests a {@link MonitoringReceiver} with a simple mocked reusable example scenario.
@@ -56,6 +56,14 @@ public abstract class AbstractMonitoringReceiverTest {
     }
     
     /**
+     * Creates the broker instance.
+     * 
+     * @param broker the broker address
+     * @return the instance
+     */
+    protected abstract Server createBroker(ServerAddress broker);
+    
+    /**
      * Runs a platform-like monitoring scenario with an ECS-runtime and a service manager on the same device.
      * 
      * @param mrl the lifecylce
@@ -63,7 +71,7 @@ public abstract class AbstractMonitoringReceiverTest {
     protected void runScenario(MonitoringRecieverLifecycle mrl) {
         System.out.println("Starting broker"); // Qpid eats up logging info
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        TestQpidServer qpid = new TestQpidServer(broker);
+        Server qpid = createBroker(broker);
         qpid.start();
         
         TransportSetup transSetup = new TransportSetup();
@@ -110,7 +118,7 @@ public abstract class AbstractMonitoringReceiverTest {
         Transport.sendServiceStatus(ActionTypes.REMOVED, serviceId);
 
         System.out.println("Sleeping...");
-        TimeUtils.sleep(3000);
+        TimeUtils.sleep(6000);
 
         // part of offboarding
         System.out.println("Device offboarding");
