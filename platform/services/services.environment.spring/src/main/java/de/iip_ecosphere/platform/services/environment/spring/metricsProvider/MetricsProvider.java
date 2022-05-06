@@ -112,6 +112,17 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     public MetricsProvider(MeterRegistry registry) {
         super(registry);
     }
+    
+    /**
+     * Sets the basic values that are usually injected. [testing outside Spring]
+     * 
+     * @param transport the transport instance
+     */
+    public void setInjectedValues(TransportSetup transport) {
+        this.transport = transport;
+        diskBaseUnitString = "kilobytes";
+        memoryBaseUnitString = "bytes";
+    }
 
     /**
      * Registers the extra system metrics onto the registry.<br>
@@ -129,11 +140,11 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
      * by Micrometer-API.<br>
      * Even though this sacrifices the real time values of these metrics, we gain
      * speed when requesting the metrics as we no longer have to calculate the
-     * values upon request. The {@code SHEDULE_RATE} indicates the time in between
-     * calculations.
+     * values upon request. The {@code SCHEDULE_RATE} indicates the time in between
+     * calculations. [public for testing outside spring]
      */
     @Scheduled(fixedRateString = SCHEDULE_RATE)
-    private void calculateMetrics() {
+    public void calculateMetrics() {
         super.calculateNonNativeSystemMetrics();
         final String id = Id.getDeviceId();
         if (null == connector && null != transport) {
