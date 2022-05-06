@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.transport.status;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.streams.StreamNames;
 
 /**
  * Optional generic tracing of platform actions. [preliminary]
@@ -23,7 +24,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
  */
 public class TraceRecord {
 
-    public static final String TRACE_STREAM = "Trace";
+    public static final String TRACE_STREAM = StreamNames.TRACE_STREAM;
 
     private String source;
     private long timestamp;

@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.transport.status;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.streams.StreamNames;
 
 /**
  * Represents a status message for a component. A component is denoted by the device id (of the ECS runtime) the 
@@ -26,7 +27,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
  */
 public class StatusMessage {
 
-    public static final String STATUS_STREAM = "ComponentStatus";
+    public static final String STATUS_STREAM = StreamNames.STATUS_STREAM;
     
     private ComponentType componentType;
     private ActionType action;
