@@ -37,42 +37,49 @@ import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
  * @author Holger Eichelberger, SSE
  */
 public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceiverTest {
+
+    /**
+     * Implements the lifecycle for prometheus test.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class MyMonitoringRecieverLifecycle implements MonitoringRecieverLifecycle {
+
+        private PrometheusLifecycleDescriptor desc;
+        
+        @Override
+        public void start(TransportSetup transSetup) {
+            ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
+            Optional<PrometheusLifecycleDescriptor> pml = ServiceLoaderUtils
+                .stream(loader)
+                .filter(d-> d instanceof PrometheusLifecycleDescriptor)
+                .map(PrometheusLifecycleDescriptor.class::cast)
+                .findFirst();
+            Assert.assertTrue(pml.isPresent());
+            desc = pml.get();
+            desc.startup(new String[] {});
+            
+            System.out.println("Sleeping to be on the safe side...");
+            TimeUtils.sleep(3000);
+
+            IipEcospherePrometheusExporter exp = desc.getExporter();
+            Assert.assertNotNull(exp);
+        }
+
+        @Override
+        public void stop() {
+            desc.shutdown();
+        }
+
+    }
     
     /** 
      * Tests the descriptor.
      */
     @Test
     public void testDescriptor() {
-        runScenario(new MonitoringRecieverLifecycle() {
-
-            private PrometheusLifecycleDescriptor desc;
-            
-            @Override
-            public void start(TransportSetup transSetup) {
-                ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
-                Optional<PrometheusLifecycleDescriptor> pml = ServiceLoaderUtils
-                    .stream(loader)
-                    .filter(d-> d instanceof PrometheusLifecycleDescriptor)
-                    .map(PrometheusLifecycleDescriptor.class::cast)
-                    .findFirst();
-                Assert.assertTrue(pml.isPresent());
-                desc = pml.get();
-                desc.startup(new String[] {});
-                
-                System.out.println("Sleeping to be on the safe side...");
-                TimeUtils.sleep(3000);
-
-                IipEcospherePrometheusExporter exp = desc.getExporter();
-                Assert.assertNotNull(exp);
-            }
-
-            @Override
-            public void stop() {
-                desc.shutdown();
-            }
-            
-        });
-        
+        MyMonitoringRecieverLifecycle mrl = new MyMonitoringRecieverLifecycle();
+        runScenario(mrl);
     }
     
     @Override
