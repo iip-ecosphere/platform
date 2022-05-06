@@ -218,7 +218,33 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         }
         return result;
     }
-    
+
+    /**
+     * Constructs an executable name without suffix, even on Windows, not naming 32 bit.
+     * 
+     * @param program the program name
+     * @param version the version of the program
+     * @return the executable prefix
+     * @see #getExecutablePrefix(String, String, boolean)
+     */
+    public static String getExecutablePrefix(String program, String version) {
+        return getExecutablePrefix(program, version, false);
+    }
+
+    /**
+     * Constructs an executable name without suffix, even on Windows.
+     * 
+     * @param program the program name
+     * @param version the version of the program
+     * @param name32 shall the method add 32 in case of a 32 bit operating system (explicit) or be quite (implicit) and 
+     *     add only 64 in case of 64 bit systems
+     * @return the executable prefix
+     * @see #getOsArch(boolean)
+     */
+    public static String getExecutablePrefix(String program, String version, boolean name32) {
+        return program + "-" + version + "-" + getOsArch(name32);
+    }
+
     /**
      * Constructs an executable name.
      * 
@@ -227,11 +253,11 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param name32 shall the method add 32 in case of a 32 bit operating system (explicit) or be quite (implicit) and 
      *     add only 64 in case of 64 bit systems
      * @return the executable name
-     * @see #getOsArch(boolean)
+     * @see #getExecutablePrefix(String, String, boolean)
      * @see #getExecutableSuffix()
      */
     public static String getExecutableName(String program, String version, boolean name32) {
-        return program + "-" + version + "-" + getOsArch(name32) + getExecutableSuffix();        
+        return getExecutablePrefix(program, version, name32) + getExecutableSuffix();        
     }
 
     /**
@@ -240,8 +266,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param program the program name
      * @param version the version of the program
      * @return the executable name
-     * @see #getOsArch(boolean)
-     * @see #getExecutableSuffix()
+     * @see #getExecutableName(String, String, boolean)
      */
     public static String getExecutableName(String program, String version) {
         return getExecutableName(program, version, false);

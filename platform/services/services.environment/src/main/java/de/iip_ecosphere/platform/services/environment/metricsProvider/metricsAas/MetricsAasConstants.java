@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas;
 
+import de.iip_ecosphere.platform.transport.streams.StreamNames;
+
 /**
  * Collection of constant name values for submodel properties.<br>
  * This class acts as a collection of constant values used mostly by the
@@ -23,7 +25,7 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAa
  */
 public class MetricsAasConstants {
     
-    public static final String TRANSPORT_SERVICE_METRICS_CHANNEL = "ServiceMetrics";
+    public static final String TRANSPORT_SERVICE_METRICS_CHANNEL = StreamNames.SERVICE_METRICS;
 
     /* Java Virtual Machine (JVM) Buffer Metrics */
     public static final String JVM_BUFFER_COUNT = "jvmbuffercount";
