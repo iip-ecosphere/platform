@@ -53,7 +53,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
         boolean autoOnOff = setup.getAutoOnOffboarding();
         try {
             //DeviceRegistrationResponse resp = 
-            DeviceManagement.addDevice(autoOnOff ? true : false);
+            DeviceManagement.addDevice(autoOnOff);
             // TODO receive tokens, certificates; store, self-configure
             registered = true;
         }  catch (ExecutionException e) {

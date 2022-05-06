@@ -22,16 +22,17 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
- * Does OS/JVM level monitoring.
+ * Does OS/JVM level monitoring. [public for testing]
  * 
  * @author Holger Eichelberger, SSE
  */
-class Monitor extends Transport {
+public class Monitor extends Transport {
     
-    public static final String TRANSPORT_METRICS_CHANNEL = "EcsMetrics";
+    public static final String TRANSPORT_METRICS_CHANNEL = StreamNames.RESOURCE_METRICS;
     private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
     private static Timer timer = new Timer();
     private static boolean update = false;
@@ -46,9 +47,9 @@ class Monitor extends Transport {
     }
     
     /**
-     * Starts metrics scheduling.
+     * Starts metrics scheduling. [public for testing]
      */
-    static void startScheduling() {
+    public static void startScheduling() {
         final String id = Id.getDeviceId();
         createConnector();
         timer.schedule(new TimerTask() {
@@ -71,9 +72,9 @@ class Monitor extends Transport {
     }
 
     /**
-     * Stops metrics scheduling.
+     * Stops metrics scheduling. [public for testing]
      */
-    static void stopScheduling() {
+    public static void stopScheduling() {
         MetricsAasConstructor.clear();
         timer.cancel();
         releaseConnector();
