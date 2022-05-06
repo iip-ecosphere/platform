@@ -66,6 +66,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     private IipEcospherePrometheusExporter exporter;
     private ModifierRunnable modifierRunnable = new ModifierRunnable();
     private Deque<ConfigModifier> modifierQueue = new ConcurrentLinkedDeque<>();
+    private Supplier<IipEcospherePrometheusExporter> exporterSupplier = () -> new IipEcospherePrometheusExporter();
     
     private Supplier<ConfigModifier> modifierSupplier = () -> { 
         ConfigModifier result = new ConfigModifier(DEFAULT_SCRAPEPOINTS);
@@ -192,9 +193,21 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         }
 
         new Thread(modifierRunnable).start();
-        exporter = new IipEcospherePrometheusExporter(modifierSupplier);
+        exporter = exporterSupplier.get();
+        exporter.setModifierSupplier(modifierSupplier);
         exporter.start();
     } 
+
+    /**
+     * Defines the exporter supplier.
+     * 
+     * @param supplier the supplier
+     */
+    public void setExporterSupplier(Supplier<IipEcospherePrometheusExporter> supplier) {
+        if (null != supplier) {
+            this.exporterSupplier = supplier;
+        }
+    }
     
     /**
      * Deletes all files used in prometheus run.

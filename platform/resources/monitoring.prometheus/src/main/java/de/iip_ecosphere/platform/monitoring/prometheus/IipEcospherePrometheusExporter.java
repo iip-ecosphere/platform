@@ -55,11 +55,19 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
     private File webapps;
     
     /**
-     * Creates a prometheus exporter with config modifier.
+     * Creates a prometheus exporter.
      * 
-     * @param modifier the modifier
+     * @see #setModifierSupplier(Supplier)
      */
-    public IipEcospherePrometheusExporter(Supplier<ConfigModifier> modifier) {
+    public IipEcospherePrometheusExporter() {
+    }
+    
+    /**
+     * Defines the modifier supplier.
+     * 
+     * @param modifier the modifier supplier
+     */
+    public void setModifierSupplier(Supplier<ConfigModifier> modifier) {
         this.modifier = modifier;
     }
 
