@@ -170,6 +170,14 @@ public abstract class MonitoringReceiver {
      */
     protected void notifyStatusReceived(StatusMessage msg) {
     }
+
+    /**
+     * Is called when a meter was added. [testing, debugging]
+     * 
+     * @param meter the meter
+     */
+    protected void notifyMeterAdded(Meter meter) {
+    }
     
     /**
      * Notifies about a added exporter.
@@ -218,7 +226,9 @@ public abstract class MonitoringReceiver {
          */
         protected void addMeters(JsonObject mtrs) {
             for (Map.Entry<String, JsonValue> e : mtrs.entrySet()) {
-                addMeter(MeterRepresentation.parseMeter(e.getValue().toString()));
+                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString());
+                addMeter(meter);
+                notifyMeterAdded(meter);
             }
         }
 

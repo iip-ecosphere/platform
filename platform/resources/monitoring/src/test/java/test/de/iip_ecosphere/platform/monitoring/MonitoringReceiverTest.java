@@ -49,6 +49,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
         private int statusCount;
         private int meterRecCount;
         private int meterCount;
+        private int meterCount2;
 
         /**
          * A simple exporter for testing.
@@ -96,6 +97,13 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
             statusCount++;
         }
 
+        @Override
+        protected void notifyMeterAdded(Meter meter) {
+            if (meter != null) {
+                meterCount2++;
+            }
+        }
+
         /**
          * Does the asserts.
          */
@@ -107,6 +115,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
             Assert.assertTrue(statusCount >= 4); // device on, service up, service down, device out
             Assert.assertTrue(meterRecCount > 0);
             Assert.assertTrue(meterCount > 0);
+            Assert.assertTrue(meterCount2 > 0);
         }
     }
 
