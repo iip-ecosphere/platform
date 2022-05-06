@@ -1,0 +1,765 @@
+2022-05-06 11:53:18,489 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 11:53:18,527 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 11:53:18,532 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 11:53:18,537 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 11:53:18,538 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 11:53:18,539 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 14148
+2022-05-06 11:53:18,592 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 11:53:18,594 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 11:53:18,595 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 11:53:18,611 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 11:53:18,621 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 11:53:18,649 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 11:53:18,678 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 53699
+2022-05-06 11:53:18,678 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 11:53:18,699 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 11:53:18,975 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 11:53:18,975 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 11:53:18,975 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 11:53:18,975 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 11:53:18,986 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 11:53:19,007 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 11:53:19,025 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 11:53:19,075 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 11:53:19,083 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 11:53:19,087 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 11:53:19,088 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 11:53:19,088 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 11:53:19,092 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 11:53:19,203 INFO  [Broker-Config] (q.m.c.open) - [con:0(/0:0:0:0:0:0:0:1:53719)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:53699) : Protocol Version : 0-9-1
+2022-05-06 11:53:19,275 INFO  [IO-/0:0:0:0:0:0:0:1:53719] (q.m.c.open) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:53699) : Protocol Version : 0-9-1 : Client ID : e4ee4afb-b5db-4749-9bf1-19c781e14349 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 11:53:19,320 INFO  [IO-/0:0:0:0:0:0:0:1:53719] (q.m.c.create) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] CHN-1001 : Create
+2022-05-06 11:53:19,324 INFO  [IO-/0:0:0:0:0:0:0:1:53719] (q.m.c.prefetch_size) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 11:53:19,377 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: a2b097c3-bca0-437f-86b3-b66d92dc2a95 AutoDelete Transient
+2022-05-06 11:53:19,403 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 11:53:19,409 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 6f72feaf-bb1b-4c9e-8784-ef96aee5a8bf AutoDelete Transient
+2022-05-06 11:53:19,411 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 11:53:19,415 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: ca1533eb-014a-4e7c-b7d0-5a116cd45336 AutoDelete Transient
+2022-05-06 11:53:19,416 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 11:53:19,579 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:53720)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:53699) : Protocol Version : 0-9-1
+2022-05-06 11:53:19,584 INFO  [IO-/0:0:0:0:0:0:0:1:53720] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:53720/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:53699) : Protocol Version : 0-9-1 : Client ID : e271ca74-e72f-4921-846b-585aa71cbdce : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 11:53:19,585 INFO  [IO-/0:0:0:0:0:0:0:1:53720] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:53720/default)/ch:1] CHN-1001 : Create
+2022-05-06 11:53:19,586 INFO  [IO-/0:0:0:0:0:0:0:1:53720] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:53720/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 11:53:19,635 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 11:53:22,649 INFO  [IO-/0:0:0:0:0:0:0:1:53720] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:53720/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:53720/default)/ch:1] CHN-1003 : Close
+2022-05-06 11:53:22,656 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 11:53:22,656 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 11:53:22,660 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:53720/default)] CON-1002 : Close
+2022-05-06 11:53:22,671 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 11:53:22,674 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 11:53:22,680 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: ca1533eb-014a-4e7c-b7d0-5a116cd45336
+2022-05-06 11:53:22,681 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 11:53:22,682 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: a2b097c3-bca0-437f-86b3-b66d92dc2a95
+2022-05-06 11:53:22,682 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 11:53:22,682 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 6f72feaf-bb1b-4c9e-8784-ef96aee5a8bf
+2022-05-06 11:53:22,683 INFO  [IO-/0:0:0:0:0:0:0:1:53719] (q.m.c.close_forced) - [IO Pool] [con:0(user@/0:0:0:0:0:0:0:1:53719/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 11:53:22,689 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 53699
+2022-05-06 11:53:22,691 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/0:0:0:0:0:0:0:1:53719/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 11:53:22,702 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 11:53:22,703 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 11:53:22,704 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 11:53:23,140 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:10:09,487 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:10:09,523 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:10:09,528 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:10:09,534 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:10:09,534 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:10:09,535 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 21124
+2022-05-06 12:10:09,592 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:10:09,593 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:10:09,594 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:10:09,606 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:10:09,614 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:10:09,639 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:10:09,663 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 49720
+2022-05-06 12:10:09,664 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:10:09,688 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:09,949 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:10:09,950 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:10:09,950 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:10:09,950 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:10:09,961 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:09,994 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:10:09,995 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:10,042 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:10:10,048 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:10:10,052 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:10:10,052 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:10:10,053 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:10:10,058 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:10:10,143 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:49744)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49720) : Protocol Version : 0-9-1
+2022-05-06 12:10:10,217 INFO  [IO-/127.0.0.1:49744] (q.m.c.open) - [con:0(user@/127.0.0.1:49744/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49720) : Protocol Version : 0-9-1 : Client ID : f7c0e159-cc37-4bd2-b73e-d43b19e552f7 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:10:10,265 INFO  [IO-/127.0.0.1:49744] (q.m.c.create) - [con:0(user@/127.0.0.1:49744/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:10:10,271 INFO  [IO-/127.0.0.1:49744] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:49744/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:10:10,324 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 87182119-5783-474a-8f95-cb5810064905 AutoDelete Transient
+2022-05-06 12:10:10,354 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:10:10,361 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 91063ece-f997-4331-8d3e-63373089919f AutoDelete Transient
+2022-05-06 12:10:10,363 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:10:10,366 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: fa35a0b3-8bc3-454d-90a0-d9ab043f0b8f AutoDelete Transient
+2022-05-06 12:10:10,367 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49744/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:10:10,531 INFO  [Broker-Config] (q.m.c.open) - [con:1(/127.0.0.1:49745)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49720) : Protocol Version : 0-9-1
+2022-05-06 12:10:10,535 INFO  [IO-/127.0.0.1:49745] (q.m.c.open) - [con:1(user@/127.0.0.1:49745/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49720) : Protocol Version : 0-9-1 : Client ID : 55f4c8f6-3c3f-4066-bdc2-d75d4a2dd342 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:10:10,539 INFO  [IO-/127.0.0.1:49745] (q.m.c.create) - [con:1(user@/127.0.0.1:49745/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:10:10,540 INFO  [IO-/127.0.0.1:49745] (q.m.c.prefetch_size) - [con:1(user@/127.0.0.1:49745/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:10:10,591 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:10:13,609 INFO  [IO-/127.0.0.1:49745] (q.m.c.close) - [con:1(user@/127.0.0.1:49745/default)/ch:1] [con:1(user@/127.0.0.1:49745/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:10:13,616 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:10:13,617 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:10:13,622 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/127.0.0.1:49745/default)] CON-1002 : Close
+2022-05-06 12:10:13,627 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:10:13,632 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:10:13,635 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: fa35a0b3-8bc3-454d-90a0-d9ab043f0b8f
+2022-05-06 12:10:13,636 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:10:13,636 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 87182119-5783-474a-8f95-cb5810064905
+2022-05-06 12:10:13,637 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:10:13,637 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 91063ece-f997-4331-8d3e-63373089919f
+2022-05-06 12:10:13,638 INFO  [IO-/127.0.0.1:49744] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:49744/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:10:13,645 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 49720
+2022-05-06 12:10:13,647 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:49744/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:10:13,662 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:10:13,664 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:10:13,666 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:10:14,100 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:10:57,867 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:10:57,903 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:10:57,908 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:10:57,913 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:10:57,914 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:10:57,915 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 18476
+2022-05-06 12:10:57,959 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:10:57,959 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:10:57,960 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:10:57,972 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:10:57,984 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:10:58,008 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:10:58,033 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 49758
+2022-05-06 12:10:58,034 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:10:58,054 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:58,321 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:10:58,322 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:10:58,322 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:10:58,322 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:10:58,333 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:58,349 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:10:58,366 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:10:58,414 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:10:58,420 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:10:58,423 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:10:58,424 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:10:58,424 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:10:58,429 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:10:58,510 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:49779)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1
+2022-05-06 12:10:58,579 INFO  [IO-/127.0.0.1:49779] (q.m.c.open) - [con:0(user@/127.0.0.1:49779/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1 : Client ID : 8ad942e6-a6ff-47bb-8c7c-9dfc7e77c5ea : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:10:58,626 INFO  [IO-/127.0.0.1:49779] (q.m.c.create) - [con:0(user@/127.0.0.1:49779/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:10:58,630 INFO  [IO-/127.0.0.1:49779] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:49779/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:10:58,680 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 43280252-b06d-4337-834c-cbf2213cd539 AutoDelete Transient
+2022-05-06 12:10:58,707 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:10:58,714 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: c4806f0b-7088-40ef-af63-7c7e59c624e1 AutoDelete Transient
+2022-05-06 12:10:58,716 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:10:58,718 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: c6111f87-df36-4e57-acfc-f8ad2b30e5a4 AutoDelete Transient
+2022-05-06 12:10:58,720 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49779/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:10:58,881 INFO  [Broker-Config] (q.m.c.open) - [con:1(/127.0.0.1:49780)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1
+2022-05-06 12:10:58,886 INFO  [IO-/127.0.0.1:49780] (q.m.c.open) - [con:1(user@/127.0.0.1:49780/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1 : Client ID : 2b212cb0-295d-4680-9b2a-fff836f3033e : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:10:58,887 INFO  [IO-/127.0.0.1:49780] (q.m.c.create) - [con:1(user@/127.0.0.1:49780/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:10:58,888 INFO  [IO-/127.0.0.1:49780] (q.m.c.prefetch_size) - [con:1(user@/127.0.0.1:49780/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:10:58,935 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:10:58,951 INFO  [Broker-Config] (q.m.c.open) - [con:2(/127.0.0.1:49781)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1
+2022-05-06 12:10:58,953 INFO  [IO-/127.0.0.1:49781] (q.m.c.open) - [con:2(user@/127.0.0.1:49781/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49758) : Protocol Version : 0-9-1 : Client ID : e65fce87-7c2a-4ddf-8f31-644fd356b42f : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:10:58,954 INFO  [IO-/127.0.0.1:49781] (q.m.c.create) - [con:2(user@/127.0.0.1:49781/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:10:58,955 INFO  [IO-/127.0.0.1:49781] (q.m.c.prefetch_size) - [con:2(user@/127.0.0.1:49781/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:11:01,956 INFO  [IO-/127.0.0.1:49781] (q.m.c.close) - [con:2(user@/127.0.0.1:49781/default)/ch:1] [con:2(user@/127.0.0.1:49781/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:11:01,963 INFO  [IO-/127.0.0.1:49780] (q.m.c.close) - [con:1(user@/127.0.0.1:49780/default)/ch:1] [con:1(user@/127.0.0.1:49780/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:11:01,965 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:11:01,965 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:11:01,968 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/127.0.0.1:49781/default)] CON-1002 : Close
+2022-05-06 12:11:01,968 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/127.0.0.1:49780/default)] CON-1002 : Close
+2022-05-06 12:11:01,975 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:11:01,978 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:11:01,981 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 43280252-b06d-4337-834c-cbf2213cd539
+2022-05-06 12:11:01,982 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:11:01,982 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: c4806f0b-7088-40ef-af63-7c7e59c624e1
+2022-05-06 12:11:01,983 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:11:01,983 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: c6111f87-df36-4e57-acfc-f8ad2b30e5a4
+2022-05-06 12:11:01,984 INFO  [IO-/127.0.0.1:49779] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:49779/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:11:01,989 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 49758
+2022-05-06 12:11:01,990 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:49779/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:11:02,008 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:11:02,009 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:11:02,011 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:11:02,479 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:17:43,529 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:17:43,568 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:17:43,574 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:17:43,580 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:17:43,581 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:17:43,582 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 23404
+2022-05-06 12:17:43,637 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:17:43,638 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:17:43,638 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:17:43,651 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:17:43,660 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:17:43,684 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:17:43,712 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 51281
+2022-05-06 12:17:43,712 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:17:43,734 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:17:44,013 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:17:44,014 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:17:44,014 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:17:44,014 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:17:44,028 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:17:44,060 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:17:44,061 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:17:44,115 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:17:44,123 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:17:44,128 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:17:44,129 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:17:44,129 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:17:44,135 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:17:44,226 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:51301)] CON-1001 : Open : Destination : AMQP(127.0.0.1:51281) : Protocol Version : 0-9-1
+2022-05-06 12:17:44,300 INFO  [IO-/127.0.0.1:51301] (q.m.c.open) - [con:0(user@/127.0.0.1:51301/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:51281) : Protocol Version : 0-9-1 : Client ID : cba46aa3-2823-41cc-b7bc-6ae16eb22796 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:17:44,353 INFO  [IO-/127.0.0.1:51301] (q.m.c.create) - [con:0(user@/127.0.0.1:51301/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:17:44,359 INFO  [IO-/127.0.0.1:51301] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:51301/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:17:44,414 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 49b3e3f0-25d3-4987-89c4-4bc87d246727 AutoDelete Transient
+2022-05-06 12:17:44,442 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:17:44,450 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 4e27ab03-f8e6-406f-aede-3ef1c4d38d0d AutoDelete Transient
+2022-05-06 12:17:44,452 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:17:44,454 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 57dddd79-b189-4d92-8fe9-7461546016f1 AutoDelete Transient
+2022-05-06 12:17:44,456 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:51301/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:17:44,647 INFO  [Broker-Config] (q.m.c.open) - [con:1(/127.0.0.1:51302)] CON-1001 : Open : Destination : AMQP(127.0.0.1:51281) : Protocol Version : 0-9-1
+2022-05-06 12:17:44,654 INFO  [IO-/127.0.0.1:51302] (q.m.c.open) - [con:1(user@/127.0.0.1:51302/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:51281) : Protocol Version : 0-9-1 : Client ID : f33f067a-43fe-47b4-9c73-13551d11779a : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:17:44,656 INFO  [IO-/127.0.0.1:51302] (q.m.c.create) - [con:1(user@/127.0.0.1:51302/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:17:44,657 INFO  [IO-/127.0.0.1:51302] (q.m.c.prefetch_size) - [con:1(user@/127.0.0.1:51302/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:17:44,704 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:17:44,721 INFO  [Broker-Config] (q.m.c.open) - [con:2(/0:0:0:0:0:0:0:1:51303)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:51281) : Protocol Version : 0-9-1
+2022-05-06 12:17:44,723 INFO  [IO-/0:0:0:0:0:0:0:1:51303] (q.m.c.open) - [con:2(user@/0:0:0:0:0:0:0:1:51303/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:51281) : Protocol Version : 0-9-1 : Client ID : 186aa05d-15d1-4635-8ff8-c1f5d4937e5b : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:17:44,724 INFO  [IO-/0:0:0:0:0:0:0:1:51303] (q.m.c.create) - [con:2(user@/0:0:0:0:0:0:0:1:51303/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:17:44,725 INFO  [IO-/0:0:0:0:0:0:0:1:51303] (q.m.c.prefetch_size) - [con:2(user@/0:0:0:0:0:0:0:1:51303/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:17:47,735 ERROR [Timer-2] (d.i.p.s.e.s.m.MetricsProvider) - Cannot sent monitoring message: null
+2022-05-06 12:17:47,737 INFO  [IO-/0:0:0:0:0:0:0:1:51303] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:51303/default)/ch:1] [con:2(user@/0:0:0:0:0:0:0:1:51303/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:17:47,745 INFO  [IO-/127.0.0.1:51302] (q.m.c.close) - [con:1(user@/127.0.0.1:51302/default)/ch:1] [con:1(user@/127.0.0.1:51302/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:17:47,747 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:17:47,747 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:17:47,751 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:51303/default)] CON-1002 : Close
+2022-05-06 12:17:47,752 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/127.0.0.1:51302/default)] CON-1002 : Close
+2022-05-06 12:17:47,756 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:17:47,759 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:17:47,762 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 57dddd79-b189-4d92-8fe9-7461546016f1
+2022-05-06 12:17:47,763 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:17:47,763 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 49b3e3f0-25d3-4987-89c4-4bc87d246727
+2022-05-06 12:17:47,765 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:17:47,765 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 4e27ab03-f8e6-406f-aede-3ef1c4d38d0d
+2022-05-06 12:17:47,765 INFO  [IO-/127.0.0.1:51301] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:51301/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:17:47,770 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 51281
+2022-05-06 12:17:47,772 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:51301/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:17:47,790 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:17:47,794 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:17:47,796 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:17:48,167 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:23:48,013 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:23:48,049 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:23:48,055 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:23:48,060 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:23:48,061 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:23:48,061 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 21244
+2022-05-06 12:23:48,109 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:23:48,110 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:23:48,110 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:23:48,121 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:23:48,129 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:23:48,151 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:23:48,176 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 56159
+2022-05-06 12:23:48,177 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:23:48,200 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:23:48,466 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:23:48,466 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:23:48,466 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:23:48,466 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:23:48,480 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:23:48,512 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:23:48,512 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:23:48,561 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:23:48,567 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:23:48,571 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:23:48,572 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:23:48,572 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:23:48,577 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:23:48,670 INFO  [Broker-Config] (q.m.c.open) - [con:0(/0:0:0:0:0:0:0:1:56182)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:56159) : Protocol Version : 0-9-1
+2022-05-06 12:23:48,750 INFO  [IO-/0:0:0:0:0:0:0:1:56182] (q.m.c.open) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:56159) : Protocol Version : 0-9-1 : Client ID : 94ff9ab9-cc08-4d9a-99eb-ee36974a371f : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:23:48,801 INFO  [IO-/0:0:0:0:0:0:0:1:56182] (q.m.c.create) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:23:48,806 INFO  [IO-/0:0:0:0:0:0:0:1:56182] (q.m.c.prefetch_size) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:23:48,862 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 4047594d-915b-4df5-a659-67821f88436f AutoDelete Transient
+2022-05-06 12:23:48,890 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:23:48,897 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: a633c41b-27a7-479b-8da9-6e16a121283b AutoDelete Transient
+2022-05-06 12:23:48,899 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:23:48,902 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 3b21d89e-2041-4d77-a847-a1ce443f24af AutoDelete Transient
+2022-05-06 12:23:48,904 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:23:49,071 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:56183)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:56159) : Protocol Version : 0-9-1
+2022-05-06 12:23:49,079 INFO  [IO-/0:0:0:0:0:0:0:1:56183] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:56183/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:56159) : Protocol Version : 0-9-1 : Client ID : 245e5802-19fd-4c8a-a6cf-ed92c8020652 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:23:49,080 INFO  [IO-/0:0:0:0:0:0:0:1:56183] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:56183/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:23:49,081 INFO  [IO-/0:0:0:0:0:0:0:1:56183] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:56183/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:23:49,144 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:23:49,160 INFO  [Broker-Config] (q.m.c.open) - [con:2(/127.0.0.1:56184)] CON-1001 : Open : Destination : AMQP(127.0.0.1:56159) : Protocol Version : 0-9-1
+2022-05-06 12:23:49,162 INFO  [IO-/127.0.0.1:56184] (q.m.c.open) - [con:2(user@/127.0.0.1:56184/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:56159) : Protocol Version : 0-9-1 : Client ID : 77f37f62-a92c-46e2-a008-e4a4bdda232d : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:23:49,163 INFO  [IO-/127.0.0.1:56184] (q.m.c.create) - [con:2(user@/127.0.0.1:56184/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:23:49,164 INFO  [IO-/127.0.0.1:56184] (q.m.c.prefetch_size) - [con:2(user@/127.0.0.1:56184/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:23:52,169 ERROR [Timer-2] (d.i.p.s.e.s.m.MetricsProvider) - Cannot sent monitoring message: null
+2022-05-06 12:23:52,171 INFO  [IO-/127.0.0.1:56184] (q.m.c.close) - [con:2(user@/127.0.0.1:56184/default)/ch:1] [con:2(user@/127.0.0.1:56184/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:23:52,180 INFO  [IO-/0:0:0:0:0:0:0:1:56183] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:56183/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:56183/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:23:52,181 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:23:52,182 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:23:52,186 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/127.0.0.1:56184/default)] CON-1002 : Close
+2022-05-06 12:23:52,186 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:56183/default)] CON-1002 : Close
+2022-05-06 12:23:52,190 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:23:52,193 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:23:52,196 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: a633c41b-27a7-479b-8da9-6e16a121283b
+2022-05-06 12:23:52,197 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:23:52,198 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 3b21d89e-2041-4d77-a847-a1ce443f24af
+2022-05-06 12:23:52,198 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:23:52,198 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 4047594d-915b-4df5-a659-67821f88436f
+2022-05-06 12:23:52,200 INFO  [IO-/0:0:0:0:0:0:0:1:56182] (q.m.c.close_forced) - [IO Pool] [con:0(user@/0:0:0:0:0:0:0:1:56182/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:23:52,205 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 56159
+2022-05-06 12:23:52,207 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/0:0:0:0:0:0:0:1:56182/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:23:52,224 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:23:52,228 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:23:52,230 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:23:52,614 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:24:34,764 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:24:34,804 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:24:34,811 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:24:34,816 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:24:34,817 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:24:34,817 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 12668
+2022-05-06 12:24:34,863 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:24:34,864 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:24:34,865 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:24:34,877 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:24:34,887 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:24:34,910 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:24:34,935 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 49399
+2022-05-06 12:24:34,936 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:24:34,960 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:24:35,227 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:24:35,227 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:24:35,227 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:24:35,228 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:24:35,242 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:24:35,273 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:24:35,274 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:24:35,322 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:24:35,327 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:24:35,330 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:24:35,331 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:24:35,331 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:24:35,336 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:24:35,422 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:49686)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49399) : Protocol Version : 0-9-1
+2022-05-06 12:24:35,499 INFO  [IO-/127.0.0.1:49686] (q.m.c.open) - [con:0(user@/127.0.0.1:49686/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:49399) : Protocol Version : 0-9-1 : Client ID : 09b2f346-3102-41cb-9935-4b145489914e : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:24:35,544 INFO  [IO-/127.0.0.1:49686] (q.m.c.create) - [con:0(user@/127.0.0.1:49686/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:24:35,549 INFO  [IO-/127.0.0.1:49686] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:49686/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:24:35,599 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 2cd34a77-cecd-463b-9891-2cd67b4c6651 AutoDelete Transient
+2022-05-06 12:24:35,625 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:24:35,632 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 529338ac-2766-4d33-9517-5252c1b0005e AutoDelete Transient
+2022-05-06 12:24:35,634 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:24:35,637 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 7f63c651-ab97-4207-a9b5-fe8fe85f1459 AutoDelete Transient
+2022-05-06 12:24:35,639 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:49686/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:24:35,798 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:49687)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:49399) : Protocol Version : 0-9-1
+2022-05-06 12:24:35,805 INFO  [IO-/0:0:0:0:0:0:0:1:49687] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:49687/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:49399) : Protocol Version : 0-9-1 : Client ID : 8f5fd3b5-752d-4641-9f08-56c3a061eee6 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:24:35,807 INFO  [IO-/0:0:0:0:0:0:0:1:49687] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:49687/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:24:35,807 INFO  [IO-/0:0:0:0:0:0:0:1:49687] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:49687/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:24:35,855 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:24:35,868 INFO  [Broker-Config] (q.m.c.open) - [con:2(/0:0:0:0:0:0:0:1:49688)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:49399) : Protocol Version : 0-9-1
+2022-05-06 12:24:35,870 INFO  [IO-/0:0:0:0:0:0:0:1:49688] (q.m.c.open) - [con:2(user@/0:0:0:0:0:0:0:1:49688/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:49399) : Protocol Version : 0-9-1 : Client ID : 48ba1756-5ea5-49b7-98b2-102d6b7f4e02 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:24:35,871 INFO  [IO-/0:0:0:0:0:0:0:1:49688] (q.m.c.create) - [con:2(user@/0:0:0:0:0:0:0:1:49688/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:24:35,872 INFO  [IO-/0:0:0:0:0:0:0:1:49688] (q.m.c.prefetch_size) - [con:2(user@/0:0:0:0:0:0:0:1:49688/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:24:38,875 INFO  [IO-/0:0:0:0:0:0:0:1:49688] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:49688/default)/ch:1] [con:2(user@/0:0:0:0:0:0:0:1:49688/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:24:38,884 INFO  [IO-/0:0:0:0:0:0:0:1:49687] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:49687/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:49687/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:24:38,886 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:24:38,886 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:24:38,890 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:49688/default)] CON-1002 : Close
+2022-05-06 12:24:38,890 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:49687/default)] CON-1002 : Close
+2022-05-06 12:24:38,894 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:24:38,897 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:24:38,900 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 7f63c651-ab97-4207-a9b5-fe8fe85f1459
+2022-05-06 12:24:38,901 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:24:38,902 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 2cd34a77-cecd-463b-9891-2cd67b4c6651
+2022-05-06 12:24:38,902 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:24:38,902 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 529338ac-2766-4d33-9517-5252c1b0005e
+2022-05-06 12:24:38,903 INFO  [IO-/127.0.0.1:49686] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:49686/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:24:38,907 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 49399
+2022-05-06 12:24:38,908 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:49686/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:24:38,925 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:24:38,929 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:24:38,931 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:24:39,380 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:25:03,600 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:25:03,636 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:25:03,642 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:25:03,647 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:25:03,648 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:25:03,648 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 22196
+2022-05-06 12:25:03,694 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:25:03,695 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:25:03,695 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:25:03,707 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:25:03,716 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:25:03,739 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:25:03,762 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 58952
+2022-05-06 12:25:03,762 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:25:03,783 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:25:04,049 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:25:04,050 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:25:04,050 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:25:04,050 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:25:04,061 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:25:04,092 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:25:04,092 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:25:04,141 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:25:04,147 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:25:04,150 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:25:04,151 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:25:04,151 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:25:04,156 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:25:04,243 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:58972)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1
+2022-05-06 12:25:04,316 INFO  [IO-/127.0.0.1:58972] (q.m.c.open) - [con:0(user@/127.0.0.1:58972/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1 : Client ID : 8fb7ebe4-1958-4671-aef0-9b68a40197c7 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:25:04,361 INFO  [IO-/127.0.0.1:58972] (q.m.c.create) - [con:0(user@/127.0.0.1:58972/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:25:04,366 INFO  [IO-/127.0.0.1:58972] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:58972/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:25:04,422 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: c675cf00-f4f9-472d-964d-70c7a1ce1ebe AutoDelete Transient
+2022-05-06 12:25:04,450 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:25:04,457 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 567cb12c-a63b-4043-83c4-72a3eef30d61 AutoDelete Transient
+2022-05-06 12:25:04,459 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:25:04,461 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: d7b0786c-57da-44c4-a1b1-160a2493c73c AutoDelete Transient
+2022-05-06 12:25:04,463 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:58972/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:25:04,621 INFO  [Broker-Config] (q.m.c.open) - [con:1(/127.0.0.1:58973)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1
+2022-05-06 12:25:04,628 INFO  [IO-/127.0.0.1:58973] (q.m.c.open) - [con:1(user@/127.0.0.1:58973/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1 : Client ID : 2cd19614-79b0-4e04-a695-0bb10f4eeaf2 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:25:04,629 INFO  [IO-/127.0.0.1:58973] (q.m.c.create) - [con:1(user@/127.0.0.1:58973/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:25:04,630 INFO  [IO-/127.0.0.1:58973] (q.m.c.prefetch_size) - [con:1(user@/127.0.0.1:58973/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:25:04,680 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:25:04,694 INFO  [Broker-Config] (q.m.c.open) - [con:2(/127.0.0.1:58974)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1
+2022-05-06 12:25:04,696 INFO  [IO-/127.0.0.1:58974] (q.m.c.open) - [con:2(user@/127.0.0.1:58974/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:58952) : Protocol Version : 0-9-1 : Client ID : b52d101f-933c-477f-80f6-ff7edd49f6b1 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:25:04,697 INFO  [IO-/127.0.0.1:58974] (q.m.c.create) - [con:2(user@/127.0.0.1:58974/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:25:04,698 INFO  [IO-/127.0.0.1:58974] (q.m.c.prefetch_size) - [con:2(user@/127.0.0.1:58974/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:25:07,707 INFO  [IO-/127.0.0.1:58974] (q.m.c.close) - [con:2(user@/127.0.0.1:58974/default)/ch:1] [con:2(user@/127.0.0.1:58974/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:25:07,713 INFO  [IO-/127.0.0.1:58973] (q.m.c.close) - [con:1(user@/127.0.0.1:58973/default)/ch:1] [con:1(user@/127.0.0.1:58973/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:25:07,718 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:25:07,718 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:25:07,722 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/127.0.0.1:58974/default)] CON-1002 : Close
+2022-05-06 12:25:07,722 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/127.0.0.1:58973/default)] CON-1002 : Close
+2022-05-06 12:25:07,727 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:25:07,730 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:25:07,736 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: c675cf00-f4f9-472d-964d-70c7a1ce1ebe
+2022-05-06 12:25:07,737 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:25:07,737 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: d7b0786c-57da-44c4-a1b1-160a2493c73c
+2022-05-06 12:25:07,738 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:25:07,738 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 567cb12c-a63b-4043-83c4-72a3eef30d61
+2022-05-06 12:25:07,740 INFO  [IO-/127.0.0.1:58972] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:58972/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:25:07,744 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 58952
+2022-05-06 12:25:07,747 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:58972/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:25:07,758 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:25:07,763 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:25:07,765 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:25:08,199 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:27:01,939 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:27:01,977 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:27:01,984 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:27:01,989 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:27:01,990 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:27:01,991 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 1800
+2022-05-06 12:27:02,040 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:27:02,041 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:27:02,041 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:27:02,054 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:27:02,063 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:27:02,088 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:27:02,127 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 61361
+2022-05-06 12:27:02,127 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:27:02,158 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:27:02,471 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:27:02,471 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:27:02,471 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:27:02,471 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:27:02,483 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:27:02,519 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:27:02,521 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:27:02,583 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:27:02,589 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:27:02,592 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:27:02,593 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:27:02,593 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:27:02,597 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:27:02,690 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:61381)] CON-1001 : Open : Destination : AMQP(127.0.0.1:61361) : Protocol Version : 0-9-1
+2022-05-06 12:27:02,769 INFO  [IO-/127.0.0.1:61381] (q.m.c.open) - [con:0(user@/127.0.0.1:61381/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:61361) : Protocol Version : 0-9-1 : Client ID : d9c0716f-af92-48bb-9121-220e272768b0 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:27:02,816 INFO  [IO-/127.0.0.1:61381] (q.m.c.create) - [con:0(user@/127.0.0.1:61381/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:27:02,822 INFO  [IO-/127.0.0.1:61381] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:61381/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:27:02,875 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 07109efb-1f69-4517-a1ab-69d51abadeff AutoDelete Transient
+2022-05-06 12:27:02,907 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:27:02,913 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 31d41b6f-b704-4a80-832d-b95335778c4f AutoDelete Transient
+2022-05-06 12:27:02,915 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:27:02,919 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 58b540c6-e937-4bff-b82b-8aee2bb66680 AutoDelete Transient
+2022-05-06 12:27:02,921 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:61381/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:27:02,944 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:61382)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:61361) : Protocol Version : 0-9-1
+2022-05-06 12:27:02,949 INFO  [IO-/0:0:0:0:0:0:0:1:61382] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:61382/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:61361) : Protocol Version : 0-9-1 : Client ID : 97cc23f3-d1ef-49a1-8398-f8ceeace241b : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:27:02,950 INFO  [IO-/0:0:0:0:0:0:0:1:61382] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:61382/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:27:02,951 INFO  [IO-/0:0:0:0:0:0:0:1:61382] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:61382/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:27:02,998 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:27:03,017 INFO  [Broker-Config] (q.m.c.open) - [con:2(/127.0.0.1:61383)] CON-1001 : Open : Destination : AMQP(127.0.0.1:61361) : Protocol Version : 0-9-1
+2022-05-06 12:27:03,019 INFO  [IO-/127.0.0.1:61383] (q.m.c.open) - [con:2(user@/127.0.0.1:61383/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:61361) : Protocol Version : 0-9-1 : Client ID : abb7f63d-9826-4ad9-8caa-d66114c84eac : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:27:03,021 INFO  [IO-/127.0.0.1:61383] (q.m.c.create) - [con:2(user@/127.0.0.1:61383/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:27:03,021 INFO  [IO-/127.0.0.1:61383] (q.m.c.prefetch_size) - [con:2(user@/127.0.0.1:61383/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:27:06,031 INFO  [IO-/127.0.0.1:61383] (q.m.c.close) - [con:2(user@/127.0.0.1:61383/default)/ch:1] [con:2(user@/127.0.0.1:61383/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:27:06,042 INFO  [IO-/0:0:0:0:0:0:0:1:61382] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:61382/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:61382/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:27:06,044 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:27:06,044 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:27:06,047 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/127.0.0.1:61383/default)] CON-1002 : Close
+2022-05-06 12:27:06,047 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:61382/default)] CON-1002 : Close
+2022-05-06 12:27:06,051 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:27:06,054 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:27:06,058 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 31d41b6f-b704-4a80-832d-b95335778c4f
+2022-05-06 12:27:06,059 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:27:06,059 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 58b540c6-e937-4bff-b82b-8aee2bb66680
+2022-05-06 12:27:06,060 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:27:06,061 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 07109efb-1f69-4517-a1ab-69d51abadeff
+2022-05-06 12:27:06,062 INFO  [IO-/127.0.0.1:61381] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:61381/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:27:06,069 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 61361
+2022-05-06 12:27:06,070 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:61381/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:27:06,081 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:27:06,085 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:27:06,088 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:27:06,650 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 12:42:32,955 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:42:32,994 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:42:33,000 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:42:33,006 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:42:33,007 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:42:33,008 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 8492
+2022-05-06 12:42:33,058 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:42:33,059 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:42:33,060 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:42:33,072 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:42:33,085 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:42:33,111 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:42:33,137 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 56686
+2022-05-06 12:42:33,137 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:42:33,159 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:42:33,461 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:42:33,461 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:42:33,462 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:42:33,462 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:42:33,474 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:42:33,508 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:42:33,508 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:42:33,562 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:42:33,567 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:42:33,571 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:42:33,571 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:42:33,572 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:42:33,578 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:42:33,662 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:56706)] CON-1001 : Open : Destination : AMQP(127.0.0.1:56686) : Protocol Version : 0-9-1
+2022-05-06 12:42:33,731 INFO  [IO-/127.0.0.1:56706] (q.m.c.open) - [con:0(user@/127.0.0.1:56706/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:56686) : Protocol Version : 0-9-1 : Client ID : e2b78e17-e577-495d-a1bf-b223988ea2f9 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:42:33,777 INFO  [IO-/127.0.0.1:56706] (q.m.c.create) - [con:0(user@/127.0.0.1:56706/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:42:33,782 INFO  [IO-/127.0.0.1:56706] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:56706/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:42:33,833 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: f9b2f3f8-f1bb-4b39-9a99-247dd962aea0 AutoDelete Transient
+2022-05-06 12:42:33,863 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:42:33,870 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: e2600ef2-7661-4243-b757-738f01ee3fa9 AutoDelete Transient
+2022-05-06 12:42:33,872 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:42:33,874 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 483fbcde-342d-4d3c-9bdf-082a842770db AutoDelete Transient
+2022-05-06 12:42:33,876 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:56706/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:42:33,926 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:42:33,927 INFO  [Broker-Config] (q.m.m.stopped) - [Shutdown] MNG-1005 : Web Management Stopped
+2022-05-06 12:42:33,936 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 483fbcde-342d-4d3c-9bdf-082a842770db
+2022-05-06 12:42:33,938 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:42:33,938 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: f9b2f3f8-f1bb-4b39-9a99-247dd962aea0
+2022-05-06 12:42:33,939 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:42:33,939 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: e2600ef2-7661-4243-b757-738f01ee3fa9
+2022-05-06 12:42:33,942 INFO  [IO-/127.0.0.1:56706] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:56706/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:42:33,953 INFO  [Broker-Config] (q.m.b.shutting_down) - [Shutdown] BRK-1003 : Shutting down : TCP port 56686
+2022-05-06 12:42:33,959 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:56706/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:42:33,961 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - [Shutdown] [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:42:33,962 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - [Shutdown] VHT-1002 : Closed : default
+2022-05-06 12:42:33,964 INFO  [Broker-Config] (q.m.c.close) - [Shutdown] [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:42:34,587 INFO  [Broker-Config] (q.m.b.stopped) - [Shutdown] BRK-1005 : Stopped
+2022-05-06 12:43:33,004 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:43:33,043 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:43:33,049 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:43:33,054 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:43:33,055 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:43:33,056 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 15372
+2022-05-06 12:43:33,108 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:43:33,109 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:43:33,110 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:43:33,124 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:43:33,133 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:43:33,160 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:43:33,190 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 51552
+2022-05-06 12:43:33,190 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:43:33,210 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:43:33,507 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:43:33,507 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:43:33,507 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:43:33,507 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:43:33,522 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:43:33,560 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:43:33,561 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:43:33,614 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:43:33,621 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:43:33,625 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:43:33,625 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:43:33,626 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:43:33,630 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:43:33,723 INFO  [Broker-Config] (q.m.c.open) - [con:0(/0:0:0:0:0:0:0:1:52616)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:51552) : Protocol Version : 0-9-1
+2022-05-06 12:43:33,799 INFO  [IO-/0:0:0:0:0:0:0:1:52616] (q.m.c.open) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:51552) : Protocol Version : 0-9-1 : Client ID : 0f2bb69a-ad3e-475d-96ca-001715a08083 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:43:33,847 INFO  [IO-/0:0:0:0:0:0:0:1:52616] (q.m.c.create) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:43:33,853 INFO  [IO-/0:0:0:0:0:0:0:1:52616] (q.m.c.prefetch_size) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:43:33,908 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 4208d8fd-bf5f-4ff3-984d-119304295e4d AutoDelete Transient
+2022-05-06 12:43:33,939 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:43:33,945 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 1daf01a1-2e81-4539-8e21-8e45fc0733f9 AutoDelete Transient
+2022-05-06 12:43:33,947 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:43:33,949 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 71a2ae1b-68a0-4b1b-82d5-a337bb1fa69c AutoDelete Transient
+2022-05-06 12:43:33,950 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:43:33,990 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:43:33,992 INFO  [Broker-Config] (q.m.m.stopped) - [Shutdown] MNG-1005 : Web Management Stopped
+2022-05-06 12:43:33,999 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 1daf01a1-2e81-4539-8e21-8e45fc0733f9
+2022-05-06 12:43:34,002 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:43:34,003 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 4208d8fd-bf5f-4ff3-984d-119304295e4d
+2022-05-06 12:43:34,004 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:43:34,005 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 71a2ae1b-68a0-4b1b-82d5-a337bb1fa69c
+2022-05-06 12:43:34,007 INFO  [IO-/0:0:0:0:0:0:0:1:52616] (q.m.c.close_forced) - [IO Pool] [con:0(user@/0:0:0:0:0:0:0:1:52616/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:43:34,019 INFO  [Broker-Config] (q.m.b.shutting_down) - [Shutdown] BRK-1003 : Shutting down : TCP port 51552
+2022-05-06 12:43:34,024 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/0:0:0:0:0:0:0:1:52616/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:43:34,026 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - [Shutdown] [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:43:34,032 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - [Shutdown] VHT-1002 : Closed : default
+2022-05-06 12:43:34,034 INFO  [Broker-Config] (q.m.c.close) - [Shutdown] [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:43:34,638 INFO  [Broker-Config] (q.m.b.stopped) - [Shutdown] BRK-1005 : Stopped
+2022-05-06 12:44:12,519 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 12:44:12,555 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 12:44:12,560 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 12:44:12,566 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 12:44:12,567 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 12:44:12,568 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 21900
+2022-05-06 12:44:12,614 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 12:44:12,615 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 12:44:12,615 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 12:44:12,627 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 12:44:12,635 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 12:44:12,657 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 12:44:12,681 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 52627
+2022-05-06 12:44:12,682 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 12:44:12,708 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:44:12,985 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 12:44:12,985 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 12:44:12,985 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 12:44:12,985 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 12:44:12,997 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:44:13,015 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 12:44:13,015 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 12:44:13,078 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 12:44:13,086 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 12:44:13,089 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 12:44:13,090 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 12:44:13,090 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 12:44:13,094 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 12:44:13,180 INFO  [Broker-Config] (q.m.c.open) - [con:0(/127.0.0.1:52647)] CON-1001 : Open : Destination : AMQP(127.0.0.1:52627) : Protocol Version : 0-9-1
+2022-05-06 12:44:13,254 INFO  [IO-/127.0.0.1:52647] (q.m.c.open) - [con:0(user@/127.0.0.1:52647/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:52627) : Protocol Version : 0-9-1 : Client ID : 6202c37c-4e22-42bd-bfcd-23d4e8a84fd9 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:44:13,302 INFO  [IO-/127.0.0.1:52647] (q.m.c.create) - [con:0(user@/127.0.0.1:52647/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:44:13,307 INFO  [IO-/127.0.0.1:52647] (q.m.c.prefetch_size) - [con:0(user@/127.0.0.1:52647/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:44:13,361 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: 5192ccf7-5437-4d0c-ac26-b3555e13bdc0 AutoDelete Transient
+2022-05-06 12:44:13,389 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 12:44:13,395 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: 5c72e32b-fc79-44c0-8f7c-cb57a1b8b7e8 AutoDelete Transient
+2022-05-06 12:44:13,397 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 12:44:13,400 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: 999a0249-d99e-4389-ab0c-e20962b78c77 AutoDelete Transient
+2022-05-06 12:44:13,401 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/127.0.0.1:52647/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 12:44:13,559 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:52648)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:52627) : Protocol Version : 0-9-1
+2022-05-06 12:44:13,564 INFO  [IO-/0:0:0:0:0:0:0:1:52648] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:52648/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:52627) : Protocol Version : 0-9-1 : Client ID : 9d44b862-0edf-45d3-9f9f-c900b319a5fe : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:44:13,565 INFO  [IO-/0:0:0:0:0:0:0:1:52648] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:52648/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:44:13,566 INFO  [IO-/0:0:0:0:0:0:0:1:52648] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:52648/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:44:13,617 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 12:44:13,631 INFO  [Broker-Config] (q.m.c.open) - [con:2(/127.0.0.1:52649)] CON-1001 : Open : Destination : AMQP(127.0.0.1:52627) : Protocol Version : 0-9-1
+2022-05-06 12:44:13,633 INFO  [IO-/127.0.0.1:52649] (q.m.c.open) - [con:2(user@/127.0.0.1:52649/default)] CON-1001 : Open : Destination : AMQP(127.0.0.1:52627) : Protocol Version : 0-9-1 : Client ID : 79139406-4668-4319-a321-7efa96adcca8 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 12:44:13,634 INFO  [IO-/127.0.0.1:52649] (q.m.c.create) - [con:2(user@/127.0.0.1:52649/default)/ch:1] CHN-1001 : Create
+2022-05-06 12:44:13,635 INFO  [IO-/127.0.0.1:52649] (q.m.c.prefetch_size) - [con:2(user@/127.0.0.1:52649/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 12:44:16,642 ERROR [Timer-2] (d.i.p.s.e.s.m.MetricsProvider) - Cannot sent monitoring message: null
+2022-05-06 12:44:16,644 INFO  [IO-/127.0.0.1:52649] (q.m.c.close) - [con:2(user@/127.0.0.1:52649/default)/ch:1] [con:2(user@/127.0.0.1:52649/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:44:16,652 INFO  [IO-/0:0:0:0:0:0:0:1:52648] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:52648/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:52648/default)/ch:1] CHN-1003 : Close
+2022-05-06 12:44:16,654 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:44:16,655 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 12:44:16,658 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/127.0.0.1:52649/default)] CON-1002 : Close
+2022-05-06 12:44:16,658 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:52648/default)] CON-1002 : Close
+2022-05-06 12:44:16,662 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 12:44:16,665 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 12:44:16,668 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: 999a0249-d99e-4389-ab0c-e20962b78c77
+2022-05-06 12:44:16,669 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 12:44:16,669 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: 5192ccf7-5437-4d0c-ac26-b3555e13bdc0
+2022-05-06 12:44:16,670 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [IO Pool] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 12:44:16,670 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [IO Pool] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: 5c72e32b-fc79-44c0-8f7c-cb57a1b8b7e8
+2022-05-06 12:44:16,671 INFO  [IO-/127.0.0.1:52647] (q.m.c.close_forced) - [IO Pool] [con:0(user@/127.0.0.1:52647/default)/ch:1] CHN-1003 : Close : 320 - Connection closed by external action
+2022-05-06 12:44:16,676 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 52627
+2022-05-06 12:44:16,677 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/127.0.0.1:52647/default)] CON-1002 : Close : 320 - Connection closed by external action
+2022-05-06 12:44:16,693 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 12:44:16,697 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 12:44:16,698 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 12:44:17,137 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped
+2022-05-06 14:16:03,011 INFO  [Broker-Config] (q.m.b.config) - [Broker] BRK-1006 : Using configuration : N/A
+2022-05-06 14:16:03,047 WARN  [Broker-Config] (o.a.q.s.s.e.AESKeyFileEncrypterFactory) - The AESKeyFile configuration encryption encryption mechanism is not available. Maximum available AES key length is 128 but 256 is required. Ensure the full strength JCE policy has been installed into your JVM.
+2022-05-06 14:16:03,053 INFO  [Broker-Config] (q.m.b.startup) - [Broker] BRK-1001 : Startup : Version: 8.0.2 Build: 22840e6e44dcc946e5f3a7c3fd60d22d729a413b
+2022-05-06 14:16:03,060 INFO  [Broker-Config] (q.m.b.platform) - [Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.8.0_41-b04 OS : Windows 8.1 version: 6.3 arch: x86 cores: 8
+2022-05-06 14:16:03,061 INFO  [Broker-Config] (q.m.b.max_memory) - [Broker] BRK-1011 : Maximum Memory : Heap : 259,522,560 bytes Direct : 259,522,560 bytes
+2022-05-06 14:16:03,061 INFO  [Broker-Config] (q.m.b.process) - [Broker] BRK-1017 : Process : PID : 22868
+2022-05-06 14:16:03,117 INFO  [Broker-Config] (q.m.c.created) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1001 : Created
+2022-05-06 14:16:03,118 INFO  [Broker-Config] (q.m.c.store_location) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\config\
+2022-05-06 14:16:03,119 INFO  [Broker-Config] (q.m.c.recovery_start) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1004 : Recovery Start
+2022-05-06 14:16:03,130 INFO  [Broker-Config] (o.a.q.s.s.GenericStoreUpgrader) - VirtualHost store has model version 8.0. Number of record(s) 5
+2022-05-06 14:16:03,139 INFO  [Broker-Config] (q.m.v.created) - [Broker] VHT-1001 : Created : default
+2022-05-06 14:16:03,162 INFO  [Broker-Config] (q.m.c.recovery_complete) - [Broker] [vh(/default)/ms(JsonFileConfigStore)] CFG-1005 : Recovery Complete
+2022-05-06 14:16:03,186 INFO  [Broker-Config] (q.m.b.listening) - [Broker] BRK-1002 : Starting : Listening on TCP port 64320
+2022-05-06 14:16:03,186 WARN  [Broker-Config] (o.a.q.s.m.p.HttpManagement) - HttpManagement plugin is configured but no suitable HTTP ports are available.
+2022-05-06 14:16:03,206 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 14:16:03,474 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: topic Name: amq.topic
+2022-05-06 14:16:03,475 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: direct Name: amq.direct
+2022-05-06 14:16:03,475 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: fanout Name: amq.fanout
+2022-05-06 14:16:03,475 INFO  [VirtualHostNode-default-Config] (q.m.e.created) - [Broker] EXH-1001 : Create : Durable Type: headers Name: amq.match
+2022-05-06 14:16:03,489 INFO  [VirtualHostNode-default-Config] (o.a.q.s.s.b.StandardEnvironmentFacade) - Creating environment at environment path W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 14:16:03,523 INFO  [VirtualHostNode-default-Config] (q.m.m.created) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1001 : Created
+2022-05-06 14:16:03,523 INFO  [VirtualHostNode-default-Config] (q.m.m.store_location) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1002 : Store location : W:\offlineFiles\git\IIP-ecosphere\platform\platform\resources\monitoring\work\default\messages
+2022-05-06 14:16:03,578 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1004 : Recovery Start
+2022-05-06 14:16:03,583 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_start) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1004 : Recovery Start
+2022-05-06 14:16:03,587 INFO  [VirtualHostNode-default-Config] (q.m.t.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] TXN-1006 : Recovery Complete
+2022-05-06 14:16:03,587 INFO  [VirtualHostNode-default-Config] (q.m.m.recovered) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1005 : Recovered 0 messages
+2022-05-06 14:16:03,587 INFO  [VirtualHostNode-default-Config] (q.m.m.recovery_complete) - [Broker] [vh(/default)/ms(BDBMessageStore)] MST-1006 : Recovery Complete
+2022-05-06 14:16:03,592 INFO  [Broker-Config] (q.m.b.ready) - [Broker] BRK-1004 : Qpid Broker Ready
+2022-05-06 14:16:03,675 INFO  [Broker-Config] (q.m.c.open) - [con:0(/0:0:0:0:0:0:0:1:64343)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1
+2022-05-06 14:16:03,747 INFO  [IO-/0:0:0:0:0:0:0:1:64343] (q.m.c.open) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1 : Client ID : e64a1c22-09c2-4192-999f-7fd536039dac : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 14:16:03,797 INFO  [IO-/0:0:0:0:0:0:0:1:64343] (q.m.c.create) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] CHN-1001 : Create
+2022-05-06 14:16:03,803 INFO  [IO-/0:0:0:0:0:0:0:1:64343] (q.m.c.prefetch_size) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 14:16:03,854 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1001 : Create : ID: dd4fa85b-9cd6-42f8-8e9a-d343dc6a7e00 AutoDelete Transient
+2022-05-06 14:16:03,882 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1001 : Create
+2022-05-06 14:16:03,890 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1001 : Create : ID: cf91d24c-01b4-4c03-8655-3dc3a8e9a67f AutoDelete Transient
+2022-05-06 14:16:03,891 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1001 : Create
+2022-05-06 14:16:03,894 INFO  [VirtualHostNode-default-Config] (q.m.q.created) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1001 : Create : ID: c85a0d87-01ad-4459-b016-70ff22702650 AutoDelete Transient
+2022-05-06 14:16:03,896 INFO  [VirtualHostNode-default-Config] (q.m.s.create) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1001 : Create
+2022-05-06 14:16:04,053 INFO  [Broker-Config] (q.m.c.open) - [con:1(/0:0:0:0:0:0:0:1:64344)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1
+2022-05-06 14:16:04,060 INFO  [IO-/0:0:0:0:0:0:0:1:64344] (q.m.c.open) - [con:1(user@/0:0:0:0:0:0:0:1:64344/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1 : Client ID : 3d62554e-00c7-4cf7-946d-3bf6f8cbc2ab : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 14:16:04,061 INFO  [IO-/0:0:0:0:0:0:0:1:64344] (q.m.c.create) - [con:1(user@/0:0:0:0:0:0:0:1:64344/default)/ch:1] CHN-1001 : Create
+2022-05-06 14:16:04,062 INFO  [IO-/0:0:0:0:0:0:0:1:64344] (q.m.c.prefetch_size) - [con:1(user@/0:0:0:0:0:0:0:1:64344/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 14:16:04,108 ERROR [main] (d.i.p.e.EcsFactory) - No configuration, falling back to default Cannot read /iipecosphere.yml
+2022-05-06 14:16:04,122 INFO  [Broker-Config] (q.m.c.open) - [con:2(/0:0:0:0:0:0:0:1:64345)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1
+2022-05-06 14:16:04,124 INFO  [IO-/0:0:0:0:0:0:0:1:64345] (q.m.c.open) - [con:2(user@/0:0:0:0:0:0:0:1:64345/default)] CON-1001 : Open : Destination : AMQP(0:0:0:0:0:0:0:1:64320) : Protocol Version : 0-9-1 : Client ID : e49a4b16-9bb7-4d19-8f00-587b487185e9 : Client Version : 5.10.0 : Client Product : RabbitMQ
+2022-05-06 14:16:04,125 INFO  [IO-/0:0:0:0:0:0:0:1:64345] (q.m.c.create) - [con:2(user@/0:0:0:0:0:0:0:1:64345/default)/ch:1] CHN-1001 : Create
+2022-05-06 14:16:04,126 INFO  [IO-/0:0:0:0:0:0:0:1:64345] (q.m.c.prefetch_size) - [con:2(user@/0:0:0:0:0:0:0:1:64345/default)/ch:1] CHN-1004 : Prefetch Size (bytes) 0 : Count 0
+2022-05-06 14:16:07,125 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:2(vh(/default)/qu(ServiceMetrics)] SUB-1002 : Close
+2022-05-06 14:16:07,135 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(ServiceMetrics)] QUE-1002 : Deleted : ID: c85a0d87-01ad-4459-b016-70ff22702650
+2022-05-06 14:16:07,139 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:1(vh(/default)/qu(EcsMetrics)] SUB-1002 : Close
+2022-05-06 14:16:07,139 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(EcsMetrics)] QUE-1002 : Deleted : ID: cf91d24c-01b4-4c03-8655-3dc3a8e9a67f
+2022-05-06 14:16:07,140 INFO  [VirtualHostNode-default-Config] (q.m.s.close) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [sub:0(vh(/default)/qu(ComponentStatus)] SUB-1002 : Close
+2022-05-06 14:16:07,141 INFO  [VirtualHostNode-default-Config] (q.m.q.deleted) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [vh(/default)/qu(ComponentStatus)] QUE-1002 : Deleted : ID: dd4fa85b-9cd6-42f8-8e9a-d343dc6a7e00
+2022-05-06 14:16:07,144 INFO  [IO-/0:0:0:0:0:0:0:1:64343] (q.m.c.close) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] [con:0(user@/0:0:0:0:0:0:0:1:64343/default)/ch:1] CHN-1003 : Close
+2022-05-06 14:16:07,153 INFO  [IO-/0:0:0:0:0:0:0:1:64345] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:64345/default)/ch:1] [con:2(user@/0:0:0:0:0:0:0:1:64345/default)/ch:1] CHN-1003 : Close
+2022-05-06 14:16:07,153 INFO  [Broker-Config] (q.m.c.close) - [con:0(user@/0:0:0:0:0:0:0:1:64343/default)] CON-1002 : Close
+2022-05-06 14:16:07,154 INFO  [Broker-Config] (q.m.c.close) - [con:2(user@/0:0:0:0:0:0:0:1:64345/default)] CON-1002 : Close
+2022-05-06 14:16:07,154 INFO  [IO-/0:0:0:0:0:0:0:1:64344] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:64344/default)/ch:1] [con:1(user@/0:0:0:0:0:0:0:1:64344/default)/ch:1] CHN-1003 : Close
+2022-05-06 14:16:07,155 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 14:16:07,155 ERROR [main] (d.i.p.t.Transport) - Staying offline with status/monitoring messages from now on
+2022-05-06 14:16:07,155 INFO  [Broker-Config] (q.m.c.close) - [con:1(user@/0:0:0:0:0:0:0:1:64344/default)] CON-1002 : Close
+2022-05-06 14:16:07,160 INFO  [Broker-Config] (q.m.b.shutting_down) - <<UNKNOWN>> BRK-1003 : Shutting down : TCP port 64320
+2022-05-06 14:16:07,166 INFO  [Broker-Config] (q.m.m.stopped) - <<UNKNOWN>> MNG-1005 : Web Management Stopped
+2022-05-06 14:16:07,173 INFO  [VirtualHostNode-default-Config] (q.m.m.closed) - <<UNKNOWN>> [vh(/default)/ms(BDBMessageStore)] MST-1003 : Closed
+2022-05-06 14:16:07,177 INFO  [VirtualHostNode-default-Config] (q.m.v.closed) - <<UNKNOWN>> VHT-1002 : Closed : default
+2022-05-06 14:16:07,178 INFO  [Broker-Config] (q.m.c.close) - <<UNKNOWN>> [vh(/default)/ms(JsonFileConfigStore)] CFG-1003 : Closed
+2022-05-06 14:16:07,631 INFO  [Broker-Config] (q.m.b.stopped) - <<UNKNOWN>> BRK-1005 : Stopped

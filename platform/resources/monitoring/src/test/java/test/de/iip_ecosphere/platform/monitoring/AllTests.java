@@ -21,6 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     AppTest.class,
+    MonitoringSetupTest.class,
+    MonitoringReceiverTest.class
 })
 public class AllTests {
 }
