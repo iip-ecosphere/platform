@@ -34,6 +34,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     ReconfigureTest.class,
     PythonProcessServiceTest.class,
     InstalledDependenciesSetupTest.class,
+    ServiceSelectorTest.class,
     
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
