@@ -123,7 +123,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                             elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl);
-                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a);
+                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                     };
@@ -279,11 +279,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // dispatch basis
     generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps) = {
     }
 
     generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         String familyInterface = familyInterfaceName(clsName);
         vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
@@ -293,7 +293,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m);
-        }        
+            if (not(noDeps)) {
+                artifacts.add(getArtifact(m));
+            }
+        }
+        if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
+            artifacts.add(getSelectorArtifact(family.selector));
+        }
     }
 
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------

@@ -140,6 +140,14 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String getArtifact(Connector conn) {
         conn.artifact;
     }
+
+    def String getSelectorArtifact(FamilyMemberSelector sel) {
+        "";
+    }
+
+    def String getSelectorArtifact(ServiceSelectorBasedFamilyMemberSelector sel) {
+        sel.artifact;
+    }
     
     // ------------------------------------------ families ----------------------------------
     
