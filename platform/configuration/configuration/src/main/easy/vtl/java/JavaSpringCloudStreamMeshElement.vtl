@@ -5,7 +5,8 @@ import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) extends MeshBasics {
+template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember) extends MeshBasics {
 
     Boolean isConnector = false;
     mapOf(IOType, IOType) pairs = {};
@@ -16,6 +17,15 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def initPairs(MeshProcessor elt) {
         pairs = ioPairs(elt);
+    }
+
+    // do not create annotations if we have a family interface, then the node delegates here
+    def nodeAnnotation(String annotation) {
+        if (familyInterface.length() > 0) {
+            ''
+        } else {
+            '${annotation}'
+        }
     }
 
     // -------------- special case no service allowed for convenience when building up a configuration ------------------
@@ -144,6 +154,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // ----------------------------- MeshBasics refinement/use ----------------------------
     
+    def ServiceBase overrideImpl(ServiceBase impl) {
+        if (familyInterface<>"") {
+            familyMember;
+        } else {
+            impl;
+        }
+    }
+    
     def attachIngestors(MeshElement elt, ServiceBase base) {
          if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
              for (String methodSuffix : ingestors.getKeys()) {
@@ -175,7 +193,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        generateSourceMethod(src, src.impl, type, methodSuffix, methodSuffixWithServiceId);
+        generateSourceMethod(src, overrideImpl(src.impl), type, methodSuffix, methodSuffixWithServiceId);
     }
     
     def generateSourceMethod(MeshSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId) {
@@ -193,8 +211,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the data supplier functor
         */
-        @Bean'
-        //${generateIngestor(service, methodSuffix, methodSuffixWithServiceId, type, "out")}
+        ${nodeAnnotation("@Bean")|e}'
         if (service.asynchronous) {
             'public Supplier<Flux<${type}>> ${methodSuffixWithServiceId}() {
                 // this is no real use of flux, but ensures that method is called only once to set the ingestor
@@ -218,19 +235,19 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the data consumer functor
         */
-        @Bean
+        ${nodeAnnotation("@Bean")|e}
         public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}() {
             return data -> ${genRcvProbe(conn, expr, type, "data")};
         }'    
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
-        not(isConnector); // type(elt.impl) <> Connector
+        not(isConnector);
     }
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        generateAsyncProcessorInMethod(proc, proc.impl, type, methodSuffix, methodSuffixWithServiceId);
+        generateAsyncProcessorInMethod(proc, overrideImpl(proc.impl), type, methodSuffix, methodSuffixWithServiceId);
     } 
     
     def generateAsyncProcessorInMethod(MeshProcessor proc, ServiceBase base, String type, String methodSuffix, String methodSuffixWithServiceId) {
@@ -239,13 +256,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the data consumer functor
         */
-        @Bean
+        ${nodeAnnotation("@Bean")|e}
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            ${generateAsyncProcessorBody(proc, base, methodSuffix, type)}
+            ${generateAsyncProcessorBody(proc, base, methodSuffix, methodSuffixWithServiceId, type)}
         }'
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String type) {
+    def generateAsyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "process${type.firstToUpperCase()}";
@@ -258,7 +275,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        generateSyncProcessorMethod(proc, proc.impl, inType, outType, methodSuffix, methodSuffixWithServiceId);
+        generateSyncProcessorMethod(proc, overrideImpl(proc.impl), inType, outType, methodSuffix, methodSuffixWithServiceId);
     }
     
     def generateSyncProcessorMethod(MeshProcessor proc, ServiceBase base, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
@@ -267,13 +284,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the data transformation functor
         */
-        @Bean
+        ${nodeAnnotation("@Bean")|e}
         public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}() {
-            ${generateSyncProcessorBody(proc, base, methodSuffix, inType, outType)}
+            ${generateSyncProcessorBody(proc, base, methodSuffix, methodSuffixWithServiceId, inType, outType)}
         }'
     } 
 
-    def generateSyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "transform${inType.firstToUpperCase()}";
@@ -296,13 +313,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         *
         * @return the data consumer functor
         */
-        @Bean
+        ${nodeAnnotation("@Bean")|e}
         public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            ${generateSinkMethodBody(snk, snk.impl, methodName)}
+            ${generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type)}
         }'
     } 
     
-    def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName) {
+    def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type) {
         'return data -> ${fallbackToNull(snk, "service.${methodName}(data)", false)};'
     }
     
@@ -431,13 +448,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             return adapter;
         }'
     }
-    
-
-    // TODO family
-
-    /*def initialService(MeshElement elt, ServiceFamily family) {
-       initialService(family.members.toSequence().first());
-    }*/
 
     def generateReceptionCallback(MeshElement elt, ServiceBase base) {
         ''
@@ -529,16 +539,18 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     // --------------- service type -------------------------
-    
-    def String getClsName(MeshElement elt) {
-        asTypeName(elt.name);
-    }
-    
+        
     def getServiceType(MeshElement elt, ServiceBase base) {
-        if (sharedInterfaces) {
-            "${getClsName(elt)}Interface";
+        String clsName;
+        if (familyInterface <> "") {
+            clsName = asTypeName(familyMember.name);
         } else {
-            "${getClsName(elt)}Service";
+            clsName = getClsName(elt);
+        }
+        if (sharedInterfaces) {
+            "${clsName}Interface";
+        } else {
+            "${clsName}Service";
         }
     }
     
@@ -558,6 +570,163 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def generateServiceAttribute(MeshElement elt, ServiceBase base) {
         String serviceType = getServiceType(elt, base);
         'private ${serviceType} service;'
+    }
+    
+    // --------------------------- ServiceFamily ----------------------------------
+
+    def Service defaultService(ServiceFamily family) {
+        family.members.toSequence().first();
+    }
+    
+    def initialService(MeshElement elt, ServiceFamily family) {
+        Service init = defaultService(family);
+        String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
+        'service = new ${clsName}();'
+    }
+    
+    def generateImports(ServiceFamily service) {
+        ''
+    }
+
+    def generateServiceAttribute(MeshElement elt, ServiceFamily family) {
+        Service init = defaultService(family);
+        if (familyInterface.length() == 0 and isDefined(family.selector) and family.selector <> null) {
+            '${generateSelectorServiceAttribute(family, family.selector)|e}'
+        }
+        'private ${familyInterfaceName(getClsName(elt))} service;
+        private String actServiceId = "${init.id}";'
+    }
+
+    def generateSelectorServiceAttribute(ServiceFamily family, FamilyMemberSelector selector) {
+        ''
+    }
+    
+    def generateSelectorServiceAttribute(ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
+        String type = toTypeName(selector.field.type);
+        Service init = defaultService(family);
+        'private ServiceSelector<${type}> selector = 
+            ServiceSelector.createInstance(getClass().getClassLoader(), "${selector.class}", ${type}.class, "${init.id}");'
+    }
+    
+    def getServiceType(MeshElement elt, ServiceFamily service) {
+        "";
+    }
+
+    def getMethodName(String prefix, String type) {
+        if (sharedInterfaces) {
+            "${prefix}${type.firstToUpperCase()}";
+        } else {
+            methodSuffix;
+        }
+    }
+
+    def generateAsyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+        'return () -> service.${methodSuffixWithServiceId}().get();'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+        'return data -> service.${methodSuffixWithServiceId}().apply(data);'
+    }
+
+    def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir) {
+        'service.attachIngestors();'
+    }
+    
+    def generateSinkMethodBody(MeshSink snk, ServiceFamily service, String methodName, String methodSuffixWithServiceId, String type) {
+        String svc = insertSelector(service, type, "data");
+        'return data -> ${svc}.${methodName}().accept(data);'
+    }
+
+    // convenience, check is defined, go for dispatch
+    def insertSelector(ServiceFamily family, String type, String dataVar) {
+        String result = "";
+        if (isDefined(family.selector) and family.selector <> null) {
+            result = insertSelector(family.selector, type, dataVar);
+        } 
+        if (result == "") {
+            "service"; // no selection, just the service attribute   
+        } else {
+            result;
+        }
+    }
+    
+    def insertSelector(FamilyMemberSelector selector, String type, String dataVar) {
+        ""; 
+    }
+
+    def insertSelector(ServiceSelectorBasedFamilyMemberSelector selector, String type, String dataVar) {
+        String fType = toTypeName(selector.field.type);
+        if (type == fType) {
+            "selectService(data)";
+        } else {
+            "";
+        }
+    }
+    
+    def attachIngestors(MeshElement elt, ServiceFamily base) {
+        'service.attachIngestors();'
+    }
+    
+    def generateReceptionCallback(MeshProcessor elt, ServiceFamily family) {
+        if (isDefined(family.selector) and family.selector <> null) {
+            generateServiceSwitch(elt, family, family.selector);            
+        }
+    }
+
+    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, FamilyMemberSelector selector) {
+        ''
+    }           
+
+    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
+        String fType = toTypeName(selector.field.type);
+        String fInterface = familyInterfaceName(getClsName(elt));
+        
+        '/**
+        * Selects the new service from the given {@code data} via the {@link #selector}.
+        * 
+        * @param data the data to select from
+        * @return {@link #service} for call chains
+        */
+        private ${fInterface} selectService(${fType} data) {
+            String id = selector.select(data);
+            if (null != id && actServiceId.equals(id)) {
+                ${fInterface} newService; // instantiation shall override AAS service mapping
+                switch (id) {
+                ${generateServiceSelection(fInterface, family, "newService")}                    
+                default:
+                    newService = null;
+                    break;
+                }
+                if (newService != null) {
+                    try {
+                        newService.setState(ServiceState.STARTING);
+                        service.setState(ServiceState.STOPPING);
+                        service = newService;
+                        actServiceId = id;
+                    } catch (ExecutionException e) {
+                        LoggerFactory.getLogger(getClass()).error("Cannot switch to new service {}: {}", id, e.getMessage());
+                    }
+                }
+            }
+            return service;
+        }'
+    }           
+    
+    def generateServiceSelection(String fInterface, ServiceFamily family, String newServiceVar) {
+        for (Service m: family.members.toSequence()->sortedBy(s|s.id)) {
+            'case "${m.id}": 
+                ${newServiceVar} = new ${familyMemberName(asTypeName(m.name), fInterface)}();
+                break;'
+        }
+    }
+    
+    def generateSetState(String implements) {
+        if (implements <> "") {
+            '@Override
+            public void setState(ServiceState state) throws ExecutionException {
+                service.setState(state);
+            }'
+        }
     }
         
     // -------------------- Python --------------------------
@@ -594,12 +763,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String type) {
+    def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String expr = 'service.processQuiet("${type}", data)';
         'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     
-    def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
         String expr = 'service.processQuiet("${inType}", data)';
         'return data -> ${genSentProbe(service, expr, true, inType, "data")};'
     }
@@ -642,7 +811,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
-    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String type) {
+    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String methodSuffixWithServiceId, String type) {
         setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
         if (ins.size() > 0) {
             IOType in = ins.toSequence().first();
@@ -714,7 +883,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService";
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String type) {
+    def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String expr = 'service.processQuiet(data)';
         'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
@@ -758,11 +927,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.services.environment.services.TraceToAasService";
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String type) {
+    def generateAsyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         'return data -> {}; // ignore, shall not be called'
     }
     
-    def generateSyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
         'return data -> null; // ignore, shall not be called'
     }
 
@@ -772,14 +941,15 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def generateReceptionCallback(MeshProcessor elt, TraceToAasService service) {
     }
     
-    def generateSinkMethodBody(MeshSink snk, TraceToAasService service, String methodName) {
+    def generateSinkMethodBody(MeshSink snk, TraceToAasService service, String methodName, String methodSuffixWithServiceId, String type) {
         'return data -> {}; // ignore'
     }
     
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, Boolean sharedInterfaces) {
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
+        Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember) {
         initPairs(elt);
         IIPEcosphere cfg = config;
         if (cfg.sharedInterfaces) {
@@ -787,8 +957,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         } else {
             typeAdd = "";
         }
-        String clsName = getClsName(elt);
+        String implements = "";
         ServiceBase impl = elt.impl;
+        String clsName = getClsName(elt);
+        if (familyInterface <> "") {
+            implements = " implements ${familyInterface}";
+            impl = familyMember;
+            clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
+        }
         String implMonId = impl.id.toIdentifier();
         'package ${pkg};
         
@@ -821,7 +997,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import iip.datatypes.*;
         import iip.interfaces.*;
         import iip.serializers.*;
-        ${generateImports(elt.impl)|e}
+        ${generateImports(impl)|e}
 
         /**
          * Spring Cloud Stream service frame for net node \'${elt.name}\'.
@@ -830,39 +1006,40 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          */
         @Component
         @EnableScheduling
-        public class ${clsName} {
+        public class ${clsName}${implements} {
         
             @Autowired
             private StreamBridge streamBridge;
-            ${generateServiceAttribute(elt, elt.impl)}
+            ${generateServiceAttribute(elt, impl)}
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             private MetricsProvider metrics;
             private String sentCounterId = "service.${implMonId}.sent";
             private String rcvCounterId = "service.${implMonId}.received";
 
-            ${generateReceptionCallback(elt, elt.impl)|e}
+            ${generateReceptionCallback(elt, impl)|e}
         
             /**
              * Creates an instance.
              */
             public ${clsName}() {
-                ${initialService(elt, elt.impl)}
+                ${initialService(elt, impl)}
             }
         
-            ${generatedServiceInitMethod(elt, elt.impl)|e}
+            ${generatedServiceInitMethod(elt, impl)|e}
             ${generateDataMethods(elt)}
             ${generateConnectorParameter(elt, app)}
 
             /**
              * Attaches the ingestors.
              */
-            @PostConstruct 
+            ${nodeAnnotation("@PostConstruct")|e}
             public void attachIngestors() {
-                ${attachIngestors(elt, elt.impl)}
+                ${attachIngestors(elt, impl)}
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}
+            ${generateSetState(implements)|e}
         }'
     }
     

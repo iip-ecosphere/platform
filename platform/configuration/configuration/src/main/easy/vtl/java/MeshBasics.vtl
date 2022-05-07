@@ -9,6 +9,10 @@ template MeshBasics(Configuration config, FileArtifact target) {
     mapOf(String, Boolean) asyncIngestors = {};
     mapOf(String, String) ingestors = {};
     
+    def String getClsName(MeshElement elt) {
+        asTypeName(elt.name);
+    }
+    
     // -------------------------------------------- suffixes -------------------------------
 
     def String getMethodSuffix(MeshElement elt, String type, String outType) {

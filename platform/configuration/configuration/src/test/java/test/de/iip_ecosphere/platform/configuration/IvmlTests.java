@@ -164,7 +164,7 @@ public class IvmlTests {
         PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
 
         assertAppInterfaces(new File(gen, "ApplicationInterfaces"), false);
-        assertApplication(new File(gen, "MyAppExample"));
+        assertApplication(new File(gen, "MyAppExample"), true);
         assertEcsRuntime(gen);
         assertServiceManager(gen);
         assertPlatform(gen);
@@ -175,9 +175,10 @@ public class IvmlTests {
      * Asserts file and contents of the application part.
      * 
      * @param base the source base folder
+     * @param withFamily test as it we expect a AI family, else a single node
      * @throws IOException in case that expected files cannot be found or inspected
      */
-    private void assertApplication(File base) throws IOException {
+    private void assertApplication(File base, boolean withFamily) throws IOException {
         File srcMain = new File(base, "src/main");
         File srcMainJava = new File(srcMain, "java");
         File srcMainResources = new File(srcMain, "resources");
@@ -186,7 +187,14 @@ public class IvmlTests {
         File srcMainJavaIip = new File(srcMainJava, "iip");
 
         assertJavaNode(srcMainJavaIip, "MyAnonymizerExample", false);
-        assertJavaNode(srcMainJavaIip, "MyKiExample", false);
+        if (withFamily) {
+            assertJavaNode(srcMainJavaIip, "KIFamilyExample", false);
+            assertJavaNode(srcMainJavaIip, "KIFamilyExampleFamilyInterface", true);
+            assertJavaNode(srcMainJavaIip, "AlternativeMyKiExampleFamilyKIFamilyExample", true);
+            assertJavaNode(srcMainJavaIip, "MyKiExampleFamilyKIFamilyExample", true);
+        } else {
+            assertJavaNode(srcMainJavaIip, "MyKiExample", false);
+        }
         assertJavaNode(srcMainJavaIip, "MyMqttConnExample", true);
         assertJavaNode(srcMainJavaIip, "MyOpcConnExample", true);
         assertJavaNode(srcMainJavaIip, "MySourceExample", false);
@@ -566,7 +574,7 @@ public class IvmlTests {
         
         File base = new File(gen, "MyAppExampleOld");
         assertAppInterfaces(base, true); // old style
-        assertApplication(base);
+        assertApplication(base, false);
         assertAllFiles(base);
         
         // specific files only generated here for testing

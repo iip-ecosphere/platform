@@ -1,0 +1,95 @@
+import JavaBasics;
+import SpringCloudStreamBasics;
+import MeshBasics;
+import JavaConnector;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+    Application app) extends MeshBasics {
+
+    // ----------------------------- MeshBasics refinement/use ----------------------------
+    
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        '/**
+        * Called when data arrived that shall be passed on to the connector.
+        *
+        * @return the data consumer functor
+        */
+        public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}();'
+    }
+    
+    def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
+        not(isKindOf(type(elt.impl), Connector));
+    }
+   
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        '/**
+        * Called when data arrived that shall be processed (asynchronously).
+        *
+        * @return the data consumer functor
+        */
+        public Consumer<${type}> ${methodSuffixWithServiceId}();'
+    }
+
+    // called via MeshBasics.generateDataMethods for synch MeshProcessor
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+        '/**
+        * Called when data arrived that shall be processed (synchronously).
+        *
+        * @return the data transformation functor
+        */
+        public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}();'
+    } 
+
+    // called via MeshBasics.generateDataMethods for MeshSink
+    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        '/**
+        * Called when data arrived that shall be received (data sink).
+        *
+        * @return the data consumer functor
+        */
+        public Consumer<${type}> ${methodSuffixWithServiceId}();'
+    } 
+    
+    // --------------------- main ---------------------------
+
+    // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) {
+        String clsName = getClsName(elt);
+        'package ${pkg};
+        
+        import java.util.function.*;
+        import iip.datatypes.*;
+        import iip.interfaces.*;
+        import java.util.concurrent.ExecutionException;
+        import de.iip_ecosphere.platform.services.environment.*;
+
+        /**
+         * Family Interface for a Spring Cloud Stream service for \'${elt.name}\'.
+         *
+         * @author EASy-Producer.
+         */
+        public interface ${clsName}FamilyInterface {
+        
+            ${generateDataMethods(elt)}
+
+            /**
+             * Attaches the ingestors.
+             */
+            public void attachIngestors();
+            
+            /**
+             * Changes the state. [R133c]
+             * 
+             * @param state the new state
+             * @throws ExecutionException if changing the state fails for some reason
+             */
+            public void setState(ServiceState state) throws ExecutionException;
+            
+        }'
+    }
+    
+}

@@ -141,6 +141,22 @@ template JavaBasics(Configuration config, FileArtifact target) {
         conn.artifact;
     }
     
+    // ------------------------------------------ families ----------------------------------
+    
+    const String familyInterfaceSuffix = "FamilyInterface";
+    
+    def String familyInterfaceName(String clsName) {
+        clsName + familyInterfaceSuffix;
+    }
+    
+    def String familyMemberName(String clsName, String familyInterfaceName) {
+        if (familyInterfaceName <> "") {
+            clsName + "Family" + familyInterfaceName.substring(0, familyInterfaceName.length() - familyInterfaceSuffix.length());
+        } else {
+            clsName;
+        }
+    }
+    
     // ------------------------------------------ other -------------------------------------
 
     def String toPath(String pkg) {

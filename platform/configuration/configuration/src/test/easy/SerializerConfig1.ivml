@@ -212,6 +212,47 @@ project SerializerConfig1 {
           }
         }
     };
+
+    Service myKiService2 = JavaService {
+        id = "myKi2",
+        name = "Alternative myKi example",
+        description = "",
+        ver = "0.1.0",
+        asynchronous = false,
+        deployable = true,
+        class = "MyKi2Impl",
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(StringType)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
+    };
+    
+    ServiceFamily myKiServiceFamily = ServiceFamily {
+        members = {refBy(myKiService), refBy(myKiService2)},
+        selector = ServiceSelectorBasedFamilyMemberSelector{
+            field=refBy(rec1.fields[1]), 
+            artifact="", // does not exist, just for testing
+            class="de.iip_ecosphere.platform.apps.myApp.MyKiServiceFamilySelector"},
+        id = "myKiFamily",
+        name = "KI family example",
+        description = "",
+        asynchronous = false,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(StringType)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
+    };
     
     // fixed for now, becomes generic with advanced integration    
     RecordType RtsaTestInput = {
@@ -323,7 +364,7 @@ project SerializerConfig1 {
     };
 
     MeshProcessor myKi = {
-        impl = refBy(myKiService),
+        impl = refBy(myKiServiceFamily),
         next = {refBy(myConnMyKiMyRtsa)}
     };
 

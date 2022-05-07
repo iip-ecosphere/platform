@@ -122,7 +122,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         String clsName = asTypeName(no.name);
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces);
+                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl);
+                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                     };
@@ -272,6 +273,27 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 	    	dockerRemoveImage(imageId);
     	}
     	
+    }
+    
+    // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
+
+    // dispatch basis
+    generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, String clsName, 
+        String javaNodesPackage, Application a) = {
+    }
+
+    generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, String clsName, 
+        String javaNodesPackage, Application a) = {
+        IIPEcosphere cfg = config;
+        String familyInterface = familyInterfaceName(clsName);
+        vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
+            elt=no, pkg=javaNodesPackage, app=a);
+        Boolean sharedIf = cfg.sharedInterfaces;
+        for (Service m: family.members) {
+            String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
+            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
+                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m);
+        }        
     }
 
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------

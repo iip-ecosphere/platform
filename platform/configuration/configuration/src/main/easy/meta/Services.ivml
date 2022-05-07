@@ -288,10 +288,27 @@ project Services {
    
    // ------------------------ families -----------------
    
-   abstract compound ServiceFamily refines ServiceBase, CFamily {
+   abstract compound FamilyMemberSelector {
+   }
+
+   // class must be instance of Supplier<input>   
+   compound ServiceSelectorBasedFamilyMemberSelector refines FamilyMemberSelector {
+       refTo(Field) field;
+       String class; // optional class name, if not given do not generate service binding
+       String artifact; // optional maven artifact
+   }
+   
+   compound ServiceFamily refines ServiceBase, CFamily {
+        String description = ""; // TODO Constraint: must be configured
         setOf(refTo(Service)) members; // refinement
         Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
+        FamilyMemberSelector selector;
         kind == members.asSequence().first().kind; // propagate
+        // TODO interface check
+        // members must be same, synch or async; same deployable
+        // same kind
+        // same parameter
+        // requires??
    }
    
     // preliminary, as long as RTSA integration is not complete
