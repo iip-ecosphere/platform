@@ -111,9 +111,10 @@ project Services {
    
    // -------------------- services -----------------------------------
 
-   // required by meta concepts, direct ref would be alternative but conflit with QM   
+   // required by meta concepts, direct ref would be alternative but conflict with QM   
    compound IOType refines CDataProperty {
        refTo(DataType) type;
+       Boolean forward = true;
    }
    
    // aligned to services.environment
@@ -141,11 +142,14 @@ project Services {
        setOf(refTo(Dependency)) dependencies = {};
        NameplateInfo nameplateInfo;
 
-       kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and output.size() > 0;
-       kind == ServiceKind.SINK_SERVICE implies isDefined(input) and input.size() > 0;
-       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and input.size() > 0 and isDefined(output) and output.size() > 0;
-       not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and input.size() == output.size();
+       kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
+       kind == ServiceKind.SINK_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0;
+       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0 and isDefined(output) and fwdTypes(output).size() > 0;
+       not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and fwdTypes(input).size() == fwdTypes(output).size();
    }
+   
+   def sequenceOf(IOType) fwdTypes(sequenceOf(IOType) types) = types->select(t|t.forward);
+   def sequenceOf(IOType) bwdTypes(sequenceOf(IOType) types) = types->select(t|not(t.forward));
    
    abstract compound Service refines ServiceBase {
        String description = ""; // TODO Constraint: must be configured

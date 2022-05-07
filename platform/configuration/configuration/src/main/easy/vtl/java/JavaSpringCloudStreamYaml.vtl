@@ -8,14 +8,21 @@ import EcsRuntimeDockerContainerManagerYaml;
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) extends MeshBasics {
 
+    sequenceOf(String) tmp = {};
+    mapOf(DataType, String) backSenders = {};
+    mapOf(DataType, setOf(String)) backReceivers = {};
+
     def function(sequenceOf(MeshElement) nodes) {
-        println(nodes);
         String result = "";
         for (MeshElement elt: nodes) {
-            if (result.length() > 0) {
-                result = result + ";";
+            tmp.clear();
+            generateDataMethods(elt);
+            for (String s : tmp) {
+                if (result.length() > 0) {
+                    result = result + ";";
+                }
+                result = result + s;
             }
-            result = result + generateDataMethods(elt);
         }        
         result;
     }
@@ -40,31 +47,75 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
         for (MeshElement elt: mappedMesh.keys().toSequence()->sortedBy(e|e.name)) { // sortedBy for testing
-            String eltMet = generateDataMethods(elt);
-            Boolean doOut;
-            if (!asyncIngestors.containsKey(eltMet)) {
-                doOut = true;
-            } else {
-                doOut = !asyncIngestors.get(eltMet); // out for synchronous, in for asynchronous
+            tmp.clear();
+            generateDataMethods(elt);
+            sequenceOf(String) tmp1 = {};
+            for (String eltMet: tmp) {
+                tmp1.add(eltMet);
             }
-            if (doOut) {
-            '${eltMet}-out-0:
-                    destination: ${eltMet}'
-            ''
-            } else { // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
-            '${eltMet}-in-0:
-                    producer:
-                        useNativeEncoding: true'
-            ''
-            }
-            for (MeshConnector conn: mappedMesh.get(elt)) {
-                MeshInnerElement next = conn.next;
-                String nextMeth = generateDataMethods(next);
-                '${nextMeth}-in-0:
-                    destination: ${eltMet}
-                '
+            for (String eltMet : tmp1) {
+                Boolean doOut;
+                if (!asyncIngestors.containsKey(eltMet)) {
+                    doOut = true;
+                } else {
+                    doOut = !asyncIngestors.get(eltMet); // out for synchronous, in for asynchronous
+                }
+                if (doOut) {
+                '${eltMet}-out-0:
+                        destination: ${eltMet}'
+                ''
+                } else { // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+                '${eltMet}-in-0:
+                        producer:
+                            useNativeEncoding: true'
+                ''
+                }
+                for (MeshConnector conn: mappedMesh.get(elt)) {
+                    MeshInnerElement next = conn.next;
+                    tmp.clear();
+                    generateDataMethods(next);
+                    for (String nextMeth: tmp) {
+                        '${nextMeth}-in-0:
+                            destination: ${eltMet}
+                        '
+                    }
+                }
             }
         }
+        // produce the backward notification "busses"
+        if (backSenders.size() > 0) {        
+            for (DataType type: backSenders.keys()) {
+                String snd = backSenders.get(type);
+                '${snd}-in-0:
+                    producer:
+                        useNativeEncoding: true'
+                for (String s: backReceivers.get(type)) {
+                    '${s}-in-0:
+                        destination: ${snd}'
+                }
+            }
+        }
+    }
+    
+    def notifyTypeUse(MeshElement elt, Boolean inType, IOType type, String methodSuffix, String methodSuffixWithServiceId, Boolean beforeGen) {
+        if (type.forward) {
+            if (beforeGen) { // used in basis only to collect but not to generate, do not add
+                tmp.add(methodSuffixWithServiceId);
+            }
+        } else {
+            DataType t = type.type;
+            if (inType) {
+                setOf(String) tmp;
+                if (not(backReceivers.containsKey(t))) {
+                    tmp = {};
+                    backReceivers.put(t, tmp);
+                }
+                tmp = backReceivers.get(t);
+                tmp.add(methodSuffixWithServiceId);
+            } else {
+                backSenders.add(t, methodSuffixWithServiceId);
+            }
+        }        
     }
     
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {

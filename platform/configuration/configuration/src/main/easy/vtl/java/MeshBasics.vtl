@@ -77,7 +77,16 @@ template MeshBasics(Configuration config, FileArtifact target) {
         impl.input;
     }
 
+    def sequenceOf(IOType) getSourceInput(ServiceBase impl) {
+        impl.input;
+    }
+
+    def sequenceOf(IOType) getSourceInput(Connector impl) {
+        impl.output;
+    }
+
     def generateDataMethods(MeshSource elt) {
+        generateAsyncDataMethods(backward(getSourceInput(elt.impl)), backward(getSourceOutput(elt.impl)), elt);
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : getSourceOutput(elt.impl)) {
             String type = toTypeName(out.type);
@@ -87,8 +96,13 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 ingestors.add(methodSuffixId, type);
                 asyncIngestors.add(methodSuffixId, elt.impl.asynchronous);
             }
+            notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, true);
             generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
         }
+    }
+
+    def Boolean recordAsyncProcessorIngestor(MeshElement elt, IOType type) {
+        true;
     }
 
     def Boolean recordAsyncProcessorIngestor(MeshProcessor elt, IOType type) {
@@ -102,30 +116,15 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(MeshProcessor elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
-            for (IOType out : elt.output) {
-                String type = toTypeName(out.type);
-                String methodSuffix = "process" + type.firstToUpperCase();
-                String methodSuffixId = methodSuffix + serviceId;
-                if (recordAsyncProcessorIngestor(elt, out)) {
-                    ingestors.add(methodSuffixId, type);
-                    asyncIngestors.add(methodSuffixId, true);
-                }
-            }
-            for (IOType in : elt.input) {
-                String type = toTypeName(in.type);
-                String methodSuffix = "process" + type.firstToUpperCase();
-                String methodSuffixId = methodSuffix + serviceId;
-                /*if (recordAsyncProcessorIngestor(elt, in)) {
-                    ingestors.add(methodSuffixId, type);
-                    asyncIngestors.add(methodSuffixId, true);
-                }*/
-                generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
-            }
+            generateAsyncDataMethods(elt.input, elt.output, elt);
         } else {
+            generateAsyncDataMethods(backward(elt.input), backward(elt.output), elt);
             Integer p = 0;
-            while (p < elt.input.size()) {
-                IOType in = elt.input[p];
-                IOType out = elt.output[p];
+            sequenceOf(IOType) inFwd = forward(elt.input);
+            sequenceOf(IOType) outFwd = forward(elt.output);
+            while (p < inFwd.size()) {
+                IOType in = inFwd[p];
+                IOType out = outFwd[p];
                 p = p + 1;
                 String inType = toTypeName(in.type);
                 String outType = toTypeName(out.type);
@@ -135,22 +134,58 @@ template MeshBasics(Configuration config, FileArtifact target) {
                     ingestors.add(methodSuffixId, outType);
                     asyncIngestors.add(methodSuffixId, false);
                 }
+                notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
                 generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
             }
         }
     }
     
+    def generateAsyncDataMethods(sequenceOf(IOType) input, sequenceOf(IOType) output, MeshElement elt) {
+        String serviceId = "_" + toIdentifier(elt.impl.id);
+        for (IOType out : output) {
+            String type = toTypeName(out.type);
+            String methodSuffix = "process" + type.firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            if (recordAsyncProcessorIngestor(elt, out)) {
+                ingestors.add(methodSuffixId, type);
+                asyncIngestors.add(methodSuffixId, true);
+            }
+            notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, false);
+        }
+        for (IOType in : input) {
+            String type = toTypeName(in.type);
+            String methodSuffix = "process" + type.firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            /*if (recordAsyncProcessorIngestor(elt, in)) {
+                ingestors.add(methodSuffixId, type);
+                asyncIngestors.add(methodSuffixId, true);
+            }*/
+            notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
+            generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
+        }    
+    }
+        
     def generateDataMethods(MeshSink elt) {
+        sequenceOf(IOType) out = {};
+        generateAsyncDataMethods(backward(elt.input), out, elt);
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);
             String methodSuffix = "receive" + type.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
+            notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
             generateSinkMethod(elt, type, methodSuffix, methodSuffixId);
         }
     }
+    
+    def notifyTypeUse(MeshElement elt, Boolean inType, IOType type, String methodSuffix, String methodSuffixWithServiceId, Boolean beforeGen) {
+    }
 
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        ''
+    } 
+
+    def generateAsyncProcessorInMethod(MeshElement elt, String type, String methodSuffix, String methodSuffixWithServiceId) {
         ''
     } 
 

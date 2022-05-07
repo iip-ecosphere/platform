@@ -8,7 +8,7 @@ template ServicesYaml(Configuration config, FileArtifact target) {
     def main(Configuration config, FileArtifact target) {
         setOf(Service) services = Service.allInstances();
         'services:'
-        for (Service s: services) {
+        for (Service s: services->sortedBy(n|n.name).toSequence()) { // sort for testing
             if (isDefined(s.nameplateInfo) and s.nameplateInfo <> null) {
                 '- id: ${s.id}
                   name: ${s.name}

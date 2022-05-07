@@ -4,8 +4,16 @@ import Basics;
 @indent(indentation = 4, additional = 0)
 template ServiceBasics(Configuration config, FileArtifact target) {
     
+    def sequenceOf(IOType) forward(sequenceOf(IOType) types) {
+        types->select(t|t.forward);
+    }
+
+    def sequenceOf(IOType) backward(sequenceOf(IOType) types) {
+        types->select(t|not(t.forward));
+    }
+    
     def mapOf(IOType, IOType) ioPairs(ServiceBase service) {
-        ioPairs(service.input, service.output);
+        ioPairs(forward(service.input), forward(service.output));
     }
     
     def produceForInputTypes(ServiceBase service) {
@@ -28,9 +36,17 @@ template ServiceBasics(Configuration config, FileArtifact target) {
                 '${produceIngestorBody(out)}'
             }
         } else {
-            mapOf(IOType, IOType) pairs = ioPairs(service.input, service.output);
-            setOf(IOType) mappedOut = values(pairs);
-            for (IOType out : service.output) {
+            for (IOType out : backward(service.output)) {
+                '${produceIngestorBody(out)}'
+            }
+            
+            mapOf(IOType, IOType) pairs = ioPairs(service);
+            //setOf(IOType) mappedOut = values(pairs); // easy bug
+            setOf(IOType) mappedOut = {};
+            for (IOType in : pairs.keys()) {
+                mappedOut.add(pairs.get(in));
+            }
+            for (IOType out : forward(service.output)) {
                 if (mappedOut.excludes(out)) {
                     '${produceProducerBody(out)}'
                 }
