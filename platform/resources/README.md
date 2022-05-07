@@ -10,4 +10,5 @@ Interfaces (SPI) and alternative implementations for managing containers and ser
      * [MinIO](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt.minio/README.md) S3-Connector for configuration and binary image storage (AGPL).
      * [In-Memory Device Registry](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt.basicRegistry/README.md) for devices represented as ECS runtime.
      * [ThingsBoard-Connector](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/deviceMgt.thingsboard/README.md) for devices represented as ECS runtime. The ThingsBoard UI is currently not further integrated.
-* [Monitoring](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/monitoring/README.md) (placeholder)
+* [Central platform monitoring](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/monitoring/README.md) basic platform component
+   * [Prometheus-based platform monitoring](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/monitoring.prometheus/README.md) The Prometheus UI is currently not further integrated.

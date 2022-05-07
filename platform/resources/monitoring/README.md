@@ -33,7 +33,7 @@ As usual, this component supports a YAML-based setup:
         keystore: <File>
         keyPassword: <String>
         keyAlias: <String>
-    transport:
+      transport:
         host: <String>
         port: <int>
         password: <String>
