@@ -245,7 +245,6 @@ project SerializerConfig1Old {
         traceSent = TraceKind::LOG,        
         input = {{type=refBy(StringType)}},
         output = {{type=refBy(rec1)}}
-        // TODO parameter
     };
 
     Service myKiService = JavaService {
@@ -262,8 +261,15 @@ project SerializerConfig1Old {
         traceSent = TraceKind::TRACE,        
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(StringType)}}
-        // TODO parameter
     };
+
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -339,6 +345,8 @@ project SerializerConfig1Old {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring; // preliminary no monitoring
+        managementUi;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

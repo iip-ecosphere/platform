@@ -315,6 +315,20 @@ project SerializerConfig1 {
         application = refBy(myApp),
         input = {{type=refBy(RtsaTestOutput)}}
     };
+    
+    // --------------------- monitoring ---------------------------
+    
+    platformMonitoring = PrometheusPlatformMonitoring {
+        schema = PrometheusSchema::HTTPS,
+        host = "127.0.0.1",
+        port = 9090,
+        running = false,
+        exporterPort = -1
+    };
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -414,6 +428,8 @@ project SerializerConfig1 {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
+        managementUi;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

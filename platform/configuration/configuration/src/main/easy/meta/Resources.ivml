@@ -79,4 +79,26 @@ project Resources {
        port = 8884
    };
    
+   // -------------------------- monitoring --------------------------------------
+   
+   abstract compound PlatformMonitoring {
+   }
+
+   compound NoPlatformMonitoring refines PlatformMonitoring {
+   }
+   
+   enum PrometheusSchema {HTTP, HTTPS};
+   compound PrometheusPlatformMonitoring refines PlatformMonitoring {
+        PrometheusSchema schema = PrometheusSchema::HTTPS;
+        NonEmptyString host = "127.0.0.1";
+        NonEmptyEphemeralPort port = 9090;
+        Boolean running = false; // running somewhere else, do we have to start it
+        NonEmptyEphemeralPort exporterPort = -1;
+   }
+   
+   // TODO monitoring rules, alerting
+   
+   // preliminary
+   PlatformMonitoring platformMonitoring = NoPlatformMonitoring {};
+   
 }

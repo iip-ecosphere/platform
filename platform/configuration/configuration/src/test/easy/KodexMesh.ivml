@@ -94,7 +94,6 @@ project KodexMesh {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}
-        // TODO parameter
     };
 
     Service myKodexService = KodexService {
@@ -105,7 +104,6 @@ project KodexMesh {
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec2)}},
         actions = {{field=refBy(rec1.fields[1]), action=KodexAction::PseudonymizeMerengue}}
-        // TODO parameter
     };
     
     Service myPythonService = PythonService {
@@ -129,8 +127,15 @@ project KodexMesh {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec2)}}
-        // TODO parameter
     };
+
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -209,6 +214,8 @@ project KodexMesh {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
+        managementUi;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

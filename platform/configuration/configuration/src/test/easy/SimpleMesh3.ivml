@@ -78,7 +78,6 @@ project SimpleMesh3 {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}
-        // TODO parameter
     };
 
     Service myTransformerService = JavaService {
@@ -93,7 +92,6 @@ project SimpleMesh3 {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec1)}}
-        // TODO parameter
     };
     
     Service myReceiverService = JavaService {
@@ -106,8 +104,15 @@ project SimpleMesh3 {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec1)}}
-        // TODO parameter
     };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -176,6 +181,8 @@ project SimpleMesh3 {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
+        managementUi;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

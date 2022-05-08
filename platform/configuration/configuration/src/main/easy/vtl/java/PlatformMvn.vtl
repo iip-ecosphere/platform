@@ -21,9 +21,11 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
         appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
-        appendDependency(dep, iipGroup, deviceMgtStorageServerModule(config), projectVersion);
+        appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
+        appendDependency(dep, iipGroup, "monitoring", projectVersion);
         appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
         appendDependency(dep, iipGroup, "platform", projectVersion);
+        appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

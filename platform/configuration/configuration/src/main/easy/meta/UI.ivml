@@ -1,0 +1,19 @@
+project UI {
+
+    import Applications;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+   abstract compound ManagementUI {
+   }
+
+   compound NoManagementUI refines ManagementUI {
+   }
+   
+   compound AngularManagementUI refines ManagementUI {
+   }
+   
+   // preliminary
+   ManagementUI managementUi = NoManagementUI {};
+   
+}

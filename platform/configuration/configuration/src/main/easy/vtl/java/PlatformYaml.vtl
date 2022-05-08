@@ -35,6 +35,24 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
         produceDeviceMgtStorage("configStorage", config.deviceMgtStorage, config.deviceMgtStorage.configStorage);
         produceDevMgtServer(config);
     }
+    
+    def produceCentralMonitoring(IIPEcosphere config) {
+        PlatformMonitoring mon = config.platformMonitoring;
+        produceCentralMonitoring(mon);
+    }
+
+    def produceCentralMonitoring(PlatformMonitoring mon) {
+        ''
+    }
+
+    def produceCentralMonitoring(PrometheusPlatformMonitoring mon) {
+        'prometheusServer:
+            schema: ${mon.schema}
+            host: ${mon.host}
+            port: ${mon.port}
+            running: ${mon.running}
+        prometheusExporterPort: ${mon.exporterPort}'
+    }
 
     def main(IIPEcosphere config, FileArtifact target) {
         String pers = "${config.aasPersistency}";
@@ -42,6 +60,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
         produceAas(config, pers, false);
         produceNetMgr(config);
         produceDevMgt(config);
+        produceCentralMonitoring(config);
     }
 
 }

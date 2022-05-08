@@ -1,6 +1,6 @@
 project IIPEcosphere {
 
-    import Applications; 
+    import UI; 
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     

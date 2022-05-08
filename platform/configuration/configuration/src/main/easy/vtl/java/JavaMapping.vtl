@@ -244,5 +244,25 @@ template JavaMapping(Configuration config, FileArtifact target) {
     }
     
     // none for S3Mock, comes with S3MockDeviceMgt, requires dependency
+
+    def String centralMonitoringModule(IIPEcosphere config) {
+        centralMonitoringModule(config.platformMonitoring);
+    }
     
+    def String centralMonitoringModule(PlatformMonitoring mon) {
+        "";
+    }
+
+    def String centralMonitoringModule(PrometheusPlatformMonitoring mon) {
+        "monitoring.prometheus";
+    }
+
+    def String managementUiModule(IIPEcosphere config) {
+        managementUiModule(config.managementUi);
+    }
+    
+    def String managementUiModule(ManagementUI ui) {
+        "";
+    }
+
 }
