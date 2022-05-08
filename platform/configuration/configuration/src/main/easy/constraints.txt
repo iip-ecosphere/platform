@@ -4,3 +4,4 @@ constraints collection
  - in/out type compliance rules unclear (AI service discussion)
  - connector service in/out types must be RecordTypes?
  - transport vs service protocol
+ - ensemble -> no overlaps, no graph

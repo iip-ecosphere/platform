@@ -38,7 +38,16 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
                 portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
                 hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
             ${generateRelations(elt)|e}
-          ${generateProcess(elt, service)|e}'
+          ${generateProcess(elt, service)|e}
+          ${generateEnsemble(elt, service)|e}'
+    }
+    
+    def generateEnsemble(MeshElement elt, Service service) {
+       if (elt.ensemble <> null) {
+           'ensemble: ${elt.ensemble.impl.id}'
+       } else {
+           ''
+       }
     }
     
     def generateProcess(MeshElement elt, Service service) {

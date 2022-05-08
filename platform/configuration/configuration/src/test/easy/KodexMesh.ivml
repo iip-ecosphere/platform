@@ -165,7 +165,8 @@ project KodexMesh {
 
     MeshProcessor myTransformer = {
         impl = refBy(myKodexService),
-        next = {refBy(myConnMyTransformerMyPython)}
+        next = {refBy(myConnMyTransformerMyPython)},
+        ensemble = refBy(mySource)
     };
 
     MeshConnector myConnMyTransformerMyPython = {
