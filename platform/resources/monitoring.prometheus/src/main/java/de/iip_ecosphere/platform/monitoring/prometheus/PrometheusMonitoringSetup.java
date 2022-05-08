@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 
 /**
  * Extended prometheus monitoring setup.
@@ -31,21 +30,20 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
 
     private static PrometheusMonitoringSetup instance;
     
-    private ServerAddressHolder prometheusServer = new ServerAddressHolder(
+    private PrometheusServerAddressHolder prometheusServer = new PrometheusServerAddressHolder(
         Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSSERVERPORT);
 
-    /*private ServerAddressHolder prometheusPushGateway = new ServerAddressHolder(
+    /*private PrometheusServerAddressHolder prometheusPushGateway = new PrometheusServerAddressHolder(
         Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSPUSHGATEWAYPORT);*/
     
-    private boolean running = false;
-    private int exporterPort = -1; // ephemeral
+    private int prometheusExporterPort = -1; // ephemeral
 
     /**
      * Returns the Prometheus server information.
      * 
      * @return the Prometheus server information
      */
-    public ServerAddressHolder getPrometheusServer() {
+    public PrometheusServerAddressHolder getPrometheusServer() {
         return prometheusServer;
     }
 
@@ -54,25 +52,17 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @return the Prometheus push gateway information
      */
-    /*public ServerAddressHolder getPrometheusPushGateway() {
+    /*public PrometheusServerAddressHolder getPrometheusPushGateway() {
         return prometheusPushGateway;
     }*/
     
-    /**
-     * Returns whether Prometheus is already running.
-     * 
-     * @return whether we can assume that it is already running
-     */
-    public boolean isRunning() {
-        return running;
-    }
 
     /**
      * Returns the Prometheus server information. [snakeyaml]
      * 
      * @param prometheusServer the Prometheus server information
      */
-    public void setPrometheusServer(ServerAddressHolder prometheusServer) {
+    public void setPrometheusServer(PrometheusServerAddressHolder prometheusServer) {
         this.prometheusServer = prometheusServer;
     }
 
@@ -81,7 +71,7 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @param prometheusPushGateway the Prometheus push gateway information
      */
-    /*public void getPrometheusPushGateway(ServerAddressHolder prometheusPushGateway) {
+    /*public void getPrometheusPushGateway(PrometheusServerAddressHolder prometheusPushGateway) {
         this.prometheusPushGateway = prometheusPushGateway;
     }*/
     
@@ -90,17 +80,8 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @return the port, may be negative for ephemeral
      */
-    public int getExporterPort() {
-        return exporterPort;
-    }
-
-    /**
-     * Changes whether Prometheus is already running. [snakeyaml]
-     * 
-     * @param running whether we can assume that it is already running
-     */
-    public void setRunning(boolean running) {
-        this.running = running;
+    public int getPrometheusExporterPort() {
+        return prometheusExporterPort;
     }
 
     /**
@@ -108,8 +89,8 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * 
      * @param exporterPort the port, may be negative for ephemeral
      */
-    public void setExporterPort(int exporterPort) {
-        this.exporterPort = exporterPort;
+    public void setPrometheusExporterPort(int exporterPort) {
+        this.prometheusExporterPort = exporterPort;
     }
 
     /**

@@ -150,7 +150,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
-        if (!setup.isRunning()) {
+        if (!setup.getPrometheusServer().isRunning()) {
             String zipName = AbstractProcessService.getExecutablePrefix(PROMETHEUS, PROMETHEUS_VERSION) + ".zip";
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
             //Set working directory in a temporary directory

@@ -78,7 +78,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         super.start();
         try {
             PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
-            port = setup.getExporterPort();
+            port = setup.getPrometheusExporterPort();
             if (port < 0) {
                 port = NetUtils.getEphemeralPort();
             }
