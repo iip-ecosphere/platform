@@ -118,6 +118,14 @@ project ExampleKODEX {
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec2)}}
     };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -186,6 +194,7 @@ project ExampleKODEX {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

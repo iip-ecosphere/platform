@@ -103,6 +103,14 @@ project VDW {
           }
         }*/
     };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
 
     // ------------ application and service nets ------------------
     
@@ -150,6 +158,7 @@ project VDW {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
         Opc; // now freeze also cachingTime
         OpcWoodworking; // now freeze also cachingTime
         .; // every variable declared in this project

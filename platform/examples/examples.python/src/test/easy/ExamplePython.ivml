@@ -130,6 +130,14 @@ project ExamplePython {
         input = {{type=refBy(PythonTestOutput)}}
     };
     
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
+    
     // ------------ application and service nets ------------------
     
     Application myApp = {
@@ -196,6 +204,7 @@ project ExamplePython {
         pidDir;
         sharedInterfaces;
         sharedArtifact;
+        platformMonitoring;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
