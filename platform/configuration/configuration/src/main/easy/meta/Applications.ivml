@@ -1,7 +1,6 @@
 project Applications {
 
     import Devices;
-    import Services;
     import Connectors;
     import DataTypes;
     import Nameplate;
