@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.transport.streams;
 
+import de.iip_ecosphere.platform.transport.status.Alert;
+import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.transport.status.TraceRecord;
+
 /**
  * Global platform stream names (see handbook, forward declarations).
  * 
@@ -20,23 +24,28 @@ package de.iip_ecosphere.platform.transport.streams;
 public class StreamNames {
 
     /**
-     * Component status changes stream.
+     * Component status changes stream in terms of {@link StatusMessage}.
      */
     public static final String STATUS_STREAM = "ComponentStatus";
 
     /**
-     * Optional tracing stream.
+     * Optional tracing stream in terms of {@link TraceRecord}.
      */
     public static final String TRACE_STREAM = "Trace";
 
     /**
-     * Service metrics stream.
+     * Service metrics stream (forward declaration).
      */
     public static final String SERVICE_METRICS = "ServiceMetrics";
 
     /**
-     * Resource metrics stream.
+     * Resource metrics stream (forward declaration).
      */
     public static final String RESOURCE_METRICS = "EcsMetrics";
 
+    /**
+     * Alerts in terms of {@link Alert}.
+     */
+    public static final String ALERTS = "Alerts";
+    
 }

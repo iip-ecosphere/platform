@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.transport.status.AlertSerializer;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
 import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 
@@ -40,6 +41,7 @@ public class SerializerRegistry {
         registerSerializer(StringSerializer.class);
         registerSerializer(StatusMessageSerializer.class);
         registerSerializer(TraceRecordSerializer.class);
+        registerSerializer(AlertSerializer.class);
     }
 
     /**

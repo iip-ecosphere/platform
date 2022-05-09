@@ -28,7 +28,8 @@ import org.junit.runners.Suite;
     TransportAasTest.class, 
     OtherTests.class,
     TransportSetupTest.class,
-    IipEnumTest.class
+    IipEnumTest.class,
+    AlertTest.class
 })
 public class AllTests {
 }
