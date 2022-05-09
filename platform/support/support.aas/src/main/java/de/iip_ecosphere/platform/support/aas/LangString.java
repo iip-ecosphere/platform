@@ -60,12 +60,15 @@ public class LangString {
      * Creates a {@link LangString] from a composed description@language string. Inspired by ZVEI nameplate
      * for industrial equipment V1.0.
      * 
-     * @param descLang the composed string, last @ separates language
+     * @param descLang the composed string, last @ separates language (<b>null</b> becomes empty string)
      * @return the {@link LangString} object
      */
     public static LangString create(String descLang) {
         String language;
         String description;
+        if (null == descLang) {
+            descLang = "";
+        }
         int pos = descLang.lastIndexOf('@');
         if (pos > 0 & pos < descLang.length()) {
             description = descLang.substring(0, pos);
