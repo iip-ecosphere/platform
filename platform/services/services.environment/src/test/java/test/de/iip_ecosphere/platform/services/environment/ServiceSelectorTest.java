@@ -48,13 +48,11 @@ public class ServiceSelectorTest {
             ServiceSelectorTest.class.getClassLoader(), "abc", String.class, "dflt");
         Assert.assertNotNull(sel);
         Assert.assertEquals("dflt", sel.select(""));
-        Assert.assertEquals("dflt", sel.select("", 1));
         
         sel = ServiceSelector.createInstance(
             ServiceSelectorTest.class.getClassLoader(), MyServiceSelector.class.getName(), String.class, "dflt");
         Assert.assertNotNull(sel);
         Assert.assertEquals("abc", sel.select("abc"));
-        Assert.assertEquals("abc", sel.select("abc", 1));
     }
 
 }

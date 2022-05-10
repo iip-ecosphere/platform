@@ -29,17 +29,6 @@ public interface ServiceSelector<T> {
      * @return the service id, <b>null</b> for staying with the actual service
      */
     public String select(T input);
-
-    /**
-     * Selects a service based on the input and a qualifier (only used if explicitly configured).
-     * 
-     * @param input the input to use
-     * @param qualifier the qualifier to use, may be a string, a number, whatever defined in the model
-     * @return the service id, <b>null</b> for staying with the actual service
-     */
-    public default String select(T input, Object qualifier) {
-        return select(input); 
-    }
     
     /**
      * Creates a selector instance with fallback.
