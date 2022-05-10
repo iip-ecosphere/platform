@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.ActionType;
+import de.iip_ecosphere.platform.transport.status.Alert;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
@@ -103,28 +104,38 @@ public class Transport {
     }
     
     /**
+     * Sends a message of a certain kind and cares fore queuing.
+     * 
+     * @param sender the sender including the message
+     * @param kind the kind of the message for logging
+     */
+    private static void send(IOConsumer<TransportConnector> sender, String kind) {
+        createConnector();
+        if (null != connector) {
+            try {
+                sender.accept(connector);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(Transport.class).error(
+                    "Cannot sent {} message: {}", kind, e.getMessage());
+            } catch (NullPointerException e) { // preliminary, may occur if the connector is not yet connected
+                LoggerFactory.getLogger(Transport.class).error(
+                    "Cannot sent {} message: Connector not yet connected (NPE)");
+            }
+        } else {
+            queue.add(sender);
+            LoggerFactory.getLogger(Transport.class).error(
+                "Cannot sent {} message now. Queued message until connector becomes available.", kind);
+        }
+    }
+    
+    /**
      * Sends a trace record. Calls {@link #createConnector()} to obtain
      * a connector instance on demand. Caches messages if no connector is available.
      * 
      * @param record the record to be sent
      */
     public static void sendTraceRecord(TraceRecord record) {
-        createConnector();
-        if (null != connector) {
-            try {
-                record.send(connector);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(Transport.class).error(
-                    "Cannot sent trace record: " + e.getMessage());
-            } catch (NullPointerException e) { // preliminary, may occur if the connector is not yet connected
-                LoggerFactory.getLogger(Transport.class).error(
-                    "Cannot sent trace record: " + e.getMessage());
-            }
-        } else {
-            queue.add(c -> record.send(c));
-            LoggerFactory.getLogger(Transport.class).error(
-                "Cannot sent trace record now. Queued record until connector becomes available.");
-        }
+        send(c -> record.send(c), "trace"); 
     }
 
     /**
@@ -134,22 +145,17 @@ public class Transport {
      * @param msg the message to be sent
      */
     public static void sendStatus(StatusMessage msg) {
-        createConnector();
-        if (null != connector) {
-            try {
-                msg.send(connector);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(Transport.class).error(
-                    "Cannot sent status message: " + e.getMessage());
-            } catch (NullPointerException e) { // preliminary, may occur if the connector is not yet connected
-                LoggerFactory.getLogger(Transport.class).error(
-                    "Cannot sent status message: " + e.getMessage());
-            }
-        } else {
-            queue.add(c -> msg.send(c));
-            LoggerFactory.getLogger(Transport.class).error(
-                "Cannot sent status message now. Queued message until connector becomes available.");
-        }
+        send(c -> msg.send(c), "status"); 
+    }
+
+    /**
+     * Sends an alert message. Calls {@link #createConnector()} to obtain
+     * a connector instance on demand. Caches messages if no connector is available.
+     * 
+     * @param alert the alert to be sent
+     */
+    public static void sendAlert(Alert alert) {
+        send(c -> alert.send(c), "alert"); 
     }
     
     /**

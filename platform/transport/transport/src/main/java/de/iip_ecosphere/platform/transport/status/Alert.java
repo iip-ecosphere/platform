@@ -12,6 +12,11 @@
 
 package de.iip_ecosphere.platform.transport.status;
 
+import java.io.IOException;
+
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.streams.StreamNames;
+
 /**
  * Represents a generic platform alert.
  * 
@@ -19,6 +24,8 @@ package de.iip_ecosphere.platform.transport.status;
  * @author Matjaž Cerkvenik (original author DEvent, see monitoring.prometheus).
  */
 public class Alert {
+    
+    public static final String ALERT_STREAM = StreamNames.ALERTS;
 
     private String uid;
     private String correlationId;
@@ -446,6 +453,16 @@ public class Alert {
             + ", ruleExpression='" + ruleExpression + '\'' 
             + ", ruleTimeLimit='" + ruleTimeLimit + '\'' 
             + '}';
+    }
+    
+    /**
+     * Sends this message to the given connector on {@code #ALERT STREAM}. [convenience]
+     * 
+     * @param conn the connector
+     * @throws IOException if sending fails
+     */
+    public void send(TransportConnector conn) throws IOException {
+        conn.asyncSend(ALERT_STREAM, this);
     }
 
 }
