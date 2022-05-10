@@ -17,7 +17,7 @@
 * Individual AAS for devices, services and Apps.
 * Platform can instantiate broker.
 * Template projects for application creation.
-* Basic integration of Prometheus for central monitoring.
+* Basic integration of Prometheus for central monitoring, i.e., delivery of micrometer data into prometheus, alerts to AAS. Disabled, conflicting with Tomcat/Apache Qpid.
 * Bug fixes / Improvements:
     * Missing resource headline/identifier in platform Cli
     * Wrong version numbers for platformDependencies/broker in Install package
