@@ -311,6 +311,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         }
     }
 
+    generateServiceResources(MeshElement no, Connector base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(no)); // connectors are (currently) platform-supplied
+    }
+
     // RTSA (preliminary in here)
     generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         resources.add(rtsaResources()+"|"+rtsaBin(service));

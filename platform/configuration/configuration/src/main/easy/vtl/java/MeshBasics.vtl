@@ -126,7 +126,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
             Integer p = 0;
             sequenceOf(IOType) inFwd = forward(elt.input);
             sequenceOf(IOType) outFwd = forward(elt.output);
-            while (p < inFwd.size()) {
+            Integer maxP = min(inFwd.size(), outFwd.size()); // must be equal -> constraint syncEqualIO
+            while (p < maxP) {
                 IOType in = inFwd[p];
                 IOType out = outFwd[p];
                 p = p + 1;
@@ -141,6 +142,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
                 generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
             }
+            // there are no remaining -> constraint syncEqualIO
         }
     }
     
