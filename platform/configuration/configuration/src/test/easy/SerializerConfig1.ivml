@@ -236,7 +236,7 @@ project SerializerConfig1 {
     ServiceFamily myKiServiceFamily = ServiceFamily {
         members = {refBy(myKiService), refBy(myKiService2)},
         selector = ServiceSelectorBasedFamilyMemberSelector{
-            field=refBy(rec1.fields[1]), 
+            type=refBy(rec1), 
             artifact="", // does not exist, just for testing
             class="de.iip_ecosphere.platform.apps.myApp.MyKiServiceFamilySelector"},
         id = "myKiFamily",

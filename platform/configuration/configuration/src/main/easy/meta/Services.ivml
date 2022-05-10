@@ -291,12 +291,18 @@ project Services {
    abstract compound FamilyMemberSelector {
    }
 
-   // class must be instance of Supplier<input>   
+   def Boolean selectorTypeOk(FamilyMemberSelector selector, ServiceFamily family) = 
+        true;
+
+   // class must be instance of ServiceSelector   
    compound ServiceSelectorBasedFamilyMemberSelector refines FamilyMemberSelector {
-       refTo(Field) field;
+       refTo(DataType) type;
        String class; // optional class name, if not given do not generate service binding
        String artifact; // optional maven artifact
    }
+   
+   def Boolean selectorTypeOk(ServiceSelectorBasedFamilyMemberSelector selector, ServiceFamily family) = 
+        family.input->exists(t|t.type == selector.type) or family.output->exists(t|t.type == selector.type);
    
    compound ServiceFamily refines ServiceBase, CFamily {
         String description = ""; // TODO Constraint: must be configured
@@ -309,6 +315,7 @@ project Services {
         // same kind
         // same parameter
         // requires??
+        selector <> null implies selectorTypeOk(selector, self);
    }
    
     // preliminary, as long as RTSA integration is not complete

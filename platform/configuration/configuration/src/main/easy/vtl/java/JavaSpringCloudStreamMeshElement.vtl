@@ -221,7 +221,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 });
             }'
         } else {
-            String expr = '${fallbackToNull(src, "service.${methodName}()", true)}';
+            String svc = insertSelector(service, type, "data");
+            String expr = '${fallbackToNull(src, "${svc}.${methodName}()", true)}';
             '\npublic Supplier<${type}> ${methodSuffixWithServiceId}() {
                 return () -> ${genSentProbe(service, expr, true, type, "")}; 
             }'
@@ -602,7 +603,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def generateSelectorServiceAttribute(ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
-        String type = toTypeName(selector.field.type);
+        String type = toTypeName(selector.type);
         Service init = defaultService(family);
         'private ServiceSelector<${type}> selector = 
             ServiceSelector.createInstance(getClass().getClassLoader(), "${selector.class}", ${type}.class, "${init.id}");'
@@ -612,20 +613,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "";
     }
 
-    def getMethodName(String prefix, String type) {
-        if (sharedInterfaces) {
-            "${prefix}${type.firstToUpperCase()}";
-        } else {
-            methodSuffix;
-        }
-    }
-
     def generateAsyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type) {
-        'return () -> service.${methodSuffixWithServiceId}().get();'
+        String svc = insertSelector(service, type, "data");
+        'return () -> ${svc}.${methodSuffixWithServiceId}().get();'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
-        'return data -> service.${methodSuffixWithServiceId}().apply(data);'
+        String svc = insertSelector(service, inType, "data");
+        'return data -> ${svc}.${methodSuffixWithServiceId}().apply(data);'
     }
 
     def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir) {
@@ -637,7 +632,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> ${svc}.${methodName}().accept(data);'
     }
 
-    // convenience, check is defined, go for dispatch
+    def insertSelector(Service family, String type, String dataVar) {
+        "service";
+    }
+
     def insertSelector(ServiceFamily family, String type, String dataVar) {
         String result = "";
         if (isDefined(family.selector) and family.selector <> null) {
@@ -655,7 +653,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def insertSelector(ServiceSelectorBasedFamilyMemberSelector selector, String type, String dataVar) {
-        String fType = toTypeName(selector.field.type);
+        String fType = toTypeName(selector.type);
+println("INSSELECTOR " + fType+" "+type);        
         if (type == fType) {
             "selectService(data)";
         } else {
@@ -678,7 +677,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }           
 
     def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
-        String fType = toTypeName(selector.field.type);
+        String fType = toTypeName(selector.type);
         String fInterface = familyInterfaceName(getClsName(elt));
         
         '/**
