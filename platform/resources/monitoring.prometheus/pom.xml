@@ -65,6 +65,31 @@
      <artifactId>micrometer-registry-prometheus</artifactId>
      <version>1.8.3</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
+    <dependency>
+     <groupId>si.matjazcerkvenik</groupId>
+     <artifactId>alertmonitor</artifactId>
+     <version>2.3.0</version>
+     <exclusions>
+       <!-- not intended to run as webapp or to persist data -->
+       <exclusion>
+        <groupId>org.primefaces</groupId>
+        <artifactId>primefaces</artifactId>
+       </exclusion>
+       <exclusion>
+		<groupId>org.apache.kafka</groupId>
+		<artifactId>kafka-clients</artifactId>
+       </exclusion>
+       <exclusion>
+		<groupId>org.mongodb</groupId>
+		<artifactId>mongo-java-driver</artifactId>
+       </exclusion>
+     </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>si.matjazcerkvenik.simplelogger</groupId>
+      <artifactId>simple-logger</artifactId>
+      <version>1.7.0</version>
+    </dependency>
     
 	<dependency>
       <groupId>junit</groupId>

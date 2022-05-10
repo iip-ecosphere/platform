@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.transport.Transport;
 
 /**
  * Platform lifecycle descriptor for prometheus monitoring. Unpacks and starts prometheus.
@@ -64,9 +65,11 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     private Process prometheusProcess;  
     private File prometheusWorkingDirectory;
     private IipEcospherePrometheusExporter exporter;
+    private AlertManagerImporter alertImporter;
     private ModifierRunnable modifierRunnable = new ModifierRunnable();
     private Deque<ConfigModifier> modifierQueue = new ConcurrentLinkedDeque<>();
     private Supplier<IipEcospherePrometheusExporter> exporterSupplier = () -> new IipEcospherePrometheusExporter();
+    private Supplier<AlertManagerImporter> alertMgrSupplier = () -> new AlertManagerImporter();
     
     private Supplier<ConfigModifier> modifierSupplier = () -> { 
         ConfigModifier result = new ConfigModifier(DEFAULT_SCRAPEPOINTS);
@@ -150,6 +153,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
+        Transport.setTransportSetup(() -> setup.getTransport());
         if (!setup.getPrometheusServer().isRunning()) {
             String zipName = AbstractProcessService.getExecutablePrefix(PROMETHEUS, PROMETHEUS_VERSION) + ".zip";
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
@@ -196,6 +200,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         exporter = exporterSupplier.get();
         exporter.setModifierSupplier(modifierSupplier);
         exporter.start();
+        alertImporter = alertMgrSupplier.get();
     } 
 
     /**
@@ -229,6 +234,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     
     @Override
     public void shutdown() {
+        alertImporter.stop();
         exporter.stop();
         modifierRunnable.stop();
         if (null != prometheusProcess) {
@@ -236,6 +242,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             LoggerFactory.getLogger(getClass()).info("{} {} shutdown", PROMETHEUS, PROMETHEUS_VERSION);
             prometheusProcess = null;
         }
+        Transport.releaseConnector();
         deleteWorkingFiles();
     }
     

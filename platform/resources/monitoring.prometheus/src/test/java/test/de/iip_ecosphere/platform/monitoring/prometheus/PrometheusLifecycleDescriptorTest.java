@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.prometheus.IipEcospherePrometheusExporter;
 import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusLifecycleDescriptor;
+import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusMonitoringSetup;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -108,6 +109,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
         
         @Override
         public void start(TransportSetup transSetup) {
+            PrometheusMonitoringSetup.getInstance().setTransport(transSetup);
             ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
             Optional<PrometheusLifecycleDescriptor> pml = ServiceLoaderUtils
                 .stream(loader)
