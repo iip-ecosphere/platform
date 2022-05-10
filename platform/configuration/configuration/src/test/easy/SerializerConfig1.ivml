@@ -318,13 +318,14 @@ project SerializerConfig1 {
     
     // --------------------- monitoring ---------------------------
     
-    platformMonitoring = PrometheusPlatformMonitoring {
+    // just for building, running causes multiple conflicts. 
+    /*platformMonitoring = PrometheusPlatformMonitoring {
         schema = PrometheusSchema::HTTPS,
         host = "127.0.0.1",
         port = 9090,
         running = false,
         exporterPort = -1
-    };
+    };*/
     
     // ------------------------- UI -------------------------------
     
