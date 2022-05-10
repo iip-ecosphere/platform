@@ -52,7 +52,7 @@ public abstract class AbstractMonitoringReceiverTest {
         /**
          * Stops the receiver.
          */
-        public void stop();        
+        public void stop();
     }
     
     /**

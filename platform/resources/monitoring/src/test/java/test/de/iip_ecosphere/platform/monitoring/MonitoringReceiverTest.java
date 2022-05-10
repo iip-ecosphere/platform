@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
+import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
@@ -132,6 +133,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
          
         @Override
         public void start(TransportSetup transSetup) {
+            MonitoringSetup.getInstance().setTransport(transSetup);
             receiver = new MyReceiver();
             receiver.start();
         }

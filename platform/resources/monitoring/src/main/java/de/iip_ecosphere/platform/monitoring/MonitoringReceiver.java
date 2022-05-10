@@ -26,10 +26,9 @@ import javax.json.stream.JsonParsingException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
-import de.iip_ecosphere.platform.transport.TransportFactory;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -38,13 +37,13 @@ import io.micrometer.core.instrument.Meter;
 
 /**
  * Observes IIP-Ecosphere standard transport channels and prepares the information for feeding it into
- * the monitoring system.
+ * the monitoring system. This class assumes that 
+ * {@link Transport#setTransportSetup(java.util.function.Supplier) Transport}  is set up.
  * 
  * @author Holger Eichelberger, SSE
  */
 public abstract class MonitoringReceiver {
     
-    private TransportConnector conn;
     private Map<String, Exporter> registry = Collections.synchronizedMap(new HashMap<>());
     
     /**
@@ -280,11 +279,8 @@ public abstract class MonitoringReceiver {
     public void start() {
         LoggerFactory.getLogger(MonitoringReceiver.class).info(
             "Connecting to IIP-Ecosphere transport");
-        MonitoringSetup setup = MonitoringSetup.getInstance();
-        TransportParameter tParams = setup.getTransport().createParameter();
-        conn = TransportFactory.createConnector();
+        TransportConnector conn = Transport.createConnector();
         try {
-            conn.connect(tParams);
             conn.setReceptionCallback(StreamNames.STATUS_STREAM, 
                 new StatusReceptionCallback());
             conn.setReceptionCallback(StreamNames.RESOURCE_METRICS, 
@@ -304,15 +300,6 @@ public abstract class MonitoringReceiver {
      * Stops the exporter.
      */
     public void stop() {
-        if (conn != null) {
-            try {
-                conn.disconnect();
-            } catch (Exception e) {
-                LoggerFactory.getLogger(MonitoringReceiver.class).warn(
-                    "Disconnecting from IIP-Ecosphere transport: {}", e.getMessage());
-            }
-            conn = null;
-        }
     }
 
     // checkstyle: resume exception type check
