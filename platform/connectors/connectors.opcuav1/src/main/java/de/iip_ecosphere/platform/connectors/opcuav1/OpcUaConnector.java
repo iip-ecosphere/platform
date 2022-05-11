@@ -17,8 +17,13 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.security.Key;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -39,6 +44,7 @@ import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
 import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.Stack;
@@ -72,6 +78,7 @@ import org.eclipse.milo.opcua.stack.core.types.structured.SimpleAttributeOperand
 import org.eclipse.milo.opcua.stack.core.types.structured.UserIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.UserNameIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.X509IdentityToken;
+import org.eclipse.milo.opcua.stack.core.util.EndpointUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,13 +194,24 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         super(selector, adapter);
         configureModelAccess(new OpcUaModelAccess());
     }
+
+    /**
+     * Construct the endpoint URL.
+     * 
+     * @param params the connector parameters
+     * @return the endpoint URL
+     */
+    private String getEndpointUrl(ConnectorParameter params) {
+        return "opc." + params.getSchema().toUri() + params.getHost() + ":" + params.getPort() 
+            + "/" + params.getEndpointPath();
+    }
     
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == client) {
             this.params = params;
-            String endpointURL = "opc." + params.getSchema().toUri() + params.getHost() + ":" + params.getPort() 
-                + "/" + params.getEndpointPath();
+            String endpointURL = getEndpointUrl(params);
+            LOGGER.info("OPC UA connecting to {}", endpointURL);
             try {
                 client = OpcUaClient.create(
                     endpointURL,
@@ -203,7 +221,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     configBuilder -> configure(configBuilder).build()
                  );
                 client.connect().get();
-                LOGGER.info("OPC UA connected to " + endpointURL);
+                LOGGER.info("OPC UA connected to {}", endpointURL);
             } catch (UaException | InterruptedException | ExecutionException e) { // also for interrupted
                 client = null;
                 throw new IOException(e);
@@ -233,6 +251,16 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             .setApplicationUri(params.getApplicationId())
             .setIdentityProvider(getIdentityProvider(params))
             .setRequestTimeout(uint(params.getRequestTimeout()));
+
+        try {        
+            List<EndpointDescription> endpoints = DiscoveryClient.getEndpoints(getEndpointUrl(params)).get();        
+            EndpointDescription configEndpoint = EndpointUtil.updateUrl(endpoints.get(0), 
+                params.getHost(), params.getPort());
+            LOGGER.info("Configured for security policy {}", configEndpoint.getSecurityPolicyUri());
+            configBuilder.setEndpoint(configEndpoint);        
+        } catch (ExecutionException | InterruptedException e) {
+            LOGGER.info("Cannot adjust endpoint of {}. Staying with original.", getEndpointUrl(params));
+        }
         if (null != params.getKeystore()) {
             try {
                 KeyStore keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
@@ -244,16 +272,29 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                         // ignore, alias == null
                     }
                 }
+
                 if (null != alias) {
                     Certificate cert = keystore.getCertificate(alias);
                     if (cert instanceof X509Certificate) {
                         configBuilder.setCertificate((X509Certificate) cert);
+                        try {                
+                            Key key = keystore.getKey(alias, params.getKeystorePassword().toCharArray());
+                            if (key instanceof PrivateKey) {
+                                configBuilder.setKeyPair(new KeyPair(cert.getPublicKey(), (PrivateKey) key));
+                            } else {
+                                configBuilder.setKeyPair(new KeyPair(cert.getPublicKey(), null)); // unsure, shall work
+                            }
+                        } catch (UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                            LOGGER.error("Cannot read private key alias '{}': {}: Trying without TLS.", alias, 
+                                e.getMessage());
+                        }                    
                     } else {
                         LOGGER.error("Certificate for alias '{}' is not of type X509. Trying without TLS.", alias);
                     }
                 } else {
                     LOGGER.error("No certificate found, no alias given. Trying without TLS.");
                 }
+
             } catch (IOException | KeyStoreException e) {
                 LOGGER.error("Cannot read from keystore '{}': {} Trying without TLS.", 
                     params.getKeystore(), e.getMessage());
