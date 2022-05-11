@@ -16,15 +16,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.security.KeyFactory;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -47,7 +54,7 @@ public class SslUtils {
     /**
      * Denotes the PCKS12 keystore type.
      */
-    public static final String KEYSTORE_PCKS12 = "PCKS12";
+    public static final String KEYSTORE_PCKS12 = "PKCS12";
     
     /**
      * Denotes the Sun X509 trust manager implementation.
@@ -247,6 +254,49 @@ public class SslUtils {
             }
         }
         return kms;
+    }
+
+    /**
+     * Reads a public key file logging exceptions.
+     * 
+     * @param file the file
+     * @param algorithm the algorithm to use to read the file into a public key structure
+     * @return the public key, <b>null</b> if no key was read
+     */
+    public static PublicKey readPublicKeySafe(File file, String algorithm) {
+        PublicKey result;
+        try {
+            result = readPublicKey(file, algorithm);
+        } catch (IOException e) {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Reads a public key file.
+     * 
+     * @param file the file
+     * @param algorithm the algorithm to use to read the file into a public key structure
+     * @return the public key
+     * @throws IOException if something goes wrong, in particular I/O
+     */
+    public static PublicKey readPublicKey(File file, String algorithm) throws IOException {
+        try {
+            String key = new String(Files.readAllBytes(file.toPath()), Charset.defaultCharset());
+    
+            String publicKeyPEM = key
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replaceAll("\r", "").replaceAll("\n", "")
+                .replace("-----END PUBLIC KEY-----", "");
+            byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
+    
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+            return keyFactory.generatePublic(keySpec);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            throw new IOException(e);
+        }
     }
     
 }
