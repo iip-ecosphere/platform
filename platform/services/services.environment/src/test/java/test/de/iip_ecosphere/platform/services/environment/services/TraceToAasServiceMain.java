@@ -267,13 +267,13 @@ public class TraceToAasServiceMain {
 
         int[] img = new int[] {128, 128, 64, 12, 0, 8};
         TraceToAasServiceMain.MyData data = new TraceToAasServiceMain.MyData(img);
-        Transport.sendTraceRecord(new TraceRecord("source", "sending", data));
+        Transport.sendTraceRecord(new TraceRecord("source", TraceRecord.ACTION_SENDING, data));
         TimeUtils.sleep(700);
-        Transport.sendTraceRecord(new TraceRecord("rtsa", "receiving", data));
+        Transport.sendTraceRecord(new TraceRecord("rtsa", TraceRecord.ACTION_RECEIVING, data));
         TimeUtils.sleep(700); 
-        Transport.sendTraceRecord(new TraceRecord("rtsa", "sending", data));
+        Transport.sendTraceRecord(new TraceRecord("rtsa", TraceRecord.ACTION_SENDING, data));
         TimeUtils.sleep(1500);
-        Transport.sendTraceRecord(new TraceRecord("receiver", "receiving", data));
+        Transport.sendTraceRecord(new TraceRecord("receiver", TraceRecord.ACTION_RECEIVING, data));
         TimeUtils.sleep(700); 
         
         System.out.println("Messages sent. Waiting until CTRL-C.");
