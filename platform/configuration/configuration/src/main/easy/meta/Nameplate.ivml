@@ -36,6 +36,17 @@ project Nameplate {
         }
     };
 
+    Manufacturer manufacturer_l3s = {
+        manufacturerName = "Universitaet Hannover@de",
+        manufacturerLogo = "SSE-Logo.png",
+        address = {
+            department = "Forschungszentrum L3S@de",
+            street = "Appelstraße 9a@de",
+            zipCode = "30167@de",
+            cityTown = "Hannover@de"
+        }
+    };
+
     Manufacturer manufacturer_rapidminer = {
         manufacturerName = "RapidMiner Germany@de",
         manufacturerLogo = "",

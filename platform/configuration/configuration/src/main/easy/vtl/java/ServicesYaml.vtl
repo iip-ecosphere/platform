@@ -21,4 +21,31 @@ template ServicesYaml(Configuration config, FileArtifact target) {
         }
     }
     
+    def generateServiceNameplateInfo(Service s) {
+        if (isDefined(s.nameplateInfo) and s.nameplateInfo <> null) {
+            '- id: ${s.id}
+              name: ${s.name}
+              version: ${s.ver}
+              description: ${s.description}
+              ${generateNameplateInfoSetup(s.nameplateInfo, "", 0)|e}'
+        } else {
+            ''
+        }
+    }
+    
+    def generateForService(Service s) {
+        generateServiceNameplateInfo(s);
+    }
+    
+    def generateForService(ServiceFamily family) {
+        '- id: ${family.id}
+          name: ${family.name}
+          version: 
+          description: 
+          ${generateNameplateInfoSetup(family.nameplateInfo, "", 0)|e}'
+        for (Service m: family.members) {
+            generateServiceNameplateInfo(m);
+        }
+    }
+    
 }
