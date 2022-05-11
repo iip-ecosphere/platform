@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils.ResourceResolver;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
@@ -59,7 +60,28 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
     
     private static final String MAVEN_SNAPSHOT_POSTFIX = "-SNAPSHOT";
+    private static ResourceResolver imageResolver = AasUtils.CLASSPATH_RESOURCE_RESOLVER;
     
+    /**
+     * Changes the image resolver. [public for testing]
+     * 
+     * @param resolver the resolver
+     */
+    public static void setImageResolver(ResourceResolver resolver) {
+        if (null != resolver) {
+            imageResolver = resolver;
+        }
+    }
+
+    /**
+     * Returns the image resolver. [public for testing]
+     * 
+     * @return the image resolver
+     */
+    public static ResourceResolver getImageResolver() {
+        return imageResolver;
+    }
+
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
@@ -145,10 +167,10 @@ public class PlatformAas implements AasContributor {
      */
     public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
         SubmodelBuilder sBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
-        AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
+        AasUtils.resolveImage(appSetup.getProductImage(), imageResolver, true, (n, r, m) -> {
             sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m).build();
         });
-        AasUtils.resolveImage(appSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, (n, r, m) -> {
+        AasUtils.resolveImage(appSetup.getManufacturerLogo(), imageResolver, true, (n, r, m) -> {
             sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m).build();
         });
         sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
