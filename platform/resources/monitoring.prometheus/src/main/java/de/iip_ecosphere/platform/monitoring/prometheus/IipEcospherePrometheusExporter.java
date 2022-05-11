@@ -89,6 +89,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             webapps = new File(home, "webapps");
             webapps.mkdirs();
             context = server.addContext(server.getHost(), "", "");
+            server.getHost().setAppBase(".");
             server.start();
         } catch (Exception  e) {
             LoggerFactory.getLogger(getClass()).error("Starting prometheus export endpoint: {}", e.getMessage());
@@ -191,10 +192,11 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             entry = new ScrapeEndpoint(id, new Endpoint(Schema.HTTP, port, path));
             Context ctx = contexts.get(id);
             if (null != ctx) {
-                ctx = server.addContext(path, "");
+                ctx = server.addContext(server.getHost(), path, "");
                 contexts.put(id, context);
             }
             Tomcat.addServlet(ctx, id, servlet);
+            ctx.addServletMappingDecoded("/" + id + "/*", id);
         }
         
         /**
