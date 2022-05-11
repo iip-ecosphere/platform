@@ -146,7 +146,8 @@ public class AasxDeviceAasProvider extends DeviceAasProvider {
             if (f.exists()) {
                 url = f.toURI().toURL();
             } else {
-                url = loader.getResource(Id.getDeviceIdAas() + ".aasx");
+                LoggerFactory.getLogger(AasxDeviceAasProvider.class).info("Checking AAS for id {}", Id.getDeviceId());
+                url = loader.getResource(Id.getDeviceId().toUpperCase() + ".aasx");
             }
         }
         if (null != url) {

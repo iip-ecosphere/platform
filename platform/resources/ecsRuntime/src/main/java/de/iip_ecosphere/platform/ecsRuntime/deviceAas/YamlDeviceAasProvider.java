@@ -156,7 +156,8 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
             try {
                 is = new FileInputStream("src/test/resources/nameplate.yml");
             } catch (IOException e) {
-                is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(Id.getDeviceIdAas() + ".yml");
+                LoggerFactory.getLogger(YamlDeviceAasProvider.class).info("Checking AAS for id {}", Id.getDeviceId());
+                is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(Id.getDeviceId().toUpperCase() + ".yml");
             }
         }
         return AbstractSetup.readFromYaml(NameplateSetup.class, is); // closes is
