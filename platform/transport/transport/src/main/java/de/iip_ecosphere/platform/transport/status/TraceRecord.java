@@ -25,6 +25,9 @@ import de.iip_ecosphere.platform.transport.streams.StreamNames;
 public class TraceRecord {
 
     public static final String TRACE_STREAM = StreamNames.TRACE_STREAM;
+    public static final String ACTION_RECEIVING = "receiving";
+    public static final String ACTION_SENDING = "sending";
+    public static final String ACTION_PARAMETER_CHANGE = "paramChange";
 
     private String source;
     private long timestamp;
