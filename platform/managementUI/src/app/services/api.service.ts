@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformData, PlatformResources, PlatformServices } from 'src/interfaces';
+import { PlatformResources, PlatformServices } from 'src/interfaces';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -12,7 +12,7 @@ export class ApiService {
   constructor(public http: HttpClient) { }
 
   ip = environment.ip;
-  urlPart = environment.urlPart;
+  urn = environment.urn;
 
   resources: PlatformResources = {};
   services: any;
@@ -28,10 +28,15 @@ export class ApiService {
     return Data;
   }
 
+  public async getArtifacts() {
+    const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformResources;
+    return Data;
+  }
+
   private async getData(url: string) {
     let Data;
     try {
-      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urlPart + '/' + url));
+      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
       console.log(Data);
     } catch(e) {
       console.log(e);

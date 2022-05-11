@@ -10,7 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatCardModule} from '@angular/material/card';
 import {MatTabsModule} from '@angular/material/tabs';
-
+import {MatButtonModule} from '@angular/material/button';
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
 import { ServicesComponent } from './components/services/services.component';
@@ -33,7 +33,8 @@ import { TidyPipe } from './pipes/tidy.pipe';
     BrowserAnimationsModule,
     MatToolbarModule,
     MatCardModule,
-    MatTabsModule
+    MatTabsModule,
+    MatButtonModule,
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS, useClass: Interceptor, multi: true

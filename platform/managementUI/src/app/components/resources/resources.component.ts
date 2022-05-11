@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlatformResources } from 'src/interfaces';
 
@@ -14,6 +13,7 @@ export class ResourcesComponent implements OnInit {
   constructor(public http: HttpClient, public api: ApiService) { }
 
   Data: PlatformResources = {};
+  Artifacts: PlatformResources = {};
 
   ngOnInit(): void {
     this.getData();
@@ -21,6 +21,17 @@ export class ResourcesComponent implements OnInit {
 
   public async getData() {
     this.Data = await this.api.getResources();
+  }
+
+  public async getArtifacts() {
+    this.Artifacts = await this.api.getArtifacts();
+  }
+
+  public isArray(value: any) {
+    console.log( value );
+    const bo = Array.isArray(value);
+    console.log(bo);
+    return bo;
   }
 
 }
