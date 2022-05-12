@@ -170,6 +170,7 @@ project Connectors {
        
        NonEmptyString host = "localhost";
        Port port;
+       Integer samplingPeriod = 0; // no sampling by default
 
        output.size() < 2;
        input.size() < 2;

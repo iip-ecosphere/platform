@@ -164,11 +164,18 @@ project Services {
 
    abstract compound Dependency {
    }
-
+   
    // must be installed on system level
    // Instantiation shall create installedDependencies.yml with this key and install path!
    compound SystemDependency refines Dependency {
        String key; 
+   }
+
+   // preliminary, to record that
+   compound LinuxCommandBasedSystemDependency refines SystemDependency {
+       sequenceOf(String) downloads = {};
+       sequenceOf(String) installCommands = {};
+       sequenceOf(String) bashSetups = {};
    }
       
    // ------------------------------ Java services -------------------------------
