@@ -28,9 +28,7 @@ export class ResourcesComponent implements OnInit {
   }
 
   public isArray(value: any) {
-    console.log( value );
     const bo = Array.isArray(value);
-    console.log(bo);
     return bo;
   }
 
