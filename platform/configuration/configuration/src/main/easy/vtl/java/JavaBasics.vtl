@@ -49,6 +49,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String toTypeName(EnumType type) {
         asTypeName(type.name);
     }
+
+    def String toTypeName(ShortTypeType type) {
+        "short";
+    }
     
     def String toTypeName(IntegerTypeType type) {
         "int";

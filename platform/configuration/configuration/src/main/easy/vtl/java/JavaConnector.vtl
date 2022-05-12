@@ -239,6 +239,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        String p;
        if (optWithStepIn) {
            p = field.name;
+           if (nestedStepCount == 0 and topPath <> "") {
+               p = topPath + "/" + p;
+           }
        } else {
            p = path + "/" + field.name;
        }

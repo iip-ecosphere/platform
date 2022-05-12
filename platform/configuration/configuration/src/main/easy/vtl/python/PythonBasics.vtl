@@ -41,6 +41,10 @@ template PythonBasics(Configuration config, FileArtifact target) {
     def String toTypeName(PrimitiveType type) {
         type.name; // fallback
     }
+
+    def String toTypeName(ShortTypeType type) {
+        "int";
+    }
     
     def String toTypeName(IntegerTypeType type) {
         "int";

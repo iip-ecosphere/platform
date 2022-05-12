@@ -300,6 +300,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def convName(PrimitiveType type) {
         "/* NOT DEFINED */"
     }
+
+    def convName(ShortTypeType type) {
+        "Short"
+    }
     
     def convName(IntegerTypeType type) {
         "Integer"

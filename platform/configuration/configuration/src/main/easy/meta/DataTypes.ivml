@@ -71,6 +71,12 @@ project DataTypes {
         name = "Integer"
     };
 
+    compound ShortTypeType refines PrimitiveType {
+    }
+    ShortTypeType ShortType = {
+        name = "Short"
+    };
+
     compound UInt16TypeType refines PrimitiveType {
     }
     UInt16TypeType UInt16Type = {
