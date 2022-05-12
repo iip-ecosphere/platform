@@ -51,6 +51,20 @@ public class IdentityToken {
         }
         
         /**
+         * Creates an untyped token that must be filled by {@link #setIssuedToken(byte[], String)}, 
+         * {@link #setUsernameToken(String, byte[], String)}, or {@link #setX509Token(byte[])}. This also works
+         * via {@link #newBuilder(String, String, byte[])} but without already passing data.
+         * 
+         * @return the builder instance
+         */
+        public static IdentityTokenBuilder newBuilder() {
+            IdentityTokenBuilder builder = new IdentityTokenBuilder();
+            builder.token = new IdentityToken(null, null, null);
+            builder.token.type = TokenType.ANONYMOUS;
+            return builder;
+        }
+        
+        /**
          * Creates an {@link TokenType#ANONYMOUS anonymous} identity token.
          *
          * @param tokenPolicyId the token policy id
