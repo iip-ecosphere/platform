@@ -17,6 +17,7 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -40,6 +41,7 @@ import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
 import org.eclipse.milo.opcua.sdk.client.api.identity.SignedIdentityToken;
+import org.eclipse.milo.opcua.sdk.client.api.identity.UsernameProvider;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaNode;
@@ -87,6 +89,7 @@ import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.IdentityToken;
+import de.iip_ecosphere.platform.connectors.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
@@ -302,6 +305,63 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
         return configBuilder;
     }
+
+    /**
+     * Returns the id token for an endpoint URL considering {@link ConnectorParameter#ANY_ENDPOINT}.
+     * 
+     * @param endpointUrl the endpoint URL
+     * @return the identity token
+     */
+    private IdentityToken getIdToken(String endpointUrl) {
+        IdentityToken idToken = params.getIdentityToken(endpointUrl);
+        if (null == idToken) {
+            idToken = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
+        }
+        return idToken;
+    }
+    
+    /**
+     * A fallback identity provider.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class FallbackIdentityProder implements IdentityProvider {
+        
+        @Override
+        public SignedIdentityToken getIdentityToken(EndpointDescription endpoint, ByteString serverNonce) 
+            throws Exception {
+            SignedIdentityToken token = null;
+            IdentityToken idToken = getIdToken(endpoint.getEndpointUrl());
+            if (null != idToken) {
+                UserIdentityToken uiToken;
+                switch (idToken.getType()) {
+                case ISSUED:
+                    uiToken = new IssuedIdentityToken(idToken.getTokenPolicyId(), 
+                        new ByteString(idToken.getTokenData()), 
+                        idToken.getTokenEncryptionAlgorithm());
+                    break;
+                case USERNAME:
+                    uiToken = new UserNameIdentityToken(idToken.getTokenPolicyId(), idToken.getUserName(), 
+                        new ByteString(idToken.getTokenData()), idToken.getTokenEncryptionAlgorithm());
+                    break;
+                case X509:
+                    uiToken = new X509IdentityToken(idToken.getTokenPolicyId(), 
+                        new ByteString(idToken.getTokenData()));
+                    break;
+                default: // including ANONYMOUS
+                    uiToken = new AnonymousIdentityToken(idToken.getTokenPolicyId());
+                    break;
+                }
+                
+                token = new SignedIdentityToken(uiToken, new SignatureData(idToken.getSignatureAlgorithm(), 
+                    new ByteString(idToken.getSignature())));
+            } else {
+                throw new Exception("No token information configured"); 
+            }
+            return token;
+        }
+
+    }
     
     /**
      * Returns the identity provider by translating the token information in {@code params} to Milo specific token 
@@ -315,45 +375,13 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         if (params.isAnonymousIdentity()) {
             identityProvider = new AnonymousProvider();
         } else { 
-            identityProvider = new IdentityProvider() {
-                
-                @Override
-                public SignedIdentityToken getIdentityToken(EndpointDescription endpoint, ByteString serverNonce) 
-                    throws Exception {
-                    IdentityToken idToken = params.getIdentityToken(endpoint.getEndpointUrl());
-                    if (null == idToken) {
-                        idToken = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
-                    }
-                    SignedIdentityToken token = null;
-                    if (null != idToken) {
-                        UserIdentityToken uiToken;
-                        switch (idToken.getType()) {
-                        case ISSUED:
-                            uiToken = new IssuedIdentityToken(idToken.getTokenPolicyId(), 
-                                new ByteString(idToken.getTokenData()), 
-                                idToken.getTokenEncryptionAlgorithm());
-                            break;
-                        case USERNAME:
-                            uiToken = new UserNameIdentityToken(idToken.getTokenPolicyId(), idToken.getUserName(), 
-                                new ByteString(idToken.getTokenData()), idToken.getTokenEncryptionAlgorithm());
-                            break;
-                        case X509:
-                            uiToken = new X509IdentityToken(idToken.getTokenPolicyId(), 
-                                new ByteString(idToken.getTokenData()));
-                            break;
-                        default: // including ANONYMOUS
-                            uiToken = new AnonymousIdentityToken(idToken.getTokenPolicyId());
-                            break;
-                        }
-                        
-                        token = new SignedIdentityToken(uiToken, new SignatureData(idToken.getSignatureAlgorithm(), 
-                            new ByteString(idToken.getSignature())));
-                    } else {
-                        throw new Exception("No token information configured"); 
-                    }
-                    return token;
-                }
-            };
+            IdentityToken idToken = getIdToken(getEndpointUrl(params));
+            if (TokenType.USERNAME == idToken.getType()) {
+                String pw = new String(idToken.getTokenData(), StandardCharsets.UTF_8);
+                identityProvider = new UsernameProvider(idToken.getUserName(), pw);
+            } else {
+                identityProvider = new FallbackIdentityProder();
+            }
         }
         return identityProvider;
     }
