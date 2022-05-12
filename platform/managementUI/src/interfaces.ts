@@ -54,3 +54,16 @@ export interface ServiceValueEntry {
 export interface PlatformData {
   value?: any[];
 }
+
+export interface DeviceSubmodel {
+  submodelElements: {
+    GeneralInformation: {
+      value: {
+        ManufacturerLogo: {
+          mimeType: string;
+          value: string;
+        }
+      }
+    }
+  }
+}

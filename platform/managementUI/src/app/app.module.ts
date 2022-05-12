@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 
@@ -16,6 +16,7 @@ import { ContainersComponent } from './components/containers/containers.componen
 import { ServicesComponent } from './components/services/services.component';
 import { ConnectorTypesComponent } from './components/connector-types/connector-types.component';
 import { TidyPipe } from './pipes/tidy.pipe';
+import { EnvConfigService } from './services/env-config.service';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,16 @@ import { TidyPipe } from './pipes/tidy.pipe';
     MatButtonModule,
   ],
   providers: [{
-    provide:HTTP_INTERCEPTORS, useClass: Interceptor, multi: true
+    provide:HTTP_INTERCEPTORS,
+    useClass: Interceptor,
+    multi: true,
+    },
+    {
+    provide: APP_INITIALIZER,
+    useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.load(),
+    deps: [EnvConfigService],
+    multi: true,
+
   }],
   bootstrap: [AppComponent]
 })

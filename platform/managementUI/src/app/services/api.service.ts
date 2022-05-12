@@ -3,16 +3,29 @@ import { Injectable } from '@angular/core';
 import { PlatformResources, PlatformServices } from 'src/interfaces';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { EnvConfigService } from './env-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  constructor(public http: HttpClient) { }
-
   ip = environment.ip;
   urn = environment.urn;
+
+  constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
+    const env = envConfigService.getEnv();
+
+    if(env && env.ip) {
+      this.ip = env.ip;
+    }
+    if (env && env.urn) {
+      this.urn = env.urn;
+    }
+
+   }
+
+
 
   resources: PlatformResources = {};
   services: any;
