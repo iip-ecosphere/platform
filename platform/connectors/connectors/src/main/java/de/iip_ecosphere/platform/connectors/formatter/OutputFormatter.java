@@ -78,6 +78,15 @@ public interface OutputFormatter<T> {
         public T fromString(String data) throws IOException;
 
         /**
+         * Converts data from short to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromShort(short data) throws IOException;
+
+        /**
          * Converts data from double to the output format.
          * 
          * @param data the data

@@ -36,6 +36,11 @@ public class ConverterToString implements OutputConverter<String> {
     }
 
     @Override
+    public String fromShort(short data) throws IOException {
+        return Short.toString(data);
+    }
+
+    @Override
     public String fromString(String data) throws IOException {
         return data;
     }

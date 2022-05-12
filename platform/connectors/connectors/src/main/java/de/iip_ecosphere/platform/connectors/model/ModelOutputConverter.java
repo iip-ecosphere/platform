@@ -47,6 +47,11 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     }
 
     @Override
+    public Object fromShort(short data) throws IOException {
+        return data;
+    }
+
+    @Override
     public Object fromString(String data) throws IOException {
         return data;
     }

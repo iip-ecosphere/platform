@@ -50,6 +50,11 @@ public class ModelInputConverter implements InputConverter<Object> {
     }
 
     @Override
+    public short toShort(Object data) throws IOException {
+        return (short) data;
+    }
+
+    @Override
     public String toString(Object data) throws IOException {
         return null != data ? data.toString() : null;
     }

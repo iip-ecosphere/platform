@@ -54,6 +54,11 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         }
 
         @Override
+        public IOConsumer<JsonGenerator> fromShort(short data) throws IOException {
+            return g -> g.writeNumber(data);
+        }
+
+        @Override
         public IOConsumer<JsonGenerator> fromDouble(double data) throws IOException {
             return g -> g.writeNumber(data);
         }

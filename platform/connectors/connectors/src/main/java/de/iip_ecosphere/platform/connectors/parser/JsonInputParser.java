@@ -366,6 +366,15 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
+        public short toShort(Any data) throws IOException {
+            try {
+                return (short) data.toInt();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
+        }
+
+        @Override
         public String toString(Any data) throws IOException {
             try {
                 return data.toString();

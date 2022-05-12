@@ -203,6 +203,15 @@ public interface InputParser<T> {
         public long toLong(T data) throws IOException;
 
         /**
+         * Converts parsed data returned by {@link ParseResult} to short.
+         * 
+         * @param data the obtained data
+         * @return the converted long
+         * @throws IOException if conversion fails
+         */
+        public short toShort(T data) throws IOException;
+
+        /**
          * Converts parsed data returned by {@link ParseResult} to String.
          * 
          * @param data the obtained data

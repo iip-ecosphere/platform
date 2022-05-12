@@ -60,6 +60,15 @@ public class ConverterFromString implements InputConverter<String> {
     }
 
     @Override
+    public short toShort(String data) throws IOException {
+        try {
+            return Short.parseShort(data);
+        } catch (NumberFormatException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
     public float toFloat(String data) throws IOException {
         try {
             return Float.parseFloat(data);
