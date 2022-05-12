@@ -321,6 +321,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 public SignedIdentityToken getIdentityToken(EndpointDescription endpoint, ByteString serverNonce) 
                     throws Exception {
                     IdentityToken idToken = params.getIdentityToken(endpoint.getEndpointUrl());
+                    if (null == idToken) {
+                        idToken = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
+                    }
                     SignedIdentityToken token = null;
                     if (null != idToken) {
                         UserIdentityToken uiToken;
