@@ -16,9 +16,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServlet;
@@ -50,7 +47,6 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
     private Tomcat server;
     private Context context;
     private Supplier<ConfigModifier> modifier;
-    private Map<String, Context> contexts = Collections.synchronizedMap(new HashMap<>());
     private int port;
     private File webapps;
     
@@ -190,13 +186,8 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             String id = getId();
             String path = "/" + id;
             entry = new ScrapeEndpoint(id, new Endpoint(Schema.HTTP, port, path));
-            Context ctx = contexts.get(id);
-            if (null != ctx) {
-                ctx = server.addContext(server.getHost(), path, "");
-                contexts.put(id, context);
-            }
-            Tomcat.addServlet(ctx, id, servlet);
-            ctx.addServletMappingDecoded("/" + id + "/*", id);
+            Tomcat.addServlet(context, id, servlet);
+            context.addServletMappingDecoded("/" + id + "/*", id);
         }
         
         /**
