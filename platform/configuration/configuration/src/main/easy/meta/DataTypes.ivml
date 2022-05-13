@@ -195,6 +195,17 @@ project DataTypes {
     // return type of specified field via dynamic dispatch access
     def refTo(DataType) type(DataType type, Integer index) = 
         field(type, index).type;
+        
+    // ------------------------------ security (preliminary) --------------------------------------
+
+    // might be split up, with alternatives    
+    compound SecuritySettings {
+        NonEmptyString keystore; 
+        NonEmptyString keyAlias; 
+        NonEmptyString keystorePasswordKey; // key in identityStore
+        NonEmptyString authenticationKey;
+        Boolean hostNameVerification = false;        
+    } 
     
     // -------------------------------- freeze fixed stuff ----------------------------------------
     

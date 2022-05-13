@@ -356,6 +356,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineOutputTranslator(Connector conn) {
         clearTemporaryVariables();
+        Boolean useNotifications = conn.samplingPeriod > 0;
         cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.inAdapterClass.length() == 0) {
             setAdd(config);
@@ -376,9 +377,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         
             @Override
             public void initializeModelAccess() throws IOException {
-                //ModelAccess access = getModelAccess();
-                //access.useNotifications(withNotifications);
-                //customizer.initializeModelAccess(access, withNotifications);
+                ModelAccess access = getModelAccess();
+                access.useNotifications(${useNotifications});
             }
         
             @Override
@@ -478,11 +478,50 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         * @return the instance to be passed to the connector
         */
         public static ConnectorParameter createConnectorParameter() {
+            ${generateConnectorParamSecurityDecls(conn)|e}
             return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder("${conn.host}", ${conn.port})
                 .setApplicationInformation("${app.id}", "${app.description}")
+                ${generateConnectorParamSecuritySettings(conn)|e}
+                ${generateNotificationInterval(conn)|e}
                 .build();
         }'
+    }
+    
+    def generateNotificationInterval(Connector conn) {
+        if (conn.samplingPeriod > 0) {
+            '.setNotificationInterval(${conn.samplingPeriod})'
+        }
+    }
+    
+    def generateConnectorParamSecurityDecls(Connector conn) {
+        if (conn.security <> null) {
+            SecuritySettings sec = conn.security;
+            if (sec.authenticationKey <> "") {
+                'Map<String, IdentityToken> identities = new HashMap<>();
+                IdentityToken tok = IdentityStore.getInstance().getToken("${conn.host}:${conn.port}", true); 
+                identities.put(ConnectorParameter.ANY_ENDPOINT, tok);'
+            }
+            if (sec.keystorePasswordKey <> "") {
+                'IdentityToken kTok = IdentityStore.getInstance().getToken("${sec.keystorePasswordKey}", true);' 
+            }
+        }
+    }
+    
+    def generateConnectorParamSecuritySettings(Connector conn) {
+        if (conn.security <> null) {
+            SecuritySettings sec = conn.security;
+            if (sec.authenticationKey <> "") {
+                '.setIdentities(identities)'
+            }
+            if (sec.keystore <> "") {
+                '.setKeystore(new File("${sec.keystore}"), kTok.getTokenDataAsString())'
+            }
+            if (sec.keyAlias <> "") {
+                '.setKeyAlias("${sec.keyAlias}")'
+            }
+            '.setHostnameVerification(${sec.hostNameVerification})'
+        }
     }
 
 }
