@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.net;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -87,7 +88,8 @@ public class SslUtils {
     }
 
     /**
-     * Opens a keystore {@code store}.
+     * Opens a keystore {@code store}. Tries to load the keystore from {@code store} first interpreting store as
+     * class path, resource name then as actual file name.
      * 
      * @param store the store file (JKS or PKCS12 with file extension ".p12")
      * @param storePass the password of the store, may be <b>null</b> for none
@@ -100,7 +102,10 @@ public class SslUtils {
             try {
                 String keystoreType = getKeystoreType(store);
                 tks = KeyStore.getInstance(keystoreType);
-                FileInputStream stream = new FileInputStream(store); 
+                InputStream stream = SslUtils.class.getClassLoader().getResourceAsStream(store.toString());
+                if (null == stream) {
+                    stream = new FileInputStream(store);    
+                }
                 tks.load(stream, null == storePass ? null : storePass.toCharArray());
                 stream.close();
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {

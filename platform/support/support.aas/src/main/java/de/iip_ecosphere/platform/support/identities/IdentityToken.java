@@ -217,6 +217,15 @@ public class IdentityToken {
     }
 
     /**
+     * The token data as String, for all token types except for {@link TokenType#ANONYMOUS}.
+     * 
+     * @return the token data as String, may be <b>null</b> for wrong token type
+     */
+    public String getTokenDataAsString() {
+        return null == tokenData ? null : new String(tokenData);
+    }
+
+    /**
      * The token encryption algorithm, for {@link TokenType#ISSUED} or {@link TokenType#USERNAME}.
      * 
      * @return the token encryption algorithm, may be <b>null</b> for wrong token type
