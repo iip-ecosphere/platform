@@ -50,6 +50,8 @@ import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
     
+    test.de.iip_ecosphere.platform.support.identities.AllTests.class,
+    
     // non-generic AAS 
     LangStringTest.class
 })

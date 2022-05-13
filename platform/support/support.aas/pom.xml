@@ -4,7 +4,7 @@
 
  <artifactId>support.aas</artifactId>
   <name>support AAS abstraction</name>
-  <description>The IIP-Ecosphere AAS abstraction.</description>
+  <description>The IIP-Ecosphere AAS abstraction and basic utilities.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -13,6 +13,12 @@
   </parent>
 
   <dependencies>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <scope>compile</scope>
+    </dependency>
+  
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

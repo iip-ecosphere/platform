@@ -1,0 +1,21 @@
+identities:
+    axc3151-2: 
+        type: USERNAME
+        userName: abba
+        tokenData: babbab
+        tokenEncryptionAlgorithm: UTF-8
+    aas:
+        type: ANONYMOUS
+    secureStore:
+        type: X509
+        tokenPolicyId: polId
+        signatureAlgorithm: mySigAlg
+        signature: sig-1
+        tokenData: token-1
+    UI:
+        type: ISSUED
+        tokenPolicyId: polId-2
+        signatureAlgorithm: yourSigAlg
+        signature: sig-2
+        tokenData: token
+        tokenEncryptionAlgorithm: bla    
