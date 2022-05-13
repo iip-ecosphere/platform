@@ -17,6 +17,7 @@ import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.
