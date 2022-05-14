@@ -25,6 +25,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path serviceMgrRoot = "${target}/serviceMgr";
     Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
     Path platformRoot = "${target}/platform";
+    Path mgtUiRoot = "${target}/mgtUi";
     Path commonRoot = "${target}/common";
     Path brokerRoot = "${target}/broker";
     String assemblyRel = "src/main/assembly";
@@ -526,6 +527,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
  
         commonRoot.mkdir();
+
+        mgtUiRoot.mkdir();
+        p = "${mgtUiRoot}/iipes-web/assets/config";
+        p.mkdir();
+        vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
         
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
     }
