@@ -356,7 +356,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineOutputTranslator(Connector conn) {
         clearTemporaryVariables();
-        Boolean useNotifications = conn.samplingPeriod > 0;
+        Boolean useNotifications = conn.samplingPeriod <= 0; // else polling
         cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.inAdapterClass.length() == 0) {
             setAdd(config);
