@@ -11,6 +11,22 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             ''
         }
     }
+    
+    def defineJacksonOptionals(RecordType type, String objectMapperVar, String typeName) {
+        sequenceOf(String) fieldNames = type.fields->select(f|f.optional)->collect(f|f.name);
+        if (fieldNames.size() > 0) {
+            String fieldList = "";
+            Boolean first = true;
+            for (String n: fieldNames) {
+                if (not(first)) {
+                    fieldList = fieldList + ", ";
+                }
+                fieldList = fieldList + "\"${n}\"";
+                first = false;
+            }
+            'JsonUtils.defineOptionals(${objectMapperVar}, ${typeName}.class, ${fieldList});'
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
@@ -26,6 +42,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
         
         import java.io.IOException;
         import de.iip_ecosphere.platform.transport.serialization.*;
+        import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
         ${importTypePackage(pkg, typePkg)}
         import com.fasterxml.jackson.databind.ObjectMapper;
         import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +57,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public ${typeName} from(byte[] data) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
+                    ${defineJacksonOptionals(type, "objectMapper", typeName)|e}
                     return objectMapper.readValue(data, ${clsName}${add}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);

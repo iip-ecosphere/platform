@@ -75,7 +75,8 @@ project SerializerConfig1 {
                 type = refBy(IntegerType)
             }, Field {
                 name = "stringField",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                optional = true
             }
         }
     };
