@@ -529,7 +529,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         commonRoot.mkdir();
 
         mgtUiRoot.mkdir();
-        p = "${mgtUiRoot}/iipes-web/assets/config";
+        vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
+        maven("${mgtUiRoot}", true);
+        p = "${mgtUiRoot}/dist/iipes-web/assets/config";
         p.mkdir();
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
         
