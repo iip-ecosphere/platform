@@ -51,8 +51,13 @@ public class YamlIdentityStore extends IdentityStore {
         if (null == in) {
             String storeFolder = System.getProperty("iip.identityStore", ".");
             File f = new File(storeFolder, "identityStore.yml");
+            // for local testing
             if (!f.exists()) {
                 f = new File("src/test/resources/identityStore.yml");
+            }
+            // for local development/deployment preparation
+            if (!f.exists()) {
+                f = new File("src/main/resources/identityStore.yml");
             }
             if (f.exists()) {
                 try {

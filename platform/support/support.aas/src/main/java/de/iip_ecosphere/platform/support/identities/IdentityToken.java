@@ -1,5 +1,7 @@
 package de.iip_ecosphere.platform.support.identities;
 
+import java.nio.charset.Charset;
+
 /**
  * Initial abstraction of a identity token based on Eclipse Milo. Preliminary.
  * 
@@ -222,7 +224,19 @@ public class IdentityToken {
      * @return the token data as String, may be <b>null</b> for wrong token type
      */
     public String getTokenDataAsString() {
-        return null == tokenData ? null : new String(tokenData);
+        String result = null;
+        if (null != tokenData) {
+            for (Charset cs : Charset.availableCharsets().values()) {
+                if (cs.displayName().equals(tokenEncryptionAlgorithm)) {
+                    result = new String(tokenData, cs);
+                    break;
+                }
+            }
+            if (null == result) {
+                result = new String(tokenData);
+            }
+        }
+        return result;
     }
 
     /**
