@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
         <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-mgtUi" pomFile="pom.xml" jarFolder="target" artifactPattern="managementUi-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-mgtUi" pomFile="pom.xml" jarFolder="target" artifactPattern="managementUi-*.*.*.zip" />
 	</target>
 </project>
