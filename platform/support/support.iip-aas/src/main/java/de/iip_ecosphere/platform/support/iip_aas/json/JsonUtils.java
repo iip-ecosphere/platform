@@ -12,8 +12,16 @@
 
 package de.iip_ecosphere.platform.support.iip_aas.json;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
@@ -221,6 +229,55 @@ public class JsonUtils {
         }
 
         return builder.toString();
+    }
+    
+    /**
+     * A handler for optional fields.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class OptionalFieldsDeserializationProblemHandler extends DeserializationProblemHandler {
+
+        private Class<?> cls;
+        private Set<String> optionalFields = new HashSet<String>();
+        
+        /**
+         * Creates an optional fields deserialization problem handler to declare certain fields as optional.
+         * 
+         * @param cls the class the fields are defined on
+         * @param fieldNames the field names
+         */
+        public OptionalFieldsDeserializationProblemHandler(Class<?> cls, String... fieldNames) {
+            this.cls = cls;
+            for (String f : fieldNames) {
+                optionalFields.add(f);
+            }
+        }
+
+        @Override
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser parser,
+            JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName)
+            throws IOException {
+            boolean result;
+            if (optionalFields.contains(propertyName) && beanOrClass.getClass().equals(cls)) {
+                result = true;
+            } else {
+                result = false;
+            }
+            return result;
+        }
+        
+    }
+    
+    /**
+     * Defines the given {@code fieldNames} as optional during deserialization.
+     * 
+     * @param mapper the mapper to define the optionals on
+     * @param cls the cls the class {@code fieldNames} are member of
+     * @param fieldNames the field names (names of Java fields)
+     */
+    public static void defineOptionals(ObjectMapper mapper, Class<?> cls, String... fieldNames) {
+        mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
     }
 
 }

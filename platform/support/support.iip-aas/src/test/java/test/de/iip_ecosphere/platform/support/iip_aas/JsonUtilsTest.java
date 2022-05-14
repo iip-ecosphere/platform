@@ -15,6 +15,9 @@ package test.de.iip_ecosphere.platform.support.iip_aas;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
@@ -89,6 +92,45 @@ public class JsonUtilsTest {
             this.stringValue = stringValue;
         }
         
+    }
+
+    /**
+     * Tests optional values.
+     */
+    @Test
+    public void testOptionals() {
+        String data = "{\"intValue\":\"1\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonUtils.defineOptionals(objectMapper, Data.class, "stringValue");
+        try {
+            Data obj = objectMapper.readValue(data, Data.class);
+            Assert.assertEquals(1, obj.getIntValue());
+            Assert.assertNull(obj.getStringValue());
+        } catch (JsonProcessingException e) {
+            Assert.fail("Shall not occur");
+        }
+
+        data = "{\"stringValue\":\"xyz\"}";
+        objectMapper = new ObjectMapper();
+        JsonUtils.defineOptionals(objectMapper, Data.class, "intValue");
+        try {
+            Data obj = objectMapper.readValue(data, Data.class);
+            Assert.assertEquals(0, obj.getIntValue());
+            Assert.assertEquals("xyz", obj.getStringValue());
+        } catch (JsonProcessingException e) {
+            Assert.fail("Shall not occur");
+        }
+
+        data = "{}";
+        objectMapper = new ObjectMapper();
+        JsonUtils.defineOptionals(objectMapper, Data.class, "stringValue", "intValue");
+        try {
+            Data obj = objectMapper.readValue(data, Data.class);
+            Assert.assertEquals(0, obj.getIntValue());
+            Assert.assertNull(obj.getStringValue());
+        } catch (JsonProcessingException e) {
+            Assert.fail("Shall not occur");
+        }
     }
     
     /**
