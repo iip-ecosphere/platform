@@ -72,7 +72,7 @@
             </goals>
             <configuration>
               <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
-              <destinationFile>${project.build.directory}/${project.name}-${project.version}-bin.zip</destinationFile>
+              <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
             </configuration>
           </execution>
         </executions>
