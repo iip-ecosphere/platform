@@ -56,7 +56,7 @@ public class Monitor extends Transport {
 
             @Override
             public void run() {
-                provider.calculateNonNativeSystemMetrics();
+                provider.calculateMetrics();
                 if (null != getConnector()) {
                     try {
                         getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
