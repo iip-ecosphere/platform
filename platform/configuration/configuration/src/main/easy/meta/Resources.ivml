@@ -94,6 +94,12 @@ project Resources {
         NonEmptyEphemeralPort port = 9090;
         Boolean running = false; // running somewhere else, do we have to start it
         NonEmptyEphemeralPort exporterPort = -1;
+        NonEmptyEphemeralPort alertMgrPort = 9091;
+        Integer scrapeInterval = 1000;
+        Integer scrapeTimeout = 1000;
+        
+        scrapeInterval > 50;
+        scrapeTimeout > 50 and scrapeTimeout < scrapeInterval; // required by Prometheus
    }
    
    // TODO monitoring rules, alerting

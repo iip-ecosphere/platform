@@ -347,6 +347,8 @@ project SerializerConfig1Old {
         sharedArtifact;
         platformMonitoring; // preliminary no monitoring
         managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

@@ -51,7 +51,10 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
             host: ${mon.host}
             port: ${mon.port}
             running: ${mon.running}
-        prometheusExporterPort: ${mon.exporterPort}'
+        prometheusExporterPort: ${mon.exporterPort}
+        prometheusAlertMgrPort: ${mon.alertMgrPort}
+        prometheusScrapeInterval: ${mon.scrapeInterval}
+        prometheusScrapeTimeout: ${mon.scrapeTimeout}'
     }
 
     def main(IIPEcosphere config, FileArtifact target) {
@@ -61,6 +64,8 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
         produceNetMgr(config);
         produceDevMgt(config);
         produceCentralMonitoring(config);
+        'artifactsFolder: ${config.artifactsFolder}
+        artifactsUriPrefix: ${config.artifactsUriPrefix}'
     }
 
 }

@@ -186,6 +186,8 @@ project ContainerCreation {
         sharedArtifact;
         platformMonitoring;
         managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
