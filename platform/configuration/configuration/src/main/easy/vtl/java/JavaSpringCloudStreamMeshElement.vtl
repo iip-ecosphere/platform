@@ -396,6 +396,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def attachMetricsProvider(String serviceVarName) {
         'if (${serviceVarName} instanceof MonitoringService) {
             ((MonitoringService) ${serviceVarName}).attachMetricsProvider(metrics);
+            if (${serviceVarName} instanceof UpdatingMonitoringService) {
+                metrics.addService((UpdatingMonitoringService) ${serviceVarName});
+            }
         }
         '
     }
