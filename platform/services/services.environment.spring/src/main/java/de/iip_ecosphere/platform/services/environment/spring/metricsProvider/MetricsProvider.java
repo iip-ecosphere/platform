@@ -144,8 +144,9 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
      * calculations. [public for testing outside spring]
      */
     @Scheduled(fixedRateString = SCHEDULE_RATE)
+    @Override
     public void calculateMetrics() {
-        super.calculateNonNativeSystemMetrics();
+        super.calculateMetrics();
         final String id = Id.getDeviceId();
         if (null == connector && null != transport) {
             try {
