@@ -159,6 +159,9 @@ project VDW {
         sharedInterfaces;
         sharedArtifact;
         platformMonitoring;
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
         Opc; // now freeze also cachingTime
         OpcWoodworking; // now freeze also cachingTime
         .; // every variable declared in this project
