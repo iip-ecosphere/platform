@@ -66,7 +66,7 @@ public abstract class AbstractMonitoringReceiverTest {
     /**
      * Runs a platform-like monitoring scenario with an ECS-runtime and a service manager on the same device.
      * 
-     * @param mrl the lifecylce
+     * @param mrl the lifecycle.
      */
     protected void runScenario(MonitoringRecieverLifecycle mrl) {
         System.out.println("Starting broker"); // Qpid eats up logging info
@@ -118,8 +118,7 @@ public abstract class AbstractMonitoringReceiverTest {
         Transport.sendServiceStatus(ActionTypes.REMOVED, serviceId);
 
         System.out.println("Sleeping...");
-        TimeUtils.sleep(6000);
-
+        TimeUtils.sleep(getSleepTime());
         // part of offboarding
         System.out.println("Device offboarding");
         Monitor.sendResourceStatus(ActionTypes.REMOVED);
@@ -134,6 +133,15 @@ public abstract class AbstractMonitoringReceiverTest {
 
         Transport.setTransportSetup(null);
         Monitor.setTransportSetup(null);
+    }
+    
+    /**
+     * The sleep time in {@link #runScenario(MonitoringRecieverLifecycle)}.
+     * 
+     * @return the sleep time in ms
+     */
+    protected int getSleepTime() {
+        return 6000;
     }
 
 }
