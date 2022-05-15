@@ -140,7 +140,7 @@
      <scope>test</scope>
     </dependency>
     
-    <!-- desired but does not work -> QPID-8588 
+    <!-- desired but does not work -> QPID-8588 -->
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>test.amqp.qpid</artifactId>
@@ -158,26 +158,6 @@
      <artifactId>transport.amqp</artifactId>
      <version>${project.version}</version>
      <scope>test</scope>
-    </dependency>
-     -->
-    
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport.mqttv3</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>test.mqtt.moquette</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.moquette</groupId>
-      <artifactId>moquette-broker</artifactId>
-      <scope>test</scope>
     </dependency>
 
    </dependencies>

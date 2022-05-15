@@ -36,8 +36,7 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.monitoring.AbstractMonitoringReceiverTest;
-//import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer; // QPID-8588
-import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
+import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer; // QPID-8588
 
 /**
  * Testing {@link PrometheusLifecycleDescriptor}.
@@ -47,6 +46,11 @@ import test.de.iip_ecosphere.platform.test.mqtt.moquette.TestMoquetteServer;
  */
 public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceiverTest {
 
+    /**
+     * Local exporter test mock.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private class MyIipPrometheusExporter extends IipEcospherePrometheusExporter {
         
         private String createdExporterId;
@@ -148,8 +152,12 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
     
     @Override
     protected Server createBroker(ServerAddress broker) {
-        return new TestMoquetteServer(broker);
-        //return new TestQpidServer(broker);
+        return new TestQpidServer(broker);
+    }
+
+    @Override
+    protected int getSleepTime() {
+        return 6000;
     }
     
 }

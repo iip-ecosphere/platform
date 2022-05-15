@@ -16,13 +16,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +43,8 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
+import io.prometheus.client.hotspot.DefaultExports;
+import si.matjazcerkvenik.alertmonitor.web.PrometheusMetricsServlet;
 
 /**
  * Observes IIP-Ecosphere standard transport channels and feeds the information into Prometheus. [public for testing]
@@ -44,6 +53,9 @@ import io.prometheus.client.exporter.common.TextFormat;
  */
 public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
+    public static final String DEFAULT_METRICS_SERVLET_NAME = "metrics";
+    public static final String DEFAULT_METRICS_ENDPOINT = "/" + DEFAULT_METRICS_SERVLET_NAME;
+    
     private Tomcat server;
     private Context context;
     private Supplier<ConfigModifier> modifier;
@@ -77,16 +89,35 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             port = setup.getPrometheusExporterPort();
             if (port < 0) {
                 port = NetUtils.getEphemeralPort();
+                setup.setPrometheusExporterPort(port); // "reconfigure"
             }
             LoggerFactory.getLogger(getClass()).info("Starting prometheus export endpoint on port {}", port);
-            server = new Tomcat();
-            server.setPort(port);
-            File home = server.getEngine().getCatalinaHome();
-            webapps = new File(home, "webapps");
-            webapps.mkdirs();
-            context = server.addContext(server.getHost(), "", "");
-            server.getHost().setAppBase(".");
-            server.start();
+            Thread serverThread = new Thread(() -> {
+                try {
+    
+                    server = new Tomcat();
+                    File home = server.getEngine().getCatalinaHome();
+                    server.setBaseDir(home.getName());
+                    server.setPort(port);
+                    server.setHostname("localhost");
+                    server.getHost().setAppBase(".");
+                    webapps = new File(home, "webapps");
+                    webapps.mkdirs();
+                    String contextPath = "";
+                    String docBase = new File(".").getAbsolutePath();
+                    context = server.addContext(contextPath, docBase);
+        
+                    DefaultExports.initialize();
+                    addServlet(DEFAULT_METRICS_SERVLET_NAME, new PrometheusMetricsServlet());
+
+                    server.getConnector();
+                    server.start();
+                    server.getServer().await();
+                } catch (LifecycleException e) {
+                    e.printStackTrace();
+                }
+            });
+            serverThread.start();
         } catch (Exception  e) {
             LoggerFactory.getLogger(getClass()).error("Starting prometheus export endpoint: {}", e.getMessage());
         }
@@ -135,6 +166,81 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         }
 
     }
+    
+    /**
+     * A simple metrics servlet for a given local, bridged metrics registry. A bit like 
+     * {@link PrometheusMetricsServlet} (unfortunately not much reusable), but with definable registry suitable
+     * for our purposes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class RegistryServlet extends HttpServlet {
+
+        private static final long serialVersionUID = -3178584303722836948L;
+        private PrometheusMeterRegistry registry;
+
+        /**
+         * Creates the servlet instance.
+         * 
+         * @param registry the registry.
+         */
+        private RegistryServlet(PrometheusMeterRegistry registry) {
+            this.registry = registry;
+        }
+
+        /**
+         * Parses the requested names from the request.
+         * 
+         * @param req the request
+         * @return the names
+         */
+        public static Set<String> parseNames(HttpServletRequest req) {
+            String[] includedParam = req.getParameterValues("name[]");
+            if (includedParam == null) {
+                return Collections.emptySet();
+            } else {
+                return new HashSet<String>(Arrays.asList(includedParam));
+            }
+        }
+
+        @Override
+        protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+            resp.setContentType(TextFormat.CONTENT_TYPE_004);
+
+            Writer writer = new BufferedWriter(resp.getWriter());
+            try {
+                writer.append(registry.scrape(TextFormat.CONTENT_TYPE_004, parseNames(req)));
+                writer.flush();
+            } finally {
+                writer.close();
+            }
+            resp.setStatus(200);
+        }
+
+        @Override
+        protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+            doGet(req, resp);
+        }
+
+    }
+
+    /**
+     * Adds a servlet to the tomcat instance. Tomcat must at least be initialized:
+     * 
+     * @param id the id of the servlet, also used for the path
+     * @param servlet the servlet instance
+     * @return the path to the servlet
+     */
+    protected String addServlet(String id, Servlet servlet) {
+        String path = "/" + id;
+        Wrapper newWrapper = context.createWrapper();
+        newWrapper.setName(id);
+        newWrapper.setLoadOnStartup(1);
+        newWrapper.setServlet(servlet);
+        context.addChild(newWrapper);
+        context.addServletMappingDecoded(path + "/*", id);
+        return path;
+    }
 
     /**
      * Implements a specialized exporter for prometheus.
@@ -145,33 +251,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
         private MyPrometheusMeterRegistry registry = new MyPrometheusMeterRegistry();
         private ScrapeEndpoint entry;
-                
-        private HttpServlet servlet = new HttpServlet() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-                resp.setStatus(200);
-                String contentType = TextFormat.chooseContentType(req.getHeader("Accept"));
-                resp.setContentType(contentType);
-
-                Writer writer = new BufferedWriter(resp.getWriter());
-                try {
-                    writer.append(registry.scrape());
-                    writer.flush();
-                } finally {
-                    writer.close();
-                }
-            }
-
-            @Override
-            protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-                doGet(req, resp);
-            }
-
-        };
-        
+        private RegistryServlet servlet = new RegistryServlet(registry);        
         /**
          * Creates an exporter.
          * 
@@ -184,10 +264,9 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         @Override
         protected void initialize() {
             String id = getId();
-            String path = "/" + id;
+            String path = addServlet(id, servlet);
             entry = new ScrapeEndpoint(id, new Endpoint(Schema.HTTP, port, path));
-            Tomcat.addServlet(context, id, servlet);
-            context.addServletMappingDecoded("/" + id + "/*", id);
+            LoggerFactory.getLogger(getClass()).info("Added device context {}", path);
         }
         
         /**
@@ -238,6 +317,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         for (Exporter e : exporters()) {
             m.addScrapeEndpoint(((PrometheusExporter) e).getScrapeEntry());
         }
+        m.end();
     }
 
 }

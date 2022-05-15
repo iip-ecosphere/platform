@@ -14,17 +14,19 @@ package de.iip_ecosphere.platform.monitoring.prometheus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 
 /**
- * Allows modifying a prometheus configuration.
+ * Allows modifying a prometheus configuration. Call {@link #end()} when modifications are complete.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class ConfigModifier {
     
     private List<ScrapeEndpoint> scrapes = new ArrayList<ScrapeEndpoint>();
+    private Consumer<ConfigModifier> endAction;
     
     /**
      * Represents a scrape endpoint.
@@ -77,8 +79,10 @@ public class ConfigModifier {
      * Creates a modifier with default endpoints.
      * 
      * @param endpoints the endpoints
+     * @param endAction the action to be called in {@link #end()}, may be <b>null</b> for none
      */
-    public ConfigModifier(List<ScrapeEndpoint> endpoints) {
+    public ConfigModifier(List<ScrapeEndpoint> endpoints, Consumer<ConfigModifier> endAction) {
+        this.endAction = endAction;
         scrapes.addAll(endpoints);
     }
 
@@ -98,6 +102,16 @@ public class ConfigModifier {
      */
     public Iterable<ScrapeEndpoint> scrapeEndpoints() {
         return scrapes;
+    }
+    
+    /**
+     * Call when configuration change setup is done.
+     */
+    public void end() {
+        if (null != endAction) {
+            endAction.accept(this);
+            endAction = null;
+        }
     }
 
 }

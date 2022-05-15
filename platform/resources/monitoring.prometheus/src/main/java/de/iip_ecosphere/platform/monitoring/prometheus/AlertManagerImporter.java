@@ -33,6 +33,7 @@ import si.matjazcerkvenik.alertmonitor.model.prometheus.PrometheusApiException;
 import si.matjazcerkvenik.alertmonitor.util.AmMetrics;
 import si.matjazcerkvenik.alertmonitor.util.AmProps;
 import si.matjazcerkvenik.alertmonitor.util.Formatter;
+import si.matjazcerkvenik.alertmonitor.util.TaskManager;
 
 /**
  * A prometheus alert manager importer. This class assumes that 
@@ -45,19 +46,22 @@ import si.matjazcerkvenik.alertmonitor.util.Formatter;
 public class AlertManagerImporter {
     
     private static Logger logger = LoggerFactory.getLogger(AlertManagerImporter.class);
-    private Timer timer = new Timer();
+    private Timer timer;
+    private SyncTask syncTask;
     
     /**
      * Starts the importer.
      */
     public void start() {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
-        AmProps.ALERTMONITOR_PROMETHEUS_SERVER = setup.getPrometheusServer().getServerAddress().toServerUri();
+        AmProps.ALERTMONITOR_PROMETHEUS_SERVER = setup.getAlertMgr().toServerUri();
         AmProps.ALERTMONITOR_HTTP_CLIENT_READ_TIMEOUT_SEC = 2;
         AmProps.ALERTMONITOR_KAFKA_ENABLED = false;
         AmProps.ALERTMONITOR_MONGODB_ENABLED = false;
         AmProps.ALERTMONITOR_PSYNC_INTERVAL_SEC = 1;
-        timer.schedule(new SyncTask(), 0, 1000);
+        syncTask = new SyncTask();
+        timer = new Timer("IIP Prometheus alert manager sync task");
+        timer.schedule(syncTask, 0, 1000);
     }
 
     /**
@@ -68,14 +72,14 @@ public class AlertManagerImporter {
      */
     private class SyncTask extends TimerTask {
 
+        private PrometheusApi api = new PrometheusApi();
+
         @Override
         public void run() {
             logger.info("PSYNC: === starting periodic synchronization ===");
             AmMetrics.lastPsyncTimestamp = System.currentTimeMillis();
 
             try {
-                PrometheusApi api = new PrometheusApi();
-
                 List<PAlert> activeAlerts = api.alerts();
                 if (activeAlerts == null) {
                     logger.error("PSYNC: null response returned");
@@ -138,17 +142,25 @@ public class AlertManagerImporter {
 
                 AmMetrics.psyncSuccessCount++;
                 AmMetrics.alertmonitor_psync_success.set(1);
-                //DAO.getInstance().removeWarning("psync");
+                DAO.getInstance().removeWarning("psync");
 
             } catch (PrometheusApiException e) {
                 logger.error("PSYNC: failed to synchronize alarms; root cause: " + e.getMessage());
                 AmMetrics.psyncFailedCount++;
                 AmMetrics.alertmonitor_psync_success.set(0);
-                //DAO.getInstance().addWarning("psync", "Synchronization is failing");
+                DAO.getInstance().addWarning("psync", "Synchronization is failing");
             }
 
             logger.info("PSYNC: === Periodic synchronization complete ===");
         }
+        
+        @Override
+        public boolean cancel() {
+            DAO.getInstance().getDataManager().close();
+            TaskManager.getInstance().stopDbMaintenanceTimer();
+            return super.cancel();
+        }
+
         
         /**
          * Creates a {@link DEvent} from a {@link PAlert}.
@@ -223,7 +235,15 @@ public class AlertManagerImporter {
      * Stops the importer.
      */
     public void stop() {
-        timer.cancel();
+        if (null != syncTask) {
+            syncTask.cancel();
+            syncTask = null;
+        }
+        if (null != timer) {
+            timer.purge();
+            timer.cancel();
+            timer = null;
+        }
     }
 
 }

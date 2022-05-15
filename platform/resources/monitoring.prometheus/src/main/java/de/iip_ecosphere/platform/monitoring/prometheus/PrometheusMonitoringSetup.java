@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
  * Extended prometheus monitoring setup.
@@ -37,6 +38,9 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
         Schema.HTTP, DEFAULT_PROMETHEUS_SERVER, DEFAULT_PROMETHEUSPUSHGATEWAYPORT);*/
     
     private int prometheusExporterPort = -1; // ephemeral
+    private int prometheusAlertMgrPort = 9091; // disabled
+    private int prometheusScrapeInterval = 1000;
+    private int prometheusScrapeTimeout = 1000; 
 
     /**
      * Returns the Prometheus server information.
@@ -45,6 +49,15 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      */
     public PrometheusServerAddressHolder getPrometheusServer() {
         return prometheusServer;
+    }
+    
+    /**
+     * Returns the server address of the alert manager.
+     * 
+     * @return the server address
+     */
+    public ServerAddress getAlertMgr() {
+        return new ServerAddress(prometheusServer.getSchema(), prometheusServer.getHost(), prometheusAlertMgrPort);
     }
 
     /**
@@ -74,7 +87,52 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
     /*public void getPrometheusPushGateway(PrometheusServerAddressHolder prometheusPushGateway) {
         this.prometheusPushGateway = prometheusPushGateway;
     }*/
-    
+
+    /**
+     * Returns the scrape interval.
+     * 
+     * @return the scrape interval in ms
+     */
+    public int getScrapeInterval() {
+        return prometheusScrapeInterval;
+    }
+
+    /**
+     * Defines the scrape interval. [snakeyaml]
+     * 
+     * @param scrapeInterval in ms
+     */
+    public void setScrapeInterval(int scrapeInterval) {
+        this.prometheusScrapeInterval = scrapeInterval;
+    }
+
+    /**
+     * Returns the scrape timeout.
+     * 
+     * @return the scrape timeout in ms
+     */
+    public int getScrapeTimeout() {
+        return prometheusScrapeTimeout;
+    }
+
+    /**
+     * Returns the safe scrape timeout, i.e., bounded by {@link #getScrapeInterval()}.
+     * 
+     * @return the scrape timeout in ms
+     */
+    public int getScrapeTimeoutSafe() {
+        return prometheusScrapeTimeout > prometheusScrapeInterval ? prometheusScrapeInterval : prometheusScrapeTimeout;
+    }
+
+    /**
+     * Defines the scrape timeout. [snakeyaml]
+     * 
+     * @param scrapeTimeout in ms
+     */
+    public void setScrapeTimeout(int scrapeTimeout) {
+        this.prometheusScrapeTimeout = scrapeTimeout;
+    }
+
     /**
      * Returns the port for the prometheus exporter.
      * 
@@ -91,6 +149,24 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      */
     public void setPrometheusExporterPort(int exporterPort) {
         this.prometheusExporterPort = exporterPort;
+    }
+
+    /**
+     * Returns the port for the prometheus alert manager.
+     * 
+     * @return the port, may be negative for ephemeral
+     */
+    public int getPrometheusAlertMgrPort() {
+        return prometheusAlertMgrPort;
+    }
+
+    /**
+     * Defines the port for the prometheus alert manager. [snakeyaml]
+     * 
+     * @param alertMgrPort the port, may be negative for ephemeral
+     */
+    public void setPrometheusAlertMgrPort(int alertMgrPort) {
+        this.prometheusAlertMgrPort = alertMgrPort;
     }
 
     /**
