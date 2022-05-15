@@ -513,14 +513,14 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             Class<?> cls = proc.getClass();
             try {
                 Method m = cls.getDeclaredMethod("pid");
-                result = (long) m.invoke(proc);
+                result = (long) m.invoke(proc); // declared as integer
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             }
             if (result < 0) {
                 try { // Windows
                     Field f = cls.getDeclaredField("handle");
                     f.setAccessible(true);
-                    result = (long) f.get(proc);
+                    result = (long) f.get(proc); // declared as long
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                 }
             }
@@ -528,7 +528,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
                 try { // Unix-like
                     Field f = cls.getDeclaredField("pid");
                     f.setAccessible(true);
-                    result = (long) f.get(proc);
+                    result = (int) f.get(proc); // declared as integer
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                 }
             }
