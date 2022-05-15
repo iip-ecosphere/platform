@@ -280,17 +280,22 @@ public abstract class MonitoringReceiver {
         LoggerFactory.getLogger(MonitoringReceiver.class).info(
             "Connecting to IIP-Ecosphere transport");
         TransportConnector conn = Transport.createConnector();
-        try {
-            conn.setReceptionCallback(StreamNames.STATUS_STREAM, 
-                new StatusReceptionCallback());
-            conn.setReceptionCallback(StreamNames.RESOURCE_METRICS, 
-                new MeterReceptionCallback(StreamNames.RESOURCE_METRICS));
-            conn.setReceptionCallback(StreamNames.SERVICE_METRICS, 
-                new MeterReceptionCallback(StreamNames.SERVICE_METRICS));
-        } catch (IOException e) {
-            conn = null;
+        if (null == conn) {
             LoggerFactory.getLogger(MonitoringReceiver.class).warn(
-                "Cannot connect to IIP-Ecosphere transport: {} Central monitoring disabled", e.getMessage());
+                "No IIP-Ecosphere transport connector available. Central monitoring disabled");
+        } else {
+            try {
+                conn.setReceptionCallback(StreamNames.STATUS_STREAM, 
+                    new StatusReceptionCallback());
+                conn.setReceptionCallback(StreamNames.RESOURCE_METRICS, 
+                    new MeterReceptionCallback(StreamNames.RESOURCE_METRICS));
+                conn.setReceptionCallback(StreamNames.SERVICE_METRICS, 
+                    new MeterReceptionCallback(StreamNames.SERVICE_METRICS));
+            } catch (IOException e) {
+                conn = null;
+                LoggerFactory.getLogger(MonitoringReceiver.class).warn(
+                    "Cannot connect to IIP-Ecosphere transport: {} Central monitoring disabled", e.getMessage());
+            }
         }
     }
     
