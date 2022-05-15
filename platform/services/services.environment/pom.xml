@@ -62,6 +62,11 @@
       <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+	<dependency>
+	    <groupId>com.github.oshi</groupId>
+	    <artifactId>oshi-core</artifactId>
+	    <version>6.1.6</version>
+	</dependency>
 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>

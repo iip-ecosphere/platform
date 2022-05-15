@@ -90,7 +90,7 @@ public class MetricsProviderTest {
         assertEquals(1, provider.getNumberOfCustomGauges());
         assertEquals(value2, provider.getGaugeValue(ID_GOOD), 0.0);
 
-        provider.calculateNonNativeSystemMetrics();
+        provider.calculateMetrics();
         assertTrue(provider.getRegisteredGaugeValue(MetricsProvider.SYS_MEM_TOTAL) > 0);
         assertEquals(value2, provider.getRegisteredGaugeValue(ID_GOOD), 0.0);
         

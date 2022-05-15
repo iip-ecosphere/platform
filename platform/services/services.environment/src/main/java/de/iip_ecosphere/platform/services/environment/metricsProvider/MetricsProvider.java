@@ -38,6 +38,8 @@ import io.micrometer.core.instrument.search.MeterNotFoundException;
 
 import com.sun.management.OperatingSystemMXBean;
 
+import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
+
 /**
  * This class represents an interface to manage the Micrometer-API meters.<br>
  * The operations available in this class are:
@@ -92,6 +94,7 @@ public class MetricsProvider {
     // Flag required for correct initialization of system metrics
     private boolean init;
     private Clock clock;
+    private List<UpdatingMonitoringService> updaters;
     
     /* By default, the base unit for the memory metrics is bytes */
     private CapacityBaseUnit memoryBaseUnit = CapacityBaseUnit.BYTES;
@@ -142,6 +145,15 @@ public class MetricsProvider {
         timers = new HashMap<String, Timer>();
 
         init = true;
+    }
+    
+    /**
+     * Returns the meter registry.
+     * 
+     * @return the meter registry
+     */
+    public MeterRegistry getRegistry() {
+        return registry;
     }
     
     /**
@@ -576,13 +588,42 @@ public class MetricsProvider {
             return getTimerCount(timerId);
         }
     }
+    
+    /**
+     * Adds a service to be updated regularly regarding its monitoring data. Services are 
+     * not added multiple times.
+     * 
+     * @param service the service, ignored if <b>null</b>
+     */
+    public void addService(UpdatingMonitoringService service) {
+        if (null != service) {
+            if (null == updaters) {
+                updaters = new ArrayList<>();
+            }
+            if (!updaters.contains(service)) { // prevent double updates
+                updaters.add(service);
+            }
+        }
+    }
+    
+    /**
+     * Call this method to update the metrics. May be called regularly.
+     */
+    public void calculateMetrics() {
+        calculateNonNativeSystemMetrics();
+        if (null != updaters) {
+            for (int i = updaters.size() - 1; i >= 0; i--) {
+                updaters.get(i).calculateMetrics();
+            }
+        }
+    }
 
     /**
      * This operation calculates the values for the extra system metrics not exposed
      * by Micrometer-API.<br>
      * Even though this sacrifices the real time values of these metrics, we gain
      * speed when requesting the metrics as we no longer have to calculate the
-     * values upon request. The {@code SHEDULE_RATE} indicates the time in between
+     * values upon request. The {@code SCHEDULE_RATE} indicates the time in between
      * calculations.
      */
     public void calculateNonNativeSystemMetrics() {

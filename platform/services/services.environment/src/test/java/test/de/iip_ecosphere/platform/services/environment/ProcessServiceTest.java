@@ -170,13 +170,16 @@ public class ProcessServiceTest {
         pDesc.setHomePath("target/test-classes");
         sDesc.setProcess(pDesc);
         
+        Assert.assertTrue(AbstractProcessService.getProcessId(null) < 0);
         TestService service = new TestService(new InDataTypeTranslator(), new OutDataTypeTranslator(), rcp, sDesc);
         service.setState(ServiceState.STARTING);
         service.process("test");
         service.process("test");
         service.process("test");
+        long pid = service.getPid();
         service.setState(ServiceState.STOPPING);
         Assert.assertEquals(3, receivedCount.get()); // 3 in, 3 out
+        Assert.assertTrue(pid > 0);
 
         service.activate();
         service.passivate();

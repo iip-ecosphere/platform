@@ -20,6 +20,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -30,9 +33,14 @@ import java.util.function.Function;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import io.micrometer.core.instrument.Gauge;
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
 
 /**
  * Implements an abstract asynchronous process-based service for a single pair of input-output types. A created 
@@ -44,7 +52,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * @param <O> the output data type
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractService {
+public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractService implements MonitoringService {
 
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
@@ -52,6 +60,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     private YamlService serviceSpec;
     private PrintWriter serviceIn;
     private Process proc;
+    private OSProcess osProcess;
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -396,6 +405,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             if (null != proc) { // may be gone anyway
                 proc.destroy();
                 proc = null;
+                osProcess = null;
             }
         }
         return ServiceState.STOPPED;
@@ -458,11 +468,72 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             handleOutputStream(proc.getOutputStream());
             handleInputStream(proc.getInputStream());
             handleErrorStream(proc.getErrorStream());
+            attachProcessInformation();
             Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
         } catch (IOException e) {
             throw new ExecutionException(e);
         }        
         return proc;
+    }
+    
+    /**
+     * Attaches process information if {@link #proc} is available. Does not attach process information twice.
+     */
+    private void attachProcessInformation() {
+        if (null == osProcess) {
+            long procId = getProcessId(proc);
+            if (procId > 0) {
+                SystemInfo si = new SystemInfo();
+                OperatingSystem os = si.getOperatingSystem();
+                osProcess = os.getProcess((int) procId);
+            }
+        }
+    }
+    
+    /**
+     * Returns the process id of the process implementing the service (if started).
+     * 
+     * @return the id, may be negative if there is no process or the id cannot be obtained
+     */
+    public long getPid() {
+        return getProcessId(proc); // copes with null
+    }
+    
+    /**
+     * Returns the process id of a process just started.
+     * 
+     * @param proc the process
+     * @return the id, may be negative if {@code proc} is <b>null</b> or the id cannot be obtained
+     */
+    public static long getProcessId(Process proc) {
+        // https://stackoverflow.com/questions/4750470/how-to-get-pid-of-process-ive-just-started-within-java-program
+        // only available since Java 9
+        long result = -1;
+        if (null != proc) {
+            Class<?> cls = proc.getClass();
+            try {
+                Method m = cls.getDeclaredMethod("pid");
+                result = (long) m.invoke(proc);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            }
+            if (result < 0) {
+                try { // Windows
+                    Field f = cls.getDeclaredField("handle");
+                    f.setAccessible(true);
+                    result = (long) f.get(proc);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                }
+            }
+            if (result < 0) {
+                try { // Unix-like
+                    Field f = cls.getDeclaredField("pid");
+                    f.setAccessible(true);
+                    result = (long) f.get(proc);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                }
+            }
+        }
+        return result;
     }
     
     /**
@@ -482,6 +553,17 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      */
     protected PrintWriter getServiceIn() {
         return serviceIn;
+    }
+    
+    /**
+     * Attaches the metrics provider.
+     * 
+     * @param provider the metrics provider instance
+     */
+    public void attachMetricsProvider(MetricsProvider provider) {
+        Gauge.builder("service." + getId() + ".process.memory.used", 
+             () -> osProcess.getVirtualSize()).description("Used memory of the attached process")
+            .baseUnit(provider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
     }
     
     /**
