@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LifecycleHandler {
 
+    private static final String CMD_ARG = "--iip.profile=";
     private static String[] cmdArgs;
     
     /**
@@ -108,17 +110,41 @@ public class LifecycleHandler {
     public static void startup(String[] args) {
         cmdArgs = args.clone();
         AtomicReference<String> pidFile = new AtomicReference<>();
-        forEach(l -> {
-            try {
-                LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
-                    + " (" + l.priority() + ")");
-                l.startup(args);
-                if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
-                    pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
+        
+        LifecycleProfile profile = DefaultProfile.INSTANCE;
+        String profileName = DefaultProfile.NAME;
+        for (int a = 0; a < args.length; a++) {
+            if (args[a].startsWith(CMD_ARG)) {
+                profileName = args[a].substring(CMD_ARG.length());
+                break;
+            }
+        }
+        if (!profileName.equals(DefaultProfile.NAME)) {
+            Iterator<LifecycleProfile> iter = ServiceLoader.load(LifecycleProfile.class).iterator();
+            while (iter.hasNext()) {
+                LifecycleProfile p = iter.next();
+                if (profileName.equals(p.getName())) {
+                    profile = p;
+                    break;
                 }
-            } catch (Throwable t) {
-                LoggerFactory.getLogger(LifecycleHandler.class).error("Startup failure in " 
-                    + l.getClass().getName() + " with " + t.getMessage(), t);
+            }
+        }
+        
+        final LifecycleProfile activeProfile = profile;
+        activeProfile.initialize(args);
+        forEach(l -> {
+            if (activeProfile.test(l.getClass())) {
+                try {
+                    LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
+                        + " (" + l.priority() + ")");
+                    l.startup(args);
+                    if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
+                        pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
+                    }
+                } catch (Throwable t) {
+                    LoggerFactory.getLogger(LifecycleHandler.class).error("Startup failure in " 
+                        + l.getClass().getName() + " with " + t.getMessage(), t);
+                }
             }
         }, false);
         String pidFileName = pidFile.get();
