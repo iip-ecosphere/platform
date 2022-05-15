@@ -16,6 +16,8 @@ public class ServerAddressHolder {
     private int port; // negative leads to ephemerial
     private String host;
     private Schema schema;
+    private boolean running = false;
+
 
     /**
      * Creates an instance (deserialization).
@@ -99,6 +101,24 @@ public class ServerAddressHolder {
      */
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+    
+    /**
+     * Returns whether the server is already running and shall not be started.
+     * 
+     * @return whether we can assume that it is already running
+     */
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
+     * Changes whether the server is already running. [snakeyaml]
+     * 
+     * @param running whether we can assume that it is already running
+     */
+    public void setRunning(boolean running) {
+        this.running = running;
     }
     
     /**
