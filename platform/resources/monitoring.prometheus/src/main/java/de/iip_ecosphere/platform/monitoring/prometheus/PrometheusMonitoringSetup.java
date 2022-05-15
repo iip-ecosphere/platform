@@ -57,7 +57,10 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
      * @return the server address
      */
     public ServerAddress getAlertMgr() {
-        return new ServerAddress(prometheusServer.getSchema(), prometheusServer.getHost(), prometheusAlertMgrPort);
+        ServerAddress result = new ServerAddress(prometheusServer.getSchema(), 
+            prometheusServer.getHost(), prometheusAlertMgrPort);
+        prometheusAlertMgrPort = result.getPort(); // if ephemeral
+        return result;
     }
 
     /**

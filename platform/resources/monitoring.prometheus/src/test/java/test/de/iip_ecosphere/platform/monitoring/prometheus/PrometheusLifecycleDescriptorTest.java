@@ -157,7 +157,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
 
     @Override
     protected int getSleepTime() {
-        return 6000;
+        return 10000;
     }
     
 }
