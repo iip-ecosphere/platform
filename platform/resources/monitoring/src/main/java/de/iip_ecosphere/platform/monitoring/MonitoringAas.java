@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.status.Alert;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
@@ -83,9 +84,15 @@ public class MonitoringAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         try {
-            Transport.createConnector().setReceptionCallback(StreamNames.ALERTS, new AlertReceptionCallback());
+            TransportConnector conn = Transport.createConnector();
+            if (null != conn) {
+                conn.setReceptionCallback(StreamNames.ALERTS, new AlertReceptionCallback());
+            } else {
+                LoggerFactory.getLogger(getClass()).error(
+                    "Cannot setup monitoring alert reception: Transport not configured");
+            }
         } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot setup alert reception: {}", e.getMessage());
+            LoggerFactory.getLogger(getClass()).error("Cannot setup monitoring alert reception: {}", e.getMessage());
         }
         return null;
     }
