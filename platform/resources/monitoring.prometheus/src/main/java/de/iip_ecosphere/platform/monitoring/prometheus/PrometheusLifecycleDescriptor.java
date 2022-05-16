@@ -260,9 +260,11 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
      * Deletes all files used in prometheus run.
      */
     public void deleteWorkingFiles() {
-        String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
-        new File(prometheusWorkingDirectory.getAbsolutePath(), exeName).delete();
-        new File(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG).delete();
+        if (prometheusWorkingDirectory != null) { // no full startup
+            String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
+            new File(prometheusWorkingDirectory.getAbsolutePath(), exeName).delete();
+            new File(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG).delete();
+        }
     }
     
     /**
