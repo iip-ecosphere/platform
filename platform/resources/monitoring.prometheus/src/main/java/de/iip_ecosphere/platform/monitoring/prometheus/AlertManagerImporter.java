@@ -74,6 +74,8 @@ public class AlertManagerImporter {
 
         private PrometheusApi api = new PrometheusApi();
 
+        // checkstyle: stop exception type check
+
         @Override
         public void run() {
             logger.info("PSYNC: === starting periodic synchronization ===");
@@ -149,10 +151,14 @@ public class AlertManagerImporter {
                 AmMetrics.psyncFailedCount++;
                 AmMetrics.alertmonitor_psync_success.set(0);
                 DAO.getInstance().addWarning("psync", "Synchronization is failing");
+            } catch (Throwable e) { // Illegal state at the beginning, cannot catch otherwise
+                logger.error("PSYNC: failed to synchronize alarms; root cause: " + e.getMessage());
             }
 
             logger.info("PSYNC: === Periodic synchronization complete ===");
         }
+        
+        // checkstyle: resume exception type check
         
         @Override
         public boolean cancel() {
