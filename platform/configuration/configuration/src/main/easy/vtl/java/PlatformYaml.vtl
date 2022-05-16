@@ -46,15 +46,25 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
     }
 
     def produceCentralMonitoring(PrometheusPlatformMonitoring mon) {
-        'prometheusServer:
+        // we assume a common schema for now
+        'prometheus:
+          server:
             schema: ${mon.schema}
             host: ${mon.host}
             port: ${mon.port}
             running: ${mon.running}
-        prometheusExporterPort: ${mon.exporterPort}
-        prometheusAlertMgrPort: ${mon.alertMgrPort}
-        prometheusScrapeInterval: ${mon.scrapeInterval}
-        prometheusScrapeTimeout: ${mon.scrapeTimeout}'
+          exporter: 
+            schema: ${mon.schema}
+            host: ${mon.exporterHost}
+            port: ${mon.exporterPort}
+            running: ${mon.exporterRunning}
+          alertMgr: 
+            schema: ${mon.schema}
+            host: ${mon.alertMgrHost}
+            port: ${mon.alertMgrPort}
+            running: ${mon.alertMgrRunning}
+          scrapeInterval: ${mon.scrapeInterval}
+          scrapeTimeout: ${mon.scrapeTimeout}'
     }
 
     def main(IIPEcosphere config, FileArtifact target) {

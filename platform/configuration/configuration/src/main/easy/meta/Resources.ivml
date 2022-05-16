@@ -94,7 +94,11 @@ project Resources {
         NonEmptyEphemeralPort port = 9090;
         Boolean running = false; // running somewhere else, do we have to start it
         NonEmptyEphemeralPort exporterPort = -1;
+        NonEmptyString exporterHost = "127.0.0.1";
+        Boolean exporterRunning = false; // running somewhere else, do we have to start it
         NonEmptyEphemeralPort alertMgrPort = 9091;
+        NonEmptyString alertMgrHost = "127.0.0.1";
+        Boolean alertMgrRunning = false; // running somewhere else, do we have to start it
         Integer scrapeInterval = 1000;
         Integer scrapeTimeout = 1000;
         
