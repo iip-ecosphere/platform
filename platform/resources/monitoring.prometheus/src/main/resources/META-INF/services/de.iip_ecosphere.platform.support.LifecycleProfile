@@ -1,0 +1,3 @@
+de.iip_ecosphere.platform.monitoring.prometheus.PrometheusMonitoringLifecycleProfile
+de.iip_ecosphere.platform.monitoring.prometheus.PrometheusExporterLifecycleProfile
+de.iip_ecosphere.platform.monitoring.prometheus.PrometheusLifecycleProfile

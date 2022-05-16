@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.monitoring.prometheus.ConfigModifier.ScrapeEndpoint;
+import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusMonitoringSetup.PrometheusSetup;
 import de.iip_ecosphere.platform.services.environment.AbstractProcessService;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -41,6 +42,7 @@ import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.transport.Transport;
 
 /**
@@ -110,7 +112,8 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
         // there must be at least one; late evaluation to have also ephemeral -1 changed to value
         result.add(new ScrapeEndpoint("prometheus", new Endpoint(Schema.HTTP, 
-            "localhost", setup.getPrometheusExporterPort(), IipEcospherePrometheusExporter.DEFAULT_METRICS_ENDPOINT)));
+            "localhost", setup.getPrometheus().getExporter().getPort(), 
+            IipEcospherePrometheusExporter.DEFAULT_METRICS_ENDPOINT)));
         return result;
     }
     
@@ -132,7 +135,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     private void updateConfiguration(ConfigModifier modifier, boolean notify) {
         // TODO works only local, how to do modifications on remote?
         try {
-            PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
+            PrometheusSetup setup = PrometheusMonitoringSetup.getInstance().getPrometheus();
             File cfg = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG);
             Path initCfgPath = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG_INITIAL).toPath();
             Files.copy(initCfgPath, cfg.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -150,19 +153,20 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 writer.println("      - targets: [\"" + ep.getHost() + ":" + ep.getPort() + "\"]");
             }
             writer.println();
-            if (setup.getPrometheusAlertMgrPort() > 0) {
+            ServerAddressHolder alertMgr = setup.getAlertMgr();
+            if (alertMgr.getPort() > 0) {
                 writer.println("# Alertmanager configuration");
                 writer.println("alerting:");
                 writer.println("  alertmanagers:");
                 writer.println("    - static_configs:");
                 writer.println("        - targets:");
-                writer.println("           - alertmanager:" + setup.getPrometheusAlertMgrPort());
+                writer.println("           - alertmanager:" + alertMgr.getHost() + ":" + alertMgr.getPort());
             }
             
             writer.close();
             if (notify) {
                 HttpClient httpclient = HttpClients.createDefault();
-                HttpPost httppost = new HttpPost(setup.getPrometheusServer().getServerAddress().toServerUri() 
+                HttpPost httppost = new HttpPost(setup.getServer().getServerAddress().toServerUri() 
                     + "/-/reload");
                 HttpResponse response = httpclient.execute(httppost);
                 int code = response.getStatusLine().getStatusCode();
@@ -182,7 +186,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     public void startup(String[] args) {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
         Transport.setTransportSetup(() -> setup.getTransport());
-        if (!setup.getPrometheusServer().isRunning()) {
+        if (!setup.getPrometheus().getServer().isRunning()) {
             String zipName = AbstractProcessService.getExecutablePrefix(PROMETHEUS, PROMETHEUS_VERSION) + ".zip";
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
             //Set working directory in a temporary directory
@@ -213,7 +217,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 pArgs.add(prometheusFile.getAbsolutePath());
                 pArgs.add("--config.file=prometheus.yml");
                 pArgs.add("--web.enable-lifecycle");
-                pArgs.add("--web.listen-address=:" + setup.getPrometheusServer().getPort());
+                pArgs.add("--web.listen-address=:" + setup.getPrometheus().getServer().getPort());
                 if (debug) {
                     pArgs.add("--log.level=debug");
                 }
@@ -222,7 +226,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 prometheusProcessBuilder.inheritIO();
                 prometheusProcess = prometheusProcessBuilder.start();
                 LoggerFactory.getLogger(getClass()).info("{} {} started on port {}", PROMETHEUS, PROMETHEUS_VERSION, 
-                    setup.getPrometheusServer().getPort());
+                    setup.getPrometheus().getServer().getPort());
     
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Starting Prometheus: {}", e.getMessage());
@@ -230,10 +234,15 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         }
 
         new Thread(modifierRunnable).start();
-        exporter = exporterSupplier.get();
-        exporter.setModifierSupplier(modifierSupplier);
-        exporter.start();
-        alertImporter = alertMgrSupplier.get();
+        if (!setup.getPrometheus().getExporter().isRunning()) {
+            exporter = exporterSupplier.get();
+            exporter.setModifierSupplier(modifierSupplier);
+            exporter.start();
+        }
+        if (!setup.getPrometheus().getAlertMgr().isRunning()) {
+            alertImporter = alertMgrSupplier.get();
+            alertImporter.start();
+        }
     } 
 
     /**
@@ -267,8 +276,12 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     
     @Override
     public void shutdown() {
-        alertImporter.stop();
-        exporter.stop();
+        if (null != alertImporter) {
+            alertImporter.stop();
+        }
+        if (null != exporter) {
+            exporter.stop();
+        }
         modifierRunnable.stop();
         if (null != prometheusProcess) {
             prometheusProcess.destroyForcibly();

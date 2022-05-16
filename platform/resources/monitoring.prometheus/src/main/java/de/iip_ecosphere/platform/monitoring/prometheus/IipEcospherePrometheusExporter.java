@@ -86,10 +86,10 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         super.start();
         try {
             PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
-            port = setup.getPrometheusExporterPort();
+            port = setup.getPrometheus().getExporter().getPort();
             if (port < 0) {
                 port = NetUtils.getEphemeralPort();
-                setup.setPrometheusExporterPort(port); // "reconfigure"
+                setup.getPrometheus().getExporter().setPort(port); // "reconfigure"
             }
             LoggerFactory.getLogger(getClass()).info("Starting prometheus export endpoint on port {}", port);
             Thread serverThread = new Thread(() -> {

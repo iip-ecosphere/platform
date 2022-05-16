@@ -54,7 +54,7 @@ public class AlertManagerImporter {
      */
     public void start() {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
-        AmProps.ALERTMONITOR_PROMETHEUS_SERVER = setup.getAlertMgr().toServerUri();
+        AmProps.ALERTMONITOR_PROMETHEUS_SERVER = setup.getPrometheus().getAlertMgr().getServerAddress().toServerUri();
         AmProps.ALERTMONITOR_HTTP_CLIENT_READ_TIMEOUT_SEC = 2;
         AmProps.ALERTMONITOR_KAFKA_ENABLED = false;
         AmProps.ALERTMONITOR_MONGODB_ENABLED = false;
