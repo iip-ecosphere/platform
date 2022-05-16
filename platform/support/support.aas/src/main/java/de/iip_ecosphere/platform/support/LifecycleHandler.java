@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 public class LifecycleHandler {
 
     private static final String CMD_ARG = "--iip.profile=";
-    private static String[] cmdArgs;
     
     /**
      * Default main program performing the steps, i.e., {@link LifecycleHandler#attachShutdownHooks()}, 
@@ -98,7 +97,10 @@ public class LifecycleHandler {
         
     }
     
+    private static String[] cmdArgs;
+    private static boolean waiting = false;
     private static List<LifecycleDescriptor> descriptors;
+    private static LifecycleProfile profile = DefaultProfile.INSTANCE;
     
     // checkstyle: stop exception type check
     
@@ -111,7 +113,7 @@ public class LifecycleHandler {
         cmdArgs = args.clone();
         AtomicReference<String> pidFile = new AtomicReference<>();
         
-        LifecycleProfile profile = DefaultProfile.INSTANCE;
+        profile = DefaultProfile.INSTANCE;
         String profileName = DefaultProfile.NAME;
         for (int a = 0; a < args.length; a++) {
             if (args[a].startsWith(CMD_ARG)) {
@@ -130,13 +132,12 @@ public class LifecycleHandler {
             }
         }
         
-        final LifecycleProfile activeProfile = profile;
-        activeProfile.initialize(args);
+        profile.initialize(args);
         forEach(l -> {
-            if (activeProfile.test(l.getClass())) {
+            if (profile.test(l.getClass())) {
                 try {
-                    LoggerFactory.getLogger(LifecycleHandler.class).info("Starting " + l.getClass().getName() 
-                        + " (" + l.priority() + ")");
+                    LoggerFactory.getLogger(LifecycleHandler.class).info("Starting {} ({}) in profile {}", 
+                        l.getClass().getName(), l.priority(), profile.getName());
                     l.startup(args);
                     if (l instanceof PidLifecycleDescriptor && null == pidFile.get()) {
                         pidFile.set(((PidLifecycleDescriptor) l).getPidFileName());
@@ -156,7 +157,11 @@ public class LifecycleHandler {
                     + pidFileName + ": " + e.getMessage());
             }
         }
-        LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.");
+        String add = "";
+        if (waiting) {
+            add = " Running until Ctrl-C.";
+        }
+        LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.{}", add);
     }
     
     /**
@@ -164,14 +169,16 @@ public class LifecycleHandler {
      */
     public static void shutdown() {
         forEach(l -> {
-            try {            
-                LoggerFactory.getLogger(LifecycleHandler.class).info("Stopping " + l.getClass().getName() 
-                    + " (" + l.priority() + ")");
-                l.shutdown();
-            } catch (Throwable t) {
-                LoggerFactory.getLogger(LifecycleHandler.class).error("Shutdown failure in " 
+            if (profile.test(l.getClass())) {
+                try {            
+                    LoggerFactory.getLogger(LifecycleHandler.class).info("Stopping {} ({})", 
+                        l.getClass().getName(), l.priority());
+                    l.shutdown();
+                } catch (Throwable t) {
+                    LoggerFactory.getLogger(LifecycleHandler.class).error("Shutdown failure in " 
                         + l.getClass().getName() + " with " + t.getMessage(), t);
-                
+                    
+                }
             }
         }, true);
     }
@@ -273,6 +280,7 @@ public class LifecycleHandler {
      * @see TerminatingLifecycleDescriptor
      */
     public static void waitUntilEnd(String[] args, boolean shutdownAsHook) {
+        waiting = true;
         attachShutdownHooks();
         if (shutdownAsHook) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
