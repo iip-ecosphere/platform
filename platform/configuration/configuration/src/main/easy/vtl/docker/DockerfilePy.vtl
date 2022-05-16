@@ -3,11 +3,12 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+template DockerfilePy(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
     	
     	'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+    	'COPY --from=python:3.8-slim-buster / /'
     	'WORKDIR /app'
     	
     	'COPY wrapper_script.sh wrapper_script.sh'
@@ -25,7 +26,11 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
     	'COPY broker/src/ src'
     	'COPY broker/broker.sh broker.sh'
     	
-		'RUN apk update && apk add bash'
+		'# Python Dependecies'
+    	'COPY requirements.txt requirements.txt'
+    	'RUN python3 -m pip install -r requirements.txt'
+    	
+    	'# Running the script'
 		'RUN chmod 777 wrapper_script.sh'
 		'CMD ./wrapper_script.sh'
           

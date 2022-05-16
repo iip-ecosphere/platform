@@ -7,10 +7,10 @@ template WrapperScript(IIPEcosphere config, FileArtifact target) {
     def main(IIPEcosphere config, FileArtifact target) {
     	    	
     	'#!/bin/bash'
-	''
-	'bash amqp.sh &'
-	'sleep 4;'
-	'bash serviceMgr.sh'
+		''
+		'bash broker.sh &'
+		'sleep 4;'
+		'bash serviceMgr.sh'
           
     }	
 }

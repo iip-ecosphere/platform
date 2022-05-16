@@ -256,24 +256,49 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     	
     	if (a.createContainer) {
     		
-    		// Wrapper-Skript 
-    		Path ws = "${appRoot}/../wrapper_script.sh";
-		vilTemplateProcessor("WrapperScript", config, ws); 
+    	    // Checking if there is any PythonService in app
+    	    Integer isPythonService = 0;		// 0 - false, 1 - true
+			for (MeshElement elem : elements) {
+			    Service service = elem.impl;
+			    if (service.isTypeOf(PythonService)) {
+				    isPythonService = 1;
+			    }
+			}
+    		
+    		// Dockerfile
+    	    if (isPythonService == 0) {
+    	    	// JAVA
+				
+				Path df = "${appRoot}/../Dockerfile.txt";
+				vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
+				df.rename("Dockerfile");
+				    		
+    	    } else {
+    	    	// JAVA & PYTHON
+				
+				// Create requirements.txt
+				Path req = "${appRoot}/../requirements.txt";
+				vilTemplateProcessor("PythonReq", config, req, elements=elements);				
+				
+				Path df = "${appRoot}/../Dockerfile.txt";
+				vilTemplateProcessor("DockerfilePy", config, df, elements=elements, app=a);
+				df.rename("Dockerfile");
+    			
+    	    }
 	    	
-	    	// DOCKERFILE 
-	    	Path df = "${appRoot}/../Dockerfile.txt";
-	    	vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
-	    	df.rename("Dockerfile");
-	    	
-	    	// Create image 
+			// Wrapper-Skript 
+			Path ws = "${appRoot}/../wrapper_script.sh";
+			vilTemplateProcessor("WrapperScript", config, ws); 
+			
+			// Create image 
 	    	Path b = "${appRoot}/../";
 	    	Path d = "${appRoot}/../Dockerfile";
 	    	String imageId = dockerBuildImage(b, d, "testapp:01");  
 	    	
 	    	// Remove image
 	    	dockerRemoveImage(imageId);
+	        
     	}
-    	
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------

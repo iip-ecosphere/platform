@@ -1,0 +1,31 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements) {
+		
+		'numpy==1.17.4'
+				
+		/*
+        setOf(String) deps = {};
+
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+        
+        for (PythonService pyService : services) {
+        	setOf(PythonDependency) pyDependencies = pyService.dependencies;	// saving all dependecies of a given Service
+        		
+        	for (PythonDependency dep : pyDependencies) {
+        		String dep = dep.name + "==" + dep.version;
+        		deps.add(dep);			// saving all dependencies for all services in one set to avoid duplicates
+        	}
+        }
+        
+
+        for (String dep : deps) {
+        	'${dep}'
+        }
+		*/
+    }	
+}
