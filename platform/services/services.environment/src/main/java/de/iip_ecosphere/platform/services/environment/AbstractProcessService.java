@@ -113,7 +113,9 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
                 return outCls;
             }
         };
-        handleInputStream(proc.getInputStream());
+        if (null != proc) { // important if process is already running, otherwise done in createAndConfigureProcess
+            handleInputStream(proc.getInputStream());
+        }
     }
     
     /**
