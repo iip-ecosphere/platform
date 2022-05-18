@@ -453,7 +453,12 @@ public class TraceToAasService extends AbstractService {
                 List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
                 AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
                 callback = new TraceRecordReceptionCallback();
-                Transport.createConnector().setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
+                TransportConnector conn = Transport.createConnector();
+                if (null != conn) {
+                    conn.setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
+                } else {
+                    LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
+                }
                 super.setState(ServiceState.RUNNING);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
