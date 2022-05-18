@@ -21,7 +21,9 @@ import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -91,7 +93,11 @@ public class BaSyxRegistry implements Registry {
         }
         BaSyxAas a = (BaSyxAas) aas;
         a.registerRegistry(this);
-        manager.createAAS(a.getAas(), endpointURL);
+        try {
+            manager.createAAS(a.getAas(), endpointURL);
+        } catch (ResourceNotFoundException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot create AAS: " + e.getMessage());
+        }
     }
 
     @Override
@@ -103,7 +109,11 @@ public class BaSyxRegistry implements Registry {
             throw new IllegalArgumentException("The submodel must be created by the AasFactory.");
         }
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
-        manager.createSubmodel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
+        try {
+            manager.createSubmodel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
+        } catch (ResourceNotFoundException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot create submodel: " + e.getMessage());
+        }
     }
 
     @Override
@@ -119,8 +129,12 @@ public class BaSyxRegistry implements Registry {
             endpointUrl = AbstractSubmodel.getSubmodelEndpoint(endpoint, aas, submodel);
         }
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
-        registry.register(aasIdentifier, new SubmodelDescriptor(submodel.getIdShort(), 
-            ((BaSyxSubmodel) submodel).getSubmodel().getIdentification(), endpointUrl));
+        try {
+            registry.register(aasIdentifier, new SubmodelDescriptor(submodel.getIdShort(), 
+                ((BaSyxSubmodel) submodel).getSubmodel().getIdentification(), endpointUrl));
+        } catch (ResourceNotFoundException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot register submodel: " + e.getMessage());
+        }
     }
     
     @Override
