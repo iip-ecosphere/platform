@@ -45,13 +45,13 @@ def start(a):
         
     args = parser.parse_args(a)
 
-    modulesPath = args.modulesPath[0]
+    modulesPath = getArg(args.modulesPath)
     sys.path.append(modulesPath)
     # dynamically load (generated) modules
-    loadModules(modulesPath, args.datatypesPackage)
-    loadModules(modulesPath, args.serializersPackage)
-    loadModules(modulesPath, args.interfacesPackage)
-    loadModules(modulesPath, args.servicesPackage)
+    loadModules(modulesPath, getArg(args.datatypesPackage))
+    loadModules(modulesPath, getArg(args.serializersPackage))
+    loadModules(modulesPath, getArg(args.interfacesPackage))
+    loadModules(modulesPath, getArg(args.servicesPackage))
 
     #sys.stderr.write("services:         " + str(Registry.services)+"\n")
     #sys.stderr.write("types:            " + str(Registry.types)+"\n")
@@ -73,6 +73,12 @@ def start(a):
         console(a, args.data, sId)
     else:
         console(a, args.data, sId)
+
+def getArg(arg):
+   if isinstance(arg, list):
+       return arg[0]
+   else:
+       return arg
 
 def loadModules(modulesPath, modulesDir):
     if len(modulesDir) > 0:
