@@ -130,6 +130,10 @@
                         </jar>
                         <zip destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" 
                             basedir="${project.build.directory}/fake/deployment"/>
+                            
+                        <!-- for testing -->
+                        <mkdir dir="${project.build.directory}/fake/deployments" />
+                        <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/fake/deployments"/>
 	                </target>
 	            </configuration>
 	            <goals>

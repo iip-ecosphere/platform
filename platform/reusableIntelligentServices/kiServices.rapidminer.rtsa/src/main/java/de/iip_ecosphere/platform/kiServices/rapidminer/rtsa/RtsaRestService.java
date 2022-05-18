@@ -80,10 +80,10 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         List<String> args = new ArrayList<>();
         networkPortKey = "rtsa_" + getServiceSpec().getId();
         instancePort = NetworkManagerFactory.getInstance().obtainPort(networkPortKey).getPort();
-        args.add("-Dspring.config.location=" + getResolvedPath(rtsaPath, "/home/config/agent.properties"));
-        args.add("-Dscoring-agent.baseDir=" + getResolvedPath(rtsaPath, ""));
+        args.add("-Dspring.config.location=" + getConfigLocation(rtsaPath));
+        args.add("-Dscoring-agent.baseDir=" + getBaseDir(rtsaPath));
         args.add("-Dserver.port=" + instancePort);
-        args.add("-Dspring.pid.file=" + getResolvedPath(rtsaPath, "/home/pid"));
+        args.add("-Dspring.pid.file=" + getPidFile(rtsaPath));
         args.add("-Dlog4j2.formatMsgNoLookups=true");
         args.add("-classpath");
         args.add(getClasspath(rtsaPath));
@@ -121,6 +121,36 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
      */
     protected String getClasspath(File rtsaPath) {
         return getResolvedPath(rtsaPath, "lib") + File.separator + "*";
+    }
+
+    /**
+     * Returns the configuration location to use.
+     * 
+     * @param rtsaPath the path to the installed RTSA
+     * @return the base directory
+     */
+    protected String getConfigLocation(File rtsaPath) {
+        return getResolvedPath(rtsaPath, "/home/config/agent.properties");
+    }
+
+    /**
+     * Returns the PID file (path) to use.
+     * 
+     * @param rtsaPath the path to the installed RTSA
+     * @return the PID file path
+     */
+    protected String getPidFile(File rtsaPath) {
+        return getResolvedPath(rtsaPath, "/home/pid");
+    }
+
+    /**
+     * Returns the base directory to use.
+     * 
+     * @param rtsaPath the path to the installed RTSA
+     * @return the base directory
+     */
+    protected String getBaseDir(File rtsaPath) {
+        return getResolvedPath(rtsaPath, "");
     }
     
     /**

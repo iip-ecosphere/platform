@@ -82,6 +82,11 @@ public class RtsaRestServiceTest {
             return result;
         }
         
+        @Override
+        protected String getBaseDir(File rtsaPath) {
+            return FileUtils.getResolvedPath(new File("."), "target/fake"); 
+        }
+        
     }
     
     /**
