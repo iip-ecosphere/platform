@@ -76,14 +76,22 @@ public class BaSyxRegistry implements Registry {
      * @throws IOException in case that the access fails
      */
     private BaSyxConnectedAas obtainAas(IIdentifier aasId) throws IOException {
-        return new BaSyxConnectedAas(manager.retrieveAAS(aasId));
+        try {
+            return new BaSyxConnectedAas(manager.retrieveAAS(aasId));
+        } catch (ResourceNotFoundException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public Submodel retrieveSubmodel(String aasIdentifier, String submodelIdentifier) throws IOException {
-        IIdentifier aasId = Tools.translateIdentifier(aasIdentifier, "");
-        IIdentifier submodelId = Tools.translateIdentifier(submodelIdentifier, "");
-        return new BaSyxISubmodel(obtainAas(aasId), manager.retrieveSubmodel(aasId, submodelId));
+        try {
+            IIdentifier aasId = Tools.translateIdentifier(aasIdentifier, "");
+            IIdentifier submodelId = Tools.translateIdentifier(submodelIdentifier, "");
+            return new BaSyxISubmodel(obtainAas(aasId), manager.retrieveSubmodel(aasId, submodelId));
+        } catch (ResourceNotFoundException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
