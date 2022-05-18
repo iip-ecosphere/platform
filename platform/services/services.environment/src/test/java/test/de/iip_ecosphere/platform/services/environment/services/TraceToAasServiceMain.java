@@ -128,7 +128,7 @@ public class TraceToAasServiceMain {
         
         // mock the setup
         EnvironmentSetup setup = Starter.getSetup();
-        setup.setAasSetup(aasSetup);
+        setup.setAas(aasSetup);
         TransportSetup transSetup = new TransportSetup();
         transSetup.setHost("localhost");
         transSetup.setPort(broker.getPort());

@@ -253,7 +253,7 @@ public class Starter {
         if (null == setup) {
             try {
                 setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
-                    Starter.class.getResourceAsStream("/application.yml"));
+                    ResourceLoader.getResourceAsStream(Starter.class, "application.yml"));
                 Transport.setTransportSetup(() -> setup.getTransport());
             } catch (IOException e) {
                 setup = new EnvironmentSetup();

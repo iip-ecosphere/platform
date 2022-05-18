@@ -57,8 +57,19 @@ public class EnvironmentSetup extends AbstractSetup {
      * Changes the AAS setup.
      * 
      * @param aas the AAS setup
+     * @deprecated use {@link #setAas(AasSetup)} instead
      */
+    @Deprecated
     public void setAasSetup(AasSetup aas) {
+        this.aas = aas;
+    }
+
+    /**
+     * Changes the AAS setup.
+     * 
+     * @param aas the AAS setup
+     */
+    public void setAas(AasSetup aas) {
         this.aas = aas;
     }
 
