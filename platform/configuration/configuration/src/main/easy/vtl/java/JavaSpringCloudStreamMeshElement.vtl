@@ -657,7 +657,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def insertSelector(ServiceSelectorBasedFamilyMemberSelector selector, String type, String dataVar) {
         String fType = toTypeName(selector.type);
-println("INSSELECTOR " + fType+" "+type);        
         if (type == fType) {
             "selectService(data)";
         } else {

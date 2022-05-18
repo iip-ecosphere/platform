@@ -46,6 +46,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     }
     
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+        setOf(String) done = {};
         for (MeshElement elt: mappedMesh.keys().toSequence()->sortedBy(e|e.name)) { // sortedBy for testing
             tmp.clear();
             generateDataMethods(elt);
@@ -61,23 +62,35 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     doOut = !asyncIngestors.get(eltMet); // out for synchronous, in for asynchronous
                 }
                 if (doOut) {
-                '${eltMet}-out-0:
-                        destination: ${eltMet}'
+                String key = "${eltMet}-out-0";
+                if (!done.includes(key)) {
+                done.add(key);
+                '${key}:
+                  destination: ${eltMet}'
                 ''
+                }
                 } else { // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
-                '${eltMet}-in-0:
-                        producer:
-                            useNativeEncoding: true'
+                String key = "${eltMet}-in-0";
+                if (!done.includes(key)) {
+                done.add(key);
+                '${key}:
+                  producer:
+                    useNativeEncoding: true'
                 ''
+                }
                 }
                 for (MeshConnector conn: mappedMesh.get(elt)) {
                     MeshInnerElement next = conn.next;
                     tmp.clear();
                     generateDataMethods(next);
                     for (String nextMeth: tmp) {
-                        '${nextMeth}-in-0:
-                            destination: ${eltMet}
-                        '
+                        String key = '${nextMeth}-in-0';
+                        if (!done.includes(key)) {
+                            '${key}:
+                              destination: ${eltMet}
+                            '
+                        }
+                        done.add(key);
                     }
                 }
             }
@@ -86,12 +99,20 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         if (backSenders.size() > 0) {        
             for (DataType type: backSenders.keys()) {
                 String snd = backSenders.get(type);
-                '${snd}-in-0:
-                    producer:
+                String key = "${snd}-in-0";
+                if (!done.includes(key)) {
+                    done.add(key);
+                    '${key}:
+                      producer:
                         useNativeEncoding: true'
+                }
                 for (String s: backReceivers.get(type)) {
-                    '${s}-in-0:
-                        destination: ${snd}'
+                    key = '${s}-in-0';
+                    if (!done.includes(key)) {
+                        done.add(key);
+                        '${s}-in-0:
+                          destination: ${snd}'
+                    }
                 }
             }
         }

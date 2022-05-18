@@ -101,7 +101,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 asyncIngestors.add(methodSuffixId, elt.impl.asynchronous);
             }
             notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, true);
-            generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
+            '${generateSourceMethod(elt, type, methodSuffix, methodSuffixId)}'
         }
     }
 
@@ -120,9 +120,9 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(MeshProcessor elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
-            generateAsyncDataMethods(elt.input, elt.output, elt);
+            '${generateAsyncDataMethods(elt.input, elt.output, elt)}'
         } else {
-            generateAsyncDataMethods(backward(elt.input), backward(elt.output), elt);
+            '${generateAsyncDataMethods(backward(elt.input), backward(elt.output), elt)}'
             Integer p = 0;
             sequenceOf(IOType) inFwd = forward(elt.input);
             sequenceOf(IOType) outFwd = forward(elt.output);
@@ -140,7 +140,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                     asyncIngestors.add(methodSuffixId, false);
                 }
                 notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-                generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
+                '${generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId)}'
             }
             // there are no remaining -> constraint syncEqualIO
         }
@@ -167,7 +167,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 asyncIngestors.add(methodSuffixId, true);
             }*/
             notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-            generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
+            '${generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId)}'
         }    
     }
         
@@ -180,7 +180,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
             String methodSuffix = "receive" + type.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
             notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-            generateSinkMethod(elt, type, methodSuffix, methodSuffixId);
+            '${generateSinkMethod(elt, type, methodSuffix, methodSuffixId)}'
         }
     }
     
