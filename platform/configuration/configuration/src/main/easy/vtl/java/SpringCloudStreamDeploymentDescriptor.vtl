@@ -67,10 +67,20 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
               - console
               - --modulesPath
               - \\${tmp}/${id}/python
+              - --servicesPackage
+              - ${pythonServicesPackageName(service)}
               - --sid
               - ${service.id}
               ${pythonDataArg(service)|e}
             started: true'
+    }
+    
+    def pythonServicesPackageName(PythonService service) {
+        if (service.servicesPackageName <> null) {
+            '${service.servicesPackageName}'
+        } else {
+            'services'
+        }
     }
     
     def pythonDataArg(PythonService service) {
