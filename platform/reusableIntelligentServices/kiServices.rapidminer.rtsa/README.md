@@ -10,7 +10,13 @@ For test packaging in the platform/application instantiation, the build process 
     mappings:
       <String>: <String>
 
-The `path` indicates the desired REST path/endpoint attached to the base path services. The mappings relate a field name in the input data to a function specification. As function specification, we currently offer PASS, SKIP, RANDOM_BOOLEAN and RANDOM_PROBABILITY. Fields not given in the data but specified in `spec.yml` will be added to the output. 
+The `path` indicates the desired REST path/endpoint attached to the base path services. The mappings relate a field name in the input data to a function specification. As function specification, we currently offer 
+- PASS: just pass the value on
+- SKIP: do not emit the value to output, filter
+- RANDOM_BOOLEAN: the value of the field shall be a random boolean
+- RANDOM_PROBABILITY: the value of the field shall be a random double in [0;1]. 
+- RANDOM_SELECT(args): the value shall be a random selection from args, whereby args are separated by commas. Strings may be given in usual quotes.
+Fields not given in the data but specified in `spec.yml` will be added to the output. 
 
 Manual building may require `mvn package -DskipTests -Djacoco.skip=true`
 

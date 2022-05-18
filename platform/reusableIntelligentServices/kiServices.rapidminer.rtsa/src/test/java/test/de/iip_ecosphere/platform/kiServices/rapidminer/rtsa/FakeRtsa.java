@@ -55,8 +55,8 @@ import static spark.Spark.delete;
  *  
  * The path indicates the desired REST path/endpoint attached to the base path services/
  * The mappings relate a field name to a function specification. As function specification, we currently offer 
- * PASS, SKIP, RANDOM_BOOLEAN and RANDOM_PROBABILITY. Fields not given in the data but specified in spec.yml will be 
- * added to the output. 
+ * PASS, SKIP, RANDOM_BOOLEAN, RANDOM_PROBABILITY, RANDOM_SELECT(args) whereby args are separated by comma, may be 
+ * strings. Fields not given in the data but specified in spec.yml will be added to the output. 
  * 
  * @author Holger Eichelberger, SSE
  * @author Ahmad Alamoush, SSE
@@ -71,6 +71,7 @@ public class FakeRtsa {
         functions.put("SKIP", p -> null);
         functions.put("RANDOM_PROBABILITY", p -> random.nextDouble());
         functions.put("RANDOM_BOOLEAN", p -> random.nextBoolean());
+        functions.put("RANDOM_SELECT", new RandomArgumentSelector());
     }
 
     /**
@@ -211,11 +212,22 @@ public class FakeRtsa {
             FunctionMapping result = functions.get("PASS");
             if (null != spec) {
                 String funcSpec = spec.getMappings().get(field);
-                // split for more complex
                 if (null != funcSpec) {
-                    FunctionMapping fm = functions.get(funcSpec);
+                    String[] args = null;
+                    String funcName = funcSpec;
+                    int argsStartPos = funcSpec.indexOf('(');
+                    int argsEndPos = funcSpec.lastIndexOf(')');
+                    if (argsStartPos > 1 && argsEndPos > 0) { // there shall be at least a "name"
+                        funcName = funcSpec.substring(0, argsStartPos);
+                        String argsTmp = "";
+                        if (argsStartPos + 1 < argsEndPos) { // there shall be a bit of args
+                            argsTmp = funcSpec.substring(argsStartPos + 1, argsEndPos);
+                        }
+                        args = argsTmp.split(","); // rather simple for now 
+                    }
+                    FunctionMapping fm = functions.get(funcName);
                     if (null != fm) {
-                        result = fm;
+                        result = fm.bind(args);
                     }
                 }
             }
@@ -244,10 +256,62 @@ public class FakeRtsa {
          * Maps an input value to an output value.
          * 
          * @param value the input value
-         * @return the output balue
+         * @return the output value
          */
         public Object map(Object value);
         
+        /**
+         * Binds the arguments to that function mapping and creates a new one.
+         * 
+         * @param args the args to be bound, may be <b>null</b> then result shall be <b>this</b>
+         * @return by default <b>this</b>
+         */
+        public default FunctionMapping bind(String[] args) {
+            return this; // no binding by default
+        }
+        
+    }
+    
+    /**
+     * A simple random argument selector.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class RandomArgumentSelector implements FunctionMapping {
+
+        private String[] args;
+        
+        /**
+         * Creates the prototype instance.
+         */
+        public RandomArgumentSelector() {
+        }
+
+        /**
+         * Creates a random argument selector with arguments for binding.
+         * 
+         * @param args the arguments
+         */
+        private RandomArgumentSelector(String[] args) {
+            this.args = args;
+        }
+
+        @Override
+        public Object map(Object value) {
+            Object result;
+            if (null == args) {
+                result = value;
+            } else {
+                result = args[random.nextInt(args.length)];
+            }
+            return result;
+        }
+
+        @Override
+        public FunctionMapping bind(String[] args) {
+            return new RandomArgumentSelector(args);
+        }
+
     }
 
     /**
