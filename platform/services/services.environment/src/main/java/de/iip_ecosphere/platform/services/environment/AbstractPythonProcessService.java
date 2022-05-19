@@ -384,7 +384,10 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     protected Process createAndCustomizeProcess(String data, Map<String, String> reconfValues) 
         throws ExecutionException {
         try {
-            List<String> args = new ArrayList<String>(pythonArgs);
+            List<String> args = new ArrayList<String>();
+            if (null != pythonArgs) { // if not completely intialized as service description is missing
+                args.addAll(pythonArgs);
+            }
             if (null != reconfValues && reconfValues.size() > 0) {
                 args.add("--configure");
                 args.add(toJson(reconfValues));
