@@ -101,7 +101,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             if (null != services) { 
                 ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
                 for (Service service : services) {
-                    mapService(mapper, service);
+                    mapService(mapper, service, true); // used by testing, may require individual information
                 }
             }
             Starter.start();
