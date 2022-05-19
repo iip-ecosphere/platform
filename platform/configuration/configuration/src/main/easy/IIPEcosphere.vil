@@ -335,7 +335,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // dispatch basis    
     generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
-            artifacts.add(getArtifact(base));
+            artifacts.add(getArtifact(no));
         }
     }
 
