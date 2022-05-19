@@ -116,7 +116,7 @@
                         <mkdir dir="${project.build.directory}/fake/rtsa/lib" />
                         <jar destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar"
                             basedir="${project.build.directory}/test-classes"
-                            includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/FakeRtsa.class">
+                            includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/Fake*.class">
                         </jar>
                         <zip destfile="${project.build.directory}/fake/RTSA-0.14.5.zip" 
                             basedir="${project.build.directory}/fake/rtsa"/>

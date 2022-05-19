@@ -58,6 +58,9 @@ import static spark.Spark.delete;
  * PASS, SKIP, RANDOM_BOOLEAN, RANDOM_PROBABILITY, RANDOM_SELECT(args) whereby args are separated by comma, may be 
  * strings. Fields not given in the data but specified in spec.yml will be added to the output. 
  * 
+ * For new classes in this package, please consider that the POM is doing a selective packaging for Fake*.class so 
+ * either classes are contained/nested or their names start with Fake!
+ * 
  * @author Holger Eichelberger, SSE
  * @author Ahmad Alamoush, SSE
  */
