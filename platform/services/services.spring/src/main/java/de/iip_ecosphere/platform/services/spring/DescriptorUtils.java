@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.ResourceLoader;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
@@ -172,7 +173,7 @@ public class DescriptorUtils {
                 artPath = artPath.substring(1);
             }
             FileInputStream fis = null;
-            InputStream artifact = DescriptorUtils.class.getResourceAsStream(artPath);
+            InputStream artifact = ResourceLoader.getResourceAsStream(DescriptorUtils.class, artPath);
             if (null == artifact) { // spring packaging fallback
                 try {
                     fis = new FileInputStream(artFile);
