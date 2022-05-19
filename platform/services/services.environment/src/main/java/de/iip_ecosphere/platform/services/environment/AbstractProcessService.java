@@ -565,8 +565,9 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     public void attachMetricsProvider(MetricsProvider provider) {
         if (null != provider) { // standalone
             Gauge.builder("service." + getId() + ".process.memory.used", 
-                 () -> osProcess.getVirtualSize()).description("Used memory of the attached process")
-                .baseUnit(provider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
+                 () -> null == osProcess ? 0 : osProcess.getVirtualSize())
+                    .description("Used memory of the attached process")
+                    .baseUnit(provider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
         }
     }
     
