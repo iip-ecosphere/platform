@@ -172,8 +172,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
         
     def generateDataMethods(MeshSink elt) {
-        sequenceOf(IOType) out = {};
-        generateAsyncDataMethods(backward(elt.input), out, elt);
+        '${generateAsyncDataMethods(backward(elt.input), backward(elt.impl.output), elt)}'
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);

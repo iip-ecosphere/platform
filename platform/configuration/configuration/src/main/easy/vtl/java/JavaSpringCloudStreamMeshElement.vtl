@@ -2,11 +2,12 @@ import JavaBasics;
 import SpringCloudStreamBasics;
 import MeshBasics;
 import JavaConnector;
+import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
-    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember) extends MeshBasics {
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
     Boolean isConnector = false;
     mapOf(IOType, IOType) pairs = {};
@@ -163,21 +164,45 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def attachIngestors(MeshElement elt, ServiceBase base) {
+         String result = ""; // ugly workaround for EASy bug
+         setOf(String) conns = {};
          if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
              for (String methodSuffix : ingestors.getKeys()) {
                  // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
                  if (asyncIngestors.containsKey(methodSuffix)) {
                      if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
                          String type = ingestors.get(methodSuffix);
+                         setOf(MeshElement) done = {};
                          for (MeshConnector c: nextConnectors(elt)) {                     
                              MeshElement target = c.next;
+                             done.add(target);
                              String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
-                             '${generateIngestor(base, methodSuffix, conn, type, "in")}'
+                             if (not(conns.includes(conn))) {
+                                 result = result + '${generateIngestor(base, methodSuffix, conn, type, "in")}';
+                                 conns.add(conn);
+                             }
                          }
+                         for (MeshElement target: nodes) {
+                            if (not(done.includes(target))) {
+                                sequenceOf(IOType) types;
+                                for (IOType t : backward(target.impl.input)) {
+                                    type = toTypeName(t.type);
+                                    String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+                                    if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
+                                        conn = "process" + conn.substring(6);
+                                    }
+                                    if (not(conns.includes(conn)) and conn.startsWith("process")) {
+                                        result = result + '${generateIngestor(base, methodSuffix, conn, type, "in")}';
+                                        conns.add(conn);
+                                    }
+                                }
+                            }
+                         } 
                      }
                  }
              }
          }
+         '${result}'
     }
     
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir) {
@@ -962,7 +987,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
-        Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember) {
+        Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
         initPairs(elt);
         IIPEcosphere cfg = config;
         if (cfg.sharedInterfaces) {

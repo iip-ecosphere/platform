@@ -119,13 +119,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 // TODO filter according to assigned resources, allow for later instantiation
                 for (ServiceMesh n : a.services) {
                     setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    setOf(MeshElement) nodes2 = {}; // just a copy, it seems that using the iterable below fails
+                    nodes2 = nodes2.including(nodes);
                     for (MeshElement no : nodes) {
                         String clsName = asTypeName(no.name);
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl);
+                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl, nodes=nodes2);
                         setOf(Service) mbs = {};
-                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps, mbs);
+                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps, mbs, nodes2);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         for (Service m: mbs) {
@@ -257,63 +259,63 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
-    	
-    	if (a.createContainer) {
-    		
-    	    // Checking if there is any PythonService in app
-    	    Integer isPythonService = 0;		// 0 - false, 1 - true
-			for (MeshElement elem : elements) {
-			    Service service = elem.impl;
-			    if (service.isTypeOf(PythonService)) {
-				    isPythonService = 1;
-			    }
-			}
-    		
-    		// Dockerfile
-    	    if (isPythonService == 0) {
-    	    	// JAVA
-				
-				Path df = "${appRoot}/../Dockerfile.txt";
-				vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
-				df.rename("Dockerfile");
-				    		
-    	    } else {
-    	    	// JAVA & PYTHON
-				
-				// Create requirements.txt
-				Path req = "${appRoot}/../requirements.txt";
-				vilTemplateProcessor("PythonReq", config, req, elements=elements);				
-				
-				Path df = "${appRoot}/../Dockerfile.txt";
-				vilTemplateProcessor("DockerfilePy", config, df, elements=elements, app=a);
-				df.rename("Dockerfile");
-    			
-    	    }
-	    	
-			// Wrapper-Skript 
-			Path ws = "${appRoot}/../wrapper_script.sh";
-			vilTemplateProcessor("WrapperScript", config, ws); 
-			
-			// Create image 
-	    	Path b = "${appRoot}/../";
-	    	Path d = "${appRoot}/../Dockerfile";
-	    	String imageId = dockerBuildImage(b, d, "testapp:01");  
-	    	
-	    	// Remove image
-	    	dockerRemoveImage(imageId);
-	        
-    	}
+        
+        if (a.createContainer) {
+            
+            // Checking if there is any PythonService in app
+            Integer isPythonService = 0;        // 0 - false, 1 - true
+            for (MeshElement elem : elements) {
+                Service service = elem.impl;
+                if (service.isTypeOf(PythonService)) {
+                    isPythonService = 1;
+                }
+            }
+            
+            // Dockerfile
+            if (isPythonService == 0) {
+                // JAVA
+                
+                Path df = "${appRoot}/../Dockerfile.txt";
+                vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
+                df.rename("Dockerfile");
+                            
+            } else {
+                // JAVA & PYTHON
+                
+                // Create requirements.txt
+                Path req = "${appRoot}/../requirements.txt";
+                vilTemplateProcessor("PythonReq", config, req, elements=elements);              
+                
+                Path df = "${appRoot}/../Dockerfile.txt";
+                vilTemplateProcessor("DockerfilePy", config, df, elements=elements, app=a);
+                df.rename("Dockerfile");
+                
+            }
+            
+            // Wrapper-Skript 
+            Path ws = "${appRoot}/../wrapper_script.sh";
+            vilTemplateProcessor("WrapperScript", config, ws); 
+            
+            // Create image 
+            Path b = "${appRoot}/../";
+            Path d = "${appRoot}/../Dockerfile";
+            String imageId = dockerBuildImage(b, d, "testapp:01");  
+            
+            // Remove image
+            dockerRemoveImage(imageId);
+            
+        }
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
 
     // dispatch basis
     generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
     }
 
     generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
         IIPEcosphere cfg = config;
         String familyInterface = familyInterfaceName(clsName);
         vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
@@ -322,7 +324,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         for (Service m: family.members) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
-                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m);
+                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
             mbs.add(m);
         }
         if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
