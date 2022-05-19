@@ -124,9 +124,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
                             elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl);
-                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps);
+                        setOf(Service) mbs = {};
+                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps, mbs);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                        for (Service m: mbs) {
+                            generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                        }
                     };
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
@@ -305,11 +309,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // dispatch basis
     generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs) = {
     }
 
     generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs) = {
         IIPEcosphere cfg = config;
         String familyInterface = familyInterfaceName(clsName);
         vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
@@ -319,9 +323,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m);
-            if (not(noDeps)) {
-                artifacts.add(getArtifact(m));
-            }
+            mbs.add(m);
         }
         if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
             artifacts.add(getSelectorArtifact(family.selector));
@@ -333,19 +335,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // dispatch basis    
     generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
-            artifacts.add(getArtifact(no));
+            artifacts.add(getArtifact(base));
         }
     }
 
     generateServiceResources(MeshElement no, Connector base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        artifacts.add(getArtifact(no)); // connectors are (currently) platform-supplied
+        artifacts.add(getArtifact(base)); // connectors are (currently) platform-supplied
     }
 
     // RTSA (preliminary in here)
     generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         resources.add(rtsaResources()+"|"+rtsaBin(service));
         resources.add(rtsaResources()+"|"+rtsaInstance(service));
-        artifacts.add(getArtifact(no));
+        artifacts.add(getArtifact(service));
     }
     
     // KODEX (preliminary in here)    
@@ -361,7 +363,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
         bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
         assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
-        artifacts.add(getArtifact(no));
+        artifacts.add(getArtifact(service));
     }
 
     // Python (preliminary in here); copy integratable sources from the artifact    
@@ -381,7 +383,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             if (not(noDeps)) {
                 assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
             }
-            artifacts.add(getArtifact(no));
+            artifacts.add(getArtifact(service));
         }
     }
     

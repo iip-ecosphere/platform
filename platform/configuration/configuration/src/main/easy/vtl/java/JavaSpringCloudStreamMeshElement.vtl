@@ -247,11 +247,16 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
+    def generateAsyncProcessorInMethod(MeshElement elt, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateAsyncProcessorInMethod(elt, overrideImpl(elt.impl), type, methodSuffix, methodSuffixWithServiceId);
+    } 
+
+    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateAsyncProcessorInMethod(proc, overrideImpl(proc.impl), type, methodSuffix, methodSuffixWithServiceId);
     } 
     
-    def generateAsyncProcessorInMethod(MeshProcessor proc, ServiceBase base, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateAsyncProcessorInMethod(MeshElement proc, ServiceBase base, String type, String methodSuffix, String methodSuffixWithServiceId) {
         '/**
         * Called when data arrived that shall be processed (asynchronously).
         *
@@ -263,7 +268,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }'
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "process${type.firstToUpperCase()}";
@@ -287,7 +292,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         ${nodeAnnotation("@Bean")|e}
         public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}() {
-            ${generateSyncProcessorBody(proc, base, methodSuffix, methodSuffixWithServiceId, inType, outType)}
+            ${generateSyncProcessorBody(proc, overrideImpl(base), methodSuffix, methodSuffixWithServiceId, inType, outType)}
         }'
     } 
 
@@ -616,9 +621,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "";
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String svc = insertSelector(service, type, "data");
-        'return () -> ${svc}.${methodSuffixWithServiceId}().get();'
+        'return data -> ${svc}.${methodSuffixWithServiceId}().accept(data);'
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
@@ -764,7 +769,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String expr = 'service.processQuiet("${type}", data)';
         'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
@@ -812,7 +817,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
-    def generateAsyncProcessorBody(MeshProcessor proc, KodexService kodex, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, KodexService kodex, String methodSuffix, String methodSuffixWithServiceId, String type) {
         setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
         if (ins.size() > 0) {
             IOType in = ins.toSequence().first();
@@ -884,15 +889,22 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService";
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         String expr = 'service.processQuiet(data)';
         'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     
+    // shall not be called, RTSA is so far always asynchronous
     def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
         String expr = 'service.processQuiet(data)';
         'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
     }
+
+    // shall not be called, RTSA is so far always asynchronous
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+        String expr = 'service.processQuiet(data)';
+        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
+    }    
 
     def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir) {
         String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
@@ -928,7 +940,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.services.environment.services.TraceToAasService";
     }
 
-    def generateAsyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
         'return data -> {}; // ignore, shall not be called'
     }
     

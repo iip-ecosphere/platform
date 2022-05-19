@@ -90,7 +90,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
 
     def generateDataMethods(MeshSource elt) {
-        generateAsyncDataMethods(backward(getSourceInput(elt.impl)), backward(getSourceOutput(elt.impl)), elt);
+        '${generateAsyncDataMethods(backward(getSourceInput(elt.impl)), backward(getSourceOutput(elt.impl)), elt)}'
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : getSourceOutput(elt.impl)) {
             String type = toTypeName(out.type);

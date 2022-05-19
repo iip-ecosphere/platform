@@ -291,6 +291,7 @@ project Services {
            manufacturerProductDesignation = "RTSA AI service@en",
            manufacturer = refBy(manufacturer_rapidminer)
        };
+       asynchronous == true; // always
        // TODO constraint: flat input/output, not hierarchical
    }
    
@@ -324,6 +325,7 @@ project Services {
         // same parameter
         // requires??
         selector <> null implies selectorTypeOk(selector, self);
+        members->forAll(m|m.asynchronous = self.asynchronous);
    }
    
     // preliminary, as long as RTSA integration is not complete
