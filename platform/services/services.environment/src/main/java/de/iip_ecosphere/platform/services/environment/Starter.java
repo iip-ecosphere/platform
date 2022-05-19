@@ -199,13 +199,14 @@ public class Starter {
      * 
      * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
      */
-    public static void mapService(ServiceMapper mapper, Service service) {
+    public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart) {
         if (null != service) {
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
-            if (serviceAutostart) {
+            if (serviceAutostart && enableAutostart) {
                 try {
                     getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
                     service.setState(ServiceState.STARTING);
@@ -227,12 +228,26 @@ public class Starter {
      * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
      * 
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
+     * 
+     * @see #getServiceMapper()
+     * @see #mapService(ServiceMapper, Service)
+     */
+    public static void mapService(Service service, boolean enableAutostart) {
+        mapService(getServiceMapper(), service, enableAutostart);
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * By default, do autostart.
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * 
      * @see #getServiceMapper()
      * @see #mapService(ServiceMapper, Service)
      */
     public static void mapService(Service service) {
-        mapService(getServiceMapper(), service);
+        mapService(service, true);
     }
     
     /**
