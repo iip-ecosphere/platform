@@ -21,6 +21,12 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     
     def generateService(MeshElement elt, ServiceBase service) {
     }
+
+    def generateService(MeshElement elt, ServiceFamily family) {
+        for (Service m : family.members) {
+            '${generateService(elt, m)}'
+        }
+    }
     
     def generateService(MeshElement elt, Service service) {
         '- id: ${service.id}
