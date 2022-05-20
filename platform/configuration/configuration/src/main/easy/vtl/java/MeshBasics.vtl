@@ -66,7 +66,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
         'YamlService ${varName} = ${artifactVarName}.getServiceSafe("${serviceId}")'
     }
 
-    def generateDataMethods(MeshElement elt) {
+    def generateDataMethods(MeshElement elt, Boolean filter) {
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
@@ -89,8 +89,9 @@ template MeshBasics(Configuration config, FileArtifact target) {
         impl.output;
     }
 
-    def generateDataMethods(MeshSource elt) {
-        '${generateAsyncDataMethods(backward(getSourceInput(elt.impl)), backward(getSourceOutput(elt.impl)), elt)}'
+    def generateDataMethods(MeshSource elt, Boolean filter) {
+        '${generateAsyncDataMethods(filterBackward(getSourceInput(elt.impl), filter), 
+            filterBackward(getSourceOutput(elt.impl), filter), elt)}'
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : getSourceOutput(elt.impl)) {
             String type = toTypeName(out.type);
@@ -117,12 +118,12 @@ template MeshBasics(Configuration config, FileArtifact target) {
         true;
     }
 
-    def generateDataMethods(MeshProcessor elt) {
+    def generateDataMethods(MeshProcessor elt, Boolean filter) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
             '${generateAsyncDataMethods(elt.input, elt.output, elt)}'
         } else {
-            '${generateAsyncDataMethods(backward(elt.input), backward(elt.output), elt)}'
+            '${generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.output, filter), elt)}'
             Integer p = 0;
             sequenceOf(IOType) inFwd = forward(elt.input);
             sequenceOf(IOType) outFwd = forward(elt.output);
@@ -171,8 +172,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
         }    
     }
         
-    def generateDataMethods(MeshSink elt) {
-        '${generateAsyncDataMethods(backward(elt.input), backward(elt.impl.output), elt)}'
+    def generateDataMethods(MeshSink elt, Boolean filter) {
+        '${generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.impl.output, filter), elt)}'
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {
             String type = toTypeName(in.type);

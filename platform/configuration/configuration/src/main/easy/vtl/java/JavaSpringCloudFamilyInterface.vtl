@@ -74,7 +74,7 @@ template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact targe
          */
         public interface ${clsName}FamilyInterface {
         
-            ${generateDataMethods(elt)}
+            ${generateDataMethods(elt, true)}
 
             /**
              * Attaches the ingestors.

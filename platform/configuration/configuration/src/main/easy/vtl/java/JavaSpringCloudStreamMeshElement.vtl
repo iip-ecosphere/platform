@@ -163,6 +163,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
+    def initIngestors(MeshElement elt, ServiceBase base) {
+        ''
+    }
+    
     def attachIngestors(MeshElement elt, ServiceBase base) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
@@ -438,7 +442,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
             '${generateParameterInit(service)|e}'
             '${attachMetricsProvider("service")}'
-            'Starter.mapService(service);'
+            '${genMapService("service")}'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -453,7 +457,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
         service.setReceptionCallback(new ConnectorReceptionCallback());
-        Starter.mapService(service);
+        ${genMapService("service")}
         ${attachMetricsProvider("service")}'
     }
     
@@ -608,14 +612,34 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // --------------------------- ServiceFamily ----------------------------------
 
+    def genMapService(String serviceVarName) {
+        if (familyInterface <> "") {
+            'Starter.mapService(${serviceVarName}, ${isDefaultService(elt.impl, familyMember)});'
+        } else {
+            'Starter.mapService(${serviceVarName});'
+        }
+    }
+    
+    def isDefaultService(ServiceBase eltImpl, ServiceBase service) {
+        'false'
+    }
+
+    def isDefaultService(ServiceFamily eltImpl, ServiceBase service) {
+        if (defaultService(eltImpl) == service) {
+            'true'
+        } else {
+            'false'
+        }
+    }
+
     def Service defaultService(ServiceFamily family) {
         family.members.toSequence().first();
     }
     
-    def initialService(MeshElement elt, ServiceFamily family) {
+    def initIngestors(MeshElement elt, ServiceFamily family) {
         Service init = defaultService(family);
         String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
-        'service = new ${clsName}();'
+        'service = new ${clsName}(streamBridge, metrics);'
     }
     
     def generateImports(ServiceFamily service) {
@@ -746,7 +770,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def generateServiceSelection(String fInterface, ServiceFamily family, String newServiceVar) {
         for (Service m: family.members.toSequence()->sortedBy(s|s.id)) {
             'case "${m.id}": 
-                ${newServiceVar} = new ${familyMemberName(asTypeName(m.name), fInterface)}();
+                ${newServiceVar} = new ${familyMemberName(asTypeName(m.name), fInterface)}(streamBridge, metrics);
                 break;'
         }
     }
@@ -764,7 +788,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, PythonService service) {
         '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
-        'Starter.mapService(service);'
+        '${genMapService("service")}'
         '${attachMetricsProvider("service")}'
         for (IOType in: service.input) {
             String type = toTypeName(in);
@@ -872,7 +896,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 new ${outType}OutputTranslator(), 
                 null, // via attachIngestor
                 serviceData);
-            Starter.mapService(${kodexServiceName(in, out)});
+            ${genMapService(kodexServiceName(in, out))}
             ${attachMetricsProvider(kodexServiceName(in, out))}'
         }
     }
@@ -896,7 +920,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             new ${outType}OutputTranslator(), 
             null, // via attachIngestor
             serviceData);
-        Starter.mapService(service);
+        ${genMapService("service")}
         ${attachMetricsProvider("service")}'
     }
     
@@ -947,7 +971,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         String clsName = "TraceToAasService";
         '${getYamlServiceFragment("serviceData", clsName, "${service.id}", appVar="app")};\n'
         'service = new TraceToAasService(app, serviceData);
-        Starter.mapService(service);
+        ${genMapService("service")}
         ${attachMetricsProvider("service")}'
     }
     
@@ -983,6 +1007,11 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> {}; // ignore'
     }
     
+    def genClassAnnotations(MeshElement elt) {
+        '@Component
+        @EnableScheduling'
+    }
+    
     // --------------------- main ---------------------------
 
     // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
@@ -998,10 +1027,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         String implements = "";
         ServiceBase impl = elt.impl;
         String clsName = getClsName(elt);
+        String constructorParams = "";
+        String constructorInit = "";
         if (familyInterface <> "") {
             implements = " implements ${familyInterface}";
             impl = familyMember;
             clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
+            constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
+            constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
         String implMonId = impl.id.toIdentifier();
         'package ${pkg};
@@ -1012,7 +1045,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import java.util.concurrent.ExecutionException;
         import javax.annotation.PostConstruct;
         import org.slf4j.LoggerFactory;
-        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.beans.factory.annotation.*;
         import org.springframework.context.annotation.Bean;
         import org.springframework.cloud.stream.function.StreamBridge;
         import org.springframework.stereotype.Component;
@@ -1043,8 +1076,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          *
          * @author EASy-Producer.
          */
-        @Component
-        @EnableScheduling
+        ${genClassAnnotations(elt)|e}
         public class ${clsName}${implements} {
         
             @Autowired
@@ -1061,12 +1093,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             /**
              * Creates an instance.
              */
-            public ${clsName}() {
+            public ${clsName}(${constructorParams}) {
+                ${constructorInit|e}
                 ${initialService(elt, impl)}
             }
         
             ${generatedServiceInitMethod(elt, impl)|e}
-            ${generateDataMethods(elt)}
+            ${generateDataMethods(elt, true)}
             ${generateConnectorParameter(elt, app)}
 
             /**
@@ -1074,6 +1107,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             ${nodeAnnotation("@PostConstruct")|e}
             public void attachIngestors() {
+                ${initIngestors(elt, impl)}
                 ${attachIngestors(elt, impl)}
             }
             ${generateAdapterTranslators(elt)}

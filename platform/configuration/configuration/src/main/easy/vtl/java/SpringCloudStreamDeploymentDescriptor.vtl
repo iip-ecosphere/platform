@@ -158,10 +158,10 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
-        String eltMet = removeNewlines(generateDataMethods(elt));
+        String eltMet = removeNewlines(generateDataMethods(elt, true));
         returnType = true;
         inputType = true;
-        String eltType = removeNewlines(generateDataMethods(elt));
+        String eltType = removeNewlines(generateDataMethods(elt, true));
         returnType = false;
         '- channel: ${eltMet}-out-0
           direction: OUT
@@ -169,10 +169,10 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         if (conns.size() > 0) {
             for (MeshConnector conn : conns, "\n") {
                 MeshInnerElement next = conn.next;
-                String nextMeth = removeNewlines(generateDataMethods(next));
+                String nextMeth = removeNewlines(generateDataMethods(next, true));
                 returnType = true;
                 inputType = true;
-                String nextType = removeNewlines(generateDataMethods(next));
+                String nextType = removeNewlines(generateDataMethods(next, true));
                 returnType = false;
                 '
                 - channel: ${nextMeth}-in-0

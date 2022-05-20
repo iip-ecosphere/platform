@@ -74,7 +74,7 @@ template JavaMeshElementStub(Configuration config, FileArtifact target, MeshElem
                 super(iCreator, serviceId);
             }
             
-            ${generateDataMethods(elt)}
+            ${generateDataMethods(elt, true)}
         
             ${generateIngestors()}
         }'

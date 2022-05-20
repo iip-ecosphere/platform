@@ -7,6 +7,16 @@ template ServiceBasics(Configuration config, FileArtifact target) {
     def sequenceOf(IOType) forward(sequenceOf(IOType) types) {
         types->select(t|t.forward);
     }
+    
+    def sequenceOf(IOType) filterBackward(sequenceOf(IOType) types, Boolean filter) {
+        sequenceOf(IOType) result;
+        if (filter) {
+            result = backward(types);
+        } else {
+            result = types;
+        }
+        result;
+    }
 
     def sequenceOf(IOType) backward(sequenceOf(IOType) types) {
         types->select(t|not(t.forward));

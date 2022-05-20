@@ -127,7 +127,7 @@ template PythonMeshElementInterface(Configuration config, FileArtifact target, M
                 if self.ingestor is not None:
                     self.ingestor(data)
             
-            ${generateDataMethods(elt)}
+            ${generateDataMethods(elt, true)}
             
             def registerMethods(self):
                 ${generateRegisterMethodBody()}'

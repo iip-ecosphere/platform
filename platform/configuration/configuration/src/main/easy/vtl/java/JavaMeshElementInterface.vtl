@@ -75,7 +75,7 @@ template JavaMeshElementInterface(Configuration config, FileArtifact target, Mes
          */
         public interface ${clsName}Service extends Service {
             
-            ${generateDataMethods(elt)}
+            ${generateDataMethods(elt, true)}
 
             ${generateIngestors()}        
         }'
