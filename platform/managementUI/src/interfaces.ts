@@ -17,6 +17,8 @@ export interface ResourceValue {
   value?: any;
   description?: any;
   inoutputVariables?: any;
+  inputVariables?: any;
+  outputVariables?: any;
   invokable?: any;
 }
 
