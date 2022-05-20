@@ -19,7 +19,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         for (MeshElement elt: nodes) {
             generateDataMethods(elt, false);
         }        
-        for (String s : beans) {
+        for (String s : beans->sortedBy(b|b)) { // sort for testing, stable sequence
             if (result.length() > 0) {
                 result = result + ";";
             }
