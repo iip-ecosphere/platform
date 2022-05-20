@@ -89,7 +89,8 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         if (kw == "class") {
             '@Override
             public String toString() {
-                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this);
+                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
+                    de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
             }'
         }
     }
@@ -124,6 +125,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             emitJavadoc = true;
         }
         'package ${pkg};
+        
         ${imp|e}
 
         /**
