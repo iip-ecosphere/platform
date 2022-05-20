@@ -258,6 +258,7 @@ public class AasUtils {
             resolver = CLASSPATH_RESOURCE_RESOLVER;
         }
         if (null != image && image.length() > 0) {
+            String prevMsg = "";
             try {
                 String fName = de.iip_ecosphere.platform.support.FileUtils.sanitizeFileName(image);
                 File f = new File(FileUtils.getTempDirectory(), fName);
@@ -269,24 +270,30 @@ public class AasUtils {
                     String mimeType = Files.probeContentType(f.toPath());
                     handler.handle(fName, contents, mimeType);
                     resolved = true;
-                } else {
-                    LoggerFactory.getLogger(PlatformAas.class).warn("Cannot resolve image '{}'", 
-                        image);
                 }
             } catch (IOException e) {
-                LoggerFactory.getLogger(PlatformAas.class).error("Cannot resolve image '{}': {}", 
-                    image, e.getMessage());
+                prevMsg = e.getMessage();
             }
             if (!resolved) {
                 try {
                     URL url = new URL(image);
                     if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
-                        handler.handle(url.getFile(), url.toString(), "text/x-uri");
+                        String name = url.getFile();
+                        int pos = name.lastIndexOf('/');
+                        if (pos > 0) {
+                            name = name.substring(pos + 1);
+                        }
+                        name = AasUtils.fixId(name);
+                        handler.handle(name, url.toString(), "text/x-uri");
                         resolved = true;
                     }
                 } catch (MalformedURLException e) {
                     // ok, we will go on below
                 }
+            }
+            if (!resolved) {
+                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot resolve image '{}' {}", 
+                    image, prevMsg);
             }
         }
         if (!resolved && handleAlways) {
