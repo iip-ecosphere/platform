@@ -639,7 +639,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initIngestors(MeshElement elt, ServiceFamily family) {
         Service init = defaultService(family);
         String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
-        'service = new ${clsName}(streamBridge, metrics);'
+        'service = new ${clsName}(streamBridge, metrics);
+        selector.initial("${init.id}");'
     }
     
     def generateImports(ServiceFamily service) {
