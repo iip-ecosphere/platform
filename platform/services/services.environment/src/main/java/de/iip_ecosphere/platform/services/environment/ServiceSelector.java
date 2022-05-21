@@ -29,6 +29,15 @@ public interface ServiceSelector<T> {
      * @return the service id, <b>null</b> for staying with the actual service
      */
     public String select(T input);
+
+    /**
+     * Notifies that the action the selection was selected for is completed.
+     * 
+     * @param id the selected service id, this may still be the same service id as before, <b>null</b> if 
+     * no service is running
+     */
+    public default void actionCompleted(String id) {
+    }
     
     /**
      * Creates a selector instance with fallback.

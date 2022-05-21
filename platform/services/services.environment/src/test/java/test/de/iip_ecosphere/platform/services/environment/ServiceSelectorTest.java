@@ -53,6 +53,8 @@ public class ServiceSelectorTest {
             ServiceSelectorTest.class.getClassLoader(), MyServiceSelector.class.getName(), String.class, "dflt");
         Assert.assertNotNull(sel);
         Assert.assertEquals("abc", sel.select("abc"));
+        
+        sel.actionCompleted("abc"); // just to call it
     }
 
 }
