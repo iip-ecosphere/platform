@@ -38,6 +38,14 @@ public interface ServiceSelector<T> {
      */
     public default void actionCompleted(String id) {
     }
+
+    /**
+     * Called with the initial service id.
+     * 
+     * @param id the service id
+     */
+    public default void initial(String id) {
+    }
     
     /**
      * Creates a selector instance with fallback.
