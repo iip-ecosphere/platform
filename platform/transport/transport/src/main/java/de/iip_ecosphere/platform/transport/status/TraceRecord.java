@@ -25,9 +25,31 @@ import de.iip_ecosphere.platform.transport.streams.StreamNames;
 public class TraceRecord {
 
     public static final String TRACE_STREAM = StreamNames.TRACE_STREAM;
+    
+    /**
+     * A data item was received. Payload is the data item.
+     */
     public static final String ACTION_RECEIVING = "receiving";
+
+    /**
+     * A data item was processed and send further. Payload is the data item.
+     */
     public static final String ACTION_SENDING = "sending";
+    
+    /**
+     * A parameter was changed.
+     */
     public static final String ACTION_PARAMETER_CHANGE = "paramChange";
+
+    /**
+     * A family starts switching a service. Payload is the id of the service to switch to.
+     */
+    public static final String ACTION_SWITCHING_SERVICE = "switchingService";
+
+    /**
+     * A family completed switching a service. Payload is the id of the actual service (may be the old one).
+     */
+    public static final String ACTION_SWITCHED_SERVICE = "switchedService";
 
     private String source;
     private long timestamp;
