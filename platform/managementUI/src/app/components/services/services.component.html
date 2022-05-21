@@ -1,25 +1,56 @@
-<button mat-raised-button (click)="getData()">Aktualisieren</button>
-
-<div *ngIf="Data && Data.submodelElements" style="display: flex;">
-  <div *ngFor="let element of Data.submodelElements">
-    <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
-      <mat-card-title>{{ element.kind }} {{ element.idShort }}</mat-card-title>
-      <mat-card-content>
-        <div *ngFor="let element2 of element.value">
-          <div *ngIf="!element2.invokable">
-            <span class="service">{{ element2.idShort }}: </span>
-              <div *ngFor="let element3 of element2.value">
-                <span class="shortId"> {{ element3.idShort }}</span>
-                <span *ngIf="!isObject(element3.value); else isobject"> {{ element3.value }} </span>
-                <ng-template #isobject>
-                  <div *ngFor="let element4 of element3.value">
-                    <span *ngIf="element4.idShort != 'type'"> {{ element4.idShort }}:  {{ element4.value }}</span>
-                  </div>
-                </ng-template>
+<div class="background">
+  <button mat-raised-button (click)="getServices()">Aktualisieren</button>
+  <table>
+    <tr>
+      <td>
+        <div *ngIf="resource">
+          <div *ngFor="let basyxFunc of resource.value">
+            <div *ngIf="basyxFunc.invokable">
+              <div>
+                <button mat-raised-button (click)="showFuncInput(basyxFunc)">{{ basyxFunc.idShort }}</button>
               </div>
+            </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </td>
+      <td>
+        <div *ngIf="selectedBasyxFunc">
+          <div> {{ selectedBasyxFunc.idShort }}</div>
+          <div *ngFor="let func of selectedBasyxFunc.inputVariables; let i = index">
+            <p>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ func.value.idShort }}</mat-label>
+                <input [(ngModel)]=value[i].value.value matInput >
+              </mat-form-field>
+              <button mat-raised-button (click)="send()">Abschicken</button>
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div *ngIf="services && services.submodelElements" style="display: flex;">
+    <div *ngFor="let element of services.submodelElements">
+      <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
+        <mat-card-title>{{ element.idShort }}</mat-card-title>
+        <mat-card-content>
+          <div *ngFor="let element2 of element.value">
+            <div *ngIf="!element2.invokable">
+              <span class="service">{{ element2.idShort }}: </span>
+                <div *ngFor="let element3 of element2.value">
+                  <span class="shortId"> {{ element3.idShort }}</span>
+                  <span *ngIf="!isObject(element3.value); else isobject"> {{ element3.value }} </span>
+                  <ng-template #isobject>
+                    <div *ngFor="let element4 of element3.value">
+                      <span *ngIf="element4.idShort != 'type'"> {{ element4.idShort }}:  {{ element4.value }}</span>
+                    </div>
+                  </ng-template>
+                </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
+
 </div>
