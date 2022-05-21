@@ -169,6 +169,7 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
             */
             protected ${clsName}Impl(String serviceId, InputStream ymlFile) {
                 super(serviceId, ymlFile);
+                registerParameterConfigurers();
             }
             
             @Override
