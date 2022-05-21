@@ -137,6 +137,7 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
              */
             protected ${clsName}Impl(ServiceKind kind) {
                 super(kind);
+                registerParameterConfigurers();
             }
 
             /**
@@ -147,6 +148,7 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
              */
             protected ${clsName}Impl(String id, ServiceKind kind) {
                 super(id, kind);
+                registerParameterConfigurers();
             }
 
             /**
