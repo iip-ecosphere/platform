@@ -744,7 +744,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         private ${fInterface} selectService(${fType} data) {
             String id = selector.select(data);
-            if (null != id && actServiceId.equals(id)) {
+            if (null != id && !actServiceId.equals(id)) {
+                Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHING_SERVICE, actServiceId));
                 ${fInterface} newService; // instantiation shall override AAS service mapping
                 switch (id) {
                 ${generateServiceSelection(fInterface, family, "newService")}                    
@@ -762,6 +763,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                         LoggerFactory.getLogger(getClass()).error("Cannot switch to new service {}: {}", id, e.getMessage());
                     }
                 }
+                selector.actionCompleted(actServiceId);
+                Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHED_SERVICE, actServiceId));
             }
             return service;
         }'
