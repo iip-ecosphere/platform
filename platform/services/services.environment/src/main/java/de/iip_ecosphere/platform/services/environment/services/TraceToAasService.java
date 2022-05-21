@@ -289,11 +289,11 @@ public class TraceToAasService extends AbstractService {
     }
     
     /**
-     * Handles a new trace record and cleans up outdated ones.
+     * Handles a new trace record and cleans up outdated ones. [protected for mocking]
      * 
      * @param data the trace record data
      */
-    private void handleNew(TraceRecord data) {
+    protected void handleNew(TraceRecord data) {
         // add new record
         try {
             Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
@@ -374,11 +374,11 @@ public class TraceToAasService extends AbstractService {
     }
     
     /**
-     * Cleans up outdated trace entries.
+     * Cleans up outdated trace entries. [protected for mocking]
      * 
      * @param aas the AAS to clean up
      */
-    private void cleanup(Aas aas) {
+    protected void cleanup(Aas aas) {
         // remove outdated ones
         long now = System.currentTimeMillis();
         if (now - lastCleanup > cleanupTimeout) {
