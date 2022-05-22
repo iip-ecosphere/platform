@@ -4,16 +4,17 @@ project UI {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-   abstract compound ManagementUI {
-   }
+    abstract compound ManagementUI {
+    }
 
-   compound NoManagementUI refines ManagementUI {
-   }
+    compound NoManagementUI refines ManagementUI {
+    }
    
-   compound AngularManagementUI refines ManagementUI {
-   }
+    compound AngularManagementUI refines ManagementUI {
+        Port port = 4200;
+    }
    
-   // preliminary
-   ManagementUI managementUi = NoManagementUI {};
+    // preliminary
+    ManagementUI managementUi = NoManagementUI {};
    
 }

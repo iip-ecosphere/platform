@@ -1,0 +1,19 @@
+import UiAngularBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularLinux(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = port(config.managementUi);
+        '#!/bin/bash
+        PORT=${port}
+        if [ $# -gt 0 ]
+          then
+          PORT=$1
+        fi
+        cd mgtUi/dist/iipes-web
+        ng serve --port \\$PORT \\$*'
+    }
+	
+}

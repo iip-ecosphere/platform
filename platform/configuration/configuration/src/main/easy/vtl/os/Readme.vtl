@@ -18,40 +18,50 @@ template Readme(Configuration config, FileArtifact target) {
         This folder contains the top-level artifacts that are needed to execute the platform (in the following sequence):
           - The central platform services, in particular the AAS server (due to various components, JDK 8 is not 
             feasible for the central platform services)
-            - platform.bat for Windows and JDK > 8
-            - platform.sh for Linux/Bash and JDK > 8
+            - platform.bat for Windows and JDK > 8 and JDK <= 13
+            - platform.sh for Linux/Bash and JDK > 8 and JDK <= 13
             - source code in "platform"
             - binaries in "plJars"
-            - platform.service for Linux/systemd and JDK > 8 
+            - platform.service for Linux/systemd and JDK > 8 and JDK <= 13
+          - The central monitoring component (if configured, as long as BaSyx, Tomcat and monitoring do conflict)
+            - monitoring.bat for Windows and JDK > 8 and JDK <= 13
+            - monitoring.sh for Linux/Bash and JDK > 8 and JDK <= 13
+            - source code in "monitoring"
+            - binaries in "monJars"
+            - monitoring.service for Linux/systemd and JDK > 8 and JDK <= 13
           - The ECS runtime with container manager
-            - ecs.bat for Windows and JDK > 8, ecs8.bat for Windows and JDK 8
-            - ecs.sh for Linux/Bash and JDK > 8, ecs8.sh for Linux/Bash and JDK 8
+            - ecs.bat for Windows and JDK > 8 and JDK <= 13, ecs8.bat for Windows and JDK 8
+            - ecs.sh for Linux/Bash and JDK > 8 and JDK <= 13, ecs8.sh for Linux/Bash and JDK 8
             - source code in "ecsRuntime"
             - binaries in "ecsJars"
             - ecs.service (with dependency to platform.service) as well as ecs-noDeps.service (for standalone 
               device installation) for Linux/systemd and JDK > 8, ecs8.service for Linux/system and JDK 8
           - The service manager
-            - serviceMgr.bat for Windows and JDK > 8, serviceMgr8.bat for Windows and JDK 8
-            - serviceMgr.sh for Linux/Bash and JDK > 8, serviceMgr8.sh for for Linux/Bash and JDK 8
+            - serviceMgr.bat for Windows and JDK > 8 and JDK <= 13, serviceMgr8.bat for Windows and JDK 8
+            - serviceMgr.sh for Linux/Bash and JDK > 8 and JDK <= 13, serviceMgr8.sh for for Linux/Bash and JDK 8
             - source code in "serviceMgr"
             - binaries in "svcJars"
             - serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
-              device/container installation) for Linux/systemd and JDK > 8, akin serviceMgr8.service and 
+              device/container installation) for Linux/systemd and JDK > 8 and JDK <= 13, akin serviceMgr8.service and 
               serviceMgr8-noDeps.service for JDK 8
           - For small resources: ECS runtime without container manager but including service manager
-            - ecsServiceMgr.bat for Windows and JDK > 8, ecsServiceMgr8.bat for Windows and JDK 8
-            - ecsServiceMgr.sh for Linux/Bash and JDK > 8, ecsServiceMgr8.sh for for Linux/Bash and JDK 8
+            - ecsServiceMgr.bat for Windows and JDK > 8 and JDK <= 13, ecsServiceMgr8.bat for Windows and JDK 8
+            - ecsServiceMgr.sh for Linux/Bash and JDK > 8 and JDK <= 13, ecsServiceMgr8.sh for for Linux/Bash and JDK 8
             - source code in "ecsServiceMgr"
             - binaries in "ecsSvcJars"
             - ecsServiceMgr.service for Linux/systemd and JDK > 8, ecsServiceMgr8.service for Linux/system and JDK 8
-          - The platform command line (so far, the platform does not have an UI but this may change in future ;))
-            - cli.bat for Windows and JDK > 8, cli8.bat for Windows and JDK 8
-            - cli.sh for Linux/Bash and JDK > 8, cli8.sh for Linux/Bash and JDK 8
+          - The platform command line 
+            - cli.bat for Windows and JDK > 8 and JDK <= 13, cli8.bat for Windows and JDK 8
+            - cli.sh for Linux/Bash and JDK > 8 and JDK <= 13, cli8.sh for Linux/Bash and JDK 8
             - source code also in "platform"
             - binaries also in "plJars"
           - The folder "common": 
             - Empty, intended for optimizing installations.
             - Do not delete, the scripts refer to it in case that JARs are in the folder. 
+          - The management user interface (Angular)
+            - Compiled binaries with instantiated AAS settings in mgtUi
+            - mgtUi.bat startup script for Windows (nodeJS 12, Angular 12)
+            - mgtUi.sh startup script for Linux (nodeJS 12, Angular 12)
         '
     }
 	

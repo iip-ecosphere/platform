@@ -319,7 +319,7 @@ project SerializerConfig1 {
     
     // --------------------- monitoring ---------------------------
     
-    // just for building, running causes multiple conflicts. 
+    // currently: instantiation into own component, not part of "platform" component
     platformMonitoring = PrometheusPlatformMonitoring {
         schema = PrometheusSchema::HTTPS,
         host = "127.0.0.1",
@@ -337,7 +337,9 @@ project SerializerConfig1 {
     
     // ------------------------- UI -------------------------------
     
-    // current default: no UI configured
+    managementUi = AngularManagementUI {
+        port = 4200
+    };
 
     // ------------ application and service nets ------------------
     
