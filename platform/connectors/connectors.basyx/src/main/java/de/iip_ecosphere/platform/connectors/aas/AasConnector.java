@@ -14,7 +14,11 @@ package de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,14 +37,20 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
  * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
- * and elements within. Requires the model URN as {@link ConnectorParameter#getApplicationId()}, e.g., 
- * "urn:::AAS:::testMachines#" and the registry URL part, e.g. "registry" in 
- * {@link ConnectorParameter#getEndpointPath()}. 
+ * and elements within. Requires the the registry URL part, e.g. "registry" in 
+ * {@link ConnectorParameter#getEndpointPath()}. The {@link ConnectorParameter#getApplicationId()} denotes the AASs
+ * to operate on. If the application id is 
+ * <ol>
+ *     <li>a non-wildcard string, the uniquely denoted AAS is used for reading and writing/calling.</li>
+ *     <li>a wildcard string in Java String Regex format, the denoted AAS are used for reading. AAS names are updated
+ *       during polling. Currently, only the first matching AAS is enabled for writing/calling.</li>
+ * </ol>
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
@@ -53,9 +63,16 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnector.class);
     private static final Object DUMMY = new Object();
 
-    private Aas connectedAAS;
+    private Map<String, Aas> connectedAAS = new HashMap<String, Aas>();
     private AasFactory factory;
     private ConnectorParameter params;
+    private Pattern pattern;
+    private Registry registry;
+    private AtomicBoolean inPolling = new AtomicBoolean(false);
+    
+    private transient String pollingAas = "";
+    private transient Thread pollingThread;
+    private String nonPollingAas = "";
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -123,7 +140,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
-        if (null == connectedAAS) {
+        if (connectedAAS.isEmpty()) {
             this.params = params;
             // BaSyx... stays HTTP, no TLS on the registry!!!
             Schema schema = params.getSchema();
@@ -139,10 +156,70 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 }
             }
             Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), epPath);
-            connectedAAS = factory.obtainRegistry(regEp, schema).retrieveAas(params.getApplicationId());
-            if (null == connectedAAS) {
-                throw new IOException("No AAS retrieved!");
+            registry = factory.obtainRegistry(regEp, schema);
+            String name = params.getApplicationId();
+            if (name.indexOf('?') > 0 || name.indexOf('*') > 0) {
+                try {
+                    pattern = Pattern.compile(name);
+                } catch (PatternSyntaxException e) {
+                    LOGGER.error("ApplicationName/AAS pattern not valid: {}", e.getMessage());
+                }
+                updateAas();
+            } else {
+                Aas aas = registry.retrieveAas(name);
+                if (null != aas) {
+                    nonPollingAas = aas.getIdShort();
+                    connectedAAS.put(nonPollingAas, aas);
+                }
             }
+        }
+    }
+    
+    /**
+     * Updates the AAS.
+     * 
+     * @return {@code true} if new AAS were added, {@code false} else
+     */
+    private boolean updateAas() {
+        boolean foundNew = false;
+        if (null != pattern && null != registry) {
+            List<String> ids = registry.getAasIdShorts();
+            for (String id: ids) {
+                if (!connectedAAS.containsKey(id) && pattern.matcher(id).matches()) {
+                    try {
+                        Aas aas = registry.retrieveAas(id);
+                        connectedAAS.put(aas.getIdShort(), aas);
+                        if (null == nonPollingAas) {
+                            nonPollingAas = aas.getIdShort();
+                        }
+                        foundNew = true;
+                    } catch (IOException e) {
+                        LOGGER.warn("Cannot retrieve AAS '{}': {}. Ignoring.", id, e.getMessage());
+                    }
+                }
+            }
+        }
+        return foundNew;
+    }
+    
+    @Override
+    protected void doPolling() {
+        if (!inPolling.getAndSet(true)) {
+            pollingThread = Thread.currentThread();
+            updateAas();
+            for (String key : connectedAAS.keySet()) {
+                pollingAas = key;
+                try {
+                    Object data = read();
+                    if (null != data) {
+                        received(data);
+                    }
+                } catch (IOException e) {
+                    error("While polling. Data discarded.", e);
+                }
+            }
+            pollingThread = null;
+            inPolling.set(false);
         }
     }
     
@@ -151,7 +228,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     @Override
     protected void disconnectImpl() throws IOException {
         // if anything to be cleaned up, do it here
-        connectedAAS = null; 
+        connectedAAS.clear(); 
+        registry = null;
     }
 
     @Override
@@ -264,12 +342,15 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 String path = qName;
                 if (null == result) {
                     int pos = qName.indexOf(SEPARATOR_CHAR);
-                    if (pos > 0) {
-                        result = connectedAAS.getSubmodel(qName.substring(0, pos));
-                        path = qName.substring(pos + 1);
-                    } else {
-                        result = connectedAAS.getSubmodel(qName);
-                        path = null;
+                    Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
+                    if (null != aas) {
+                        if (pos > 0) {
+                            result = aas.getSubmodel(qName.substring(0, pos));
+                            path = qName.substring(pos + 1);
+                        } else {
+                            result = aas.getSubmodel(qName);
+                            path = null;
+                        }
                     }
                 } 
                 if (path != null && result != null) {
@@ -399,7 +480,11 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         public AasModelAccess stepInto(String name) throws IOException {
             AasModelAccess result = null;
             if (null == base) {
-                Submodel submodel = connectedAAS.getSubmodel(name);
+                Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
+                if (null == aas) {
+                    throw new IOException("AAS " + pollingAas + " not found. Cannot resolve further.");
+                }
+                Submodel submodel = aas.getSubmodel(name);
                 if (null == submodel) {
                     throw new IOException("Submodel " + name + " not found. Cannot resolve further.");
                 }
