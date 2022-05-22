@@ -283,7 +283,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             } else {
                 // JAVA & PYTHON
                 
-                // Create requirements.txt
                 Path req = "${appRoot}/../requirements.txt";
                 vilTemplateProcessor("PythonReq", config, req, elements=elements);              
                 
