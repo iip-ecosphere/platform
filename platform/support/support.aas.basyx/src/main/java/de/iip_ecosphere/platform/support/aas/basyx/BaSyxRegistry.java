@@ -13,6 +13,9 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
@@ -66,6 +69,38 @@ public class BaSyxRegistry implements Registry {
     @Override
     public Aas retrieveAas(String identifier) throws IOException {
         return obtainAas(Tools.translateIdentifier(identifier, ""));
+    }
+
+    @Override
+    public List<String> getAasIdShorts() {
+        return getStrings(d -> d.getIdShort());
+    }
+
+    @Override
+    public List<String> getAasIdentifiers() {
+        return getStrings(d -> Tools.translateIdentifier(d.getIdentifier()));
+    }
+
+    /**
+     * Retrieves strings from registered AAS descriptors.
+     * 
+     * @param func returns the output for a given descriptor, skip descriptor if result is <b>null</b>
+     * @return the strings
+     */
+    private List<String> getStrings(Function<AASDescriptor, String> func) {
+        List<String> result = new ArrayList<String>();
+        try {
+            List<AASDescriptor> desc = registry.lookupAll();
+            for (AASDescriptor d : desc) {
+                String tmp = func.apply(d);
+                if (tmp != null) {
+                    result.add(tmp);
+                }
+            }
+        } catch (ResourceNotFoundException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS descriptor: " + e.getMessage());
+        }
+        return result;
     }
     
     /**
