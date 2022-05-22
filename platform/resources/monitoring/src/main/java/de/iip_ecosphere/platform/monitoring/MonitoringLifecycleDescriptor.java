@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.monitoring;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.transport.Transport;
 
 /**
@@ -20,7 +21,7 @@ import de.iip_ecosphere.platform.transport.Transport;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MonitoringLifecycleDescriptor implements LifecycleDescriptor {
+public class MonitoringLifecycleDescriptor implements LifecycleDescriptor, PidLifecycleDescriptor {
     
     @Override
     public void startup(String[] args) {
@@ -40,5 +41,10 @@ public class MonitoringLifecycleDescriptor implements LifecycleDescriptor {
     public int priority() {
         return LifecycleDescriptor.INIT_PRIORITY;
     }
-    
+
+    @Override
+    public String getPidFileName() {
+        return "iip-monitoring.pid";
+    }
+
 }
