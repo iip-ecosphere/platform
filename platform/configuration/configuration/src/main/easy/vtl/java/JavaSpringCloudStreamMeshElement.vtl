@@ -942,8 +942,23 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService";
     }
 
+    def isBackward(sequenceOf(IOType) types, String type) {
+        Boolean bwd = false;
+        for (IOType t : types) {
+            if (t.type.name == type) {
+                bwd = not(t.forward);
+            }
+        }
+        bwd;
+    }
+
     def generateAsyncProcessorBody(MeshElement proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
-        String expr = 'service.processQuiet(data)';
+        String expr;
+        if (not(isBackward(service.input, type))) { // service is not prepared for this
+            expr = 'service.processQuiet(data)';
+        } else {
+            expr = '';
+        }
         'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     

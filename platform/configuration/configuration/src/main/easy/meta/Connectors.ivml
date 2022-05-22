@@ -200,7 +200,10 @@ project Connectors {
    compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
         String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
         String artifact ="de.iip-ecosphere.platform:connectors.aas:";
-        NonEmptyString idShortSpec; // name or java regex pattern
+        NonEmptyString idShortSpec; // name or java regex pattern, shall start with iri:urn:...
+        NonEmptyString registryHost = "localhost";
+        Port registryPort;
+        String registryPath;
         NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "Generic AAS connector@en",
            manufacturer = refBy(manufacturer_sse)

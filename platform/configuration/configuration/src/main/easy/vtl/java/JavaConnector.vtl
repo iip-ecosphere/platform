@@ -479,6 +479,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         conn.idShortSpec;
     }
 
+    def generateEndpointPath(Connector conn) {
+        ""
+    }
+
+    def generateEndpointPath(AasConnector conn) {
+        String url = "http://" + conn.registryHost + ":" + conn.registryPort;
+        if (conn.registryPath <> "") {
+            url = url + "/" + conn.registryPath;
+        }
+        '.setEndpointPath("${url}")'
+    }
+
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
         * Creates the connector parameter instance. [public for testing]
@@ -490,6 +502,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder("${conn.host}", ${conn.port})
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
+                ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
                 ${generateNotificationInterval(conn)|e}
                 .build();
