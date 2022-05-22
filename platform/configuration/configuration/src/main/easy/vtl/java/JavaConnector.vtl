@@ -471,6 +471,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         ''
     }
 
+    def getApplicationInformation(Connector conn, Application app) {
+        app.id;
+    }
+
+    def getApplicationInformation(AasConnector conn, Application app) {
+        conn.idShortSpec;
+    }
+
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
         * Creates the connector parameter instance. [public for testing]
@@ -481,7 +489,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             ${generateConnectorParamSecurityDecls(conn)|e}
             return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder("${conn.host}", ${conn.port})
-                .setApplicationInformation("${app.id}", "${app.description}")
+                .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
                 ${generateConnectorParamSecuritySettings(conn)|e}
                 ${generateNotificationInterval(conn)|e}
                 .build();
