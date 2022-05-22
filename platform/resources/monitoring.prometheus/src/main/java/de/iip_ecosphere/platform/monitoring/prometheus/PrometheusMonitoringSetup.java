@@ -42,6 +42,7 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
 
         private int scrapeInterval = 1000;
         private int scrapeTimeout = 1000; 
+        private int evaluationInterval = 3000; 
 
         /**
          * Returns the Prometheus server information.
@@ -77,6 +78,24 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
          */
         public void setScrapeInterval(int scrapeInterval) {
             this.scrapeInterval = scrapeInterval;
+        }
+
+        /**
+         * Returns the evaluation interval.
+         * 
+         * @return the evaluation interval in ms
+         */
+        public int getEvaluationInterval() {
+            return evaluationInterval;
+        }
+
+        /**
+         * Defines the evaluation interval. [snakeyaml]
+         * 
+         * @param evaluationInterval in ms
+         */
+        public void setEvaluationInterval(int evaluationInterval) {
+            this.evaluationInterval = evaluationInterval;
         }
 
         /**

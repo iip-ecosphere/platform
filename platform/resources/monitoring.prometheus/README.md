@@ -56,8 +56,9 @@ As usual, this component supports a YAML-based setup:
           running: <Boolean>
         scrapeInterval: <int>
         scrapeTimeout: <int>
+        evaluationInterval: <int>
         
-The fields are akin to [EcsRuntime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime). `prometheusServer` defines the network address where the server shall be running (then `host` is implicitly `localhost`) or where it is installed (default values: schema `HTTP`, host `localhost`, port `9090`). For local prometheus instances, `running` shall be `false` (the default), for installed and running installations this value shall be `true`. Similarly for the platform-sided `exporter` (default for port is `-1` meaning an emphereral port) and the `alertMgr`. `scrapeInterval` defines how often metrics from the `exporter` shall be read and `scrapeTimeout` (smaller than `scrapeInterval`) when a timeout for accessing a scrape point shall be assumed.
+The fields are akin to [EcsRuntime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime). `prometheusServer` defines the network address where the server shall be running (then `host` is implicitly `localhost`) or where it is installed (default values: schema `HTTP`, host `localhost`, port `9090`). For local prometheus instances, `running` shall be `false` (the default), for installed and running installations this value shall be `true`. Similarly for the platform-sided `exporter` (default for port is `-1` meaning an emphereral port) and the `alertMgr`. `scrapeInterval` defines how often metrics from the `exporter` shall be read and `scrapeTimeout` (smaller than `scrapeInterval`) when a timeout for accessing a scrape point shall be assumed. Similarly, `evaluationInterval` defines the rule evaluation interval (defaults: `scrapeInterval` 1000ms, `scrapeTimeout` 1000ms, `evaluationInterval` 3000ms)
 
 ## Lifecycle Profiles
 

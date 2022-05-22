@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.monitoring.prometheus;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -33,7 +34,10 @@ import si.matjazcerkvenik.alertmonitor.model.prometheus.PrometheusApiException;
 import si.matjazcerkvenik.alertmonitor.util.AmMetrics;
 import si.matjazcerkvenik.alertmonitor.util.AmProps;
 import si.matjazcerkvenik.alertmonitor.util.Formatter;
+import si.matjazcerkvenik.alertmonitor.util.LogFactory;
 import si.matjazcerkvenik.alertmonitor.util.TaskManager;
+import si.matjazcerkvenik.simplelogger.Config;
+import si.matjazcerkvenik.simplelogger.LEVEL;
 
 /**
  * A prometheus alert manager importer. This class assumes that 
@@ -53,6 +57,7 @@ public class AlertManagerImporter {
      * Starts the importer.
      */
     public void start() {
+        LogFactory.getLogger().setLogLevel(LEVEL.WARN);
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
         AmProps.ALERTMONITOR_PROMETHEUS_SERVER = setup.getPrometheus().getAlertMgr().getServerAddress().toServerUri();
         AmProps.ALERTMONITOR_HTTP_CLIENT_READ_TIMEOUT_SEC = 2;
@@ -73,7 +78,7 @@ public class AlertManagerImporter {
     private class SyncTask extends TimerTask {
 
         private PrometheusApi api = new PrometheusApi();
-
+        
         // checkstyle: stop exception type check
 
         @Override

@@ -278,13 +278,22 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             return entry;
         }
         
+        // checkstyle: stop exception type check
+        
         @Override
         protected void addMeter(Meter meter)  {
             if (null != meter) {
-                registry.remove(meter.getId());
-                registry.createMeter(meter.getId(), meter.getId().getType(), meter.measure());
+                try {
+                    registry.remove(meter.getId());
+                    registry.createMeter(meter.getId(), meter.getId().getType(), meter.measure());
+                } catch (Throwable t) {
+                    LoggerFactory.getLogger(getClass()).error("Cannot add meter ({}, {}, {}): {}", meter.getId(), 
+                        meter.getId().getType(), meter.measure(), t.getMessage());
+                }
             }
         }
+
+        // checkstyle: resume exception type check
 
         @Override
         protected void dispose() {

@@ -139,15 +139,18 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             File cfg = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG);
             Path initCfgPath = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG_INITIAL).toPath();
             Files.copy(initCfgPath, cfg.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            PrintWriter writer = new PrintWriter(new FileWriter(cfg, true));
+            PrintWriter writer = new PrintWriter(new FileWriter(cfg, false));
+            writer.println("global:");
+            writer.println("  scrape_interval: " + setup.getScrapeInterval() + "ms");
+            writer.println("  scrape_timeout: " + setup.getScrapeTimeoutSafe() + "ms");
+            writer.println("  evaluation_interval: " + setup.getEvaluationInterval() + "ms");
+            
             writer.println("");
             writer.println("scrape_configs:");
             for (ScrapeEndpoint e : modifier.scrapeEndpoints()) {
                 Endpoint ep = e.getScrapePoint();
                 writer.println("  - job_name: \"" + e.getName() + "\"");
                 writer.println("    metrics_path: \"" + ep.getEndpoint() + "\"");
-                writer.println("    scrape_interval: " + setup.getScrapeInterval() + "ms");
-                writer.println("    scrape_timeout: " + setup.getScrapeTimeoutSafe() + "ms");
                 writer.println("    scheme: \"" + ep.getSchema().name().toLowerCase() + "\"");
                 writer.println("    static_configs:");
                 writer.println("      - targets: [\"" + ep.getHost() + ":" + ep.getPort() + "\"]");
@@ -162,6 +165,10 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 writer.println("        - targets:");
                 writer.println("           - alertmanager:" + alertMgr.getHost() + ":" + alertMgr.getPort());
             }
+            
+            writer.println("rule_files:");
+            writer.println("  # - \"first_rules.yml\"");
+            writer.println("  # - \"second_rules.yml\"");
             
             writer.close();
             if (notify) {
@@ -264,6 +271,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
             new File(prometheusWorkingDirectory.getAbsolutePath(), exeName).delete();
             new File(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG).delete();
+            // delete data?
         }
     }
     
