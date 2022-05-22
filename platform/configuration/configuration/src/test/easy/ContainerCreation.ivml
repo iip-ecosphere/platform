@@ -91,7 +91,18 @@ project ContainerCreation {
         //artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(rec1)}}    
+        output = {{type=refBy(rec1)}},
+        dependencies = {refBy(PYTHON39), refBy(ScipPy141), refBy(NumPy1201)}   
+    };
+    
+    PythonDependency ScipPy141 = {
+       name = "scipy",
+       version = "1.4.1"
+    };
+
+    PythonDependency NumPy1201 = {
+       name = "numpy",
+       version = "1.20.1"
     };
     
     Service myReceiverService = JavaService {
