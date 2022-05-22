@@ -137,36 +137,33 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     @Override
     public void process(I data) throws IOException {
-        ReceptionCallback<O> callback = getReceptionCallback();
-        if (null != callback) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    try {
-                        HttpPost post = new HttpPost(getApiPath());
-                        String bearer = getBearerToken();
-                        String input = adjustRestQuery(getInputTranslator().to(data));
-                        StringEntity entity = new StringEntity(input);
-                        post.setEntity(entity);
-                        post.setHeader("Accept", "application/json");
-                        post.setHeader("Content-type", "application/json");
-                        post.setHeader("Authorization", bearer);
-                        if (client != null) {
-                            CloseableHttpResponse response = client.execute(post);
-                            String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
-                            try {
-                                callback.received(getOutputTranslator().to(result));
-                            } catch (IOException e) {
-                                LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
-                            }
-                        } else {
-                            LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    HttpPost post = new HttpPost(getApiPath());
+                    String bearer = getBearerToken();
+                    String input = adjustRestQuery(getInputTranslator().to(data));
+                    StringEntity entity = new StringEntity(input);
+                    post.setEntity(entity);
+                    post.setHeader("Accept", "application/json");
+                    post.setHeader("Content-type", "application/json");
+                    post.setHeader("Authorization", bearer);
+                    if (client != null) {
+                        CloseableHttpResponse response = client.execute(post);
+                        String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
+                        try {
+                            notifyCallbacks(getOutputTranslator().to(result));
+                        } catch (IOException e) {
+                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
                         }
-                    } catch (IOException e1) {
-                        LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
+                    } else {
+                        LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");
                     }
+                } catch (IOException e1) {
+                    LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
                 }
-            });
-        }
+            }
+        });
     }
     
     /**

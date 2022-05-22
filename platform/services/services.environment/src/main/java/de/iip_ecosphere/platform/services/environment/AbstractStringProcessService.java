@@ -57,30 +57,27 @@ public abstract class AbstractStringProcessService<I, O> extends AbstractProcess
      * Redirects an input stream to another stream (in parallel).
      * 
      * @param in the input stream of the spawned process (e.g., input/error)
-     * @param callback the callback to inform
      */
-    public void redirectIO(final InputStream in, ReceptionCallback<O> callback) {
-        if (null != callback) {
-            new Thread(new Runnable() {
-                public void run() {
-                    Scanner sc = new Scanner(in);
-                    while (sc.hasNextLine()) {
-                        String line = sc.nextLine();
-                        try {
-                            callback.received(getOutputTranslator().to(line));
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
-                        }
+    public void redirectIO(final InputStream in) {
+        new Thread(new Runnable() {
+            public void run() {
+                Scanner sc = new Scanner(in);
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    try {
+                        notifyCallbacks(getOutputTranslator().to(line));
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
                     }
-                    sc.close();
                 }
-            }).start();
-        }
+                sc.close();
+            }
+        }).start();
     }
 
     @Override
     protected void handleInputStream(InputStream in) {
-        redirectIO(in, getReceptionCallback());
+        redirectIO(in);
     }
 
 }

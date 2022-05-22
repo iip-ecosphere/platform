@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -56,7 +58,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
 
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
-    private ReceptionCallback<O> callback;
+    private Map<Class<?>, List<ReceptionCallback<?>>> callbacks = new HashMap<>();
     private YamlService serviceSpec;
     private PrintWriter serviceIn;
     private Process proc;
@@ -76,8 +78,25 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         super(serviceSpec);
         this.inTrans = inTrans;
         this.outTrans = outTrans;
-        this.callback = callback;
         this.serviceSpec = serviceSpec;
+        addCallback(callback);
+    }
+    
+    /**
+     * Adds a callback.
+     * 
+     * @param callback the callback, ignored if <b>null</b>
+     */
+    private void addCallback(ReceptionCallback<?> callback) {
+        if (null != callback) {
+            Class<?> type = callback.getType();
+            List<ReceptionCallback<?>> list = callbacks.get(type);
+            if (null == list) {
+                list = new ArrayList<>();
+                callbacks.put(type, list);
+            }
+            list.add(callback);
+        }
     }
     
     /**
@@ -97,22 +116,23 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     /**
      * Attaches an asynchronous result data ingestor as callback.
      * 
+     * @param <P> the output type
      * @param outCls the class representing the type
      * @param ingestor the ingestor instance
      */
-    public void attachIngestor(Class<O> outCls, DataIngestor<O> ingestor) {
-        callback = new ReceptionCallback<O>() {
+    public <P> void attachIngestor(Class<P> outCls, DataIngestor<P> ingestor) {
+        addCallback(new ReceptionCallback<P>() {
 
             @Override
-            public void received(O data) {
+            public void received(P data) {
                 ingestor.ingest(data);
             }
 
             @Override
-            public Class<O> getType() {
+            public Class<P> getType() {
                 return outCls;
             }
-        };
+        });
         if (null != proc) { // important if process is already running, otherwise done in createAndConfigureProcess
             handleInputStream(proc.getInputStream());
         }
@@ -155,14 +175,24 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             args.addAll(pSpec.getCmdArg());
         }            
     }
-    
+
     /**
-     * Returns the reception callback.
+     * Returns the reception callbacks for {@code out}.
      * 
-     * @return the callback
+     * @param <P> the output type
+     * @param data the output data, may be <b>null</b> 
      */
-    protected ReceptionCallback<O> getReceptionCallback() {
-        return callback;
+    @SuppressWarnings("unchecked")
+    protected <P> void notifyCallbacks(P data) {
+        if (data != null) {
+            Class<?> cls = data.getClass();
+            List<ReceptionCallback<?>> cbs = callbacks.get(cls);
+            if (null != cbs) {
+                for (int c = 0; c < cbs.size(); c++) {
+                    ((ReceptionCallback<P>) cbs.get(c)).received(data);
+                }
+            }
+        }
     }
     
     /**
