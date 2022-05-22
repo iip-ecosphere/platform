@@ -158,14 +158,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
 
                 @Override
                 public void run() {
-                    try {
-                        O data = read();
-                        if (null != data) {
-                            received(data);
-                        }
-                    } catch (IOException e) {
-                        error("While polling. Data discarded.", e);
-                    }
+                    doPolling();
                 }
                 
             };
@@ -173,6 +166,20 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
         }
     }
     
+    /**
+     * Does the default polling.
+     */
+    protected void doPolling() {
+        try {
+            O data = read();
+            if (null != data) {
+                received(data);
+            }
+        } catch (IOException e) {
+            error("While polling. Data discarded.", e);
+        }
+    }
+
     /**
      * Returns whether we are polling or waiting for events.
      * 
