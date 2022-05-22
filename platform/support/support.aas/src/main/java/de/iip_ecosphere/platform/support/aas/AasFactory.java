@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -117,6 +119,16 @@ public abstract class AasFactory {
                 @Override
                 public String getEndpoint(String aasIdShort) {
                     return null;
+                }
+
+                @Override
+                public List<String> getAasIdShorts() {
+                    return new ArrayList<String>();
+                }
+
+                @Override
+                public List<String> getAasIdentifiers() {
+                    return new ArrayList<String>();
                 }
             };
         }

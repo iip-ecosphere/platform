@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Provides access to AAS/submodels via a (remote) registry. This also allows for deploying new AAS to a remote 
@@ -74,6 +75,20 @@ public interface Registry {
      */
     public void register(Aas aas, Submodel submodel, String endpointUrl);
     
+    /**
+     * Retrieves the short ids from registered AAS descriptors.
+     * 
+     * @return the short ids
+     */
+    public List<String> getAasIdShorts();
+
+    /**
+     * Retrieves the identifiers (e.g., URNs) from registered AAS descriptors.
+     * 
+     * @return the identifiers
+     */
+    public List<String> getAasIdentifiers();
+   
     /**
      * Returns the URI of a (deployed) AAS.
      * 
