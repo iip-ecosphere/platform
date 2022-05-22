@@ -35,7 +35,6 @@ import si.matjazcerkvenik.alertmonitor.util.AmProps;
 import si.matjazcerkvenik.alertmonitor.util.Formatter;
 import si.matjazcerkvenik.alertmonitor.util.LogFactory;
 import si.matjazcerkvenik.alertmonitor.util.TaskManager;
-import si.matjazcerkvenik.simplelogger.Config;
 import si.matjazcerkvenik.simplelogger.LEVEL;
 
 /**
