@@ -53,6 +53,9 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
  *     <li>a wildcard string in Java String Regex format, the denoted AAS are used for reading. AAS names are updated
  *       during polling. Currently, only the first matching AAS is enabled for writing/calling.</li>
  * </ol>
+ * If the application id starts with a known AAS identifier schema, the id is parsed into that and utilized to obtain 
+ * the AAS, e.g., iri:urn:... Without, the connector tries to obtain a registry based on an AAS short id, which 
+ * currently may fail.
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
