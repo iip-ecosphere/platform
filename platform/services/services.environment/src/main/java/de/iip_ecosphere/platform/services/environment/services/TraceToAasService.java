@@ -460,6 +460,7 @@ public class TraceToAasService extends AbstractService {
                     LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
                 }
                 super.setState(ServiceState.RUNNING);
+                start();
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
                 super.setState(ServiceState.FAILED);
@@ -467,6 +468,7 @@ public class TraceToAasService extends AbstractService {
             break;
         case STOPPING:
             super.setState(state);
+            stop();
             try {
                 TransportConnector conn = Transport.getConnector();
                 if (null != conn) {
@@ -491,6 +493,18 @@ public class TraceToAasService extends AbstractService {
             super.setState(state);
             break;
         }
+    }
+
+    /**
+     * Called when service goes to state running.
+     */
+    protected void start() {
+    }
+
+    /**
+     * Called when service goes to state stopped.
+     */
+    protected void stop() {
     }
 
     /**
