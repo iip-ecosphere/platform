@@ -478,6 +478,7 @@ public class FakeRtsa {
             if (input.data != null) {
                 for (Map<String, Object> values : input.data) {
                     Set<String> done = new HashSet<String>();
+                    Set<String> toRemove = new HashSet<String>();
                     for (Map.Entry<String, Object> ent : values.entrySet()) {
                         done.add(ent.getKey());
                         FunctionMapping fm = deployment.getMapping(ent.getKey());
@@ -485,6 +486,8 @@ public class FakeRtsa {
                             Object newValue = fm.map(ent.getValue());
                             if (null != newValue) {
                                 ent.setValue(newValue);
+                            } else {
+                                toRemove.add(ent.getKey());
                             }
                         }
                     }
@@ -498,6 +501,9 @@ public class FakeRtsa {
                                 }
                             }
                         }
+                    }
+                    for (String key : toRemove) {
+                        values.remove(key);
                     }
                 }
             }
