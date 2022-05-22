@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +147,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             // BaSyx... stays HTTP, no TLS on the registry!!!
             Schema schema = params.getSchema();
             String epPath = params.getEndpointPath();
+            
+            // endpoint handling is a bit mixed, old and new stuff
             int pos = epPath.indexOf(':');
             if (pos > 0 && pos < epPath.length()) {
                 String tmp = epPath.substring(0, pos);
@@ -155,7 +159,24 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                     LOGGER.warn("Implicit schema in endpoint path '" + tmp + "' unknown. Ignored. Using " + schema);
                 }
             }
-            Endpoint regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), epPath);
+            Endpoint regEp = null;
+            try {
+                Schema regSchema;
+                URL url = new URL(params.getEndpointPath());
+                try {
+                    regSchema = Schema.valueOf(url.getProtocol());
+                } catch (IllegalArgumentException e1) {
+                    regSchema = Schema.HTTP; // usual in BaSyx, not encrypted
+                }
+                if (url.getHost().length() > 0 && url.getPort() > 0) {
+                    regEp = new Endpoint(regSchema, url.getHost(), url.getPort(), url.getPath());
+                }
+            } catch (MalformedURLException e) {
+            }
+            if (null == regEp) { // fallback, use server and epPath
+                regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), epPath);
+            }
+            
             registry = factory.obtainRegistry(regEp, schema);
             String name = params.getApplicationId();
             if (name.indexOf('?') > 0 || name.indexOf('*') > 0) {
@@ -183,13 +204,19 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     private boolean updateAas() {
         boolean foundNew = false;
         if (null != pattern && null != registry) {
-            List<String> ids = registry.getAasIdShorts();
+            List<String> ids;
+            String name = params.getApplicationId(); 
+            if (name.startsWith("iri:")) {
+                ids = registry.getAasIdentifiers();
+            } else {
+                ids = registry.getAasIdShorts();
+            }
             for (String id: ids) {
                 if (!connectedAAS.containsKey(id) && pattern.matcher(id).matches()) {
                     try {
                         Aas aas = registry.retrieveAas(id);
                         connectedAAS.put(aas.getIdShort(), aas);
-                        if (null == nonPollingAas) {
+                        if (nonPollingAas.length() == 0) {
                             nonPollingAas = aas.getIdShort();
                         }
                         foundNew = true;
@@ -218,6 +245,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                     error("While polling. Data discarded.", e);
                 }
             }
+            pollingAas = "";
             pollingThread = null;
             inPolling.set(false);
         }
@@ -229,6 +257,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     protected void disconnectImpl() throws IOException {
         // if anything to be cleaned up, do it here
         connectedAAS.clear(); 
+        nonPollingAas = "";
         registry = null;
     }
 
@@ -268,7 +297,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         private static final String SEPARATOR_STRING = "/";
         private ElementsAccess base;
         private AasModelAccess parent;
-        private Map<String, ElementsAccess> elements = new HashMap<>();
+        private Map<String, Map<String, ElementsAccess>> elements = new HashMap<>();
 
         /**
          * Creates the instance and binds the listener to the creating connector instance.
@@ -336,13 +365,15 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * @throws IOException if no node can be found for {@code qName}
          */
         private ElementsAccess retrieveElement(String qName) throws IOException {
-            ElementsAccess result = elements.get(qName);
+            String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+            Map<String, ElementsAccess> cache = elements.get(aasId);
+            ElementsAccess result = null == cache ? null : cache.get(qName);
             if (null == result) {
                 result = base;
                 String path = qName;
                 if (null == result) {
                     int pos = qName.indexOf(SEPARATOR_CHAR);
-                    Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
+                    Aas aas = connectedAAS.get(aasId);
                     if (null != aas) {
                         if (pos > 0) {
                             result = aas.getSubmodel(qName.substring(0, pos));
@@ -359,7 +390,11 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 if (null == result) {
                     throw new IOException("No element found for " + qName);
                 } else {
-                    elements.put(qName, result);
+                    if (null == cache) {
+                        cache = new HashMap<>();
+                        elements.put(aasId, cache);
+                    }
+                    cache.put(qName, result);
                 }
             }
             return result;
