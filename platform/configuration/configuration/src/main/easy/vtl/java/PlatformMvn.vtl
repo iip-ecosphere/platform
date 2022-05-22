@@ -4,9 +4,9 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -19,13 +19,16 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
-        appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
-        appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
-        appendDependency(dep, iipGroup, "monitoring", projectVersion);
-        appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
-        appendDependency(dep, iipGroup, "platform", projectVersion);
-        appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
+        if (monitoring) {
+            appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
+            appendDependency(dep, iipGroup, "monitoring", projectVersion);
+        } else {
+            appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
+            appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
+            appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
+            appendDependency(dep, iipGroup, "platform", projectVersion);
+            appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
+        }
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

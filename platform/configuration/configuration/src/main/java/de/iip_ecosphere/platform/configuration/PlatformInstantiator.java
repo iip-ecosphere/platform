@@ -27,6 +27,8 @@ import net.ssehub.easy.varModel.confModel.Configuration;
  */
 public class PlatformInstantiator {
 
+    private static int exitCode = 0;
+    
     /**
      * Configures the instantiation. Default is for command line execution, but the configurer allows for adjusting the 
      * execution  to jUnit testing.
@@ -138,6 +140,7 @@ public class PlatformInstantiator {
          */
         protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
             System.out.println(ex.getMessage());
+            exitCode = 1;
         }
         
     }
@@ -196,6 +199,7 @@ public class PlatformInstantiator {
                 c.setStartRuleName(args[3]);
             }
             instantiate(c);
+            System.exit(exitCode);
         }
     }
 

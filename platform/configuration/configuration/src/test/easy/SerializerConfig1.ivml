@@ -320,20 +320,20 @@ project SerializerConfig1 {
     // --------------------- monitoring ---------------------------
     
     // just for building, running causes multiple conflicts. 
-    /*platformMonitoring = PrometheusPlatformMonitoring {
+    platformMonitoring = PrometheusPlatformMonitoring {
         schema = PrometheusSchema::HTTPS,
         host = "127.0.0.1",
         port = 9090,
-        running = true,
+        running = false,
         exporterPort = -1, // ephemeral
         exporterHost = "127.0.0.1",
-        exporterRunning = true,
+        exporterRunning = false,
         alertMgrPort = 9091,
         alertMgrHost = "127.0.0.1",
-        alertMgrRunning = true,
+        alertMgrRunning = false,
         scrapeInterval = 1000,
         scrapeTimeout = 1000
-    };*/
+    };
     
     // ------------------------- UI -------------------------------
     

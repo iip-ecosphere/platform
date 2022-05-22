@@ -25,6 +25,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path serviceMgrRoot = "${target}/serviceMgr";
     Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
     Path platformRoot = "${target}/platform";
+    Path monitoringRoot = "${target}/monitoring";
     Path mgtUiRoot = "${target}/mgtUi";
     Path commonRoot = "${target}/common";
     Path brokerRoot = "${target}/broker";
@@ -550,10 +551,22 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
-        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests);
+        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
         maven("${platformRoot}", true);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "", withJava8=false);
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
+
+        // preliminary, as long as BaSyx conflicts with Tomcat
+        monitoringRoot.mkdir();
+        p = "${monitoringRoot}/src/main/resources";
+        p.mkdir();
+        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${monitoringRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.monitoring.MonitoringSetup", cfgFile="src/main/resources/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
+        maven("${monitoringRoot}", true);
+        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "", withJava8=false);
  
         commonRoot.mkdir();
 
