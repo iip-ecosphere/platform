@@ -134,7 +134,7 @@ project ContainerCreation {
         //name = "Simple Mesh Testing App",
         ver = "0.1.0",
         description = "",
-        createContainer = true,
+        createContainer = false,
         services = {refBy(myMesh)}        
     };
     
