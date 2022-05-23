@@ -52,23 +52,22 @@ export class ApiService {
     let Data;
     try {
       Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
-      console.log(Data);
     } catch(e) {
       console.log(e);
     }
     return Data;
   }
 
-  public async doThing() {
-    let thing;
-    try {
-      thing = await firstValueFrom(this.http.post("http://192.168.0.199:9001/shells/urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23/aas/submodels/resources/submodel/submodelElements/D43D7E502D25/addArtifact/invoke"
-      , {"inputArguments":[{"value":{"modelType":{"name":"Property"},"idShort":"url","value":"file:///C:/Users/Chris/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar","kind":"Template","valueType":"string"},"modelType":{"name":"OperationVariable"}}],"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf","inoutputArguments":[],"timeout":10000}));
-    } catch(e) {
-      console.log(e);
-    }
-    console.log(thing);
-  }
+  // public async doThing() {
+  //   let thing;
+  //   try {
+  //     thing = await firstValueFrom(this.http.post("http://192.168.0.199:9001/shells/urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23/aas/submodels/resources/submodel/submodelElements/D43D7E502D25/addArtifact/invoke"
+  //     , {"inputArguments":[{"value":{"modelType":{"name":"Property"},"idShort":"url","value":"file:///C:/Users/Chris/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar","kind":"Template","valueType":"string"},"modelType":{"name":"OperationVariable"}}],"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf","inoutputArguments":[],"timeout":10000}));
+  //   } catch(e) {
+  //     console.log(e);
+  //   }
+  //   console.log(thing);
+  // }
 
   public async executeFunction(resource: string, basyxFunc: string, params: any) {
     let response;
@@ -81,8 +80,8 @@ export class ApiService {
   }
 
   public async getResource(id: string) {
-    if(!this.resources) {
-      this.getResources();
+    if(!this.resources || !this.resources.submodelElements) {
+      await this.getResources();
     }
     return this.resources.submodelElements?.find(resource => resource.idShort === id);
   }
