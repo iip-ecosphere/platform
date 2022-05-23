@@ -114,7 +114,7 @@ public class ActiveAasBase {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage(), e);
+                LOGGER.error("While retrieving the IIP-Ecosphere AAS: " + e.getMessage());
             }
         }
     }
