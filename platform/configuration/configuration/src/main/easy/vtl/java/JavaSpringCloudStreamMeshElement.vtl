@@ -851,6 +851,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         for (IOType in : pairs.keys()) {
             IOType out = pairs.get(in);
             String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+            if (typeAdd <> "") {
+                '${kodexServiceName(in, out)}.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+            }
             '${kodexServiceName(in, out)}.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
         }
     }
@@ -976,6 +979,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir) {
         String expr = 'SerializerMessageConverter.serializeAndSend(streamBridge, "${conn}-${dir}-0", data)';
+        if (typeAdd <> "") {
+            'service.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+        }
         'service.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
