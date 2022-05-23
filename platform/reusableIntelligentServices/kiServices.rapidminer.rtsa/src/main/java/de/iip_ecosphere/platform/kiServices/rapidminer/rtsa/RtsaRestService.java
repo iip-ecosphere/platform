@@ -154,7 +154,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     /**
-     * REturns whether we try to run a fake RTSA. [testing, running without license]
+     * Returns whether we try to run a fake RTSA. [testing, running without license]
      * 
      * @param rtsaPath the path to the installed RTSA
      * @return {@code true} for fake RTSA, {@code false} for real RTSA
