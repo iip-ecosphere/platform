@@ -38,9 +38,9 @@ export class ResourcesComponent implements OnInit {
     return bo;
   }
 
-  public doThing() {
-    this.api.doThing();
-  }
+  // public doThing() {
+  //   this.api.doThing();
+  // }
 
   public async details(resource: ResourceValue[] | undefined) {
     let id: string | undefined = undefined;

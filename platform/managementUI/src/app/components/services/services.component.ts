@@ -19,7 +19,6 @@ export class ServicesComponent implements OnInit {
   resource: ResourceSubmodelElement | undefined;
   selectedBasyxFunc : any;
   value: ResourceValue[] = [];
-  test = "fuu";
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id')
@@ -55,8 +54,6 @@ export class ServicesComponent implements OnInit {
     if(this.id) {
       console.log(this.value);
       await this.api.executeFunction(this.id, this.selectedBasyxFunc.idShort, this.value);
-      console.log({"inputArguments": this.value});
-      console.log({"inputArguments":[{"value":{"modelType":{"name":"Property"},"idShort":"url","value":"file:///C:/Users/Chris/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar","kind":"Template","valueType":"string"},"modelType":{"name":"OperationVariable"}}]});
     }
 
   }
