@@ -755,8 +755,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                     break;
                 }
                 if (newService != null) {
+                    ${fInterface} oldService = service;
                     service = selector.createStrategy().doSwitch(service, newService);
-                    actServiceId = service.getId();
+                    if (oldService != service) {
+                        service.attachIngestors(); // connect outputs
+                        actServiceId = service.getId();
+                    }
                 }
                 selector.actionCompleted(actServiceId);
                 Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHED_SERVICE, actServiceId));
