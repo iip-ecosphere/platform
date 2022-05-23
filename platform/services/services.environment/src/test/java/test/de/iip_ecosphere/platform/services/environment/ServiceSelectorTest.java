@@ -14,7 +14,7 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.ServiceSelector;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceSelector;
 import org.junit.Assert;
 
 /**
