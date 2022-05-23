@@ -65,14 +65,16 @@ template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact targe
         import iip.datatypes.*;
         import iip.interfaces.*;
         import java.util.concurrent.ExecutionException;
+        import de.iip_ecosphere.platform.services.environment.switching.ServiceSelector;
         import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.services.environment.switching.*;
 
         /**
          * Family Interface for a Spring Cloud Stream service for \'${elt.name}\'.
          *
          * @author EASy-Producer.
          */
-        public interface ${clsName}FamilyInterface {
+        public interface ${clsName}FamilyInterface extends ServiceBase {
         
             ${generateDataMethods(elt, true)}
 

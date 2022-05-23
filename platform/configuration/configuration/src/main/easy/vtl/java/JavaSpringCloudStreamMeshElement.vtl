@@ -755,14 +755,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                     break;
                 }
                 if (newService != null) {
-                    try {
-                        newService.setState(ServiceState.STARTING);
-                        service.setState(ServiceState.STOPPING);
-                        service = newService;
-                        actServiceId = id;
-                    } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(getClass()).error("Cannot switch to new service {}: {}", id, e.getMessage());
-                    }
+                    service = selector.createStrategy().doSwitch(service, newService);
+                    actServiceId = service.getId();
                 }
                 selector.actionCompleted(actServiceId);
                 Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHED_SERVICE, actServiceId));
@@ -779,12 +773,23 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
-    def generateSetState(String implements) {
+    def generateServiceBase(String implements) {
         if (implements <> "") {
             '@Override
             public void setState(ServiceState state) throws ExecutionException {
                 service.setState(state);
             }'
+
+            '@Override
+            public ServiceState getState() {
+                return service.getState();
+            }'
+
+            '@Override
+            public String getId() {
+                return service.getId();
+            }'
+
         }
     }
         
@@ -1084,7 +1089,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
         import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
+        import de.iip_ecosphere.platform.services.environment.switching.ServiceSelector;
         import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.services.environment.switching.*;
         import de.iip_ecosphere.platform.services.environment.metricsProvider.MonitoredTranslatingProtocolAdapter;
         import de.iip_ecosphere.platform.services.environment.spring.Starter;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
@@ -1137,7 +1144,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}
-            ${generateSetState(implements)|e}
+            ${generateServiceBase(implements)|e}
         }'
     }
     
