@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.services.environment.switching;
 
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 
 /**
@@ -25,8 +24,8 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 public class StopOldStartNew extends AbstractStrategy {
 
     @Override
-    public Service doSwitch(Service sOld, Service sNew) {
-        Service result = sOld;
+    public <S extends ServiceBase> S doSwitch(S sOld, S sNew) {
+        S result = sOld;
         boolean stoppedOld = false;
         try {
             getLogger().info("Stopping old service {}", sNew.getId());

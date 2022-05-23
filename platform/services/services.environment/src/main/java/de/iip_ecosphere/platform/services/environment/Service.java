@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -23,14 +24,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Service extends ParameterConfigurerProvider {
-
-    /**
-     * Returns the unique id of the service.
-     * 
-     * @return the unique id
-     */
-    public String getId();
+public interface Service extends ParameterConfigurerProvider, ServiceBase {
     
     /**
      * The name of the service.
@@ -53,21 +47,6 @@ public interface Service extends ParameterConfigurerProvider {
      */
     public String getDescription();
 
-    /**
-     * Returns the state the service is currently in. [R4c]
-     * 
-     * @return the state
-     */
-    public ServiceState getState();
-
-    /**
-     * Changes the state. [R133c]
-     * 
-     * @param state the new state
-     * @throws ExecutionException if changing the state fails for some reason
-     */
-    public void setState(ServiceState state) throws ExecutionException;
-    
     /**
      * Returns whether the service is deployable in distributable manner or fixed in deployment location.
      * 

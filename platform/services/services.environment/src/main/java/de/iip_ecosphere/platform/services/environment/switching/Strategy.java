@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.services.environment.switching;
 
-import de.iip_ecosphere.platform.services.environment.Service;
-
 /**
  * Encapsulates a switching strategy.
  * 
@@ -24,10 +22,11 @@ public interface Strategy {
     /**
      * Performs the switch.
      * 
+     * @param <S> the actual type of the service
      * @param sOld the old service instance
      * @param sNew the new service instance
      * @return the active service
      */
-    public Service doSwitch(Service sOld, Service sNew);
+    public <S extends ServiceBase> S doSwitch(S sOld, S sNew);
 
 }
