@@ -42,13 +42,13 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         PlatformSetup setup = PlatformSetup.getInstance();
         AasSetup aasSetup = setup.getAas();
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
-        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
+        Endpoint regEndpoint = aasSetup.adaptEndpoint(aasSetup.getRegistryEndpoint());
         PersistenceType pType = rcp.toPersistenceType(setup.getAas().getPersistence().name());
         String fullRegUri = AasFactory.getInstance().getFullRegistryUri(regEndpoint);
         LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS registry on " + fullRegUri);
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
-        Endpoint serverEndpoint = aasSetup.getServerEndpoint();
+        Endpoint serverEndpoint = aasSetup.adaptEndpoint(aasSetup.getServerEndpoint());
         LoggerFactory.getLogger(getClass()).info("Starting " + pType + " AAS server on " + serverEndpoint.toUri());
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
