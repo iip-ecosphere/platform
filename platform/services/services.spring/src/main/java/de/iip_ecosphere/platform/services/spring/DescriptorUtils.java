@@ -286,7 +286,7 @@ public class DescriptorUtils {
             YamlProcess proc = service.getProcess();
             if (null != proc) {
                 File d = extractProcessArtifacts(service.getId(), proc, jar, null);
-                d.deleteOnExit();
+                FileUtils.deleteOnExit(d);
             }
             for (Relation r : service.getRelations()) {
                 // simplification, don't think about relations
