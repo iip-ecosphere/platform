@@ -1,5 +1,5 @@
 <div class="background">
-  <button mat-raised-button (click)="getServices()">Aktualisieren</button>
+  <h1 *ngIf="resource && resource.idShort">Operations for {{ resource.idShort }}</h1>
   <table>
     <tr>
       <td>
@@ -29,9 +29,11 @@
       </td>
     </tr>
   </table>
+  <br>
+  <h1>Services <span *ngIf="resource && resource.idShort">for {{ resource.idShort }}</span></h1>
   <div *ngIf="services && services.submodelElements" style="display: flex;">
     <div *ngFor="let element of services.submodelElements">
-      <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
+      <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 100%; flex-wrap: wrap;">
         <mat-card-title>{{ element.idShort }}</mat-card-title>
         <mat-card-content>
           <div *ngFor="let element2 of element.value">
@@ -53,4 +55,30 @@
     </div>
   </div>
 
+  <h1>available Artifacts</h1>
+  <button mat-raised-button (click)="getArtifacts()">refresh Artifacts</button>
+  <div>
+    <div *ngFor="let element of artifacts.submodelElements; let i = index">
+      <mat-card  *ngIf="!element.invokable" tabindex="0">
+        <mat-card-title>
+          <mat-icon *ngIf="artifactsToggle[i]">keyboard_arrow_down</mat-icon>
+          <mat-icon *ngIf="!artifactsToggle[i]">keyboard_arrow_right</mat-icon>
+          <button mat-raised-button (click)="toggle(i)">{{ element.idShort }}</button>
+        </mat-card-title>
+        <mat-card-content *ngIf="artifactsToggle[i]">
+          <div *ngFor="let element2 of element.value">
+            <div class="button" *ngIf="!element2.invokable">
+              <span class="shortId">{{ element2.idShort }}: </span>
+              <div *ngIf="isArray(element2.value); else noArray ">
+                <div *ngFor="let element3 of element2.value">
+                  <span *ngIf="element3.value"> {{ element3.value | tidy}} </span>
+                </div>
+              </div>
+              <ng-template #noArray>{{ element2.value | tidy}}</ng-template>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
 </div>

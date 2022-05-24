@@ -7,6 +7,8 @@ export interface ResourceSubmodelElement {
   kind?: string;
   value?: ResourceValue[];
   description?: any;
+  invokable?: any;
+  inputVariables?: any; //for deploymentPlans, deploymentPlan will need its own interface to avoid confusion
 
 }
 

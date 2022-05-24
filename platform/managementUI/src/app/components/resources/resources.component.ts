@@ -16,11 +16,6 @@ export class ResourcesComponent implements OnInit {
   Data: PlatformResources = {};
   Artifacts: PlatformResources = {};
 
-   poo = {"values": [
-     {"id": 12, "name": "bub"},
-     {"id": 2, "name": "sub"}
-   ]}
-
   ngOnInit(): void {
     this.getData();
   }

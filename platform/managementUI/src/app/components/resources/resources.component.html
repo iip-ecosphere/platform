@@ -1,5 +1,3 @@
-<button mat-raised-button (click)="getData()">Aktualisieren</button>
-
 <div *ngIf="Data && Data.submodelElements" style="display: flex;">
   <div *ngFor="let element of Data.submodelElements">
     <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
@@ -16,7 +14,8 @@
     </mat-card>
   </div>
 </div>
-<button mat-raised-button (click)="getArtifacts()">Artefakte</button> <!--to be removed in future version-->
+<h1>available Artifacts</h1>
+<button mat-raised-button (click)="getArtifacts()">show Artifacts</button> <!--to be removed in future version-->
 <div *ngIf="Data && Data.submodelElements" style="display: flex;">
   <div *ngFor="let element of Artifacts.submodelElements">
     <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0" style="flex: 1 1 auto; flex-wrap: wrap;">
