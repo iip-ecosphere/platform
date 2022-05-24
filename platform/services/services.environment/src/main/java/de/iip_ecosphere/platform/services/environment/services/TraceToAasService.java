@@ -91,7 +91,7 @@ public class TraceToAasService extends AbstractService {
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
-    private long timeout = 60 * 60 * 1000; // cleanup after 1 hour
+    private long timeout = 20 * 60 * 1000; // cleanup after 1 hour
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000;
     private TraceRecordReceptionCallback callback;
@@ -183,6 +183,15 @@ public class TraceToAasService extends AbstractService {
     public TraceToAasService(YamlArtifact artifact, String serviceId) {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
+    }
+    
+    /**
+     * Changes the timeout until trace events are deleted.
+     * 
+     * @param timeout the timeout in ms
+     */
+    protected void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
     
     /**
