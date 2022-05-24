@@ -33,19 +33,18 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             host: ${aasServer.host}
             schema: ${aasServer.schema}
             path: ${aasServer.path}
-            ${serverHost(aasServer)|e}
           registry:
             port: ${aasRegistryServer.port}
             host: ${aasRegistryServer.host}
             schema: ${aasRegistryServer.schema}
             path: ${aasRegistryServer.path}
-            ${serverHost(aasRegistryServer)|e}
           implementation:
             port: ${aasImplServerPort}
             host: ${aasImplServerHost}
             netmask: ${aasImplNetmask}
             schema: ${aasImplServer.schema}
             protocol: ${aasProtocolName(aasImplServer.protocol)}
+          ${serverHost(aasServer)|e}
           ${produceAasPersistence(aasPersistence)|e}'
     }
     
