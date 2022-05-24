@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.platform;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 
+import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -28,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 
 /**
  * The platform AAS contributor, in particular for the available artifacts.
@@ -45,6 +48,9 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_URI = "uri";
     
+    public static final String NAME_OPERATION_DEPLOY = "deployPlan";
+    public static final String NAME_OPERATION_UNDEPLOY = "undeployPlan";
+    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
@@ -60,6 +66,14 @@ public class PlatformAas implements AasContributor {
                 .build();
         }
         b.build();
+        smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
+            .addInputVariable("url", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY))
+            .build(Type.NONE);
+        smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY)
+            .addInputVariable("url", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
+            .build(Type.NONE);
         smB.build();
         
         return null;
@@ -67,6 +81,44 @@ public class PlatformAas implements AasContributor {
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
+        sBuilder.defineOperation(NAME_OPERATION_DEPLOY, new JsonResultWrapper(p -> { 
+            return deployPlan(AasUtils.readString(p));
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY, new JsonResultWrapper(p -> { 
+            return undeployPlan(AasUtils.readString(p));
+        }));
+    }
+    
+    /**
+     * Deploys a deployment plan.
+     * 
+     * @param url the URL of the deployment plan
+     * @return <b>null</b>
+     * @throws ExecutionException if the operation fails
+     */
+    static Object deployPlan(String url) throws ExecutionException {
+        try {
+            CliBackend.deployPlan(CliBackend.toUri(url));
+            return null;
+        } catch (URISyntaxException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    /**
+     * Undeploys a deployment plan.
+     * 
+     * @param url the URL of the deployment plan
+     * @return <b>null</b>
+     * @throws ExecutionException if the operation fails
+     */
+    static Object undeployPlan(String url) throws ExecutionException {
+        try {
+            CliBackend.undeployPlan(CliBackend.toUri(url));
+            return null;
+        } catch (URISyntaxException e) {
+            throw new ExecutionException(e);
+        }
     }
 
     @Override
