@@ -73,6 +73,7 @@ public class AasPartRegistry {
     
     public static final Schema DEFAULT_SCHEMA = Schema.HTTP;
     public static final String DEFAULT_HOST = ServerAddress.LOCALHOST;
+    public static final String NO_SPECIFIC_SERVER_HOST = "-";
     public static final int DEFAULT_PORT = 8080;
     public static final int DEFAULT_REGISTRY_PORT = 8081; // shall also be on 8080; two processes in one needs revision
     public static final int DEFAULT_PROTOCOL_PORT = 9000;
@@ -119,6 +120,8 @@ public class AasPartRegistry {
 
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
+        
+        private String serverHost = NO_SPECIFIC_SERVER_HOST; // -> use what is stated in server/registry
         
         private AasMode mode = AasMode.REMOTE_DEPLOY;
 
@@ -223,6 +226,46 @@ public class AasPartRegistry {
          */
         public void setMode(AasMode mode) {
             this.mode = mode;
+        }
+        
+        /**
+         * Returns the server host. Often, the address stated in {@link #server} or {@link #registry} is sufficient.
+         * However, if the devices shall use a specific address, while the server shall listen to multiple or all 
+         * available IP addresses, the address to be used for server instance creation may have to be different, e.g., 
+         * "localhost" rather than a specific IO.
+         * 
+         * @return the server host, may be {@link #NO_SPECIFIC_SERVER_HOST} to indicate that the addresses in 
+         *     {@link #server} or {@link #registry} shall be used
+         */
+        public String getServerHost() {
+            return serverHost;
+        }
+        
+        /**
+         * Potentially adapts the endpoint with respect to {@link #getServerEndpoint()}.
+         * 
+         * @param endpoint the endpoint to be adapted
+         * @return the adapted endpoint or {@code endpoint}
+         */
+        public Endpoint adaptEndpoint(Endpoint endpoint) {
+            Endpoint result;
+            if (NO_SPECIFIC_SERVER_HOST.equals(serverHost)) {
+                result = endpoint;
+            } else {
+                result = new Endpoint(endpoint.getSchema(), serverHost, endpoint.getPort(), endpoint.getEndpoint());
+            }
+            return result;
+        }
+
+        /**
+         * Changes the server host. 
+         * 
+         * @param serverHost the server host, may be {@link #NO_SPECIFIC_SERVER_HOST} to indicate that the addresses in 
+         *     {@link #server} or {@link #registry} shall be used
+         * @see #getServerHost()
+         */
+        public void setServerHost(String serverHost) {
+            this.serverHost = serverHost;
         }
         
         /**
