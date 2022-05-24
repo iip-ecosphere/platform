@@ -55,14 +55,47 @@ public class FileUtils {
     }
     
     /**
-     * Deletes a file, never throwing an exception. If file is a directory, delete it and all sub-directories. 
-     * [convenience]
+     * Deletes a file or directory, not throwing an exception. If file is a directory, delete it and all 
+     * sub-directories. [convenience]
      *
      * @param file file or directory to delete, may be {@code null}
      * @return {@code true} if {@code file} was deleted, otherwise {@code false}
      */
     public static boolean deleteQuietly(File file) {
         return org.apache.commons.io.FileUtils.deleteQuietly(file);        
+    }
+    
+    /**
+     * Deletes a file or directory on JVM exit, not throwing an exception. If file is a directory, delete it and all 
+     * sub-directories. [convenience]
+     *
+     * @param file file or directory to delete, may be {@code null}
+     */
+    public static void deleteOnExit(File file) {
+        try {
+            if (null != file) {
+                org.apache.commons.io.FileUtils.forceDeleteOnExit(file);
+            }
+        } catch (IOException e) {
+        }
+    }
+
+    /**
+     * Returns the path to the system temporary directory. [convenience]
+     *
+     * @return the path to the system temporary directory.
+     */
+    public static String getTempDirectoryPath() {
+        return org.apache.commons.io.FileUtils.getTempDirectoryPath();
+    }
+
+    /**
+     * Returns a {@link File} representing the system temporary directory. [convenience]
+     *
+     * @return the system temporary directory.
+     */
+    public static File getTempDirectory() {
+        return org.apache.commons.io.FileUtils.getTempDirectory();
     }
 
     /**

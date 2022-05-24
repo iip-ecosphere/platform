@@ -16,13 +16,23 @@ import de.iip_ecosphere.platform.support.FileUtils;
  * @author Holger Eichelberger, SSE
  */
 public class FileUtilsTest {
+
     
+    /**
+     * Tests the temporary directory access.
+     */
+    @Test
+    public void testTempDir() {
+        Assert.assertNotNull(FileUtils.getTempDirectoryPath());
+        Assert.assertNotNull(FileUtils.getTempDirectory());
+    }
+
     /**
      * Tests creating a temporary folder.
      */
     @Test
     public void testCreateTmpFolder() {
-        String tmp = System.getProperty("java.io.tmpdir");
+        String tmp = FileUtils.getTempDirectoryPath();
         File created = FileUtils.createTmpFolder("support.test");
         Assert.assertTrue(created.toString().startsWith(tmp));
         Assert.assertTrue(created.exists());
@@ -104,6 +114,16 @@ public class FileUtilsTest {
         Assert.assertEquals("a", FileUtils.sanitizeFileName("a"));
         Assert.assertEquals("a", FileUtils.sanitizeFileName("a", false));
         Assert.assertTrue(FileUtils.sanitizeFileName("a", true).startsWith("a"));
+    }
+
+    /**
+     * Tests {@link FileUtils#deleteOnExit(File)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    public void testDeleteOnExit() throws IOException {
+        File f = File.createTempFile("iip-test", null);
+        FileUtils.deleteOnExit(f);
     }
 
 }
