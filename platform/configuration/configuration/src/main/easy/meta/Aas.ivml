@@ -45,6 +45,7 @@ project Aas {
 
     compound EndpointAddress refines ServerAddress {
         String path = "";
+        String serverHost = null; // overwrites host on the server, e.g., to allow for multiple IP listening
     }
 
     // host "127.0.0.1" replaced by host IP if possible
