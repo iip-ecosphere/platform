@@ -14,7 +14,10 @@ export class ServicesComponent implements OnInit {
   constructor(public http: HttpClient, public api: ApiService, public route: ActivatedRoute) { }
 
   services: PlatformServices = {}
+
   artifacts: PlatformResources = {};
+  artifactsToggle: boolean[] = [];
+
   id: string | null = null;
   resource: ResourceSubmodelElement | undefined;
   selectedBasyxFunc : any;
@@ -26,18 +29,24 @@ export class ServicesComponent implements OnInit {
       this.getResource(this.id);
     }
     this.getServices();
+    this.getArtifacts();
   }
 
   public async getServices() {
     this.services = await this.api.getServices();
   }
 
-  public isObject(value: any) {
-    return (typeof value === 'object');
-  }
-
   public async getArtifacts() {
     this.artifacts = await this.api.getArtifacts();
+    if(this.artifacts && this.artifacts.submodelElements) {
+      this.artifactsToggle = new Array(this.artifacts.submodelElements.length).fill(false);
+    }
+  }
+
+  public toggle(index: number) {
+    if(this.artifactsToggle) {
+      this.artifactsToggle[index] = !this.artifactsToggle[index]
+    }
   }
 
   private async getResource(id: string) {
@@ -52,9 +61,18 @@ export class ServicesComponent implements OnInit {
 
   public async send() {
     if(this.id) {
-      console.log(this.value);
-      await this.api.executeFunction(this.id, this.selectedBasyxFunc.idShort, this.value);
+      const response = await this.api.executeFunction(this.id, this.selectedBasyxFunc.idShort, this.value);
+      console.log(response);
     }
 
+  }
+
+  public isArray(value: any) {
+    const bo = Array.isArray(value);
+    return bo;
+  }
+
+  public isObject(value: any) {
+    return (typeof value === 'object');
   }
 }

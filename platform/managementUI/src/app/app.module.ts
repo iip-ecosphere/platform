@@ -13,6 +13,9 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
+
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
 import { ServicesComponent } from './components/services/services.component';
@@ -20,6 +23,7 @@ import { ConnectorTypesComponent } from './components/connector-types/connector-
 import { TidyPipe } from './pipes/tidy.pipe';
 import { EnvConfigService } from './services/env-config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DeploymentPlansComponent } from './components/deployment-plans/deployment-plans.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +32,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ContainersComponent,
     ServicesComponent,
     ConnectorTypesComponent,
-    TidyPipe
+    TidyPipe,
+    DeploymentPlansComponent
   ],
   imports: [
     BrowserModule,
@@ -43,6 +48,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

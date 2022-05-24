@@ -45,6 +45,7 @@ export class ApiService {
 
   public async getArtifacts() {
     const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformResources;
+    console.log(Data);
     return Data;
   }
 
@@ -84,6 +85,23 @@ export class ApiService {
       await this.getResources();
     }
     return this.resources.submodelElements?.find(resource => resource.idShort === id);
+  }
+
+  public async deployPlan(params: any, undeploy?: boolean) {
+    let response
+    let basyxFunc;
+    if (undeploy) {
+      basyxFunc = "undeployPlan";
+    } else {
+      basyxFunc = "deployPlan";
+    }
+    try {
+      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
+      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
+    } catch(e) {
+      console.log(e);
+    }
+    return response;
   }
 
 }
