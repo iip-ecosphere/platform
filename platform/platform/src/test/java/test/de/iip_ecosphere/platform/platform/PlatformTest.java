@@ -157,14 +157,14 @@ public class PlatformTest {
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         SubmodelElementCollection coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
-        Assert.assertEquals(2, coll.getElementsCount());
-        Assert.assertNotNull(coll.getElement("art"));
-        Assert.assertNotNull(coll.getElement("art1"));
+        assertSubmodelElementsCollection(coll, "art", "art1");
         
         coll = sc.getSubmodel().getSubmodelElementCollection(PlatformAas.NAME_COLL_CONTAINER);
-        Assert.assertEquals(2, coll.getElementsCount());
-        Assert.assertNotNull(coll.getElement("cnt1"));
-        
+        assertSubmodelElementsCollection(coll, "cnt1");
+
+        coll = sc.getSubmodel().getSubmodelElementCollection(PlatformAas.NAME_COLL_DEPLOYMENT_PLANS);
+        assertSubmodelElementsCollection(coll, "appDesc_1"); // ID translated to AAS
+
         // preliminary, not nice
         FileUtils.copyFile(
             new File("src/test/resources/service3.jar"), 
@@ -180,13 +180,26 @@ public class PlatformTest {
 
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_CONTAINER);
-        Assert.assertEquals(2, coll.getElementsCount()); // unchanged
+        Assert.assertEquals(1, coll.getElementsCount()); // unchanged
 
         FileUtils.deleteQuietly(new File("src/test/resources/artifacts/service3.jar"));
         TimeUtils.sleep(1000); // wait for watcher
         
         //Assert.assertEquals(count, mgr.getArtifactCount()); // watcher unclear although file is gone
         //Assert.assertEquals(count, coll.getElementsCount());
+    }
+    
+    /**
+     * Asserts the contents of a SMEC.
+     * 
+     * @param coll the collection
+     * @param ids the ids to assert
+     */
+    private void assertSubmodelElementsCollection(SubmodelElementCollection coll, String... ids) {
+        Assert.assertEquals(ids.length, coll.getElementsCount());
+        for (String id: ids) {
+            Assert.assertNotNull(coll.getElement(id)); // ID translated to AAS
+        }
     }
 
     /**
