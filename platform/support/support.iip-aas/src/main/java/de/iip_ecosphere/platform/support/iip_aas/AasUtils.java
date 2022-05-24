@@ -22,9 +22,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
@@ -260,13 +260,13 @@ public class AasUtils {
         if (null != image && image.length() > 0) {
             String prevMsg = "";
             try {
-                String fName = de.iip_ecosphere.platform.support.FileUtils.sanitizeFileName(image);
+                String fName = FileUtils.sanitizeFileName(image);
                 File f = new File(FileUtils.getTempDirectory(), fName);
-                f.deleteOnExit();
+                FileUtils.deleteOnExit(f);
                 InputStream is = resolver.resolve(image);
                 if (null != is) {
-                    FileUtils.copyInputStreamToFile(is, f); // closes is
-                    String contents = de.iip_ecosphere.platform.support.FileUtils.fileToBase64(f);
+                    org.apache.commons.io.FileUtils.copyInputStreamToFile(is, f); // closes is
+                    String contents = FileUtils.fileToBase64(f);
                     String mimeType = Files.probeContentType(f.toPath());
                     handler.handle(fName, contents, mimeType);
                     resolved = true;
