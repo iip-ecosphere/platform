@@ -218,7 +218,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
                 submodels.remove(submodel.getIdShort());
                 getAas().removeSubmodel(((AbstractSubmodel<?>) submodel).getSubmodel().getIdentification());
             } catch (ResourceNotFoundException e) {
-                LoggerFactory.getLogger(getClass()).error("Deleting submodel %s: %s", 
+                LoggerFactory.getLogger(getClass()).error("Deleting submodel {}: {}", 
                     submodel.getIdShort(), e.getMessage());
             }
         }
