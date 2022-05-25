@@ -1,13 +1,13 @@
-artifact: file:C:/Users/cknap/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
 parallelize: true
 onUndeployRemoveArtifact: true
 assignments:
   - resource: container1
-    artifact: file:C:/Users/cknap/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
     services:
       - SimpleSource
   - resource: container2
-    artifact: file:C:/Users/cknap/Desktop/Install/gen/artifacts/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
     services:
       - SimpleReceiver
 
