@@ -62,6 +62,11 @@ template Readme(Configuration config, FileArtifact target) {
             - Compiled binaries with instantiated AAS settings in mgtUi
             - mgtUi.bat startup script for Windows (nodeJS 12, Angular 12)
             - mgtUi.sh startup script for Linux (nodeJS 12, Angular 12)
+          - The folder "artifacts":
+            - Place your application service artifacts, deployment plans (.yml) or containers (with container 
+              descriptor, .yml) into this directory. Container and descriptor may be located in individual sub-folders.
+            - By default, this folder is is in the folder wher wethe platform is being started from. The folder may 
+              also be in a different location (see configuration).
         '
     }
 	
