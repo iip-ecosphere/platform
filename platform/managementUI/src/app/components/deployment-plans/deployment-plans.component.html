@@ -1,15 +1,16 @@
 <div class="background">
   <h1>Deployment Plans</h1>
 
-  <mat-form-field appearance="outline" >
+  <mat-form-field appearance="outline">
     <mat-label>Deployment Plan</mat-label>
     <mat-select *ngIf="deploymentPlans" [(value)]="selected">
-      <mat-option *ngFor="let plan of deploymentPlans.value" [value]="plan.value">
-        {{plan.idShort}}
+      <mat-option *ngFor="let plan of deploymentPlans.value" [value]="plan">
+        {{getName(plan.value)}}
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <button mat-raised-button (click)="test()">selected</button>
-  <button mat-raised-button (click)="deploy()">deploy</button>
-  <button mat-raised-button style="background-color: rgb(112, 112, 10)" (click)="undeploy()">udeploy</button>
+  <mat-card>selected: <span *ngIf="selected && selected.value" style="background-color: white; color:black">{{ getName(selected.value) }}</span></mat-card>
+  <button mat-raised-button class="button" (click)="deploy()">deploy</button>
+  <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button>
+  <p *ngIf="message"> {{message}}</p>
 </div>

@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -49,7 +50,8 @@ import { DeploymentPlansComponent } from './components/deployment-plans/deployme
     MatInputModule,
     MatFormFieldModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

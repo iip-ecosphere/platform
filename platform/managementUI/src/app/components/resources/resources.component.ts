@@ -14,7 +14,6 @@ export class ResourcesComponent implements OnInit {
   constructor(public http: HttpClient, public api: ApiService, public router: Router) { }
 
   Data: PlatformResources = {};
-  Artifacts: PlatformResources = {};
 
   ngOnInit(): void {
     this.getData();
@@ -24,18 +23,10 @@ export class ResourcesComponent implements OnInit {
     this.Data = await this.api.getResources();
   }
 
-  public async getArtifacts() {
-    this.Artifacts = await this.api.getArtifacts();
-  }
-
   public isArray(value: any) {
     const bo = Array.isArray(value);
     return bo;
   }
-
-  // public doThing() {
-  //   this.api.doThing();
-  // }
 
   public async details(resource: ResourceValue[] | undefined) {
     let id: string | undefined = undefined;
