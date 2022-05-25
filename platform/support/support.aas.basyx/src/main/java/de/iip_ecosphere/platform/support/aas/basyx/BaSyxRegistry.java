@@ -24,7 +24,6 @@ import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +96,7 @@ public class BaSyxRegistry implements Registry {
                     result.add(tmp);
                 }
             }
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS descriptor: " + e.getMessage());
         }
         return result;
@@ -113,7 +112,7 @@ public class BaSyxRegistry implements Registry {
     private BaSyxConnectedAas obtainAas(IIdentifier aasId) throws IOException {
         try {
             return new BaSyxConnectedAas(manager.retrieveAAS(aasId));
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             throw new IOException(e);
         }
     }
@@ -124,7 +123,7 @@ public class BaSyxRegistry implements Registry {
             IIdentifier aasId = Tools.translateIdentifier(aasIdentifier, "");
             IIdentifier submodelId = Tools.translateIdentifier(submodelIdentifier, "");
             return new BaSyxISubmodel(obtainAas(aasId), manager.retrieveSubmodel(aasId, submodelId));
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             throw new IOException(e);
         }
     }
@@ -138,7 +137,7 @@ public class BaSyxRegistry implements Registry {
         a.registerRegistry(this);
         try {
             manager.createAAS(a.getAas(), endpointURL);
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot create AAS: " + e.getMessage());
         }
     }
@@ -154,7 +153,7 @@ public class BaSyxRegistry implements Registry {
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
         try {
             manager.createSubmodel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot create submodel: " + e.getMessage());
         }
     }
@@ -175,7 +174,7 @@ public class BaSyxRegistry implements Registry {
         try {
             registry.register(aasIdentifier, new SubmodelDescriptor(submodel.getIdShort(), 
                 ((BaSyxSubmodel) submodel).getSubmodel().getIdentification(), endpointUrl));
-        } catch (ResourceNotFoundException e) {
+        } catch (ProviderException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot register submodel: " + e.getMessage());
         }
     }
