@@ -13,7 +13,8 @@ export class ServicesComponent implements OnInit {
 
   constructor(public http: HttpClient, public api: ApiService, public route: ActivatedRoute) { }
 
-  services: PlatformServices = {}
+  services: PlatformServices = {};
+  servicesToggle: boolean[] = [];
 
   artifacts: PlatformResources = {};
   artifactsToggle: boolean[] = [];
@@ -34,6 +35,15 @@ export class ServicesComponent implements OnInit {
 
   public async getServices() {
     this.services = await this.api.getServices();
+    if(this.services && this.services.submodelElements) {
+      this.servicesToggle = new Array(this.services.submodelElements.length).fill(false);
+    }
+  }
+
+  public serToggle(index: number) {
+    if(this.servicesToggle) {
+      this.servicesToggle[index] = !this.servicesToggle[index]
+    }
   }
 
   public async getArtifacts() {
@@ -43,7 +53,7 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  public toggle(index: number) {
+  public artToggle(index: number) {
     if(this.artifactsToggle) {
       this.artifactsToggle[index] = !this.artifactsToggle[index]
     }
