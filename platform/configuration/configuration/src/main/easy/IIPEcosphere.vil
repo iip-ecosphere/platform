@@ -28,6 +28,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     Path monitoringRoot = "${target}/monitoring";
     Path mgtUiRoot = "${target}/mgtUi";
     Path commonRoot = "${target}/common";
+    Path artifactsRoot = "${target}/artifacts";
     Path brokerRoot = "${target}/broker";
     String assemblyRel = "src/main/assembly";
     String serviceArtifactsRel = "src/main/serviceArtifacts";
@@ -567,6 +568,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         maven("${monitoringRoot}", true);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "", withJava8=false);
  
+        artifactsRoot.mkdir();
         commonRoot.mkdir();
 
         mgtUiRoot.mkdir();
