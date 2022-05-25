@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.transport;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class Transport {
     private static TransportConnector connector;
     private static boolean stayOffline = false;
     private static Queue<IOConsumer<TransportConnector>> queue = new ConcurrentLinkedDeque<>();
+    private static Predicate<TraceRecord> traceFilter;
 
     /**
      * Sends a service status message. Uses {@link Id#getDeviceId()}. Calls {@link #createConnector()} to obtain
@@ -127,6 +129,15 @@ public class Transport {
                 "Cannot sent {} message now. Queued message until connector becomes available.", kind);
         }
     }
+
+    /**
+     * Defines a trace filter.
+     * 
+     * @param filter the filter, <b>null</b> for no filter
+     */
+    public static void setTraceFilter(Predicate<TraceRecord> filter) {
+        traceFilter = filter;
+    }
     
     /**
      * Sends a trace record. Calls {@link #createConnector()} to obtain
@@ -135,7 +146,9 @@ public class Transport {
      * @param record the record to be sent
      */
     public static void sendTraceRecord(TraceRecord record) {
-        send(c -> record.send(c), "trace"); 
+        if (null == traceFilter || traceFilter.test(record)) {
+            send(c -> record.send(c), "trace"); 
+        }
     }
 
     /**
