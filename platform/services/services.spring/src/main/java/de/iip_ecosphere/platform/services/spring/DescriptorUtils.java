@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -48,6 +49,8 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
  * @author Holger Eichelberger, SSE
  */
 public class DescriptorUtils {
+    
+    public static final String IIP_APP_PREFIX = "iip.app.";
 
     /**
      * Reads the YAML deployment descriptor from {@code file}.
@@ -248,6 +251,20 @@ public class DescriptorUtils {
     // checkstyle: stop parameter number check
 
     /**
+     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} to the command line of the service 
+     * to be started.
+     * 
+     * @param args the arguments to add the application environment settings
+     */
+    public static void addAppEnvironment(List<String> args) {
+        for (Map.Entry<String, String> ent : System.getenv().entrySet()) {
+            if (ent.getKey().startsWith(IIP_APP_PREFIX)) {
+                args.add("-D" + ent.getKey() + "=" + ent.getValue());
+            }
+        }
+    }
+    
+    /**
      * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner.
      *   
      * @param jar the JAR file to read
@@ -278,6 +295,7 @@ public class DescriptorUtils {
         result.add("java");
         result.add("-jar");
         result.add("-Dlog4j2.formatMsgNoLookups=true");
+        addAppEnvironment(result);
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
         result.add("--server.port=" + springPort);
