@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -257,9 +256,11 @@ public class DescriptorUtils {
      * @param args the arguments to add the application environment settings
      */
     public static void addAppEnvironment(List<String> args) {
-        for (Map.Entry<String, String> ent : System.getenv().entrySet()) {
-            if (ent.getKey().startsWith(IIP_APP_PREFIX)) {
-                args.add("-D" + ent.getKey() + "=" + ent.getValue());
+        for (Object k : System.getProperties().keySet()) {
+            String key = k.toString();
+            String val = System.getProperty(key);
+            if (key.startsWith(IIP_APP_PREFIX)) {
+                args.add("-D" + key + "=" + val);
             }
         }
     }
