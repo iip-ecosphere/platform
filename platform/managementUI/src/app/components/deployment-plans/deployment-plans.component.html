@@ -12,4 +12,5 @@
   <mat-card>selected: <span *ngIf="selected && selected.value" style="background-color: white; color:black">{{ getName(selected.value) }}</span></mat-card>
   <button mat-raised-button class="button" (click)="deploy()">deploy</button>
   <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button>
+  <p *ngIf="message"> {{message}}</p>
 </div>

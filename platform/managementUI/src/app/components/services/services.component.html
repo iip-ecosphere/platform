@@ -25,6 +25,7 @@
             </p>
           </div>
           <button mat-raised-button class="button" (click)="send()">Abschicken</button>
+          <p *ngIf="message"> {{message}}</p>
         </div>
       </td>
     </tr>

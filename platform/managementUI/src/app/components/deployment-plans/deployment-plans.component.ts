@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
+import { outputArgument, PlatformResources, platformResponse, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -20,6 +20,7 @@ export class DeploymentPlansComponent implements OnInit {
   selected: ResourceSubmodelElement | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
+  message: string = '';
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
@@ -27,10 +28,6 @@ export class DeploymentPlansComponent implements OnInit {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
       this.undeployPlanInput = response.submodelElements.find(item => item.idShort === "undeployPlan")?.inputVariables;
-      // console.log(response);
-       console.log(this.deploymentPlans);
-      // console.log(this.deployPlanInput);
-      // console.log(this.undeployPlanInput);
     }
   }
 
@@ -45,9 +42,29 @@ export class DeploymentPlansComponent implements OnInit {
        if (value) {
         params[0].value.value = value.value;
        }
-      const response = await this.api.deployPlan(params);
+      const response = await this.api.deployPlan(params) as platformResponse;
       this.selected = undefined;
       console.log(response);
+
+      this.openSnackbar(response.outputArguments);
+
+    }
+
+  }
+
+  private openSnackbar(output: outputArgument[]) {
+    try {
+      let message = '';
+      if(output[0].value) {
+        //this.bar.openSnackbar(output[0].value.value);
+        for(let bit of output) {
+          message = message.concat(bit.value.value);
+          message = message.concat('  ')
+        }
+      }
+      this.message = message;
+    } catch(e) {
+      console.log(e);
     }
 
   }

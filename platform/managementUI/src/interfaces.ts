@@ -71,3 +71,16 @@ export interface DeviceSubmodel {
     }
   }
 }
+
+export interface platformResponse {
+  executionState: string;
+  requestId: string;
+  outputArguments: outputArgument[];
+}
+
+export interface outputArgument {
+  value: {
+    idShort: string;
+    value: string;
+  }
+}
