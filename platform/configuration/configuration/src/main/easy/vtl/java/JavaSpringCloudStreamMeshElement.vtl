@@ -453,12 +453,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         String clsName = getClsName(elt);
         '${conn.class}${connGen} conn = 
             new ${conn.class}<>(createConnectorAdapter());
+        conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
         service.setReceptionCallback(new ConnectorReceptionCallback());
         ${genMapService("service")}
         ${attachMetricsProvider("service")}'
+    }
+    
+    def initIngestors(MeshElement elt, Connector conn) {
+        'service.enablePolling(true); // if notifications enabled, enable now also polling as @Autowired is done'
     }
     
     def generatedServiceInitMethod(MeshElement elt, Connector conn) {
