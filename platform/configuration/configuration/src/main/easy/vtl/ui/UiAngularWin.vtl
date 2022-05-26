@@ -7,13 +7,10 @@ template UiAngularWin(IIPEcosphere config, FileArtifact target) {
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = port(config.managementUi);
         '@echo off
-        set PORT=${port}
-        if "%~1"=="" goto blank
-        set PORT=%~1
-
-        :blank
-        cd mgtUi\\dist\\iipes-web
-        ng serve --port %PORT% %*'
+        REM starts the management UI, install nodejs and express before
+        
+        cd mgtUi
+        nodejs server.js %*'
     }
     
 }

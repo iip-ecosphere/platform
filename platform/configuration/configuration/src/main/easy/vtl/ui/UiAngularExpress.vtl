@@ -1,0 +1,26 @@
+import UiAngularBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
+    
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = port(config.managementUi);
+        'const express = require("express");
+        const app = express(),
+              bodyParser = require("body-parser");
+              port = ${port};
+
+        app.use(bodyParser.json());
+        app.use(express.static(process.cwd()+"/dist/iipes-web/"));
+
+        app.get("/", (req,res) => {
+          res.sendFile(process.cwd()+"/dist/iipes-web/index.html")
+        });
+
+        app.listen(port, () => {
+          console.log("Server listening on the port::\\${port}");
+        });'
+    }
+    
+}
