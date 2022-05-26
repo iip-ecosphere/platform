@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -95,7 +96,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      */
     public void setReceptionCallback(ReceptionCallback<CO> callback) {
         try {
-            connector.setReceptionCallback(null);
+            connector.setReceptionCallback(callback);
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Data loss, cannot set reception callback: " + e.getMessage());
         }
@@ -106,9 +107,18 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
         super.setState(state);
         try {
             if (ServiceState.STARTING == state) {
-                connector.connect(connParamSupplier.get());
+                ConnectorParameter param = connParamSupplier.get();
+                connector.connect(param);
+                // not needed, but generation may statically switch off notifications and prevent testing with
+                // different values
+                if (connector instanceof AbstractConnector) {
+                    ((AbstractConnector<?, ?, ?, ?>) connector).notificationsChanged(
+                        param.getNotificationInterval() == 0);
+                }
+                super.setState(ServiceState.RUNNING);
             } else if (ServiceState.STOPPING == state) {
                 connector.disconnect();
+                super.setState(ServiceState.STOPPED);
             } else if (ServiceState.UNDEPLOYING == state) {
                 connector.dispose();
             }
