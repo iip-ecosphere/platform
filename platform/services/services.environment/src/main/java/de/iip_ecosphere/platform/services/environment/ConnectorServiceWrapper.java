@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -111,10 +110,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
                 connector.connect(param);
                 // not needed, but generation may statically switch off notifications and prevent testing with
                 // different values
-                if (connector instanceof AbstractConnector) {
-                    ((AbstractConnector<?, ?, ?, ?>) connector).notificationsChanged(
-                        param.getNotificationInterval() == 0);
-                }
+                connector.enableNotifications(param.getNotificationInterval() == 0);
                 super.setState(ServiceState.RUNNING);
             } else if (ServiceState.STOPPING == state) {
                 connector.disconnect();
@@ -141,6 +137,25 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
+    }
+
+    /**
+     * Enable/disable polling (does not influence the polling timer).
+     * 
+     * @param enablePolling whether polling shall enabled
+     * @see #enableNotifications(boolean)
+     */
+    public void enablePolling(boolean enablePolling) {
+        connector.enablePolling(enablePolling);
+    }
+
+    /**
+     * Enables/disables notifications/polling at all.
+     * 
+     * @param enableNotifications enable or disable notifications
+     */
+    public void enableNotifications(boolean enableNotifications) {
+        connector.enableNotifications(enableNotifications);
     }
 
 }
