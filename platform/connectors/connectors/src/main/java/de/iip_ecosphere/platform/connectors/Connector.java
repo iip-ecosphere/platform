@@ -17,7 +17,9 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
  * The interface of a platform/machine connector. A connector shall define a {@link ConnectorDescriptor} as top-level 
- * inner class and register the descriptor as service.
+ * inner class and register the descriptor as service. By default, polling shall be enabled but in certain cases this
+ * may not fit into the lifecycle of services in a service environment. Then it is possible to explicitly 
+ * {@link #enablePolling(boolean) enable/disable} polling.
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -127,5 +129,20 @@ public interface Connector <O, I, CO, CI> {
      * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
      */
     public String enabledEncryption();
+
+    /**
+     * Enable/disable polling (does not influence the polling timer).
+     * 
+     * @param enablePolling whether polling shall enabled
+     * @see #enableNotifications(boolean)
+     */
+    public void enablePolling(boolean enablePolling);
+
+    /**
+     * Enables/disables notifications/polling at all.
+     * 
+     * @param enableNotifications enable or disable notifications
+     */
+    public void enableNotifications(boolean enableNotifications);
 
 }

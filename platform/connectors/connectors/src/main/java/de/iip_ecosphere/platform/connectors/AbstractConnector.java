@@ -42,6 +42,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private Timer timer;
     private TimerTask pollTask;
     private ConnectorParameter params;
+    private boolean enablePolling = true; // enable by default
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default selector for the first adapter.
@@ -158,12 +159,19 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
 
                 @Override
                 public void run() {
-                    doPolling();
+                    if (enablePolling) {
+                        doPolling();
+                    }
                 }
                 
             };
             timer.scheduleAtFixedRate(pollTask, 0, pollingPeriod);
         }
+    }
+    
+    @Override
+    public void enablePolling(boolean enablePolling) {
+        this.enablePolling = enablePolling;
     }
     
     /**
@@ -308,6 +316,11 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
         for (int a = 0; a < adapter.length; a++) {
             adapter[a].initializeModelAccess();
         }
+    }
+
+    @Override
+    public void enableNotifications(boolean enableNotifications) {
+        notificationsChanged(enableNotifications);
     }
 
     /**
