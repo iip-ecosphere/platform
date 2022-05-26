@@ -106,12 +106,12 @@ public class Transport {
     }
     
     /**
-     * Sends a message of a certain kind and cares fore queuing.
+     * Sends a message of a certain {@code kind} and cares fore queuing.
      * 
      * @param sender the sender including the message
      * @param kind the kind of the message for logging
      */
-    private static void send(IOConsumer<TransportConnector> sender, String kind) {
+    public static void send(IOConsumer<TransportConnector> sender, String kind) {
         createConnector();
         if (null != connector) {
             try {
