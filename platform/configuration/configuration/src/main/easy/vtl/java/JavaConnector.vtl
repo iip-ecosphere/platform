@@ -445,12 +445,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def generateReceptionCallback(Connector conn) {
         String serviceId = "_" + toIdentifier(conn.id);
         String coType = asTypeName(getFirstTypeName(conn.output));
-        String methodSuffix = "create" + coType.firstToUpperCase() + serviceId;
+        String suffix = coType.firstToUpperCase() + serviceId;
+        String methodSuffix = "create" + suffix;
         'private class ConnectorReceptionCallback implements ReceptionCallback<${coType}> {
+        
+            {
+                Starter.getSetup(); // initialize Transport if needed
+            }
         
             @Override
             public void received(${coType} data) {
-                streamBridge.send("${methodSuffix}", data);
+                //streamBridge.send("${methodSuffix}", data);
+                Transport.send(c -> c.asyncSend("${suffix}", data), "${conn.id}");
             }
         
             @Override

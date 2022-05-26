@@ -206,7 +206,55 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                  }
              }
          }
+         // HACK for connectors, may also be for backward
+         if (not(elt.impl.isKindOf(Connector))) {
+             Boolean first = true;
+             for (MeshElement n: nodes) {
+                 if (n.impl.isKindOf(Connector)) {
+                     for (IOType out : getSourceInput(n.impl)) {
+                         for (IOType in: base.input) {
+                             if (in.type == out.type) {
+                                 result = result + generateReceptionCallback(n, in, elt, first);
+                                 first = false;
+                             }
+                         }
+                     }
+                 }
+             }
+         }
          '${result}'
+    }
+
+    def generateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
+        String serviceId = "_" + toIdentifier(source.impl.id);
+        String coType = toTypeName(sourceType);
+        String suffix = coType.firstToUpperCase() + serviceId;
+
+        if (first) { // initialize Transport
+           'Starter.getSetup();
+           TransportConnector conn = Transport.createConnector();' 
+        }
+        'if (null != conn) {
+            try {
+                conn.setReceptionCallback("${suffix}", new ReceptionCallback<${coType}>() {
+    
+                    @Override
+                    public void received(${coType} data) {
+                        process${coType}_${toIdentifier(receiver.impl.id)}().accept(data);
+                    }
+            
+                    @Override
+                    public Class<${coType}> getType() {
+                        return ${coType}.class;
+                    }
+    
+                });
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records. {}", e.getMessage());
+            }
+        } else {
+            LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
+        }'
     }
     
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir) {
@@ -1096,7 +1144,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import de.iip_ecosphere.platform.transport.Transport;
         import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;
-        import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+        import de.iip_ecosphere.platform.transport.connectors.*;
         import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
         import de.iip_ecosphere.platform.services.environment.switching.ServiceSelector;
         import de.iip_ecosphere.platform.services.environment.*;
