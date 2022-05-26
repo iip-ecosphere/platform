@@ -82,7 +82,8 @@ public class TraceToAasService extends AbstractService {
 
     public static final ValueConverter IDENTITY_CONVERTER = v -> v;
     public static final ValueConverter JSON_CONVERTER = v -> JsonUtils.toJson(v);
-
+    public static final ValueConverter SHORT2INT_CONVERTER = v -> Integer.valueOf((Short) v);
+    
     private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = new HashMap<>();
     private static final String PREFIX_GETTER = "get";
     private static final Set<String> METHODS_TO_IGNORE = new HashSet<>();
@@ -108,6 +109,8 @@ public class TraceToAasService extends AbstractService {
         DEFAULT_CONVERTERS.put(Float.class, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
         DEFAULT_CONVERTERS.put(Double.TYPE, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
         DEFAULT_CONVERTERS.put(Double.class, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
+        DEFAULT_CONVERTERS.put(Short.TYPE, new TypeConverter(Type.INTEGER, SHORT2INT_CONVERTER));
+        DEFAULT_CONVERTERS.put(Short.class, new TypeConverter(Type.INTEGER, SHORT2INT_CONVERTER));
         DEFAULT_CONVERTERS.put(int[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(long[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(float[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
