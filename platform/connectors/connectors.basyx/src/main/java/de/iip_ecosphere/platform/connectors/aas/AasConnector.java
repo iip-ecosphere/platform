@@ -218,11 +218,13 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 if (!connectedAAS.containsKey(id) && pattern.matcher(id).matches()) {
                     try {
                         Aas aas = registry.retrieveAas(id);
-                        connectedAAS.put(aas.getIdShort(), aas);
-                        if (nonPollingAas.length() == 0) {
-                            nonPollingAas = aas.getIdShort();
+                        if (null != aas) {
+                            connectedAAS.put(aas.getIdShort(), aas);
+                            if (nonPollingAas.length() == 0) {
+                                nonPollingAas = aas.getIdShort();
+                            }
+                            foundNew = true;
                         }
-                        foundNew = true;
                     } catch (IOException e) {
                         LOGGER.warn("Cannot retrieve AAS '{}': {}. Ignoring.", id, e.getMessage());
                     }
