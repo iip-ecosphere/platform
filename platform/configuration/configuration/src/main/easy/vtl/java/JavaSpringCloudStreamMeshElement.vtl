@@ -854,7 +854,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, PythonService service) {
         '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
-        '${genMapService("service")}'
+        // no mapServices here as Python may take long and block the constructor -> initIngestors
         '${attachMetricsProvider("service")}'
         for (IOType in: service.input) {
             String type = toTypeName(in);
@@ -864,6 +864,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String type = toTypeName(out);
             'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
         }
+    }
+    
+    def initIngestors(MeshElement elt, PythonService base) {
+        '${genMapService("service")}'
     }
     
     def generateImports(PythonService service) {
