@@ -352,7 +352,8 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             tmp.addAll(args);
         }
         
-        LoggerFactory.getLogger(AbstractProcessService.class).info("Cmd line: " + tmp + " in " + dir);
+        System.out.println("Cmd line: " + tmp + " in " + dir); // preliminary
+        //LoggerFactory.getLogger(AbstractProcessService.class).info("Cmd line: " + tmp + " in " + dir);
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
         if (null != customizer) {

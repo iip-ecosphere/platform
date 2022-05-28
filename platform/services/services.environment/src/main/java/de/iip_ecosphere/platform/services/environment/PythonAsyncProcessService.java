@@ -22,7 +22,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
+
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -41,6 +44,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     private Process proc;
     private PrintWriter serviceIn;
+    private boolean enableFileDeletion;
  
     /**
      * Creates an instace from a service id and a YAML artifact.
@@ -62,6 +66,15 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
      */
     public PythonAsyncProcessService(YamlService yaml) {
         super(yaml);
+    }
+    
+    /**
+     * Enables or deletes file deletion. By default, Python files are delete upon end of the process.
+     * 
+     * @param enableFileDeletion enables deletion
+     */
+    public void enableFileDeletion(boolean enableFileDeletion) {
+        this.enableFileDeletion = enableFileDeletion;
     }
 
     /**
@@ -95,8 +108,19 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             serviceIn = null;
         }
         if (null != proc) {
-            proc.destroy();
+            proc.destroyForcibly();
+            while (proc.isAlive()) {
+                TimeUtils.sleep(200);
+            }
             proc = null;
+        }
+        if (null != getHome() && enableFileDeletion) {
+            try {
+                FileUtils.forceDelete(getHome());
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot delete Python process home {}: {}", 
+                    getHome(), e.getMessage());
+            }
         }
     }
     

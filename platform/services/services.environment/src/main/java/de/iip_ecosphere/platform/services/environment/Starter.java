@@ -212,6 +212,7 @@ public class Starter {
                     service.setState(ServiceState.STARTING);
                     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                         try {
+                            System.out.println("Service autostop: " + service.getId());
                             service.setState(ServiceState.STOPPING);
                         } catch (ExecutionException e) {
                             getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());

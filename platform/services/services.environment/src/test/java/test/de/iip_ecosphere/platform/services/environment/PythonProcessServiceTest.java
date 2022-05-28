@@ -91,7 +91,8 @@ public class PythonProcessServiceTest {
         
         final String stringTypeName = "S"; // same symbolic type name for in/output
         final String rec13TypeName = "Rec13";
-        AbstractPythonProcessService service = new PythonAsyncProcessService(sDesc);
+        PythonAsyncProcessService service = new PythonAsyncProcessService(sDesc);
+        service.enableFileDeletion(false); // do not remove src/main/python!
         service.registerInputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
         service.registerOutputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
         service.attachIngestor(String.class, stringTypeName, new DataIngestor<String>() {

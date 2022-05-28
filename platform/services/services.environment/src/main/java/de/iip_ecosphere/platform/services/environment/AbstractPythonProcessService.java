@@ -190,6 +190,15 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     }
     
     /**
+     * Returns the home directory.
+     * 
+     * @return the home directory
+     */
+    protected File getHome() {
+        return home;
+    }
+    
+    /**
      * Returns the name of the Python module. The default (if not explicitly given) is "ServiceEnvironment.py".
      * 
      * @param module the module name, may be empty or <b>null</b>
