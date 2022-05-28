@@ -97,7 +97,7 @@ public class BaSyxRegistry implements Registry {
                 }
             }
         } catch (ProviderException e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS descriptor: " + e.getMessage());
+            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS descriptor: " + e.getMessage(), e);
         }
         return result;
     }
