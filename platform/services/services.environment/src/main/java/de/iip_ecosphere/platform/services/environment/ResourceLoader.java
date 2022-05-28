@@ -51,8 +51,14 @@ public class ResourceLoader {
      */
     public static InputStream getResourceAsStream(ClassLoader loader, String name) {
         InputStream result = loader.getResourceAsStream(name);
+        if (result != null) {
+            System.out.println("LOADING " + name + " " + result);
+        }
         if (null == result && !name.startsWith("/")) {
             result = loader.getResourceAsStream("/" + name);
+            if (result != null) {
+                System.out.println("LOADING " + "/" + name + " " + result);
+            }
         }
         // TODO fixed integration of alternative spring...
         if (null == result) {
@@ -60,8 +66,14 @@ public class ResourceLoader {
                 name = name.substring(1);
             }
             result = loader.getResourceAsStream("BOOT-INF/classes/" + name);
+            if (result != null) {
+                System.out.println("LOADING " + "BOOT-INF/classes/" + name + " " + result);
+            }
             if (null == result) {
                 result = loader.getResourceAsStream("/BOOT-INF/classes/" + name);
+                if (result != null) {
+                    System.out.println("LOADING " + "/BOOT-INF/classes/" + name + " " + result);
+                }
             }
         }
         return result;
