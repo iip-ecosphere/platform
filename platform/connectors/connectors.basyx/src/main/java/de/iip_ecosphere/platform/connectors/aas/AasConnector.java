@@ -288,7 +288,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
     @Override
     protected void error(String message, Throwable th) {
-        LOGGER.error(message, th);
+        LOGGER.error(message + ": " + th.getMessage());
     }
 
     /**
@@ -458,7 +458,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 try {
                     result = operation.invoke(args);
                 } catch (Exception e) {
-                    throw new IOException("While calling " + qName + ": " + e.getMessage(), e);
+                    throw new IOException("While calling " + qName + ": " + e.getMessage());
                 }
             } else {
                 throw new IOException("Cannot find operation " + qName);
@@ -471,7 +471,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             try {
                 return findProperty(qName).getValue();
             } catch (Exception e) {
-                throw new IOException("Accessing " + qName + ": " + e.getMessage(), e);
+                throw new IOException("Accessing " + qName + ": " + e.getMessage());
             }
         }
 
@@ -480,7 +480,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             try {
                 findProperty(qName).setValue(value); // writes into model, may not be reflected further
             } catch (Exception e) {
-                throw new IOException("Accessing " + qName + ": " + e.getMessage(), e);
+                throw new IOException("Accessing " + qName + ": " + e.getMessage());
             }
         }
 
