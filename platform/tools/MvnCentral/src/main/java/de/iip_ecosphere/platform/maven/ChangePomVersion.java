@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import de.iip_ecosphere.platform.maven.PomReader.PomInfo;
+
 /**
  * Changes POM versions.
  * 
@@ -103,7 +105,16 @@ public class ChangePomVersion {
     private void process(File file) {
         System.out.print(file.getAbsolutePath() + ": ");
         if (simulate) {
-            System.out.println("not changed (-> simulate)");
+            PomInfo info = PomReader.getInfo(file);
+            if (null != info) {
+                if (PomReader.equalsSafe(info.getVersion(), oldPomVersion)) {
+                    System.out.println("not changed (version -> " + newPomVersion + ")");
+                } else if (PomReader.equalsSafe(info.getParentVersion(), oldParentPomVersion)) {
+                    System.out.println("not changed (parent -> " + newParentPomVersion + ")");
+                } else {
+                    System.out.println("not changed (-> wrong version)");
+                }
+            } 
         } else {
             try {
                 PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, newParentPomVersion);

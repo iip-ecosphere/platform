@@ -271,7 +271,7 @@ public class PomReader {
      * @param s2 the second string
      * @return {@code true} if both are equal, {@code false} else
      */
-    private static boolean equalsSafe(String s1, String s2) {
+    public static boolean equalsSafe(String s1, String s2) {
         boolean result = false;
         if (s1 != null && s2 != null) {
             result = s1.equals(s2);
@@ -396,12 +396,13 @@ public class PomReader {
      * @param newPomVersion the new POM version (may be <b>null</b> to ignore)
      * @param oldParentPomVersion the old parent POM version (may be <b>null</b> to ignore)
      * @param newParentPomVersion the new parent POM version (may be <b>null</b> to ignore)
+     * @return whether {@code file} was modified
      * @throws IOException if reading/writing fails
      */
-    public static void replaceVersion(File file, String oldPomVersion, String newPomVersion, 
+    public static boolean replaceVersion(File file, String oldPomVersion, String newPomVersion, 
         String oldParentPomVersion, String newParentPomVersion) throws IOException {
         
-        readPom(file, new PomHandler() {
+        PomHandler handler = new PomHandler() {
             
             private boolean modified = false;
 
@@ -450,7 +451,9 @@ public class PomReader {
                 return modified;
             }
 
-        });
+        };
+        readPom(file, handler);
+        return handler.wasModified();
     }
     
 }
