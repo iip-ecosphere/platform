@@ -67,7 +67,7 @@
      <version>1.8.3</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
     <dependency>
-     <groupId>si.matjazcerkvenik</groupId>
+     <groupId>de.iip-ecosphere.platform.external.si.matjazcerkvenik</groupId>
      <artifactId>alertmonitor</artifactId>
      <version>2.3.0</version>
      <exclusions>
@@ -87,7 +87,7 @@
      </exclusions>
     </dependency>
     <dependency>
-      <groupId>si.matjazcerkvenik.simplelogger</groupId>
+      <groupId>de.iip-ecosphere.platform.external.si.matjazcerkvenik.simplelogger</groupId>
       <artifactId>simple-logger</artifactId>
       <version>1.7.0</version>
     </dependency>
