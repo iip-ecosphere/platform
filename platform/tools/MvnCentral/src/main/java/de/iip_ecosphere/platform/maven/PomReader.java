@@ -362,7 +362,7 @@ public class PomReader {
                     DOMSource source = new DOMSource(doc);
                     transformer.transform(source, result);
                     // ridiculus
-                    String res = xmlText.toString().replace("xmlns=\"\"", "");
+                    String res = xmlText.toString().replace(" xmlns=\"\"", "");
                     FileUtils.writeStringToFile(file, res, StandardCharsets.UTF_8);
                 } catch (TransformerException e) {
                     throw new IOException(e);
