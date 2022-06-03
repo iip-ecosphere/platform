@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <name>IIP-Ecosphere Management UI</name>
   <description>IIP-Ecosphere Management UI.</description>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.0</version>
   <groupId>de.iip-ecosphere.platform</groupId>
   <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
 
