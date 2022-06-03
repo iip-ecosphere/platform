@@ -2,21 +2,20 @@ package de.iip_ecosphere.platform.maven;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,26 +29,6 @@ import org.xml.sax.SAXException;
  */
 public class PomReader {
     
-    //https://stackoverflow.com/questions/6400328/how-to-avoid-adding-xmlns-when-using-using-java-xml-transformer
-        
-    /**
-     * Output stylesheet to avoid empty xmlns.
-     */
-    private static String outStylesheet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-         + "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">" 
-         + "<xsl:output method=\"xml\" version=\"1.0\" indent=\"no\"/>" 
-         + "<xsl:template match=\"*\">" 
-         + "<xsl:element name=\"{local-name()}\">" 
-         + "<xsl:for-each select=\"@*\">" 
-         + "<xsl:attribute name=\"{local-name()}\">" 
-         + "<xsl:value-of select=\".\"/>" 
-         + "</xsl:attribute>" 
-         + "</xsl:for-each>" 
-         + "<xsl:apply-templates/>" 
-         + "</xsl:element>" 
-         + "</xsl:template>" 
-         + "</xsl:stylesheet>";
-
     /**
      * Simple wrapper class for extracted information.
      * @author Patu
@@ -374,14 +353,17 @@ public class PomReader {
             
             if (handler.wasModified()) {
                 try {
+                    
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                    StreamSource xslSource = new StreamSource(new StringReader(outStylesheet));
-                    Transformer transformer = transformerFactory.newTransformer(xslSource);
-                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                    FileWriter writer = new FileWriter(file);
-                    StreamResult result = new StreamResult(writer);
+                    Transformer transformer = transformerFactory.newTransformer(/*xslSource*/);
+                    //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                    StringWriter xmlText = new StringWriter();
+                    StreamResult result = new StreamResult(xmlText);
                     DOMSource source = new DOMSource(doc);
                     transformer.transform(source, result);
+                    // ridiculus
+                    String res = xmlText.toString().replace("xmlns=\"\"", "");
+                    FileUtils.writeStringToFile(file, res, StandardCharsets.UTF_8);
                 } catch (TransformerException e) {
                     throw new IOException(e);
                 }
