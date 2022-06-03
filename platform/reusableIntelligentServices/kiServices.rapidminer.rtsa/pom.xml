@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>kiServices.rapidminer.rtsa</artifactId>
@@ -10,7 +9,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.3.0-SNAPSHOT</version>
+     <version>0.3.0</version>
   </parent>
 
   <dependencies>
@@ -107,33 +106,28 @@
 	            <phase>process-test-resources</phase>
 	            <configuration>
 	                <target>
-                        <mkdir dir="${project.build.directory}/fake" />
+                        <mkdir dir="${project.build.directory}/fake"/>
 	                    
-                        <mkdir dir="${project.build.directory}/fake/rtsa" />
-	                    <mkdir dir="${project.build.directory}/fake/rtsa/bin" />
-                        <mkdir dir="${project.build.directory}/fake/rtsa/home" />
-                        <mkdir dir="${project.build.directory}/fake/rtsa/deployments" />
-                        <mkdir dir="${project.build.directory}/fake/rtsa/lib" />
-                        <jar destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar"
-                            basedir="${project.build.directory}/test-classes"
-                            includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/Fake*.class, simplelogger.properties">
+                        <mkdir dir="${project.build.directory}/fake/rtsa"/>
+	                    <mkdir dir="${project.build.directory}/fake/rtsa/bin"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/home"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/deployments"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/lib"/>
+                        <jar basedir="${project.build.directory}/test-classes" destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar" includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/Fake*.class, simplelogger.properties">
                         </jar>
-                        <zip destfile="${project.build.directory}/fake/RTSA-0.14.5.zip" 
-                            basedir="${project.build.directory}/fake/rtsa"/>
+                        <zip basedir="${project.build.directory}/fake/rtsa" destfile="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
 
-                        <mkdir dir="${project.build.directory}/fake/empty" />
+                        <mkdir dir="${project.build.directory}/fake/empty"/>
                         
-                        <mkdir dir="${project.build.directory}/fake/deployment" />
-                        <mkdir dir="${project.build.directory}/fake/deployment/home" />
-                        <mkdir dir="${project.build.directory}/fake/deployment/home/deployments" />
-                        <jar destfile="${project.build.directory}/fake/deployment/home/deployments/fakeDeployment.jar"
-                            basedir="${project.build.directory}/fake/empty">
+                        <mkdir dir="${project.build.directory}/fake/deployment"/>
+                        <mkdir dir="${project.build.directory}/fake/deployment/home"/>
+                        <mkdir dir="${project.build.directory}/fake/deployment/home/deployments"/>
+                        <jar basedir="${project.build.directory}/fake/empty" destfile="${project.build.directory}/fake/deployment/home/deployments/fakeDeployment.jar">
                         </jar>
-                        <zip destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" 
-                            basedir="${project.build.directory}/fake/deployment"/>
+                        <zip basedir="${project.build.directory}/fake/deployment" destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip"/>
                             
                         <!-- for testing -->
-                        <mkdir dir="${project.build.directory}/fake/deployments" />
+                        <mkdir dir="${project.build.directory}/fake/deployments"/>
                         <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/fake/deployments"/>
 	                </target>
 	            </configuration>
@@ -170,7 +164,7 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <ignore></ignore>
+                                    <ignore/>
                                 </action>
                             </pluginExecution>
                             <pluginExecution>
@@ -189,7 +183,7 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <ignore></ignore>
+                                    <ignore/>
                                 </action>
                             </pluginExecution>
                         </pluginExecutions>
