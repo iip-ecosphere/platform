@@ -150,7 +150,7 @@
               <groupId>de.iip-ecosphere.platform</groupId>
               <artifactId>test.simpleStream.spring</artifactId>
               <version>${project.version}</version>
-              <classifier>services</classifier>
+              <classifier>spring</classifier>
               <type>zip</type>
               <overWrite>true</overWrite>
               <outputDirectory>${project.build.directory}/jars</outputDirectory>
