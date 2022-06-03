@@ -72,7 +72,7 @@ public class ChangePomVersion {
      */
     private boolean isValid() {
         return ((oldPomVersion.length() > 0 && newPomVersion.length() > 0) 
-            ^ (oldParentPomVersion.length() > 0 && newParentPomVersion.length() > 0));
+            || (oldParentPomVersion.length() > 0 && newParentPomVersion.length() > 0));
     }
 
     /**
