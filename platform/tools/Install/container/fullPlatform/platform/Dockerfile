@@ -3,7 +3,7 @@ WORKDIR /device
 # Broker (src contains broker configuration)
 COPY brokerJars/ brokerJars
 COPY src/ src
-COPY amqp.sh amqp.sh
+COPY broker.sh broker.sh
 # Platform
 COPY plJars/ plJars
 COPY platform.sh platform.sh

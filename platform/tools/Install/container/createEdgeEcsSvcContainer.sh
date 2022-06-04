@@ -1,7 +1,7 @@
 #!/bin/bash
 cp -r ../broker/src ../gen
-cp ../broker/amqp.sh ../gen
-chmod u+x ../gen/amqp.sh
+cp ../broker/broker.sh ../gen
+chmod u+x ../gen/broker.sh
 cp -r ../broker/brokerJars ../gen
 cp EdgeEcsSvc/wrapper_script.sh ../gen/edgeEcsSvc.wrapper_script.sh
 chmod u+x ../gen/edgeEcsSvc.wrapper_script.sh
