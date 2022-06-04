@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>MvnCentral</artifactId>
-  <version>0.3.0-SNAPSHOT</version> <!-- for release, remove -SNAPSHOT -->
+  <version>0.3.0</version> <!-- for release, remove -SNAPSHOT -->
   
   <repositories>       
     <repository>
@@ -37,36 +37,13 @@
         <type>pom</type>
     </dependency>
 
-    <!-- Related release until BaSyx provides own releases -->
-    <dependency>
-      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.lib</artifactId>
-      <version>${basyx.version}</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
-      <artifactId>basyx.components.lib</artifactId>
-      <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
-          <artifactId>basyx.components.registry</artifactId>
-      <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
-          <artifactId>basyx.components.AASServer</artifactId>
-      <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform.org.eclipse.basyx</groupId>
-          <artifactId>basyx.sdk</artifactId>
-      <version>${basyx.version}</version> 
-    </dependency>
-
     <dependency>
         <artifactId>support.aas</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.dfltSysMetrics</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>    
@@ -87,6 +64,11 @@
     </dependency>    
     
     <dependency>
+        <artifactId>transport</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
         <artifactId>transport.amqp</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
@@ -102,6 +84,11 @@
         <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+        <artifactId>transport.spring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
     <dependency>
         <artifactId>transport.spring.amqp</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -128,6 +115,11 @@
         <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+        <artifactId>connectors</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
         <artifactId>connectors.opcuav1</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -180,12 +172,12 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-    <!-- not part of 0.2 release
+    <!-- not part of 0.3 release
     <dependency>
         <artifactId>ecsRuntime.kubernetes</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency>
+    </dependency>-->
 
     <dependency>
         <artifactId>deviceMgt</artifactId>
@@ -193,13 +185,38 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>deviceMgt.basicRegistry</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>deviceMgt.minio</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>deviceMgt.s3mock</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>deviceMgt.thingsboard</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
         <artifactId>monitoring</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-     -->
+    <dependency>
+        <artifactId>monitoring.prometheus</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
      
-     <dependency>
+   <dependency>
         <artifactId>platform</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
@@ -207,6 +224,28 @@
     
     <dependency>
         <artifactId>configuration.configuration</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+        <artifactId>managementUi</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>bin</classifier>
+        <type>zip</type>
+    </dependency>
+
+    <!-- platform-provided services -->
+    
+    <dependency>
+        <artifactId>kiServices.rapidminer.rtsa</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+        <artifactId>security.services.kodex</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>

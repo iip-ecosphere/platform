@@ -4,12 +4,12 @@ REM install maven into PATH
 REM install GnuPGP
 REM add your account settings for ossrh into maven setup (use authentication token)
 REM copy this script into an empty directory
-REM run mvn package
-REM run this script (once for basix, once for platform with different version numbers if needed)
+REM run mvn -U package
+REM run this script
 REM goto https://oss.sonatype.org/#welcome, staging repositories, deiip-ecosphere...*, close for check/deploy
 
 setlocal ENABLEDELAYEDEXPANSION
-SET VERSION=0.2.0
+SET VERSION=0.3.0
 SET TARGET=https://oss.sonatype.org/service/local/staging/deploy/maven2
 SET REPO=ossrh-iip
 SET DEPLOYCMD=mvn gpg:sign-and-deploy-file -Durl=%TARGET% -DrepositoryId=%REPO%

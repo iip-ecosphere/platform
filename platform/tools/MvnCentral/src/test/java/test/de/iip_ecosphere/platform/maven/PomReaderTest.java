@@ -19,12 +19,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.maven.PomReader;
 import de.iip_ecosphere.platform.maven.PomReader.PomInfo;
-import net.ssehub.easy.instantiation.core.model.artifactModel.FileUtils;
 
 /**
  * Tests {@link PomReader}.
