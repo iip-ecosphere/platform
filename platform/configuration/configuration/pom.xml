@@ -11,6 +11,27 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.3.0</version>
   </parent>
+  
+  <!-- required for container building on github when release is not already in Mvn central -->  
+  <repositories>       
+    <repository>
+      <id>SSE</id>
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+    </repository>
+    
+    <repository>
+        <id>bintray</id>
+        <url>https://jcenter.bintray.com</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
