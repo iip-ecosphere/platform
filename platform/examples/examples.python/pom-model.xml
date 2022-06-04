@@ -1,19 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion >4.0.0</modelVersion>
 
-  <artifactId>examples.python</artifactId>
-  <packaging>jar</packaging>
-  <name>Pythons service example</name>
-  <description>Utilizing the Python service environment in a simple service chain for validation.</description>
+  <artifactId >examples.python</artifactId>
+  <packaging >jar</packaging>
+  <name >Pythons service example</name>
+  <description >Utilizing the Python service environment in a simple service chain for validation.</description>
 
-  <parent>
+  <parent >
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.3.0-SNAPSHOT</version>
+     <version>0.3.0</version>
   </parent>
 
-  <dependencies>
+  <dependencies >
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>connectors</artifactId>
@@ -51,7 +50,7 @@
   </dependencies>
 
 
-  <build>
+  <build >
     <plugins>
        <plugin>
          <groupId>org.apache.maven.plugins</groupId>
