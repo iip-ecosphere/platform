@@ -27,6 +27,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'zulu'
+      - name: Setup maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: '[{"id": "central", "name":"Maven Central", "url": "https://repo1.maven.org/maven2", "releases": {"enabled": "true"}, "snapshots": {"enabled": "false"}}, {"id": "SSE", "name":"SSE", "url": "https://projects.sse.uni-hildesheim.de/qm/maven/", "releases": {"enabled": "true"}, "snapshots": {"enabled": "true"}}, {"id": "bintray", "name":"bintray", "url": "https://jcenter.bintray.com", "releases": {"enabled": "true"}, "snapshots": {"enabled": "false"}}]'
       - name: Install the platform basics
         run: |
           cd ./platform/tools/Install/platformDependencies
