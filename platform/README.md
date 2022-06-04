@@ -12,15 +12,9 @@ All material is also available from the [IIP-Ecosphere Website](https://www.iip-
 
 ## News
 
-* Increased focus on use cases and evaluation. Preparation of a demonstration for HM'22.
-* Individual AAS for devices, services and Apps.
-* Code templates for application creation.
-* Integration of RapidMiner RTSA for AI (with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.rtsa))
-* [Example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python) for Python service integration 
+* Successful presentation of robot-based visual quality inspection app on HM'22 (with 3 sources, Python-based AI, AAS-based Angular application).
+* Platform release 0.3.0 (2022/06/4)
 * Start of Angular-based Platform Management UI, integrated with the platform instantiation process.
-* Model-based IoT connector creation (MQTT in various formats, OPC UA with [example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.vdw))
-* Python Service Execution Environment and model-based Python Service integration
-* Generic integration of the anonymization and pseudonymization tool [KODEX](https://heykodex.com/)
 
 ## Documentation
 

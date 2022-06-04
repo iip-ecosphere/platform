@@ -1,7 +1,16 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (winter 2021, expected end of March 2022):
+### Next release (sommer 2022):
+Planned:
+* Asynchronous service streams via Transport Layer
+* Service test frames
+* Monitoring
+* Integrated container management for Kubernetes
+* Automatic creation of containers.
+
+### Version 0.3.0 (2022/06/04, HM'22):
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
+* EASy-Producer version 1.3.2
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
 * Model-based of KODEX as platform service (and upgrade to 0.0.8) for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
@@ -38,9 +47,6 @@
     * Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
     * Separated generation of platform application interfaces and application code
     * Changed generated service artifact classifier to *bin* in order to keep the original file for testing.
-* Planned improvements:
-    * Integrated container management for Kubernetes
-    * Automatic creation of containers and their accessibility for devices (started).
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
