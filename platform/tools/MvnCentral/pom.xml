@@ -147,6 +147,14 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>services.environment</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>python</classifier>
+        <type>zip</type>
+    </dependency>
+    
+    <dependency>
         <artifactId>services.environment.spring</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
@@ -227,7 +235,19 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>configuration.configuration</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>easy</classifier>
+        <type>zip</type>
+    </dependency>
 
+    <dependency>
+        <artifactId>managementUi</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
         <artifactId>managementUi</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -248,6 +268,13 @@
         <artifactId>security.services.kodex</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>security.services.kodex</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>bin</classifier>
+        <type>zip</type>
     </dependency>
     
     <!-- Install shall not be referenced here --> 
@@ -271,6 +298,13 @@
         <artifactId>test.simpleStream.spring</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>test.simpleStream.spring</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>spring</classifier>
+        <type>zip</type>
     </dependency>
     <!-- this is test.configuration.configuration -->
     <dependency>

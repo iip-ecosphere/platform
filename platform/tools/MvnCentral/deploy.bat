@@ -46,9 +46,11 @@ REM param2: version of the artifact to deploy
     SET JAVADOC=%ARTIFACTPREFIX%-javadoc.jar
     SET TESTJAVADOC=%ARTIFACTPREFIX%-test-javadoc.jar
     SET PYTHON=%ARTIFACTPREFIX%-python.jar
-    SET EASY=%ARTIFACTPREFIX%-easy.jar
+    SET EASY=%ARTIFACTPREFIX%-easy.zip
     SET INTERFACES=%ARTIFACTPREFIX%-interfaces.jar
-    SET BINS=%ARTIFACTPREFIX%-bins.jar
+    SET BINZ=%ARTIFACTPREFIX%-bin.zip
+    SET BINJ=%ARTIFACTPREFIX%-bin.jar
+    SET SPRING_ZIP=%ARTIFACTPREFIX%-spring.zip
     
     REM deploy to central
     if EXIST %FOLDER%\%JAR% (
@@ -79,12 +81,20 @@ REM param2: version of the artifact to deploy
           call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%EASY% -Dclassifier=easy
         )
         if EXIST %FOLDER%\%INTERFACES% (
-          echo "EASY %FOLDER%\%INTERFACES%"
+          echo "IF %FOLDER%\%INTERFACES%"
           call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%INTERFACES% -Dclassifier=interfaces
         )
-        if EXIST %FOLDER%\%BINS% (
-          echo "EASY %FOLDER%\%BINS%"
-          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINS% -Dclassifier=bin
+        if EXIST %FOLDER%\%BINZ% (
+          echo "BIN-Z IP%FOLDER%\%BINZ%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINZ% -Dclassifier=bin
+        )
+        if EXIST %FOLDER%\%BINJ% (
+          echo "BIN-JAR %FOLDER%\%BINJ%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINJ% -Dclassifier=bin
+        )
+        if EXIST %FOLDER%\%SPRING_ZIP% (
+          echo "SPRING %FOLDER%\%SPRING_ZIP%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%SPRING_ZIP% -Dclassifier=spring
         )
     ) else (
         echo "POM %FOLDER%\%POM%"
