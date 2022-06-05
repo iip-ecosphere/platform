@@ -4,7 +4,7 @@ project DataTypes {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    NonEmptyString iipVer = "0.3.0"; // Maven version of platform
+    NonEmptyString iipVer = "0.4.0-SNAPSHOT"; // Maven version of platform
     
     typedef EphemeralPort Integer with (EphemeralPort >= -1 and EphemeralPort <= 65535);
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
