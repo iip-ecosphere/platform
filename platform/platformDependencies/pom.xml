@@ -150,7 +150,7 @@
     <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
     <org.jacoco.maven.jacoco.version>0.8.2</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
-    <net.ssehub.easyProducer.version>1.3.2</net.ssehub.easyProducer.version>
+    <net.ssehub.easyProducer.version>1.3.3-SNAPSHOT</net.ssehub.easyProducer.version>
     <com.google.guava.version>22.0</com.google.guava.version>
 
     <!-- for now due to edge deployment/initial experience -->
