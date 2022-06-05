@@ -18,4 +18,4 @@ Besides the Maven build specifications for the platform dependencies, the test b
 
 This package contains also programs to optimize specific deployments, e.g., to reduce the overlap between JAR folders.
 
-**For snapshots:** See required EASy-Producer 1.3.1-SNAPSHOT version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
+**For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
