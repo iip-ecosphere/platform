@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion >4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId >examples.rtsa</artifactId>
-  <packaging >jar</packaging>
-  <name >RTSA example</name>
-  <description >Utilizing the RTSA platform service in a simple service chain for validation.</description>
+  <artifactId>examples.rtsa</artifactId>
+  <packaging>jar</packaging>
+  <name>RTSA example</name>
+  <description>Utilizing the RTSA platform service in a simple service chain for validation.</description>
 
-  <parent >
+  <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.3.0</version>
+     <version>0.4.0-SNAPSHOT</version>
   </parent>
 
-  <dependencies >
+  <dependencies>
     <dependency>
       <artifactId>configuration.configuration</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
@@ -57,7 +57,7 @@
   </dependencies>
 
 
-  <build >
+  <build>
     <plugins>
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
