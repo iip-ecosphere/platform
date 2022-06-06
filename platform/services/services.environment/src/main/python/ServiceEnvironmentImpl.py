@@ -10,6 +10,27 @@ import json
 from codecs import decode
 import Registry
 
+def printStdout(text): 
+    """ Use in here to write to stdout, independent whether redirected or not 
+    
+    Parameters:
+      - text -- what to print, converted to string, newline added"""
+      
+    sys.__stdout__.write(str(text) + "\n")  
+
+def flushStdout(): 
+    """ Flushes original stdout """
+    
+    sys.__stdout__.flush()  
+
+def printStderr(text): 
+    """ Use in here to write to stderr, independent whether redirected or not
+    
+    Parameters:
+      - text -- what to print, converted to string, newline added"""
+      
+    sys.__stderr__.write(str(text) + "\n")  
+    
 # for command line version of service environment: do not emit anything to system out rather than intended results
 
 def start():
@@ -44,6 +65,10 @@ def start(a):
         default="", help='JSON value map to be passed to the service for initial reconfiguration.')    
         
     args = parser.parse_args(a)
+    consoleMode = len(args.mode) > 0 and args.mode[0]=='console'
+    
+    if consoleMode:
+        sys.stdout = sys.stderr
 
     modulesPath = getArg(args.modulesPath)
     sys.path.append(modulesPath)
@@ -53,14 +78,14 @@ def start(a):
     loadModules(modulesPath, getArg(args.interfacesPackage))
     loadModules(modulesPath, getArg(args.servicesPackage))
 
-    #sys.stderr.write("services:         " + str(Registry.services)+"\n")
-    #sys.stderr.write("types:            " + str(Registry.types)+"\n")
-    #sys.stderr.write("serializers:      " + str(Registry.serializers)+"\n")
-    #sys.stderr.write("receivers:        " + str(Registry.receivers)+"\n")
-    #sys.stderr.write("senders:          " + str(Registry.senders)+"\n")
-    #sys.stderr.write("asyncTransformers:" + str(Registry.asyncTransformers)+"\n")
-    #sys.stderr.write("syncTransformers: " + str(Registry.syncTransformers)+"\n")
-    #sys.stderr.write("sid: " + str(args.sId)+"\n")
+    #print("services:         " + str(Registry.services))
+    #print("types:            " + str(Registry.types))
+    #print("serializers:      " + str(Registry.serializers))
+    #print("receivers:        " + str(Registry.receivers))
+    #print("senders:          " + str(Registry.senders))
+    #print("asyncTransformers:" + str(Registry.asyncTransformers))
+    #print("syncTransformers: " + str(Registry.syncTransformers))
+    #print("sid: " + str(args.sId))
     
     sId = args.sId[0]
 
@@ -69,9 +94,9 @@ def start(a):
         if service:
             service.reconfigure(json.loads(data))
 
-    if len(args.mode) > 0 and args.mode[0]=='console':
+    if consoleMode:
         console(a, args.data, sId)
-    else:
+    else: # currently no alternative, just use console as fallback
         console(a, args.data, sId)
 
 def getArg(arg):
@@ -98,8 +123,8 @@ def consoleIngestResult(data):
         serializer = Registry.serializers.get(typeInfo)
         if serializer:
             result = typeInfo + "|" + serializer.writeTo(data)
-            print(result)
-            sys.stdout.flush()
+            printStdout(result)
+            flushStdout()
 
 def console(a, data, sId):
     """ Starts the command line based service environment
