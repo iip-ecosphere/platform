@@ -49,8 +49,6 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
  */
 public class DescriptorUtils {
     
-    public static final String IIP_APP_PREFIX = "iip.app.";
-
     /**
      * Reads the YAML deployment descriptor from {@code file}.
      * 
@@ -248,22 +246,6 @@ public class DescriptorUtils {
     }
     
     // checkstyle: stop parameter number check
-
-    /**
-     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} to the command line of the service 
-     * to be started.
-     * 
-     * @param args the arguments to add the application environment settings
-     */
-    public static void addAppEnvironment(List<String> args) {
-        for (Object k : System.getProperties().keySet()) {
-            String key = k.toString();
-            String val = System.getProperty(key);
-            if (key.startsWith(IIP_APP_PREFIX)) {
-                args.add("-D" + key + "=" + val);
-            }
-        }
-    }
     
     /**
      * Creates command line args for executing the (Spring) fat JAR in standalone/debugging manner.
@@ -296,7 +278,7 @@ public class DescriptorUtils {
         result.add("java");
         result.add("-jar");
         result.add("-Dlog4j2.formatMsgNoLookups=true");
-        addAppEnvironment(result);
+        Starter.addAppEnvironment(result);
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
         result.add("--server.port=" + springPort);

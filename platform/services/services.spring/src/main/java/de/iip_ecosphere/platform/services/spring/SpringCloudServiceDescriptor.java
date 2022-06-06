@@ -226,7 +226,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             if (null != cmdArgs) {
                 cmdLine.addAll(cmdArgs);
             }
-            DescriptorUtils.addAppEnvironment(cmdLine);
+            Starter.addAppEnvironment(cmdLine);
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
             getLogger().info("Creates deployment request for " + getName() + " " + cmdLine);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
