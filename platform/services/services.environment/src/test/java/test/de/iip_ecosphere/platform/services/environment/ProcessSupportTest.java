@@ -16,25 +16,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.PythonSupport;
-import de.iip_ecosphere.platform.services.environment.PythonSupport.ScriptOwner;
+import de.iip_ecosphere.platform.services.environment.ProcessSupport;
+import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner;
 import org.junit.Assert;
 
 /**
- * Tests {@link PythonSupport}.
+ * Tests {@link ProcessSupport}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonSupportTest {
+public class ProcessSupportTest {
     
     /**
-     * Tests {@link PythonSupport}.
+     * Tests {@link ProcessSupport}.
      */
     @Test
     public void testPythonSupport() {
         AtomicReference<String> ref = new AtomicReference<>(null);
         ScriptOwner owner = new ScriptOwner("pythonSupportTest", "src/test/python", "notEx.zip");
-        PythonSupport.callPython(owner, "ForwardingApp.py", s -> ref.set(s), "testABC");
+        ProcessSupport.callPython(owner, "ForwardingApp.py", s -> ref.set(s), "testABC");
         Assert.assertEquals("testABC", ref.get().trim());
     }
 

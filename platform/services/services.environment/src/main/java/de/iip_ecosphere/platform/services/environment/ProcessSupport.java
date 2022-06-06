@@ -28,11 +28,14 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 
 /**
- * Python support functions.
+ * Process execution support functions. Process scripts or binaries shall be packaged using a Maven assembly 
+ * descriptor into a ZIP file in the "root" of the Jar/Service artifact (fallback for testing can be defined, 
+ * e.g., src/main/python/...). Here, the name is free, but shall not collide with the default process artifacts 
+ * of generated services.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonSupport {
+public class ProcessSupport {
 
     /**
      * Holds the script context.
@@ -163,9 +166,9 @@ public class PythonSupport {
             owner.setPythonFolder(new File(owner.getTestFallbackPath()));
             if (!owner.getPythonFolder().exists()) {
                 // load from maven packaged JAR via class loader
-                InputStream in = ResourceLoader.getResourceAsStream(PythonSupport.class, owner.getZipFileName());
+                InputStream in = ResourceLoader.getResourceAsStream(ProcessSupport.class, owner.getZipFileName());
                 if (null == in) {
-                    LoggerFactory.getLogger(PythonSupport.class).error(
+                    LoggerFactory.getLogger(ProcessSupport.class).error(
                         "Cannot find python scripts, neither local nor in ZIP on classpath");
                 } else {
                     File tmp = FileUtils.createTmpFolder(owner.getTmpFolderName());
@@ -173,7 +176,7 @@ public class PythonSupport {
                         JarUtils.extractZip(in, tmp.toPath());
                         owner.setPythonFolder(tmp);
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(PythonSupport.class).error(
+                        LoggerFactory.getLogger(ProcessSupport.class).error(
                             "Cannot extract python scripts: {}", e.getMessage());
                     }
                 }
@@ -199,7 +202,7 @@ public class PythonSupport {
     public static Process createPythonProcess(File dir, String script, Consumer<ProcessBuilder> procCustomizer, 
         String... args) throws IOException {
         String pythonPath = PythonUtils.getPythonExecutable().toString();
-        LoggerFactory.getLogger(PythonSupport.class).info("Using Python: {}", pythonPath);
+        LoggerFactory.getLogger(ProcessSupport.class).info("Using Python: {}", pythonPath);
         List<String> tmp = new ArrayList<String>();
         tmp.add(pythonPath);
         tmp.add(script);
@@ -207,7 +210,7 @@ public class PythonSupport {
             tmp.add(a);
         }
         
-        LoggerFactory.getLogger(PythonSupport.class).info("Cmd line: {} in {}", tmp, dir);
+        LoggerFactory.getLogger(ProcessSupport.class).info("Cmd line: {} in {}", tmp, dir);
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);        
         processBuilder.directory(dir);
         if (null != procCustomizer) {
@@ -244,10 +247,10 @@ public class PythonSupport {
                     new File(resultFile), StandardCharsets.UTF_8));
             }
         } catch (InterruptedException e) {
-            LoggerFactory.getLogger(PythonSupport.class).error(
+            LoggerFactory.getLogger(ProcessSupport.class).error(
                 "Waiting for script {} interrupted: {}", script, e.getMessage());
         } catch (IOException e) {
-            LoggerFactory.getLogger(PythonSupport.class).error(
+            LoggerFactory.getLogger(ProcessSupport.class).error(
                 "Reading for script {} results: {}", script, e.getMessage());
         } 
         return procResult;
@@ -274,7 +277,7 @@ public class PythonSupport {
             }
             return waitForAndKill(createPythonProcess(dir, script, customizer, args), script, cmdResult, resultFile);
         } catch (IOException e) {
-            LoggerFactory.getLogger(PythonSupport.class).error(
+            LoggerFactory.getLogger(ProcessSupport.class).error(
                 "Cannot execute python script {}: {}", script, e.getMessage());
             return -1;
         } 

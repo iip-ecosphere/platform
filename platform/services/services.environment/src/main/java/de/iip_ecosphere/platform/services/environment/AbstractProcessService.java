@@ -381,20 +381,32 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             }
         }).start();
     }
+
+    /**
+     * Waits and destroys a process with a default sleep time of 200 ms.
+     * 
+     * @param proc the process to be destroyed, may be <b>null</b> but nothing happens then
+     * @see #waitAndDestroy(Process, int)
+     */
+    public static void waitAndDestroy(Process proc) {
+        waitAndDestroy(proc, 200);
+    }
     
     /**
      * Waits and destroys a process.
      * 
-     * @param proc the process to be destroyed
+     * @param proc the process to be destroyed, may be <b>null</b> but nothing happens then
      * @param sleepTime the waiting portion until {@link Process#isAlive()} is queried again
      */
     public static void waitAndDestroy(Process proc, int sleepTime) {
-        while (proc.isAlive()) {
-            TimeUtils.sleep(sleepTime);
-        }
-        proc.destroyForcibly();
-        while (proc.isAlive()) {
-            TimeUtils.sleep(sleepTime);
+        if (null != proc) {
+            while (proc.isAlive()) {
+                TimeUtils.sleep(sleepTime);
+            }
+            proc.destroyForcibly();
+            while (proc.isAlive()) {
+                TimeUtils.sleep(sleepTime);
+            }
         }
     }
     
@@ -452,7 +464,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         if (null != proc) {
             TimeUtils.sleep(Math.max(0, getWaitTimeBeforeDestroy()));
             if (null != proc) { // may be gone anyway
-                proc.destroy();
+                waitAndDestroy(proc);
                 proc = null;
                 osProcess = null;
             }
