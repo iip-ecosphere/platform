@@ -40,7 +40,7 @@ jobs:
       - name: Build the test app through tests
         run: |
           cd ./platform/configuration/configuration
-          mvn --batch-mode --update-snapshots package
+          mvn --batch-mode --update-snapshots package -Dtest="IvmlSimpleMeshTests"
           cd ../../..
       - name: Instantiate the platform, prepare container building
         run: |

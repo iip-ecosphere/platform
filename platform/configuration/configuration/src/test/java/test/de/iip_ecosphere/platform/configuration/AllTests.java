@@ -20,8 +20,14 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    IvmlTests.class,
-    StorageFactoryTest.class
+    IvmlMetaModelTests.class,
+    IvmlKodexMeshTests.class,
+    IvmlSimpleMeshTests.class,
+    IvmlSimpleMesh3Tests.class,
+    IvmlSerializerConfig1Tests.class,
+    IvmlSerializerConfig1OldTests.class,
+    IvmlContainerTests.class,
+    StorageFactoryTest.class,
 })
 public class AllTests {
 }
