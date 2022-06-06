@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (sommer 2022):
+### Next release (summer/fall 2022):
 Planned:
 * Asynchronous service streams via Transport Layer
 * Service test frames
@@ -8,7 +8,16 @@ Planned:
 * Integrated container management for Kubernetes
 * Automatic creation of containers.
 
+Improvements:
+* #30: Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
+* #27: Move `iip.app.` prefix and system settings into `service.environment`.
+* #31: Python service cleanup including `__pycache__` by terminating all external service implementations via alive-wait and destroy forcibly (from HM'22 example).
+* #32: Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
+* #33: Split `IvmlTests` into separated tests in `configuration.configuration` to speed up automated container creation on Github.
+
 ### Version 0.3.0 (2022/06/04, HM'22):
+
+New functionality:
 * BaSyx upgrade to 1.0.0 and then to 1.0.1 (from Maven Central)
 * EASy-Producer version 1.3.2
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
@@ -28,25 +37,26 @@ Planned:
 * Template projects for application creation.
 * Lifecycle profiles for starting parts of components.
 * Integration of Prometheus for central monitoring, i.e., delivery of micrometer data into prometheus, alerts to AAS. Disabled, conflicting with Tomcat/Apache Qpid.
-* Bug fixes / Improvements:
-    * Missing resource headline/identifier in platform Cli
-    * Wrong version numbers for platformDependencies/broker in Install package
-    * Wrong content types file name when writing an AASX file
-    * TLS encryption support for the basic transport connectors.
-    * Spring transport connector instances/binders can be configured individually. TLS encryption support for the spring transport connectors/binders is available.
-    * MQTT machine connectors support optional TLS encryption.
-    * PID files for the major platform components
-    * Generation of Linux/systemd service descriptions for platform services, ECS runtime and service manager. Generation of separate scripts for Java 8 (no module system).
-    * Generation of README.txt with brief explanations on the generated files and folders.
-    * Fixed/extended qualified name access for OPC UA connector.
-    * Automated instantiation of a one-process ECS runtime/service manager without container manager for devices with low resources.
-    * Platform instantiation process without Java test execution (may fail depending on JDK/surefire combination).
-    * Integration of initial device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
-    * Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
-    * TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
-    * Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
-    * Separated generation of platform application interfaces and application code
-    * Changed generated service artifact classifier to *bin* in order to keep the original file for testing.
+
+Bug fixes / Improvements:
+* Missing resource headline/identifier in platform Cli
+* Wrong version numbers for platformDependencies/broker in Install package
+* Wrong content types file name when writing an AASX file
+* TLS encryption support for the basic transport connectors.
+* Spring transport connector instances/binders can be configured individually. TLS encryption support for the spring transport connectors/binders is available.
+* MQTT machine connectors support optional TLS encryption.
+* PID files for the major platform components
+* Generation of Linux/systemd service descriptions for platform services, ECS runtime and service manager. Generation of separate scripts for Java 8 (no module system).
+* Generation of README.txt with brief explanations on the generated files and folders.
+* Fixed/extended qualified name access for OPC UA connector.
+* Automated instantiation of a one-process ECS runtime/service manager without container manager for devices with low resources.
+* Platform instantiation process without Java test execution (may fail depending on JDK/surefire combination).
+* Integration of initial device management (BSc Dennis Pidun) with ThingsBoard, in-memory registry, MinIO and S3Fake connectors.
+* Code refactoring: Renaming setup-related "Configuration" classes to "Setup".
+* TLS on AAS abstraction level and VAB-HTTPS protocol, TLS for AAS connector
+* Security fix for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Determined by the log4j use of integrated components, we enforce log4j 2.15 (core) where needed, in particular in service artifacts, or rely transitively on logback.
+* Separated generation of platform application interfaces and application code
+* Changed generated service artifact classifier to *bin* in order to keep the original file for testing.
 
 ### Basis platform release (2021/8/09)
 * Services layer, service management for Spring Cloud Stream, service execution environment for Java and (initial) Python
