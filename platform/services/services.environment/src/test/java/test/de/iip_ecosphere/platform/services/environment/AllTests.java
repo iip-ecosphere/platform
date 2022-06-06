@@ -36,6 +36,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     InstalledDependenciesSetupTest.class,
     ServiceSelectorTest.class,
     IipStringStyleTest.class,
+    PythonSupportTest.class,
     
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
