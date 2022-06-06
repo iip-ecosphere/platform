@@ -382,6 +382,22 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
         }).start();
     }
     
+    /**
+     * Waits and destroys a process.
+     * 
+     * @param proc the process to be destroyed
+     * @param sleepTime the waiting portion until {@link Process#isAlive()} is queried again
+     */
+    public static void waitAndDestroy(Process proc, int sleepTime) {
+        while (proc.isAlive()) {
+            TimeUtils.sleep(sleepTime);
+        }
+        proc.destroyForcibly();
+        while (proc.isAlive()) {
+            TimeUtils.sleep(sleepTime);
+        }
+    }
+    
     @Override
     public void activate() throws ExecutionException {
         super.setState(ServiceState.ACTIVATING);

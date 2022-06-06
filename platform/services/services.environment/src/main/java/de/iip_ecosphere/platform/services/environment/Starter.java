@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -38,12 +39,29 @@ public class Starter {
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
+    public static final String IIP_APP_PREFIX = "iip.app.";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
     private static EnvironmentSetup setup;
+
+    /**
+     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} to the command line of the service 
+     * to be started.
+     * 
+     * @param args the arguments to add the application environment settings
+     */
+    public static void addAppEnvironment(List<String> args) {
+        for (Object k : System.getProperties().keySet()) {
+            String key = k.toString();
+            String val = System.getProperty(key);
+            if (key.startsWith(IIP_APP_PREFIX)) {
+                args.add("-D" + key + "=" + val);
+            }
+        }
+    }
 
     /**
      * Returns the network manager key used by this descriptor to allocate dynamic network ports for service commands.

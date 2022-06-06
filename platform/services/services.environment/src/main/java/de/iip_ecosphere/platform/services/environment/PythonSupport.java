@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
-import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * Python support functions.
@@ -192,11 +191,13 @@ public class PythonSupport {
      * 
      * @param dir the home dir where to find the script/run it within
      * @param script the script to execute
+     * @param procCustomizer allows to customize the internal process builder, may be <b>null</b> for none
      * @param args the process arguments for the script including python arguments (first), script and script arguments
      * @return the created process
      * @throws IOException if process creation fails
      */
-    public static Process createPythonProcess(File dir, String script, String... args) throws IOException {
+    public static Process createPythonProcess(File dir, String script, Consumer<ProcessBuilder> procCustomizer, 
+        String... args) throws IOException {
         String pythonPath = PythonUtils.getPythonExecutable().toString();
         LoggerFactory.getLogger(PythonSupport.class).info("Using Python: {}", pythonPath);
         List<String> tmp = new ArrayList<String>();
@@ -209,7 +210,9 @@ public class PythonSupport {
         LoggerFactory.getLogger(PythonSupport.class).info("Cmd line: {} in {}", tmp, dir);
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);        
         processBuilder.directory(dir);
-        //processBuilder.inheritIO();
+        if (null != procCustomizer) {
+            procCustomizer.accept(processBuilder);
+        }
         Process python = processBuilder.start();
         return python;
     }
@@ -222,6 +225,7 @@ public class PythonSupport {
      * @param cmdResult a consumer for the result, may be <b>null</b> for none
      * @param resultFile file to read result from, e.g., short lived processes, if {@code null} use standard in
      * @return the process status, <code>-1</code> if the process was not executed
+     * @see AbstractProcessService#redirectIO(InputStream, PrintStream)
      */
     public static int waitForAndKill(Process proc, String script, Consumer<String> cmdResult, String resultFile) {
         int procResult = -1;
@@ -232,14 +236,7 @@ public class PythonSupport {
                 AbstractProcessService.redirectIO(proc.getInputStream(), new PrintStream(res));
             }
             procResult = proc.waitFor();
-            while (proc.isAlive()) {
-                TimeUtils.sleep(200);
-            }
-            procResult = proc.exitValue();
-            proc.destroyForcibly();
-            while (proc.isAlive()) {
-                TimeUtils.sleep(200);
-            }
+            AbstractProcessService.waitAndDestroy(proc, 200);
             if (null != res) {
                 cmdResult.accept(res.toString());
             } else if (resultFile != null) {
@@ -271,7 +268,11 @@ public class PythonSupport {
     public static int callPythonWaitForAndKill(File dir, String script, Consumer<String> cmdResult, String resultFile, 
         String... args) {
         try {
-            return waitForAndKill(createPythonProcess(dir, script, args), script, cmdResult, resultFile);
+            Consumer<ProcessBuilder> customizer = null;
+            if (null == cmdResult) { // just for convenience
+                customizer = pb -> pb.inheritIO();
+            }
+            return waitForAndKill(createPythonProcess(dir, script, customizer, args), script, cmdResult, resultFile);
         } catch (IOException e) {
             LoggerFactory.getLogger(PythonSupport.class).error(
                 "Cannot execute python script {}: {}", script, e.getMessage());
