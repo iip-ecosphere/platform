@@ -19,6 +19,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.LoggerFactory;
 
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -161,14 +162,18 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
 
     @Override
     public void disconnect() throws IOException {
-        closing = true;
-        super.disconnect();
-        try {
-            channel.close();
-        } catch (TimeoutException e) {
-            // nothing for now
+        if (!closing) {
+            closing = true;
+            super.disconnect();
+            try {
+                channel.close();
+            } catch (TimeoutException e) {
+                // nothing for now
+            } catch (AlreadyClosedException e) {
+                // ok, fine
+            }
+            connection.close();
         }
-        connection.close();
     }
 
     @Override
