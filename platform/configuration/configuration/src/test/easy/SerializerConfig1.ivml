@@ -321,7 +321,7 @@ project SerializerConfig1 {
     
     // currently: instantiation into own component, not part of "platform" component
     platformMonitoring = PrometheusPlatformMonitoring {
-        schema = PrometheusSchema::HTTPS,
+        schema = PrometheusSchema::HTTP,
         host = "127.0.0.1",
         port = 9090,
         running = false,

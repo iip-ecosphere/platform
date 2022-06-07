@@ -230,31 +230,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         String coType = toTypeName(sourceType);
         String suffix = coType.firstToUpperCase() + serviceId;
 
-        if (first) { // initialize Transport
-           'Starter.getSetup();
-           TransportConnector conn = Transport.createConnector();' 
-        }
-        'if (null != conn) {
-            try {
-                conn.setReceptionCallback("${suffix}", new ReceptionCallback<${coType}>() {
-    
-                    @Override
-                    public void received(${coType} data) {
-                        process${coType}_${toIdentifier(receiver.impl.id)}().accept(data);
-                    }
-            
-                    @Override
-                    public Class<${coType}> getType() {
-                        return ${coType}.class;
-                    }
-    
-                });
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records. {}", e.getMessage());
-            }
-        } else {
-            LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
-        }'
+        'createReceptionCallback("${suffix}", process${coType}_${toIdentifier(receiver.impl.id)}(), ${coType}.class);'
     }
     
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir) {
@@ -1155,6 +1131,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import de.iip_ecosphere.platform.services.environment.switching.*;
         import de.iip_ecosphere.platform.services.environment.metricsProvider.MonitoredTranslatingProtocolAdapter;
         import de.iip_ecosphere.platform.services.environment.spring.Starter;
+        import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter;
         import de.iip_ecosphere.platform.connectors.types.*;
@@ -1170,7 +1147,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          * @author EASy-Producer.
          */
         ${genClassAnnotations(elt)|e}
-        public class ${clsName}${implements} {
+        public class ${clsName} extends SpringAsyncServiceBase${implements} {
         
             @Autowired
             private StreamBridge streamBridge;

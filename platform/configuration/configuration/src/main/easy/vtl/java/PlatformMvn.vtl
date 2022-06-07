@@ -12,7 +12,11 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "platform.exec", "ConfiguredPlatformInstance", "Configured platform instance");
+        if (monitoring) {
+            createMavenProjectAttributes(project, "monitoring.exec", "ConfiguredPlatformMonitoringInstance", "Configured platform monitoring instance");
+        } else {
+            createMavenProjectAttributes(project, "platform.exec", "ConfiguredPlatformInstance", "Configured platform instance");
+        }
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
