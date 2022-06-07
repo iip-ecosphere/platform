@@ -127,7 +127,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
             desc.startup(new String[] {});
             
             System.out.println("Sleeping to be on the safe side...");
-            TimeUtils.sleep(3000);
+            TimeUtils.sleep(30000);
 
             IipEcospherePrometheusExporter exp = desc.getExporter();
             Assert.assertNotNull(exp);

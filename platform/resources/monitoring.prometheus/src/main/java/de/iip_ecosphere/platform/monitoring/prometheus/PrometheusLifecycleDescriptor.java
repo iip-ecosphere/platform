@@ -54,13 +54,17 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
     
     public static final String PROMETHEUS = "prometheus";
     public static final String PROMETHEUS_VERSION = "2.34.0";
+    public static final String ALERTMGR = "alertmanager";
+    public static final String ALERTMGR_VERSION = "0.24.0";
     public static final String PROMETHEUS_CONFIG_INITIAL = "prometheus.yml.init";
     public static final String PROMETHEUS_CONFIG = "prometheus.yml";
+    public static final String ALERTMGR_CONFIG = "alertmanager.yml";
     public static final String RESOURCES = "src/main/resources";
     
     private static boolean debug = false;
     
     private Process prometheusProcess;  
+    private Process alertMgrProcess;  
     private File prometheusWorkingDirectory;
     private IipEcospherePrometheusExporter exporter;
     private AlertManagerImporter alertImporter;
@@ -161,9 +165,10 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 writer.println("# Alertmanager configuration");
                 writer.println("alerting:");
                 writer.println("  alertmanagers:");
-                writer.println("    - static_configs:");
+                writer.println("    - api_version: v1");
+                writer.println("      static_configs:");
                 writer.println("        - targets:");
-                writer.println("           - alertmanager:" + alertMgr.getHost() + ":" + alertMgr.getPort());
+                writer.println("           - " + alertMgr.getHost() + ":" + alertMgr.getPort());
             }
             
             writer.println("rule_files:");
@@ -188,64 +193,98 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 .info("Cannot update configuration: {}", e.getMessage());
         }
     }
+    
+    /**
+     * Returns a resource to use.
+     * 
+     * @param name the name of the resource
+     * @return the resource
+     * @throws IOException if the resource can (finally) not be loaded
+     */
+    private static InputStream getResource(String name) throws IOException {
+        InputStream in = PrometheusLifecycleDescriptor.class.getClassLoader().getResourceAsStream(name);
+        if (in == null) { // testing fallback
+            in = new FileInputStream(new File(RESOURCES, name));
+        }
+        return in;
+    }
      
     @Override
     public void startup(String[] args) {
         PrometheusMonitoringSetup setup = PrometheusMonitoringSetup.getInstance();
         Transport.setTransportSetup(() -> setup.getTransport());
+
+        if (!setup.getPrometheus().getExporter().isRunning()) {
+            exporter = exporterSupplier.get();
+            exporter.setModifierSupplier(modifierSupplier);
+            exporter.start();
+        }
         if (!setup.getPrometheus().getServer().isRunning()) {
             String zipName = AbstractProcessService.getExecutablePrefix(PROMETHEUS, PROMETHEUS_VERSION) + ".zip";
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
-            //Set working directory in a temporary directory
+            String alertExeName = AbstractProcessService.getExecutableName(ALERTMGR, ALERTMGR_VERSION);
             prometheusWorkingDirectory = FileUtils.createTmpFolder("iip-prometheus");
             File prometheusFile = new File(prometheusWorkingDirectory, exeName);
+            File alertMgrFile = new File(prometheusWorkingDirectory, alertExeName);
             try {
-                InputStream in = getClass().getClassLoader().getResourceAsStream(PROMETHEUS_CONFIG);
-                if (in == null) {
-                    in = new FileInputStream(new File(RESOURCES, PROMETHEUS_CONFIG));
-                }
+                InputStream in = getResource(PROMETHEUS_CONFIG);
                 Path initCfgPath = new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG_INITIAL).toPath();
                 Files.copy(in, initCfgPath,  StandardCopyOption.REPLACE_EXISTING);
                 in.close();
-
                 Files.copy(initCfgPath, new File(prometheusWorkingDirectory, PROMETHEUS_CONFIG).toPath(),  
                     StandardCopyOption.REPLACE_EXISTING);
+
+                in = getResource(ALERTMGR_CONFIG);
+                Path alertCfgPath = new File(prometheusWorkingDirectory, ALERTMGR_CONFIG).toPath();
+                Files.copy(in, alertCfgPath,  StandardCopyOption.REPLACE_EXISTING);
+                in.close();
                 updateConfiguration(new ConfigModifier(getDefaultScrapePoints(), null), false);
 
-                in = getClass().getClassLoader().getResourceAsStream(zipName);
-                if (in == null) {
-                    in = new FileInputStream(new File(RESOURCES, zipName));
-                }
+                in = getResource(zipName);
                 JarUtils.extractZip(in, prometheusWorkingDirectory.toPath());
                 in.close();
                 prometheusFile.setExecutable(true);
-                
+
+                in = getResource(alertExeName);
+                Path alertMgrPath = new File(prometheusWorkingDirectory, alertExeName).toPath();
+                Files.copy(in, alertMgrPath,  StandardCopyOption.REPLACE_EXISTING);
+                in.close();
+                alertMgrFile.setExecutable(true);
+
                 List<String> pArgs = new ArrayList<>();
+                pArgs.add(alertMgrFile.getAbsolutePath());
+                pArgs.add("--config.file=" + ALERTMGR_CONFIG);
+                pArgs.add("--web.listen-address=:" + setup.getPrometheus().getAlertMgr().getPort());
+                if (debug) {
+                    pArgs.add("--log.level=debug");
+                }
+                ProcessBuilder procBuilder = new ProcessBuilder(pArgs);
+                procBuilder.directory(prometheusWorkingDirectory);
+                procBuilder.inheritIO();
+                alertMgrProcess = procBuilder.start();
+                LoggerFactory.getLogger(getClass()).info("{} {} started on port {}", ALERTMGR, ALERTMGR_VERSION, 
+                    setup.getPrometheus().getAlertMgr().getPort());
+
+                pArgs = new ArrayList<>();
                 pArgs.add(prometheusFile.getAbsolutePath());
-                pArgs.add("--config.file=prometheus.yml");
+                pArgs.add("--config.file=" + PROMETHEUS_CONFIG);
                 pArgs.add("--web.enable-lifecycle");
                 pArgs.add("--web.listen-address=:" + setup.getPrometheus().getServer().getPort());
                 if (debug) {
                     pArgs.add("--log.level=debug");
                 }
-                ProcessBuilder prometheusProcessBuilder = new ProcessBuilder(pArgs);
-                prometheusProcessBuilder.directory(prometheusWorkingDirectory);
-                prometheusProcessBuilder.inheritIO();
-                prometheusProcess = prometheusProcessBuilder.start();
+                procBuilder = new ProcessBuilder(pArgs);
+                procBuilder.directory(prometheusWorkingDirectory);
+                procBuilder.inheritIO();
+                prometheusProcess = procBuilder.start();
                 LoggerFactory.getLogger(getClass()).info("{} {} started on port {}", PROMETHEUS, PROMETHEUS_VERSION, 
                     setup.getPrometheus().getServer().getPort());
-    
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Starting Prometheus: {}", e.getMessage());
             }
         }
 
         new Thread(modifierRunnable).start();
-        if (!setup.getPrometheus().getExporter().isRunning()) {
-            exporter = exporterSupplier.get();
-            exporter.setModifierSupplier(modifierSupplier);
-            exporter.start();
-        }
         if (!setup.getPrometheus().getAlertMgr().isRunning()) {
             alertImporter = alertMgrSupplier.get();
             alertImporter.start();
@@ -270,7 +309,10 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
         if (prometheusWorkingDirectory != null) { // no full startup
             String exeName = AbstractProcessService.getExecutableName(PROMETHEUS, PROMETHEUS_VERSION);
             new File(prometheusWorkingDirectory.getAbsolutePath(), exeName).delete();
+            String alertMgrName = AbstractProcessService.getExecutableName(PROMETHEUS, ALERTMGR);
+            new File(prometheusWorkingDirectory.getAbsolutePath(), alertMgrName).delete();
             new File(prometheusWorkingDirectory.getAbsolutePath(), PROMETHEUS_CONFIG).delete();
+            new File(prometheusWorkingDirectory.getAbsolutePath(), ALERTMGR_CONFIG).delete();
             // delete data?
         }
     }
@@ -297,6 +339,11 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             prometheusProcess.destroyForcibly();
             LoggerFactory.getLogger(getClass()).info("{} {} shutdown", PROMETHEUS, PROMETHEUS_VERSION);
             prometheusProcess = null;
+        }
+        if (null != alertMgrProcess) {
+            alertMgrProcess.destroyForcibly();
+            LoggerFactory.getLogger(getClass()).info("{} {} shutdown", ALERTMGR, ALERTMGR_VERSION);
+            alertMgrProcess = null;
         }
         Transport.releaseConnector();
         deleteWorkingFiles();

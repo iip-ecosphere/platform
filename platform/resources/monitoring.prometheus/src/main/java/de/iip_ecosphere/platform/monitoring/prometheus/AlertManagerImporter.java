@@ -81,14 +81,14 @@ public class AlertManagerImporter {
 
         @Override
         public void run() {
-            logger.info("PSYNC: === starting periodic synchronization ===");
+            logger.debug("PSYNC: === starting periodic synchronization ===");
             AmMetrics.lastPsyncTimestamp = System.currentTimeMillis();
 
             try {
                 List<PAlert> activeAlerts = api.alerts();
                 if (activeAlerts == null) {
                     logger.error("PSYNC: null response returned");
-                    logger.info("PSYNC: === Periodic synchronization complete ===");
+                    logger.debug("PSYNC: === Periodic synchronization complete ===");
                     AmMetrics.psyncFailedCount++;
                     DAO.getInstance().addWarning("psync", "Synchronization is failing");
                     return;
@@ -155,10 +155,10 @@ public class AlertManagerImporter {
                 AmMetrics.alertmonitor_psync_success.set(0);
                 DAO.getInstance().addWarning("psync", "Synchronization is failing");
             } catch (Throwable e) { // Illegal state at the beginning, cannot catch otherwise
-                logger.error("PSYNC: failed to synchronize alarms; root cause: " + e.getMessage());
+                //logger.error("PSYNC: failed to synchronize alarms; root cause: " + e.getMessage());
             }
 
-            logger.info("PSYNC: === Periodic synchronization complete ===");
+            logger.debug("PSYNC: === Periodic synchronization complete ===");
         }
         
         // checkstyle: resume exception type check

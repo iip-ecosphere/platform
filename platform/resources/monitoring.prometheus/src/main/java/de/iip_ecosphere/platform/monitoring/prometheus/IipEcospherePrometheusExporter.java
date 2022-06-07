@@ -322,11 +322,13 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
      * Changes the prometheus configuration for modified scrape setup.
      */
     private void writeScrapeConfig() {
-        ConfigModifier m = modifier.get();
-        for (Exporter e : exporters()) {
-            m.addScrapeEndpoint(((PrometheusExporter) e).getScrapeEntry());
+        if (null != modifier) {
+            ConfigModifier m = modifier.get();
+            for (Exporter e : exporters()) {
+                m.addScrapeEndpoint(((PrometheusExporter) e).getScrapeEntry());
+            }
+            m.end();
         }
-        m.end();
     }
 
 }

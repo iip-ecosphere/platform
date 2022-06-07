@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 
 /**
@@ -27,7 +28,7 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
 
     public static final String DEFAULT_PROMETHEUS_SERVER = "localhost";
     public static final int DEFAULT_PROMETHEUSSERVER_PORT = 9090;
-    public static final int DEFAULT_ALERTMGR_PORT = 9090;
+    public static final int DEFAULT_ALERTMGR_PORT = 9093;
 
     private static PrometheusMonitoringSetup instance;
     
@@ -185,11 +186,12 @@ public class PrometheusMonitoringSetup extends MonitoringSetup {
     }
 
     /**
-     * Reads a {@link PrometheusMonitoringSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder 
+     * Reads a {@link PrometheusMonitoringSetup} instance from {@link AbstractSetup#DEFAULT_FNAME} in the root folder 
      * of the jar/classpath. 
      *
      * @return the configuration instance
      * @see #readFromYaml(Class)
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static PrometheusMonitoringSetup readConfiguration() throws IOException {
         return readFromYaml(PrometheusMonitoringSetup.class);
