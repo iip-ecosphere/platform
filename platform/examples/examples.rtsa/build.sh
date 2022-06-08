@@ -28,7 +28,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
-mvn exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P Example exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 
