@@ -173,17 +173,28 @@ public class DescriptorUtils {
                 artPath = artPath.substring(1);
             }
             FileInputStream fis = null;
-            InputStream artifact = ResourceLoader.getResourceAsStream(DescriptorUtils.class, artPath);
-            if (null == artifact) { // spring packaging fallback
-                try {
-                    fis = new FileInputStream(artFile);
-                    artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
-                    if (null == artifact) {
-                        fis = new FileInputStream(artFile); // TODO preliminary, use predicate 
-                        artifact = JarUtils.findFile(fis, artPath);
+            InputStream artifact = null; 
+            try { // spring packaging
+                fis = new FileInputStream(artFile);
+                artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
+                if (null == artifact) {
+                    fis = new FileInputStream(artFile); // TODO preliminary, use predicate
+                    artifact = JarUtils.findFile(fis, artPath);
+                    if (null != artifact) {
+                        getLogger().info("Found " + artPath + " in " + artFile + " " 
+                            + artifact.getClass().getSimpleName());
                     }
-                } catch (IOException e) {
-                    getLogger().info("Cannot open " + artFile + ": " + e.getMessage());
+                } else {
+                    getLogger().info("Found " + artPath + " in BOOT-INF/classes/" + artPath + " " 
+                        + artifact.getClass().getSimpleName());
+                }
+            } catch (IOException e) {
+                getLogger().info("Cannot open " + artFile + ": " + e.getMessage());
+            }
+            if (null == artifact) { 
+                artifact = ResourceLoader.getResourceAsStream(DescriptorUtils.class, artPath);
+                if (null != artifact) {
+                    getLogger().info("Found " + artPath + " on classpath " + artifact.getClass().getSimpleName());
                 }
             }
             if (null == artifact) {
