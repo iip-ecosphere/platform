@@ -56,9 +56,11 @@ public class Starter {
     public static void addAppEnvironment(List<String> args) {
         for (Object k : System.getProperties().keySet()) {
             String key = k.toString();
-            String val = System.getProperty(key);
-            if (key.startsWith(IIP_APP_PREFIX)) {
-                args.add("-D" + key + "=" + val);
+            if (key != null && key.length() > 0) {
+                String val = System.getProperty(key);
+                if (key.startsWith(IIP_APP_PREFIX)) {
+                    args.add("-D" + key + "=" + val);
+                }
             }
         }
     }
