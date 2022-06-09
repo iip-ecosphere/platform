@@ -82,6 +82,53 @@ template PythonBasics(Configuration config, FileArtifact target) {
         "Any";
     }
 
+	// Start - Added types OPC UA - by Ahmad
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(Integer16TypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(Integer32TypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(Integer64TypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(SByteTypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(UnsignedInteger16TypeType type) {
+        "Int";
+    }
+
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(UnsignedInteger32TypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(UnsignedInteger64TypeType type) {
+        "Int";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(ByteStringTypeType type) {
+        "bytearray";
+    }
+    
+    //NOT READY!! Check mapping to Python
+    def String toTypeName(DateTimeTypeType type) {
+        "datetime";
+    }
+	// End - Added types OPC UA - by Ahmad
+	
     def String toTypeName(ArrayType type) {
         "list";
     } // implies IntegerArrayTypeType, DoubleArrayTypeType 

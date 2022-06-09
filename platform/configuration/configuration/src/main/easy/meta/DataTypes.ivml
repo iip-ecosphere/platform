@@ -130,6 +130,62 @@ project DataTypes {
         name = "Object"
     };
 
+	// Start - Added types OPC UA - by Ahmad
+    compound Integer16TypeType refines PrimitiveType {
+    }
+    Integer16TypeType Integer16Type = {
+        name = "Int16"
+    };
+    
+    compound Integer32TypeType refines PrimitiveType {
+    }
+    Integer32TypeType Integer32Type = {
+        name = "Int32"
+    };
+    
+    compound Integer64TypeType refines PrimitiveType {
+    }
+    Integer64TypeType Integer64Type = {
+        name = "Int64"
+    };
+    
+    compound SByteTypeType refines PrimitiveType {
+    }
+    SByteTypeType SByteType = {
+        name = "SByte"
+    };
+    
+    compound UnsignedInteger16TypeType refines PrimitiveType {
+    }
+    UnsignedInteger16TypeType UnsignedInteger16Type = {
+        name = "UInt16"
+    };
+    
+    compound UnsignedInteger32TypeType refines PrimitiveType {
+    }
+    UnsignedInteger32TypeType UnsignedInteger32Type = {
+       name = "UInt32"
+    };
+    
+    compound UnsignedInteger64TypeType refines PrimitiveType {
+    }
+    UnsignedInteger64TypeType UnsignedInteger64Type = {
+        name = "UInt64"
+    };
+    
+    compound ByteStringTypeType refines PrimitiveType {
+    }
+    ByteStringTypeType ByteStringType = {
+        name = "ByteString"
+    };
+    
+    compound DateTimeTypeType refines PrimitiveType {
+    }
+    DateTimeTypeType DateTimeType = {
+        name = "DateTime"
+    };
+	//End - Added types OPC UA - by Ahmad
+	
     compound ByteArrayTypeType refines ArrayType {
     }
     ByteArrayTypeType ByteArrayType = {
@@ -218,6 +274,15 @@ project DataTypes {
         FloatType;
         DoubleType;
         ObjectType;
+        Integer16Type;
+        Integer32Type;
+        Integer64Type;
+        SByteType;
+        UnsignedInteger16Type;
+        UnsignedInteger32Type;
+        UnsignedInteger64Type;
+        ByteStringType;
+        DateTimeType;
         ByteArrayType;
         IntegerArrayType;
         DoubleArrayType;

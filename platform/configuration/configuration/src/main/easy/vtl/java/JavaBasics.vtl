@@ -90,6 +90,45 @@ template JavaBasics(Configuration config, FileArtifact target) {
         "Object";
     }
     
+    // Start - Added types OPC UA - by Ahmad
+	def String toTypeName(Integer16TypeType type) {
+        "short";
+    }
+    
+    def String toTypeName(Integer32TypeType type) {
+        "int";
+    }
+    
+    def String toTypeName(Integer64TypeType type) {
+        "long";
+    }
+    
+    def String toTypeName(SByteTypeType type) {
+        "byte";
+    }
+    
+    def String toTypeName(UnsignedInteger16TypeType type) {
+        "short";
+    }
+
+    def String toTypeName(UnsignedInteger32TypeType type) {
+        "int";
+    }
+    
+    def String toTypeName(UnsignedInteger64TypeType type) {
+        "long";
+    }
+    
+    //NOT READY!! might need convertion to byte array com.google.protobuf.ByteString
+    def String toTypeName(ByteStringTypeType type) {
+        "byte[]";
+    }
+    
+    def String toTypeName(DateTimeTypeType type) {
+        "java.time.LocalDateTime";
+    }
+	// End - Added types OPC UA - by Ahmad
+	
     def String toTypeName(ArrayType type) {
         toTypeName(type.type) + "[]";
     } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType
