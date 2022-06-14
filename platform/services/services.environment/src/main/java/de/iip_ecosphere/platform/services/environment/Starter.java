@@ -252,7 +252,7 @@ public class Starter {
      * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
      * 
      * @see #getServiceMapper()
-     * @see #mapService(ServiceMapper, Service)
+     * @see #mapService(ServiceMapper, Service, boolean)
      */
     public static void mapService(Service service, boolean enableAutostart) {
         mapService(getServiceMapper(), service, enableAutostart);
@@ -265,7 +265,7 @@ public class Starter {
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * 
      * @see #getServiceMapper()
-     * @see #mapService(ServiceMapper, Service)
+     * @see #mapService(ServiceMapper, Service, boolean)
      */
     public static void mapService(Service service) {
         mapService(service, true);

@@ -81,20 +81,6 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
     public void switchTo(String targetId) throws ExecutionException {
         // do within Java
     }
-    
-    @Override
-    public void activate() throws ExecutionException {
-        super.setState(ServiceState.ACTIVATING);
-        stop();
-        super.setState(ServiceState.ACTIVATING);
-    }
-
-    @Override
-    public void passivate() throws ExecutionException {
-        super.setState(ServiceState.PASSIVATING);
-        start();
-        super.setState(ServiceState.PASSIVATED);
-    }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {

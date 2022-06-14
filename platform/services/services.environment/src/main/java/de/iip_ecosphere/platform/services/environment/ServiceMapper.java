@@ -116,6 +116,8 @@ public class ServiceMapper {
                 new JsonResultWrapper(p -> {
                     ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
                     service.setState(state);
+                    LoggerFactory.getLogger(ServiceMapper.class).info("Setting state " + state 
+                        + " on " + service.getId() + " -> " + service.getState());
                     return null;
                 }
             ));

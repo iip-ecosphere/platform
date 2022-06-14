@@ -265,7 +265,7 @@ public class ProcessSupport {
      * @param resultFile file to read result from, e.g., short lived processes, if {@code null} use standard in
      * @param args the process arguments for the script including python arguments (first), script and script arguments
      * @return the process status, <code>-1</code> if the process was not executed
-     * @see #createPythonProcess(File, String, String...)
+     * @see #createPythonProcess(File, String, Consumer, String...)
      * @see #waitForAndKill(Process, String, Consumer, String)
      */
     public static int callPythonWaitForAndKill(File dir, String script, Consumer<String> cmdResult, String resultFile, 

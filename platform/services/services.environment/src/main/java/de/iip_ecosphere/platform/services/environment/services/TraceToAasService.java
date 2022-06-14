@@ -508,18 +508,6 @@ public class TraceToAasService extends AbstractService {
     }
 
     /**
-     * Called when service goes to state running.
-     */
-    protected void start() {
-    }
-
-    /**
-     * Called when service goes to state stopped.
-     */
-    protected void stop() {
-    }
-
-    /**
      * Adds elements to the services submodel if available.
      * 
      * @param smBuilder the submodel builder
