@@ -622,7 +622,7 @@ public class ServicesAas implements AasContributor {
                 getLogger().error("Service state change - cannot find service `" + desc.getId() + "`");
             }
             // synchronous execution needed??
-            if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == act) {
+            if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
                 Reference serviceRef = elt.createReference();
                 SubmodelElementCollectionBuilder connectionBuilder 
                     = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
