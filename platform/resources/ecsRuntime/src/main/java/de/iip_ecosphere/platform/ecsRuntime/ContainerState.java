@@ -12,6 +12,12 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 /**
  * Defines container states.
  * 
@@ -72,6 +78,76 @@ public enum ContainerState {
     /**
      * The state of the container is not known.
      */
-    UNKNOWN
+    UNKNOWN;
 
+    private static Map<ContainerState, Set<ContainerState>> validTransitions = new HashMap<>();
+
+    static {
+        // failed, unknown is always possible
+        addValidTransition(UNKNOWN, AVAILABLE);
+        addValidTransition(AVAILABLE, DEPLOYING);
+        addValidTransition(DEPLOYING, DEPLOYED);
+        addValidTransition(DEPLOYED, MIGRATING, UPDATING, STOPPING);
+        addValidTransition(MIGRATING, DEPLOYED, STOPPING);
+        addValidTransition(UPDATING, DEPLOYED, STOPPING);
+        addValidTransition(STOPPING, STOPPED);
+        addValidTransition(STOPPED, UNDEPLOYING);
+
+        addValidTransition(FAILED, DEPLOYED, MIGRATING, UPDATING, STOPPING);
+    }
+    
+    /**
+     * Adds a valid transition. Transitions to {@link #FAILED} or {@link #UNKOWN} are implicitly
+     * valid.
+     * 
+     * @param source the source state to transition from
+     * @param targets the target state(s) to transition to
+     */
+    private static void addValidTransition(ContainerState source, ContainerState... targets) {
+        Set<ContainerState> validTrans = validTransitions.get(source);
+        if (null == validTrans) {
+            validTrans = new HashSet<ContainerState>();
+            validTransitions.put(source, validTrans);
+        }
+        for (ContainerState t : targets) {
+            validTrans.add(t);
+        }
+    }
+    
+    /**
+     * Returns whether a transition from this state to {@code target} is valid.
+     * 
+     * @param target the target state 
+     * @return {@code true} for valid, {@code false} else
+     */
+    public boolean isValidTransition(ContainerState target) {
+        boolean result = false;
+        if (FAILED == target || UNKNOWN == target) {
+            result = true;
+        } else {
+            Set<ContainerState> validTargets = validTransitions.get(this);
+            if (null != validTargets) {
+                result = validTargets.contains(target);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Validates a container state transition and throws an exception if the transition is invalid.
+     * 
+     * @param source the source state
+     * @param target the target state
+     * @throws ExecutionException if {@code source} is <b>null</b> or a transition from {@code source} to {@code target}
+     *    is not valid
+     */
+    public static void validateTransition(ContainerState source, ContainerState target) throws ExecutionException {
+        if (null == source) {
+            throw new ExecutionException("No source state given: null", null);
+        }
+        if (!source.isValidTransition(target)) {
+            throw new ExecutionException("State transition from " + source + " to " + target + "is not valid", null);
+        }
+    }
+    
 }
