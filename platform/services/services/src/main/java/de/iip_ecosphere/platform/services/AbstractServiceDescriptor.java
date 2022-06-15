@@ -154,6 +154,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         if (null != stub) {
             try {            
                 stub.setState(state);
+                state = stub.getState(); // may do a transition
             } catch (ExecutionException e) {
                 // may fail, keep local; handover needed
                 LoggerFactory.getLogger(getClass()).info("Cannot set state for service '" + getId() + "' via AAS. "
