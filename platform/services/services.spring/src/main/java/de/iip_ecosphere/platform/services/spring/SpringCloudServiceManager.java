@@ -343,6 +343,10 @@ public class SpringCloudServiceManager
         // must be done before setState (via stub), synchronous for now required on Jenkins/Linux
         ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
         service.setState(state);
+        ServiceState further = service.getState();
+        if (further != state) {
+            ServicesAas.notifyServiceStateChanged(state, further, service, NotificationMode.SYNCHRONOUS); 
+        }
     }
 
 }
