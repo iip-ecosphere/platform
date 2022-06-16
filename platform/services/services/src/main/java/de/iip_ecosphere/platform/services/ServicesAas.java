@@ -624,24 +624,14 @@ public class ServicesAas implements AasContributor {
             // synchronous execution needed??
             getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
             if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
-                if (!MetricsAasConstructor.containsMetrics(elt)) {
-                    SubmodelElementCollectionBuilder serviceB = 
-                            sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
-                    SubmodelElementCollectionBuilder subB =
-                        serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
-                    MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
-                        MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, 
-                        Id.getDeviceId(), ServiceFactory.getTransport());
-                    subB.build();
-                }
+                registerMetrics(desc, sub, elt);
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
-                Reference serviceRef = elt.createReference();
-                SubmodelElementCollectionBuilder connectionBuilder 
-                    = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
-                addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
-                addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
-                connectionBuilder.build();
+                setupRelations(desc, sub, elt);
+                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+            } else if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == act) { // legacy fallback
+                registerMetrics(desc, sub, elt);
+                setupRelations(desc, sub, elt);
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
@@ -655,6 +645,42 @@ public class ServicesAas implements AasContributor {
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             }
         });
+    }
+    
+    /**
+     * Registers metrics for a changed service.
+     * 
+     * @param desc the service descriptor
+     * @param sub the submodel
+     * @param elt the element representing the service
+     */
+    private static void registerMetrics(ServiceDescriptor desc, Submodel sub, SubmodelElementCollection elt) {
+        if (!MetricsAasConstructor.containsMetrics(elt)) {
+            SubmodelElementCollectionBuilder serviceB = 
+                    sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
+            SubmodelElementCollectionBuilder subB =
+                serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+            MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
+                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, 
+                Id.getDeviceId(), ServiceFactory.getTransport());
+            subB.build();
+        }
+    }
+    
+    /**
+     * Sets up the relations for a starting service.
+     * 
+     * @param desc the service descriptor
+     * @param sub the submodel
+     * @param elt the element representing the service
+     */
+    private static void setupRelations(ServiceDescriptor desc, Submodel sub, SubmodelElementCollection elt) {
+        Reference serviceRef = elt.createReference();
+        SubmodelElementCollectionBuilder connectionBuilder 
+            = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
+        addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
+        addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
+        connectionBuilder.build();
     }
 
     /**
