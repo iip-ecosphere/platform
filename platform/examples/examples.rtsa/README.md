@@ -12,7 +12,7 @@ This example consists of several pieces:
   * An implementation of the Java services used in the application in `src/main/java`
   * A fake implementation of RapidMiner RTSA in `resources`. If you have an RTSA at hands, just overwrite the packaged RTSA as well as the deployment with respective files in `resources`. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** runs with **JDK 8 and newer**.
   * A specific starter class for the example `src/main/java` so that the example can run even without a running platform. Please note that the starter class is not part of an usual service implementation.
-  * Two Maven files, `pom-model.xml` for obtaining the configuration meta-model and for performing the instantiation as well as `pom.xml` for the application itself. 
+  * `pom.xml` for the application itself. 
   
 As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
 
