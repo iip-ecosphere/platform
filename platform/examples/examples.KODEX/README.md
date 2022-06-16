@@ -3,7 +3,7 @@
 This example aims at running the anonymizer/pseudonymizer KODEX as part of an IIP-Ecosphere pipeliner. The example consists of several pieces:
   * An IVML configuration for the application in `src/test/easy/ExampleKODEX.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
-  * Two Maven files, `pom-model.xml` for obtaining the configuration meta-model and for performing the instantiation as well as `pom.xml` for the application itself. 
+  * `pom.xml` for the application itself. 
   
 As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
 
