@@ -4,11 +4,11 @@
 
 #build with broker
 
-mvn -U -f pom-model.xml generate-sources
-mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/broker generateBroker"
-mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateAppsNoDeps"
-mvn -U install -DskipTests
-mvn -f pom-model.xml exec:java -Dexec.args="ExamplePython src/test/easy gen/py generateApps"
+mvn -U -P EasyGen generate-sources
+mvn -P EasyGen exec:java@generateBroker
+mvn -P EasyGen exec:java@generateAppsNoDeps
+mvn -U -P Example install -DskipTests
+mvn -P EasyGen exec:java@generateApps
 
 #execute and test
 
@@ -28,7 +28,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
-mvn exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P Example exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 
