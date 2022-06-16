@@ -39,7 +39,7 @@ public class ContainerManagerTest {
      * @throws ExecutionException shall not occur
      * @throws URISyntaxException shall not occur
      */
-    @Test
+    @Test(timeout = 10 * 6000)
     public void testContainerManager() throws ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         URI dummy = new URI("file:///dummy");
