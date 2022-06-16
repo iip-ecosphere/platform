@@ -38,4 +38,3 @@ pkill -P "$pidBroker" && kill "$pidBroker"
 echo "Testing for RECEIVED in log"
 
 grep -Fq "RECEIVED" log
-
