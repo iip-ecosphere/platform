@@ -22,6 +22,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ServiceStateTest.class,
     ServiceTest.class,
     AasTest.class,
     YamlTest.class, 

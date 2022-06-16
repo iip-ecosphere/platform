@@ -409,47 +409,6 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
             }
         }
     }
-    
-    @Override
-    public void activate() throws ExecutionException {
-        super.setState(ServiceState.ACTIVATING);
-        stop();
-        super.setState(ServiceState.ACTIVATING);
-    }
-
-    @Override
-    public void passivate() throws ExecutionException {
-        super.setState(ServiceState.PASSIVATING);
-        start();
-        super.setState(ServiceState.PASSIVATED);
-    }
-
-    @Override
-    public void setState(ServiceState state) throws ExecutionException {
-        ServiceState next = null;
-        super.setState(state);
-        switch (state) {
-        case STARTING:
-            next = start();
-            break;
-        case STOPPING:
-            next = stop();
-            break;
-        default:
-            break;
-        }
-        if (null != next) {
-            super.setState(next);
-        }
-    }
-
-    /**
-     * Preliminary: Starts the service and the background process.
-     * 
-     * @return the state to transition to, may be <b>null</b> for none
-     * @throws ExecutionException if starting the process fails
-     */
-    protected abstract ServiceState start() throws ExecutionException;
 
     /**
      * Preliminary: Stops the service and the background process.

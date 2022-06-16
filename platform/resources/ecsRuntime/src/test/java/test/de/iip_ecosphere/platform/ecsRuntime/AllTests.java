@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ContainerStateTest.class,
     BasicContainerDescriptorTest.class,
     ConfigurationTest.class,
     ContainerManagerTest.class,

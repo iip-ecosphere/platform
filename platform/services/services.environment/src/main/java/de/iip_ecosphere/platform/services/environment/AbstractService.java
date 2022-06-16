@@ -298,10 +298,43 @@ public abstract class AbstractService implements Service {
     public ServiceState getState() {
         return state;
     }
-
+    
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        this.state = state; // for now, no state machine checking
+        ServiceState next = null;
+        this.state = state;
+        switch (state) {
+        case STARTING:
+            next = start();
+            break;
+        case STOPPING:
+            next = stop();
+            break;
+        default:
+            break;
+        }
+        if (null != next) {
+            this.state = next;
+        }
+    }
+
+    /**
+     * Starts the service and the background process.
+     * 
+     * @return the state to transition to, may be <b>null</b> for none
+     * @throws ExecutionException if starting the process fails
+     */
+    protected ServiceState start() throws ExecutionException {
+        return ServiceState.RUNNING; // default, just go for from starting to running
+    }
+
+    /**
+     * Stops the service and the background process.
+     * 
+     * @return the state to transition to, may be <b>null</b> for none
+     */
+    protected ServiceState stop() {
+        return ServiceState.STOPPED; // default, just go for from stopping to stopped
     }
 
     @Override
@@ -313,10 +346,12 @@ public abstract class AbstractService implements Service {
     public ServiceKind getKind() {
         return kind;
     }
-    
+
     @Override
     public void activate() throws ExecutionException {
         if (getState() == ServiceState.PASSIVATED) {
+            setState(ServiceState.ACTIVATING);
+            start();
             setState(ServiceState.RUNNING);
         }
     }
@@ -324,6 +359,8 @@ public abstract class AbstractService implements Service {
     @Override
     public void passivate() throws ExecutionException {
         if (getState() == ServiceState.RUNNING) {
+            setState(ServiceState.PASSIVATING);
+            stop();
             setState(ServiceState.PASSIVATED);
         }
     }

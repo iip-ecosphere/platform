@@ -188,7 +188,7 @@ public class SpringCloudServiceManager
                     service.setDeploymentId(id);
                     if (DeploymentState.deployed == status.getState()) {
                         service.attachStub();
-                        setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                        setState(service, ServiceState.STARTING); // preliminary, done by/via service???
                         LOGGER.info("Starting " + ids + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
@@ -200,7 +200,7 @@ public class SpringCloudServiceManager
                     ServiceState ensState = service.getEnsembleLeader().getState();
                     if (ServiceState.RUNNING == ensState) {
                         service.attachStub();
-                        setState(service, ServiceState.RUNNING); // preliminary, done by/via service???
+                        setState(service, ServiceState.STARTING); // preliminary, done by/via service???
                         LOGGER.info("Starting ensemble service " + ids + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
@@ -343,6 +343,10 @@ public class SpringCloudServiceManager
         // must be done before setState (via stub), synchronous for now required on Jenkins/Linux
         ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
         service.setState(state);
+        ServiceState further = service.getState();
+        if (further != state) {
+            ServicesAas.notifyServiceStateChanged(state, further, service, NotificationMode.SYNCHRONOUS); 
+        }
     }
 
 }

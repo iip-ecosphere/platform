@@ -220,35 +220,6 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
         return result;
     }
     
-    @Override
-    public void activate() throws ExecutionException {
-        super.setState(ServiceState.ACTIVATING);
-        stop();
-        super.setState(ServiceState.ACTIVATING);
-    }
-
-    @Override
-    public void passivate() throws ExecutionException {
-        super.setState(ServiceState.PASSIVATING);
-        start();
-        super.setState(ServiceState.PASSIVATED);
-    }
-
-    @Override
-    public void setState(ServiceState state) throws ExecutionException {
-        switch (state) {
-        case STARTING:
-            start();
-            break;
-        case STOPPING:
-            stop();
-            break;
-        default:
-            break;
-        }
-        super.setState(state);
-    }
-    
     /**
      * Returns whether the Python executable shall be started by name or by full path.
      * 
@@ -256,14 +227,6 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      */
     protected boolean startExecutableByName() {
         return true;
-    }
-    
-    /**
-     * Starts the service and the background process.
-     * 
-     * @throws ExecutionException if starting the process fails
-     */
-    protected void start() throws ExecutionException {
     }
        
     /**
@@ -448,12 +411,6 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      */
     protected void handleErrorStream(InputStream err) {
         AbstractProcessService.redirectIO(err, System.err);
-    }
-
-    /**
-     * Preliminary: Stops the service and the background process.
-     */
-    protected void stop() {
     }
 
     /**

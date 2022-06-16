@@ -77,14 +77,8 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         this.enableFileDeletion = enableFileDeletion;
     }
 
-    /**
-     * Preliminary: Starts the service and the background process.
-     * 
-     * @throws ExecutionException if starting the process fails
-     * @see #getPythonExecutable()
-     * @see #startExecutableByName()
-     */
-    protected void start() throws ExecutionException {
+    @Override
+    protected ServiceState start() throws ExecutionException {
         proc = createAndCustomizeProcess(null, null);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
         serviceIn = new PrintWriter(writer);
@@ -97,12 +91,11 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             }
             return false;
         }).start();
+        return ServiceState.RUNNING;
     }
 
-    /**
-     * Preliminary: Stops the service and the background process.
-     */
-    protected void stop() {
+    @Override
+    protected ServiceState stop() {
         if (null != serviceIn) {
             serviceIn.flush();
             serviceIn = null;
@@ -122,6 +115,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
                     getHome(), e.getMessage());
             }
         }
+        return ServiceState.STOPPED;
     }
     
     @Override
@@ -180,7 +174,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             serviceIn.println(text);
             serviceIn.flush();
         } else {
-            throw new ExecutionException("Service/process not started,", null);
+            throw new ExecutionException("Service/process not started.", null);
         }
     }
 
