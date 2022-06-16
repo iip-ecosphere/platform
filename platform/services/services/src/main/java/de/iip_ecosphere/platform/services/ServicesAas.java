@@ -612,23 +612,18 @@ public class ServicesAas implements AasContributor {
                     try {
                         prop.setValue(act.toString());
                     } catch (ExecutionException e) {
-                        getLogger().error("Cannot write state for service `" + desc.getId() + "`: " + e.getMessage());
+                        getLogger().error("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
                     }
                 } else {
-                    getLogger().error("Service state change - cannot find property " + NAME_PROP_STATE 
-                        + "for service `" + desc.getId());
+                    getLogger().error("Service state change - cannot find property {} for service `{}`", 
+                        NAME_PROP_STATE, desc.getId());
                 }
             } else {
-                getLogger().error("Service state change - cannot find service `" + desc.getId() + "`");
+                getLogger().error("Service state change - cannot find service `{}`", desc.getId());
             }
             // synchronous execution needed??
+            getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
             if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
-                Reference serviceRef = elt.createReference();
-                SubmodelElementCollectionBuilder connectionBuilder 
-                    = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
-                addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
-                addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
-                connectionBuilder.build();
                 if (!MetricsAasConstructor.containsMetrics(elt)) {
                     SubmodelElementCollectionBuilder serviceB = 
                             sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
@@ -640,6 +635,14 @@ public class ServicesAas implements AasContributor {
                     subB.build();
                 }
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+            } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
+                Reference serviceRef = elt.createReference();
+                SubmodelElementCollectionBuilder connectionBuilder 
+                    = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
+                addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
+                addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
+                connectionBuilder.build();
+                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
@@ -647,6 +650,8 @@ public class ServicesAas implements AasContributor {
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {
                 MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
+                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+            } else if (old != act) {
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             }
         });
