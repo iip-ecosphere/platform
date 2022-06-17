@@ -18,6 +18,5 @@ The `path` indicates the desired REST path/endpoint attached to the base path se
 - RANDOM_SELECT(args): the value shall be a random selection from args, whereby args are separated by commas. Strings may be given in usual quotes.
 Fields not given in the data but specified in `spec.yml` will be added to the output. 
 
+Building and testing in an IDE requires execution of Maven as neither classpath file nor jar folder for fake RTSA may exist.
 Manual building may require `mvn package -DskipTests -Djacoco.skip=true`
-
-

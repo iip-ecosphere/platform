@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Tests the RTSA local server. The utilized REST framework is just for testing, no production use!
+ * Tests the RTSA local server. 
  * 
  * @author Holger Eichelberger
  */
@@ -78,6 +78,16 @@ public class RtsaRestServiceTest {
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Cannot read test classpath file");
                 }
+            } else {            
+                f = new File("target/fake/rtsa/lib");
+                File[] jars = f.listFiles();
+                if (f.exists() && null != jars) {
+                    for (File j : jars) {
+                        result += File.pathSeparator + j.getAbsolutePath();
+                    }
+                } else {
+                    LoggerFactory.getLogger(getClass()).error("Cannot complete test classpath");
+                }                    
             }
             return result;
         }
