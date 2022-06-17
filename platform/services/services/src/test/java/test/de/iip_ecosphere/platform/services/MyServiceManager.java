@@ -115,15 +115,14 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
-            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
-            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING); // mock transition
+            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.START_SERVICE); // omit transition
         }
     }
 
     @Override
     public void stopService(String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
-            setState(getServiceDescriptor(s, "serviceId", "stop"), ServiceState.STOPPED);
+            setState(getServiceDescriptor(s, "serviceId", "stop"), ServiceState.STOPPED); // omit transition
         }
     }
 
