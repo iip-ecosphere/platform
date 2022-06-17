@@ -226,6 +226,7 @@ public class Starter {
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
+            // TODO -> ServiceState.DEPLOYED
             if (serviceAutostart && enableAutostart) {
                 try {
                     getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());

@@ -301,20 +301,24 @@ public abstract class AbstractService implements Service {
     
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        ServiceState next = null;
-        this.state = state;
-        switch (state) {
-        case STARTING:
-            next = start();
-            break;
-        case STOPPING:
-            next = stop();
-            break;
-        default:
-            break;
-        }
-        if (null != next) {
-            this.state = next;
+        if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // base implementation, STARTING fails Linux/Jenkins
+            this.state = state;
+        } else {
+            ServiceState next = null;
+            this.state = state;
+            switch (state) {
+            case STARTING:
+                next = start();
+                break;
+            case STOPPING:
+                next = stop();
+                break;
+            default:
+                break;
+            }
+            if (null != next) {
+                this.state = next;
+            }
         }
     }
 
