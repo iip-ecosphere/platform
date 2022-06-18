@@ -46,17 +46,18 @@ import static spark.Spark.delete;
 /**
  * A very simple RTSA fake server as we are not allowed to publish RTSA. The FakeRTSA reads its functionality out
  * of a spec.yml file in the deployment.jar (packaged into a zip, there into folder home/deployments). The spec.yml is
- * intended to quickly adjust the behavior rather than doing coding/requiring a build process.
+ * intended to easily adjust the behavior rather than doing coding/requiring a build process.
  * 
  * Format of the spec.yml:
  * path: <String>
  * mappings:
  *   <String>: <String>
  *  
- * The path indicates the desired REST path/endpoint attached to the base path services/
+ * The path indicates the desired REST path/endpoint attached to the base path "services/"
  * The mappings relate a field name to a function specification. As function specification, we currently offer 
  * PASS, SKIP, RANDOM_BOOLEAN, RANDOM_PROBABILITY, RANDOM_SELECT(args) whereby args are separated by comma, may be 
- * strings. Fields not given in the data but specified in spec.yml will be added to the output. 
+ * strings. Fields not given in the data but specified in spec.yml will be added to the output based on the given 
+ * (random) data specification. 
  * 
  * For new classes in this package, please consider that the POM is doing a selective packaging for Fake*.class so 
  * either classes are contained/nested or their names start with Fake!
@@ -84,6 +85,7 @@ public class FakeRtsa {
      * @throws IOException shall not occur
      */
     public static void main(String[] args) throws IOException {
+        long start = System.currentTimeMillis();
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
         String defaultPath = CmdLine.getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
         boolean verbose = CmdLine.getBooleanArg(args, "verbose", true);
@@ -112,18 +114,29 @@ public class FakeRtsa {
             put("/services/" + path, route); // whyever
             delete("/services/" + path, route); // whyever
         }
+        Spark.awaitInitialization();
+        // for thread.destroy or CTRL+C, allow for completing requests, flushing output
+        Runtime.getRuntime().addShutdownHook(new Thread(() ->  {
+            System.out.println("Stopping FakeRtsa");
+            Spark.stop();
+            Spark.awaitStop();
+            System.out.println("Stopped FakeRtsa");
+        }));
         
         new Thread(() -> {
+            long end = System.currentTimeMillis();
             if (waitAtStart) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    // puuh
+                long diff = end - start;
+                if (diff < 2500) { // pretend a significant startup time
+                    try {
+                        Thread.sleep(2500 - diff);
+                    } catch (InterruptedException e) {
+                        // puuh
+                    }
                 }
-                System.out.println("Started Application in 2500 ms"); // we need some output for state change
-            } else {
-                System.out.println("Started Application in 50 ms"); // we need some output for state change
-            }
+                end = System.currentTimeMillis();
+            } 
+            System.out.println("Started Application in " + (end - start) + " ms"); // output for state change
         }).start();
     }
     
