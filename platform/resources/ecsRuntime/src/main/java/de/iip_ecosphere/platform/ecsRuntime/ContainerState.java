@@ -85,13 +85,14 @@ public enum ContainerState {
     static {
         // failed, unknown is always possible
         addValidTransition(UNKNOWN, AVAILABLE);
-        addValidTransition(AVAILABLE, DEPLOYING);
+        addValidTransition(AVAILABLE, DEPLOYING, DEPLOYED); // with pragmatic shortcut to DEPLOYED
         addValidTransition(DEPLOYING, DEPLOYED);
-        addValidTransition(DEPLOYED, MIGRATING, UPDATING, STOPPING);
+        addValidTransition(DEPLOYED, MIGRATING, UPDATING, STOPPING, STOPPED); // with pragmatic shortcut to STOPPED
         addValidTransition(MIGRATING, DEPLOYED, STOPPING);
         addValidTransition(UPDATING, DEPLOYED, STOPPING);
         addValidTransition(STOPPING, STOPPED);
-        addValidTransition(STOPPED, UNDEPLOYING);
+        addValidTransition(STOPPED, DEPLOYED, UNDEPLOYING);
+        addValidTransition(UNDEPLOYING, UNKNOWN);
 
         addValidTransition(FAILED, DEPLOYED, MIGRATING, UPDATING, STOPPING);
     }
@@ -146,7 +147,7 @@ public enum ContainerState {
             throw new ExecutionException("No source state given: null", null);
         }
         if (!source.isValidTransition(target)) {
-            throw new ExecutionException("State transition from " + source + " to " + target + "is not valid", null);
+            throw new ExecutionException("State transition from " + source + " to " + target + " is not valid", null);
         }
     }
     

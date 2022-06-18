@@ -101,8 +101,10 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
      * @param container the container
      * @param state the new state
      * @throws ExecutionException if changing the state fails
+     * @see ContainerState#validateTransition(ContainerState, ContainerState)
      */
     protected void setState(BasicContainerDescriptor container, ContainerState state) throws ExecutionException {
+        ContainerState.validateTransition(container.getState(), state);
         container.setState(state);
         EcsAas.notifyContainerStateChanged(container);
     }
