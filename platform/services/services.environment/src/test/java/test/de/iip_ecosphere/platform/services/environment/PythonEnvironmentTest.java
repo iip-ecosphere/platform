@@ -155,7 +155,8 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             .deploy(aas)
             .createServer()
             .start();
-            
+        
+        TimeUtils.sleep(1000); // works without on Windows, fails sometimes on Linux??
         AbstractEnvironmentTest.testAas(aasServerRegistry, service);
 
         httpServer.stop(true);
