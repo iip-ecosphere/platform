@@ -12,6 +12,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     Boolean isConnector = false;
     mapOf(IOType, IOType) pairs = {};
     String typeAdd = "";
+    setOf(String) serviceVars = {};
 
     def initPairs(MeshElement elt) {
     }
@@ -160,6 +161,21 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             familyMember;
         } else {
             impl;
+        }
+    }
+
+    def genMapService(String serviceVarName) {
+        if (familyInterface <> "") {
+            'Starter.mapService(${serviceVarName}, ${isDefaultService(elt.impl, familyMember)});'
+        } else {
+            'Starter.mapService(${serviceVarName});'
+        }
+    }
+
+    def registerService() {
+        for (String s: serviceVars) {
+            '${attachMetricsProvider("${s}")}'
+            '${genMapService("${s}")}'
         }
     }
     
@@ -463,10 +479,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
     def initialService(MeshElement elt, JavaService service) {
         if (service.class.length() > 0) {
+            serviceVars.add("service");
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
-            '${generateParameterInit(service)|e}'
-            '${attachMetricsProvider("service")}'
-            '${genMapService("service")}'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -475,15 +489,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, Connector conn) {
         String connGen = getConnectorGenerics(conn, false);
         String clsName = getClsName(elt);
+        serviceVars.add("service");
         '${conn.class}${connGen} conn = 
             new ${conn.class}<>(createConnectorAdapter());
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
-        service.setReceptionCallback(new ConnectorReceptionCallback());
-        ${genMapService("service")}
-        ${attachMetricsProvider("service")}'
+        service.setReceptionCallback(new ConnectorReceptionCallback());'
     }
     
     def initIngestors(MeshElement elt, Connector conn) {
@@ -640,14 +653,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     // --------------------------- ServiceFamily ----------------------------------
-
-    def genMapService(String serviceVarName) {
-        if (familyInterface <> "") {
-            'Starter.mapService(${serviceVarName}, ${isDefaultService(elt.impl, familyMember)});'
-        } else {
-            'Starter.mapService(${serviceVarName});'
-        }
-    }
     
     def isDefaultService(ServiceBase eltImpl, ServiceBase service) {
         'false'
@@ -831,7 +836,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initialService(MeshElement elt, PythonService service) {
         '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
         // no mapServices here as Python may take long and block the constructor -> initIngestors
-        '${attachMetricsProvider("service")}'
+        serviceVars.add("service");
         for (IOType in: service.input) {
             String type = toTypeName(in);
             'service.registerInputTypeTranslator(${type}.class, "${type}", new ${type}InputTranslator());\n'
@@ -840,10 +845,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String type = toTypeName(out);
             'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
         }
-    }
-    
-    def initIngestors(MeshElement elt, PythonService base) {
-        '${genMapService("service")}'
     }
     
     def generateImports(PythonService service) {
@@ -940,13 +941,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String inType = toTypeName(in.type);
             IOType out = pairs.get(in);
             String outType = toTypeName(out.type);
+            serviceVars.add(kodexServiceName(in, out));
             '${kodexServiceName(in, out)} = new ${getServiceType(elt, elt.impl)}(
                 new ${inType}InputTranslator(), 
                 new ${outType}OutputTranslator(), 
                 null, // via attachIngestor
-                serviceData);
-            ${genMapService(kodexServiceName(in, out))}
-            ${attachMetricsProvider(kodexServiceName(in, out))}'
+                serviceData);'
         }
     }
 
@@ -964,13 +964,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         String inType = toTypeName(in.type);
         IOType out = service.output.first();
         String outType = toTypeName(out.type);
+        serviceVars.add("service");
         'service = new RtsaRestService(
             new ${inType}InputTranslator(), 
             new ${outType}OutputTranslator(), 
             null, // via attachIngestor
-            serviceData);
-        ${genMapService("service")}
-        ${attachMetricsProvider("service")}'
+            serviceData);'
     }
     
     def generateImports(RtsaService service) {
@@ -1036,10 +1035,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def initialService(MeshElement elt, TraceToAasService service) {
         String clsName = "TraceToAasService";
+        serviceVars.add("service");
         '${getYamlServiceFragment("serviceData", clsName, "${service.id}", appVar="app")};\n'
-        'service = new TraceToAasService(app, serviceData);
-        ${genMapService("service")}
-        ${attachMetricsProvider("service")}'
+        'service = new TraceToAasService(app, serviceData);'
     }
     
     def generateImports(TraceToAasService service) {
@@ -1177,6 +1175,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             ${nodeAnnotation("@PostConstruct")|e}
             public void attachIngestors() {
+                ${registerService()}
                 ${initIngestors(elt, impl)}
                 ${attachIngestors(elt, impl)}
             }
