@@ -14,6 +14,7 @@ class BaSyxHTTPServer():
     def start(self):
         handler = HTTPHandlerFactory(self.builder)
         server = HTTPServer((HOST, self.port), handler)
+        logger.info('Bound to ' + HOST + ':' + str(self.port))
         server.serve_forever()
 
 

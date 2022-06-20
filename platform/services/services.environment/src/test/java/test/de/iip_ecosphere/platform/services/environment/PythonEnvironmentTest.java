@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import org.junit.Assert;
 
 /**
  * Integration test for the Python environment.
@@ -28,25 +31,30 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
  * @author Sakshi Singh, SSE
  */
 public class PythonEnvironmentTest extends AbstractEnvironmentTest {
-
+    
     /**
      * Redirects an input stream to another stream (in parallel).
      * 
      * @param src the source stream
      * @param dest the destination stream
+     * @param cons optional consumer to analyze received lines, may be <b>null</b> for none
      */
-    private static void redirectIO(final InputStream src, final PrintStream dest) {
+    private static void redirectIO(final InputStream src, final PrintStream dest, Consumer<String> cons) {
         new Thread(new Runnable() {
             public void run() {
                 Scanner sc = new Scanner(src);
                 while (sc.hasNextLine()) {
-                    dest.println(sc.nextLine());
+                    String line = sc.nextLine();
+                    dest.println(line);
+                    if (null != cons) {
+                        cons.accept(line);
+                    }
                 }
                 sc.close();
             }
         }).start();
     }
-    
+
     /**
      * Creates and starts a Python process.
      * 
@@ -56,6 +64,21 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws IOException if process creation fails
      */
     public static Process createPythonProcess(File dir, String... args) throws IOException {
+        return createPythonProcess(dir, null, null, args);
+    }
+
+    /**
+     * Creates and starts a Python process.
+     * 
+     * @param dir the home dir where to find the script/run it within
+     * @param stdCons optional consumer on standard out, may be <b>null</b>
+     * @param errCons optional consumer on standard error, may be <b>null</b>
+     * @param args the process arguments for the script including python arguments (first), script and script arguments
+     * @return the created process
+     * @throws IOException if process creation fails
+     */
+    public static Process createPythonProcess(File dir, Consumer<String> stdCons, Consumer<String> errCons, 
+        String... args) throws IOException {
         String pythonPath = PythonUtils.getPythonExecutable().toString();
         System.out.println("Using Python: " + pythonPath);
         List<String> tmp = new ArrayList<String>();
@@ -69,8 +92,8 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         processBuilder.directory(dir);
         //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
         Process python = processBuilder.start();
-        redirectIO(python.getInputStream(), System.out);
-        redirectIO(python.getErrorStream(), System.err);
+        redirectIO(python.getInputStream(), System.out, stdCons);
+        redirectIO(python.getErrorStream(), System.err, errCons);
         return python;
     }
 
@@ -82,9 +105,23 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      * @throws IOException if process creation fails
      */
     public static Process createPythonProcess(String... args) throws IOException {
-        return createPythonProcess(new File("./src/test/python"), args);
+        return createPythonProcess(null, null, args);
     }
 
+    /**
+     * Creates and starts a Python process with home directory "./src/test/python".
+     * 
+     * @param stdCons optional consumer on standard out, may be <b>null</b>
+     * @param errCons optional consumer on standard error, may be <b>null</b>
+     * @param args the process arguments for the script including python arguments (first), script and script arguments
+     * @return the created process
+     * @throws IOException if process creation fails
+     */
+    public static Process createPythonProcess(Consumer<String> stdCons, Consumer<String> errCons, String... args) 
+        throws IOException {
+        return createPythonProcess(new File("./src/test/python"), stdCons, errCons, args);
+    }
+    
     /**
      * Tests the Python implementation.
      * 
@@ -137,10 +174,17 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             args.add(protocol);
         }
         String[] tmp = new String[args.size()];
-        Process python = createPythonProcess(args.toArray(tmp));
+        AtomicBoolean started = new AtomicBoolean(false);
+        Consumer<String> bindingConsumer = l -> started.set(l.contains("INFO:root:Bound to"));
+        Process python = createPythonProcess(bindingConsumer, bindingConsumer, args.toArray(tmp));
         // add protocol
-        TimeUtils.sleep(1000); // works without on Windows, but not on Jenkins/Linux
 
+        int count = 0;
+        while (!started.get() && count < 20) { // wait max. for 20*200 ms
+            TimeUtils.sleep(200);
+            count++;
+        }
+        Assert.assertTrue("Python server process not started", started.get());
         
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
         Endpoint aasServerBase = new Endpoint(aasServer, "");
@@ -156,7 +200,6 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             .createServer()
             .start();
         
-        TimeUtils.sleep(1000); // works without on Windows, fails sometimes on Linux??
         AbstractEnvironmentTest.testAas(aasServerRegistry, service);
 
         httpServer.stop(true);
