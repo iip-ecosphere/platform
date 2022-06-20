@@ -56,7 +56,6 @@ template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact targe
     
     // --------------------- main ---------------------------
 
-    // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app) {
         String clsName = getClsName(elt);
         'package ${pkg};
@@ -79,9 +78,9 @@ template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact targe
             ${generateDataMethods(elt, true)}
 
             /**
-             * Attaches the ingestors.
+             * Initializes the service instance. Please execute resource-intensive or time-intensive calls here.
              */
-            public void attachIngestors();
+            public void initService();
             
             /**
              * Changes the state. [R133c]

@@ -716,7 +716,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir) {
-        'service.attachIngestors();'
+        'service.initService();'
     }
     
     def generateSinkMethodBody(MeshSink snk, ServiceFamily service, String methodName, String methodSuffixWithServiceId, String type) {
@@ -754,7 +754,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def attachIngestors(MeshElement elt, ServiceFamily base) {
-        'service.attachIngestors();'
+        'service.initService();'
     }
     
     def generateReceptionCallback(MeshProcessor elt, ServiceFamily family) {
@@ -792,7 +792,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                     ${fInterface} oldService = service;
                     service = selector.createStrategy().doSwitch(service, newService);
                     if (oldService != service) {
-                        service.attachIngestors(); // connect outputs
+                        service.initService(); // connect outputs
                         actServiceId = service.getId();
                     }
                 }
@@ -1079,7 +1079,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // --------------------- main ---------------------------
 
-    // method attachIngestors() is not needed from Java side but allows for MeshBasics script reuse
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
         initPairs(elt);
