@@ -62,6 +62,10 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         }
         d = appendDependency(dep, "org.glassfish", "jakarta.el");
         new XmlElement(d, "optional", "false");
+
+        appendDependency(dep, "org.springframework", "spring-test", scope="test");
+        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
+        appendDependency(dep, "junit", "junit", scope="test");
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);

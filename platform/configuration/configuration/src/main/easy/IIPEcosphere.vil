@@ -80,6 +80,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             Path appRoot = "${target}/${appName}";
             appRoot.mkdir();
             Path javaSrc = "${appRoot}/src/main/java";
+            Path javaTestSrc = "${appRoot}/src/test/java";
             Path pySrc = "${appRoot}/src/main/python";
             Path resourcesSrc = "${appRoot}/src/main/resources";
             Path assemblySrc = "${appRoot}/${assemblyRel}";
@@ -88,6 +89,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
             Path javaStubsSrc = "${javaSrc}/${toPath(javaStubsPackage)}";
             Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+            Path javaNodesTestSrc = "${javaTestSrc}/${toPath(javaNodesPackage)}";
 
             assemblySrc.mkdir();
             // generate data classes and serializers
@@ -126,10 +128,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     for (MeshElement no : nodes) {
                         String clsName = asTypeName(no.name);
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
-                        vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${clsName}.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
+                            "${javaNodesSrc}/${clsName}.java", 
+                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                            familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
+                            "${javaNodesTestSrc}/${clsName}Test.java", 
+                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                            familyInterface="", familyMember=no.impl, nodes=nodes2);
                         setOf(Service) mbs = {};
-                        generateNestedServices(no, no.impl, javaNodesSrc, clsName, javaNodesPackage, a, artifacts, noDeps, mbs, nodes2);
+                        generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
+                            a, artifacts, noDeps, mbs, nodes2);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         for (Service m: mbs) {
@@ -311,11 +320,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
 
     // dispatch basis
-    generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, String clsName, 
+    generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
         String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
     }
 
-    generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, String clsName, 
+    generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
         String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
         IIPEcosphere cfg = config;
         String familyInterface = familyInterfaceName(clsName);
@@ -325,6 +334,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         for (Service m: family.members) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
+                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
+            vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
             mbs.add(m);
         }

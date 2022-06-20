@@ -1171,10 +1171,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             ${generateConnectorParameter(elt, app)}
 
             /**
-             * Attaches the ingestors.
+             * Initializes the service when feasible in Spring lifecycle.
              */
             ${nodeAnnotation("@PostConstruct")|e}
-            public void attachIngestors() {
+            public void initService() {
                 ${registerService()}
                 ${initIngestors(elt, impl)}
                 ${attachIngestors(elt, impl)}
