@@ -146,6 +146,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
+        ServiceState.validateTransition(this.state, state);
         if (ServiceState.STOPPING == state || ServiceState.STOPPED == state) {
             // stub shall only be active when service is active, avoid confusion/exceptions during shutdown
             // and switch back to descriptor shadow state

@@ -115,17 +115,18 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
-            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.START_SERVICE); // omit transition
             if (ServiceState.START_SERVICE == ServiceState.STARTING) { // full
-                setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING); // omit transition
+                setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
             }
+            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING);
         }
     }
 
     @Override
     public void stopService(String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
-            setState(getServiceDescriptor(s, "serviceId", "stop"), ServiceState.STOPPED); // omit transition
+            setState(getServiceDescriptor(s, "serviceId", "stop"), ServiceState.STOPPING);
+            setState(getServiceDescriptor(s, "serviceId", "stop"), ServiceState.STOPPED);
         }
     }
 
@@ -157,6 +158,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     public void activateService(String serviceId) throws ExecutionException {
         MyServiceDescriptor service = getServiceDescriptor(serviceId, "serviceId", "activate");
         if (ServiceState.PASSIVATED == service.getState()) {
+            setState(service, ServiceState.ACTIVATING);
             setState(service, ServiceState.RUNNING);
         } else {
             throw new ExecutionException("Cannot passivate as service is in state " + service.getState(), null);
