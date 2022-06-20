@@ -123,6 +123,12 @@ public enum ServiceState {
         // error, unknown is always possible
         addValidTransition(UNKNOWN, AVAILABLE);
         addValidTransition(AVAILABLE, DEPLOYING, CREATED, STARTING, UNDEPLOYING); // preliminary: created, starting 
+        if (START_SERVICE == RUNNING) { // legacy
+            addValidTransition(DEPLOYING, RUNNING);
+            addValidTransition(AVAILABLE, RUNNING);
+            addValidTransition(STOPPED, RUNNING);
+            addValidTransition(RUNNING, STOPPED);
+        }
         addValidTransition(DEPLOYING, CREATED, STARTING); // preliminary: starting 
         addValidTransition(CREATED, STARTING);
         addValidTransition(STARTING, RUNNING);
@@ -166,7 +172,7 @@ public enum ServiceState {
      */
     public boolean isValidTransition(ServiceState target) {
         boolean result = false;
-        if (FAILED == target || UNKNOWN == target) {
+        if (FAILED == target || UNKNOWN == target || this == target) { // including self-transition
             result = true;
         } else {
             Set<ServiceState> validTargets = validTransitions.get(this);

@@ -447,66 +447,84 @@ public class TraceToAasService extends AbstractService {
     
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        switch (state) {
-        case STARTING:
-            try {
-                AasFactory factory = AasFactory.getInstance();
-                AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
-                PlatformAas.addSoftwareInfo(smBuilder, appSetup);
-                smBuilder.build();
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
-                augmentCommandsSubmodel(smBuilder);
-                smBuilder.build();                
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
-                augmentServicesSubmodel(smBuilder);
-                smBuilder.build();
-                aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null).build();
-                List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
-                AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
-                callback = new TraceRecordReceptionCallback();
-                TransportConnector conn = Transport.createConnector();
-                if (null != conn) {
-                    conn.setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
-                } else {
-                    LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
-                }
-                super.setState(ServiceState.RUNNING);
-                start();
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
-                super.setState(ServiceState.FAILED);
-            }
-            break;
-        case STOPPING:
+        if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // base implementation, STARTING fails Linux/Jenkins
+            ServiceState next = null;
             super.setState(state);
-            stop();
-            try {
-                TransportConnector conn = Transport.getConnector();
-                if (null != conn) {
-                    conn.detachReceptionCallback(TraceRecord.TRACE_STREAM, callback);
-                }
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
+            switch (state) {
+            case STARTING:
+                next = start();
+                break;
+            case STOPPING:
+                next = stop();
+                break;
+            default:
+                break;
             }
-            try {
-                // unclear how to get rid of AAS itself
-                Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
-                aas.delete(aas.getSubmodel(SUBMODEL_TRACES));
-                aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
-                aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
-            } catch (IOException e ) {
-                LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
-                super.setState(ServiceState.FAILED);
+            if (null != next) {
+                super.setState(next);
             }
-            super.setState(ServiceState.STOPPED);
-            break;
-        default:
+        } else {
             super.setState(state);
-            break;
         }
     }
+    
+    @Override
+    protected ServiceState start() throws ExecutionException {
+        ServiceState result;
+        try {
+            AasFactory factory = AasFactory.getInstance();
+            AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
+            SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
+            PlatformAas.addSoftwareInfo(smBuilder, appSetup);
+            smBuilder.build();
+            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
+            augmentCommandsSubmodel(smBuilder);
+            smBuilder.build();                
+            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+            augmentServicesSubmodel(smBuilder);
+            smBuilder.build();
+            aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null).build();
+            List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
+            AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
+            callback = new TraceRecordReceptionCallback();
+            TransportConnector conn = Transport.createConnector();
+            if (null != conn) {
+                conn.setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
+            } else {
+                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
+            }
+            result = super.start();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
+            result = ServiceState.FAILED;
+        }
+        return result;
+    }
 
+    @Override
+    protected ServiceState stop() {
+        ServiceState result = super.stop();
+        try {
+            TransportConnector conn = Transport.getConnector();
+            if (null != conn) {
+                conn.detachReceptionCallback(TraceRecord.TRACE_STREAM, callback);
+            }
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
+        }
+        try {
+            // unclear how to get rid of AAS itself
+            Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
+            aas.delete(aas.getSubmodel(SUBMODEL_TRACES));
+            aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
+            aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
+        } catch (IOException e ) {
+            LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
+            result = ServiceState.FAILED;
+        }
+        return result; // default, just go for from stopping to stopped
+    }
+    
     /**
      * Adds elements to the services submodel if available.
      * 

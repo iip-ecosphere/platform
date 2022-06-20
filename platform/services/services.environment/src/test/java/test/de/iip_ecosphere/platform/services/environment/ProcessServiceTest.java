@@ -92,7 +92,7 @@ public class ProcessServiceTest {
             args.add("test.de.iip_ecosphere.platform.services.environment.ForwardingApp");
             addProcessSpecCmdArg(args);
             createAndConfigureProcess(exe, true, home, args);
-            return null;
+            return ServiceState.RUNNING;
         }
         
     }

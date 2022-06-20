@@ -299,8 +299,17 @@ public abstract class AbstractService implements Service {
         return state;
     }
     
+    /**
+     * Changes the state. [R133c]
+     * 
+     * @param state the new state
+     * @throws ExecutionException if changing the state fails for some reason
+     * @see #start()
+     * @see #stop()
+     */
     @Override
     public void setState(ServiceState state) throws ExecutionException {
+        ServiceState.validateTransition(this.state, state);
         if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // base implementation, STARTING fails Linux/Jenkins
             this.state = state;
         } else {

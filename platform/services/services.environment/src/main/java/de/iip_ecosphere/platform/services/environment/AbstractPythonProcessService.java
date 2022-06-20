@@ -232,17 +232,21 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // base implementation, STARTING fails Linux/Jenkins
+            ServiceState next = null;
+            super.setState(state);
             switch (state) {
             case STARTING:
-                start();
+                next = start();
                 break;
             case STOPPING:
-                stop();
+                next = stop();
                 break;
             default:
                 break;
             }
-            super.setState(state);
+            if (null != next) {
+                super.setState(next);
+            }
         } else {
             super.setState(state);
         }

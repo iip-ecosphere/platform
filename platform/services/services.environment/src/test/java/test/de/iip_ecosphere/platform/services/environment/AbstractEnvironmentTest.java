@@ -70,6 +70,8 @@ public abstract class AbstractEnvironmentTest {
         
         // do not make too many assumptions for now
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, null,
+            ServiceState.STARTING.name());
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, null,
             ServiceState.RUNNING.name());
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
             o -> checkStateString(o, ServiceState.RUNNING));
