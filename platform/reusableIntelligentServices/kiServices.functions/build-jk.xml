@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="kiServices.functions" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- deploy to SSE Mvn repo -->
+	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="package"/>
+		<mvnDeployResolveArtifact folderName="IIP-kiServices.functions" pomFile="pom.xml" jarFolder="target" artifactPattern="kiServices.functions-*.*.*.jar" />
+	</target>
+</project>

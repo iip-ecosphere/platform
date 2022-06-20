@@ -57,6 +57,7 @@ The following layers and components of the IIP-Ecosphere are available in this p
  * [Security and Data Protection](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/README.md)
     * [KIPROTECT](https://kiprotect.com/) [KODEX](https://heykodex.com/) [integration](https://github.com/iip-ecosphere/platform/tree/main/platform/securityDataProtection/security.services.kodex/README.md)
  * [Reusable Intelligent Services](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/README.md)
+    * Basic AI and data processing [functions](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.functions/README.md).
     * [RapidMiner](https://rapidminer.com) Real-Time Scoring Agent (RTSA) for [AI components and processes](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.rapidminer.rtsa/README.md).
  * Configuration
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
