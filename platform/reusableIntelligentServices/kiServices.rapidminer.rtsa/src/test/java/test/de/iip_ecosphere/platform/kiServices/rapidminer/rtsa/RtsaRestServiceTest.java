@@ -173,6 +173,13 @@ public class RtsaRestServiceTest {
         process(service, new InData(1, 1.3, 3));
         process(service, new InData(1, 1.5, 2));
         process(service, new InData(1, 1.7, 4));
+
+        int count = 0;
+        while (receivedCount.get() == 0 && count < 20) { // wait max. for 20*200 ms
+            TimeUtils.sleep(200);
+            count++;
+        }
+        
         TimeUtils.sleep(500);
         LoggerFactory.getLogger(RtsaRestServiceTest.class).info("Stopping service");
         service.setState(ServiceState.STOPPING);
