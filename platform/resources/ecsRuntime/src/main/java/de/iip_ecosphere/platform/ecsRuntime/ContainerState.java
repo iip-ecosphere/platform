@@ -123,7 +123,7 @@ public enum ContainerState {
      */
     public boolean isValidTransition(ContainerState target) {
         boolean result = false;
-        if (FAILED == target || UNKNOWN == target) {
+        if (FAILED == target || UNKNOWN == target || this == target) { // including self-transition
             result = true;
         } else {
             Set<ContainerState> validTargets = validTransitions.get(this);
