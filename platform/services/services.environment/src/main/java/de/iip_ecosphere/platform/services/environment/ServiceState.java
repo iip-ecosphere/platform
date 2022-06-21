@@ -112,10 +112,7 @@ public enum ServiceState {
     /**
      * The state of the service is not known.
      */
-    UNKOWN; 
-    
-    public static final ServiceState UNKNOWN = UNKOWN; // TODO rename -> UNKNOWN
-    public static final ServiceState START_SERVICE = STARTING; // legacy, shall be starting, fails with Linux/Jenkins
+    UNKNOWN; 
     
     private static Map<ServiceState, Set<ServiceState>> validTransitions = new HashMap<>();
 
@@ -123,14 +120,7 @@ public enum ServiceState {
         // error, unknown is always possible
         addValidTransition(UNKNOWN, AVAILABLE);
         addValidTransition(AVAILABLE, DEPLOYING, CREATED, STARTING, UNDEPLOYING); // preliminary: created, starting 
-        if (START_SERVICE == RUNNING) { // legacy
-            addValidTransition(DEPLOYING, RUNNING);
-            addValidTransition(AVAILABLE, RUNNING);
-            addValidTransition(STOPPED, RUNNING);
-            addValidTransition(RUNNING, STOPPED);
-        } else {
-            addValidTransition(STARTING, STOPPING); // test fallback :/
-        }
+        addValidTransition(STARTING, STOPPING); // test fallback :/
         addValidTransition(DEPLOYING, CREATED, STARTING); // preliminary: starting 
         addValidTransition(CREATED, STARTING);
         addValidTransition(STARTING, RUNNING);

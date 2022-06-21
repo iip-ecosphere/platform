@@ -228,29 +228,6 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     protected boolean startExecutableByName() {
         return true;
     }
-    
-    @Override
-    public void setState(ServiceState state) throws ExecutionException {
-        if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // base implementation, STARTING fails Linux/Jenkins
-            ServiceState next = null;
-            super.setState(state);
-            switch (state) {
-            case STARTING:
-                next = start();
-                break;
-            case STOPPING:
-                next = stop();
-                break;
-            default:
-                break;
-            }
-            if (null != next) {
-                super.setState(next);
-            }
-        } else {
-            super.setState(state);
-        }
-    }
        
     /**
      * Defines a function that handles "parsed" input, split into type and serialized data.
