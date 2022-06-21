@@ -14,6 +14,12 @@ Improvements:
 * #31: Python service cleanup including `__pycache__` by terminating all external service implementations via alive-wait and destroy forcibly (from HM'22 example).
 * #32: Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
 * #33: Split `IvmlTests` into separated tests in `configuration.configuration` to speed up automated container creation on Github.
+* #37: Delay service mapping to allow for longer service startup.
+* #47: Starting services with correct service state (STARTING, not RUNNING)
+* #46: Validating/securing container lifecycle
+* #45: Validating/securing service lifecycle
+* #43: Additional IVML model datatypes for OPC UA
+* #34: Fixed monitoring integration
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 
