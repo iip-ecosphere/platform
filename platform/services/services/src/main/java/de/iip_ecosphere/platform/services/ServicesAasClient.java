@@ -108,7 +108,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
 
     @Override
     public ServiceState getServiceState(String serviceId) {
-        ServiceState result = ServiceState.UNKOWN;
+        ServiceState result = ServiceState.UNKNOWN;
         try {
             String tmp = fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_GET_STATE).invoke(serviceId));
             if (null != tmp) {

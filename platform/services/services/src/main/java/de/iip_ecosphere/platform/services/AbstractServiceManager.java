@@ -99,7 +99,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     
     @Override
     public ServiceState getServiceState(String serviceId) {
-        ServiceState result = ServiceState.UNKOWN;
+        ServiceState result = ServiceState.UNKNOWN;
         S service = getService(serviceId);
         if (null != service) {
             result = service.getState();

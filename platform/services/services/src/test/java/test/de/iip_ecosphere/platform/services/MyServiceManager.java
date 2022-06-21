@@ -115,9 +115,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
-            if (ServiceState.START_SERVICE == ServiceState.STARTING) { // full
-                setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
-            }
+            setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
             setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING);
         }
     }

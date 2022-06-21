@@ -623,23 +623,11 @@ public class ServicesAas implements AasContributor {
             }
             // synchronous execution needed??
             getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
-            boolean done = false;
-            if (ServiceState.START_SERVICE == ServiceState.RUNNING) { // old style
-                if (ServiceState.AVAILABLE == old && ServiceState.RUNNING == act) {
-                    registerMetrics(desc, sub, elt);
-                    setupRelations(desc, sub, elt);
-                    done = true;
-                } 
-            } else { // new style
-                if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
-                    registerMetrics(desc, sub, elt);
-                    done = true;
-                } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
-                    setupRelations(desc, sub, elt);
-                    done = true;
-                }   
-            }
-            if (done) {
+            if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
+                registerMetrics(desc, sub, elt);
+                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+            } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
+                setupRelations(desc, sub, elt);
                 Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
