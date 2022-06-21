@@ -269,7 +269,6 @@ public class SpringCloudServiceManager
         for (String ids : sortByDependency(serviceIds, false)) {
             SpringCloudServiceDescriptor service = getService(ids);
             String id = service.getDeploymentId();
-            service.detachStub();
             if (null != id) {
                 AppStatus status = deployer.status(id);
                 if (null != status) {
@@ -281,17 +280,18 @@ public class SpringCloudServiceManager
                         state = waitFor(id, state, s -> DeploymentState.deployed == s);
                         LOGGER.info("Stopping " + id + "... ");
                         if (null == state || state == DeploymentState.undeployed) {
-                            setState(service, ServiceState.STOPPED);
+                            setState(service, ServiceState.STOPPED); // to be safe, shall be done by service
                         } else if (state == DeploymentState.error || state == DeploymentState.failed) {
                             setState(service, ServiceState.FAILED);
                         }
                     } else {
-                        setState(service, ServiceState.STOPPED);
+                        setState(service, ServiceState.STOPPING);
                     }
                 }
             } else {
-                setState(service, ServiceState.STOPPED);
+                setState(service, ServiceState.STOPPING);
             }
+            service.detachStub();
         }
         checkErrors(errors);
         LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
