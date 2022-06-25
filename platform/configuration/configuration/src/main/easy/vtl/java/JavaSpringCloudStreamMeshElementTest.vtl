@@ -9,27 +9,117 @@ import ServiceBasics;
 template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
-    // --------------------- main ---------------------------
-    
+    // --------------------- imports ---------------------------
+
     def genImports(MeshElement elt, ServiceBase service) {
         ''
     }
+
+    def genImports(MeshElement elt, Connector connector) {
+        'import java.util.concurrent.atomic.*;
+        import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+        import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
+        import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;'
+    }
+    
+    // ------------------- reusable methods -----------------
+
+    def genMethods(MeshElement elt, ServiceBase service, String clsName) {
+        ''
+    }
+
+    def genMethods(MeshElement elt, Connector connector, String clsName) {
+        String connGen = getConnectorGenerics(connector, false);
+        String outType = asTypeName(getFirstTypeName(connector.output));
+
+        '/**
+        * Tests the connector.
+        *
+        * @param params the connector parameter to use
+        * @param callback the callback to attach to the connector
+        *
+        * @throws IOException shall not occur
+        */
+        protected void testConnector(ConnectorParameter params, ReceptionCallback<${outType}> callback) throws IOException {
+            ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
+            ${connector.class}${connGen} conn = 
+                new ${connector.class}<>(${clsName}.createConnectorAdapter());
+            conn.connect(params);
+            conn.setReceptionCallback(callback);
+            conn.request(true);
+            ${genSampling(connector)|e}
+            System.out.println("Disconnecting...");
+            conn.disconnect();
+        }
+        
+        /**
+        * Returns the connector parameter to be used.
+        *
+        * @return the connector parameter, by default as configured in the model
+        */
+        protected ConnectorParameter createConnectorParameter() {
+            return ${clsName}.createConnectorParameter();
+        }'
+    }
+    
+    def genSampling(Connector connector) {
+        Boolean useNotifications = connector.samplingPeriod <= 0; // else polling
+        if (useNotifications) {
+            ''
+        } else {
+            'conn.notificationsChanged(false); // force sampling independent of model
+            System.out.println("Waiting for sampling... 10s until auto-stop");
+            TimeUtils.sleep(10000);'
+        }
+    }
+
+    // --------------------- tests --------------------------
+
+    def genTests(MeshElement elt, ServiceBase service, String clsName) {
+        ''
+    }
+
+    def genTests(MeshElement elt, Connector connector, String clsName) {
+        String outType = asTypeName(getFirstTypeName(connector.output));
+        
+        '/**
+        * Tests the connector, here whether the connector (parameterized by 
+        * {@link #createConnectorParameter()} delivered any data.
+        *
+        * @throws IOException shall not occur
+        */
+        @Test
+        public void testConnector() throws IOException {
+            ${clsName}Test test = new ${clsName}Test();
+            AtomicInteger counter = new AtomicInteger(0);
+            ReceptionCallback<${outType}> callback = new ReceptionCallback<${outType}>() {
+    
+                @Override
+                public void received(${outType} data) {
+                    counter.incrementAndGet();
+                }
+                
+                @Override
+                public Class<${outType}> getType() {
+                    return ${outType}.class;
+                }
+                
+            };
+            test.testConnector(test.createConnectorParameter(), callback);
+            Assert.assertTrue("Connector does not deliver data", counter.get() > 0);
+        }
+        '
+    }
+
+    // ------------------- main method ----------------------
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
         ''
     }
 
-    def genImports(MeshElement elt, Connector connector) {
-        'import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-        import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
-        import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;'
-    }
-
     def genMain(MeshElement elt, Connector connector, String clsName) {
-        String connGen = getConnectorGenerics(connector, false);
-        Boolean useNotifications = connector.samplingPeriod <= 0; // else polling
         String outType = asTypeName(getFirstTypeName(connector.output));
-        'ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
+        '${clsName}Test test = new ${clsName}Test();
         ReceptionCallback<${outType}> callback = new ReceptionCallback<${outType}>() {
 
             @Override
@@ -43,21 +133,11 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             }
             
         };
-        ${connector.class}${connGen} conn = 
-            new ${connector.class}<>(${clsName}.createConnectorAdapter());
-        ConnectorParameter cp = ${clsName}.createConnectorParameter();
-        conn.connect(cp);
-        conn.setReceptionCallback(callback);
-        conn.request(true);'
-        if (not(useNotifications)) {
-            'conn.notificationsChanged(false); // force sampling independent of model
-            System.out.println("Waiting for sampling... 10s until auto-stop");
-            TimeUtils.sleep(10000);'
-        }
-        'System.out.println("Disconnecting...");
-        conn.disconnect();
+        test.testConnector(test.createConnectorParameter(), callback);
         System.exit(0);'
     }
+
+    // ------------------- main ----------------------
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
@@ -85,10 +165,19 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import iip.interfaces.*;
         import iip.serializers.*;
         import iip.nodes.*;
-        
+
+        /**
+        * Implements tests for "${clsName}".
+        *
+        * @author EASy-Producer
+        */        
         @SpringBootTest
         @RunWith(SpringRunner.class)
         public class ${clsName}Test {
+        
+            ${genMethods(elt, elt.impl, clsName)|e}
+
+            ${genTests(elt, elt.impl, clsName)|e}
         
             /**
             * Starts the configured version of this service/connector as main program.

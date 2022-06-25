@@ -1092,12 +1092,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ServiceBase impl = elt.impl;
         String clsName = getClsName(elt);
         String constructorParams = "";
+        String constructorParamsDoc = "";
         String constructorInit = "";
         if (familyInterface <> "") {
             implements = " implements ${familyInterface}";
             impl = familyMember;
             clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
             constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
+            constructorParamsDoc = "@param streamBridge the stream bridge\n    @param metrics the metrics provider\n    ";
             constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
         String implMonId = impl.id.toIdentifier();
@@ -1159,6 +1161,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         
             /**
              * Creates an instance.
+             * ${constructorParamsDoc}
              */
             public ${clsName}(${constructorParams}) {
                 ${constructorInit|e}
