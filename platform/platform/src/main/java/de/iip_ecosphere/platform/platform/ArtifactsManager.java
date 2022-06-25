@@ -419,6 +419,8 @@ public class ArtifactsManager {
         PlatformSetup setup = PlatformSetup.getInstance();
         File artifactsFolder = setup.getArtifactsFolder();
         if (artifactsFolder.exists()) {
+            LoggerFactory.getLogger(ArtifactsManager.class)
+                .info("Watching artifacts folder {}", artifactsFolder.getAbsolutePath());
             Path path = PlatformSetup.getInstance().getArtifactsFolder().toPath();
             INSTANCE.scan(path);
             FileSystem fs = path.getFileSystem();
@@ -433,7 +435,7 @@ public class ArtifactsManager {
             }
         } else {
             LoggerFactory.getLogger(ArtifactsManager.class)
-                .error("Configured artifacts folder {} does not exist. Disabling watching for artifacts", 
+                .warn("Configured artifacts folder {} does not exist. Disabling watching for artifacts", 
                     artifactsFolder.getAbsolutePath());
         }
     }
@@ -461,6 +463,7 @@ public class ArtifactsManager {
     public Artifact artifactCreated(Path path, URI accessUri) {
         Artifact result = null;
         if (null != path && path.toFile().exists()) {
+            LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file created: {}", path);
             Path pn = path.normalize();
             if (!artifactPaths.containsKey(pn)) {
                 File file = path.toFile();
@@ -510,6 +513,8 @@ public class ArtifactsManager {
             if (null != is) {
                 YamlArtifact yml = YamlArtifact.readFromYaml(is); // closes is
                 result = new ServiceArtifact(yml, accessUri);
+                LoggerFactory.getLogger(ArtifactsManager.class).info("Service artifact added: {} @ {}", 
+                    path, accessUri);
             }
             fis.close();
         } catch (IOException e) {
@@ -533,6 +538,8 @@ public class ArtifactsManager {
             File f = new File(file.getParentFile(), desc.getImageFile());
             if (f.exists()) {
                 result = new ContainerArtifact(desc, accessUri);
+                LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}", 
+                    file.getAbsoluteFile(), accessUri);
             } else {
                 LoggerFactory.getLogger(ArtifactsManager.class).info("Cannot create container descriptor for {}: "
                     + "Container image file {} not found in same directory", file, desc.getImageFile());
@@ -544,6 +551,8 @@ public class ArtifactsManager {
                     ServiceDeploymentPlan.class, new FileInputStream(file));
                 if (plan.getAssignments().size() > 0) {
                     result = new DeploymentPlanArtifact(plan, accessUri);
+                    LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}",
+                        file.getAbsoluteFile(), accessUri);
                 }
             } catch (IOException e) {
                 // cannot read, may just be a wrong thing
@@ -565,6 +574,7 @@ public class ArtifactsManager {
             Path pn = path.normalize();
             result = artifactPaths.get(pn);
             if (null != result) {
+                LoggerFactory.getLogger(ArtifactsManager.class).info("Artifact file modified: {}", path);
                 PlatformAas.notifyArtifactModified(result);
             }
         }
@@ -586,6 +596,7 @@ public class ArtifactsManager {
             result = artifactPaths.remove(pn);
             if (null != result) {
                 artifacts.remove(result.getId());
+                LoggerFactory.getLogger(ArtifactsManager.class).info("Artifact file deleted: {}", path);
                 PlatformAas.notifyArtifactDeleted(result);
             }
         }
