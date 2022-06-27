@@ -7,10 +7,10 @@ project RoutingTest {
     // ------------ data types ------------------
     
     RecordType rec1 = {
-        name = "Rec1",
+        name = "RoutingTestData",
         fields = {
             Field {
-                name = "intField",
+                name = "serNr",
                 type = refBy(IntegerType)
             }, Field {
                 name = "stringField",
@@ -20,7 +20,7 @@ project RoutingTest {
     };
 
     RecordType connIn = {
-        name = "ConnIn",
+        name = "RoutingConnIn",
         fields = {
             Field {
                 name = "intField",
@@ -30,21 +30,24 @@ project RoutingTest {
     };
 
     RecordType connOut = {
-        name = "ConnOut",
+        name = "RoutingConnOut",
         fields = {
             Field {
-                name = "cmd",
+                name = "serNr",
                 type = refBy(IntegerType)
+            }, Field {
+                name = "data",
+                type = refBy(StringType)
             }
         }
     };
     
     RecordType command = {
-        name = "Command",
+        name = "RoutingCommand",
         fields = {
             Field {
                 name = "cmd",
-                type = refBy(IntegerType)
+                type = refBy(StringType)
             }
         }
     };
@@ -57,7 +60,7 @@ project RoutingTest {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        asynchronous = true,
+        asynchronous = false,
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.SourceImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
