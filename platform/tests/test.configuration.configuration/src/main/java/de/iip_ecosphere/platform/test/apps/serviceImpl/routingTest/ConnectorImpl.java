@@ -117,6 +117,10 @@ public class ConnectorImpl<CO, CI> extends AbstractConnector<Object, Object, CO,
      * @author Holger Eichelberger, SSE
      */
     private class ConnModelAccess extends AbstractModelAccess {
+        
+        @SuppressWarnings("unused")
+        private int intField = 0;
+        private int serNr = 0;
 
         /**
          * Creates the instance and binds the listener to the creating connector instance.
@@ -127,80 +131,85 @@ public class ConnectorImpl<CO, CI> extends AbstractConnector<Object, Object, CO,
 
         @Override
         public String topInstancesQName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "";
         }
 
         @Override
         public String getQSeparator() {
-            // TODO Auto-generated method stub
-            return null;
+            return "/";
         }
 
         @Override
         public Object call(String qName, Object... args) throws IOException {
-            // TODO Auto-generated method stub
-            return null;
+            throw new IOException("Operation " + qName + " is not known");
         }
 
         @Override
         public Object get(String qName) throws IOException {
-            // TODO Auto-generated method stub
-            return null;
+            Object result = null;
+            if ("serNr".equals(qName)) {
+                result = serNr;
+            } else if ("data".equals(qName)) {
+                result = "connData";
+            } else {
+                throw new IOException("Field " + qName + " is not known");
+            }
+            return result;
         }
 
         @Override
         public void set(String qName, Object value) throws IOException {
-            // TODO Auto-generated method stub
-            
+            if ("intField".equals(qName)) {
+                try {
+                    intField = (int) value;
+                } catch (ClassCastException e) {
+                    throw new IOException("Value for field " + qName + " is not an integer: " + value);
+                } catch (NullPointerException e) {
+                    throw new IOException("Value for field " + qName + " must not be null");
+                }
+            } else {
+                throw new IOException("Field " + qName + " is not known");
+            }
         }
 
         @Override
         public <T> T getStruct(String qName, Class<T> type) throws IOException {
-            // TODO Auto-generated method stub
-            return null;
+            throw new IOException("Struct " + qName + " is not known");
         }
 
         @Override
         public void setStruct(String qName, Object value) throws IOException {
-            // TODO Auto-generated method stub
-            
+            throw new IOException("Struct " + qName + " cannot be defined");
         }
 
         @Override
         public void registerCustomType(Class<?> cls) throws IOException {
-            // TODO Auto-generated method stub
-            
+            throw new IOException("Custom type " + cls + " cannot be defined");
         }
 
         @Override
         public void monitor(int notificationInterval, String... qNames) throws IOException {
-            // TODO Auto-generated method stub
-            
+            throw new IOException("Monitoring is not supported here");
         }
 
         @Override
         public void monitorModelChanges(int notificationInterval) throws IOException {
-            // TODO Auto-generated method stub
-            
+            throw new IOException("Monitoring is not supported here");
         }
 
         @Override
         public ModelAccess stepInto(String name) throws IOException {
-            // TODO Auto-generated method stub
-            return null;
+            return this; // no hierarchical model access
         }
 
         @Override
         public ModelAccess stepOut() {
-            // TODO Auto-generated method stub
-            return null;
+            return this; // no hierarchical model access
         }
 
         @Override
         protected ConnectorParameter getConnectorParameter() {
-            // TODO Auto-generated method stub
-            return null;
+            return ConnectorImpl.this.getConnectorParameter();
         }
     }
     

@@ -16,17 +16,21 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.ConnOut;
-import iip.datatypes.Rec1;
+import iip.datatypes.RoutingConnOut;
+import iip.datatypes.RoutingTestData;
+import iip.datatypes.RoutingTestDataImpl;
 import iip.impl.RoutingProcessorImpl;
 
 /**
- * The processor of the routing test app.
+ * The processor of the routing test app. Just merge the two input streams, the conn stream with negative 
+ * serial numbers.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class ProcessorImpl extends RoutingProcessorImpl {
 
+    private DataIngestor<RoutingTestData> routingIngestor;
+    
     /**
      * Fallback constructor.
      */
@@ -45,21 +49,28 @@ public class ProcessorImpl extends RoutingProcessorImpl {
     }
     
     @Override
-    public void processRec1(Rec1 data) {
-        // TODO Auto-generated method stub
-        
+    public void processRoutingTestData(RoutingTestData data) {
+        if (null != routingIngestor) {
+            RoutingTestData result = new RoutingTestDataImpl();
+            result.setSerNr(data.getSerNr());
+            result.setStringField(data.getStringField());
+            routingIngestor.ingest(result);
+        }
     }
 
     @Override
-    public void processConnOut(ConnOut data) {
-        // TODO Auto-generated method stub
-        
+    public void attachRoutingTestDataIngestor(DataIngestor<RoutingTestData> ingestor) {
+        this.routingIngestor = ingestor;
     }
 
     @Override
-    public void attachRec1Ingestor(DataIngestor<Rec1> ingestor) {
-        // TODO Auto-generated method stub
-        
+    public void processRoutingConnOut(RoutingConnOut data) {
+        if (null != routingIngestor) {
+            RoutingTestData result = new RoutingTestDataImpl();
+            result.setSerNr(-data.getSerNr());
+            result.setStringField(data.getData());
+            routingIngestor.ingest(result);
+        }
     }
 
 }

@@ -16,8 +16,9 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.Command;
-import iip.datatypes.Rec1;
+import iip.datatypes.RoutingCommand;
+import iip.datatypes.RoutingCommandImpl;
+import iip.datatypes.RoutingTestData;
 import iip.impl.RoutingSinkImpl;
 
 /**
@@ -27,6 +28,8 @@ import iip.impl.RoutingSinkImpl;
  */
 public class SinkImpl extends RoutingSinkImpl {
 
+    private DataIngestor<RoutingCommand> cmdIngestor;
+    
     /**
      * Fallback constructor.
      */
@@ -43,17 +46,20 @@ public class SinkImpl extends RoutingSinkImpl {
     public SinkImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
-    
+
     @Override
-    public void processRec1(Rec1 data) {
-        // TODO Auto-generated method stub
-        
+    public void processRoutingTestData(RoutingTestData data) {
+        System.out.println("Received: " + data);
+        if (data.getSerNr() > 10 && cmdIngestor != null) {
+            RoutingCommand cmd = new RoutingCommandImpl();
+            cmd.setCmd("Batch completed");
+            cmdIngestor.ingest(cmd);
+        }
     }
 
     @Override
-    public void attachCommandIngestor(DataIngestor<Command> ingestor) {
-        // TODO Auto-generated method stub
-        
+    public void attachRoutingCommandIngestor(DataIngestor<RoutingCommand> ingestor) {
+        this.cmdIngestor = ingestor;
     }
 
 }

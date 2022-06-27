@@ -14,10 +14,10 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.Command;
-import iip.datatypes.Rec1;
+import iip.datatypes.RoutingCommand;
+import iip.datatypes.RoutingTestData;
+import iip.datatypes.RoutingTestDataImpl;
 import iip.impl.MyRoutingSourceImpl;
 
 /**
@@ -26,6 +26,8 @@ import iip.impl.MyRoutingSourceImpl;
  * @author Holger Eichelberger, SSE
  */
 public class SourceImpl extends MyRoutingSourceImpl {
+    
+    private int counter = 0;
 
     /**
      * Fallback constructor.
@@ -43,17 +45,18 @@ public class SourceImpl extends MyRoutingSourceImpl {
     public SourceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
-
+    
     @Override
-    public void processCommand(Command data) {
-        // TODO Auto-generated method stub
-        
+    public RoutingTestData produceRoutingTestData() {
+        RoutingTestDataImpl result = new RoutingTestDataImpl();
+        result.setSerNr(counter);
+        result.setStringField("data");
+        return result;
     }
 
     @Override
-    public void attachRec1Ingestor(DataIngestor<Rec1> ingestor) {
-        // TODO Auto-generated method stub
-        
+    public void processRoutingCommand(RoutingCommand data) {
+        System.out.println("Source received cmd: " + data);
     }
 
 }
