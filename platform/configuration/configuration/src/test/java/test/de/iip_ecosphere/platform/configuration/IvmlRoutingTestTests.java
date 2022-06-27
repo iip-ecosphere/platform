@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2021} The original author or authors
+ * Copyright (c) {2022} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -37,8 +37,7 @@ public class IvmlRoutingTestTests extends IvmlTests {
     public void testRoutingTest() throws ExecutionException, IOException {
         File gen = new File("gen/tests/RoutingTest");
         PlatformInstantiator.instantiate(
-            genAppsNoDeps(
-                new TestConfigurer("RoutingTest", new File("src/test/easy"), gen)));
+            genApps(new TestConfigurer("RoutingTest", new File("src/test/easy"), gen)));
         assertAllFiles(gen);
     }
     

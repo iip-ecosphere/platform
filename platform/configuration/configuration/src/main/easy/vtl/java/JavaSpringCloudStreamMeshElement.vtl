@@ -1084,17 +1084,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         @EnableScheduling'
     }
     
-    def genConstructorDoc() {
+    def genConstructorDoc(String familyInterface) {
         if (familyInterface <> "") {
-            '/**
-            * Creates an instance.
-            */'
-         } else {
             '/**
             * Creates an instance.
             *
             * @param streamBridge the stream bridge
             * @param metrics the metrics provider
+            */'
+         } else {
+            '/**
+            * Creates an instance.
             */'
          }
     }
@@ -1179,7 +1179,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
             ${generateReceptionCallback(elt, impl)|e}
         
-             ${genConstructorDoc()}
+             ${genConstructorDoc(familyInterface)}
             public ${clsName}(${constructorParams}) {
                 ${constructorInit|e}
                 ${initialService(elt, impl)}

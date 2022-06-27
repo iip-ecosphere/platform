@@ -128,10 +128,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     for (MeshElement no : nodes) {
                         String clsName = asTypeName(no.name);
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
-                        vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
-                            "${javaNodesSrc}/${clsName}.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                            familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        // connector gen references connector impl, in case of non-specific connector may not yet be there
+                        Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
+                        if (genElt) {
+                            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
+                                "${javaNodesSrc}/${clsName}.java", 
+                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        }
                         if (not(noDeps)) {
                             vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
                                 "${javaNodesTestSrc}/${clsName}Test.java", 
