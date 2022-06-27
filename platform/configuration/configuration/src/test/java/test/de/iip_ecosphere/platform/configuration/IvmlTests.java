@@ -381,5 +381,15 @@ public abstract class IvmlTests {
     public static InstantiationConfigurer genApps(InstantiationConfigurer cfg) {
         return cfg.setStartRuleName("generateApps");
     }
-    
+
+    /**
+     * Helper method to configure for partial instantiation, i.e., apps without dependencies and no platform components.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer genAppsNoDeps(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateAppsNoDeps");
+    }
+
 }

@@ -455,6 +455,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         
             @Override
             public void received(${coType} data) {
+                //streamBridge.send("${methodSuffix}", data);
                 Transport.send(c -> c.asyncSend("${suffix}", data), "${conn.id}");
             }
         

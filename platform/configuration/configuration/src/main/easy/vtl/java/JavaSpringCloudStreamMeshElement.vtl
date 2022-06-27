@@ -187,6 +187,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
          if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
+             setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
+             for (IOType t: backward(base.output)) {
+                 outBack.add(t.type);
+             }
              for (String methodSuffix : ingestors.getKeys()) {
                  // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
                  if (asyncIngestors.containsKey(methodSuffix)) {
@@ -206,14 +210,16 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                             if (not(done.includes(target))) {
                                 sequenceOf(IOType) types;
                                 for (IOType t : backward(target.impl.input)) {
-                                    type = toTypeName(t.type);
-                                    String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
-                                    if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
-                                        conn = "process" + conn.substring(6);
-                                    }
-                                    if (not(conns.includes(conn)) and conn.startsWith("process")) {
-                                        result = result + '${generateIngestor(base, methodSuffix, conn, type, "in")}';
-                                        conns.add(conn);
+                                    if (outBack.includes(t.type)) {
+                                        type = toTypeName(t.type);
+                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+                                        if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
+                                            conn = "process" + conn.substring(6);
+                                        }
+                                        if (not(conns.includes(conn)) and conn.startsWith("process")) {
+                                            result = result + '${generateIngestor(base, methodSuffix, conn, type, "in")}';
+                                            conns.add(conn);
+                                        }
                                     }
                                 }
                             }
@@ -481,6 +487,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         if (service.class.length() > 0) {
             serviceVars.add("service");
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
+            '${generateParameterInit(service)|e}'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -834,7 +841,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     // -------------------- Python --------------------------
 
     def initialService(MeshElement elt, PythonService service) {
-        '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}'
+        '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}\n'
         // no mapServices here as Python may take long and block the constructor -> initIngestors
         serviceVars.add("service");
         for (IOType in: service.input) {
@@ -1077,6 +1084,21 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         @EnableScheduling'
     }
     
+    def genConstructorDoc() {
+        if (familyInterface <> "") {
+            '/**
+            * Creates an instance.
+            */'
+         } else {
+            '/**
+            * Creates an instance.
+            *
+            * @param streamBridge the stream bridge
+            * @param metrics the metrics provider
+            */'
+         }
+    }
+    
     // --------------------- main ---------------------------
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
@@ -1092,14 +1114,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ServiceBase impl = elt.impl;
         String clsName = getClsName(elt);
         String constructorParams = "";
-        String constructorParamsDoc = "";
         String constructorInit = "";
         if (familyInterface <> "") {
             implements = " implements ${familyInterface}";
             impl = familyMember;
             clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
             constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
-            constructorParamsDoc = "@param streamBridge the stream bridge\n    @param metrics the metrics provider\n    ";
             constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
         String implMonId = impl.id.toIdentifier();
@@ -1159,10 +1179,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
             ${generateReceptionCallback(elt, impl)|e}
         
-            /**
-             * Creates an instance.
-             * ${constructorParamsDoc}
-             */
+             ${genConstructorDoc()}
             public ${clsName}(${constructorParams}) {
                 ${constructorInit|e}
                 ${initialService(elt, impl)}

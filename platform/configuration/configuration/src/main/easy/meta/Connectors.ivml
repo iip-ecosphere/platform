@@ -173,8 +173,8 @@ project Connectors {
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
 
-       output.size() < 2;
-       input.size() < 2;
+       fwdTypes(output).size() < 2;
+       fwdTypes(input).size() < 2;
        kind == ServiceKind.SOURCE_SERVICE;
        deployable == true;
    }

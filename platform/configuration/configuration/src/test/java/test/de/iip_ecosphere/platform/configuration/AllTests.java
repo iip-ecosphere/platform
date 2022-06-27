@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
     IvmlSimpleMesh3Tests.class,
     IvmlSerializerConfig1Tests.class,
     IvmlSerializerConfig1OldTests.class,
+    IvmlRoutingTestTests.class,
     IvmlContainerTests.class,
     StorageFactoryTest.class,
 })

@@ -1,0 +1,15 @@
+project CommonSetupNoMonUi {
+
+    import CommonSetup;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        platformMonitoring;
+        managementUi;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
