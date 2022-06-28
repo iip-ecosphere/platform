@@ -28,12 +28,24 @@ import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner
  *
  */
 public class QRCodeService {
-    // will probably not work on windows!
+    //Shall set the result folder appropriate for each operating system.
+    static {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            resultScript = "%temp%/qr.res";
+        } else {
+            resultScript = "/tmp/qr.res";
+        }
+    }
+    
+    private static String resultScript;
+    
+    // will probably not work on windows!(Set files location for windows, might be changed)
     private ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
-         "python-qr.zip", "/tmp/qr.res");
+            "python-qr.zip", resultScript);
     
     /**
-     * Takes a base64 encoded byte-array of an image in form of a String and turns it into a BufferedImage for further processing.
+     * Takes a base64 encoded byte-array of an image in form of a String and turns it into a BufferedImage for 
+     * further processing.
      * @param imageString The image to be converted.
      * @return The image extracted from the String.
      * @throws IOException If there is an error while converting the byte-array string to an image.
@@ -72,7 +84,7 @@ public class QRCodeService {
      * @param bufferedImage The image to be converted.
      * @return The original image as gray scale.
      */
-    public BufferedImage grayScaleImage (BufferedImage bufferedImage) {
+    public BufferedImage grayScaleImage(BufferedImage bufferedImage) {
         
         ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         op.filter(bufferedImage, bufferedImage);
@@ -84,8 +96,9 @@ public class QRCodeService {
      * @param b64Image The image.
      * @return The contents of the qr code as a String.
      */
-    public String pythonFallbackQRDetection (String b64Image) {
+    public String pythonFallbackQRDetection(String b64Image) {
     // Fallback to python, write to filer
+        System.out.println(qrScriptOwner.getResultFile());
         AtomicReference<String> resultRef = new AtomicReference<>("");
         try {
             System.out.println("TRYING QR");
