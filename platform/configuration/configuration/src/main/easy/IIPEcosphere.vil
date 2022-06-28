@@ -128,14 +128,20 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     for (MeshElement no : nodes) {
                         String clsName = asTypeName(no.name);
                         generateServiceElements(appRoot, config, artifacts, no, no.impl);
-                        vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
-                            "${javaNodesSrc}/${clsName}.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                            familyInterface="", familyMember=no.impl, nodes=nodes2);
-                        vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
-                            "${javaNodesTestSrc}/${clsName}Test.java", 
-                            elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                            familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        // connector gen references connector impl, in case of non-specific connector may not yet be there
+                        Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
+                        if (genElt) {
+                            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
+                                "${javaNodesSrc}/${clsName}.java", 
+                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        }
+                        if (not(noDeps)) {
+                            vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
+                                "${javaNodesTestSrc}/${clsName}Test.java", 
+                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        }
                         setOf(Service) mbs = {};
                         generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
                             a, artifacts, noDeps, mbs, nodes2);
@@ -335,8 +341,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
-            vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
-                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
+            if (not(noDeps)) {
+                vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
+                     elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
+            }
             mbs.add(m);
         }
         if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
@@ -489,6 +497,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path javaServiceImplSrc = "${javaSrc}/${toPath(javaImplPackage)}";
         vilTemplateProcessor("JavaServiceInterface", config, "${javaInterfacesSrc}/${clsName}Interface.java", service=service, pkg=javaInterfacesPackage);
         vilTemplateProcessor("JavaServiceBaseImpl", config, "${javaServiceImplSrc}/${clsName}Impl.java", service=service, pkg=javaImplPackage);
+    }
+
+    generateServiceInterfaces(Path appRoot, Configuration config, Connector connector) = {
+        // do nothing, connectors have different interfaces
     }
     
     generateServiceInterfaces(Path appRoot, Configuration config, CompleteService service) = {

@@ -16,9 +16,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
 
     def genImports(MeshElement elt, Connector connector) {
+        String impConnector = "";
+        if (connector.class.length() > 0) {
+            impConnector = "import ${connector.class};";
+        }
         'import java.util.concurrent.atomic.*;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-        import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
+        ${impConnector|e}
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;'
     }
     

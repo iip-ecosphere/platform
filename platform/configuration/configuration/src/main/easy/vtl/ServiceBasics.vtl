@@ -37,6 +37,12 @@ template ServiceBasics(Configuration config, FileArtifact target) {
                 IOType out = pairs.get(in);
                 '${produceSyncProcessorBody(out, in)}'
             }
+            sequenceOf(IOType) rcv = backward(service.input);
+            if (rcv.size() > 0) { // EASY bug
+                for (IOType in : rcv) {
+                    '${produceAsyncProcessorBody(in)}'
+                }
+            }
         }
     }
     

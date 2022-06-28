@@ -23,6 +23,11 @@
      <version>${project.version}</version>
     </dependency>
     <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
      <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
      <artifactId>apps.AppInterfacesSimpleMesh</artifactId>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -43,6 +48,12 @@
     <dependency>
      <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
      <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesRoutingTest</artifactId>
      <groupId>de.iip-ecosphere.platform</groupId>
      <version>${project.version}</version>
     </dependency>    

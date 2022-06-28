@@ -1,0 +1,190 @@
+project RoutingTest {
+
+    import CommonSetupNoMonUi;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ data types ------------------
+    
+    RecordType rec1 = {
+        name = "RoutingTestData",
+        fields = {
+            Field {
+                name = "serNr",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    RecordType connIn = {
+        name = "RoutingConnIn",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }
+        }
+    };
+
+    RecordType connOut = {
+        name = "RoutingConnOut",
+        fields = {
+            Field {
+                name = "serNr",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "data",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    RecordType command = {
+        name = "RoutingCommand",
+        fields = {
+            Field {
+                name = "cmd",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+        
+    Service mySourceService = JavaService {
+        id = "myRoutingSource",
+        name = "myRoutingSource",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.SourceImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        input = {{type=refBy(command), forward=false}},
+        output = {{type=refBy(rec1)}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    // own connector for testing
+    Connector myConnector = {
+        id = "myRoutingConnector",
+        name = "myRoutingConnector",
+        description = "",
+        ver = "0.1.0",
+        port = 1234, 
+        samplingPeriod = 500,
+
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorImpl",
+        artifact ="de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        nameplateInfo = {
+           manufacturerProductDesignation = "Routing test connector@en",
+           manufacturer = refBy(manufacturer_sse)
+        },
+        
+        input = {{type=refBy(connIn)}}, // TODO , {type=refBy(command), forward=false}
+        output = {{type=refBy(connOut)}},
+        inInterface = refBy(connIn),
+        outInterface = refBy(connOut),
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service myProcessorService = JavaService {
+        id = "RoutingProcessor",
+        name = "RoutingProcessor",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(connOut)}}, // , {type=refBy(command), forward=false}
+        output = {{type=refBy(rec1)}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service mySinkService = JavaService {
+        id = "RoutingSink",
+        name = "RoutingSink",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.SinkImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(command), forward=false}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "RoutingTestApp",
+        name = "Routing Test App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    ServiceMesh myMesh = {
+        description = "routing test mesh",
+        sources = {refBy(mySource), refBy(myConn)}
+    };
+    
+    MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyProcessor)}
+    };
+
+    MeshConnector myConnMySourceMyProcessor = {
+        name = "Source->Processor",
+        next = refBy(myProcessor)
+    };
+    
+    MeshSource myConn = {
+        impl = refBy(myConnector),
+        next = {refBy(myConnMyConnMyProcessor)}
+    };
+    
+    MeshConnector myConnMyConnMyProcessor = {
+        name = "Conn->Processor",
+        next = refBy(myProcessor)
+    };
+
+    MeshProcessor myProcessor = {
+        impl = refBy(myProcessorService),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+    
+    MeshConnector myConnMyProcessorMySink = {
+        name = "Processor->Sink",
+        next = refBy(mySink)
+    };
+
+    MeshSink mySink = {
+        impl = refBy(mySinkService)
+    };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesRoutingTest:" + iipVer; // for testing all-in-one
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        sharedInterfaces;
+        sharedArtifact;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
