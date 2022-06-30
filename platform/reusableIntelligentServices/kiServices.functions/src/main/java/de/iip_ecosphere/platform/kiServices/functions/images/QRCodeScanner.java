@@ -1,16 +1,10 @@
-package de.iip_ecosphere.platform.kiServices.functions;
+package de.iip_ecosphere.platform.kiServices.functions.images;
 
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
@@ -27,7 +21,7 @@ import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner
  * @author Weber
  *
  */
-public class QRCodeService {
+public class QRCodeScanner {
     //Shall set the result folder appropriate for each operating system.
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
@@ -40,31 +34,30 @@ public class QRCodeService {
     private static String resultScript;
     
     // will probably not work on windows!(Set files location for windows, might be changed)
-    private ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
+    private static ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
             "python-qr.zip", resultScript);
     
     /**
-     * Takes a base64 encoded byte-array of an image in form of a String and turns it into a BufferedImage for 
-     * further processing.
-     * @param imageString The image to be converted.
-     * @return The image extracted from the String.
-     * @throws IOException If there is an error while converting the byte-array string to an image.
+     * Enables the QR code detection for base64 encoded images.
+     * @param b64image Image as base 64 encoded string.
+     * @return the result of the QR scan.
+     * @throws IOException When the conversion from String to image fails.
      */
-    public static BufferedImage base64StringToBufferdImage(String imageString) throws IOException {
-        byte[] bytes = Base64.getDecoder().decode(imageString);
-        BufferedImage imagetest = null;
-        imagetest = ImageIO.read(new ByteArrayInputStream(bytes));
-        
-        return imagetest;
-    }
+    public static String readQRCode(String b64image) throws IOException {
+        BufferedImage image = null;
+        image = ImageEncodingDecoding.base64StringToBufferdImage(b64image);
 
+        String result = readQRCode(image);
+        return result;
+    }
+    
     /**
      * Detects a QR code on bufferdImages.
      * Source: https://simplesolution.dev/java-read-qr-code-from-image-file-base64-zxing/
      * @param bufferedImage a BufferdImage to read a QR code from.
      * @return The content of the QR code as a String. If nothing could be detected the String will be empty.
      */
-    public String readQRCode(BufferedImage bufferedImage)  {
+    public static String readQRCode(BufferedImage bufferedImage)  {
         String encodedContent = null;
         try {
             BufferedImageLuminanceSource bufferedImageLuminanceSource = new BufferedImageLuminanceSource(bufferedImage);
@@ -79,24 +72,13 @@ public class QRCodeService {
         }
         return encodedContent;
     }
-    /**
-     * Gray scales a BufferedImage to potentially improve QR scan quality.
-     * @param bufferedImage The image to be converted.
-     * @return The original image as gray scale.
-     */
-    public BufferedImage grayScaleImage(BufferedImage bufferedImage) {
-        
-        ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-        op.filter(bufferedImage, bufferedImage);
-        
-        return bufferedImage;
-    }
+
     /**
      * Call for python fallback script. Shall retry the detection!
      * @param b64Image The image.
-     * @return The contents of the qr code as a String.
+     * @return The contents of the QR code as a String.
      */
-    public String pythonFallbackQRDetection(String b64Image) {
+    public static String pythonFallbackQRDetection(String b64Image) {
     // Fallback to python, write to filer
         System.out.println(qrScriptOwner.getResultFile());
         AtomicReference<String> resultRef = new AtomicReference<>("");
