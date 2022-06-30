@@ -110,7 +110,7 @@ public class StatusMessage {
     /**
      * Returns the primary id of the component.
      * 
-     * @return the primary id, may be equal to {@link #getDeviceId()} if {@link #getType()} is 
+     * @return the primary id, may be equal to {@link #getDeviceId()} if 
      *    {@link #getComponentType()} is {@link ComponentTypes#DEVICE}.
      */
     public String getId() {
@@ -129,7 +129,7 @@ public class StatusMessage {
     /**
      * Returns the device (context) id of the component.
      * 
-     * @return the device id, shall be equal to {@link #getId()} if {@link #getType()} is {@link #getComponentType()} 
+     * @return the device id, shall be equal to {@link #getId()} if {@link #getComponentType()} 
      *    is {@link ComponentTypes#DEVICE}.
      */
     public String getDeviceId() {
