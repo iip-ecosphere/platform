@@ -61,5 +61,21 @@ template Basics(Configuration config, FileArtifact target) {
             "";
         }
     }
+
+    def String appendWithNewline(String text1, String text2) {
+        appendWithSeparator(text1, "\n", text2);
+    }
+
+    def String appendWithSemicolon(String text1, String text2) {
+        appendWithSeparator(text1, ";", text2);
+    }
+
+    def String appendWithSeparator(String text1, String sep, String text2) {
+        if (text1.length() > 0) {
+            text1 + sep + text2;
+        } else {
+            text2;
+        }
+    }
 	
 }

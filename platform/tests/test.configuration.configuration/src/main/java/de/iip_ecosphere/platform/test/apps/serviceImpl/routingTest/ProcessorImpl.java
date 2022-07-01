@@ -65,11 +65,13 @@ public class ProcessorImpl extends RoutingProcessorImpl {
 
     @Override
     public void processRoutingConnOut(RoutingConnOut data) {
+        System.out.println("Processor received: " + data);
         if (null != routingIngestor) {
             RoutingTestData result = new RoutingTestDataImpl();
             result.setSerNr(-data.getSerNr());
             result.setStringField(data.getData());
             routingIngestor.ingest(result);
+            System.out.println("Processor sent: " + result);
         }
     }
 

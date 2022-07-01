@@ -56,6 +56,7 @@ public class AmqpConfiguration extends BasicConfiguration {
      * Returns the user name.
      * 
      * @return the user name (empty by default)
+     * @deprecated #22, use {@link #getAuthenticationKey()} instead
      */
     public String getUser() {
         return user;
@@ -65,6 +66,7 @@ public class AmqpConfiguration extends BasicConfiguration {
      * Returns the password.
      * 
      * @return the password (empty by default)
+     * @deprecated #22, use {@link #getAuthenticationKey()} instead
      */
     public String getPassword() {
         return password;
@@ -76,6 +78,7 @@ public class AmqpConfiguration extends BasicConfiguration {
      * Changes the user name. [required by Spring]
      * 
      * @param user the user name
+     * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
      */
     public void setUser(String user) {
         this.user = user;
@@ -85,6 +88,7 @@ public class AmqpConfiguration extends BasicConfiguration {
      * Changes the password. [required by Spring]
      * 
      * @param password the password
+     * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
      */
     public void setPassword(String password) {
         this.password = password;

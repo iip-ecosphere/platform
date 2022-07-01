@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    AbstractTransportConnectorTest.class,
     TypeTranslatorsTest.class,
     TraceRecordTest.class,
     TransportParameterTest.class,

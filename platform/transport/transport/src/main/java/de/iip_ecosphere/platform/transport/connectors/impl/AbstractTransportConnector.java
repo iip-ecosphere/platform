@@ -20,6 +20,8 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -36,6 +38,84 @@ public abstract class AbstractTransportConnector implements TransportConnector {
 
     private Map<String, List<ReceptionCallback<?>>> callbacks = Collections.synchronizedMap(new HashMap<>());
     private TransportParameter params;
+
+    /**
+     * Tries to resolve {@link TransportParameter#getKeystorePassword()} as key in {@link IdentityStore} using
+     * token data of a username token if found or {@link TransportParameter#getKeystorePassword()} as fallback.
+     * 
+     * @param params the transport parameter to return the keystore password for
+     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
+     */
+    public static String getKeystorePassword(TransportParameter params) {
+        return getKeystorePassword(params.getKeystorePassword());
+    }
+
+    /**
+     * Tries to resolve {@code keystorePassword} as key in {@link IdentityStore} using
+     * token data of a username token if found or {@code keystorePassword} as fallback.
+     * 
+     * @param keystorePassword the transport parameter to return the keystore password for
+     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
+     */
+    public static String getKeystorePassword(String keystorePassword) {
+        String keyPasswd = keystorePassword;
+        IdentityToken tok = IdentityStore.getInstance().getToken(keystorePassword);
+        if (tok != null) {
+            if (IdentityToken.TokenType.USERNAME == tok.getType()) {
+                keyPasswd = tok.getTokenDataAsString();
+            } else {
+                LoggerFactory.getLogger(AbstractTransportConnector.class).info("Cannot handle identity token type {}. "
+                    + "Using plaintext keystore password as fallback.", tok.getType());
+            }
+        } 
+        return keyPasswd;
+    }
+
+    /**
+     * Consumes token authentication data.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface AuthenticationConsumer {
+        
+        /**
+         * Accepts a user name and a password.
+         * 
+         * @param user the user name
+         * @param password the password
+         * @param pwdEncAlg the name of the password encryption algorithm, e.g., UTF-8 for plaintext
+         * @return {@code true} for applied, {@code false} for ignored (shall be logged)
+         */
+        public boolean accept(String user, String password, String pwdEncAlg);
+        
+    }
+
+    /**
+     * Tries to apply the given authentication key to the given consumer.
+     * 
+     * @param authenticationKey the authentication key
+     * @param consumer the consumer
+     * @return {@code true} for applied, {@code false} for ignored/failed
+     */
+    public static boolean applyAuthenticationKey(String authenticationKey, AuthenticationConsumer consumer) {
+        boolean authDone = false;
+        if (null != authenticationKey) {
+            IdentityToken tok = IdentityStore.getInstance().getToken(authenticationKey);
+            if (tok != null) {
+                if (IdentityToken.TokenType.USERNAME == tok.getType()) {
+                    authDone = consumer.accept(tok.getUserName(), tok.getTokenDataAsString(), 
+                        tok.getTokenEncryptionAlgorithm());
+                } else {
+                    LoggerFactory.getLogger(AbstractTransportConnector.class).info(
+                        "Cannot handle identity token type {}. Trying user/password.", tok.getType());
+                }
+            } else {
+                LoggerFactory.getLogger(AbstractTransportConnector.class).info(
+                    "Authentication key {} not found. Trying user/password.", authenticationKey);
+            }
+        }
+        return authDone;
+    }
 
     @Override
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {

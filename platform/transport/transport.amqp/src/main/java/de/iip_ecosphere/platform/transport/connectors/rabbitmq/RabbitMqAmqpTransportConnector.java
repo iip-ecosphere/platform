@@ -119,6 +119,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         return streamName;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void connect(TransportParameter params) throws IOException {
         super.connect(params);
@@ -126,13 +127,18 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         factory.setHost(params.getHost());
         factory.setPort(params.getPort());
         factory.setAutomaticRecoveryEnabled(true);
-        if (null != params.getUser() && null != params.getPassword()) {
+        boolean authDone = applyAuthenticationKey(params.getAuthenticationKey(), (user, pwd, enc) -> {
+            factory.setUsername(user);
+            factory.setPassword(pwd);
+            return true;
+        });
+        if (!authDone && null != params.getUser() && null != params.getPassword()) {
             factory.setUsername(params.getUser());
             factory.setPassword(params.getPassword());
         }
         if (null != params.getKeystore()) {
             try {                
-                factory.useSslProtocol(SslUtils.createTlsContext(params.getKeystore(), params.getKeystorePassword(), 
+                factory.useSslProtocol(SslUtils.createTlsContext(params.getKeystore(), getKeystorePassword(params), 
                     params.getKeyAlias()));
                 tlsEnabled = true;
             } catch (IOException e) {

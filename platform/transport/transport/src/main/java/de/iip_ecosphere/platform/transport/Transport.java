@@ -256,7 +256,7 @@ public class Transport {
      * Returns the transport connector.
      * 
      * @return the transport connector, may be <b>null</b>
-     * @see #createConnector(TransportSetup)
+     * @see #createConnector()
      */
     public static TransportConnector getConnector() {
         return connector;

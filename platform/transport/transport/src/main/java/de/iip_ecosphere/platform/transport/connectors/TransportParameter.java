@@ -13,6 +13,7 @@ package de.iip_ecosphere.platform.transport.connectors;
 import java.io.File;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
@@ -33,6 +34,7 @@ public class TransportParameter {
     private String keyPassword;
     private String keyAlias;
     private boolean hostnameVerification = false;
+    private String authenticationKey; // will replace user/password #22
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
     private MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
@@ -158,6 +160,7 @@ public class TransportParameter {
          * @param user the user name
          * @param password the password
          * @return <b>this</b>
+         * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
          */
         public TransportParameterBuilder setUser(String user, String password) {
             instance.user = user;
@@ -171,7 +174,9 @@ public class TransportParameter {
          * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
          *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
          *   implementation, e.g., PKCS12 may not work with all forms
-         * @param password the TLS keystore, may be <b>null</b> for none
+         * @param password the TLS keystore, may be <b>null</b> for none; the transport connector shall try a resolution
+         *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
+         *   fallback
          * @return <b>this</b>
          */
         public TransportParameterBuilder setKeystore(File keystore, String password) {
@@ -188,6 +193,17 @@ public class TransportParameter {
          */
         public TransportParameterBuilder setKeyAlias(String alias) {
             instance.keyAlias = alias;
+            return this;
+        }
+
+        /**
+         * Defines the {@link IdentityStore} key for the authentication, usually a password token.
+         * 
+         * @param authenticationKey the identity store key, may be empty or <b>null</b>
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setAuthenticationKey(String authenticationKey) {
+            instance.authenticationKey = authenticationKey;
             return this;
         }
         
@@ -309,6 +325,7 @@ public class TransportParameter {
      * Returns the password. [preliminary]
      * 
      * @return the password (may be <b>null</b>, to be ignored then)
+     * @deprecated #22, use {@link #getAuthenticationKey()} instead
      */
     public String getPassword() {
         return password;
@@ -318,6 +335,7 @@ public class TransportParameter {
      * Returns the user name. [preliminary]
      * 
      * @return the user name (may be <b>null</b>, to be ignored then)
+     * @deprecated #22, use {@link #getAuthenticationKey()} instead
      */
     public String getUser() {
         return user;
@@ -336,7 +354,9 @@ public class TransportParameter {
     /**
      * Returns the password for the optional TLS keystore.
      * 
-     * @return the TLS keystore, may be <b>null</b> for none
+     * @return the TLS keystore password, may be <b>null</b> for none; the transport connector shall try a resolution
+     *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
+     *   fallback
      */
     public String getKeystorePassword() {
         return keyPassword;
@@ -349,6 +369,15 @@ public class TransportParameter {
      */
     public String getKeyAlias() {
         return keyAlias;
+    }
+    
+    /**
+     * Returns the {@link IdentityStore} key for the authentication, usually a password token.
+     * 
+     * @return the identity store key, may be empty or <b>null</b>
+     */
+    public String getAuthenticationKey() {
+        return authenticationKey;
     }
     
     /**

@@ -49,8 +49,9 @@ public class SourceImpl extends MyRoutingSourceImpl {
     @Override
     public RoutingTestData produceRoutingTestData() {
         RoutingTestDataImpl result = new RoutingTestDataImpl();
-        result.setSerNr(counter);
+        result.setSerNr(counter++);
         result.setStringField("data");
+        System.out.println("Input: " + result);
         return result;
     }
 

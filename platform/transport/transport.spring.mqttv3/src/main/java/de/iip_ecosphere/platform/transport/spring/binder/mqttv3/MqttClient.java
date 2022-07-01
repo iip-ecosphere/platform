@@ -171,7 +171,8 @@ public class MqttClient {
                     try {
                         connOpts.setHttpsHostnameVerificationEnabled(config.getHostnameVerification());
                         connOpts.setSocketFactory(SslUtils.createTlsContext(config.getKeystore(), 
-                            config.getKeyPassword(), config.getKeyAlias()).getSocketFactory());
+                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword()), 
+                            config.getKeyAlias()).getSocketFactory());
                     } catch (IOException e) {
                         LOGGER.error("TLS setup failed " + e.getMessage() + ". Trying plaintext.");
                     }

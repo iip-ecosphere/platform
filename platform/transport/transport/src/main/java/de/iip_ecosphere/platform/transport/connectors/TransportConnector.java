@@ -49,7 +49,7 @@ public interface TransportConnector {
 
     /**
      * Attaches a reception {@code callback} to {@code stream}. The {@code callback}
-     * is called upon a reception. Implicitly subscribes to {@code channel].
+     * is called upon a reception. Implicitly subscribes to {@code channel}.
      * 
      * @param stream   the stream to attach the reception to
      * @param callback the callback to attach

@@ -49,11 +49,12 @@ public class SinkImpl extends RoutingSinkImpl {
 
     @Override
     public void processRoutingTestData(RoutingTestData data) {
-        System.out.println("Received: " + data);
-        if (data.getSerNr() > 10 && cmdIngestor != null) {
+        System.out.println("RECEIVED: " + data);
+        if (data.getSerNr() % 10 == 0 && cmdIngestor != null) {
             RoutingCommand cmd = new RoutingCommandImpl();
             cmd.setCmd("Batch completed");
             cmdIngestor.ingest(cmd);
+            System.out.println("Sending command: " + cmd);
         }
     }
 

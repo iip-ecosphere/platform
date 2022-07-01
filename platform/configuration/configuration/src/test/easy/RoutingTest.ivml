@@ -65,9 +65,7 @@ project RoutingTest {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         input = {{type=refBy(command), forward=false}},
-        output = {{type=refBy(rec1)}},
-        traceRcv = TraceKind::TRACE,
-        traceSent = TraceKind::TRACE
+        output = {{type=refBy(rec1)}}
     };
     
     // own connector for testing
@@ -89,9 +87,7 @@ project RoutingTest {
         input = {{type=refBy(connIn)}}, // TODO , {type=refBy(command), forward=false}
         output = {{type=refBy(connOut)}},
         inInterface = refBy(connIn),
-        outInterface = refBy(connOut),
-        traceRcv = TraceKind::TRACE,
-        traceSent = TraceKind::TRACE
+        outInterface = refBy(connOut)
     };
     
     Service myProcessorService = JavaService {
@@ -104,9 +100,7 @@ project RoutingTest {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}, {type=refBy(connOut)}}, // , {type=refBy(command), forward=false}
-        output = {{type=refBy(rec1)}},
-        traceRcv = TraceKind::TRACE,
-        traceSent = TraceKind::TRACE
+        output = {{type=refBy(rec1)}}
     };
     
     Service mySinkService = JavaService {
@@ -119,9 +113,7 @@ project RoutingTest {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(command), forward=false}},
-        traceRcv = TraceKind::TRACE,
-        traceSent = TraceKind::TRACE
+        output = {{type=refBy(command), forward=false}}
     };
 
     // ------------ application and service nets ------------------
