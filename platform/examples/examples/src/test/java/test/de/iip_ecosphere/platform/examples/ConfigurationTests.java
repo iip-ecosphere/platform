@@ -138,6 +138,7 @@ public class ConfigurationTests {
             assertContains(s, "Processor received: RoutingConnOutImpl["); // ConnOut in processor
             assertContains(s, "Processor sent: RoutingTestDataImpl["); // TestData in processor
             assertContains(s, "Source received cmd: RoutingCommandImpl[cmd=Batch completed]"); // Cmd back in source
+            assertContains(s, "Processor received cmd: RoutingCommandImpl[cmd=Batch completed]"); // Cmd back in proc.
         });
     }
 
