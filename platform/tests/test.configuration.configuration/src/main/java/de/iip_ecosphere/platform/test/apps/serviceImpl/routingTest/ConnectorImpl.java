@@ -148,7 +148,7 @@ public class ConnectorImpl<CO, CI> extends AbstractConnector<Object, Object, CO,
         public Object get(String qName) throws IOException {
             Object result = null;
             if ("serNr".equals(qName)) {
-                result = serNr;
+                result = serNr++;
             } else if ("data".equals(qName)) {
                 result = "connData";
             } else {
