@@ -110,7 +110,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
                 try {
                     connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
                     connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                        params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
+                        getKeystorePassword(params), params.getKeyAlias()).getSocketFactory());
                     tlsEnabled = true;
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 

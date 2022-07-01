@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.transport.spring;
 
 import java.io.File;
 
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 
@@ -30,6 +31,7 @@ public class BasicConfiguration {
     private String keyPassword;
     private String keyAlias;
     private boolean hostnameVerification = false;
+    private String authenticationKey;
 
     /**
      * Returns the broker host name.
@@ -62,7 +64,9 @@ public class BasicConfiguration {
     /**
      * Returns the password for the optional TLS keystore.
      * 
-     * @return the TLS keystore, may be <b>null</b> for none
+     * @return the TLS keystore password, may be <b>null</b> for none; the binder shall try a resolution
+     *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
+     *   fallback
      */
     public String getKeyPassword() {
         return keyPassword;
@@ -84,6 +88,15 @@ public class BasicConfiguration {
      */
     public boolean getHostnameVerification() {
         return hostnameVerification;
+    }
+
+    /**
+     * Returns the {@link IdentityStore} key for the authentication, usually a password token.
+     * 
+     * @return the identity store key, may be empty or <b>null</b>
+     */
+    public String getAuthenticationKey() {
+        return authenticationKey;
     }
 
     // setters required for @ConfigurationProperties
@@ -119,7 +132,9 @@ public class BasicConfiguration {
     /**
      * Returns the password for the optional TLS keystore.
      * 
-     * @param keyPassword the TLS keystore, may be <b>null</b> for none
+     * @param keyPassword the TLS keystore password, may be <b>null</b> for none; the binder shall try a resolution
+     *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
+     *   fallback
      */
     public void setKeyPassword(String keyPassword) {
         this.keyPassword = keyPassword;
@@ -143,6 +158,15 @@ public class BasicConfiguration {
         this.hostnameVerification = hostnameVerification;
     }
 
+    /**
+     * Returns the {@link IdentityStore} key for the authentication, usually a password token. [requred by SnakeYaml]
+     * 
+     * @param authenticationKey the identity store key, may be empty or <b>null</b>
+     */
+    public void setAuthenticationKey(String authenticationKey) {
+        this.authenticationKey = authenticationKey;
+    }
+    
     // converter
 
     /**
