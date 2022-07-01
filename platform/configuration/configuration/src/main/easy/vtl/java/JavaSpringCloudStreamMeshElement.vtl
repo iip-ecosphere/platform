@@ -14,6 +14,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     mapOf(IOType, IOType) pairs = {};
     String typeAdd = "";
     setOf(String) serviceVars = {};
+    String mainClsName = "";
 
     def initPairs(MeshElement elt) {
     }
@@ -146,9 +147,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                 }
             }
             '{
-                ${mon|e}
-                ${trace|e} 
-                ${expr}; 
+                    ${mon|e}
+                    ${trace|e} 
+                    ${expr}; 
             }'
         } else {
             '${expr}'
@@ -234,15 +235,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
          for (MeshElement n: nodes) {
              if (n != elt) {
                  for (IOType out : n.impl.output) {
-println("CHECK " + n.impl.id + " <-> " + base.id);             
                      for (IOType in: base.input) {
-println(" -> " + out.type.name+" "+in.type.name);                 
                          // if types are equal and both are backward, n is async or n is a connector sending to elt
                          if (in.type == out.type and (
                              (not(in.forward) and not(out.forward)) or // anyway ingest/transport
                              (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
                              (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
-println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous)+" "+(not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)));                 
 
                              result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
                              first = false;
@@ -320,16 +318,33 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
     }
 
     def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        String expr = '${fallbackToNull(src, "service.send(data)", false)}';
+        String sel = insertSelector(conn, type, "data");
+        String expr;
+        String methodName = methodSuffixWithServiceId;
+        boolean forward = true;
+        sequenceOf(IOType) tps = conn.input->select(t|toTypeName(t) == type);
+        if (tps.size() > 0) {
+            IOType t = tps[0];
+            forward = t.forward;
+        }
+        if (forward) {
+            expr = '${fallbackToNull(src, "${sel}.send(data)", false)}';
+        } else {
+            expr = sel;
+            if (methodName.startsWith("create")) {
+                methodName = "process" + methodName.substring(6);
+            }
+        }
         '/**
         * Called when data arrived that shall be passed on to the connector.
         *
         * @return the data consumer functor
         */
         ${nodeAnnotation("@Bean")|e}
-        public Consumer<${asTypeName(type)}> ${methodSuffixWithServiceId}() {
+        public Consumer<${asTypeName(type)}> ${methodName}() {
             return data -> ${genRcvProbe(conn, expr, type, "data")};
-        }'    
+        }
+        '
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
@@ -747,10 +762,14 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
         'return data -> ${svc}.${methodName}().accept(data);'
     }
 
+    // dispatch basis
+    // inserts a selector/event handler instead of a direct call to "service"
+    // prerequisite: the call takes "service" as parameter and returns "service"
     def insertSelector(Service family, String type, String dataVar) {
         "service";
     }
 
+    // inserts a selector/event handler for a service family
     def insertSelector(ServiceFamily family, String type, String dataVar) {
         String result = "";
         if (isDefined(family.selector) and family.selector <> null) {
@@ -763,6 +782,7 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
         }
     }
     
+    // inserts a selector/event handler for a service family member
     def insertSelector(FamilyMemberSelector selector, String type, String dataVar) {
         ""; 
     }
@@ -778,6 +798,59 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
     
     def attachIngestors(MeshElement elt, ServiceFamily base) {
         'service.initService();'
+    }
+    
+    def generateInputEventHandlers(MeshElement elt, ServiceBase service) {
+        ""
+    }
+
+    def generateImports(Connector conn) {
+        if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
+            'import de.iip_ecosphere.platform.connectors.events.*;'
+        }
+    }
+
+    def generateInputEventHandlers(MeshElement elt, Connector conn) {
+        if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
+            for (ConnectorInputHandler h: conn.inputHandlers) {
+                String typeName = toTypeName(h.type);
+                'private ConnectorInputHandler<${typeName}> ${firstToLowerCase(typeName)}Handler = ConnectorEventUtils.createInputHandlerInstance(
+                    ${mainClsName}.class.getClassLoader(), 
+                    "${h.class}", ${typeName}.class);'
+            }
+        }
+    }
+
+    // inserts a selector/event handler for a connector, here a event handler
+    def insertSelector(Connector conn, String type, String dataVar) {
+        setOf(ConnectorInputHandler) handlers = conn.inputHandlers->select(h|toTypeName(h.type) == type);
+        if (handlers.size() > 0) {
+            ConnectorInputHandler h = handlers.projectSingle();
+            String typeName = toTypeName(h.type);
+            "handle${typeName}(service, ${dataVar})"
+        } else {
+            "service";
+        }
+    }
+
+    def generateEventHandlers(MeshElement elt, ServiceBase service) {
+        ''
+    }
+    
+    // generates connector event handler helper functions
+    def generateEventHandlers(MeshElement elt, Connector conn) {
+        String serviceType = getServiceType(elt, conn);
+        if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
+            for (ConnectorInputHandler h: conn.inputHandlers) {
+                String typeName = toTypeName(h.type);
+                'private ${serviceType} handle${typeName}(${serviceType} service, ${typeName} data) {
+                    if (null != ${firstToLowerCase(typeName)}Handler) {
+                        ${firstToLowerCase(typeName)}Handler.received(data, service.getConnector());
+                    }
+                    return service;
+                }'
+            }
+        }
     }
     
     def generateReceptionCallback(MeshProcessor elt, ServiceFamily family) {
@@ -1128,13 +1201,13 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
         }
         String implements = "";
         ServiceBase impl = elt.impl;
-        String clsName = getClsName(elt);
+        mainClsName = getClsName(elt);
         String constructorParams = "";
         String constructorInit = "";
         if (familyInterface <> "") {
             implements = " implements ${familyInterface}";
             impl = familyMember;
-            clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
+            mainClsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
             constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
             constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
@@ -1182,7 +1255,7 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
          * @author EASy-Producer.
          */
         ${genClassAnnotations(elt)|e}
-        public class ${clsName} extends SpringAsyncServiceBase${implements} {
+        public class ${mainClsName} extends SpringAsyncServiceBase${implements} {
         
             @Autowired
             private StreamBridge streamBridge;
@@ -1192,11 +1265,12 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
             private MetricsProvider metrics;
             private String sentCounterId = "service.${implMonId}.sent";
             private String rcvCounterId = "service.${implMonId}.received";
+            ${generateInputEventHandlers(elt, impl)|e}
 
             ${generateReceptionCallback(elt, impl)|e}
         
              ${genConstructorDoc(familyInterface)}
-            public ${clsName}(${constructorParams}) {
+            public ${mainClsName}(${constructorParams}) {
                 ${constructorInit|e}
                 ${initialService(elt, impl)}
             }
@@ -1216,6 +1290,7 @@ println(" -> " + (not(in.forward) and not(out.forward))+" "+(n.impl.asynchronous
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}
+            ${generateEventHandlers(elt, impl)|e}
             ${generateServiceBase(implements)|e}
         }'
     }

@@ -84,10 +84,15 @@ project RoutingTest {
            manufacturer = refBy(manufacturer_sse)
         },
         
-        input = {{type=refBy(connIn)}}, // TODO , {type=refBy(command), forward=false}
+        input = {{type=refBy(connIn)}, {type=refBy(command), forward=false}},
         output = {{type=refBy(connOut)}},
         inInterface = refBy(connIn),
-        outInterface = refBy(connOut)
+        outInterface = refBy(connOut),
+        inputHandlers = {{
+          type=refBy(command), 
+          class="de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorCommandEventHandler", 
+          artifact=""} // same artifact as connector -> not specified
+        } 
     };
     
     Service myProcessorService = JavaService {

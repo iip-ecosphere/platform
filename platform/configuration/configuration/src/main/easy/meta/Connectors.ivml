@@ -151,6 +151,14 @@ project Connectors {
     compound DivideDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
+
+    // ------------------------ event handler  ---------------------------
+    
+    compound ConnectorInputHandler {
+       refTo(DataType) type;
+       NonEmptyString class; // must be implementation of de.iip_ecosphere.platform.connectors.ConnectorInputHandler
+       String artifact; // may be empty -> same as connector (or other known artifact)
+    }
     
     // ------------------------ connector types --------------------------
       
@@ -167,6 +175,7 @@ project Connectors {
        // may collapse into one, to be supported by configurable mapping
        refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       setOf(ConnectorInputHandler) inputHandlers = {};
        
        NonEmptyString host = "localhost";
        Port port;
