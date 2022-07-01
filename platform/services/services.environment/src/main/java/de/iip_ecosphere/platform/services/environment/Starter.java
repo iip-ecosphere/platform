@@ -38,6 +38,7 @@ public class Starter {
     
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
+    public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     public static final String IIP_APP_PREFIX = "iip.app.";
     
@@ -45,6 +46,7 @@ public class Starter {
     private static Server server;
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
+    private static int transportPort = -1; // -1 -> use configured one
     private static EnvironmentSetup setup;
 
     /**
@@ -140,6 +142,10 @@ public class Starter {
         if (port < 0) {
             port = NetUtils.getEphemeralPort();
         }
+        transportPort = getIntArg(args, PARAM_IIP_TEST_TRANSPORT_PORT, -1);
+        if (transportPort > 0) {
+            getSetup();
+        }
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, false);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);
         boolean found = false;
@@ -222,7 +228,7 @@ public class Starter {
      * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
      */
     public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart) {
-        if (null != service) {
+        if (null != service && service.getId() != null) {
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
@@ -243,6 +249,9 @@ public class Starter {
                     getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
                 }
             }
+        }  else {
+            Throwable t = new Throwable("NO EXCEPTION/DEBUGGIN: Service null or Service id null");
+            t.printStackTrace(System.out);
         }
     }
 
@@ -291,6 +300,9 @@ public class Starter {
             try {
                 setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
                     ResourceLoader.getResourceAsStream(Starter.class, "application.yml"));
+                if (transportPort > 0) {
+                    setup.getTransport().setPort(transportPort);
+                }
                 Transport.setTransportSetup(() -> setup.getTransport());
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
