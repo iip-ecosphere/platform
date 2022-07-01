@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.connectors.opcuav1;
 
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 
+import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 
@@ -23,11 +24,21 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DataItem {
+public class DataItem implements ConnectorTriggerQuery {
     
+    private ConnectorTriggerQuery query;
     private Variant data;
     private Object identifier;
-    
+
+    /**
+     * Creates a data item.
+     * 
+     * @param query the data trigger query
+     */
+    public DataItem(ConnectorTriggerQuery query) {
+        this.query = query;
+    }
+
     /**
      * Creates a data item.
      * 
@@ -42,7 +53,7 @@ public class DataItem {
     /**
      * Returns the changed data.
      * 
-     * @return the changed ata
+     * @return the changed data (may be <b>null</b> if {@link #getQuery()} is specified)
      */
     public Variant getData() {
         return data;
@@ -51,10 +62,20 @@ public class DataItem {
     /**
      * Returns the identifier in the model.
      * 
-     * @return the data item identifier in the model, usually a string but who knows in Milo
+     * @return the data item identifier in the model, usually a string but who knows in Milo (may be <b>null</b> 
+     *     if {@link #getQuery()} is specified)
      */
     public Object getIdentifier() {
         return identifier;
+    }
+    
+    /**
+     * Returns the query.
+     * 
+     * @return the query (may be <b>null</b> if {@link #getData()}/{@link #getIdentifier()} are specified)
+     */
+    public ConnectorTriggerQuery getQuery() {
+        return query;
     }
 
 }

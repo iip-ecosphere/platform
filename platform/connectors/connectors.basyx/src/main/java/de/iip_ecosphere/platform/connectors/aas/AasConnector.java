@@ -30,10 +30,12 @@ import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
+import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
@@ -188,7 +190,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 } catch (PatternSyntaxException e) {
                     LOGGER.error("ApplicationName/AAS pattern not valid: {}", e.getMessage());
                 }
-                updateAas();
+                updateAas(pattern, connectedAAS, true);
             } else {
                 Aas aas = registry.retrieveAas(name);
                 if (null != aas) {
@@ -202,9 +204,12 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     /**
      * Updates the AAS.
      * 
+     * @param pattern the AAS id matching pattern
+     * @param connectedAAS the actually known connected AAS for this update
+     * @param modifyNotPollingAas whether {@link #nonPollingAas} may be modified by this call as a side effect
      * @return {@code true} if new AAS were added, {@code false} else
      */
-    private boolean updateAas() {
+    private boolean updateAas(Pattern pattern, Map<String, Aas> connectedAAS, boolean modifyNotPollingAas) {
         boolean foundNew = false;
         if (null != pattern && null != registry) {
             List<String> ids;
@@ -220,7 +225,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                         Aas aas = registry.retrieveAas(id);
                         if (null != aas) {
                             connectedAAS.put(aas.getIdShort(), aas);
-                            if (nonPollingAas.length() == 0) {
+                            if (modifyNotPollingAas && nonPollingAas.length() == 0) {
                                 nonPollingAas = aas.getIdShort();
                             }
                             foundNew = true;
@@ -234,22 +239,31 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         return foundNew;
     }
     
+    /**
+     * Calls {@code #received(Object)} for each AAS in {@code connectedAAS}.
+     * 
+     * @param connectedAAS the received AAS to be ingested
+     */
+    private void receivedAas(Map<String, Aas> connectedAAS) {
+        for (String key : connectedAAS.keySet()) {
+            pollingAas = key;
+            try {
+                Object data = read();
+                if (null != data) {
+                    received(data);
+                }
+            } catch (IOException e) {
+                error("While polling. Data discarded.", e);
+            }
+        }
+    }
+    
     @Override
     protected void doPolling() {
         if (!inPolling.getAndSet(true)) {
             pollingThread = Thread.currentThread();
-            updateAas();
-            for (String key : connectedAAS.keySet()) {
-                pollingAas = key;
-                try {
-                    Object data = read();
-                    if (null != data) {
-                        received(data);
-                    }
-                } catch (IOException e) {
-                    error("While polling. Data discarded.", e);
-                }
-            }
+            updateAas(pattern, connectedAAS, true);
+            receivedAas(connectedAAS);
             pollingAas = "";
             pollingThread = null;
             inPolling.set(false);
@@ -284,6 +298,27 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     @Override
     protected Object read() throws IOException {
         return DUMMY; // allow for polling, no change information so far
+    }
+    
+    @Override
+    public void trigger(ConnectorTriggerQuery query) {
+        if (query instanceof AasPatternTriggerQuery) {
+            AasPatternTriggerQuery q = (AasPatternTriggerQuery) query;
+            Map<String, Aas> connectedAAS = new HashMap<String, Aas>();
+            int count = 0;
+            while (inPolling.get() && count < 30) {
+                TimeUtils.sleep(20);
+                count++;
+            }
+            if (!inPolling.getAndSet(true)) {
+                pollingThread = Thread.currentThread();
+                updateAas(q.getPattern(), connectedAAS, false);
+                receivedAas(connectedAAS);
+                pollingAas = "";
+                pollingThread = null;
+                inPolling.set(false);
+            }
+        }
     }
 
     @Override
