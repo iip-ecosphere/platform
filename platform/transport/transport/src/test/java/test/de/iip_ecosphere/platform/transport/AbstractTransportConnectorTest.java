@@ -10,9 +10,11 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.transport;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -21,6 +23,7 @@ import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
@@ -154,6 +157,49 @@ public class AbstractTransportConnectorTest {
         Assert.assertEquals(expected.getDescription(), received.data.getDescription());
         Assert.assertEquals(expected.getPrice(), received.data.getPrice(), 0.01);
         received.data = null;
+    }
+    
+    /**
+     * Tests {@link AbstractTransportConnector#applyAuthenticationKey(String, 
+     * de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector.AuthenticationConsumer)}.
+     */
+    @Test
+    public void testApplyAuthenticationKey() {
+        Assert.assertTrue(AbstractTransportConnector.applyAuthenticationKey("amqp", (u, p, e) -> {
+            Assert.assertNotNull(u);
+            Assert.assertTrue(u.length() > 0);
+            Assert.assertNotNull(p);
+            Assert.assertTrue(p.length() > 0);
+            Assert.assertNotNull(e);
+            Assert.assertTrue(e.length() > 0);
+            return true;
+        }));
+        
+        // not found
+        Assert.assertFalse(AbstractTransportConnector.applyAuthenticationKey("xyz", (u, p, e) -> {
+            Assert.assertNull(u);
+            Assert.assertNull(p);
+            Assert.assertNull(e);
+            return false;
+        }));
+    }
+    
+    /**
+     * Tests {@link AbstractTransportConnector#getKeystorePassword}.
+     */
+    @Test
+    public void testGetKeystorePassword() {
+        TransportParameter p = TransportParameter.TransportParameterBuilder.newBuilder("", 0)
+            .setKeystore(new File("."), "amqp")
+            .build();
+        String pwd = AbstractTransportConnector.getKeystorePassword(p);
+        Assert.assertNotNull(pwd);
+        Assert.assertTrue(!"amqp".equals(pwd));
+
+        // fallback
+        pwd = AbstractTransportConnector.getKeystorePassword("xyz");
+        Assert.assertNotNull(pwd);
+        Assert.assertTrue("xyz".equals(pwd));
     }
     
 }

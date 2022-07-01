@@ -12,8 +12,10 @@
 
 package de.iip_ecosphere.platform.transport.connectors;
 
+import java.io.File;
 import java.io.Serializable;
 
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 
 /**
@@ -27,6 +29,11 @@ public class TransportSetup implements Serializable {
     private static final long serialVersionUID = 8110026253178816807L;
     private String host;
     private int port;
+    private File keystore;
+    private String keyPassword;
+    private String keyAlias;
+    private boolean hostnameVerification = false;
+    private String authenticationKey; // will replace user/password #22
     private String password; // preliminary, AMQP
     private String user; // preliminary, AMQP
     
@@ -67,6 +74,54 @@ public class TransportSetup implements Serializable {
     }
 
     /**
+     * Returns the optional TLS keystore.
+     * 
+     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
+     *   be <b>null</b> for none
+     */
+    public File getKeystore() {
+        return keystore;
+    }
+
+    /**
+     * Returns the password for the optional TLS keystore.
+     * 
+     * @return the TLS keystore password, may be <b>null</b> for none; the transport connector shall try a resolution
+     *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
+     *   fallback
+     */
+    public String getKeystorePassword() {
+        return keyPassword;
+    }
+    
+    /**
+     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * 
+     * @return the alias or <b>null</b> for none/first match
+     */
+    public String getKeyAlias() {
+        return keyAlias;
+    }
+    
+    /**
+     * Returns the {@link IdentityStore} key for the authentication, usually a password token.
+     * 
+     * @return the identity store key, may be empty or <b>null</b>
+     */
+    public String getAuthenticationKey() {
+        return authenticationKey;
+    }
+    
+    /**
+     * Returns whether TLS hostname verification shall be performed.
+     * 
+     * @return {@code false} for no verification (default), {@code true} else
+     */
+    public boolean getHostnameVerification() {
+        return hostnameVerification;
+    }
+
+    /**
      * Defines the server/broker host name. [required by snakeyaml]
      * 
      * @param host the server/broker host name.
@@ -88,6 +143,7 @@ public class TransportSetup implements Serializable {
      * Defines the password. [required by snakeyaml]
      * 
      * @param password the password
+     * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
      */
     public void setPassword(String password) {
         this.password = password;
@@ -97,9 +153,58 @@ public class TransportSetup implements Serializable {
      * Defines the user name. [required by snakeyaml]
      * 
      * @param user the user name
+     * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
      */
     public void setUser(String user) {
         this.user = user;
+    }
+
+    /**
+     * Returns the optional TLS keystore. [requred by SnakeYaml]
+     * 
+     * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
+     *   be <b>null</b> for none
+     */
+    public void setKeystore(File keystore) {
+        this.keystore = keystore;
+    }
+
+    /**
+     * Returns the password for the optional TLS keystore. [requred by SnakeYaml]
+     * 
+     * @param keyPassword the TLS keystore password, may be <b>null</b> for none; the transport connector shall try 
+     *   a resolution via the {@link IdentityStore} to obtain a password token before using it as a plaintext password 
+     *   as fallback
+     */
+    public void setKeystorePassword(String keyPassword) {
+        this.keyPassword = keyPassword;
+    }
+    
+    /**
+     * Returns the alias of the key in {@link #getKeystore()} to use. [requred by SnakeYaml]
+     * 
+     * @param keyAlias the alias or <b>null</b> for none/first match
+     */
+    public void setKeyAlias(String keyAlias) {
+        this.keyAlias = keyAlias;
+    }
+    
+    /**
+     * Returns the {@link IdentityStore} key for the authentication, usually a password token. [requred by SnakeYaml]
+     * 
+     * @param authenticationKey the identity store key, may be empty or <b>null</b>
+     */
+    public void setAuthenticationKey(String authenticationKey) {
+        this.authenticationKey = authenticationKey;
+    }
+    
+    /**
+     * Returns whether TLS hostname verification shall be performed. [requred by SnakeYaml]
+     * 
+     * @param hostnameVerification {@code false} for no verification (default), {@code true} else
+     */
+    public void setHostnameVerification(boolean hostnameVerification) {
+        this.hostnameVerification = hostnameVerification;
     }
     
     /**
@@ -107,9 +212,14 @@ public class TransportSetup implements Serializable {
      * 
      * @return the transport parameter instance
      */
+    @SuppressWarnings("deprecation")
     public TransportParameter createParameter() {
         return TransportParameterBuilder.newBuilder(host, port)
             .setUser(user, password)
+            .setKeystore(keystore, keyPassword)
+            .setKeyAlias(keyAlias)
+            .setHostnameVerification(hostnameVerification)
+            .setAuthenticationKey(authenticationKey)
             .build();
     }
 
