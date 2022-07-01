@@ -15,37 +15,6 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     mapOf(DataType, String) backSenders = {};
     mapOf(DataType, setOf(String)) backReceivers = {};
 
-    // OUTDATED
-    def function(sequenceOf(MeshElement) nodes) {
-        String result = "";
-        tmp.clear();
-        for (MeshElement elt: nodes) {
-            generateDataMethods(elt, false);
-        }        
-        for (String s : beans->sortedBy(b|b)) { // sort for testing, stable sequence
-            if (result.length() > 0) {
-                result = result + ";";
-            }
-            result = result + s;
-        }
-        result;
-    }
-    
-    // OUTDATED
-    def sources() {
-        /*if (ingestors.size() > 0) {
-            String sources = "";
-            for (String i: ingestors.keys().toSequence()->sortedBy(s|s)) { // sortedBy for testing
-                if (sources.length() > 0) {
-                    sources = sources + ";";
-                }
-                sources = sources + i;
-            }
-            "source: ${sources}"
-        }*/
-        ''
-    }
-
     /*
     * Emits a list prefixed by name:elt, elements separated by ";". Empty if elt is emtpty.
     */
@@ -160,60 +129,6 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         }
         result;
     }
-    
-    // OUTDATED
-    def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
-        mapOf(String, setOf(String)) destinations = {};
-        for (MeshElement elt: mappedMesh.keys()) {
-            tmp.clear();
-            generateDataMethods(elt, true);
-            sequenceOf(String) tmp1 = {};
-            for (String eltMet: tmp) {
-                tmp1.add(eltMet);
-            }
-            for (String eltMet : tmp1) {
-                Boolean doOut;
-                if (!asyncIngestors.containsKey(eltMet)) {
-                    addDestination(destinations, "${eltMet}-out-0", eltMet);
-                } else {
-                    if (!asyncIngestors.get(eltMet)) { // out for synchronous, in for asynchronous
-                        //addDestination(destinations, "${eltMet}-in-0", "*");
-                        addDestination(destinations, "${eltMet}-out-0", eltMet);
-                    }
-                }
-                for (MeshConnector conn: mappedMesh.get(elt)) {
-                    MeshInnerElement next = conn.next;
-                    tmp.clear();
-                    generateDataMethods(next, true);
-                    for (String nextMeth: tmp) {
-                        addDestination(destinations, "${nextMeth}-in-0", eltMet);
-                    }
-                }
-            }
-        }
-        generateDestinations(destinations);
-        // produce the backward notification "busses"
-        /*if (backSenders.size() > 0) {        
-            for (DataType type: backSenders.keys()) {
-                String snd = backSenders.get(type);
-                String key = "${snd}-in-0";
-                if (!done.includes(key)) {
-                    done.add(key);
-                    '${key}:
-                      producer:
-                        useNativeEncoding: true'
-                }
-                for (String s: backReceivers.get(type)) {
-                    key = '${s}-in-0';
-                    if (!done.includes(key)) {
-                        done.add(key);
-                        '${s}-in-0:
-                          destination: ${snd}'
-                    }
-                }
-            }
-        }*/
-    }
 
     /*
     * Emits a spring destination table from destinations. Considers destination "*" as "useNativeEncoding".
@@ -250,56 +165,6 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         } else {
             ''
         }
-    }
-    
-    // OUTDATED
-    def notifyTypeUse(MeshElement elt, Boolean inType, IOType type, String methodSuffix, String methodSuffixWithServiceId, Boolean beforeGen) {
-        if (type.forward and (inType or (not(inType) and not(elt.impl.asynchronous)))) {
-            if (beforeGen) { // used in basis only to collect but not to generate, do not add
-                tmp.add(methodSuffixWithServiceId);
-                boolean addToBeans = true;
-                if (methodSuffixWithServiceId.startsWith("process") and not(elt.isTypeOf(MeshProcessor))) {
-                    addToBeans = false;
-                }
-                if (addToBeans) {
-                    beans.add(methodSuffixWithServiceId);
-                }
-            }
-        } /*else {
-            DataType t = type.type;
-            if (inType) {
-                setOf(String) tmp;
-                if (not(backReceivers.containsKey(t))) {
-                    tmp = {};
-                    backReceivers.put(t, tmp);
-                }
-                tmp = backReceivers.get(t);
-                //tmp.add(methodSuffixWithServiceId);
-                //beans.add(methodSuffixWithServiceId);
-            } else {
-                backSenders.add(t, methodSuffixWithServiceId);
-            }
-        }    */    
-    }
-    
-    // OUTDATED
-    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        methodSuffixWithServiceId;
-    } 
-
-    // OUTDATED
-    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        methodSuffixWithServiceId;
-    } 
-
-    // OUTDATED
-    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        methodSuffixWithServiceId;
-    } 
-    
-    // OUTDATED
-    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        methodSuffixWithServiceId;
     }
     
     // ----------------------------- creates a protocol setup --------------------------
