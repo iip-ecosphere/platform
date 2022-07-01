@@ -13,6 +13,7 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
@@ -28,7 +29,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  *
  * @author Holger Eichelberger, SSE
  */
-public interface Connector <O, I, CO, CI> {
+public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     
     /**
      * Connects the connector to the underlying machine/platform.
@@ -81,13 +82,6 @@ public interface Connector <O, I, CO, CI> {
     public void dispose();
     
     /**
-     * Returns a descriptive name of the connector/the connected protocol.
-     * 
-     * @return a descriptive name of the connected protocol
-     */
-    public String getName();
-    
-    /**
      * Returns the input type to the protocol.
      * 
      * @return the input type (may be <b>null</b> in case of generic types, but shall not be <b>null</b>)
@@ -129,14 +123,6 @@ public interface Connector <O, I, CO, CI> {
      * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
      */
     public String enabledEncryption();
-
-    /**
-     * Enable/disable polling (does not influence the polling timer).
-     * 
-     * @param enablePolling whether polling shall enabled
-     * @see #enableNotifications(boolean)
-     */
-    public void enablePolling(boolean enablePolling);
 
     /**
      * Enables/disables notifications/polling at all.

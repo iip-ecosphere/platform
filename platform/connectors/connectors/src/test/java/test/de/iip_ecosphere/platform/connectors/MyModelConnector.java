@@ -286,7 +286,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
      * 
      * @throws IOException if offering fails for some reason
      */
-    public void trigger() throws IOException {
+    public void testTrigger() throws IOException {
         Object trigger = new Object();
         if (isPolling()) {
             offers.offer(trigger);

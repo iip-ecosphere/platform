@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -285,6 +287,15 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
             result = received(data, notifyCallback);
         }
         return result;
+    }
+    
+    @Override
+    public void trigger() {
+        try {
+            request(true);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot trigger connector {}: {}", getName(), e.getMessage());
+        }
     }
     
     /**

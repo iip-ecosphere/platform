@@ -380,7 +380,7 @@ public class ConnectorTest {
                 return Product.class;
             }
         });
-        instance.trigger();
+        instance.testTrigger();
         Object received = null;
         // trigger?
         int count = 30; // polling
@@ -390,6 +390,8 @@ public class ConnectorTest {
             count--;
         } while (count > 0 && null == received);
         Assert.assertNotNull("nothing received", received);
+        
+        instance.trigger(); // regular trigger
         
         assertInstance(instance, true);
         instance.disconnect();
