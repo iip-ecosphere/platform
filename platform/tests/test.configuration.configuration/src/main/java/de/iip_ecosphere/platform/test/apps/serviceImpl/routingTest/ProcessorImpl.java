@@ -76,11 +76,7 @@ public class ProcessorImpl extends RoutingProcessorImpl {
         }
     }
 
-    /**
-     * Process a command.
-     * 
-     * @param data
-     */
+    @Override
     public void processRoutingCommand(RoutingCommand data) {
         System.out.println("Processor received cmd: " + data);
     }
