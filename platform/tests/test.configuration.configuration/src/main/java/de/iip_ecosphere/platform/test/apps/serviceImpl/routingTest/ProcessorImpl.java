@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import iip.datatypes.RoutingCommand;
 import iip.datatypes.RoutingConnOut;
 import iip.datatypes.RoutingTestData;
 import iip.datatypes.RoutingTestDataImpl;
@@ -73,6 +74,15 @@ public class ProcessorImpl extends RoutingProcessorImpl {
             routingIngestor.ingest(result);
             System.out.println("Processor sent: " + result);
         }
+    }
+
+    /**
+     * Process a command.
+     * 
+     * @param data
+     */
+    public void processRoutingCommand(RoutingCommand data) {
+        System.out.println("Processor received cmd: " + data);
     }
 
 }
