@@ -20,12 +20,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- the application itself, generated code -->
-    <dependency>
-      <artifactId>apps.AppInterfacesKodexExample</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <version>${project.version}</version>
-    </dependency>    
+    <!-- the application itself, generated code -->  
     <dependency>
       <artifactId>SimpleKodexTestingApp</artifactId>
       <groupId>de.iip-ecosphere.platform.apps</groupId>
@@ -61,6 +56,13 @@
   <profiles>
      <profile>
         <id>Example</id>
+        <dependencies>    
+        	<dependency>
+      			<artifactId>apps.AppInterfacesKodexExample</artifactId>
+      			<groupId>de.iip-ecosphere.platform</groupId>
+      			<version>${project.version}</version>
+    	</dependency> 
+     </dependencies>
         <build>
             <plugins>
                 <plugin>
