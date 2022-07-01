@@ -1,5 +1,7 @@
+import Basics;
 import JavaBasics;
 import JavaMapping;
+import ServiceBasics;
 import SpringCloudStreamBasics;
 import MeshBasics;
 import EcsRuntimeDockerContainerManagerYaml;
@@ -13,6 +15,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     mapOf(DataType, String) backSenders = {};
     mapOf(DataType, setOf(String)) backReceivers = {};
 
+    // OUTDATED
     def function(sequenceOf(MeshElement) nodes) {
         String result = "";
         tmp.clear();
@@ -28,8 +31,9 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         result;
     }
     
+    // OUTDATED
     def sources() {
-        if (ingestors.size() > 0) {
+        /*if (ingestors.size() > 0) {
             String sources = "";
             for (String i: ingestors.keys().toSequence()->sortedBy(s|s)) { // sortedBy for testing
                 if (sources.length() > 0) {
@@ -38,17 +42,129 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                 sources = sources + i;
             }
             "source: ${sources}"
-        } 
+        }*/
+        ''
+    }
+
+    /*
+    * Emits a list prefixed by name:elt, elements separated by ";". Empty if elt is emtpty.
+    */
+    def namedList(String name, setOf(String) elt) {
+        if (elt.size() > 0) {
+            String result = "";
+            for (String i: elt->sortedBy(s|s)) { // sortedBy for testing
+                result = appendWithSemicolon(result, i);
+            }
+            "${name}: ${result}"
+        }
     }
     
-    def nativeEnc() {
-        'producer: 
-            useNativeEncoding: true'
+    /*
+    * Conditionally emit native encoding (or not).
+    */
+    def nativeEnc(Boolean enable) {
+        if (enable) {
+            'producer: 
+              useNativeEncoding: true'
+        } else {
+            ''
+        }
     }
     
+    /*
+    * Adds a key-dest pair to m. Dest may be "*" to indicate "producer.useNativeEncoding".
+    */
+    def addDestination(mapOf(String, setOf(String)) m, String key, String dest) {
+        setOf(String) tmp;
+        if (not(m.containsKey(key))) {
+            tmp = {};
+            m.put(key, tmp);            
+        } else {
+            tmp = m.get(key);
+        }
+        tmp.add(dest);
+    }
+    
+    /*
+    * Calculates Spring bindings, functions and sources, based on mappedMesh, nodes as fallback, the others are for 
+    * output by ref.
+    */
+    def calcBindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, 
+        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources) {
+        for (MeshElement elt: mappedMesh.keys()) {
+            ServiceBase eltImpl = elt.impl;
+            if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
+                mapOf(DataType, IOType) eltOutput = {};
+                for (IOType eo: forward(eltImpl.output)) { // backward via ingestors/transport
+                    eltOutput.add(eo.type, eo);
+                }
+                for (MeshConnector conn: mappedMesh.get(elt)) {
+                    MeshInnerElement next = conn.next;
+                    ServiceBase nextImpl = next.impl;
+                    for (IOType nextIn: forward(nextImpl.input)) { // backward via ingestors/transport
+                        if (eltOutput.containsKey(nextIn.type)) {
+                            IOType eltOut = eltOutput.get(nextIn.type);
+
+                            String nextId = getMethodSuffixId(getMethodSuffix(next, toTypeName(nextIn), outType(next, nextIn)), next);
+                            String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
+
+                            addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
+                            addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
+                            
+                            functions.add(eltId);
+                            functions.add(nextId);
+                            
+                            // we do not touch sources here as async via ingestors/transport
+                        }
+                    }
+                }
+            }
+        }
+        // spring does not allow empty function definition for multiple beans
+        // sources must be parts of sources, even asynchronous flux-based sources
+        if (functions.size() == 0) {
+            for (MeshElement elt: nodes) {
+                fallbackFunction(functions, elt);
+            }
+        }
+    }
+    
+    def fallbackFunction(setOf(String) functions, MeshElement elt) {
+    }
+
+    def fallbackFunction(setOf(String) functions, MeshSource source) {
+        for (IOType out : source.impl.output) {
+            functions.add(getMethodSuffixId(getMethodSuffix(source, toTypeName(out), ""), source));
+        }
+    }
+
+    /*def fallbackFunction(setOf(String) functions, MeshSink sink) {
+        if (functions.size() == 0 and sink.impl.input.size() > 0) {
+            functions.add(getMethodSuffixId(getMethodSuffix(sink, toTypeName(sink.impl.input.first()), ""), sink));
+        }
+    }*/
+    
+    def String outType(MeshElement elt, IOType inType) {
+        "";
+    }
+
+    def String outType(MeshProcessor elt, IOType inType) {
+        String result = "";
+        if (not(elt.impl.asynchronous)) {
+            mapOf(IOType, IOType) tmp = ioPairs(elt);
+            for (IOType i : tmp.keys()) {
+                if (i.type == inType.type) {
+                    result = toTypeName(tmp.get(i));
+                }
+            }
+        }
+        result;
+    }
+    
+    // OUTDATED
     def bindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
-        setOf(String) done = {};
-        for (MeshElement elt: mappedMesh.keys().toSequence()->sortedBy(e|e.name)) { // sortedBy for testing
+        mapOf(String, setOf(String)) destinations = {};
+        for (MeshElement elt: mappedMesh.keys()) {
             tmp.clear();
             generateDataMethods(elt, true);
             sequenceOf(String) tmp1 = {};
@@ -58,46 +174,26 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
             for (String eltMet : tmp1) {
                 Boolean doOut;
                 if (!asyncIngestors.containsKey(eltMet)) {
-                    doOut = true;
+                    addDestination(destinations, "${eltMet}-out-0", eltMet);
                 } else {
-                    doOut = !asyncIngestors.get(eltMet); // out for synchronous, in for asynchronous
-                }
-                if (doOut) {
-                String key = "${eltMet}-out-0";
-                if (!done.includes(key)) {
-                done.add(key);
-                '${key}:
-                  destination: ${eltMet}'
-                ''
-                }
-                } else { // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
-                String key = "${eltMet}-in-0";
-                if (!done.includes(key)) {
-                done.add(key);
-                '${key}:
-                  producer:
-                    useNativeEncoding: true'
-                ''
-                }
+                    if (!asyncIngestors.get(eltMet)) { // out for synchronous, in for asynchronous
+                        //addDestination(destinations, "${eltMet}-in-0", "*");
+                        addDestination(destinations, "${eltMet}-out-0", eltMet);
+                    }
                 }
                 for (MeshConnector conn: mappedMesh.get(elt)) {
                     MeshInnerElement next = conn.next;
                     tmp.clear();
                     generateDataMethods(next, true);
                     for (String nextMeth: tmp) {
-                        String key = '${nextMeth}-in-0';
-                        if (!done.includes(key)) {
-                            '${key}:
-                              destination: ${eltMet}
-                            '
-                        }
-                        done.add(key);
+                        addDestination(destinations, "${nextMeth}-in-0", eltMet);
                     }
                 }
             }
         }
+        generateDestinations(destinations);
         // produce the backward notification "busses"
-        if (backSenders.size() > 0) {        
+        /*if (backSenders.size() > 0) {        
             for (DataType type: backSenders.keys()) {
                 String snd = backSenders.get(type);
                 String key = "${snd}-in-0";
@@ -116,11 +212,49 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     }
                 }
             }
+        }*/
+    }
+
+    /*
+    * Emits a spring destination table from destinations. Considers destination "*" as "useNativeEncoding".
+    */
+    def generateDestinations(mapOf(String, setOf(String)) destinations) {
+        if (destinations.size() > 0) {
+            'bindings:'
+            for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
+                String dst = "";
+                Boolean useNativeEncoding = false;
+                for (String d : destinations.get(k)) {
+                    if (d == "*") {
+                        useNativeEncoding = true;
+                    } else {
+                        if (dst.length() > 0) {
+                            dst = dst + ",";
+                        }
+                        dst = dst + d;
+                    }
+                }
+                ' ${k}:
+                    ${destinations(dst)|e}
+                    ${nativeEnc(useNativeEncoding)|e}'
+            }
+        }
+    }
+
+    /*
+    * Conditionally emits dst with prefix "destination:" if non empty, empty if dst is empty.
+    */
+    def destinations(String dst) {
+        if (dst.length() > 0) {
+            'destination: ${dst}'
+        } else {
+            ''
         }
     }
     
+    // OUTDATED
     def notifyTypeUse(MeshElement elt, Boolean inType, IOType type, String methodSuffix, String methodSuffixWithServiceId, Boolean beforeGen) {
-        if (type.forward) {
+        if (type.forward and (inType or (not(inType) and not(elt.impl.asynchronous)))) {
             if (beforeGen) { // used in basis only to collect but not to generate, do not add
                 tmp.add(methodSuffixWithServiceId);
                 boolean addToBeans = true;
@@ -131,7 +265,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     beans.add(methodSuffixWithServiceId);
                 }
             }
-        } else {
+        } /*else {
             DataType t = type.type;
             if (inType) {
                 setOf(String) tmp;
@@ -140,26 +274,30 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     backReceivers.put(t, tmp);
                 }
                 tmp = backReceivers.get(t);
-                tmp.add(methodSuffixWithServiceId);
-                beans.add(methodSuffixWithServiceId);
+                //tmp.add(methodSuffixWithServiceId);
+                //beans.add(methodSuffixWithServiceId);
             } else {
                 backSenders.add(t, methodSuffixWithServiceId);
             }
-        }        
+        }    */    
     }
     
+    // OUTDATED
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
 
+    // OUTDATED
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
 
+    // OUTDATED
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     } 
     
+    // OUTDATED
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         methodSuffixWithServiceId;
     }
@@ -267,6 +405,11 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     // ----------------------------------------- main -------------------------------------
  
     def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) {
+        mapOf(String, setOf(String)) destinations = {};
+        setOf(String) functions = {};
+        setOf(String) sources = {};
+        calcBindings(mappedMesh, nodes, destinations, functions, sources);
+
         '${protocolConfig(config, false)}'
         '${produceTransport(config)}'
         '${produceAas(config, withDocker=false, implLocalEphemerial=true)}'
@@ -296,14 +439,13 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                 banner-mode: off
             cloud:
                 function:
-                    definition: ${function(nodes)}
-                ${sources()}
+                    ${namedList("definition", functions)}
+                ${namedList("sources", sources)|e}
                 stream:
                     ${poller(nodes)|e}
                     default:
                         contentType: application/iip
-                    bindings:
-                        ${bindings(mappedMesh)}
+                    ${generateDestinations(destinations)}
                     ${produceBinders(config)}'
     }
 

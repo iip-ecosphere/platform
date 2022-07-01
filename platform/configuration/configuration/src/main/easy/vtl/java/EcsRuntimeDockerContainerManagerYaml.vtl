@@ -69,8 +69,28 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
        'transport:
             host: ${tp.globalHost}
             port: ${tp.port}
+            ${produceTransportSecurity(tp)|e}
             user: ${tp.user}
             password: ${tp.password}'
+    }
+    
+    def produceTransportSecurity(TransportProtocol tp) {
+        if (tp.security <> null) {
+            SecuritySettings sec = tp.security;
+            if (sec.authenticationKey <> "") {
+                'authenticationKey: ${sec.authenticationKey}'
+            }
+            if (sec.keystore <> "") {
+                'keystore: ${sec.keystore}'
+            }
+            if (sec.keystorePasswordKey <> "") {
+                'keystorePassword: ${sec.keystorePasswordKey}'
+            }
+            if (sec.keyAlias <> "") {
+                'keyAlias: ${sec.keyAlias}'
+            }
+            'hostnameVerification: ${sec.hostNameVerification}'
+        }
     }
     
     def produceNetMgr(IIPEcosphere config) {

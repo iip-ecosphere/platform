@@ -254,12 +254,15 @@ project DataTypes {
         
     // ------------------------------ security (preliminary) --------------------------------------
 
+    compound AuthenticationSettings {
+        NonEmptyString authenticationKey;
+    }
+
     // might be split up, with alternatives    
-    compound SecuritySettings {
+    compound SecuritySettings refines AuthenticationSettings {
         NonEmptyString keystore; 
         NonEmptyString keyAlias; 
         NonEmptyString keystorePasswordKey; // key in identityStore
-        NonEmptyString authenticationKey;
         Boolean hostNameVerification = false;        
     } 
     
