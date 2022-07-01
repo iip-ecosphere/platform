@@ -32,8 +32,8 @@ mvn -P Example exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPor
 pidTest=$!
 echo "Test started $pidTest"
 
-sleep 30 && pkill -P "$pidTest" && kill "$pidTest"
-pkill -P "$pidBroker" && kill "$pidBroker"
+sleep 30 && pkill -9 -P "$pidTest" && kill -9 "$pidTest"
+pkill -9 -P "$pidBroker" && kill -9 "$pidBroker"
 
 echo "Testing for RECEIVED in log"
 
