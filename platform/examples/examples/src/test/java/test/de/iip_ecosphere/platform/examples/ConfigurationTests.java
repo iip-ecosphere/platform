@@ -137,8 +137,11 @@ public class ConfigurationTests {
             assertContains(s, "RECEIVED: RoutingTestDataImpl["); // in sink regardless if TestData or ConnOut
             assertContains(s, "Processor received: RoutingConnOutImpl["); // ConnOut in processor
             assertContains(s, "Processor sent: RoutingTestDataImpl["); // TestData in processor
-            assertContains(s, "Source received cmd: RoutingCommandImpl[cmd=Batch completed]"); // Cmd back in source
-            assertContains(s, "Processor received cmd: RoutingCommandImpl[cmd=Batch completed]"); // Cmd back in proc.
+            
+            // Commands sent backwards
+            assertContains(s, "Source received cmd: RoutingCommandImpl[cmd=Batch completed]");
+            assertContains(s, "Processor received cmd: RoutingCommandImpl[cmd=Batch completed]");
+            assertContains(s, "Connector received cmd: RoutingCommandImpl[cmd=Batch completed]");
         });
     }
 
