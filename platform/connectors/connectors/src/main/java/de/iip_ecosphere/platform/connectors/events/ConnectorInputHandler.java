@@ -26,7 +26,8 @@ public interface ConnectorInputHandler<T> {
     
     /**
      * Called to inform that data to be handled has been received. Calling {@link EventHandlingConnector#trigger()} 
-     * to asynchronously ingest a next data item by the {@code connector}.
+     * or {@link EventHandlingConnector#trigger(ConnectorTriggerQuery)} to asynchronously ingest a next data item by 
+     * the {@code connector}.
      * 
      * @param data the data
      * @param connector the connector

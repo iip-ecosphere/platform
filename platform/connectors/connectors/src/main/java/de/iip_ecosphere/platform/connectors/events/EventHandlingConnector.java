@@ -39,4 +39,11 @@ public interface EventHandlingConnector {
      */
     public void trigger();
 
+    /**
+     * Trigger the ingestion of a next data item.
+     * 
+     * @param query specification what to ingest; capabilities depend on connector
+     */
+    public void trigger(ConnectorTriggerQuery query);
+
 }
