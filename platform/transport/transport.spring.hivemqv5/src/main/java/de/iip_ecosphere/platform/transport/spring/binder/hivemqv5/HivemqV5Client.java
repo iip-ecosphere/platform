@@ -128,7 +128,7 @@ public class HivemqV5Client {
                     }
                     MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
                         .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
-                             config.getKeyPassword()))
+                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword())))
                         .hostnameVerifier(verifier)                        
                         .build();
                     builder.sslConfig(sslConfig);

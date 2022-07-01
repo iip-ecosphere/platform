@@ -128,7 +128,7 @@ public class HivemqV3Client {
                     }                    
                     MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
                         .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
-                             config.getKeyPassword()))
+                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword())))
                         .hostnameVerifier(verifier) // currently by default
                         .build();
                     builder.sslConfig(sslConfig);

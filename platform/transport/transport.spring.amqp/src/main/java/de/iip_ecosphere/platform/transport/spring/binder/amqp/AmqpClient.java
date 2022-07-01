@@ -33,6 +33,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import de.iip_ecosphere.platform.support.net.SslUtils;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * An AMQP client for a single binder instance. Typically, different binders subscribe to different
@@ -113,6 +114,7 @@ public class AmqpClient {
      * 
      * @param config the AMQP configuration to take the connection information from
      */
+    @SuppressWarnings("deprecation")
     public synchronized void createClient(AmqpConfiguration config) {
         if (null == channel) {
             try {
@@ -122,12 +124,22 @@ public class AmqpClient {
                 factory.setHost(config.getHost());
                 factory.setPort(config.getPort());
                 factory.setAutomaticRecoveryEnabled(true);
-                factory.setUsername(config.getUser());
-                factory.setPassword(config.getPassword());
+                boolean authDone = AbstractTransportConnector.applyAuthenticationKey(config.getAuthenticationKey(), 
+                    (user, pwd, enc) -> {
+                        factory.setUsername(user);
+                        factory.setPassword(pwd);
+                        return true;
+                    }
+                );
+                if (!authDone) {
+                    factory.setUsername(config.getUser());
+                    factory.setPassword(config.getPassword());
+                }
                 if (null != config.getKeystore()) {
                     try {                
                         factory.useSslProtocol(SslUtils.createTlsContext(config.getKeystore(), 
-                            config.getKeyPassword(), config.getKeyAlias()));
+                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword()), 
+                            config.getKeyAlias()));
                     } catch (IOException e) {
                         LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
                     }
