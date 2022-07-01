@@ -99,7 +99,7 @@ project RoutingTest {
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        input = {{type=refBy(rec1)}, {type=refBy(connOut)}}, // , {type=refBy(command), forward=false}
+        input = {{type=refBy(rec1)}, {type=refBy(connOut)}, {type=refBy(command), forward=false}}, 
         output = {{type=refBy(rec1)}}
     };
     
