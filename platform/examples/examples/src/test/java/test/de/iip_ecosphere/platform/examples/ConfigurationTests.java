@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.examples;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.apache.qpid.server.util.FileUtils;
 import org.junit.AfterClass;
@@ -35,6 +36,32 @@ public class ConfigurationTests {
 
     private static ServerAddress broker;
     private static TestQpidServer server;
+    private static final Consumer<String> SIMPLE_RECEIVED_ASSERTER = s -> assertContains(s, "RECEIVED ");
+    private static final boolean DEBUG = false;
+
+    /**
+     * Configures the process builder {@code pb} for output handling depending on {@link #DEBUG}.
+     * 
+     * @param pb the process builder
+     * @param res the file to redirect the output to if {@link #DEBUG} is false. 
+     */
+    private static final void configureProcess(ProcessBuilder pb, File res) {
+        if (DEBUG) {
+            pb.inheritIO(); 
+        } else {
+            pb.redirectOutput(res);
+        }
+    }
+        
+    /**
+     * Asserts whether {@code output} contains {@code test}.
+     * 
+     * @param output the output to test
+     * @param test the test string to search within {@code output}
+     */
+    private static final void assertContains(String output, String test) {
+        Assert.assertTrue("Output does not contain '" + test + "'", output.indexOf(test) > 0);
+    }
 
     /**
      * Starts the broker.
@@ -60,9 +87,11 @@ public class ConfigurationTests {
      * @param folder the example folder in gen
      * @param appName the app name/artifact name without version
      * @param stopTime the time to stop the application/test
+     * @param asserter asserts on the output log
      * @throws IOException if any I/O reading problem occurs
      */
-    private void testInstantiatedExample(String folder, String appName, int stopTime) throws IOException {
+    private void testInstantiatedExample(String folder, String appName, int stopTime, Consumer<String> asserter) 
+        throws IOException {
         File cfg = new File("../../configuration/configuration/gen/tests"); // git
         if (!cfg.exists()) {
             cfg = new File("../IIP_configuration.configuration/gen/tests"); // Jenkins
@@ -71,10 +100,9 @@ public class ConfigurationTests {
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
         File res = File.createTempFile("examples-test", ".out");
         res.deleteOnExit();
-        SpringStartup.start(f, false, p -> p.redirectOutput(res), 
+        SpringStartup.start(f, false, p -> configureProcess(p, res), 
             "--iip.test.stop=" + stopTime, "--iip.test.brokerPort=" + broker.getPort());
-        String procOut = FileUtils.readFileAsString(res);
-        Assert.assertTrue(procOut, procOut.indexOf("RECEIVED ") > 0);
+        asserter.accept(FileUtils.readFileAsString(res));
         res.delete();
     }
 
@@ -85,7 +113,7 @@ public class ConfigurationTests {
      */
     @Test
     public void testSimpleMesh() throws IOException {
-        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 15000);
+        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 15000, SIMPLE_RECEIVED_ASSERTER);
     }
 
     /**
@@ -95,7 +123,22 @@ public class ConfigurationTests {
      */
     @Test
     public void testSimpleMesh3() throws IOException {
-        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 25000);
+        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 25000, SIMPLE_RECEIVED_ASSERTER);
+    }
+    
+    /**
+     * Tests the routing test from configuration.configuration.
+     * 
+     * @throws IOException if any I/O problem occurs
+     */
+    @Test
+    public void testRoutingTest() throws IOException {
+        testInstantiatedExample("RoutingTest", "RoutingTestApp", 25000, s -> {
+            assertContains(s, "RECEIVED: RoutingTestDataImpl["); // in sink regardless if TestData or ConnOut
+            assertContains(s, "Processor received: RoutingConnOutImpl["); // ConnOut in processor
+            assertContains(s, "Processor sent: RoutingTestDataImpl["); // TestData in processor
+            assertContains(s, "Source received cmd: RoutingCommandImpl[cmd=Batch completed]"); // Cmd back in source
+        });
     }
 
 }
