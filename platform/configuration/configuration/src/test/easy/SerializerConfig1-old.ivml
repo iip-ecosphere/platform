@@ -196,7 +196,7 @@ project SerializerConfig1Old {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         traceRcv = TraceKind::LOG,
         traceSent = TraceKind::LOG,        
-        input = {{type=refBy(StringType)}},
+        input = {{type=refBy(StringType)}, {type=refBy(myConnPltfIn)}},
         output = {{type=refBy(rec1)}}
     };
 
@@ -216,6 +216,18 @@ project SerializerConfig1Old {
         output = {{type=refBy(StringType)}}
     };
 
+    Service myReceiverService = JavaService {
+        id = "MyReceiver",
+        name = "MyReceiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "MyReceiverImpl",
+        artifact = "",
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(StringType)}}
+    };
+
     // ------------ application and service nets ------------------
     
     Application myApp = {
@@ -232,13 +244,25 @@ project SerializerConfig1Old {
     };
     
     MeshSource myOpcConn = {
-       impl = refBy(myOpcUaConn)
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myOpcConnMyAnonymizer)}
+    };
+
+    MeshConnector myOpcConnMyAnonymizer = {
+        name = "MyOpcConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
     };
 
     MeshSource myMqttC = {
-       impl = refBy(myMqttConn)
+       impl = refBy(myMqttConn),
+       next = {refBy(myMqttConnMyAnonymizer)}
     };
     
+    MeshConnector myMqttConnMyAnonymizer = {
+        name = "MyMqttConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
+    };
+
     MeshSource mySource = {
         impl = refBy(mySourceService),
         next = {refBy(myConnMySourceMyAnonymizer)}
@@ -260,7 +284,17 @@ project SerializerConfig1Old {
     };
 
     MeshProcessor myKi = {
-        impl = refBy(myKiService)
+        impl = refBy(myKiService), 
+        next = {refBy(myConnMyKiMyReceiver)}
+    };
+
+    MeshConnector myConnMyKiMyReceiver = {
+        name = "MyKi->MyReceiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
     };
 
     // ---------- generation setup ------------
