@@ -43,6 +43,8 @@ containerImageStorage:
 
 The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/main/easy) is also explained/documented.
 
+The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples/README.md). Implementation components stem from [test.configuration.configuration](https://github.com/iip-ecosphere/platform/tree/main/tests/test.configuration.configuration/README.md) with mutual dependencies to this project. For a graphical documentation of the test cases, see [test case slides](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/test/easy/summary.pdf).
+
 ## hint
 
 For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
@@ -58,4 +60,4 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
-**For snapshots:** EASy-Producer 1.3.1-SNAPSHOT built on **2022/04/08** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.3-SNAPSHOT built on **2022/06/05** or newer is required. Use `mvn -U exec:java ...`
