@@ -136,7 +136,7 @@ project SerializerConfig1 {
         class = "MyAnonymizerImpl",
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        input = {{type=refBy(StringType)}},
+        input = {{type=refBy(StringType)}, {type=refBy(myConnPltfIn)}},
         output = {{type=refBy(rec1)}},
         parameter = {
           BooleanParameter {
@@ -157,7 +157,7 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(StringType)}},
+        output = {{type=refBy(RtsaTestInput)}},
         parameter = {
           IntegerParameter {
             name="threshold", 
@@ -177,7 +177,7 @@ project SerializerConfig1 {
         artifact = "",
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(StringType)}},
+        output = {{type=refBy(RtsaTestInput)}},
         parameter = {
           IntegerParameter {
             name="threshold", 
@@ -198,7 +198,7 @@ project SerializerConfig1 {
         asynchronous = false,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(StringType)}},
+        output = {{type=refBy(RtsaTestInput)}},
         parameter = {
           IntegerParameter {
             name="threshold", 
@@ -207,7 +207,6 @@ project SerializerConfig1 {
         }
     };
     
-    // fixed for now, becomes generic with advanced integration    
     RecordType RtsaTestInput = {
         name = "RtsaTestInput",
         fields = {
@@ -313,11 +312,23 @@ project SerializerConfig1 {
     };
     
     MeshSource myOpcConn = {
-       impl = refBy(myOpcUaConn)
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myOpcConnMyAnonymizer)}
+    };
+
+    MeshConnector myOpcConnMyAnonymizer = {
+        name = "MyOpcConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
     };
 
     MeshSource myMqttC = {
-       impl = refBy(myMqttConn)
+       impl = refBy(myMqttConn),
+       next = {refBy(myMqttConnMyAnonymizer)}
+    };
+    
+    MeshConnector myMqttConnMyAnonymizer = {
+        name = "MyMqttConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
     };
     
     MeshSource mySource = {
