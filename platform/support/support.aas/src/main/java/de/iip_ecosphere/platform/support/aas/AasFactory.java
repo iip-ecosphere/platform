@@ -211,7 +211,7 @@ public abstract class AasFactory {
     /**
      * Creates the factory instance.
      * 
-     * @see #accept(ProtocolCreator)
+     * @see ProtocolDescriptor
      */
     protected AasFactory() {
         // load specified first so that refined classes can overwrite protocols on demand later in their constructor

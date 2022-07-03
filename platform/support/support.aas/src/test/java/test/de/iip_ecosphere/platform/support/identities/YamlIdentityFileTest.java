@@ -31,6 +31,8 @@ public class YamlIdentityFileTest {
     
     /**
      * Basic tests for {@link YamlIdentityFile}.
+     * 
+     * @throws IOException shall not occur if successful
      */
     @Test
     public void testIdentityFile() throws IOException {

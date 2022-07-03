@@ -12,9 +12,8 @@
 
 package de.iip_ecosphere.platform.support.metrics;
 
-import java.util.Optional;
-
-import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  * Provides the system metrics instance to use.
@@ -33,9 +32,30 @@ public class SystemMetricsFactory {
     public static SystemMetrics getSystemMetrics() {
         if (null == instance) {
             SystemMetricsDescriptor desc;
-            Optional<SystemMetricsDescriptor> oDesc = ServiceLoaderUtils.findFirst(SystemMetricsDescriptor.class);
-            if (oDesc.isPresent()) {
-                desc = oDesc.get();
+            Iterator<SystemMetricsDescriptor> iterator = ServiceLoader.load(SystemMetricsDescriptor.class).iterator();
+            SystemMetricsDescriptor first = null;
+            SystemMetricsDescriptor firstEnabled = null;
+            SystemMetricsDescriptor firstFallback = null;
+            int count = 0;
+            while (iterator.hasNext()) {
+                SystemMetricsDescriptor d = iterator.next();
+                if (null == first) {
+                    first = d;
+                }
+                if (null == firstEnabled && d.isEnabled()) {
+                    firstEnabled = d;
+                }
+                if (null == firstFallback && !d.isEnabled()) {
+                    firstFallback = d;
+                }
+                count++;
+            }
+            if (count > 1 && null != firstEnabled) {
+                desc = firstEnabled;
+            } else if (count > 1 && null != firstFallback) {
+                desc = firstFallback;
+            } else if (null != first) {
+                desc = first;
             } else {
                 desc = new DefaultSystemMetricsDescriptor();
             }

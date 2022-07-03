@@ -189,31 +189,22 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     }
 
     def protocolConfig(TransportProtocolAMQP protocol, Boolean global) {
-        String usr = "";
-        if (isDefined(protocol.user)) {
-            usr = 'user: ${protocol.user}';
-        }
-        String pw = "";
-        if (isDefined(protocol.password)) {
-            pw = 'password: ${protocol.password}';
-        }
-        'amqp:
-            host: ${protocolHost(protocol, global)}
-            port: ${protocol.port}
-            ${usr|e}
-            ${pw|e}'
+        '${produceProtocolConfig(protocol, "amqp", global, true)}'
     }
 
     def protocolConfig(TransportProtocolMQTTv3 protocol, Boolean global) {
-        'mqtt:
-            host: ${protocolHost(protocol, global)}
-            port: ${protocol.port}'
+        '${produceProtocolConfig(protocol, "mqtt", global, false)}'
     }
 
     def protocolConfig(TransportProtocolMQTTv5 protocol, Boolean global) {
-        'mqtt:
+        '${produceProtocolConfig(protocol, "mqtt", global, false)}'
+    }
+
+    def produceProtocolConfig(TransportProtocol protocol, String key, Boolean global, Boolean userPwdFallback) {
+        '${key}:
             host: ${protocolHost(protocol, global)}
-            port: ${protocol.port}'
+            port: ${protocol.port}
+            ${produceTransportSecurity(protocol, userPwdFallback)|e}'
     }
     
     // --------------------------- spring poller(s) ---------------------------------------------

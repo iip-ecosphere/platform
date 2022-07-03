@@ -183,7 +183,7 @@ public class FileUtils {
     }
 
     /**
-     * Turn base64 encoded {@code string] into a {@code file}.
+     * Turn base64 encoded {@code string} into a {@code file}.
      * 
      * @param string the base64 encoded string
      * @param file the file

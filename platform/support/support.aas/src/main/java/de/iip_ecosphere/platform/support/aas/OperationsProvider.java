@@ -9,7 +9,7 @@ public interface OperationsProvider {
     /**
      * Defines an operation.
      * 
-     * @param category the category within {@value #OPERATIONS}
+     * @param category the category
      * @param name the name of the operation
      * @param function the implementing function
      * @return <b>this</b>
@@ -20,7 +20,7 @@ public interface OperationsProvider {
     /**
      * Returns a registered service operation.
      * 
-     * @param category the category within {@value #OPERATIONS}
+     * @param category the category
      * @param name the name of the service operation
      * @return the operation functor, may be <b>null</b>
      * @see #defineOperation(String, String, Function)
@@ -37,7 +37,7 @@ public interface OperationsProvider {
     public Function<Object[], Object> getServiceFunction(String name);
     
     /**
-     * Defines a service function (i.e., in {@value #OPERATIONS}/{@value #SERVICE}).
+     * Defines a service function (in a pre-defined category).
      * 
      * @param name the name of the service operation
      * @param function the implementing function
@@ -48,7 +48,7 @@ public interface OperationsProvider {
     public OperationsProvider defineServiceFunction(String name, Function<Object[], Object> function);
 
     /**
-     * Defines a property with getter/setter implementation within {@value #STATUS}. Theoretically, either getter/setter
+     * Defines a property with getter/setter implementation. Theoretically, either getter/setter
      * may be <b>null</b> for read-only/write-only properties, but this must be, however, reflected in the AAS so that 
      * no wrong can access happens.
      * 

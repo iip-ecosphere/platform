@@ -30,6 +30,8 @@ public class PidFileTest {
     
     /**
      * Tests the {@link PidFile} functionality.
+     * 
+     * @throws IOException shall not occur if successful
      */
     @Test
     public void testPidFile() throws IOException {

@@ -35,8 +35,8 @@ public interface ProtocolServerBuilder extends Builder<Server> {
      * communication using a similar protocol as VAB.
      * 
      * For encoding call {@link #encode(String, byte[])}. For 
-     * decoding, fetch first an array of size {@link #getPayloadBytesLength()}. Use 
-     * {@link #decodePayloadLength(byte[])} to read an array of the actual length of the 
+     * decoding, fetch first an array of size {@link #getDataBytesLength()}. Use 
+     * {@link #decodeDataLength(byte[])} to read an array of the actual length of the 
      * following payload. Use then {@link #decode(byte[], PayloadConsumer)} to decode the payload.
      * 
      * @author Holger Eichelberger, SSE

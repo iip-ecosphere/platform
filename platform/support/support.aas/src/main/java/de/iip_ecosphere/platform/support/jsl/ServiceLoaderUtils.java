@@ -94,7 +94,7 @@ public class ServiceLoaderUtils {
     }
     
     /**
-     * Returns whether an {@link instance} is tagged with the {@link ExcludeFirst} annotation.
+     * Returns whether an {@code instance} is tagged with the {@link ExcludeFirst} annotation.
      * 
      * @param instance the instance to check (may be <b>null</b>)
      * @return {@code true} if the annotation is present, {@code false} else

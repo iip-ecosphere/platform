@@ -69,27 +69,47 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
        'transport:
             host: ${tp.globalHost}
             port: ${tp.port}
-            ${produceTransportSecurity(tp)|e}
-            user: ${tp.user}
-            password: ${tp.password}'
+            ${produceTransportSecurity(tp, true)|e}'
     }
     
-    def produceTransportSecurity(TransportProtocol tp) {
-        if (tp.security <> null) {
+    def produceTransportSecurity(TransportProtocol tp, Boolean userPwdFallback) {
+println(tp+" "+isDefined(tp.security)+" "+userPwdFallback);    
+if (isDefined(tp.security)) {
+    println(" -> "+(tp.security <> null));
+}
+        if (isDefined(tp.security) and tp.security <> null) {
+println("HERE");        
             SecuritySettings sec = tp.security;
-            if (sec.authenticationKey <> "") {
+            if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 'authenticationKey: ${sec.authenticationKey}'
             }
-            if (sec.keystore <> "") {
+            if (isDefined(sec.keystore) and sec.keystore <> "") {
                 'keystore: ${sec.keystore}'
             }
-            if (sec.keystorePasswordKey <> "") {
+            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
                 'keystorePassword: ${sec.keystorePasswordKey}'
             }
-            if (sec.keyAlias <> "") {
+            if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
                 'keyAlias: ${sec.keyAlias}'
             }
-            'hostnameVerification: ${sec.hostNameVerification}'
+            if (isDefined(sec.hostNameVerification)) {
+                'hostnameVerification: ${sec.hostNameVerification}'
+            }
+        } else {
+            if (userPwdFallback) {
+                String usr = "";
+                if (isDefined(tp.user)) {
+                    usr = 'user: ${tp.user}';
+                }
+                String pw = "";
+                if (isDefined(tp.password)) {
+                    pw = 'password: ${tp.password}';
+                }
+                '${usr|e}
+                ${pw|e}'
+            } else {
+                ''
+            }
         }
     }
     

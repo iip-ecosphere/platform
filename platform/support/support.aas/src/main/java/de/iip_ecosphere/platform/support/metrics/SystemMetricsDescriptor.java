@@ -26,4 +26,25 @@ public interface SystemMetricsDescriptor {
      */
     public SystemMetrics createInstance();
 
+    /**
+     * Is this system metrics descriptor enabled if multiple are specified. Usually, there shall be only a single 
+     * plugin, but for testing or generating just a few container for all devices, a dynamic selection may be helpful.
+     * The default plugin is always enabled as fallback. This method may represent a system-specific condition. 
+     * 
+     * @return {@code true} for enabled, {@code false} else
+     */
+    public default boolean isEnabled() {
+        return false;
+    }
+
+    /**
+     * In case that there are multiple non-enabled descriptors, shall this descriptor act as fallback. Only generic
+     * plugins shall act as fallback, never system-specific ones.
+     * 
+     * @return {@code true} for fallback, {@code false} else
+     */
+    public default boolean isFallback() {
+        return false;
+    }
+
 }

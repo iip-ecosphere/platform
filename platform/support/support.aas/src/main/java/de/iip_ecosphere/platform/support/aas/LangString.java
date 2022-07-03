@@ -57,7 +57,7 @@ public class LangString {
     }
     
     /**
-     * Creates a {@link LangString] from a composed description@language string. Inspired by ZVEI nameplate
+     * Creates a {@link LangString} from a composed description@language string. Inspired by ZVEI nameplate
      * for industrial equipment V1.0.
      * 
      * @param descLang the composed string, last @ separates language (<b>null</b> becomes empty string)

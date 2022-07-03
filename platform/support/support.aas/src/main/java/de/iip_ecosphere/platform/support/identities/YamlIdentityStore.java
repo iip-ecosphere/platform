@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityFile.IdentityInformation;
 
 /**
- * Simple file-based identity store.
+ * Simple file-based identity store. Tries to load {@code identityStore.yml} from the classpath (root or folder 
+ * {@code resources}) and as development fallbacks from {@code src/main/resources} or {@code src/test/resources}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -48,6 +49,9 @@ public class YamlIdentityStore extends IdentityStore {
      */
     public YamlIdentityStore() {
         InputStream in = YamlIdentityStore.class.getResourceAsStream("identityStore.yml");
+        if (null == in) {
+            in = YamlIdentityStore.class.getResourceAsStream("resources/identityStore.yml");
+        }
         if (null == in) {
             String storeFolder = System.getProperty("iip.identityStore", ".");
             File f = new File(storeFolder, "identityStore.yml");

@@ -95,7 +95,7 @@ public class AasTest {
     
     /**
      * Creates the operations server for the given machine instance and for the operations in 
-     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, String, int)}..
+     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, String, int, String)}.
      * 
      * @param port the server communication port
      * @param machine the machine
@@ -135,7 +135,8 @@ public class AasTest {
     }
 
     /**
-     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine)}.
+     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine, 
+     * String, KeyStoreDescriptor)}.
      * 
      * @param subModelBuilder the sub model container builder to add the elements to
      * @param addr the server address (schema ignored)
@@ -147,7 +148,8 @@ public class AasTest {
     }
 
     /**
-     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine)}.
+     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine, String, 
+     * KeyStoreDescriptor)}.
      * 
      * @param subModelBuilder the sub model container builder to add the elements to
      * @param host the protocol host 

@@ -24,4 +24,14 @@ public class DefaultSystemMetricsDescriptor implements SystemMetricsDescriptor {
         return new DefaultSystemMetrics();
     }
 
+    @Override
+    public boolean isEnabled() {
+        return false; // do not override system specific one
+    }
+
+    @Override 
+    public boolean isFallback() {
+        return true; // act as fallback if there is no specific enabled one
+    }
+
 }

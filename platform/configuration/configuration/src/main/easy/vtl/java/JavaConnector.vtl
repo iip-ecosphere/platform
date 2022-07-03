@@ -523,12 +523,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def generateConnectorParamSecurityDecls(Connector conn) {
         if (conn.security <> null) {
             SecuritySettings sec = conn.security;
-            if (sec.authenticationKey <> "") {
+            if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 'Map<String, IdentityToken> identities = new HashMap<>();
                 IdentityToken tok = IdentityStore.getInstance().getToken("${conn.host}:${conn.port}", true); 
                 identities.put(ConnectorParameter.ANY_ENDPOINT, tok);'
             }
-            if (sec.keystorePasswordKey <> "") {
+            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
                 'IdentityToken kTok = IdentityStore.getInstance().getToken("${sec.keystorePasswordKey}", true);' 
             }
         }
@@ -537,16 +537,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def generateConnectorParamSecuritySettings(Connector conn) {
         if (conn.security <> null) {
             SecuritySettings sec = conn.security;
-            if (sec.authenticationKey <> "") {
+            if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 '.setIdentities(identities)'
             }
-            if (sec.keystore <> "") {
+            if (isDefined(sec.keystore) and sec.keystore <> "") {
                 '.setKeystore(new File("${sec.keystore}"), kTok.getTokenDataAsString())'
             }
-            if (sec.keyAlias <> "") {
+            if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
                 '.setKeyAlias("${sec.keyAlias}")'
             }
-            '.setHostnameVerification(${sec.hostNameVerification})'
+            if (isDefined(sec.hostNameVerification)) {
+                '.setHostnameVerification(${sec.hostNameVerification})'
+            }
         }
     }
 
