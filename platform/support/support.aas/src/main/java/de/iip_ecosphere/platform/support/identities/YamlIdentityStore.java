@@ -48,9 +48,11 @@ public class YamlIdentityStore extends IdentityStore {
      * Creates a YAML identity store. Usually, shall be created via JSL ({@link IdentityStoreDescriptor}). [testing]
      */
     public YamlIdentityStore() {
+        String source = "classpath";
         InputStream in = YamlIdentityStore.class.getResourceAsStream("identityStore.yml");
         if (null == in) {
             in = YamlIdentityStore.class.getResourceAsStream("resources/identityStore.yml");
+            source = "classpath: resources";
         }
         if (null == in) {
             String storeFolder = System.getProperty("iip.identityStore", ".");
@@ -66,12 +68,16 @@ public class YamlIdentityStore extends IdentityStore {
             if (f.exists()) {
                 try {
                     in = new FileInputStream(f);
+                    source = f.getAbsolutePath();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).info("Cannot load identityStore.yml: {}", e.getMessage());
                 }
             } else {
                 in = null;
             }
+        }
+        if (null != in) {
+            LoggerFactory.getLogger(getClass()).info("Loading identityStore.yml from {}", source);
         }
         data = YamlIdentityFile.load(in); // can cope with null
     }
