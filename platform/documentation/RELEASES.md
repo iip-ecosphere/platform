@@ -20,6 +20,7 @@ Improvements:
 * #45: Validating/securing service lifecycle
 * #43: Additional IVML model datatypes for OPC UA
 * #34: Fixed monitoring integration
+* #22: Transport considers identity store, user/pwd deprecated and discouraged but still available.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 
