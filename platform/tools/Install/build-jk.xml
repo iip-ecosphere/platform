@@ -15,6 +15,7 @@
             <fileset dir="." includes="src/**/*.*" />
             <fileset dir="." includes="gen/**/*.*" />
             <fileset dir="." includes="container/**/*.*" />
+            <fileset dir="." includes="resources/**/*.*" />
         </zip>
         <tar destfile="install.tar.gz" compression="gzip">
             <fileset dir="." includes="pom.xml README.md"/>
@@ -22,6 +23,7 @@
             <fileset dir="." includes="platformDependencies/**/*.*" />
             <fileset dir="." includes="src/**/*.*" />
         	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh" />
+            <fileset dir="." includes="resources/**/*.*" />
         </tar>
     </target>
 </project>
