@@ -14,7 +14,7 @@ This example consists of several pieces:
   * `src/test/python` contains the IIP-Ecosphere service environment (from Maven, see below).
   * A specific starter class for the example `src/main/java` so that the example can run even without a running platform. Please note that the starter class is not part of an usual service implementation.
   * A Maven assembly descriptor `src/main/assembly/python.xml` for packaging the Python service code into a ZIP (to be deployed, basis for the automated integration).
-  * Two Maven files, `pom-model.xml` for obtaining the configuration meta-model and for performing the instantiation as well as `pom.xml` for the application itself (executes the assembly descriptor). 
+  * Two Maven profiles, one for obtaining the configuration meta-model / performing the instantiation as well as one for the application itself (executes the assembly descriptor). 
   
 Regarding Python code, we make the assumption that the module of the Python Service Environment `iip` and the generated modules `datatypes`, `interfaces`, `serializers` and `services` are visible to Python within the same folder (physically or virtually).
   

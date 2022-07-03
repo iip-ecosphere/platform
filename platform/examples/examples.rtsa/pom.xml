@@ -171,12 +171,6 @@
                                     <argument>gen/broker</argument>
                                     <argument>generateBroker</argument>
                                 </arguments>
-                                <systemProperties>
-                                   <systemProperty>
-                                     <key>iip.resources</key>
-                                     <value>${project.basedir}/resources</value>
-                                   </systemProperty>
-                                </systemProperties>
                             </configuration>
                          </execution>
                          <execution>
