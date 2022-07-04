@@ -1,0 +1,871 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Plc/Gds/DataAccessError.proto";
+import "Plc/Gds/SubscriptionKind.proto";
+import "Plc/Gds/VariableInfo.proto";
+import "ArpTypes.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+
+/**
+ * Services for the subscription.
+ * 
+ * <div>
+ * <p>The subscription functionality is a more elegant way reading values from variables, in contrast to permanently reading (polling).
+ * A client can subscribe a selection of variables of interest and the subscription will copy the data values to a internal buffer.
+ * This is the recommended mechanism to "read" variable values from th PLC system. All read data are always task consistent, because
+ * the data is written by the task itself.</p><p>The data updating rate depends of the task to which the variable belongs. Because global variables haven't a task affiliation,
+ * each global variable will be updated by default from the task 'Globals'. This task has a default cycling time of 50ms which is configurable
+ * via the ESM configuration. For more information to the update rate see {@code M:Arp.Plc.Gds.Services.ISubscriptionService.Subscribe(System.UInt32,System.UInt64)}.</p><p>Initially, the internal buffers are initialized with null values ({@code F:Arp.Plc.DataType.Void}). This is important to know,
+ * especially if values are read immediately after the subscription is created. More precisely if the data are read
+ * before the tasks have written the data.</p><p>Additionally a subscription is able to generate timestamps which will be generated at the end of the variable source task.
+ * {@code M:Arp.Plc.Gds.Services.ISubscriptionService.ReadTimeStampedValues(System.UInt32,System.Object[]@)}</p><p>A client can subscribe to different types of variables provided in {@code T:Arp.Plc.DataType}.
+ * Currently supported variable types are listed below:</p><p>To address a variable, the full variable name (uri) is necessary. Some valid examples are given below:
+ * {@code
+ * ComponentName-1/ProgramName-1.Variable_Name
+ * ComponentName-1/Global_Variable_Name
+ * ComponentName-1/ProgramName-1.Array_Variable_Name[index]
+ * ComponentName-1/ProgramName-1.Array_Variable_Name[startIndex:endIndex]
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.Leaf
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.LeafArray[index]
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.LeafArrayOfArray[indexX][indexY]
+ * }</p><p>A Subscription can created in the PLC process, in other processes and also on remote targets.</p><p>All subscriptions will be removed after a {@code F:Arp.Plc.Domain.Services.PlcStartKind.Cold} and
+ * {@code F:Arp.Plc.Domain.Services.PlcStartKind.Warm} start and after a download change.
+ * While a download change is in process the subscription service will be disabled and each function
+ * will be return the error code {@code F:Arp.Plc.Gds.Services.DataAccessError.CurrentlyUnavailable}.</p><p>Procedure of usage:
+ * tdb</p>
+ * </div>
+ */
+
+service ISubscriptionService 
+{
+  /// <summary>
+  /// Creates a subscription of the given <see cref="Arp.Device.Interface.Services.SubscriptionKind" />.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This method allows other components, also from remote targets,
+  /// to create a subscription which is able to subscribe each PLC variable.
+  /// On success it returns a unique <c>SubscriptionId</c> which is
+  /// created internally. The <c>SubscriptionId</c> has to be exposed to the SDK
+  /// user, due to the usage on remote targets. The <c>SubscriptionId</c> is
+  /// the reference to a created subscription at the PLC target and is needed in
+  /// each subscription method exclude this and <see cref="Arp.Device.Interface.Services.ISubscriptionService.CreateRecordingSubscription" />.
+  /// </para>
+  /// <para>
+  /// Each subscription contains at least one buffer which kind depends on the
+  /// <see cref="Arp.Device.Interface.Services.SubscriptionKind" />. The number of buffer depends on the different
+  /// tasks which contains the added variables. The buffer are initialized with a
+  /// <see cref="Arp.Plc.DataType" /> specific initial value e.g.: int8 = 0 or boolean = false.
+  /// Apart from <see cref="Arp.Device.Interface.Services.SubscriptionKind.DirectRead" />, the buffer will filled by
+  /// the task. How often the task stores the data to the buffer depends on the task
+  /// cycle time and the configured subscription sample interval.
+  /// </para>
+  /// <para>
+  /// The <see cref="Arp.Device.Interface.Services.SubscriptionKind" /> decides which kind of a subscription will be
+  /// created. Each kind has its own benefits and differs in consistence, performance and
+  /// memory usage. The available kinds are listed below:
+  /// </para>
+  /// <list type="table">
+  /// <listheader>
+  /// <term>kind</term>
+  /// <description>description</description>
+  /// </listheader>
+  /// <item>
+  /// <term>
+  /// <see cref="Arp.Device.Interface.Services.SubscriptionKind.DirectRead" />
+  /// </term>
+  /// <description>
+  /// The subscription itself triggers the copy process and will read the data
+  /// directly from the source. This could be the fastest way and with no
+  /// influence to the real time, to get the current data, but
+  /// the task consistency is not guaranteed.
+  /// <para>
+  /// Usage example: Asynchronous data collection for non critical data.
+  /// </para></description>
+  /// </item>
+  /// <item>
+  /// <term>
+  /// <see cref="Arp.Device.Interface.Services.SubscriptionKind.HighPerformance" />
+  /// </term>
+  /// <description>
+  /// This subscription uses a <c>DoubleBuffer</c> which contains the last
+  /// written data from the added variables. This kind is task consistent, has low
+  /// influence to the real time and is low in memory usage.
+  /// <para>
+  /// Usage example: Standard way to collect the variable data.
+  /// </para></description>
+  /// </item>
+  /// <item>
+  /// <term>
+  /// <see cref="Arp.Device.Interface.Services.SubscriptionKind.RealTime" />
+  /// </term>
+  /// <description>
+  /// This subscription uses a <c>QuadBuffer</c> which contains the last
+  /// written data from the added variables. This kind is task consistent, has the
+  /// fastest access to the current written data, but uses the fourfold memory.
+  /// <para>
+  /// Usage example: For variables which are running in high speed tasks and for which
+  /// it is necessary to guarantee the fastest access to the current written data.
+  /// Note that in most cases the <see cref="Arp.Device.Interface.Services.SubscriptionKind.HighPerformance" /> is
+  /// sufficient.
+  /// </para></description>
+  /// </item>
+  /// <item>
+  /// <term>
+  /// <see cref="Arp.Device.Interface.Services.SubscriptionKind.Recording" />
+  /// </term>
+  /// <description>
+  /// This subscription uses a <c>RingBuffer</c> which is able to store
+  /// more than one record of data. This kind is task consistent, has low
+  /// influence to the real time, but needs, dependent to the ring capacity, a lot
+  /// of memory. By default the ring capacity is <c>10</c>, use
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.CreateRecordingSubscription" /> to create a subscription
+  /// witch a self defined size.
+  /// <para>
+  /// Usage example: For variables which are running in faster tasks than the consumer does
+  /// and for which it is necessary to guarantee that every data record will be stored,
+  /// without a single gap.
+  /// Note that this kind uses a lot of memory!
+  /// </para></description>
+  /// </item>
+  /// </list>
+  /// <para>
+  /// After the subscription is created successfully, variables could be added with
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariable" /> or <see cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariables" />
+  /// with the <c>SubscriptionId</c> just returned in this method.
+  /// </para>
+  /// </remarks>
+  /// <param name="kind">
+  /// The kind of the subscription.
+  /// </param>
+  /// <returns>
+  /// The unique subscription id on success, otherwise 0.
+  /// <para></para></returns>
+  rpc CreateSubscription(ISubscriptionServiceCreateSubscriptionRequest) returns (ISubscriptionServiceCreateSubscriptionResponse)  {}
+
+  /// <summary>
+  /// Creates a subscription of <see cref="Arp.Device.Interface.Services.SubscriptionKind.Recording" />.
+  /// </summary>
+  /// <remarks>
+  /// This method creates a subscription of the kind <see cref="Arp.Device.Interface.Services.SubscriptionKind.Recording" />.
+  /// Compared to the method <see cref="Arp.Device.Interface.Services.ISubscriptionService.CreateSubscription" />, it allows to
+  /// configure the capacity of the internal used ring buffer.
+  /// For further information see <see cref="Arp.Device.Interface.Services.ISubscriptionService.CreateSubscription" />.
+  /// </remarks>
+  /// <param name="recordCount">
+  /// The maximum number of storable records.
+  /// </param>
+  /// <returns>
+  /// The unique subscription id on success, otherwise 0.
+  /// </returns>
+  /// <seealso cref="Arp.Device.Interface.Services.ISubscriptionService.CreateSubscription" />
+  rpc CreateRecordingSubscription(ISubscriptionServiceCreateRecordingSubscriptionRequest) returns (ISubscriptionServiceCreateRecordingSubscriptionResponse)  {}
+
+  /// <summary>
+  /// Extends the subscription with the given id by inserting the given
+  /// variable name
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// The added variable is stored in a internal container and will be
+  /// subscribed after calling <see cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />. If
+  /// the subscription has already been subscribed, it is necessary to
+  /// call <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" /> to subscribe the new
+  /// added variable finally.
+  /// </para>
+  /// <para>
+  /// If the same full variable name is added multiple times, the old variable will be
+  /// overridden. In case, a variable name is invalid or doesn't exists
+  /// a specific error code will be returned <see cref="Arp.Device.Interface.Services.DataAccessError" />,
+  /// on success the code <see cref="Arp.Device.Interface.Services.DataAccessError.None" />
+  /// of the added variable will be returned. A variable which doesn't returned with
+  /// <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> won't be added to the subscription
+  /// and won't be subscribed.
+  /// </para>
+  /// <para>
+  /// A single array element can added with its index in brackets e.g.:
+  /// <code>
+  /// ComponentName-1/ProgramName-1.Array_Name[index]
+  /// </code>
+  ///
+  /// Or a rage of an array can added with tow indexes separated with a colon in brackets e.g.:
+  /// <code>
+  /// ComponentName-1/ProgramName-1.Array_Name[StartIndex:EndIndex]
+  /// </code>
+  ///
+  /// If an array variable is added without a variable specification,
+  /// the entire array will be added to the subscription.
+  /// </para>
+  /// <para>
+  /// An alternative way to insert variables to the subscription is by using
+  /// the function <see cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariables" />.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription where the variable is add to.
+  /// </param>
+  /// <param name="variableName">
+  /// The full name of the variable.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  /// <seealso cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariables" />
+  rpc AddVariable(ISubscriptionServiceAddVariableRequest) returns (ISubscriptionServiceAddVariableResponse)  {}
+
+  /// <summary>
+  /// Extends the subscription with the given id by inserting a range of new variables.
+  /// </summary>
+  /// <remarks>
+  /// Allows to add a range of variables to the subscription. The returned array of type <see cref="Arp.Device.Interface.Services.DataAccessError" />,
+  /// is in the same order as the given array of variable names and indicates if the given variables are valid and exist.
+  /// For further information see <see cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariable" />.
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription where the variables are added to.
+  /// </param>
+  /// <param name="variableNames">
+  /// An array of full variable names.
+  /// </param>
+  /// <returns>
+  /// Returns a vector of <see cref="Arp.Device.Interface.Services.DataAccessError" />, <see cref="Arp.Device.Interface.Services.DataAccessError.None" />
+  /// on success, in the same order as the variables were added.
+  /// </returns>
+  /// <seealso cref="Arp.Device.Interface.Services.ISubscriptionService.AddVariable" />
+  rpc AddVariables(ISubscriptionServiceAddVariablesRequest) returns (ISubscriptionServiceAddVariablesResponse)  {}
+
+  /// <summary>
+  /// Removes the variable with the specific variable name from the subscription.
+  /// </summary>
+  /// <remarks>
+  /// Removes the variable that compare equal to the given variable name, from the
+  /// internal variable list. If the subscription has already been subscribed,
+  /// it is necessary to call <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" /> to
+  /// remove the given variable from the internal created buffer.
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="variableName">
+  /// The full name of the variable to be removed from the subscription.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc RemoveVariable(ISubscriptionServiceRemoveVariableRequest) returns (ISubscriptionServiceRemoveVariableResponse)  {}
+
+  /// <summary>
+  /// Subscribes the subscription with the given id.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// All previously added variables including in the given subscription will be subscribed. Internally
+  /// the variables are separated in the respective tasks, a buffer for each task will be created and
+  /// connected to the task executed event. At this point the task will copy the selected variable data
+  /// into the task buffer (excluded subscriptions from kind <see cref="Arp.Device.Interface.Services.SubscriptionKind.DirectRead" />).
+  /// How often the task stores the data to the buffer depends on the task cycle time and the
+  /// configured subscription sample rate.
+  /// </para>
+  /// <para>
+  /// Calling this method on a already subscribed subscription has no effect, even if new
+  /// variables have been added or removed. To make variable modification effective, use
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />. Calling this method while the subscription is in the state
+  /// <c>Unsubscribed</c>, because <see cref="Arp.Device.Interface.Services.ISubscriptionService.Unsubscribe" /> has been called, will only
+  /// connect the already constructed buffer to the respective tasks and will set the given sampleRate.
+  /// Compare to the first and initial call of this method, this call cost more less time because
+  /// the buffer are already created. This also means that variable modification which have been
+  /// done after the first call of <see cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />, have also no effect. At this point
+  /// it is also necessary to call <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />.
+  /// </para>
+  /// <para>
+  /// A subscribed subscription can operates in different sample rates (excluded subscriptions from
+  /// kind <see cref="Arp.Device.Interface.Services.SubscriptionKind.DirectRead" />) which depends on several factors.
+  /// First, each variable belongs to a program which runs in a task and this task has a cycle rate which determines
+  /// the sample rate. This means that at the end of each task cycle, all variable data, subscribed and related to this
+  /// task, will be written to the corresponding buffer. Note that all global variables are assigned to the task 'Globals'.
+  /// Thats the case if the given sample rate is set to zero,
+  /// which means the subscription operates in <c>'real-time'</c>, the same sample rate the task is operating in.
+  /// This is also the fastest possible rate for a subscription.
+  /// Note that it's possible that one subscription could contain variables from different tasks, which has the
+  /// consequence that the subscription operates in different rates!
+  /// If the given sample rate desire to a specific rate, the subscription tries to operate in this rate, for each variable,
+  /// no matter from which task this variable comes.
+  /// Potential self defined sample rates for a subscription are the task cycle rate or a multiple of them, otherwise
+  /// the given rate will rounded down. E.g.:
+  ///
+  /// <code>
+  /// Task A cycle rate = 10ms
+  /// Task B cycle rate = 8ms
+  ///
+  /// Subscription given rate = 50ms
+  ///
+  /// Subscription rate for task A = 50ms
+  /// Subscription rate for task B = 48ms
+  /// </code>
+  ///
+  /// Special handling for global Varibales: If there isn't a given sample rate by the user (value is zero),
+  /// the global variables will be recored by default from the 'Globals' task (50ms, configured in the ESM.config).
+  /// But if there is a given sample rate (value is greater than zero) the global variables will be connected a task which fits
+  /// the given sample rate. If no task exists with the given sample rate, the fastest available task will be picked and used for
+  /// downsampling (see above). So it is possible to record data of global variables in the fastest availble interval
+  /// or an multiple of them.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="sampleRate">
+  /// The desired sample rate in microseconds.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  /// <seealso cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />
+  rpc Subscribe(ISubscriptionServiceSubscribeRequest) returns (ISubscriptionServiceSubscribeResponse)  {}
+
+  /// <summary>
+  /// Resubscribes the subscription with the given id.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Resubscribes the subscription, which will trigger a completely rebuild process of
+  /// the whole subscription, including previously done variable modification which have been
+  /// done after the first call of <see cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />.
+  /// It destroys the internal buffer and subscribes the subscription again
+  /// (for further information see <see cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />).
+  /// Note that the subscription is not able to collect data from the variables, while the
+  /// resubscribe process is in progress.
+  /// </para>
+  /// <para>
+  /// This method has only an effect if the given subscription is currently subscribed,
+  /// otherwise nothing will happen.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="sampleRate">
+  /// The desired sample rate in microseconds.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  /// <seealso cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />
+  rpc Resubscribe(ISubscriptionServiceResubscribeRequest) returns (ISubscriptionServiceResubscribeResponse)  {}
+
+  /// <summary>
+  /// Unsubscribes the subscription with the given id.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Unsubscribes the subscription from all task executed events. The subscription
+  /// data are still exist and could be get by the respective read-methods. To
+  /// subscribe the subscription again, call <see cref="Arp.Device.Interface.Services.ISubscriptionService.Subscribe" />.
+  /// </para>
+  /// <para>
+  /// This method has only an effect if the given subscription is currently subscribed,
+  /// otherwise nothing will happen.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc Unsubscribe(ISubscriptionServiceUnsubscribeRequest) returns (ISubscriptionServiceUnsubscribeResponse)  {}
+
+  /// <summary>
+  /// Deletes the subscription.
+  /// </summary>
+  /// <remarks>
+  /// Deletes the subscription with the given id. After that the id is no longer valid and all data,
+  /// containing in the subscription will be removed.
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc DeleteSubscription(ISubscriptionServiceDeleteSubscriptionRequest) returns (ISubscriptionServiceDeleteSubscriptionResponse)  {}
+
+  /// <summary>
+  /// Get the subscribed variable information of the subscription.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// The subscription service provides several read functions
+  /// (<see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadValues" />,
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadTimeStampedValues" /> and
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadRecords" />) which will
+  /// return the plain values without any information of type and order.
+  /// To assign this plain values to the added variables, this function returns
+  /// the currently subscribed variable information in a array of
+  /// <see cref="Arp.Device.Interface.Services.VariableInfo" /> in the same order as the read functions will do.
+  /// This order and type information wont change, till
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" /> was called.
+  /// Note that this order does not have to be the same order like the
+  /// variables has been added to the subscription.
+  /// </para>
+  /// <para>
+  /// This service function relates to the read function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadValues" />.
+  /// The provided information contains only information of the added and
+  /// currently subscribed variables. It doesn't contain information
+  /// of timestamps. Timestamps could be read by the function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadTimeStampedValues" /> and its related
+  /// information with <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetTimeStampedVariableInfos" />.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// Results in:
+  /// VariableInfo[]
+  /// a1
+  /// a2
+  /// b1
+  /// </code></para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="variableInfo">
+  /// An array of <see cref="Arp.Device.Interface.Services.VariableInfo" /> in a static order without
+  /// timestamp information.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc GetVariableInfos(ISubscriptionServiceGetVariableInfosRequest) returns (ISubscriptionServiceGetVariableInfosResponse)  {}
+
+  /// <summary>
+  /// Get the subscribed variable information including information
+  /// of timestamps of the subscription.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function relates to the read function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadTimeStampedValues" />.
+  /// The provided information contains information of the added and
+  /// currently subscribed variables and additionally information about the
+  /// timestamps. Note that a subscription could contain multiple
+  /// timestamps, related on the number of used tasks from which the
+  /// added variables are from. The timestamp is always the first value
+  /// followed by all to the task related variable information.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// Results in:
+  /// VariableInfo[]
+  /// timestamp
+  /// a1
+  /// a2
+  /// timestamp
+  /// b1
+  /// </code></para>
+  /// <para>
+  /// Each containing timestamp has the variable name <c>timestamp</c> and
+  /// the data type <see cref="Arp.Plc.DataType.Int64" /> which is provided in
+  /// <see cref="Arp.Device.Interface.Services.VariableInfo" /> like each other variable information.
+  /// </para>
+  /// <para>
+  /// For further information see <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetVariableInfos" />.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="variableInfo">
+  /// An array of <see cref="Arp.Device.Interface.Services.VariableInfo" />.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc GetTimeStampedVariableInfos(ISubscriptionServiceGetTimeStampedVariableInfosRequest) returns (ISubscriptionServiceGetTimeStampedVariableInfosResponse)  {}
+
+  /// <summary>
+  /// Get the subscribed variable information as a record of the subscription.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function relates to the read function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadRecords" />.
+  /// The provided information contains information of the added and
+  /// currently subscribed variables, its task relation and additionally
+  /// information about the task related timestamp.
+  /// </para>
+  /// <para>
+  /// The information are provided in an array of array of
+  /// <see cref="Arp.Device.Interface.Services.VariableInfo" />. The first array correspond to the
+  /// number of different tasks and the second contains the related variable
+  /// information which are related to the variables of this task and
+  /// additionally information about the task related timestamp.
+  /// </para>
+  /// <para>
+  /// Each containing timestamp has the variable name <c>timestamp</c> and
+  /// the data type <see cref="Arp.Plc.DataType.Int64" /> which is provided in
+  /// <see cref="Arp.Device.Interface.Services.VariableInfo" /> like each other variable information.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// Results in:
+  /// VariableInfo[][]
+  /// VariableInfo[]
+  /// timestamp
+  /// a1
+  /// a2
+  /// VariableInfo[]
+  /// timestamp
+  /// b1
+  /// </code></para>
+  /// <para>
+  /// For further information see <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetVariableInfos" />.
+  /// </para>
+  /// <para>
+  /// Note: This function is currently not supported in C#!.
+  /// </para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="recordInfos">
+  /// An array of <see cref="Arp.Device.Interface.Services.VariableInfo" />.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc GetRecordInfos(ISubscriptionServiceGetRecordInfosRequest) returns (ISubscriptionServiceGetRecordInfosResponse)  {}
+
+  /// <summary>
+  /// Read the data from the subscription with the given id.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function returns the plain data values from
+  /// the added and subscribed variables. The data values are returned
+  /// in a static order and doesn't contain any type information. To
+  /// figure out which value belongs to the added variable, it is necessary
+  /// to call the related information function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetVariableInfos" />.
+  /// As long as the subscription doesn't resubscribed with
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />, all the information are valid
+  /// and both, the read value data and information data, are in a static
+  /// order.
+  /// </para>
+  /// <para>
+  /// Note that this values doesn't contain timestamps! If the timestamp is
+  /// needed use the function <see cref="Arp.Device.Interface.Services.ISubscriptionService.ReadTimeStampedValues" />
+  /// instead.
+  /// </para>
+  /// <para>
+  /// The read data may contain null values (<see cref="Arp.Plc.DataType.Void" />) if the read call was executed
+  /// before the tasks initially have written the data.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// Results in:
+  /// object[]
+  /// a1
+  /// a2
+  /// b1
+  /// </code></para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="values">
+  /// Contains the plain values of the given and subscribed variables.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc ReadValues(ISubscriptionServiceReadValuesRequest) returns (ISubscriptionServiceReadValuesResponse)  {}
+
+  /// <summary>
+  /// Read the data including timestamps from the subscription with the given id.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function returns the plain data values from
+  /// the added and subscribed variables including timestamps.
+  /// The data values are returned in a static order and doesn't contain
+  /// any type information. To figure out which value belongs to the added
+  /// variable, it is necessary to call the related information function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetTimeStampedVariableInfos" />.
+  /// As long as the subscription doesn't resubscribed with
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />, all the information are valid
+  /// and both, the read value data and information data, are in a static
+  /// order.
+  /// </para>
+  /// <para>
+  /// The read data may contain null values (<see cref="Arp.Plc.DataType.Void" />) if the read call was executed
+  /// before the tasks initially have written the data.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// Results in:
+  /// object[]
+  /// timestamp task A
+  /// a1
+  /// a2
+  /// timestamp task B
+  /// b1
+  /// </code></para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="values">
+  /// Contains the plain values including the timestamps of the
+  /// given and subscribed variables.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc ReadTimeStampedValues(ISubscriptionServiceReadTimeStampedValuesRequest) returns (ISubscriptionServiceReadTimeStampedValuesResponse)  {}
+
+  /// <summary>
+  /// Read the data including timestamps from the subscription with the given id
+  /// separated in task records.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function returns the plain data values from
+  /// the added and subscribed variables including timestamps separated
+  /// in task records.
+  /// The data values are returned in a static order and doesn't contain
+  /// any type information. To figure out which value belongs to the added
+  /// variable, it is necessary to call the related information function
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.GetRecordInfos" />.
+  /// As long as the subscription doesn't resubscribed with
+  /// <see cref="Arp.Device.Interface.Services.ISubscriptionService.Resubscribe" />, all the information are valid
+  /// and both, the read value data and information data, are in a static
+  /// order.
+  /// </para>
+  /// <para>
+  /// The number of returned value records depends on the count of tasks,
+  /// the number of sampled data and the number of the given
+  /// <paramref name="count" /> parameter.
+  /// </para>
+  /// <para>
+  /// The structure how the values are returned is strictly defined:
+  /// The first array (records) contains n arrays (task records) and where
+  /// n depends on the number of tasks.
+  /// The array from the second dimension (task records) contains n arrays
+  /// (record), where n depends on the number of collected data, one data
+  /// record per task cycle.
+  /// The array from the third dimension (record) contains the plain
+  /// values, starting with the timestamp.
+  /// </para>
+  /// <para>
+  /// The read data may contain null values (<see cref="Arp.Plc.DataType.Void" />) if the read call was executed
+  /// before the tasks initially have written the data.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Added Variable from task A: a1, a2
+  /// Added Variable from task B: b1
+  ///
+  /// task A sampled 2 cycles
+  /// task B sampled 1 cycles
+  ///
+  /// Results in:
+  /// object[] (records)
+  /// object[] (task A records)
+  /// object[] (record cycle 1)
+  /// timestamp
+  /// a1
+  /// a2
+  /// object[] (record cycle 2)
+  /// timestamp
+  /// a1
+  /// a2
+  /// object[] (task B records)
+  /// object[] (record cycle 1)
+  /// timestamp
+  /// a1
+  /// a2
+  /// </code></para>
+  /// </remarks>
+  /// <param name="subscriptionId">
+  /// The id of the subscription.
+  /// </param>
+  /// <param name="count">
+  /// Number of maximum records to be copied per task. If set to zero, all available records
+  /// will be copied.
+  /// </param>
+  /// <param name="records">
+  /// Array for the subscribed data records including timestamps.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc ReadRecords(ISubscriptionServiceReadRecordsRequest) returns (ISubscriptionServiceReadRecordsResponse)  {}
+
+}
+
+message ISubscriptionServiceCreateSubscriptionRequest
+{
+   Arp.Plc.Gds.Services.Grpc.SubscriptionKind kind = 1;
+}
+message ISubscriptionServiceCreateRecordingSubscriptionRequest
+{
+   int32 recordCount = 1;
+}
+message ISubscriptionServiceAddVariableRequest
+{
+   uint32 subscriptionId = 1;
+   string variableName = 2;
+}
+message ISubscriptionServiceAddVariablesRequest
+{
+   uint32 subscriptionId = 1;
+   repeated string variableNames = 2;
+}
+message ISubscriptionServiceRemoveVariableRequest
+{
+   uint32 subscriptionId = 1;
+   string variableName = 2;
+}
+message ISubscriptionServiceSubscribeRequest
+{
+   uint32 subscriptionId = 1;
+   uint64 sampleRate = 2;
+}
+message ISubscriptionServiceResubscribeRequest
+{
+   uint32 subscriptionId = 1;
+   uint64 sampleRate = 2;
+}
+message ISubscriptionServiceUnsubscribeRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceDeleteSubscriptionRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceGetVariableInfosRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceGetTimeStampedVariableInfosRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceGetRecordInfosRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceReadValuesRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceReadTimeStampedValuesRequest
+{
+   uint32 subscriptionId = 1;
+}
+message ISubscriptionServiceReadRecordsRequest
+{
+   uint32 subscriptionId = 1;
+   int32 count = 2;
+}
+
+
+message ISubscriptionServiceCreateSubscriptionResponse
+{
+   uint32 _ReturnValue = 1;
+}
+message ISubscriptionServiceCreateRecordingSubscriptionResponse
+{
+   uint32 _ReturnValue = 1;
+}
+message ISubscriptionServiceAddVariableResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceAddVariablesResponse
+{
+   repeated Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceRemoveVariableResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceSubscribeResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceResubscribeResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceUnsubscribeResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceDeleteSubscriptionResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message ISubscriptionServiceGetVariableInfosResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Plc.Gds.Services.Grpc.VariableInfo variableInfo = 2;
+}
+message ISubscriptionServiceGetTimeStampedVariableInfosResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Plc.Gds.Services.Grpc.VariableInfo variableInfo = 2;
+}
+message ISubscriptionServiceGetRecordInfosResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Plc.Gds.Services.Grpc.VariableInfo recordInfos = 2;
+}
+message ISubscriptionServiceReadValuesResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Type.Grpc.ObjectType values = 2;
+}
+message ISubscriptionServiceReadTimeStampedValuesResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Type.Grpc.ObjectType values = 2;
+}
+message ISubscriptionServiceReadRecordsResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+   repeated Arp.Type.Grpc.ObjectType records = 2;
+}

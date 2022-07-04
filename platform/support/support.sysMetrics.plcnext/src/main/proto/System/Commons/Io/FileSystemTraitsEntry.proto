@@ -1,0 +1,32 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "System/Commons/Io/TraitItem.proto";
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+   
+
+/// <summary>
+/// This struct is used by file operations reading file informations from device.
+/// </summary>
+/// <seealso cref="Arp.System.Commons.Services.Io.IDirectoryService.EnumerateFileSystemTraitsEntries" />
+/// <seealso cref="Arp.System.Commons.Services.Io.IFileSystemInfoService.GetFileSystemTraitsEntry" />
+message FileSystemTraitsEntry
+{
+   string Path = 1;
+   bool IsFile = 2;
+   bool IsDirectory = 3;
+   repeated Arp.System.Commons.Services.Io.Grpc.TraitItem Traits = 4;
+}
+
+
+
+
+

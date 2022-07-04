@@ -1,0 +1,26 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+package Arp.System.Um.Services.Grpc;
+
+   
+
+/// <summary>
+/// Describes a subscribed variable.
+/// </summary>
+/// <remarks>
+/// The structure includes the full name of the variable e.g.:
+/// <c>ComponentName-1/ProgramName-1.Variable_Name</c> and the associated type
+/// (<see cref="Arp.Plc.DataType" />) e.g.: <see cref="Arp.Plc.DataType.Int8" />.
+/// </remarks>
+message ChannelInformation
+{
+   uint32 GatewayID = 1;
+   string ProtocolObjectName = 2;   
+}

@@ -1,0 +1,51 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "System/Security/SecurityToken.proto";
+import "System/Um/Operation.proto";
+
+package Arp.System.Um.Services.Grpc;
+
+
+/**
+ * Use this service to read device information.
+ */
+
+service IAuthorizationInfoService 
+{
+/// <summary>
+/// Checks if the specified session has permission to execute particular entity operations,
+/// e.g. calling Rsc service operations, accessing files, reading data.
+/// </summary>
+/// <param name="entity">The protected entitiy to check the permission for, e.g. Rsc service operations, files, Gds data points.</param>
+/// <param name="operation">
+/// The operation to be executed on the entity, like <see cref="Arp.System.Um.Services.Operation.Call" /> to invoke Rsc services or
+/// <see cref="Arp.System.Um.Services.Operation.ReadValue" /> to read values of Gds data points.
+/// </param>
+/// <param name="securityToken">The security token of the session to check the permission for, which has been obtained through <see cref="Arp.System.Um.Services.IPasswordAuthenticationService" /></param>
+/// <returns>
+/// <c>true</c> if the access is granted, otherwise <c>false</c>.</returns>
+  rpc HasPermissionFor(IAuthorizationInfoServiceHasPermissionForRequest) returns (IAuthorizationInfoServiceHasPermissionForResponse)  {}
+
+}
+
+message IAuthorizationInfoServiceHasPermissionForRequest
+{
+   string entity = 1;
+   Arp.System.Um.Commons.Grpc.Operation operation = 2;
+   Arp.System.Security.Grpc.SecurityToken securityToken = 3;
+}
+
+
+
+message IAuthorizationInfoServiceHasPermissionForResponse
+{
+   bool _ReturnValue = 1;
+}

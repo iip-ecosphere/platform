@@ -1,0 +1,92 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+package Arp.Type.Grpc;
+enum CoreType
+{
+    option allow_alias = true;
+    CT_None = 0;
+    CT_End = 0;
+    CT_Void = 1;
+    CT_Boolean = 2;
+    CT_Char            = 3;
+    CT_Int8            = 4;
+    CT_Uint8           = 5;
+    CT_Int16           = 6;
+    CT_Uint16          = 7;
+    CT_Int32           = 8;
+    CT_Uint32          = 9;
+    CT_Int64           = 10;
+    CT_Uint64          = 11;
+    CT_Real32          = 12;
+    CT_Real64          = 13;
+    CT_Struct          = 18;
+    CT_String          = 19;
+    CT_Utf8String      = 19;
+    CT_Array           = 20;
+    CT_DateTime        = 23;
+    CT_Version         = 24;
+    CT_Guid            = 25;
+    CT_AnsiString      = 26;
+    CT_Object          = 28;
+    CT_Utf16String     = 30;
+    CT_Stream          = 34;
+    CT_Enumerator      = 35;
+    CT_SecureString    = 36;
+    CT_Enum            = 37;
+    CT_Dictionary      = 38;
+    CT_SecurityToken   = 39;
+    CT_Exception       = 40;
+    CT_IecTime         = 41;
+    CT_IecTime64       = 42;
+    CT_IecDate         = 43;
+    CT_IecDate64       = 44;
+
+    CT_IecDateTime     = 45;
+    CT_IecDateTime64   = 46;
+
+    CT_IecTimeOfDay    = 47;
+    CT_IecTimeOfDay64  = 48;
+}
+
+
+message TypeStruct
+{
+    repeated ObjectType StructElements = 1;
+}
+
+message TypeArray
+{
+    repeated ObjectType ArrayElements = 1;
+}
+
+message ObjectType
+{
+    CoreType TypeCode = 1;
+    oneof Value
+    {
+        bool BoolValue = 2;
+        sint32 CharValue = 3;
+        sint32 Int8Value = 4;
+        uint32 Uint8Value = 5;
+        sint32 Int16Value = 6;
+        uint32 Uint16Value = 7;
+        sint32 Int32Value = 8;
+        uint32 Uint32Value = 9;
+        sint64 Int64Value = 10;    
+        uint64 UIntValue = 11;   
+        float  FloatValue = 12;
+        double DoubleValue = 13;
+        string StringValue = 14; 
+
+        TypeStruct StructValue = 15;
+        TypeArray ArrayValue = 16;
+
+        sint32 EnumValue = 17;
+    }
+}

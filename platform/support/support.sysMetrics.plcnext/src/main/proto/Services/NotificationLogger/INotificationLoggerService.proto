@@ -1,0 +1,149 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Services/NotificationLogger/Notification.proto";
+import "Services/NotificationLogger/NotificationFilter.proto";
+import "Services/NotificationLogger/SortOrder.proto";
+import "Services/NotificationLogger/StoredNotification.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.Services.NotificationLogger.Services.Grpc;
+
+
+/**
+ * The NotificationLogger stores Notifications and provides an interface to retrieve them.
+ */
+
+service INotificationLoggerService 
+{
+  /// <summary>
+  /// Queries notifications matching the supplied filter from the mentioned archives and returns them as StoredNotification objects
+  /// </summary>
+  /// <param name="archives">List of archives to query. Empty list queries all.</param>
+  /// <param name="filter">filter specifications</param>
+  /// <param name="limit">maximum number of returned notifications</param>
+  /// <param name="sortOrder">sorting to apply</param>
+  /// <param name="language">translate notification payloads</param>
+  /// <returns>collection of notifications</returns>
+  rpc QueryStoredNotifications(INotificationLoggerServiceQueryStoredNotificationsRequest) returns (INotificationLoggerServiceQueryStoredNotificationsResponse)  {}
+
+  /// <summary>
+  /// Queries notifications matching the supplied filter from the mentioned archives and returns them as Notification objects
+  /// </summary>
+  /// <param name="archives">List of archives to query. Empty list queries all.</param>
+  /// <param name="filter">filter specifications</param>
+  /// <param name="limit">maximum number of returned notifications</param>
+  /// <param name="sortOrder">sorting to apply</param>
+  /// <param name="language">translate notification payloads</param>
+  /// <returns>collection of notifications</returns>
+  rpc QueryNotifications(INotificationLoggerServiceQueryNotificationsRequest) returns (INotificationLoggerServiceQueryNotificationsResponse)  {}
+
+  /// <summary>
+  /// Remove notifications mathing the filter  from the given archives
+  /// </summary>
+  /// <param name="archives">List of archives to delete notifications from. Empty list deletes from all.</param>
+  /// <param name="filter">filter specification, matching notifications are removed</param>
+  /// <returns>number of deleted notifications</returns>
+  rpc DeleteNotifications(INotificationLoggerServiceDeleteNotificationsRequest) returns (INotificationLoggerServiceDeleteNotificationsResponse)  {}
+
+  /// <summary>
+  /// Queries a list of archives
+  /// </summary>
+  /// <returns>list of known archives</returns>
+  rpc ListArchives(google.protobuf.Empty) returns (INotificationLoggerServiceListArchivesResponse)  {}
+
+  /// <summary>
+  /// Query the configuration as XML for the given archive
+  /// </summary>
+  /// <param name="archive">name of the archive</param>
+  /// <returns>XML of the configuration</returns>
+  rpc GetArchiveConfiguration(INotificationLoggerServiceGetArchiveConfigurationRequest) returns (INotificationLoggerServiceGetArchiveConfigurationResponse)  {}
+
+  /// <summary>
+  /// Set the configuration of the given archive
+  /// </summary>
+  /// <param name="archive">name of the archive</param>
+  /// <param name="xmlConfiguration">XML containing the configuration</param>
+  /// <returns>true on success</returns>
+  rpc SetArchiveConfiguration(INotificationLoggerServiceSetArchiveConfigurationRequest) returns (INotificationLoggerServiceSetArchiveConfigurationResponse)  {}
+
+  /// <summary>
+  /// Resets the configuration of the given archive to the configuration files. All changes made by RSC are reverted.
+  /// </summary>
+  /// <param name="archive">name of the archive</param>
+  /// <returns>true on success</returns>
+  rpc ResetArchiveConfigurationToFiles(INotificationLoggerServiceResetArchiveConfigurationToFilesRequest) returns (INotificationLoggerServiceResetArchiveConfigurationToFilesResponse)  {}
+
+}
+
+message INotificationLoggerServiceQueryStoredNotificationsRequest
+{
+   repeated string archives = 1;
+   Arp.Services.NotificationLogger.Services.Grpc.NotificationFilter filter = 2;
+   int32 limit = 3;
+   Arp.Services.NotificationLogger.Services.Grpc.SortOrder sortOrder = 4;
+   string language = 5;
+}
+message INotificationLoggerServiceQueryNotificationsRequest
+{
+   repeated string archives = 1;
+   Arp.Services.NotificationLogger.Services.Grpc.NotificationFilter filter = 2;
+   int32 limit = 3;
+   Arp.Services.NotificationLogger.Services.Grpc.SortOrder sortOrder = 4;
+   string language = 5;
+}
+message INotificationLoggerServiceDeleteNotificationsRequest
+{
+   repeated string archives = 1;
+   Arp.Services.NotificationLogger.Services.Grpc.NotificationFilter filter = 2;
+}
+message INotificationLoggerServiceGetArchiveConfigurationRequest
+{
+   string archive = 1;
+}
+message INotificationLoggerServiceSetArchiveConfigurationRequest
+{
+   string archive = 1;
+   repeated string xmlConfiguration = 2;
+}
+message INotificationLoggerServiceResetArchiveConfigurationToFilesRequest
+{
+   string archive = 1;
+}
+
+
+message INotificationLoggerServiceQueryStoredNotificationsResponse
+{
+   repeated Arp.Services.NotificationLogger.Services.Grpc.StoredNotification _ReturnValue = 1;
+}
+message INotificationLoggerServiceQueryNotificationsResponse
+{
+   repeated Arp.System.Nm.Services.Grpc.Notification _ReturnValue = 1;
+}
+message INotificationLoggerServiceDeleteNotificationsResponse
+{
+   int32 _ReturnValue = 1;
+}
+message INotificationLoggerServiceListArchivesResponse
+{
+   repeated string _ReturnValue = 1;
+}
+message INotificationLoggerServiceGetArchiveConfigurationResponse
+{
+   repeated string _ReturnValue = 1;
+}
+message INotificationLoggerServiceSetArchiveConfigurationResponse
+{
+   bool _ReturnValue = 1;
+}
+message INotificationLoggerServiceResetArchiveConfigurationToFilesResponse
+{
+   bool _ReturnValue = 1;
+}

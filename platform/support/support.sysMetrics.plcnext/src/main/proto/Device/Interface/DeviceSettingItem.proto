@@ -1,0 +1,34 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "ArpTypes.proto";
+
+package Arp.Device.Interface.Services.Grpc;
+
+   
+
+/// <summary>
+/// Container for a (relative) setting identifier with its value.
+/// </summary>
+/// <remarks>
+/// The structure is designed for efficient interpretation on the receiving side which is the Remoting server.
+/// The structure is used by <see cref="Arp.Device.Interface.Services.IDeviceSettingsService.WriteValue" />
+/// A sequence of instances of this structure is intended to be passed to the
+/// method <see cref="Arp.Device.Interface.Services.IDeviceSettingsService.WriteValues" />.
+/// </remarks>
+message DeviceSettingItem
+{
+   string Setting = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

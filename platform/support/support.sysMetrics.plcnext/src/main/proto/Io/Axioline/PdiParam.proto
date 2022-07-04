@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.Io.Axioline.Services.Grpc;
+
+   
+
+/// <summary>
+/// Contains all parameter to address an object on a module
+/// </summary>
+message PdiParam
+{
+   int32 Slot = 1;
+   int32 Subslot = 2;
+   int32 Index = 3;
+   int32 Subindex = 4;
+}
+
+
+
+
+

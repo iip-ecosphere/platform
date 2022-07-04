@@ -1,0 +1,166 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Io/Axioline/AxioDeviceConfiguration.proto";
+import "Io/Axioline/AxioResult.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.Io.Axioline.Services.Grpc;
+
+
+/**
+ * Provides the access to the AXIO master
+ */
+
+service IAxioMasterService 
+{
+  /// <summary>
+  /// Raw AXIO service to communicate with the AXIO master.
+  /// </summary>
+  /// <param name="inData">
+  /// Request Data to send to the AXIO master. Format has to be according to DDI specification.
+  /// </param>
+  /// <param name="IAxioMasterServiceAxioControlOutData">
+  /// Response Data received from the AXIO master. Format is according to DDI specification.
+  /// </param>
+  /// <returns>
+  /// Status value.
+  /// Note: This service only returns internal errors. Negative confirmations have to be evaluated by user.
+  /// </returns>
+  rpc AxioControl(IAxioMasterServiceAxioControlRequest) returns (IAxioMasterServiceAxioControlResponse)  {}
+
+  /// <summary>
+  /// Automatic creation of a new configuration
+  /// </summary>
+  /// <param name="frameReference">
+  /// Frame reference
+  /// </param>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc CreateConfiguration(IAxioMasterServiceCreateConfigurationRequest) returns (IAxioMasterServiceCreateConfigurationResponse)  {}
+
+  /// <summary>
+  /// Read current configuration
+  /// </summary>
+  /// <param name="frameReference">
+  /// Frame reference
+  /// </param>
+  /// <param name="configuration">
+  /// Configuration of AXIO device
+  /// <see cref="Arp.Device.Interface.Services.AxioDeviceConfiguration" /></param>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc ReadConfiguration(IAxioMasterServiceReadConfigurationRequest) returns (IAxioMasterServiceReadConfigurationResponse)  {}
+
+  /// <summary>
+  /// Write configuration
+  /// </summary>
+  /// <param name="frameReference">
+  /// Frame reference
+  /// </param>
+  /// <param name="configuration">
+  /// Configuration of AXIO device
+  /// <see cref="Arp.Device.Interface.Services.AxioDeviceConfiguration" /></param>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc WriteConfiguration(IAxioMasterServiceWriteConfigurationRequest) returns (IAxioMasterServiceWriteConfigurationResponse)  {}
+
+  /// <summary>
+  /// Activate configuration
+  /// </summary>
+  /// <param name="frameReference">
+  /// Frame reference
+  /// </param>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc ActivateConfiguration(IAxioMasterServiceActivateConfigurationRequest) returns (IAxioMasterServiceActivateConfigurationResponse)  {}
+
+  /// <summary>
+  /// Deactivate configuration
+  /// </summary>
+  /// <param name="frameReference">
+  /// Frame reference
+  /// </param>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc DeactivateConfiguration(IAxioMasterServiceDeactivateConfigurationRequest) returns (IAxioMasterServiceDeactivateConfigurationResponse)  {}
+
+  /// <summary>
+  /// Reset AXIO master
+  /// </summary>
+  /// <returns>
+  /// Structure with error information.
+  /// </returns>
+  rpc ResetMaster(google.protobuf.Empty) returns (IAxioMasterServiceResetMasterResponse)  {}
+
+}
+
+message IAxioMasterServiceAxioControlRequest
+{
+   repeated int32 inData = 1;
+}
+message IAxioMasterServiceCreateConfigurationRequest
+{
+   int32 frameReference = 1;
+}
+message IAxioMasterServiceReadConfigurationRequest
+{
+   int32 frameReference = 1;
+}
+message IAxioMasterServiceWriteConfigurationRequest
+{
+   int32 frameReference = 1;
+   repeated Arp.Io.Axioline.Services.Grpc.AxioDeviceConfiguration configuration = 2;
+}
+message IAxioMasterServiceActivateConfigurationRequest
+{
+   int32 frameReference = 1;
+}
+message IAxioMasterServiceDeactivateConfigurationRequest
+{
+   int32 frameReference = 1;
+}
+
+
+message IAxioMasterServiceAxioControlResponse
+{
+   int32 _ReturnValue = 1;
+   repeated int32 outData = 2;
+}
+message IAxioMasterServiceCreateConfigurationResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+}
+message IAxioMasterServiceReadConfigurationResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+   repeated Arp.Io.Axioline.Services.Grpc.AxioDeviceConfiguration configuration = 2;
+}
+message IAxioMasterServiceWriteConfigurationResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+}
+message IAxioMasterServiceActivateConfigurationResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+}
+message IAxioMasterServiceDeactivateConfigurationResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+}
+message IAxioMasterServiceResetMasterResponse
+{
+   Arp.Io.Axioline.Services.Grpc.AxioResult _ReturnValue = 1;
+}

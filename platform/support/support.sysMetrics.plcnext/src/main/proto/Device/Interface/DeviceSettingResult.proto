@@ -1,0 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "Device/Interface/AccessErrorCode.proto";
+import "ArpTypes.proto";
+
+package Arp.Device.Interface.Services.Grpc;
+
+   
+
+/// <summary>
+/// Container for a combination of an error code and a value which is a result for a read operation to a single setting.
+/// </summary>
+/// <remarks>
+/// The structure is used as result by <see cref="Arp.Device.Interface.Services.IDeviceSettingsService.ReadValue" />
+/// A sequence of instances of this structure is used as result by <see cref="Arp.Device.Interface.Services.IDeviceSettingsService.ReadValues" />.
+/// </remarks>
+message DeviceSettingResult
+{
+   Arp.Device.Interface.Services.Grpc.AccessErrorCode ErrorCode = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

@@ -1,0 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.Services.NotificationLogger.Services.Grpc;
+
+   
+
+/// <summary>
+/// Filter specification to match notification on query or delete
+/// </summary>
+message NotificationFilter
+{
+   uint64 StoredIdLowerLimit = 1;
+   uint64 StoredIdUpperLimit = 2;
+   string NotificationNameRegExp = 3;
+   string SenderNameRegExp = 4;
+   string TimestampBefore = 5;
+   string TimestampAfter = 6;
+   string SeverityLowerLimit = 7;
+   string SeverityUpperLimit = 8;
+}
+
+
+
+
+

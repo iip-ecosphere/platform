@@ -1,0 +1,30 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "System/Commons/Io/Traits.proto";
+import "ArpTypes.proto";
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+   
+
+/// <summary>
+/// Specifies a file trait item
+/// </summary>
+/// <seealso cref="Arp.System.Commons.Services.Io.FileSystemTraitsEntry" />
+message TraitItem
+{
+   Arp.System.Commons.Services.Io.Grpc.Traits Trait = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

@@ -1,0 +1,30 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+package Arp.Grpc;
+
+/**
+ * Provides the access to the AXIO master
+ */
+   
+message DateStructure
+{
+    sint32 year = 1;
+    sint32 month = 2;
+    sint32 day = 3;
+    sint32 hour = 4;
+    sint32 minute = 5;
+    sint32 second = 6;
+    sint32 millisecond = 7;
+    sint32 microsecond = 8;
+}
+
+
+
+

@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "Services/DataLogger/RpnItemType.proto";
+import "ArpTypes.proto";
+
+package Arp.Services.DataLogger.Services.Grpc;
+
+   
+
+/// <summary>
+/// Item of the trigger condition/&gt;.
+/// </summary>
+message TriggerRpnItem
+{
+   Arp.Services.DataLogger.Services.Grpc.RpnItemType Type = 1;
+   Arp.Type.Grpc.ObjectType Item = 2;
+}
+
+
+
+
+

@@ -1,0 +1,111 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "System/Commons/Io/FileSystemError.proto";
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+
+/**
+ * Provides common file operations for reading and writing files
+ * as well as deleting/moving/copying files on the device.
+ * 
+ * <div>
+ * The path separator is always '/'.
+ * </div>
+ */
+
+service IFileService 
+{
+  /// <summary>
+  /// Checks if the specified file exists.
+  /// </summary>
+  /// <param name="path">Path of the file to check.</param>
+  /// <returns>
+  /// <c>true</c> if the file exists, otherwise <c>false</c>.
+  /// </returns>
+  rpc Exists(IFileServiceExistsRequest) returns (IFileServiceExistsResponse)  {}
+
+
+  /// <summary>
+  /// Deletes the specified file.
+  /// </summary>
+  /// <param name="filePath">The pathe of the file to delete.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Delete(IFileServiceDeleteRequest) returns (IFileServiceDeleteResponse)  {}
+
+  /// <summary>
+  /// Moves the specified file.
+  /// </summary>
+  /// <param name="createDirectory">if set to <c>true</c> the directory of the file is created (recursively), if it does not exists yet.</param>
+  /// <param name="overwrite">if set to <c>true</c> the destination file is overwritten, if it yet exists, otherwise an error is returned.</param>
+  /// <param name="sourceFilePath">The source path of the file to move.</param>
+  /// <param name="destinationFilePath">The destination path of the file to move.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Move(IFileServiceMoveRequest) returns (IFileServiceMoveResponse)  {}
+
+  /// <summary>
+  /// Copies the specified files.
+  /// </summary>
+  /// <param name="createDirectory">if set to <c>true</c> the directory of the file is created (recursively), if it does not exists yet.</param>
+  /// <param name="overwrite">if set to <c>true</c> the destination file is overwritten, if it yet exists, otherwise an error is returned.</param>
+  /// <param name="sourceFilePath">The source path of the file to copy.</param>
+  /// <param name="destinationFilePath">The destination path of the file to copy.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Copy(IFileServiceCopyRequest) returns (IFileServiceCopyResponse)  {}
+
+}
+
+message IFileServiceExistsRequest
+{
+   string path = 1;
+}
+message IFileServiceDeleteRequest
+{
+   string filePath = 1;
+}
+message IFileServiceMoveRequest
+{
+   bool createDirectory = 1;
+   bool overwrite = 2;
+   string sourceFilePath = 3;
+   string destinationFilePath = 4;
+}
+message IFileServiceCopyRequest
+{
+   bool createDirectory = 1;
+   bool overwrite = 2;
+   string sourceFilePath = 3;
+   string destinationFilePath = 4;
+}
+
+
+message IFileServiceExistsResponse
+{
+   bool _ReturnValue = 1;
+}
+message IFileServiceDeleteResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IFileServiceMoveResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IFileServiceCopyResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}

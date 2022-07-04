@@ -1,0 +1,36 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "System/Um/AuthenticationError.proto";
+
+package Arp.System.Security.Services.Grpc;
+
+service IAuthenticationService
+{
+  rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {}
+  rpc CloseSession (google.protobuf.Empty) returns (CloseSessionResponse) {}
+}
+
+message CreateSessionRequest
+{
+  string username = 1;
+  string password = 2;
+}
+
+message CreateSessionResponse 
+{
+  Arp.System.Security.Grpc.AuthenticationError result = 1;
+  string sessionId = 2;    // session ID that has to be used for each call that needs to be authorized.
+  uint32 penaltyDelay = 3;  // delay in ms if illegal credentials have been used
+}
+
+message CloseSessionResponse
+{
+    bool result = 1; // true: session successfully closed
+}

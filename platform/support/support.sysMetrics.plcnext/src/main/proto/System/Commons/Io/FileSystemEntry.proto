@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+   
+
+/// <summary>
+/// This struct is used by file operations to reading of the file system entries.
+/// </summary>
+/// <see cref="Arp.System.Commons.Services.Io.IDirectoryService.EnumerateFileSystemEntries" />
+message FileSystemEntry
+{
+   string Path = 1;
+   bool IsFile = 2;
+   bool IsDirectory = 3;
+}
+
+
+
+
+

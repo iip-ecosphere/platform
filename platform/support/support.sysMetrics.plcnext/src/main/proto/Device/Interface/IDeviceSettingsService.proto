@@ -1,0 +1,88 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Device/Interface/AccessErrorCode.proto";
+import "Device/Interface/DeviceSettingItem.proto";
+import "Device/Interface/DeviceSettingResult.proto";
+
+package Arp.Device.Interface.Services.Grpc;
+
+
+/**
+ * Use this service to read and write device settings.
+ */
+
+service IDeviceSettingsService 
+{
+  /// <summary>
+  /// Read a single setting
+  /// </summary>
+  /// <param name="setting">String for select the item</param>
+  /// <returns> result as <see cref="Arp.Device.Interface.Services.DeviceSettingResult" /></returns>
+  rpc ReadValue(IDeviceSettingsServiceReadValueRequest) returns (IDeviceSettingsServiceReadValueResponse)  {}
+
+  /// <summary>
+  /// Read a list of settings
+  /// </summary>
+  /// <param name="settings">Arry of string for select the items</param>
+  /// <returns> result as arry of <see cref="Arp.Device.Interface.Services.DeviceSettingResult" /></returns>
+  rpc ReadValues(IDeviceSettingsServiceReadValuesRequest) returns (IDeviceSettingsServiceReadValuesResponse)  {}
+
+  /// <summary>
+  /// Write a single setting
+  /// </summary>
+  /// <param name="settingItem">
+  /// <see cref="Arp.Device.Interface.Services.DeviceSettingItem" /> with string for select the item and the new value</param>
+  /// <returns> result as <see cref="Arp.Device.Interface.Services.AccessErrorCode" /></returns>
+  rpc WriteValue(IDeviceSettingsServiceWriteValueRequest) returns (IDeviceSettingsServiceWriteValueResponse)  {}
+
+  /// <summary>
+  /// Write a list of settings
+  /// </summary>
+  /// <param name="settingItems">Arry of <see cref="Arp.Device.Interface.Services.DeviceSettingItem" /> for set the items to new values</param>
+  /// <returns> result as arry of <see cref="Arp.Device.Interface.Services.AccessErrorCode" /></returns>
+  rpc WriteValues(IDeviceSettingsServiceWriteValuesRequest) returns (IDeviceSettingsServiceWriteValuesResponse)  {}
+
+}
+
+message IDeviceSettingsServiceReadValueRequest
+{
+   string setting = 1;
+}
+message IDeviceSettingsServiceReadValuesRequest
+{
+   repeated string settings = 1;
+}
+message IDeviceSettingsServiceWriteValueRequest
+{
+   Arp.Device.Interface.Services.Grpc.DeviceSettingItem settingItem = 1;
+}
+message IDeviceSettingsServiceWriteValuesRequest
+{
+   repeated Arp.Device.Interface.Services.Grpc.DeviceSettingItem settingItems = 1;
+}
+
+
+message IDeviceSettingsServiceReadValueResponse
+{
+   Arp.Device.Interface.Services.Grpc.DeviceSettingResult _ReturnValue = 1;
+}
+message IDeviceSettingsServiceReadValuesResponse
+{
+   repeated Arp.Device.Interface.Services.Grpc.DeviceSettingResult _ReturnValue = 1;
+}
+message IDeviceSettingsServiceWriteValueResponse
+{
+   Arp.Device.Interface.Services.Grpc.AccessErrorCode _ReturnValue = 1;
+}
+message IDeviceSettingsServiceWriteValuesResponse
+{
+   repeated Arp.Device.Interface.Services.Grpc.AccessErrorCode _ReturnValue = 1;
+}

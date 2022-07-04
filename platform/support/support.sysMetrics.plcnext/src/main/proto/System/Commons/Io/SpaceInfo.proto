@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+   
+
+/// <summary>
+/// This struct is used by file operations to reading of the space informations.
+/// </summary>
+/// <seealso cref="Arp.System.Commons.Services.Io.FileSystemTraitsEntry" />
+message SpaceInfo
+{
+   uint64 Capacity = 1;
+   uint64 Free = 2;
+   uint64 Available = 3;
+}
+
+
+
+
+

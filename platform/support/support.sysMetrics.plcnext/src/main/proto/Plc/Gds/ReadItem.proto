@@ -1,0 +1,30 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "Plc/Gds/DataAccessError.proto";
+import "ArpTypes.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+   
+
+/// <summary>
+/// Stores the data to be read, written by the controller
+/// and a possible data access error.
+/// </summary>
+message ReadItem
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError Error = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

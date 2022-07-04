@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "ArpTypes.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+   
+
+/// <summary>
+/// Stores the to be written data and the related variable
+/// name to be write to.
+/// </summary>
+message WriteItem
+{
+   string PortName = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "Services/DataLogger/SessionPropertyName.proto";
+import "ArpTypes.proto";
+
+package Arp.Services.DataLogger.Services.Grpc;
+
+   
+
+/// <summary>
+/// All available names of properties that can be set on a session
+/// </summary>
+message SessionProperty
+{
+   Arp.Services.DataLogger.Services.Grpc.SessionPropertyName Name = 1;
+   Arp.Type.Grpc.ObjectType Value = 2;
+}
+
+
+
+
+

@@ -1,0 +1,55 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "ArpTypes.proto";
+
+package Arp.Device.Interface.Services.Grpc;
+
+
+/**
+ * Use this service to read device states.
+ */
+
+service IDeviceStatusService 
+{
+  /// <summary>
+  /// Read a single state
+  /// </summary>
+  /// <param name="identifier">String for select the item</param>
+  /// <returns>value as <code>RscVariant</code> on success, <code>RscType::Void</code> on error</returns>
+  rpc GetItem(IDeviceStatusServiceGetItemRequest) returns (IDeviceStatusServiceGetItemResponse)  {}
+
+  /// <summary>
+  /// Read a list of states
+  /// </summary>
+  /// <param name="identifiers">Arry of String for select the items</param>
+  /// <returns>value as <code>RscVariant</code> on success, <code>RscType::Void</code> on error</returns>
+  rpc GetItems(IDeviceStatusServiceGetItemsRequest) returns (IDeviceStatusServiceGetItemsResponse)  {}
+
+}
+
+message IDeviceStatusServiceGetItemRequest
+{
+   string identifier = 1;
+}
+message IDeviceStatusServiceGetItemsRequest
+{
+   repeated string identifiers = 1;
+}
+
+
+message IDeviceStatusServiceGetItemResponse
+{
+   Arp.Type.Grpc.ObjectType _ReturnValue = 1;
+}
+message IDeviceStatusServiceGetItemsResponse
+{
+   repeated Arp.Type.Grpc.ObjectType _ReturnValue = 1;
+}

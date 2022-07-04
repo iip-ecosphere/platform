@@ -1,0 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "Plc/DataType.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+   
+
+/// <summary>
+/// Describes a subscribed variable.
+/// </summary>
+/// <remarks>
+/// The structure includes the full name of the variable e.g.:
+/// <c>ComponentName-1/ProgramName-1.Variable_Name</c> and the associated type
+/// (<see cref="Arp.Plc.DataType" />) e.g.: <see cref="Arp.Plc.DataType.Int8" />.
+/// </remarks>
+message VariableInfo
+{
+   string Name = 1;
+   Arp.Plc.Grpc.DataType Type = 2;
+}
+
+
+
+
+

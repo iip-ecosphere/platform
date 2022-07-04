@@ -1,0 +1,190 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "System/Nm/NotificationRegistrationInfo.proto";
+import "System/Nm/NotificationRegistrationStatus.proto";
+import "System/Nm/Severity.proto";
+import "ArpTypes.proto";
+import "DateTime.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.System.Nm.Services.Grpc;
+
+
+/**
+ * Service to send Notifications and query information about the NotificationManager
+ */
+
+service INotificationManagerService 
+{
+  /// <summary>
+  /// Registers a new Notification
+  /// </summary>
+  /// <param name="notificationName">name of the notification (e.g. Arp.System.Nm.SomethingInterestingHappened)</param>
+  /// <param name="senderName">name of the sender of the notification</param>
+  /// <param name="severity">severity of the notification</param>
+  /// <param name="payloadTypeName">name of the payload type</param>
+  /// <returns>NotificationNameId, necessary for sending and unregistering</returns>
+  rpc RegisterNotification(INotificationManagerServiceRegisterNotificationRequest) returns (INotificationManagerServiceRegisterNotificationResponse)  {}
+
+  /// <summary>
+  /// Unregisters a Nototification
+  /// </summary>
+  /// <param name="notificationNameId">id of the NotificationName to unregister</param>
+  rpc UnregisterNotification(INotificationManagerServiceUnregisterNotificationRequest) returns (google.protobuf.Empty)  {}
+
+  /// <summary>
+  /// Sends a notification
+  /// </summary>
+  /// <param name="notificationNameId">id of the NotificationName to send</param>
+  /// <param name="timestamp">Current timestamp</param>
+  /// <param name="payload">payload to send</param>
+  /// <returns>NotificationId</returns>
+  rpc SendNotification(INotificationManagerServiceSendNotificationRequest) returns (INotificationManagerServiceSendNotificationResponse)  {}
+
+  /// <summary>
+  /// Queries the NotifictionName
+  /// </summary>
+  /// <param name="notificationNameId">NotificationNameId</param>
+  /// <returns>NotificationName</returns>
+  rpc GetNotificationName(INotificationManagerServiceGetNotificationNameRequest) returns (INotificationManagerServiceGetNotificationNameResponse)  {}
+
+  /// <summary>
+  /// Queries the id of an NotificationName
+  /// </summary>
+  /// <param name="notificationName">NotificationName</param>
+  /// <returns>NotificationNameId</returns>
+  rpc GetNotificationNameId(INotificationManagerServiceGetNotificationNameIdRequest) returns (INotificationManagerServiceGetNotificationNameIdResponse)  {}
+
+  /// <summary>
+  /// Queries the ids of Notifications with a given NotificationRegistrationStatus
+  /// </summary>
+  /// <param name="status">status of the queried Notifications</param>
+  /// <returns>collection of matching NotificationNameIds</returns>
+  rpc GetNotificationNameIdsByStatus(INotificationManagerServiceGetNotificationNameIdsByStatusRequest) returns (INotificationManagerServiceGetNotificationNameIdsByStatusResponse)  {}
+
+  /// <summary>
+  /// Queries of all known NotificationNameIds
+  /// </summary>
+  /// <returns>collection of all known NotificationNameIds</returns>
+  rpc GetAllKnownNotificationNameIds(google.protobuf.Empty) returns (INotificationManagerServiceGetAllKnownNotificationNameIdsResponse)  {}
+
+  /// <summary>
+  /// Queries information about an Notification
+  /// </summary>
+  /// <param name="notificationNameId">NotificationNameId</param>
+  /// <returns>data structure to describe the Notification</returns>
+  rpc GetNotificationRegistration(INotificationManagerServiceGetNotificationRegistrationRequest) returns (INotificationManagerServiceGetNotificationRegistrationResponse)  {}
+
+  /// <summary>
+  /// Query an id for a given PayloadType
+  /// </summary>
+  /// <param name="payloadTypeName">Name fo the payload type</param>
+  /// <returns>id of the payload type</returns>
+  rpc GetPayloadTypeId(INotificationManagerServiceGetPayloadTypeIdRequest) returns (INotificationManagerServiceGetPayloadTypeIdResponse)  {}
+
+  /// <summary>
+  /// Query the payload type name of a given id
+  /// </summary>
+  /// <param name="payloadTypeId">id of the payload type</param>
+  /// <returns>name of the payload type</returns>
+  rpc GetPayloadTypeName(INotificationManagerServiceGetPayloadTypeNameRequest) returns (INotificationManagerServiceGetPayloadTypeNameResponse)  {}
+
+  /// <summary>
+  /// Returns the number of Notifications submitted since startup of the controller
+  /// </summary>
+  /// <returns>number of submitted notifications</returns>
+  rpc GetNumberOfSubmittedNotifications(google.protobuf.Empty) returns (INotificationManagerServiceGetNumberOfSubmittedNotificationsResponse)  {}
+
+}
+
+message INotificationManagerServiceRegisterNotificationRequest
+{
+   string notificationName = 1;
+   string senderName = 2;
+   Arp.System.Nm.Services.Grpc.Severity severity = 3;
+   string payloadTypeName = 4;
+}
+message INotificationManagerServiceUnregisterNotificationRequest
+{
+   uint32 notificationNameId = 1;
+}
+message INotificationManagerServiceSendNotificationRequest
+{
+   uint32 notificationNameId = 1;
+   Arp.Grpc.DateTime timestamp = 2;
+   repeated Arp.Type.Grpc.ObjectType payload = 3;
+}
+message INotificationManagerServiceGetNotificationNameRequest
+{
+   uint32 notificationNameId = 1;
+}
+message INotificationManagerServiceGetNotificationNameIdRequest
+{
+   string notificationName = 1;
+}
+message INotificationManagerServiceGetNotificationNameIdsByStatusRequest
+{
+   Arp.System.Nm.Services.Grpc.NotificationRegistrationStatus status = 1;
+}
+message INotificationManagerServiceGetNotificationRegistrationRequest
+{
+   uint32 notificationNameId = 1;
+}
+message INotificationManagerServiceGetPayloadTypeIdRequest
+{
+   string payloadTypeName = 1;
+}
+message INotificationManagerServiceGetPayloadTypeNameRequest
+{
+   int32 payloadTypeId = 1;
+}
+
+
+message INotificationManagerServiceRegisterNotificationResponse
+{
+   uint32 _ReturnValue = 1;
+}
+message INotificationManagerServiceSendNotificationResponse
+{
+   uint64 _ReturnValue = 1;
+}
+message INotificationManagerServiceGetNotificationNameResponse
+{
+   string _ReturnValue = 1;
+}
+message INotificationManagerServiceGetNotificationNameIdResponse
+{
+   uint32 _ReturnValue = 1;
+}
+message INotificationManagerServiceGetNotificationNameIdsByStatusResponse
+{
+   repeated uint32 _ReturnValue = 1;
+}
+message INotificationManagerServiceGetAllKnownNotificationNameIdsResponse
+{
+   repeated uint32 _ReturnValue = 1;
+}
+message INotificationManagerServiceGetNotificationRegistrationResponse
+{
+   Arp.System.Nm.Services.Grpc.NotificationRegistrationInfo _ReturnValue = 1;
+}
+message INotificationManagerServiceGetPayloadTypeIdResponse
+{
+   int32 _ReturnValue = 1;
+}
+message INotificationManagerServiceGetPayloadTypeNameResponse
+{
+   string _ReturnValue = 1;
+}
+message INotificationManagerServiceGetNumberOfSubmittedNotificationsResponse
+{
+   uint64 _ReturnValue = 1;
+}

@@ -1,0 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.Services.NotificationLogger.Services.Grpc;
+
+   
+
+/// <summary>
+/// Data structure for notifications from the NotificationLogger
+/// </summary>
+message StoredNotification
+{
+   uint64 Id = 1;
+   string Archive = 2;
+   string NotificationName = 3;
+   string SenderName = 4;
+   string TimeStamp = 5;
+   string Severity = 6;
+   repeated string Payload = 7;
+   repeated string PayloadXml = 8;
+}
+
+
+
+
+

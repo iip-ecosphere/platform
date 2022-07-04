@@ -1,0 +1,46 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+
+package Arp.System.Lm.Services.Grpc;
+
+
+/**
+ * Service methods retrieving current license status
+ */
+
+service ILicenseStatusService 
+{
+  /// <summary>
+  /// Retrieves license status of specified firm code, product code and feature code provide by license issuer
+  /// </summary>
+  /// <param name="firmCode">Firm code</param>
+  /// <param name="productCode">Product code</param>
+  /// <param name="featureCode">Feature code (ignored if <c>0</c>)</param>
+  /// <returns>
+  /// <c>true</c>, if license is valid, <c>false</c> if license is invalid
+  /// </returns>
+  /// <exception cref="System.InvalidOperationException">"License manager has not been configured."</exception>
+  rpc GetLicenseStatus(ILicenseStatusServiceGetLicenseStatusRequest) returns (ILicenseStatusServiceGetLicenseStatusResponse)  {}
+
+}
+
+message ILicenseStatusServiceGetLicenseStatusRequest
+{
+   uint32 firmCode = 1;
+   uint32 productCode = 2;
+   uint32 featureCode = 3;
+}
+
+
+message ILicenseStatusServiceGetLicenseStatusResponse
+{
+   bool _ReturnValue = 1;
+}

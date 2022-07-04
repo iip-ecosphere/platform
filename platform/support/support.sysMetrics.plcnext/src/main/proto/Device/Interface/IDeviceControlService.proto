@@ -1,0 +1,69 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Device/Interface/AccessErrorCode.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.Device.Interface.Services.Grpc;
+
+
+/**
+ * Use this service to control the device.
+ */
+
+service IDeviceControlService 
+{
+  /// <summary>
+  /// Reboot the device
+  /// </summary>
+  rpc RestartDevice(google.protobuf.Empty) returns (google.protobuf.Empty)  {}
+
+  /// <summary>
+  /// Reset device configuration
+  /// </summary>
+  /// <param name="resetType">
+  /// <c>1</c> Reset device configuration to factory default, <c>2</c> Downgrade FW to factory version and reset configuration</param>
+  /// <returns>Result of start execute <see cref="Arp.Device.Interface.Services.AccessErrorCode" /></returns>
+  /// <remarks>
+  /// After successfull start the PLC will stop and than reboot. While the reboot the requested defaults will be set.
+  /// </remarks>
+  rpc ResetToFactoryDefaults(IDeviceControlServiceResetToFactoryDefaultsRequest) returns (IDeviceControlServiceResetToFactoryDefaultsResponse)  {}
+
+  /// <summary>
+  /// Start FW update
+  /// </summary>
+  /// <param name="updateType">Reserved for extentions, must be <c>0</c> in this version.</param>
+  /// <returns>Result of start execute <see cref="Arp.Device.Interface.Services.AccessErrorCode" /></returns>
+  /// <remarks>
+  /// Before you can start an update a raucb-container must be copied to path "/opt/plcnext".
+  /// After successfull start an update the PLC will stop, execute the update and than reboot.
+  /// </remarks>
+  rpc StartFirmwareUpdate(IDeviceControlServiceStartFirmwareUpdateRequest) returns (IDeviceControlServiceStartFirmwareUpdateResponse)  {}
+
+}
+
+message IDeviceControlServiceResetToFactoryDefaultsRequest
+{
+   uint32 resetType = 1;
+}
+message IDeviceControlServiceStartFirmwareUpdateRequest
+{
+   uint32 updateType = 1;
+}
+
+
+message IDeviceControlServiceResetToFactoryDefaultsResponse
+{
+   Arp.Device.Interface.Services.Grpc.AccessErrorCode _ReturnValue = 1;
+}
+message IDeviceControlServiceStartFirmwareUpdateResponse
+{
+   Arp.Device.Interface.Services.Grpc.AccessErrorCode _ReturnValue = 1;
+}

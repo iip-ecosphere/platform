@@ -1,0 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "System/Nm/NotificationRegistrationStatus.proto";
+import "System/Nm/Severity.proto";
+
+package Arp.System.Nm.Services.Grpc;
+
+   
+
+/// <summary>
+/// Information about the registration of a Notification
+/// </summary>
+message NotificationRegistrationInfo
+{
+   uint32 NotificationNameId = 1;
+   string NotificationName = 2;
+   string SenderName = 3;
+   Arp.System.Nm.Services.Grpc.Severity Severity = 4;
+   int32 PayloadTypeId = 5;
+   Arp.System.Nm.Services.Grpc.NotificationRegistrationStatus Status = 6;
+}
+
+
+
+
+

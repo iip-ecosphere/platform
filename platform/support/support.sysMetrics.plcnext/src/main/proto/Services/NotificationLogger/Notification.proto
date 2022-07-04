@@ -1,0 +1,34 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "System/Nm/Severity.proto";
+import "ArpTypes.proto";
+import "DateTime.proto";
+
+package Arp.System.Nm.Services.Grpc;
+
+   
+
+/// <summary>
+/// Notification object as delivered by the NotificationManager
+/// </summary>
+message Notification
+{
+   uint64 Id = 1;
+   uint32 NotificationNameId = 2;
+   Arp.Grpc.DateTime Timestamp = 3;
+   Arp.System.Nm.Services.Grpc.Severity Severity = 4;
+   int32 PayloadTypeId = 5;
+   repeated Arp.Type.Grpc.ObjectType Payload = 6;
+}
+
+
+
+
+

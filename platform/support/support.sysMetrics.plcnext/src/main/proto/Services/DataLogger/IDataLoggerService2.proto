@@ -1,0 +1,327 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Services/DataLogger/ErrorCode.proto";
+import "Services/DataLogger/SessionProperty.proto";
+import "Services/DataLogger/SessionState.proto";
+import "Services/DataLogger/TriggerRpnItem.proto";
+import "Plc/Gds/VariableInfo.proto";
+import "ArpTypes.proto";
+import "DateTime.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.Services.DataLogger.Services.Grpc;
+
+
+/**
+ * The DataLogger provides an interface to log and store variables during firmware runtime.
+ */
+
+service IDataLoggerService2 
+{
+  /// <summary>
+  /// List all names of sessions inside the data logger component.
+  /// </summary>
+  /// <returns>Array of session names.</returns>
+  rpc ListSessionNames(google.protobuf.Empty) returns (IDataLoggerService2ListSessionNamesResponse)  {}
+
+  /// <summary>
+  /// Tries to create a new session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to be created.</param>
+  /// <param name="persistent">If set to <c>true</c>, the newly created session will not be removed when the RSC connection is closed.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc CreateSession(IDataLoggerService2CreateSessionRequest) returns (IDataLoggerService2CreateSessionResponse)  {}
+
+  /// <summary>
+  /// Tries to remove a session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to be removed.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc RemoveSession(IDataLoggerService2RemoveSessionRequest) returns (IDataLoggerService2RemoveSessionResponse)  {}
+
+  /// <summary>
+  /// Tries to start a logging session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to be started.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc StartSession(IDataLoggerService2StartSessionRequest) returns (IDataLoggerService2StartSessionResponse)  {}
+
+  /// <summary>
+  /// Tries to stop a logging session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to be stopped.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc StopSession(IDataLoggerService2StopSessionRequest) returns (IDataLoggerService2StopSessionResponse)  {}
+
+  /// <summary>
+  /// (Re)configures a session
+  /// </summary>
+  /// <param name="sessionname">Name of session to be created or reconfigured</param>
+  /// <param name="properties">Collection of attributes forming the configuration for the session</param>
+  /// <returns>
+  /// <cref name="ErrorCode" /> for more details</returns>
+  rpc ConfigureSession(IDataLoggerService2ConfigureSessionRequest) returns (IDataLoggerService2ConfigureSessionResponse)  {}
+
+  /// <summary>
+  /// Tries to query the current configuration of a session
+  /// </summary>
+  /// <param name="sessionname">Name of session to be queried</param>
+  /// <param name="properties">Collection of attributes forming the sessions configuration after successfull invocation</param>
+  /// <param name="isPersistent">Determines if the session will remain (<c>true</c>) when the connection to the server is closed or not</param>
+  /// <returns>
+  /// <cref name="ErrorCode" /> for more details</returns>
+  rpc GetSessionConfiguration(IDataLoggerService2GetSessionConfigurationRequest) returns (IDataLoggerService2GetSessionConfigurationResponse)  {}
+
+  /// <summary>
+  /// Tries to query the state of a session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to query state of.</param>
+  /// <param name="state">Container for state of session, if session exists. The value after return from call is
+  /// unspecified if the session does not exists.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc GetSessionState(IDataLoggerService2GetSessionStateRequest) returns (IDataLoggerService2GetSessionStateResponse)  {}
+
+  /// <summary>
+  /// Tries to add a variable to a session.
+  /// </summary>
+  /// <param name="sessionName">Name of session where variable should be added.</param>
+  /// <param name="variableNames">Name of variable to be added to session.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc SetVariables(IDataLoggerService2SetVariablesRequest) returns (IDataLoggerService2SetVariablesResponse)  {}
+
+  /// <summary>
+  /// Queries all infos about logged variables of a session.
+  /// </summary>
+  /// <param name="sessionName">Name of session to query logged variables</param>
+  /// <param name="infos">Iterator which can be used to list logged variables after successful call</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc GetLoggedVariables(IDataLoggerService2GetLoggedVariablesRequest) returns (IDataLoggerService2GetLoggedVariablesResponse)  {}
+
+  /// <summary>
+  /// Read the data from the given variable from the session with the session name.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This service function returns the plain data values from
+  /// the passed variable names including timestamps and data series consistent flags,
+  /// which is called a record.
+  /// In a record the values are in a static order and doesn't contain
+  /// any type information. Each record starts with the timestamp followed by
+  /// the values from the given variable by names and the consistent flag. The
+  /// record ends with a record type describing the cycle the record belongs to.
+  /// </para>
+  /// <para>
+  /// Example:
+  /// <code>
+  /// Read variables from task A: a1, a2
+  /// from task B: b1
+  ///
+  /// Results in:
+  /// object[]
+  /// timestamp task A, a1, a2, b1, consistent flag, record type
+  /// timestamp task B, a1, a2, b1, consistent flag, record type
+  /// </code></para>
+  /// <para>
+  /// The number of records depends on the given start and end time.
+  /// Each values will be returned between the start and end time.
+  ///
+  /// If the start time is zero, all available records until the end time
+  /// will be returned.
+  ///
+  /// If the end time is zero, all available records from the start time until
+  /// the last available record is reached will be returned.
+  ///
+  /// If the start and end time is zero, each available record will be returned.
+  ///
+  /// If the start time is greater than the end time, the resulted values are returned
+  /// in descending order.
+  /// </para>
+  /// </remarks>
+  /// <param name="sessionName">Name of session where variable should be read from.</param>
+  /// <param name="startTime">Start time to be read data.</param>
+  /// <param name="endTime">End time to be read data.</param>
+  /// <param name="variableNames">Name of variables to be read data.</param>
+  /// <param name="values">An enumerator which stores the read values.</param>
+  /// <returns>Returns <see cref="Arp.Device.Interface.Services.ErrorCode.None" /> on success.</returns>
+  rpc ReadVariablesData(IDataLoggerService2ReadVariablesDataRequest) returns (IDataLoggerService2ReadVariablesDataResponse)  {}
+
+  /// <summary>
+  /// Returns names of all files that have been written by a session
+  /// </summary>
+  /// <param name="sessionname">Name of session from which rotated files should be listed</param>
+  /// <param name="filenames">Iterator to list names of all rotated files on successful call.</param>
+  /// <returns>
+  /// ErrorCode.NoData in case the session has no data sink configured.
+  /// </returns>
+  rpc GetRotatedFileNames(IDataLoggerService2GetRotatedFileNamesRequest) returns (IDataLoggerService2GetRotatedFileNamesResponse)  {}
+
+  /// <summary>
+  /// Tries to retrieve names of sessions which log assigned variables
+  /// </summary>
+  /// <param name="variablename">Name of variable to which corresponding sessions should be found</param>
+  /// <returns>Enumeration of names of sessions which log the variable in question</returns>
+  rpc GetSessionNames(IDataLoggerService2GetSessionNamesRequest) returns (IDataLoggerService2GetSessionNamesResponse)  {}
+
+  /// <summary>
+  /// Sets a trigger condition
+  /// </summary>
+  /// <remarks>
+  /// Configuration of the trigger is done in RPN (Reverse Polish Notation). Each operand or operation is a single <see cref="Arp.Device.Interface.Services.TriggerRpnItem" />. Only
+  /// if the condition specified by the trigger is fullfilled values are logged and stored inside the sink.
+  ///
+  /// The amount of cycles that should be stored before the condition was fullfilled can be configured using <c>preCycleCount</c> whereas the amount of
+  /// cycles that should be recorded afterwards can be configured using <c>postCycleCount</c>. If <c>postCycleCount</c> is set to 0 then the
+  /// recording continues until IDataLoggerService::StopSession is called or the PLC project is stopped.
+  /// </remarks>
+  /// <param name="sessionName">Name of session to set trigger condition</param>
+  /// <param name="taskName">Name of task where trigger condition is evaluated</param>
+  /// <param name="preCycleCount">Amount of datasets recorded before the condition was triggered</param>
+  /// <param name="postCycleCount">Amount of dataset recorded ater the condition is triggered (0 means endless)</param>
+  /// <param name="triggerCondition">List of trigger items. All items are evaluated in order of their position inside the list.</param>
+  /// <returns>
+  /// <see cref="Arp.Device.Interface.Services.ErrorCode" /> for more information</returns>
+  rpc SetTriggerCondition(IDataLoggerService2SetTriggerConditionRequest) returns (IDataLoggerService2SetTriggerConditionResponse)  {}
+
+}
+
+message IDataLoggerService2CreateSessionRequest
+{
+   string sessionName = 1;
+   bool persistent = 2;
+}
+message IDataLoggerService2RemoveSessionRequest
+{
+   string sessionName = 1;
+}
+message IDataLoggerService2StartSessionRequest
+{
+   string sessionName = 1;
+}
+message IDataLoggerService2StopSessionRequest
+{
+   string sessionName = 1;
+}
+message IDataLoggerService2ConfigureSessionRequest
+{
+   string sessionname = 1;
+   repeated Arp.Services.DataLogger.Services.Grpc.SessionProperty properties = 2;
+}
+message IDataLoggerService2GetSessionConfigurationRequest
+{
+   string sessionname = 1;
+}
+message IDataLoggerService2GetSessionStateRequest
+{
+   string sessionName = 1;
+}
+message IDataLoggerService2SetVariablesRequest
+{
+   string sessionName = 1;
+   repeated string variableNames = 2;
+}
+message IDataLoggerService2GetLoggedVariablesRequest
+{
+   string sessionName = 1;
+}
+message IDataLoggerService2ReadVariablesDataRequest
+{
+   string sessionName = 1;
+   Arp.Grpc.DateTime startTime = 2;
+   Arp.Grpc.DateTime endTime = 3;
+   repeated string variableNames = 4;
+}
+message IDataLoggerService2GetRotatedFileNamesRequest
+{
+   string sessionname = 1;
+}
+message IDataLoggerService2GetSessionNamesRequest
+{
+   string variablename = 1;
+}
+message IDataLoggerService2SetTriggerConditionRequest
+{
+   string sessionName = 1;
+   string taskName = 2;
+   int32 preCycleCount = 3;
+   int32 postCycleCount = 4;
+   repeated Arp.Services.DataLogger.Services.Grpc.TriggerRpnItem triggerCondition = 5;
+}
+
+
+message IDataLoggerService2ListSessionNamesResponse
+{
+   repeated string _ReturnValue = 1;
+}
+message IDataLoggerService2CreateSessionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2RemoveSessionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2StartSessionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2StopSessionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2ConfigureSessionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2GetSessionConfigurationResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+   repeated Arp.Services.DataLogger.Services.Grpc.SessionProperty properties = 2;
+   bool isPersistent = 3;
+}
+message IDataLoggerService2GetSessionStateResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+   Arp.Services.DataLogger.Services.Grpc.SessionState state = 2;
+}
+message IDataLoggerService2SetVariablesResponse
+{
+   repeated Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}
+message IDataLoggerService2GetLoggedVariablesResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+   repeated Arp.Plc.Gds.Services.Grpc.VariableInfo infos = 2;
+}
+message IDataLoggerService2ReadVariablesDataResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+   repeated Arp.Type.Grpc.ObjectType values = 2;
+}
+message IDataLoggerService2GetRotatedFileNamesResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+   repeated string filenames = 2;
+}
+message IDataLoggerService2GetSessionNamesResponse
+{
+   repeated string _ReturnValue = 1;
+}
+message IDataLoggerService2SetTriggerConditionResponse
+{
+   Arp.Services.DataLogger.Services.Grpc.ErrorCode _ReturnValue = 1;
+}

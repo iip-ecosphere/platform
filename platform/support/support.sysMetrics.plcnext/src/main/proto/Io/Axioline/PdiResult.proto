@@ -1,0 +1,28 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.Io.Axioline.Services.Grpc;
+
+   
+
+/// <summary>
+/// Contains error information
+/// </summary>
+message PdiResult
+{
+   bool ServiceDone = 1;
+   int32 ErrorCode = 2;
+   int32 AddInfo = 3;
+}
+
+
+
+
+

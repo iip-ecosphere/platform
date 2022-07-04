@@ -1,0 +1,122 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Plc/Gds/DataAccessError.proto";
+import "Plc/Gds/ForceItem.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+
+/**
+ * Service for managing and controlling force variables by the Arp GDS.
+ * 
+ * <div>
+ * Use {@code T:Arp.Plc.Gds.Services.IForceService} in order to force and to unforce variables.
+ * </div>
+ */
+
+service IForceService 
+{
+  /// <summary>
+  /// Adds a new variable and value for forcing. Enables force mode.
+  /// </summary>
+  /// <remarks>
+  /// The enabled force mode is signalized by notification and by the
+  /// activated 'PlcState.Forcing'
+  /// </remarks>
+  /// <param name="item">
+  /// Force item <see cref="Arp.System.Commons.Services.Io.ForceItem" />, which contains the the name
+  /// of the variable with the full instance path and the force value.
+  /// The data type of the force value must be equal with the data type
+  /// of the target variable.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.System.Commons.Services.Io.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc AddVariable(IForceServiceAddVariableRequest) returns (IForceServiceAddVariableResponse)  {}
+
+  /// <summary>
+  /// Resets forced variable. Disables force mode after force list is empty.
+  /// </summary>
+  /// <param name="variableName">
+  /// Instance path of the variable.
+  /// </param>
+  rpc RemoveVariable(IForceServiceRemoveVariableRequest) returns (google.protobuf.Empty)  {}
+
+  /// <summary>
+  /// Gets a list of all forced variables.
+  /// </summary>
+  /// <returns>
+  /// Returns a list with all existing <see cref="Arp.System.Commons.Services.Io.ForceItem" /> objects.
+  /// </returns>
+  rpc GetVariables(google.protobuf.Empty) returns (IForceServiceGetVariablesResponse)  {}
+
+  /// <summary>
+  /// Resets the force list. Disables force mode.
+  /// </summary>
+  /// <remarks>
+  /// The disabled force mode is signalized by notification and by the
+  /// deactivated PlcState.
+  /// </remarks>
+  rpc Reset(google.protobuf.Empty) returns (google.protobuf.Empty)  {}
+
+  /// <summary>
+  /// Tests whether variable is forcable.
+  /// </summary>
+  /// <remarks>
+  /// The variable has to meet the following requirements to be forcable:
+  /// 1. The kind of variable should be an In- or an Out-port of a program
+  /// (IEC, C ++, Simulink ...) or a variable that is connected to I/O data.
+  /// 2. The data type of the variable has to be supported.
+  /// </remarks>
+  /// <returns>
+  /// <b>true</b>if the variable is forcable.</returns>
+  rpc IsForcable(IForceServiceIsForcableRequest) returns (IForceServiceIsForcableResponse)  {}
+
+  /// <summary>
+  /// Tests whether force mode is active.
+  /// </summary>
+  /// <returns>
+  /// <b>true</b>if the force mode is active.</returns>
+  rpc IsActive(google.protobuf.Empty) returns (IForceServiceIsActiveResponse)  {}
+
+}
+
+message IForceServiceAddVariableRequest
+{
+   Arp.Plc.Gds.Services.Grpc.ForceItem item = 1;
+}
+message IForceServiceRemoveVariableRequest
+{
+   string variableName = 1;
+}
+message IForceServiceIsForcableRequest
+{
+   string variableName = 1;
+}
+
+
+message IForceServiceAddVariableResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message IForceServiceGetVariablesResponse
+{
+   repeated Arp.Plc.Gds.Services.Grpc.ForceItem _ReturnValue = 1;
+}
+message IForceServiceIsForcableResponse
+{
+   bool _ReturnValue = 1;
+}
+message IForceServiceIsActiveResponse
+{
+   bool _ReturnValue = 1;
+}

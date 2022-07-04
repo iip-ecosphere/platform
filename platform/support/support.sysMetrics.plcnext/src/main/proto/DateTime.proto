@@ -1,0 +1,38 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "DateStructure.proto";
+
+package Arp.Grpc;
+
+/**
+ * Provides the access to the AXIO master
+ */
+
+ enum DateTimeKind
+{
+
+    Unspecified = 0;
+    Utc = 1;
+}
+
+   
+message DateTime
+{
+    DateTimeKind DateTimeKind = 1;
+    oneof Value
+    {
+        sint64 ticks = 2;
+        DateStructure datestructure = 3;
+    }
+}
+
+
+
+

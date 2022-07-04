@@ -1,0 +1,72 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Io/Axioline/PdiParam.proto";
+import "Io/Axioline/PdiResult.proto";
+
+package Arp.Io.Axioline.Services.Grpc;
+
+
+/**
+ * Use this service for acyclic axioline communication
+ */
+
+service IAcyclicCommunicationService 
+{
+  /// <summary>
+  /// Read a PDI object from an axioline module (blocking mode)
+  /// </summary>
+  /// <param name="pdiParam">
+  /// Structure with all parameter to address an object on a module to read from
+  /// <see cref="Arp.Device.Interface.Services.PdiParam" /></param>
+  /// <param name="data">
+  /// Data that are read from the module
+  /// </param>
+  /// <returns>
+  /// Structure with error information
+  /// <see cref="Arp.Device.Interface.Services.PdiResult" /></returns>
+  rpc PdiRead(IAcyclicCommunicationServicePdiReadRequest) returns (IAcyclicCommunicationServicePdiReadResponse)  {}
+
+  /// <summary>
+  /// Write a PDI object on an axioline module (blocking mode)
+  /// </summary>
+  /// <param name="pdiParam">
+  /// Structure with all parameter to address an object on a module to write on
+  /// <see cref="Arp.Device.Interface.Services.PdiParam" /></param>
+  /// <param name="data">
+  /// Data that shall be written on the module
+  /// </param>
+  /// <returns>
+  /// Structure with error information
+  /// <see cref="Arp.Device.Interface.Services.PdiResult" /></returns>
+  rpc PdiWrite(IAcyclicCommunicationServicePdiWriteRequest) returns (IAcyclicCommunicationServicePdiWriteResponse)  {}
+
+}
+
+message IAcyclicCommunicationServicePdiReadRequest
+{
+   Arp.Io.Axioline.Services.Grpc.PdiParam pdiParam = 1;
+}
+message IAcyclicCommunicationServicePdiWriteRequest
+{
+   Arp.Io.Axioline.Services.Grpc.PdiParam pdiParam = 1;
+   repeated int32 data = 2;
+}
+
+
+message IAcyclicCommunicationServicePdiReadResponse
+{
+   Arp.Io.Axioline.Services.Grpc.PdiResult _ReturnValue = 1;
+   repeated int32 _data = 2;
+}
+message IAcyclicCommunicationServicePdiWriteResponse
+{
+   Arp.Io.Axioline.Services.Grpc.PdiResult _ReturnValue = 1;
+}

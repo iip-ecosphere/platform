@@ -1,0 +1,28 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "ArpTypes.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+   
+
+/// <summary>
+/// A force item structure.
+/// </summary>
+message ForceItem
+{
+   string VariableName = 1;
+   Arp.Type.Grpc.ObjectType ForceValue = 2;
+}
+
+
+
+
+

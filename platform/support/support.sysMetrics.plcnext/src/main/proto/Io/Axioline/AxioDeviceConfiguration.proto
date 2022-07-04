@@ -1,0 +1,28 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+package Arp.Io.Axioline.Services.Grpc;
+
+   
+
+/// <summary>
+/// Configuration of AXIO device
+/// </summary>
+message AxioDeviceConfiguration
+{
+   uint32 Type = 1;
+   uint32 Id = 2;
+   int32 Length = 3;
+}
+
+
+
+
+

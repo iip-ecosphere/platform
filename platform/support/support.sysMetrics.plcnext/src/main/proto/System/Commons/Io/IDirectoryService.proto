@@ -1,0 +1,188 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+import "System/Commons/Io/FileSystemError.proto";
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+
+/**
+ * Provides common file directory operations.
+ * 
+ * <div>
+ * The path separator is always '/'.
+ * </div>
+ */
+
+service IDirectoryService 
+{
+  /// <summary>
+  /// Checks if the specified directory exists.
+  /// </summary>
+  /// <param name="path">The path of the directory to check.</param>
+  /// <returns>
+  /// <c>true</c> if  the directory exists, otherwise <c>false</c>.
+  /// </returns>
+  rpc Exists(IDirectoryServiceExistsRequest) returns (IDirectoryServiceExistsResponse)  {}
+
+  /// <summary>
+  /// Creates the specified directory.
+  /// </summary>
+  /// <param name="path">The path of the directory to create.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Create(IDirectoryServiceCreateRequest) returns (IDirectoryServiceCreateResponse)  {}
+
+  /// <summary>
+  /// Deletes the specified directory and its content.
+  /// </summary>
+  /// <param name="path">The path of the directory to delete.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Delete(IDirectoryServiceDeleteRequest) returns (IDirectoryServiceDeleteResponse)  {}
+
+  /// <summary>
+  /// Removes the content of the specified directory, but does not delete the specified directory itself.
+  /// </summary>
+  /// <param name="path">The path of the directory to clear.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Clear(IDirectoryServiceClearRequest) returns (IDirectoryServiceClearResponse)  {}
+
+  /// <summary>
+  /// Moves the specified directory and its content to the given new location.
+  /// </summary>
+  /// <param name="sourcePath">The source path of the directory to move.</param>
+  /// <param name="destinationPath">The destination path of the directory to move all content to.</param>
+  /// <param name="clear">If set to <c>true</c> the destination location is cleared first if it yet exists and the operation succeeds anyway
+  /// while returning <c>true</c>.
+  /// Otherwise, if the destination yet exists, the operations fails and returns <c>false</c>.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Move(IDirectoryServiceMoveRequest) returns (IDirectoryServiceMoveResponse)  {}
+
+  /// <summary>
+  /// Copies the specified directory and its content to the given new location.
+  /// </summary>
+  /// <param name="sourcePath">The source path of the directory to copy.</param>
+  /// <param name="destinationPath">The destination path of the directory to copy all content to.</param>
+  /// <param name="clear">If set to <c>true</c> the destination location is cleared first if it yet exists and the operation succeeds anyway
+  /// while returning <c>true</c>.
+  /// Otherwise, if the destination yet exists, the operations fails and returns <c>false</c>.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc Copy(IDirectoryServiceCopyRequest) returns (IDirectoryServiceCopyResponse)  {}
+
+  /// <summary>
+  /// Enumerates all files and subdirectories of the specified directory.
+  /// </summary>
+  /// <param name="path">The path of the directory to search in.</param>
+  /// <param name="searchPattern">The pattern of the files to enumerate.</param>
+  /// <param name="recursive">if set to <c>true</c> the files of all subdirectories are liested as well.</param>
+  /// <returns>
+  /// A file system entry for each found file.
+  /// </returns>
+  //rpc EnumerateFileSystemEntries(IDirectoryServiceEnumerateFileSystemEntriesRequest) returns (IDirectoryServiceEnumerateFileSystemEntriesResponse)  {}
+
+  /// <summary>
+  /// Enumerates all files and subdirectories of the specified directory.
+  /// </summary>
+  /// <param name="path">The path of the directory to search in.</param>
+  /// <param name="searchPattern">The pattern of the files to enumerate.</param>
+  /// <param name="traits">The selection of traits to get.</param>
+  /// <param name="recursive">if set to <c>true</c> the files of all subdirectories are liested as well.</param>
+  /// <returns>
+  /// A file system trait entry for each found file.
+  /// </returns>
+  //rpc EnumerateFileSystemTraitsEntries(IDirectoryServiceEnumerateFileSystemTraitsEntriesRequest) returns (IDirectoryServiceEnumerateFileSystemTraitsEntriesResponse)  {}
+
+}
+
+message IDirectoryServiceExistsRequest
+{
+   string path = 1;
+}
+message IDirectoryServiceCreateRequest
+{
+   string path = 1;
+}
+message IDirectoryServiceDeleteRequest
+{
+   string path = 1;
+}
+message IDirectoryServiceClearRequest
+{
+   string path = 1;
+}
+message IDirectoryServiceMoveRequest
+{
+   string sourcePath = 1;
+   string destinationPath = 2;
+   bool clear = 3;
+}
+message IDirectoryServiceCopyRequest
+{
+   string sourcePath = 1;
+   string destinationPath = 2;
+   bool clear = 3;
+}
+//message IDirectoryServiceEnumerateFileSystemEntriesRequest
+//{
+//   string path = 1;
+//   string searchPattern = 2;
+//   bool recursive = 3;
+//}
+
+//message IDirectoryServiceEnumerateFileSystemTraitsEntriesRequest
+//{
+//   string path = 1;
+//   string searchPattern = 2;
+//   Arp.System.Commons.Services.Io.Grpc.Traits traits = 3;
+//   bool recursive = 4;
+//}
+
+
+message IDirectoryServiceExistsResponse
+{
+   bool _ReturnValue = 1;
+}
+message IDirectoryServiceCreateResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IDirectoryServiceDeleteResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IDirectoryServiceClearResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IDirectoryServiceMoveResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IDirectoryServiceCopyResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+//message IDirectoryServiceEnumerateFileSystemEntriesResponse
+//{
+//   repeated Arp.System.Commons.Services.Io.Grpc.FileSystemEntry _ReturnValue = 1;
+//}
+
+//message IDirectoryServiceEnumerateFileSystemTraitsEntriesResponse
+//{
+//   repeated Arp.System.Commons.Services.Io.Grpc.FileSystemTraitsEntry _ReturnValue = 1;
+//}

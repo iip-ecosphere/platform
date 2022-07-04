@@ -1,0 +1,170 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "Plc/Gds/DataAccessError.proto";
+import "Plc/Gds/ReadItem.proto";
+import "Plc/Gds/WriteItem.proto";
+
+package Arp.Plc.Gds.Services.Grpc;
+
+
+/**
+ * Services for the direct data access.
+ * 
+ * <div>
+ * <p>The direct access functionality is a way for reading and
+ * writing values from and to variables.
+ * This is the fastest way, with a minimum of influence to the
+ * real time process, but it is not guaranteed that the data
+ * will be read/write in the same task cycle.
+ * For task consistent reading the subscription
+ * service {@code T:Arp.Plc.Gds.Services.ISubscriptionService} has to be used.</p><p>A client can read/write from/to different types of variables
+ * provided in {@code T:Arp.Plc.DataType}. Currently supported types
+ * are listed below:</p><p>To address a variable, the full variable name uri is necessary.
+ * Some valid examples are given below:
+ * {@code
+ * ComponentName-1/ProgramName-1.Variable_Name
+ * ComponentName-1/Global_Variable_Name
+ * ComponentName-1/ProgramName-1.Array_Variable_Name
+ * ComponentName-1/ProgramName-1.Array_Variable_Name[index]
+ * ComponentName-1/ProgramName-1.Array_Variable_Name[startIndex:endIndex]
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.Leaf
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.LeafArray
+ * ComponentName-1/ProgramName-1.Struct_Variable_Name.Element1.LeafArray[index]
+ * }</p>
+ * </div>
+ */
+
+service IDataAccessService 
+{
+  /// <summary>
+  /// Reads the value of the variable directly from the
+  /// given variable name.
+  /// </summary>
+  /// <remarks>
+  /// Copies the value of the variable, given by the variable name,
+  /// to the <see cref="Arp.Device.Interface.Services.ReadItem" /> object, which will be returned.
+  /// ReadSingle can only read one single variable, so if you want
+  /// to read multiple variables simultaneously, an array or a
+  /// range of an array, you have to use the
+  /// <see cref="Arp.Device.Interface.Services.IDataAccessService.Read" /> service instead.
+  /// Be aware, this copy process isn't task consistent and the
+  /// data could be corrupted.
+  /// </remarks>
+  /// <param name="portName">
+  /// Full variable name uri.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.ReadItem" />.
+  /// </returns>
+  rpc ReadSingle(IDataAccessServiceReadSingleRequest) returns (IDataAccessServiceReadSingleResponse)  {}
+
+  /// <summary>
+  /// Reads the value of the variable directly from the
+  /// given variable name.
+  /// </summary>
+  /// <remarks>
+  /// Copies the value of the variable, given by the variable name,
+  /// to the <see cref="Arp.Device.Interface.Services.ReadItem" /> object, which will be returned.
+  /// ReadSingle can only read one single variable, so if you want
+  /// to read multiple variables simultaneously, an array or a
+  /// range of an array, you have to use the
+  /// <see cref="Arp.Device.Interface.Services.IDataAccessService.Read" /> service instead.
+  /// Be aware, this copy process isn't task consistent and the
+  /// data could be corrupted.
+  /// </remarks>
+  /// <param name="portName">
+  /// Full variable name uri.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.ReadItem" />.
+  /// </returns>
+  rpc Read(IDataAccessServiceReadRequest) returns (IDataAccessServiceReadResponse)  {}
+
+  /// <summary>
+  /// Writes the given value to the given variable name
+  /// containing in the given <see cref="Arp.Device.Interface.Services.WriteItem" />.
+  /// </summary>
+  /// <remarks>
+  /// Writes the given value to the given variable containing
+  /// in the given <see cref="Arp.Device.Interface.Services.WriteItem" /> object. WriteSingle
+  /// can only write one single value, so if you want to write to
+  /// multiple variables simultaneously, to an array or to a range
+  /// of an array, you have to use the <see cref="Arp.Device.Interface.Services.IDataAccessService.Write" />
+  /// service instead. Be aware, this write process isn't task
+  /// consistent and the data could be corrupted.
+  /// </remarks>
+  /// <param name="data">
+  /// Variable data which contains the variable name and the
+  /// value to be written.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc WriteSingle(IDataAccessServiceWriteSingleRequest) returns (IDataAccessServiceWriteSingleResponse)  {}
+
+  /// <summary>
+  /// Writes the given value to the given variable name
+  /// containing in the given <see cref="Arp.Device.Interface.Services.WriteItem" />.
+  /// </summary>
+  /// <remarks>
+  /// Writes the given value to the given variable containing
+  /// in the given <see cref="Arp.Device.Interface.Services.WriteItem" /> object. WriteSingle
+  /// can only write one single value, so if you want to write to
+  /// multiple variables simultaneously, to an array or to a range
+  /// of an array, you have to use the <see cref="Arp.Device.Interface.Services.IDataAccessService.Write" />
+  /// service instead. Be aware, this write process isn't task
+  /// consistent and the data could be corrupted.
+  /// </remarks>
+  /// <param name="data">
+  /// Variable data which contains the variable name and the
+  /// value to be written.
+  /// </param>
+  /// <returns>
+  /// Returns <see cref="Arp.Device.Interface.Services.DataAccessError.None" /> on success.
+  /// </returns>
+  rpc Write(IDataAccessServiceWriteRequest) returns (IDataAccessServiceWriteResponse)  {}
+
+}
+
+message IDataAccessServiceReadSingleRequest
+{
+   string portName = 1;
+}
+message IDataAccessServiceReadRequest
+{
+   repeated string portNames = 1;
+}
+message IDataAccessServiceWriteSingleRequest
+{
+   Arp.Plc.Gds.Services.Grpc.WriteItem data = 1;
+}
+message IDataAccessServiceWriteRequest
+{
+   repeated Arp.Plc.Gds.Services.Grpc.WriteItem data = 1;
+}
+
+
+message IDataAccessServiceReadSingleResponse
+{
+   Arp.Plc.Gds.Services.Grpc.ReadItem _ReturnValue = 1;
+}
+message IDataAccessServiceReadResponse
+{
+   repeated Arp.Plc.Gds.Services.Grpc.ReadItem _ReturnValue = 1;
+}
+message IDataAccessServiceWriteSingleResponse
+{
+   Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}
+message IDataAccessServiceWriteResponse
+{
+   repeated Arp.Plc.Gds.Services.Grpc.DataAccessError _ReturnValue = 1;
+}

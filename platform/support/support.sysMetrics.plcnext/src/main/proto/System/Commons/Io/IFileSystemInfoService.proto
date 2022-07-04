@@ -1,0 +1,153 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright PHOENIX CONTACT Electronics GmbH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto3";
+
+
+import "System/Commons/Io/FileSystemError.proto";
+import "System/Commons/Io/FileSystemTraitsEntry.proto";
+import "System/Commons/Io/Permissions.proto";
+import "System/Commons/Io/SpaceInfo.proto";
+import "System/Commons/Io/Traits.proto";
+import "google/protobuf/empty.proto";
+
+package Arp.System.Commons.Services.Io.Grpc;
+
+
+/**
+ * A generic service to retrieve file system infos.
+ * 
+ * <div>
+ * The path separator is always '/'.
+ * </div>
+ */
+
+service IFileSystemInfoService 
+{
+  /// <summary>
+  /// Gets the supported traits.
+  /// </summary>
+  /// <returns>The supported traits as bitset.</returns>
+  rpc GetSupportedTraits(google.protobuf.Empty) returns (IFileSystemInfoServiceGetSupportedTraitsResponse)  {}
+
+  /// <summary>
+  /// Gets the permissions of the specified path.
+  /// </summary>
+  /// <param name="path">The path to get the permissions from.</param>
+  /// <param name="permissions">The permissions of the specified path.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc GetPermissions(IFileSystemInfoServiceGetPermissionsRequest) returns (IFileSystemInfoServiceGetPermissionsResponse)  {}
+
+  /// <summary>
+  /// Adds the permissions to the specified path.
+  /// </summary>
+  /// <param name="path">The path to add the permissions from.</param>
+  /// <param name="permissions">The  permissions to add.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc AddPermissions(IFileSystemInfoServiceAddPermissionsRequest) returns (IFileSystemInfoServiceAddPermissionsResponse)  {}
+
+  /// <summary>
+  /// Removes the permissions of the specified path.
+  /// </summary>
+  /// <param name="path">The path to remove the permissions from.</param>
+  /// <param name="permissions">The permissions to remove.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc RemovePermissions(IFileSystemInfoServiceRemovePermissionsRequest) returns (IFileSystemInfoServiceRemovePermissionsResponse)  {}
+
+  /// <summary>
+  /// Gets the file system traits entry of the specified path.
+  /// </summary>
+  /// <param name="traits">The selection of traits to get.</param>
+  /// <param name="path">The path to get the file system traits entry from.</param>
+  /// <param name="fileSystemTraitsEntry">The file system traits entry of the specified path</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc GetFileSystemTraitsEntry(IFileSystemInfoServiceGetFileSystemTraitsEntryRequest) returns (IFileSystemInfoServiceGetFileSystemTraitsEntryResponse)  {}
+
+  /// <summary>
+  /// Gets the space information of the specified path.
+  /// </summary>
+  /// <param name="path">The path to get the space information from.</param>
+  /// <param name="spaceInfo">The space information of the specified path.</param>
+  /// <returns>
+  /// Result of the action.
+  /// </returns>
+  rpc GetSpaceInfo(IFileSystemInfoServiceGetSpaceInfoRequest) returns (IFileSystemInfoServiceGetSpaceInfoResponse)  {}
+
+  /// <summary>
+  /// Gets a list of all root directories supported by the target.
+  /// </summary>
+  /// <returns>
+  /// A list of list of all root directories.
+  /// </returns>
+  rpc GetRootDirectories(google.protobuf.Empty) returns (IFileSystemInfoServiceGetRootDirectoriesResponse)  {}
+
+}
+
+message IFileSystemInfoServiceGetPermissionsRequest
+{
+   string path = 1;
+}
+message IFileSystemInfoServiceAddPermissionsRequest
+{
+   string path = 1;
+   Arp.System.Commons.Services.Io.Grpc.Permissions permissions = 2;
+}
+message IFileSystemInfoServiceRemovePermissionsRequest
+{
+   string path = 1;
+   Arp.System.Commons.Services.Io.Grpc.Permissions permissions = 2;
+}
+message IFileSystemInfoServiceGetFileSystemTraitsEntryRequest
+{
+   Arp.System.Commons.Services.Io.Grpc.Traits traits = 1;
+   string path = 2;
+}
+message IFileSystemInfoServiceGetSpaceInfoRequest
+{
+   string path = 1;
+}
+
+
+message IFileSystemInfoServiceGetSupportedTraitsResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.Traits _ReturnValue = 1;
+}
+message IFileSystemInfoServiceGetPermissionsResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+   Arp.System.Commons.Services.Io.Grpc.Permissions permissions = 2;
+}
+message IFileSystemInfoServiceAddPermissionsResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IFileSystemInfoServiceRemovePermissionsResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+}
+message IFileSystemInfoServiceGetFileSystemTraitsEntryResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+   Arp.System.Commons.Services.Io.Grpc.FileSystemTraitsEntry fileSystemTraitsEntry = 2;
+}
+message IFileSystemInfoServiceGetSpaceInfoResponse
+{
+   Arp.System.Commons.Services.Io.Grpc.FileSystemError _ReturnValue = 1;
+   Arp.System.Commons.Services.Io.Grpc.SpaceInfo spaceInfo = 2;
+}
+message IFileSystemInfoServiceGetRootDirectoriesResponse
+{
+   repeated string _ReturnValue = 1;
+}
