@@ -463,7 +463,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         /**
          * Sets the cached value.
          * 
-         * @param value
+         * @param value the value to set
          */
         private void setValue(Object value) {
             if (valueLifetime != 0) { // no caching
@@ -474,9 +474,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         
         /**
          * Changes the value of a cached entry.
-         * @param value
-         * @param lifetime
-         * @return
+         * 
+         * @param value the value to set
+         * @param lifetime the lifetime (negative unlimited, 0 request all time, positive caching time in ms) 
          */
         private void setValue(Object value, int lifetime) {
             this.valueLifetime = lifetime;
@@ -602,8 +602,14 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             return callResult;
         }
 
-        /* Just for testing, see Identifiers.RootFolder */
-        /*private void browseNode(String indent, NodeId browseRoot) {
+        /**
+         * Just for testing, see Identifiers.RootFolder.
+         * 
+         * @param indent output indent
+         * @param browseRoot the node id to start browsing at
+         */
+        @SuppressWarnings("unused")
+        private void browseNode(String indent, NodeId browseRoot) {
             try {
                 List<? extends UaNode> nodes = client.getAddressSpace().browseNodes(browseRoot);
 
@@ -617,7 +623,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             } catch (UaException e) {
                 LOGGER.error("Browsing nodeId={} failed: {}", browseRoot, e.getMessage(), e);
             }
-        }*/
+        }
 
         /**
          * Retrieves an OPC UA variable node from a cache node entry.
