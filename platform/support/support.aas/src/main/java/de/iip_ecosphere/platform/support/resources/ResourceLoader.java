@@ -54,6 +54,7 @@ public class ResourceLoader {
     public static void registerResourceResolver(ResourceResolver resolver) {
         if (null != resolver) {
             resolvers.add(resolver);
+            LoggerFactory.getLogger(ResourceLoader.class).info("Registered resource loader {}", resolver.getName());
         }
     }
 
@@ -65,6 +66,7 @@ public class ResourceLoader {
     public static void unregisterResourceResolver(ResourceResolver resolver) {
         if (null != resolver) {
             resolvers.remove(resolver);
+            LoggerFactory.getLogger(ResourceLoader.class).info("Unregistered resource loader {}", resolver.getName());
         }
     }
 
@@ -104,7 +106,7 @@ public class ResourceLoader {
         for (ResourceResolver r: resolvers) {
             result = r.resolve(loader, name);    
             if (result != null) {
-                LoggerFactory.getLogger(ResourceLoader.class).info("LOADING {} via {}", name, r.getName());
+                LoggerFactory.getLogger(ResourceLoader.class).info("Loading resource '{}' via {}", name, r.getName());
                 break;
             }
             if (null == result && !name.startsWith("/")) {
