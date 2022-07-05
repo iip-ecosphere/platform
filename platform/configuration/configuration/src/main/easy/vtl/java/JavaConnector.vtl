@@ -236,10 +236,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // called via translateDataOperations
     def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value, String indexes) {
+        '${genFieldAccessInt(path, field, set, setEnd, value, indexes, nestedStepCount)}'; // EASY-bug, nestedStepCount in wrong scope
+    }
+    
+    protected def genFieldAccessInt(String path, Field field, Boolean set, String setEnd, String value, String indexes, Integer nestedCount) {
        String p;
        if (optWithStepIn) {
            p = field.name;
-           if (nestedStepCount == 0 and topPath <> "") {
+           if (nestedCount == 0 and topPath <> "") {
                p = topPath + "/" + p;
            }
        } else {
@@ -267,7 +271,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // called via produceDataTransfer
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {
-        String acc = genFieldAccess(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt), indexes);
+        String acc = genFieldAccessInt(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt), indexes, nestedStepCount); 
         if (not(genFrom)) {
             if (tgt.type.isKindOf(RecordType)) {
                 String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
