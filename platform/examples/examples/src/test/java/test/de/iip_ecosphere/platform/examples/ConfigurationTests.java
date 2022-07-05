@@ -21,7 +21,6 @@ import org.apache.qpid.server.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.examples.SpringStartup;
@@ -144,13 +143,13 @@ public class ConfigurationTests {
      * 
      * @throws IOException if any I/O problem occurs
      */
-    @Ignore("Temporarily disabled for building")
     @Test
     public void testRoutingTest() throws IOException {
         testInstantiatedExample("RoutingTest", "RoutingTestApp", 25000, s -> {
             assertContains(s, "RECEIVED: RoutingTestDataImpl["); // in sink regardless if TestData or ConnOut
             assertMatches(s, ".*RECEIVED: RoutingTestDataImpl\\[.* - P1\\].*"); 
             assertMatches(s, ".*RECEIVED: RoutingTestDataImpl\\[.* - P2\\].*"); 
+            assertMatches(s, ".*RECEIVED: RoutingTestDataImpl\\[.* - P3\\].*"); 
             assertContains(s, "Processor received: RoutingConnOutImpl["); // ConnOut in processor
             assertContains(s, "Processor sent: RoutingTestDataImpl["); // TestData in processor
             
@@ -160,6 +159,7 @@ public class ConfigurationTests {
             assertContains(s, "Connector received cmd: RoutingCommandImpl[cmd=Batch completed]");
             assertContains(s, "Processor P1 received cmd: RoutingCommandImpl[cmd=Batch completed]");
             assertContains(s, "Processor P2 received cmd: RoutingCommandImpl[cmd=Batch completed]");
+            assertContains(s, "Processor P3 received cmd: RoutingCommandImpl[cmd=Batch completed]");
         });
     }
 
