@@ -104,6 +104,19 @@ project VDW {
         }*/
     };
     
+    // not really needed except for populating the interfaces package
+    Service myReceiverService = JavaService {
+        id = "OpcReceiver",
+        name = "OPC Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "ReceiverImpl",
+        artifact = "",
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(opcOut)}}
+    };
+    
     // --------------------- monitoring ---------------------------
     
     // current default: no monitoring configured
@@ -128,7 +141,19 @@ project VDW {
     };
 
     MeshSource mqttOpcSource = {
-       impl = refBy(myOpcUaConn)
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+    
+    // this is not really needed, but in the future, topological constraints will prevent incomplete graphs
+    
+    MeshConnector myConnMySourceMyReceiver = {
+        name = "Source->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
     };
     
     // ---------- generation setup ------------
