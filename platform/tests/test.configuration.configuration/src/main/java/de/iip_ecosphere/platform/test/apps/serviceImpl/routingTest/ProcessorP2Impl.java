@@ -17,25 +17,23 @@ import java.io.InputStream;
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.RoutingCommand;
-import iip.datatypes.RoutingConnOut;
 import iip.datatypes.RoutingTestData;
 import iip.datatypes.RoutingTestDataImpl;
-import iip.impl.RoutingProcessorImpl;
+import iip.impl.ParallelRoutingProcessor2Impl;
 
 /**
- * The processor of the routing test app. Just merge the two input streams, the conn stream with negative 
- * serial numbers.
+ * A parallel asynchronous processor just adding its id to the data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ProcessorImpl extends RoutingProcessorImpl {
+public class ProcessorP2Impl extends ParallelRoutingProcessor2Impl {
 
     private DataIngestor<RoutingTestData> routingIngestor;
     
     /**
      * Fallback constructor.
      */
-    public ProcessorImpl() {
+    public ProcessorP2Impl() {
         super(ServiceKind.TRANSFORMATION_SERVICE);
     }
     
@@ -45,19 +43,19 @@ public class ProcessorImpl extends RoutingProcessorImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public ProcessorImpl(String serviceId, InputStream ymlFile) {
+    public ProcessorP2Impl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
     
     @Override
     public void processRoutingTestData(RoutingTestData data) {
-        System.out.println("Processor received: " + data);
+        System.out.println("Processor P2 received: " + data);
         if (null != routingIngestor) {
             RoutingTestData result = new RoutingTestDataImpl();
             result.setSerNr(data.getSerNr());
-            result.setStringField(data.getStringField());
+            result.setStringField(data.getStringField() + " - P2");
             routingIngestor.ingest(result);
-            System.out.println("Processor sent: " + result);
+            System.out.println("Processor P2 sent: " + result);
         }
     }
 
@@ -67,20 +65,8 @@ public class ProcessorImpl extends RoutingProcessorImpl {
     }
 
     @Override
-    public void processRoutingConnOut(RoutingConnOut data) {
-        System.out.println("Processor received: " + data);
-        if (null != routingIngestor) {
-            RoutingTestData result = new RoutingTestDataImpl();
-            result.setSerNr(-data.getSerNr());
-            result.setStringField(data.getData());
-            routingIngestor.ingest(result);
-            System.out.println("Processor sent: " + result);
-        }
-    }
-
-    @Override
     public void processRoutingCommand(RoutingCommand data) {
-        System.out.println("Processor received cmd: " + data);
+        System.out.println("Processor P2 received cmd: " + data);
     }
 
 }
