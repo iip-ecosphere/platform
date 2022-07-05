@@ -83,5 +83,15 @@ public class ResourceLoaderTest {
         Assert.assertTrue(myResolver2Called > 0);
         ResourceLoader.unregisterResourceResolver(res);
     }
+    
+    /**
+     * Tests {@link ResourceLoader#prependSlash(String)}.
+     */
+    @Test
+    public void testPrependSlash() {
+        Assert.assertEquals("/a", ResourceLoader.prependSlash("a"));
+        Assert.assertEquals("/a", ResourceLoader.prependSlash("/a"));
+        Assert.assertEquals("/", ResourceLoader.prependSlash(""));
+    }
 
 }

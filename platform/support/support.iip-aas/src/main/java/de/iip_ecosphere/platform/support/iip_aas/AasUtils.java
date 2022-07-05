@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
  * Helper functions for active AAS.
@@ -44,26 +46,13 @@ public class AasUtils {
      * Resolves a resource from the main classpath.
      */
     public static final ResourceResolver CLASSPATH_RESOLVER = 
-        n -> PlatformAas.class.getResourceAsStream(prependSlash(n));
+        (c, n) -> ResourceLoader.getResourceAsStream(ResourceLoader.prependSlash(n));
 
     /**
      * Resolves a resource from the resources directory in the main classpath.
      */
     public static final ResourceResolver CLASSPATH_RESOURCE_RESOLVER = 
-        n -> PlatformAas.class.getResourceAsStream("/resources" + prependSlash(n));
-
-    /**
-     * Prepends a "/" if there is none at the beginning of {@code text}.
-     * 
-     * @param text the text to use as basis
-     * @return test with "/" prepended
-     */
-    public static final String prependSlash(String text) {
-        if (!text.startsWith("/")) {
-            text = "/" + text;
-        }
-        return text;
-    }
+        (c, n) -> ResourceLoader.getResourceAsStream("/resources" + ResourceLoader.prependSlash(n));
         
     static {
         URI tmp;
@@ -204,23 +193,6 @@ public class AasUtils {
      */
     public static String writeMap(Map<String, String> map) {
         return JsonUtils.toJson(map);
-    }
-    
-    /**
-     * Resolves resources.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public interface ResourceResolver {
-        
-        /**
-         * Resolves a resource to an input stream.
-         * 
-         * @param resource the name of the resource
-         * @return the related input stream, may be <b>null</b> for none
-         */
-        public InputStream resolve(String resource);
-        
     }
     
     /**

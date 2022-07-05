@@ -30,9 +30,9 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils.ResourceResolver;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
  * The platform name/typeplate.

@@ -20,7 +20,7 @@ import java.util.ServiceLoader;
 import org.slf4j.LoggerFactory;
 
 /**
- * Support for class loading also in FAT jars.
+ * Support for class loading also in FAT jars. Resource resolvers can be added directly or via JLS.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -93,7 +93,7 @@ public class ResourceLoader {
      * Returns a resource as string.
      * 
      * @param loader the class loader to use
-     * @param name the name of the resource to load (shall not start with "/", tested as fallback alternative)
+     * @param name the name of the resource to load (shall not start with "/", used as fallback alternative)
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
     public static InputStream getResourceAsStream(ClassLoader loader, String name) {
@@ -116,6 +116,19 @@ public class ResourceLoader {
             }
         }
         return result;
+    }
+    
+    /**
+     * Prepends a "/" if there is none at the beginning of {@code text}.
+     * 
+     * @param text the text to use as basis
+     * @return test with "/" prepended
+     */
+    public static final String prependSlash(String text) {
+        if (!text.startsWith("/")) {
+            text = "/" + text;
+        }
+        return text;
     }
 
 }
