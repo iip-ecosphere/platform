@@ -74,8 +74,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
 
         for (MeshConnector c : next) {
             MeshElement target = c.next;
-            String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
-            generateIngestor(base, methodSuffix, conn, type, "in");
+            String outName = getOutName(target, type);
+            String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+            generateIngestor(base, methodSuffix, conn, type, "in", target.impl);
         }
     }
     
@@ -202,9 +203,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                          for (MeshConnector c: nextConnectors(elt)) {                     
                              MeshElement target = c.next;
                              done.add(target);
-                             String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+                             String outName = getOutName(target, type);
+                             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
                              if (not(conns.includes(conn))) {
-                                 result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in"));
+                                 result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
                                  conns.add(conn);
                              }
                          }
@@ -214,12 +216,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                                 for (IOType t : backward(target.impl.input)) {
                                     if (outBack.includes(t.type)) {
                                         type = toTypeName(t.type);
-                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, ""), target); // outType is only for sync, ingestors are not for sync
+                                        String outName = getOutName(target, type);
+                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
                                         if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
                                             conn = "process" + conn.substring(6);
                                         }
                                         if (not(conns.includes(conn)) and conn.startsWith("process")) {
-                                            result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in"));
+                                            result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
                                             conns.add(conn);
                                         }
                                     }
@@ -264,19 +267,23 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'createReceptionCallback("${source.impl.id}_${coType}", ${prefix}${coType}_${toIdentifier(receiver.impl.id)}(), ${coType}.class);'
     }
     
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir) {
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "attach${type.firstToUpperCase()}Ingestor";
         } else {
             methodName = "attach${methodSuffix}Ingestor";
         }
-        String expr = generateTransportSend(base, type);
+        String expr = generateTransportSend(base, type, springConnId(base, conn, target));
         'service.${methodName}(data -> ${genSentProbe(base, expr, false, type, "data")});'
     }
     
-    def generateTransportSend(ServiceBase sender, String type) {
-        'Transport.send(c -> c.asyncSend("${sender.id}_${type}", data), "${sender.id}");'
+    def generateTransportSend(ServiceBase sender, String type, String springConnId) {
+        if (springConnId <> "") {
+            'SerializerMessageConverter.serializeAndSend(streamBridge, "${springConnId}", data);'
+        } else {
+            'Transport.send(c -> c.asyncSend("${sender.id}_${type}", data), "${sender.id}");'
+        }
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
@@ -575,7 +582,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              String type = toTypeName(out.type);
              String methodSuffixEnd = type.firstToUpperCase() + serviceId;
              String methodSuffix = "create" + methodSuffixEnd;
-             String sendEx = generateTransportSend(service, type);
+             String sendEx = generateTransportSend(service, type, "");
 
             '/**
              * Reception callback.
@@ -753,7 +760,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> ${svc}.${methodSuffixWithServiceId}().apply(data);'
     }
 
-    def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir) {
+    def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
         'service.initService();'
     }
     
@@ -956,8 +963,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
     
-    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir) {
-        String expr = generateTransportSend(service, type);
+    def springConnId(ServiceBase source, String conn, ServiceBase target) {
+        String springConnId = "";
+        if (source.kind <> ServiceKind::SOURCE_SERVICE and source.asynchronous and not(target.asynchronous)) {
+            // async -> sync connection requires spring as target is function
+            springConnId = "${conn}-in-0";
+        }
+        springConnId;
+    }
+    
+    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target));
         'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
@@ -986,10 +1002,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.security.services.kodex.KodexService";
     }
     
-    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir) {
+    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
         for (IOType in : pairs.keys()) {
             IOType out = pairs.get(in);
-            String expr = generateTransportSend(service, type);
+            String expr = generateTransportSend(service, type, springConnId(service, conn, target));
             if (typeAdd <> "") {
                 '${kodexServiceName(in, out)}.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
             }
@@ -1114,8 +1130,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
     }    
 
-    def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir) {
-        String expr = generateTransportSend(service, type);
+    def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target));
         if (typeAdd <> "") {
             'service.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
         }
@@ -1158,7 +1174,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> null; // ignore, shall not be called'
     }
 
-    def generateIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir) {
+    def generateIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
     }
 
     def generateReceptionCallback(MeshProcessor elt, TraceToAasService service) {

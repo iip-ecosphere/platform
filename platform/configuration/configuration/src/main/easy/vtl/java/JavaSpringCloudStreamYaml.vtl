@@ -61,33 +61,38 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     def calcBindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, 
         mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources) {
         for (MeshElement elt: mappedMesh.keys()) {
-            ServiceBase eltImpl = elt.impl;
-            if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
-                mapOf(DataType, IOType) eltOutput = {};
-                for (IOType eo: forward(eltImpl.output)) { // backward via ingestors/transport
-                    eltOutput.add(eo.type, eo);
-                }
-                for (MeshConnector conn: mappedMesh.get(elt)) {
-                    MeshInnerElement next = conn.next;
-                    ServiceBase nextImpl = next.impl;
-                    for (IOType nextIn: forward(nextImpl.input)) { // backward via ingestors/transport
-                        if (eltOutput.containsKey(nextIn.type)) {
-                            IOType eltOut = eltOutput.get(nextIn.type);
+          ServiceBase eltImpl = elt.impl;
+          if (not(eltImpl.kind==ServiceKind::SOURCE_SERVICE and eltImpl.asynchronous)) {
+            mapOf(DataType, IOType) eltOutput = {};
+            for (IOType eo: forward(eltImpl.output)) { // backward via ingestors/transport
+                eltOutput.add(eo.type, eo);
+            }
+            for (MeshConnector conn: mappedMesh.get(elt)) {
+                MeshInnerElement next = conn.next;
+                ServiceBase nextImpl = next.impl;
+                for (IOType nextIn: forward(nextImpl.input)) { // backward via ingestors/transport
+                    if (eltOutput.containsKey(nextIn.type)) {
+                        IOType eltOut = eltOutput.get(nextIn.type);
 
-                            String nextId = getMethodSuffixId(getMethodSuffix(next, toTypeName(nextIn), outType(next, nextIn)), next);
-                            String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
+                        String nextId = getMethodSuffixId(getMethodSuffix(next, toTypeName(nextIn), outType(next, nextIn)), next);
+                        String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
 
+                        if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
                             addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
-                            addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
-                            
                             functions.add(eltId);
-                            functions.add(nextId);
-                            
-                            // we do not touch sources here as async via ingestors/transport
+                        } else {
+                            // async -> sync connection requires spring as target is function
+                            addDestination(destinations, "${nextId}-in-0", "*");
                         }
+                        
+                        addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
+                        functions.add(nextId);
+                        
+                        // we do not touch sources here as async via ingestors/transport
                     }
                 }
             }
+          }
         }
         // spring does not allow empty function definition for multiple beans
         // sources must be parts of sources, even asynchronous flux-based sources

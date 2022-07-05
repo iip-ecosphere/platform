@@ -15,6 +15,19 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     // -------------------------------------------- suffixes -------------------------------
 
+    def String getOutName(MeshElement elt, String inType) {
+        String outName = "";
+        if (not(elt.impl.asynchronous)) {
+            mapOf(IOType, IOType) pairs = ioPairs(elt);
+            for (IOType t: pairs.keys()) {
+                if (toTypeName(t) == inType) {
+                    outName = toTypeName(pairs.get(t));
+                }
+            }
+        }
+        outName;
+    }
+
     def String getMethodSuffix(MeshElement elt, String type, String outType) {
         "";
     }
@@ -208,6 +221,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
     } 
     
     // --------------------------------- collecting record types ---------------------------------------------
+
+    def mapOf(IOType, IOType) ioPairs(MeshElement elt) {
+        mapOf(IOType, IOType) tmp = {};
+        tmp;
+    }
     
     def mapOf(IOType, IOType) ioPairs(MeshProcessor elt) {
         ioPairs(elt.input, elt.output);

@@ -107,6 +107,46 @@ project RoutingTest {
         input = {{type=refBy(rec1)}, {type=refBy(connOut)}, {type=refBy(command), forward=false}}, 
         output = {{type=refBy(rec1)}}
     };
+
+    Service myProcessorP1Service = JavaService {
+        id = "ParallelRoutingProcessor1",
+        name = "ParallelRoutingProcessor1",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP1Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myProcessorP2Service = JavaService {
+        id = "ParallelRoutingProcessor2",
+        name = "ParallelRoutingProcessor2",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP2Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myProcessorP3Service = JavaService {
+        id = "ParallelRoutingProcessor3",
+        name = "ParallelRoutingProcessor3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
     
     Service mySinkService = JavaService {
         id = "RoutingSink",
@@ -159,11 +199,41 @@ project RoutingTest {
 
     MeshProcessor myProcessor = {
         impl = refBy(myProcessorService),
+        next = {refBy(myConnMyProcessorMyParallelProc1), refBy(myConnMyProcessorMyParallelProc2), refBy(myConnMyProcessorMyParallelProc3)}
+    };
+    
+    MeshConnector myConnMyProcessorMyParallelProc1 = {
+        name = "Processor->ParallelProc1",
+        next = refBy(myProcessorP1)
+    };
+
+    MeshConnector myConnMyProcessorMyParallelProc2 = {
+        name = "Processor->ParallelProc2",
+        next = refBy(myProcessorP2)
+    };
+
+    MeshConnector myConnMyProcessorMyParallelProc3 = {
+        name = "Processor->ParallelProc3",
+        next = refBy(myProcessorP3)
+    };
+
+    MeshProcessor myProcessorP1 = {
+        impl = refBy(myProcessorP1Service),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+
+    MeshProcessor myProcessorP2 = {
+        impl = refBy(myProcessorP2Service),
         next = {refBy(myConnMyProcessorMySink)}
     };
     
+    MeshProcessor myProcessorP3 = {
+        impl = refBy(myProcessorP3Service),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+
     MeshConnector myConnMyProcessorMySink = {
-        name = "Processor->Sink",
+        name = "ProcessorP1/P2/P3->Sink",
         next = refBy(mySink)
     };
 

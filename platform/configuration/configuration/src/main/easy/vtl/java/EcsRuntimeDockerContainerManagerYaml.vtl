@@ -73,12 +73,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     }
     
     def produceTransportSecurity(TransportProtocol tp, Boolean userPwdFallback) {
-println(tp+" "+isDefined(tp.security)+" "+userPwdFallback);    
-if (isDefined(tp.security)) {
-    println(" -> "+(tp.security <> null));
-}
         if (isDefined(tp.security) and tp.security <> null) {
-println("HERE");        
             SecuritySettings sec = tp.security;
             if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 'authenticationKey: ${sec.authenticationKey}'

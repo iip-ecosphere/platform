@@ -5,3 +5,4 @@ constraints collection
  - connector service in/out types must be RecordTypes?
  - transport vs service protocol
  - ensemble -> no overlaps, no graph
+ - synchronous input service cannot be connected to asynchronous output service
