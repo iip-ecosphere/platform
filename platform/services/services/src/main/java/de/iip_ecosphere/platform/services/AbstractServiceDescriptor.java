@@ -143,6 +143,8 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         }
         return result;
     }
+    
+    // checkstyle: checkstyle: stop exception type check
 
     @Override
     public void setState(ServiceState state) throws ExecutionException {
@@ -152,14 +154,16 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
                 stub.setState(state);
                 // if service/stub made an implicit transition, take it up
                 state = stub.getState(); // may do a transition
-            } catch (ExecutionException e) {
-                // may fail, keep local; handover needed
-                LoggerFactory.getLogger(getClass()).info("Cannot set state for service '" + getId() + "' via AAS. "
-                    + "Falling back to local state. " + e.getMessage());
+            } catch (Throwable e) {
+                // may fail, e.g., shutdown may just be faster, keep local; handover needed
+                LoggerFactory.getLogger(getClass()).info("Cannot set state for service '{}' via AAS. "
+                    + "Falling back to local state. Resason: {} {}", getId(), e.getClass(), e.getMessage());
             }
         }
         this.state = state; // keep the descriptor shadow state up to date
     }
+    
+    // checkstyle: checkstyle: resume exception type check
 
     @Override
     public boolean isDeployable() {
