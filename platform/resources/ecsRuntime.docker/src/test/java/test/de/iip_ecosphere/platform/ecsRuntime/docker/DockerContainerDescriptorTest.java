@@ -22,6 +22,7 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.InternetProtocol;
 
 import de.iip_ecosphere.platform.ecsRuntime.docker.DockerContainerDescriptor;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Tests a given docker descriptor.
@@ -35,11 +36,11 @@ public class DockerContainerDescriptorTest {
      */
     @Test
     public void testDescriptor() {
-        Assert.assertNull(DockerContainerDescriptor.readFromYaml(getClass().getResourceAsStream("/xyz.yml"), 
+        Assert.assertNull(DockerContainerDescriptor.readFromYaml(ResourceLoader.getResourceAsStream("xyz.yml"), 
             new File("xyz.yml").toURI()));
         
         DockerContainerDescriptor desc = DockerContainerDescriptor.readFromYaml(
-            getClass().getResourceAsStream("/mesh-info.yml"), new File("mesh-info.yml").toURI());
+            ResourceLoader.getResourceAsStream("mesh-info.yml"), new File("mesh-info.yml").toURI());
         Assert.assertNotNull(desc);
         
         Assert.assertEquals("test-serviceMgr", desc.getId());
