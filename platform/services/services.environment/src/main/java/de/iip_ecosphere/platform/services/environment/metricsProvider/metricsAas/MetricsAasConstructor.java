@@ -289,6 +289,7 @@ public class MetricsAasConstructor {
      * 
      * @author Holger Eichelberger, SSE
      */
+    @SuppressWarnings("unused")
     private static class ListGetter implements Supplier<Object>, Serializable {
 
         private static final long serialVersionUID = -4387599926801687791L;

@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
 
 import static de.iip_ecosphere.platform.support.iip_aas.config.CmdLine.*;
@@ -250,8 +251,10 @@ public class Starter {
                 }
             }
         }  else {
-            Throwable t = new Throwable("NO EXCEPTION/DEBUGGIN: Service null or Service id null");
-            t.printStackTrace(System.out);
+            if (setup.getNotifyServiceNull()) {
+                Throwable t = new Throwable("NO EXCEPTION/DEBUGGING: Service null or Service id null");
+                t.printStackTrace(System.out);
+            }
         }
     }
 

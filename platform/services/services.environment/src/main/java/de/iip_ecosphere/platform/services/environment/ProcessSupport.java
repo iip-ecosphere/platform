@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Process execution support functions. Process scripts or binaries shall be packaged using a Maven assembly 

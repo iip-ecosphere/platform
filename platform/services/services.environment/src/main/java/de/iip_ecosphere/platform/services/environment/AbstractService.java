@@ -252,10 +252,11 @@ public abstract class AbstractService implements Service {
             }
             
             if (null == instance) {
-                instance = serviceClass.newInstance();
+                instance = serviceClass.getConstructor().newInstance();
             }
             result = cls.cast(instance);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException 
+            | IllegalAccessException | ClassCastException e) {
             String loaders = "";
             ClassLoader l = loader;
             while (null != l) {

@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment.switching;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -71,11 +73,12 @@ public interface ServiceSelector<T> {
         ServiceSelector<T> result = null;
         try {
             Class<?> c = loader.loadClass(cls);
-            result = (ServiceSelector<T>) c.newInstance();
+            result = (ServiceSelector<T>) c.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             LoggerFactory.getLogger(ServiceSelector.class).warn(
                 "Cannot load selector {}: Falling back to '{}'", cls, dflt);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException 
+            | InstantiationException | IllegalAccessException e) {
             LoggerFactory.getLogger(ServiceSelector.class).warn(
                 "Cannot instantiate selector {}: {}. Falling back to '{}'", cls, e.getMessage(), dflt);
         } catch (ClassCastException e) {

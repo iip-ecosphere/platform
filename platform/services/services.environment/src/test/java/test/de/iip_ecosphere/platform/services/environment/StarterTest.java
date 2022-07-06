@@ -89,7 +89,10 @@ public class StarterTest {
             Starter.composeArgument(Starter.PARAM_IIP_PROTOCOL, protocol),
             Starter.composeArgument(Starter.PARAM_IIP_PORT, String.valueOf(port))    
         });
+        boolean notifyOld = Starter.getSetup().getNotifyServiceNull();
+        Starter.getSetup().setNotifyServiceNull(false); // prevent exception output
         Starter.mapService(null); // service does not exist
+        Starter.getSetup().setNotifyServiceNull(notifyOld);
         InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(protocol, "localhost", port);
         ServiceStub stub = new ServiceStub(iCreator, "1234"); // service does not exist
         Assert.assertNull(stub.getState());

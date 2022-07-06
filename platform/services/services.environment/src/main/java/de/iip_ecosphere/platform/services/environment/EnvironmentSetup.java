@@ -25,6 +25,7 @@ public class EnvironmentSetup extends AbstractSetup {
     
     private TransportSetup transport = new TransportSetup();
     private AasSetup aas = new AasSetup();
+    private boolean notifyServiceNull = true;
 
     /**
      * Returns the transport setup.
@@ -44,6 +45,16 @@ public class EnvironmentSetup extends AbstractSetup {
         return aas;
     }
 
+    /**
+     * Returns whether some output shall be produced if a service to be registered is <b>null</b> or its id 
+     * is <b>null</b>.
+     * 
+     * @return notify or not
+     */
+    public boolean getNotifyServiceNull() {
+        return this.notifyServiceNull;
+    }
+    
     /**
      * Defines the transport setup.
      * 
@@ -71,6 +82,15 @@ public class EnvironmentSetup extends AbstractSetup {
      */
     public void setAas(AasSetup aas) {
         this.aas = aas;
+    }
+    
+    /**
+     * Sets whether some output shall be produced if a service to be registered is <b>null</b> or its id is <b>null</b>.
+     * 
+     * @param notifyServiceNull notify or not
+     */
+    public void setNotifyServiceNull(boolean notifyServiceNull) {
+        this.notifyServiceNull = notifyServiceNull;
     }
 
 }
