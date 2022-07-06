@@ -352,8 +352,13 @@ public class SpringCloudServiceManager
 
     @Override
     public void clear() {
+        AppDeployer deployer = getDeployer();
         for (SpringCloudServiceDescriptor desc: getServices()) {
-            getDeployer().undeploy(desc.getDeploymentId());
+            String deploymentId = desc.getDeploymentId();
+            AppStatus status = deployer.status(deploymentId);
+            if (DeploymentState.deployed == status.getState()) {
+                getDeployer().undeploy(deploymentId);
+            }
         }
         super.clear();
     }
