@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * A specialized starter for Spring Cloud Stream in including the metrics provider.
@@ -95,8 +96,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
             // technical information)
-            YamlArtifact art = YamlArtifact.readFromYaml(
-                getClass().getClassLoader().getResourceAsStream("/deployment.yml"));
+            YamlArtifact art = YamlArtifact.readFromYaml(ResourceLoader.getResourceAsStream("deployment.yml"));
             List<Service> services = createServices(art);
             if (null != services) { 
                 ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
@@ -163,6 +163,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @param args command line arguments
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
+        ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         Starter.parse(args);
         // start spring cloud app
         SpringApplication app = new SpringApplication(cls);
