@@ -54,7 +54,7 @@ public class ResourceLoader {
     public static void registerResourceResolver(ResourceResolver resolver) {
         if (null != resolver) {
             resolvers.add(resolver);
-            LoggerFactory.getLogger(ResourceLoader.class).info("Registered resource loader {}", resolver.getName());
+            LoggerFactory.getLogger(ResourceLoader.class).info("Registered resource resolver {}", resolver.getName());
         }
     }
 
@@ -66,7 +66,7 @@ public class ResourceLoader {
     public static void unregisterResourceResolver(ResourceResolver resolver) {
         if (null != resolver) {
             resolvers.remove(resolver);
-            LoggerFactory.getLogger(ResourceLoader.class).info("Unregistered resource loader {}", resolver.getName());
+            LoggerFactory.getLogger(ResourceLoader.class).info("Unregistered resource resolver {}", resolver.getName());
         }
     }
 
