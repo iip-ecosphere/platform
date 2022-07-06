@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
@@ -89,7 +90,7 @@ public class PlatformAas implements AasContributor {
             String ver = "";
             String buildId = "??";
             boolean isRelease = false;
-            InputStream is = getClass().getClassLoader().getResourceAsStream("iip-version.properties");
+            InputStream is = ResourceLoader.getResourceAsStream("iip-version.properties");
             if (null != is) {
                 Properties prop = new Properties();
                 try {
