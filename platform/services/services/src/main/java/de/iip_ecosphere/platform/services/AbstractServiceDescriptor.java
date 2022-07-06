@@ -156,8 +156,8 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
                 state = stub.getState(); // may do a transition
             } catch (Throwable e) {
                 // may fail, e.g., shutdown may just be faster, keep local; handover needed
-                LoggerFactory.getLogger(getClass()).info("Cannot set state for service '{}' via AAS. "
-                    + "Falling back to local state. Resason: {} {}", getId(), e.getClass(), e.getMessage());
+                LoggerFactory.getLogger(getClass()).info("Cannot set state {} for service '{}' via AAS. "
+                    + "Falling back to local state. Resason: {} {}", state, getId(), e.getClass(), e.getMessage());
             }
         }
         this.state = state; // keep the descriptor shadow state up to date

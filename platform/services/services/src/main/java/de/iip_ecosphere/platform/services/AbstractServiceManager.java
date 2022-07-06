@@ -603,5 +603,12 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
 
         return result;
     }
+    
+    /**
+     * Clears the internal data. [testing]
+     */
+    public void clear() {
+        artifacts.clear();
+    }
 
 }
