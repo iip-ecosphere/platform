@@ -350,4 +350,12 @@ public class SpringCloudServiceManager
         }
     }
 
+    @Override
+    public void clear() {
+        for (SpringCloudServiceDescriptor desc: getServices()) {
+            getDeployer().undeploy(desc.getDeploymentId());
+        }
+        super.clear();
+    }
+
 }
