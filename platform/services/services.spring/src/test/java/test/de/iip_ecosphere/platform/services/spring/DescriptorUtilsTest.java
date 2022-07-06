@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -24,6 +25,7 @@ import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Tests uncovered aspects of {@link DescriptorUtils}.
@@ -73,5 +75,15 @@ public class DescriptorUtilsTest {
             // exception ok
         }
     } 
+    
+    /**
+     * Tries loading a resource from BOOT-INF/classes (in resources folder), descriptor comes via 
+     * services.environment.spring.
+     */
+    @Test
+    public void testResourceLoader() {
+        InputStream in = ResourceLoader.getResourceAsStream("spring.test.txt");
+        Assert.assertNotNull(in);
+    }
     
 }
