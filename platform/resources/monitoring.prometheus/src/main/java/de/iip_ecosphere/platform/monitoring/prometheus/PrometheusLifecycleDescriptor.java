@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
 
 /**
@@ -202,7 +203,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
      * @throws IOException if the resource can (finally) not be loaded
      */
     private static InputStream getResource(String name) throws IOException {
-        InputStream in = PrometheusLifecycleDescriptor.class.getClassLoader().getResourceAsStream(name);
+        InputStream in = ResourceLoader.getResourceAsStream(name);
         if (in == null) { // testing fallback
             in = new FileInputStream(new File(RESOURCES, name));
         }
