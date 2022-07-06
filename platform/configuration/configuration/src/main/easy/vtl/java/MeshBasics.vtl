@@ -67,11 +67,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
     // -------------------------------------------------------------------------------------
     
     def String getDeploymentDescriptorPath() {
-        "/deployment.yml";
+        "deployment.yml";
     }
     
     def String getYamlServiceFragment(String varName, String clsName, String serviceId, String artifactVarName="art", String appVar="") {
-        'YamlArtifact ${artifactVarName} = YamlArtifact.readFromYamlSafe(${clsName}.class
+        'YamlArtifact ${artifactVarName} = YamlArtifact.readFromYamlSafe(ResourceLoader
             .getResourceAsStream("${getDeploymentDescriptorPath()}"));'
         if (appVar.length() > 0) {
             'ApplicationSetup ${appVar} = ${artifactVarName}.getApplication();'
