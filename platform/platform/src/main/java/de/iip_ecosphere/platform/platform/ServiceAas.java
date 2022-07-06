@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Provides the AAS of all known services. [preliminary]
@@ -77,7 +78,7 @@ public class ServiceAas {
      * @throws IOException if the setup file cannot be read
      */
     public static ServiceAasSetup obtainNameplateSetup() throws IOException {
-        InputStream is = ServiceAasSetup.class.getResourceAsStream("/services.yml"); // TODO preliminary
+        InputStream is = ResourceLoader.getResourceAsStream("services.yml"); // TODO preliminary
         if (null == is) {
             try {
                 is = new FileInputStream("src/test/resources/services.yml");
