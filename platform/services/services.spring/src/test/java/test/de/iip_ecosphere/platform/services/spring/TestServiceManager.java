@@ -133,8 +133,7 @@ public class TestServiceManager {
         TransportSetup setup = ServiceFactory.getTransport();
         setup.setPort(BROKER.getPort());
         setup.setHost("localhost");
-        setup.setUser("user");
-        setup.setPassword("pwd");
+        setup.setAuthenticationKey("amqp"); // -> identityStore.yml
         server.start();
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
@@ -278,11 +277,11 @@ public class TestServiceManager {
         config.setDescriptorName(descriptorName);
         ServiceManager mgr = ServiceFactory.getServiceManager();
         Assert.assertTrue(mgr instanceof SpringCloudServiceManager);
+        ((SpringCloudServiceManager) mgr).clear(); // start test in fair conditions
         
         File f = new File("./target/jars/simpleStream.spring.jar");
         Assert.assertTrue("Test cannot be executed as " + f 
             + " does not exist. Was it downloaded by Maven?", f.exists());
-        
         String aId = mgr.addArtifact(f.toURI());
         Assert.assertNotNull(aId);
         Assert.assertTrue(aId.length() > 0);
