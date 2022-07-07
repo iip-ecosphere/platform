@@ -46,7 +46,33 @@
         <version>3.3.0</version>
     </dependency>    
     
-    
   </dependencies>
+  <build>
+  	<plugins>
+  	<plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+           <version>3.1.1</version>
+           <executions>
+               <execution>
+                   <id>python-qr-scan</id>
+                   <phase>prepare-package</phase>
+                   <goals>
+                       <goal>single</goal>
+                   </goals>
+                   <configuration>
+                       <descriptors>
+                           <descriptor>src/main/assembly/pythonQrScanner.xml</descriptor>
+                       </descriptors>
+                       <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                       <attach>false</attach>
+                       <appendAssemblyId>false</appendAssemblyId>
+                       <finalName>python-qr</finalName>
+                   </configuration>
+               </execution>
+           </executions>
+       </plugin>
+  	</plugins>
+  </build>
 
 </project>
