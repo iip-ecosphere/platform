@@ -14,8 +14,7 @@ import de.iip_ecosphere.platform.kiServices.functions.images.ImageProcessing;
  */
 public class ImageProcessingTests {
     
-    private static final String TEST_FILE_FOLDER = "src/test/java/test/de/iip_ecosphere/platform"
-            + "/kiServices/functions/resources";
+    private static final String TEST_FILE_FOLDER = "src/test/resources";
     
     private static final String TEST_FILE_PATH = TEST_FILE_FOLDER + "/testImage.jpg";
     
