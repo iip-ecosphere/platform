@@ -122,23 +122,6 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         }
     }*/
     
-    def String outType(MeshElement elt, IOType inType) {
-        "";
-    }
-
-    def String outType(MeshProcessor elt, IOType inType) {
-        String result = "";
-        if (not(elt.impl.asynchronous)) {
-            mapOf(IOType, IOType) tmp = ioPairs(elt);
-            for (IOType i : tmp.keys()) {
-                if (i.type == inType.type) {
-                    result = toTypeName(tmp.get(i));
-                }
-            }
-        }
-        result;
-    }
-
     /*
     * Emits a spring destination table from destinations. Considers destination "*" as "useNativeEncoding".
     */

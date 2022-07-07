@@ -13,6 +13,23 @@ template MeshBasics(Configuration config, FileArtifact target) {
         asTypeName(elt.name);
     }
     
+    def String outType(MeshElement elt, IOType inType) {
+        "";
+    }
+
+    def String outType(MeshProcessor elt, IOType inType) {
+        String result = "";
+        if (not(elt.impl.asynchronous)) {
+            mapOf(IOType, IOType) tmp = ioPairs(elt);
+            for (IOType i : tmp.keys()) {
+                if (i.type == inType.type) {
+                    result = toTypeName(tmp.get(i));
+                }
+            }
+        }
+        result;
+    }
+    
     // -------------------------------------------- suffixes -------------------------------
 
     def String getOutName(MeshElement elt, String inType) {
@@ -268,6 +285,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     // --------------------------------- iterating ingestors ---------------------------------------------
  
+     // requires generateDataMethods to be called before
      def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
@@ -349,6 +367,25 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
         ''
+    }
+
+    def processOutput(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
+        String result = ""; // ugly workaround for EASy bug
+        for (IOType eltOut : base.output) {
+            String conn = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
+            for (MeshConnector c: nextConnectors(elt)) {                     
+                MeshElement target = c.next;
+                for (IOType cOut: target.impl.input) {
+                    // if types are equal and both are backward, n is async or n is a connector sending to elt
+                    if (eltOut.type == cOut.type) {
+                        String type = toTypeName(eltOut.type);
+                        String methodSuffix = "receive" + type.firstToUpperCase();
+                        result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "out", target.impl));
+                    }
+                }
+            }
+        }
+        '${result}'
     }
     
 }

@@ -1,6 +1,7 @@
 import JavaBasics;
 import SpringCloudStreamBasics;
 import MeshBasics;
+import SpringBasics;
 import JavaConnector;
 import ServiceBasics;
 
@@ -9,22 +10,24 @@ import ServiceBasics;
 template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
-    // ------------------------ specialization of MeshBasics --------
+    setOf(String) doneIngestors = {};
 
-    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
-        if (source == elt.impl) { // we do not want all connections here, just elt outgoing
-println("REC-CB " + source.impl.id+" | "+receiver.impl.id);    
-        String type = toTypeName(sourceType);
-        'final Predicate<${type}> pred${type} = getAssertPredicate${type}();
-        createReceptionCallback("${source.impl.id}_${type}", d -> Assert.assertTrue(pred${type}.test(d)), ${type}.class);'
-        }
-    }
+    // ------------------------ specialization of MeshBasics --------
     
-    // standard spring receive
+    // via processOutput
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
-        if (source == elt.impl) { // we do not want all connections here, just elt outgoing
-//println("REC-ING " + base.id+" "+type+" "+target.id);
-        'matcher.addPredicate(${type}.class, getAssertPredicate${type}());'
+        if (not(doneIngestors.includes(type))) {
+            doneIngestors.add(type);
+            if (springConnId(base, conn, target) <> "") { 
+                'matcher.addPredicate(${type}.class, getAssertPredicate${type}());' // dynamic evaluation, no test needed
+            } else {
+                'final Predicate<${type}> pred${type} = getAssertPredicate${type}();
+                createReceptionCallback("${base.id}_${type}", d -> {
+                    incrementReceived(${type}.class); 
+                    printReceivedData(d);
+                    Assert.assertTrue(pred${type}.test(d));
+                }, ${type}.class);'
+            }
         }
     }
 
@@ -85,7 +88,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         *
         * @author EASy-Producer
         */
-        private static class TestMatcher extends IsAnything<Object> {
+        private class TestMatcher extends IsAnything<Object> {
         
             private Map<Class<?>, Predicate<?>> predicates = new HashMap<>();
         
@@ -121,6 +124,8 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
             *     registered
             */
             private <T> boolean test(T obj) {
+                incrementReceived(obj.getClass());
+                printReceivedData(obj);
                 @SuppressWarnings("unchecked")
                 Predicate<T> pred = (Predicate<T>) predicates.get(obj.getClass());
                 return null == pred ? true : pred.test(obj);
@@ -251,7 +256,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
-            ${processIngestors(elt, service, nodes)}
+            ${processOutput(elt, service, nodes)}
             ${genMatcherAssert(elt)}
         }
         '
@@ -269,7 +274,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
             DataMapper.MappingConsumer<DataUnit> consumer = new DataMapper.MappingConsumer<>(DataUnit.class);
             ${genConsumerBindings(service, "consumer")}
             DataMapper.mapJsonData(in, DataUnit.class, consumer);
-            ${processIngestors(elt, service, nodes)}
+            ${processOutput(elt, service, nodes)}
             ${genMatcherAssert(elt)|e}
         }
         
@@ -366,6 +371,11 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
 
     // --------------------- tests --------------------------
 
+    def genAssertReceived() {
+        'Assert.assertTrue("Received counters not as expected", 
+            createReceivedCounterAssertPredicate().test(Collections.unmodifiableMap(received)));'
+    }
+
     def genTests(MeshElement elt, ServiceBase service, String clsName) {
         ''
     }
@@ -379,6 +389,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         @Test
         public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
             testSource();
+            ${genAssertReceived()}
         }
         '
     }
@@ -393,6 +404,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         @Test
         public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
             testService();
+            ${genAssertReceived()}            
         }
         '
     }
@@ -415,6 +427,8 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
                 @Override
                 public void received(${outType} data) {
                     counter.incrementAndGet();
+                    printReceivedData(data);
+                    incrementReceived(${outType}.class);
                 }
                 
                 @Override
@@ -425,6 +439,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
             };
             test.testConnector(test.createConnectorParameter(), callback);
             Assert.assertTrue("Connector does not deliver data", counter.get() > 0);
+            ${genAssertReceived()}
         }
         '
     }
@@ -464,6 +479,7 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         if (familyInterface <> "") {
             clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
         }
+        generateDataMethods(elt, true); // prerequisite for processIngestors
 
         'package ${pkg};
         
@@ -503,10 +519,41 @@ println("REC-CB " + source.impl.id+" | "+receiver.impl.id);
         public class ${clsName}Test extends SpringAsyncServiceBase {
         
             ${genAttributes(elt, elt.impl, clsName)|e}
+            private Map<Class<?>, Integer> received = new HashMap<>();
             
             ${genClasses(elt, elt.impl, clsName)|e}
             ${genMethods(elt, elt.impl, clsName)|e}
+            
+            /**
+            * Increments the received counter for the given data {@code type}.
+            *
+            * @param type the type to increment the counter for
+            */
+            private void incrementReceived(Class<?> type) {
+                if (received.containsKey(type)) {
+                    received.put(type, received.get(type) + 1);
+                } else {
+                    received.put(type, 1);
+                }
+            }
+            
             ${genAssertPredicates(elt, elt.impl, clsName)|e}
+            
+            /**
+            * Returns the predicate to assert the counters for received data type instances.
+            *
+            * @return the predicate (by default, a predicate with constant value {@code true})
+            */
+            protected Predicate<Map<Class<?>, Integer>> createReceivedCounterAssertPredicate() {
+                return m -> true;
+            }
+            
+            /**
+            * Prints the received data. Can be overridden.
+            */
+            protected void printReceivedData(Object data) {
+                System.out.println(data);
+            }
 
             ${genTests(elt, elt.impl, clsName)|e}
         

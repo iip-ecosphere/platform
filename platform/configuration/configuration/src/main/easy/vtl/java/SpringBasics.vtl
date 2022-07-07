@@ -1,0 +1,18 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template SpringBasics(Configuration config, FileArtifact target) {
+
+    def springConnId(ServiceBase source, String conn, ServiceBase target) {
+        String springConnId = "";
+        if (source.kind <> ServiceKind::SOURCE_SERVICE // source always via transfer 
+            and source.kind <> ServiceKind::SINK_SERVICE // sinks no output, only backward, via transfer
+            and source.asynchronous and not(target.asynchronous)) {
+            // async -> sync connection requires spring as target is function
+            springConnId = "${conn}-in-0";
+        }
+        springConnId;
+    }
+
+}
