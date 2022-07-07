@@ -29,4 +29,19 @@ public interface MonitoringService extends Service {
      */
     public void attachMetricsProvider(MetricsProvider provider);
 
+    /**
+     * Sets up a service with {@code provider}.
+     * 
+     * @param service the service to set up, in particular a {@link MonitoringService} or one if its subtypes
+     * @param provider the provider instance
+     */
+    public static void setUp(Service service, MetricsProvider provider) {
+        if (service instanceof MonitoringService) {
+            ((MonitoringService) service).attachMetricsProvider(provider);
+            if (service instanceof UpdatingMonitoringService) { // well, forward...
+                provider.addService((UpdatingMonitoringService) service);
+            }
+        }
+    }
+    
 }

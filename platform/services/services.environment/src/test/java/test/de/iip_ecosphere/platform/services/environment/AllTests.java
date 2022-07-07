@@ -39,6 +39,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     IipStringStyleTest.class,
     ProcessSupportTest.class,
     DataMapperTest.class,
+    MonitoringServiceTest.class,
     
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
