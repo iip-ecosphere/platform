@@ -185,76 +185,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     def initIngestors(MeshElement elt, ServiceBase base) {
         ''
     }
-    
-    def attachIngestors(MeshElement elt, ServiceBase base) {
-         String result = ""; // ugly workaround for EASy bug
-         setOf(String) conns = {};
-         if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
-             setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
-             for (IOType t: backward(base.output)) {
-                 outBack.add(t.type);
-             }
-             for (String methodSuffix : ingestors.getKeys()) {
-                 // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
-                 if (asyncIngestors.containsKey(methodSuffix)) {
-                     if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
-                         String type = ingestors.get(methodSuffix);
-                         setOf(MeshElement) done = {};
-                         for (MeshConnector c: nextConnectors(elt)) {                     
-                             MeshElement target = c.next;
-                             done.add(target);
-                             String outName = getOutName(target, type);
-                             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
-                             if (not(conns.includes(conn))) {
-                                 result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
-                                 conns.add(conn);
-                             }
-                         }
-                         for (MeshElement target: nodes) {
-                            if (not(done.includes(target))) {
-                                sequenceOf(IOType) types;
-                                for (IOType t : backward(target.impl.input)) {
-                                    if (outBack.includes(t.type)) {
-                                        type = toTypeName(t.type);
-                                        String outName = getOutName(target, type);
-                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
-                                        if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
-                                            conn = "process" + conn.substring(6);
-                                        }
-                                        if (not(conns.includes(conn)) and conn.startsWith("process")) {
-                                            result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
-                                            conns.add(conn);
-                                        }
-                                    }
-                                }
-                            }
-                         } 
-                     }
-                 }
-             }
-         }
-         // go over all possibilities, in particular for backward
-         Boolean first = true;
-         for (MeshElement n: nodes) {
-             if (n != elt) {
-                 for (IOType out : n.impl.output) {
-                     for (IOType in: base.input) {
-                         // if types are equal and both are backward, n is async or n is a connector sending to elt
-                         if (in.type == out.type and (
-                             (not(in.forward) and not(out.forward)) or // anyway ingest/transport
-                             (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
-                             (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
 
-                             result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
-                             first = false;
-                         }
-                     }
-                 }
-             }
-         }
-         '${result}'
-    }
-
+    //specialization of MeshBasics
     def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
         String serviceId = "_" + toIdentifier(source.impl.id);
         String coType = toTypeName(sourceType);
@@ -267,7 +199,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'createReceptionCallback("${source.impl.id}_${coType}", ${prefix}${coType}_${toIdentifier(receiver.impl.id)}(), ${coType}.class);'
     }
     
+    def attachIngestors(MeshElement elt, ServiceBase base) {
+        processIngestors(elt, base, nodes);
+    }
+    
+    //specialization of MeshBasics
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+println("HERE " + type);    
         String methodName;
         if (sharedInterfaces) {
             methodName = "attach${type.firstToUpperCase()}Ingestor";
@@ -282,7 +220,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         if (springConnId <> "") {
             'SerializerMessageConverter.serializeAndSend(streamBridge, "${springConnId}", data);'
         } else {
-            'Transport.send(c -> c.asyncSend("${sender.id}_${type}", data), "${sender.id}");'
+            'Transport.send(c -> c.asyncSend("${sender.id}_${type}", data), "${sender.id}")'
         }
     }
     
@@ -959,7 +897,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     def springConnId(ServiceBase source, String conn, ServiceBase target) {
         String springConnId = "";
-        if (source.kind <> ServiceKind::SOURCE_SERVICE and source.asynchronous and not(target.asynchronous)) {
+        if (source.kind <> ServiceKind::SOURCE_SERVICE // source always via transfer 
+            and source.kind <> ServiceKind::SINK_SERVICE // sinks no output, only backward, via transfer
+            and source.asynchronous and not(target.asynchronous)) {
             // async -> sync connection requires spring as target is function
             springConnId = "${conn}-in-0";
         }

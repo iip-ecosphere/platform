@@ -266,4 +266,89 @@ template MeshBasics(Configuration config, FileArtifact target) {
         elt.next;
     }
     
+    // --------------------------------- iterating ingestors ---------------------------------------------
+ 
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
+         String result = ""; // ugly workaround for EASy bug
+         setOf(String) conns = {};
+         if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
+             setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
+             for (IOType t: backward(base.output)) {
+                 outBack.add(t.type);
+             }
+             for (String methodSuffix : ingestors.getKeys()) {
+                 // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+                 if (asyncIngestors.containsKey(methodSuffix)) {
+                     if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
+                         String type = ingestors.get(methodSuffix);
+                         setOf(MeshElement) done = {};
+                         for (MeshConnector c: nextConnectors(elt)) {                     
+                             MeshElement target = c.next;
+                             done.add(target);
+                             String outName = getOutName(target, type);
+                             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+                             if (not(conns.includes(conn))) {
+                                 result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
+                                 conns.add(conn);
+                                 conns.add(type);
+                             }
+                         }
+                         for (MeshElement target: nodes) {
+                            if (not(done.includes(target))) {
+                                sequenceOf(IOType) types;
+                                for (IOType t : backward(target.impl.input)) {
+                                    if (outBack.includes(t.type)) {
+                                        type = toTypeName(t.type);
+                                        String outName = getOutName(target, type);
+                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+                                        if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
+                                            conn = "process" + conn.substring(6);
+                                        }
+                                        if (not(conns.includes(conn)) and not(conns.includes(type)) and conn.startsWith("process")) {
+                                            result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
+                                            conns.add(type);
+                                            conns.add(conn);
+                                        }
+                                    }
+                                }
+                            }
+                         } 
+                     }
+                 }
+             }
+         }
+         // go over all possibilities, in particular for backward
+         Boolean first = true;
+         for (MeshElement n: nodes) {
+             if (n != elt) {
+                 for (IOType out : n.impl.output) {
+                     for (IOType in: base.input) {
+                         // if types are equal and both are backward, n is async or n is a connector sending to elt
+                         if (in.type == out.type and (
+                             (not(in.forward) and not(out.forward)) or // anyway ingest/transport
+                             (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
+                             (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
+
+                             String conn = toTypeName(in);
+                             if (not(conns.includes(conn))) {
+                                 result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
+                                 first = false;
+                                 conns.add(conn);
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+         '${result}'
+    }
+    
+    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
+        ''
+    }
+    
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+        ''
+    }
+    
 }

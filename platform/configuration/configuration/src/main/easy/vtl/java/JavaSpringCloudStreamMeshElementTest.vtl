@@ -9,6 +9,25 @@ import ServiceBasics;
 template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
+    // ------------------------ specialization of MeshBasics --------
+
+    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
+        if (source == elt.impl) { // we do not want all connections here, just elt outgoing
+println("REC-CB " + source.impl.id+" | "+receiver.impl.id);    
+        String type = toTypeName(sourceType);
+        'final Predicate<${type}> pred${type} = getAssertPredicate${type}();
+        createReceptionCallback("${source.impl.id}_${type}", d -> Assert.assertTrue(pred${type}.test(d)), ${type}.class);'
+        }
+    }
+    
+    // standard spring receive
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+        if (source == elt.impl) { // we do not want all connections here, just elt outgoing
+//println("REC-ING " + base.id+" "+type+" "+target.id);
+        'matcher.addPredicate(${type}.class, getAssertPredicate${type}());'
+        }
+    }
+
     // --------------------- imports ---------------------------
 
     def genImports(MeshElement elt, ServiceBase service) {
@@ -43,6 +62,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genClasses(MeshElement elt, ServiceBase service, String clsName) {
         '/**
         * Represents all potential inputs to the service and the JSON input format.
+        *
+        * @author EASy-Producer
         */
         private static class DataUnit {
         
@@ -52,7 +73,66 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
             ${getDataUnitSetters(service)}
         
-        }'
+        }
+        
+        ${genMatcher(elt, service, clsName)|e}'
+    }
+    
+    def genMatcher(MeshElement elt, ServiceBase service, String clsName) {
+        '/**
+        * A predicate-based matcher for spring-based output testing. Class generated here, because we do not want to 
+        * include the testing artifact of services.environment and hamcrest shall not be a major production dependency.
+        *
+        * @author EASy-Producer
+        */
+        private static class TestMatcher extends IsAnything<Object> {
+        
+            private Map<Class<?>, Predicate<?>> predicates = new HashMap<>();
+        
+            /**
+            * Creates an instance.
+            */
+            public TestMatcher() {
+                super("${service.id} matcher");
+            }
+            
+            /**
+            * Adds a predicate for a given type.
+            * 
+            * @param <T> the type of data to be considered by the predicate
+            * @param cls the type to add the predicate for
+            * @param pred the predicate
+            */
+            private <T> void addPredicate(Class<T> cls, Predicate<T> pred) {
+                predicates.put(cls, pred);
+            }
+        
+            @Override
+            public boolean matches(Object obj) {
+                return test(obj);
+            }
+            
+            /**
+            * Does a typed test against {@link #predicates}.
+            *
+            * @param <T> the type of data to be considered by the test
+            * @param obj the data/object to be tested
+            * @return whether {@code obj} matches the condition of a registered predicate or {@code true} if none was 
+            *     registered
+            */
+            private <T> boolean test(T obj) {
+                @SuppressWarnings("unchecked")
+                Predicate<T> pred = (Predicate<T>) predicates.get(obj.getClass());
+                return null == pred ? true : pred.test(obj);
+            }
+        };
+        
+        '            
+    }
+
+    // not needed here
+    def genMatcher(MeshSink elt, ServiceBase service, String clsName) {
+        ''
     }
     
     protected def getDataUnitAttributes(ServiceBase service) {
@@ -112,7 +192,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         private ${channelsType(elt)} channels;
 
         @Autowired
-        private MessageCollector collector;'
+        private MessageCollector collector;
+        ${genQueue(elt, service)|e}'
     }
     
     def channelsType(MeshElement elt) {
@@ -130,6 +211,15 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def channelsType(MeshSink elt) {
         'Sink'
     }
+    
+    def genQueue(MeshElement elt, ServiceBase service) {
+        'private BlockingQueue<Message<?>> messages = collector.forChannel(channels.output());
+        private TestMatcher matcher = new TestMatcher();'
+    }
+
+    def genQueue(MeshSink elt, ServiceBase service) {
+        ''
+    }
 
     def genAttributes(MeshElement elt, Connector conn, String clsName) {
         ''
@@ -144,6 +234,15 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genMethods(MeshElement elt, ServiceBase service, String clsName) {
         ''
     }
+    
+    def genMatcherAssert(MeshElement elt) {
+        'assertThat(messages, receivesPayloadThat(matcher));'
+    }
+    
+    // nothing comes out
+    def genMatcherAssert(MeshSink elt) {
+        ''
+    }
 
     def genMethods(MeshSource elt, ServiceBase service, String clsName) {
         '/**
@@ -152,7 +251,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
-            // TODO reception: transport/spring
+            ${processIngestors(elt, service, nodes)}
+            ${genMatcherAssert(elt)}
         }
         '
     }
@@ -169,7 +269,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             DataMapper.MappingConsumer<DataUnit> consumer = new DataMapper.MappingConsumer<>(DataUnit.class);
             ${genConsumerBindings(service, "consumer")}
             DataMapper.mapJsonData(in, DataUnit.class, consumer);
-            // TODO reception: transport/spring
+            ${processIngestors(elt, service, nodes)}
+            ${genMatcherAssert(elt)|e}
         }
         
         /**
@@ -196,7 +297,28 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             }
         }
     }
-
+    
+    protected def genAssertPredicates(MeshElement elt, ServiceBase service, String clsName) {
+        for (IOType out: service.output) {
+            String typeName = toTypeName(out);
+            '/**
+            * Creates/returns a predicate asserting that the received data of type ${typeName}
+            * as output of the testing object is ok (or not). Allows for overriding the test behavior
+            * with "semantic" expectations.
+            *
+            * @return the predicate (default: lambda function always returning {@code true})
+            */ 
+            protected Predicate<${typeName}> getAssertPredicate${typeName}() {
+                return d -> true;
+            }'
+        }
+    }
+    
+    // nothing comes out of a sink
+    protected def genAssertPredicates(MeshSink elt, ServiceBase service, String clsName) {
+        ''
+    }
+    
     def genMethods(MeshSource elt, Connector connector, String clsName) {
         String connGen = getConnectorGenerics(connector, false);
         String outType = asTypeName(getFirstTypeName(connector.output));
@@ -346,9 +468,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         'package ${pkg};
         
         import java.io.IOException;
+        import java.util.*;
+        import java.util.function.*;
+        import java.util.concurrent.BlockingQueue;
+        
         import de.iip_ecosphere.platform.support.TimeUtils;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+        import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         ${genImports(elt, elt.impl)|e}
         
         import org.junit.*;
@@ -363,18 +490,23 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import iip.nodes.*;
 
         /**
-        * Implements tests for "${clsName}".
+        * Implements tests for "${clsName}". The generated class is meant to be re-usable and extensible, e.g.,
+        * regarding the assert predicates. If possible, we provide a main method to ease startup (unsure for Spring
+        * components at the moment). There is no guarantee on the sequence of received data, in particular not when 
+        * the service is declared to be asynchronous.
         *
         * @author EASy-Producer
         */        
         @SpringBootTest
         @RunWith(SpringRunner.class)
-        public class ${clsName}Test {
+        // TODO specify spring setup
+        public class ${clsName}Test extends SpringAsyncServiceBase {
         
             ${genAttributes(elt, elt.impl, clsName)|e}
             
             ${genClasses(elt, elt.impl, clsName)|e}
             ${genMethods(elt, elt.impl, clsName)|e}
+            ${genAssertPredicates(elt, elt.impl, clsName)|e}
 
             ${genTests(elt, elt.impl, clsName)|e}
         
