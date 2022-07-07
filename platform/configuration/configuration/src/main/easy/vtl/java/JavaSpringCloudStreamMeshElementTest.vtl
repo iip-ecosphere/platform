@@ -12,10 +12,22 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // --------------------- imports ---------------------------
 
     def genImports(MeshElement elt, ServiceBase service) {
-        ''
+        'import de.iip_ecosphere.platform.services.environment.*;
+        import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+        
+        import java.io.InputStream;
+        import org.hamcrest.core.IsAnything;
+        import org.springframework.beans.factory.annotation.*;
+        import org.springframework.integration.support.MessageBuilder;
+        import org.springframework.messaging.Message;
+        import org.springframework.cloud.stream.messaging.*;
+        import org.springframework.cloud.stream.test.binder.MessageCollector;
+        import org.springframework.messaging.Message;
+        import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.*;
+        import static org.junit.Assert.*;'
     }
 
-    def genImports(MeshElement elt, Connector connector) {
+    def genImports(MeshSource elt, Connector connector) {
         String impConnector = "";
         if (connector.class.length() > 0) {
             impConnector = "import ${connector.class};";
@@ -25,14 +37,167 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         ${impConnector|e}
         import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;'
     }
+
+    // --------------------- classes ---------------------
     
+    def genClasses(MeshElement elt, ServiceBase service, String clsName) {
+        '/**
+        * Represents all potential inputs to the service and the JSON input format.
+        */
+        private static class DataUnit {
+        
+            ${getDataUnitAttributes(service)}
+
+            ${getDataUnitGetters(service)}
+
+            ${getDataUnitSetters(service)}
+        
+        }'
+    }
+    
+    protected def getDataUnitAttributes(ServiceBase service) {
+        if (service.input.size() > 0) { // EASY bug
+            for (IOType in: service.input) {
+                String typeName = toTypeName(in);
+                String attributeName = firstToLowerCase(toTypeName(in));
+                'private ${typeName} ${attributeName};'
+            }
+        }
+    }
+
+    protected def getDataUnitGetters(ServiceBase service) {
+        if (service.input.size() > 0) { // EASY bug
+            for (IOType in: service.input) {
+                String typeName = toTypeName(in);
+                String attributeName = firstToLowerCase(toTypeName(in));
+                '/**
+                * Returns ${attributeName}.
+                *
+                * @return ${attributeName}, may be <b>null</b>
+                */
+                public ${typeName} get${typeName}() {
+                    return ${attributeName};
+                }
+                '
+            }
+        }
+    }
+
+    protected def getDataUnitSetters(ServiceBase service) {
+        if (service.input.size() > 0) { // EASY bug
+            for (IOType in: service.input) {
+                String typeName = toTypeName(in);
+                String attributeName = firstToLowerCase(toTypeName(in));
+                '/**
+                * Changes ${attributeName}. [required by Jackson]
+                *
+                * @param ${attributeName}, the new value, may be <b>null</b>
+                */
+                public void set${typeName}(${typeName} ${attributeName}) {
+                    this.${attributeName} = ${attributeName};
+                }
+                '
+            }
+        }
+    }
+
+    def genClasses(MeshElement elt, Connector conn, String clsName) {
+        ''
+    }
+    
+    // --------------------- attributes ---------------------
+    
+    def genAttributes(MeshElement elt, ServiceBase service, String clsName) {
+        '@Autowired
+        private ${channelsType(elt)} channels;
+
+        @Autowired
+        private MessageCollector collector;'
+    }
+    
+    def channelsType(MeshElement elt) {
+        ''
+    }
+
+    def channelsType(MeshSource elt) {
+        'Source'
+    }
+
+    def channelsType(MeshProcessor elt) {
+        'Processor'
+    }
+
+    def channelsType(MeshSink elt) {
+        'Sink'
+    }
+
+    def genAttributes(MeshElement elt, Connector conn, String clsName) {
+        ''
+    }
+
     // ------------------- reusable methods -----------------
+
+    def String getFileName(ServiceBase service) {
+        "testData-${toIdentifier(service.id)}.yml";
+    }
 
     def genMethods(MeshElement elt, ServiceBase service, String clsName) {
         ''
     }
 
-    def genMethods(MeshElement elt, Connector connector, String clsName) {
+    def genMethods(MeshSource elt, ServiceBase service, String clsName) {
+        '/**
+        * Tests the source.
+        *
+        * @throws IOException if setting up the source fails
+        */
+        public void testSource() throws IOException {
+            // TODO reception: transport/spring
+        }
+        '
+    }
+
+    def genMethods(MeshInnerElement elt, ServiceBase service, String clsName) {
+        String fileName = getFileName(service);
+        '/**
+        * Tests the service with a given JSON input stream.
+        * 
+        * @param in the Yaml input stream, will be closed
+        * @throws IOException if the data cannot be loaded/mapped to the service input data
+        */
+        public void testService(InputStream in) throws IOException {
+            DataMapper.MappingConsumer<DataUnit> consumer = new DataMapper.MappingConsumer<>(DataUnit.class);
+            ${genConsumerBindings(service, "consumer")}
+            DataMapper.mapJsonData(in, DataUnit.class, consumer);
+            // TODO reception: transport/spring
+        }
+        
+        /**
+        * Tests the service with the default resource "${fileName}".
+        *
+        * @throws IOException of the data cannot be loaded/mapped to the service input data
+        */
+        public void testService() throws IOException {
+            InputStream in = ResourceLoader.getResourceAsStream("${fileName}");
+            testService(in);
+        }
+        '
+    }
+    
+    protected def genConsumerBindings(ServiceBase service, String var) {
+        if (service.input.size() > 0) { // EASY bug
+            for (IOType in: service.input) {
+                String typeName = toTypeName(in);
+                String attributeName = firstToLowerCase(toTypeName(in));
+                '${var}.addHandler(${typeName}.class, d -> {
+                    Message<${typeName}> msg = MessageBuilder.withPayload(d).build();
+                    channels.input().send(msg);
+                });'
+            }
+        }
+    }
+
+    def genMethods(MeshSource elt, Connector connector, String clsName) {
         String connGen = getConnectorGenerics(connector, false);
         String outType = asTypeName(getFirstTypeName(connector.output));
 
@@ -83,14 +248,41 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         ''
     }
 
-    def genTests(MeshElement elt, Connector connector, String clsName) {
+    def genTests(MeshSource elt, ServiceBase service, String clsName) {
+        '/**
+        * Tests the source.
+        *
+        * @throws IOException shall not occur / test failure
+        */
+        @Test
+        public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
+            testSource();
+        }
+        '
+    }
+
+    def genTests(MeshInnerElement elt, ServiceBase service, String clsName) {
+        String fileName = getFileName(service);
+        '/**
+        * Tests the service with the default resource "${fileName}".
+        *
+        * @throws IOException shall not occur / test failure
+        */
+        @Test
+        public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
+            testService();
+        }
+        '
+    }
+
+    def genTests(MeshSource elt, Connector connector, String clsName) {
         String outType = asTypeName(getFirstTypeName(connector.output));
         
         '/**
         * Tests the connector, here whether the connector (parameterized by 
         * {@link #createConnectorParameter()} delivered any data.
         *
-        * @throws IOException shall not occur
+        * @throws IOException shall not occur / test failure
         */
         @Test
         public void testConnector() throws IOException {
@@ -118,10 +310,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------- main method ----------------------
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
-        ''
+        'System.out.println("Please execute this class as a jUnit test.");'
     }
 
-    def genMain(MeshElement elt, Connector connector, String clsName) {
+    def genMain(MeshSource elt, Connector connector, String clsName) {
         String outType = asTypeName(getFirstTypeName(connector.output));
         '${clsName}Test test = new ${clsName}Test();
         ReceptionCallback<${outType}> callback = new ReceptionCallback<${outType}>() {
@@ -179,6 +371,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         @RunWith(SpringRunner.class)
         public class ${clsName}Test {
         
+            ${genAttributes(elt, elt.impl, clsName)|e}
+            
+            ${genClasses(elt, elt.impl, clsName)|e}
             ${genMethods(elt, elt.impl, clsName)|e}
 
             ${genTests(elt, elt.impl, clsName)|e}

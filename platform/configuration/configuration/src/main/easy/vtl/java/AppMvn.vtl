@@ -66,6 +66,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendDependency(dep, "org.springframework", "spring-test", scope="test");
         appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
         appendDependency(dep, "junit", "junit", scope="test");
+        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream-test-support", scope="test");
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
