@@ -379,7 +379,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
                     // if types are equal and both are backward, n is async or n is a connector sending to elt
                     if (eltOut.type == cOut.type) {
                         String type = toTypeName(eltOut.type);
-                        String methodSuffix = "receive" + type.firstToUpperCase();
+                        String methodSuffix = getMethodSuffix(target, toTypeName(cOut), outType(target, cOut));
+                        //"receive" + type.firstToUpperCase();
                         result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "out", target.impl));
                     }
                 }

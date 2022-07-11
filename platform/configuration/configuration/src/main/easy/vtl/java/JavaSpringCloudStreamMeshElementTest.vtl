@@ -70,12 +70,57 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         */
         private static class DataUnit {
         
+            private int \\$period = 0;
             ${getDataUnitAttributes(service)}
 
             ${getDataUnitGetters(service)}
+            
+            /**
+            * Returns the delay period between this and the next data unit.
+            *
+            * @return the period in ms, use default/last value if zero or negative
+            */
+            public int get\\$Period() {
+                return \\$period;
+            }
 
             ${getDataUnitSetters(service)}
         
+            /**
+            * Changes the delay period between this and the next data unit.
+            *
+            * @param \\$period the period in ms, default/last value if zero or negative
+            */
+            public void set\\$Period(int \\$period) {
+                this.\\$period = \\$period;
+            }
+            
+        }
+        
+        /**
+        * Extended data mapper taking {@link DataUnit#\\$period} into account.
+        */
+        private class TimedMappingConsumer extends DataMapper.MappingConsumer<DataUnit> {
+        
+            private int period = getInitialPeriod();
+        
+            /**
+             * Creates a timed mapping consumer.
+             */
+            public TimedMappingConsumer() {
+                super(DataUnit.class);
+            }
+        
+        
+            @Override
+            public void accept(DataUnit value) {
+                super.accept(value);
+                period = value.get\\$Period();
+                if (period > 0) {
+                    TimeUtils.sleep(period);
+                }
+            }
+         
         }
         
         ${genMatcher(elt, service, clsName)|e}'
@@ -271,7 +316,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @throws IOException if the data cannot be loaded/mapped to the service input data
         */
         public void testService(InputStream in) throws IOException {
-            DataMapper.MappingConsumer<DataUnit> consumer = new DataMapper.MappingConsumer<>(DataUnit.class);
+            TimedMappingConsumer consumer = new TimedMappingConsumer();
             ${genConsumerBindings(service, "consumer")}
             DataMapper.mapJsonData(in, DataUnit.class, consumer);
             ${processOutput(elt, service, nodes)}
@@ -279,12 +324,19 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         }
         
         /**
-        * Tests the service with the default resource "${fileName}".
+        * Tests the service with the file given in system property "iip.test.dataFile",  
+        * "../../src/test/resources/${fileName}" or the default resource "${fileName}".
         *
         * @throws IOException of the data cannot be loaded/mapped to the service input data
         */
         public void testService() throws IOException {
-            InputStream in = ResourceLoader.getResourceAsStream("${fileName}");
+            InputStream in;
+            try {
+                in = new java.io.FileInputStream(
+                    System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}"));
+            } catch (IOException e) {
+                in = ResourceLoader.getResourceAsStream("${fileName}");
+            }
             testService(in);
         }
         '
@@ -443,11 +495,76 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         }
         '
     }
+    
+    // ------------------- properties -----------------------
+    
+    def genDynamicProperties(MeshElement elt, ServiceBase service, String clsName) {
+        mapOf(String, setOf(String)) destinations = {};
+        setOf(String) functions = {};
+        setOf(String) sources = {};
+        
+        // emulate params for a single node under testing and its predecessors
+        sequenceOf(MeshElement) no = {};
+        no.add(elt);
+        for (MeshElement e: nodes) {
+            for (MeshConnector c: nextConnectors(e)) {
+               if (c.next == elt and not(no.includes(e))) {
+                   no.add(e);
+               }
+            }
+        }
+        mapOf(MeshElement, setOf(MeshConnector)) mMesh = {};
+        for (MeshElement e: no) {
+            setOf(MeshConnector) mMeshConn;
+            if (mMesh.containsKey(e)) {
+                mMeshConn = mMesh.get(e);
+            } else {
+                mMeshConn = {};
+                mMesh.add(e, mMeshConn);
+            }
+            for (MeshConnector c: nextConnectors(e)) {
+                mMeshConn.add(c);
+            }
+        }
+
+        calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id);
+        if (destinations.size() > 0) {
+            for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
+                String dst = "";
+                Boolean useNativeEncoding = false;
+                for (String d : destinations.get(k)) {
+                    if (d == "*") {
+                        useNativeEncoding = true;
+                    } else {
+                        if (dst.length() > 0) {
+                            dst = dst + ",";
+                        }
+                        dst = dst + d;
+                    }
+                }
+                'registry.add("spring.cloud.stream.bindings.${k}.destination", () -> "${dst}");'
+                if (useNativeEncoding) {
+                    'registry.add("spring.cloud.stream.bindings.${k}.useNativeEncoding", () -> true);'
+                }
+            }
+        }
+
+        sequenceOf(MeshElement) pollNodes = {};
+        pollNodes.add(elt);
+        Integer pollInterval = calcPollerInterval(pollNodes);
+        if (pollInterval > 0) {
+            'registry.add("spring.cloud.stream.poller.fixedDelay", () -> ${pollInterval});'
+        }
+        '
+        registry.add("spring.cloud.function.definition", () -> "${semicolonList(functions)}");'
+    }
 
     // ------------------- main method ----------------------
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
-        'System.out.println("Please execute this class as a jUnit test.");'
+        'JUnitCore junit = new JUnitCore();
+        junit.addListener(new TextListener(System.out));
+        junit.run(${clsName}.class);'
     }
 
     def genMain(MeshSource elt, Connector connector, String clsName) {
@@ -476,8 +593,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
 
         String clsName = getClsName(elt);
+        String fileName = getFileName(elt.impl);
         if (familyInterface <> "") {
             clsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
+            fileName = getFileName(familyMember);
         }
         generateDataMethods(elt, true); // prerequisite for processIngestors
 
@@ -496,9 +615,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         
         import org.junit.*;
         import org.junit.runner.RunWith;
+        import org.junit.internal.TextListener;
+        import org.junit.runner.JUnitCore;
         
         import org.springframework.boot.test.context.SpringBootTest;
         import org.springframework.test.context.junit4.SpringRunner;
+        import org.springframework.test.context.DynamicPropertyRegistry;
+        import org.springframework.test.context.DynamicPropertySource;
         
         import iip.datatypes.*;
         import iip.interfaces.*;
@@ -509,7 +632,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * Implements tests for "${clsName}". The generated class is meant to be re-usable and extensible, e.g.,
         * regarding the assert predicates. If possible, we provide a main method to ease startup (unsure for Spring
         * components at the moment). There is no guarantee on the sequence of received data, in particular not when 
-        * the service is declared to be asynchronous.
+        * the service is declared to be asynchronous. The test loads input data file from the system 
+        * property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".
+        * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
+        * A data unit consists of one optional object entry per input type of the service under test (attribute name
+        * is the type name with first character in small case) - the contents of the same structure as defined in the
+        * configuration model. Further, "\\$period" is a generic entry that defines the delay period between the actual
+        * and the next data entry (initial by {@link #getInitialPeriod()}.
         *
         * @author EASy-Producer
         */        
@@ -554,9 +683,28 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             protected void printReceivedData(Object data) {
                 System.out.println(data);
             }
+            
+            /**
+            * Returns the initial period.
+            *
+            * @return the initial period in ms, no (initial) input delay happens if the value is zero or negative
+            */
+            protected int getInitialPeriod() {
+                return 500;
+            } 
 
             ${genTests(elt, elt.impl, clsName)|e}
-        
+            
+            /**
+            * Defining the spring properties to set up the test.
+            *
+            * @param registry a properties registry that can be modifier
+            */
+            @DynamicPropertySource
+            static void setDynamicProperties(DynamicPropertyRegistry registry) {
+                ${genDynamicProperties(elt, elt.impl, clsName)}
+            }
+                    
             /**
             * Starts the configured version of this service/connector as main program.
             *

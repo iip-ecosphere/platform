@@ -1,4 +1,7 @@
+import Basics;
 import JavaBasics;
+import ServiceBasics;
+import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -13,6 +16,132 @@ template SpringBasics(Configuration config, FileArtifact target) {
             springConnId = "${conn}-in-0";
         }
         springConnId;
+    }
+
+    /*
+    * Adds a key-dest pair to m. Dest may be "*" to indicate "producer.useNativeEncoding".
+    */
+    def addDestination(mapOf(String, setOf(String)) m, String key, String dest) {
+        setOf(String) tmp;
+        if (not(m.containsKey(key))) {
+            tmp = {};
+            m.put(key, tmp);            
+        } else {
+            tmp = m.get(key);
+        }
+        tmp.add(dest);
+    }
+    
+    /*
+    * Calculates Spring bindings, functions and sources, based on mappedMesh, nodes as fallback, the others are for 
+    * output by ref.
+    */
+    def calcBindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, 
+        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc) {
+        for (MeshElement elt: mappedMesh.keys()) {
+            ServiceBase eltImpl = elt.impl;
+            Boolean includeInFunc = filterFunc == "" or filterFunc == elt.impl.id;
+          
+            mapOf(DataType, IOType) eltOutput = {};
+            for (IOType eo: forward(eltImpl.output)) { // backward via ingestors/transport
+                eltOutput.add(eo.type, eo);
+            }
+            for (MeshConnector conn: mappedMesh.get(elt)) {
+                MeshInnerElement next = conn.next;
+                ServiceBase nextImpl = next.impl;
+                for (IOType nextIn: forward(nextImpl.input)) { // backward via ingestors/transport
+                    if (eltOutput.containsKey(nextIn.type)) {
+                        IOType eltOut = eltOutput.get(nextIn.type);
+
+                        String nextId = getMethodSuffixId(getMethodSuffix(next, toTypeName(nextIn), outType(next, nextIn)), next);
+                        String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
+                        if (not(eltImpl.kind==ServiceKind::SOURCE_SERVICE and eltImpl.asynchronous)) { // bindings for async sources cause troubles
+                            if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
+                                addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
+                                if (includeInFunc) {
+                                    functions.add(eltId);
+                                }
+                            } else {
+                                // async -> sync connection requires spring as target is function
+                                addDestination(destinations, "${nextId}-in-0", "*");
+                            }
+                            
+                            addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
+                            if (includeInFunc) {
+                                functions.add(nextId);
+                            }
+                        }
+                        
+                        if (eltImpl.kind==ServiceKind::SOURCE_SERVICE and includeInFunc) {
+                            functions.add(eltId); // flux and poller-based sources must be in
+                        }
+                        
+                        // we do not touch sources here as async via ingestors/transport
+                    }
+                }
+            }
+        }
+        // spring does not allow empty function definition for multiple beans
+        // sources must be parts of sources, even asynchronous flux-based sources
+        if (functions.size() == 0) {
+            for (MeshElement elt: nodes) {
+                fallbackFunction(functions, elt);
+            }
+        }
+    }
+    
+    def fallbackFunction(setOf(String) functions, MeshElement elt) {
+    }
+
+    def fallbackFunction(setOf(String) functions, MeshSource source) {
+        for (IOType out : source.impl.output) {
+            functions.add(getMethodSuffixId(getMethodSuffix(source, toTypeName(out), ""), source));
+        }
+    }
+
+    /*def fallbackFunction(setOf(String) functions, MeshSink sink) {
+        if (functions.size() == 0 and sink.impl.input.size() > 0) {
+            functions.add(getMethodSuffixId(getMethodSuffix(sink, toTypeName(sink.impl.input.first()), ""), sink));
+        }
+    }*/
+    
+    def Integer calcPollerInterval(sequenceOf(MeshElement) nodes) {
+        // until Spring Cloud Streams 3.1.1 there is no individual poll setting per source
+        // might be solved with code, but unsure if needed at all as connectors are anyway asynchronous
+        Integer pollInterval = -1;
+        for (MeshElement elt : nodes) {
+            Integer pi = getPollInterval(elt);
+            if (pi > 0) {
+                if (pollInterval < 0 or pi < pollInterval) { // set or minimize
+                    pollInterval = pi;
+                }
+            }
+        }
+        pollInterval;
+    }
+    
+    def Integer getPollInterval(MeshElement elt) {
+        -1;
+    }
+
+    def Integer getPollInterval(MeshSource src) {
+        if (src.impl.asynchronous) {
+            -1;
+        } else {
+            src.pollInterval;
+        }
+    }
+    
+    // ---------------------------- formatting, emitting ---------------------------------------
+
+    def semicolonList(setOf(String) elt) {
+        String result = "";
+        if (elt.size() > 0) {
+            for (String i: elt->sortedBy(s|s)) { // sortedBy for testing
+                result = appendWithSemicolon(result, i);
+            }
+        }
+        result;
     }
 
 }
