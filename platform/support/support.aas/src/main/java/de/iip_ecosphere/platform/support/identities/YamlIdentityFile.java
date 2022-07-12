@@ -39,9 +39,9 @@ public class YamlIdentityFile {
      * Required information:
      * <ol>
      *     <li>{@link TokenType#ISSUED}: {@link #getSignatureAlgorithm()}, {@link #getSignature()}, 
- *             {@link #getTokenData()}, {@link #getTokenEncryptionAlgorithm()}</li>
+     *         {@link #getTokenData()}, {@link #getTokenEncryptionAlgorithm()}</li>
      *     <li>{@link TokenType#X509}: {@link #getSignatureAlgorithm()}, {@link #getSignature()}, 
- *             {@link #getTokenData()}</li>
+     *         {@link #getTokenData()}</li>
      *     <li>{@link TokenType#USERNAME}: {@link #getUserName()}, {@link #getTokenData()}, 
      *         {@link #getTokenEncryptionAlgorithm()}</li>
      *     <li>{@link TokenType#ANONYMOUS}</li>

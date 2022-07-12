@@ -20,6 +20,7 @@ import java.io.InputStream;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.identities.YamlIdentityFile.IdentityInformation;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Simple file-based identity store. Tries to load {@code identityStore.yml} from the classpath (root or folder 
@@ -49,9 +50,9 @@ public class YamlIdentityStore extends IdentityStore {
      */
     public YamlIdentityStore() {
         String source = "classpath";
-        InputStream in = YamlIdentityStore.class.getResourceAsStream("identityStore.yml");
+        InputStream in = ResourceLoader.getResourceAsStream("identityStore.yml");
         if (null == in) {
-            in = YamlIdentityStore.class.getResourceAsStream("resources/identityStore.yml");
+            in = ResourceLoader.getResourceAsStream("resources/identityStore.yml");
             source = "classpath: resources";
         }
         if (null == in) {
@@ -78,6 +79,8 @@ public class YamlIdentityStore extends IdentityStore {
         }
         if (null != in) {
             LoggerFactory.getLogger(getClass()).info("Loading identityStore.yml from {}", source);
+        } else {
+            LoggerFactory.getLogger(getClass()).warn("identityStore.yml not found!");
         }
         data = YamlIdentityFile.load(in); // can cope with null
     }
