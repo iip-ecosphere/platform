@@ -173,9 +173,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         if (null != serviceIn) {
             serviceIn.println(text);
             serviceIn.flush();
-        } else {
-            throw new ExecutionException("Service/process not started.", null);
-        }
+        } // ignore, this may be a deactivated service that shall not be operating
     }
 
     @SuppressWarnings("unchecked")
