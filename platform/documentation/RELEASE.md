@@ -9,7 +9,7 @@ For performing a release...
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Deploy software that is not in Maven Central, e.g., alert manager and its logger.
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
-* Change the (non-SNAPSHOT) version number using the `ChangePomVersion` tool in `MvnCentral`. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies . In most of the other cases, only changes to the POM parent entry are required. 
+* Change the (non-SNAPSHOT) version number using the `ChangePomVersion` tool in `MvnCentral`. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies . In most of the other cases, only changes to the POM parent entry are required. **Check** platform dependencies installation POM in **Install** package! 
 * Temporarily disable `IvmlTests.testSerializerConfig1` for release/first compilation of next snapshot. Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
 * Check the CI that all builds are completed. Generated test-apps will not be released.
 * Create a new version tag on github.
