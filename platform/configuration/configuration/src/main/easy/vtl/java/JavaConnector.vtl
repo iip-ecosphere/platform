@@ -459,6 +459,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         
             @Override
             public void received(${coType} data) {
+                metrics.increaseCounter("service.sent"); 
                 Transport.send(c -> c.asyncSend("${conn.id}_${coType}", data), "${conn.id}");
             }
         

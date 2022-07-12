@@ -44,12 +44,14 @@ project CommonSetup {
     
     deviceMgtStorage = S3MockDeviceMgtStorage {
         host = "localhost",
-        port = 8884,
+        port = 8885,
         region = "local"
     };
     
-    // just for testing, this instantiates app rather than platform, default port = 8884
-    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{
+        port = 8885
+    };
     
     // --------------------- monitoring ---------------------------
     

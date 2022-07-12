@@ -89,7 +89,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String mon = "";
             String trace = "";
             if (base.monitorSentCount) {
-                mon = "metrics.increaseCounter(sentCounterId);";
+                mon = 'metrics.increaseCounter("service.sent");';
             }
             if (base.traceSent <> TraceKind::NONE) {
                 String d;                
@@ -130,7 +130,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String mon = "";
             String trace = "";
             if (base.monitorRcvCount) {
-                mon = "metrics.increaseCounter(rcvCounterId);";
+                mon = 'metrics.increaseCounter("service.received");';
             }
             if (base.traceRcv <> TraceKind::NONE) {
                 String d;
@@ -177,6 +177,18 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def registerService() {
+        'io.micrometer.core.instrument.Counter
+            .builder("service.sent")
+            .baseUnit("tuple/s")
+            .description("Tuples sent out by a service")
+            .tags("service", "${elt.impl.id}", "application", "${app.id}")
+            .register(metrics.getRegistry());'
+        'io.micrometer.core.instrument.Counter
+            .builder("service.received")
+            .baseUnit("tuple/s")
+            .description("Tuples received by a service")
+            .tags("service", "${elt.impl.id}", "application", "${app.id}")
+            .register(metrics.getRegistry());'
         for (String s: serviceVars) {
             '${attachMetricsProvider("${s}")}'
             '${genMapService("${s}")}'
@@ -1203,8 +1215,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             private MetricsProvider metrics;
-            private String sentCounterId = "service.${implMonId}.sent";
-            private String rcvCounterId = "service.${implMonId}.received";
             ${generateInputEventHandlers(elt, impl)|e}
 
             ${generateReceptionCallback(elt, impl)|e}
