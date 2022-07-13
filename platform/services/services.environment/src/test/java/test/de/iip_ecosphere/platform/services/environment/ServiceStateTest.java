@@ -28,6 +28,8 @@ public class ServiceStateTest {
 
     /**
      * Tests {@link ServiceState} transitions.
+     * 
+     * @throws ExecutionException shall not occur in successful tests
      */
     @Test
     public void testTransitions() throws ExecutionException {

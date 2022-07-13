@@ -44,17 +44,6 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      * 
      * @param yaml the service information as read from YAML
      * @param connector the connector instance to wrap
-     */
-    public ConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector) { // TODO remove after build
-        super(yaml);
-        this.connector = connector;
-    }
-
-    /**
-     * Creates a service wrapper instance.
-     * 
-     * @param yaml the service information as read from YAML
-     * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
      */
     public ConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
@@ -103,7 +92,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     
     @Override
     public void setState(ServiceState state) throws ExecutionException {
-        super.setState(state);
+        doSetState(state);
         try {
             if (ServiceState.STARTING == state) {
                 ConnectorParameter param = connParamSupplier.get();
@@ -111,16 +100,35 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
                 // not needed, but generation may statically switch off notifications and prevent testing with
                 // different values
                 connector.enableNotifications(param.getNotificationInterval() == 0);
-                super.setState(ServiceState.RUNNING);
+                doSetState(ServiceState.RUNNING);
             } else if (ServiceState.STOPPING == state) {
                 connector.disconnect();
-                super.setState(ServiceState.STOPPED);
+                doSetState(ServiceState.STOPPED);
             } else if (ServiceState.UNDEPLOYING == state) {
                 connector.dispose();
             }
         } catch (IOException e) {
             throw new ExecutionException(e);
         }
+    }
+    
+    /**
+     * Changes the state by calling {@link AbstractService#setState(ServiceState)}.
+     * 
+     * @param state the new state
+     * @throws ExecutionException if changing the state fails for some reason
+     */
+    protected void doSetState(ServiceState state) throws ExecutionException {
+        super.setState(state);
+    }
+
+    /**
+     * Implements the state change.
+     * 
+     * @param state the state
+     * @throws ExecutionException if changing the state fails
+     */
+    protected void handleState(ServiceState state) throws ExecutionException {
     }
     
     @Override

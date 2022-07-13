@@ -151,7 +151,7 @@ public class DataMapper {
      * instance/line. Closes {@code stream}. Ignores unknown attributes in {@code cls}.
      *  
      * @param <T> the type of data to read
-     * @param stream the stream to read
+     * @param stream the stream to read (may be <b>null</b> for none)
      * @param cls the type of data to read
      * @param cons the consumer to be called per instance
      * @throws IOException if I/O or Json parsing errors occur
@@ -174,7 +174,9 @@ public class DataMapper {
         } catch (JsonProcessingException e) {
             throw new IOException(e);
         } finally {
-            stream.close();
+            if (null != stream) {
+                stream.close();
+            }
         }
     }
 

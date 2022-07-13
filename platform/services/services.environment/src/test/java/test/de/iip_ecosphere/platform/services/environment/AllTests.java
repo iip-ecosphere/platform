@@ -40,6 +40,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     ProcessSupportTest.class,
     DataMapperTest.class,
     MonitoringServiceTest.class,
+    ConnectorServiceWrapperTest.class,
     
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
