@@ -149,13 +149,16 @@ public class PlatformAas implements AasContributor {
         if (null != appSetup.getId()) {
             smB.createPropertyBuilder(NAME_PROPERTY_ID)
                 .setValue(Type.STRING, appSetup.getId())
+                .setSemanticId("irdi:0173-1#02-ABF809#001")
                 .build();
         }
         smB.createPropertyBuilder(NAME_PROPERTY_NAME)
             .setValue(Type.STRING, appSetup.getName())
+            .setSemanticId("irdi:0173-1#02-AAO247#002")
             .build();
         smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
             .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
+            .setSemanticId("irdi:0173-1#02-AAM737#002")
             .build();
     }
 
