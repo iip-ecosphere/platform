@@ -22,8 +22,8 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service. The process implementation (whatever it is) will be extracted 
- * from {@link #getPath()}. For the execution in a shell, the home directory will be set to the folder where the files 
- * in {@link #getPath()} are located.
+ * from {@link #getHomePath()}. For the execution in a shell, the home directory will be set to the folder where the 
+ * files in {@link #getHomePath()} are located.
  *  
  * @author Holger Eichelberger, SSE
  */

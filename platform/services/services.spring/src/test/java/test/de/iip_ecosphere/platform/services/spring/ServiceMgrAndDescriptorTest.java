@@ -187,9 +187,9 @@ public class ServiceMgrAndDescriptorTest {
     /**
      * Asserts a function definition.
      * 
-     * @param expected
-     * @param mgr
-     * @param serviceId
+     * @param expected the expected result
+     * @param mgr the service manager instance
+     * @param serviceId the service ids to operate on
      */
     private static void assertFunctionDef(String expected, ServiceManager mgr, String... serviceId) {
         Set<TypedDataConnection> conn = AbstractServiceManager.determineInternalConnections(mgr, serviceId);

@@ -90,7 +90,7 @@ import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
- * Tests {@ink SpringCloudServiceManager}. We assume that the test artifacts are prepared for MQTT v3.
+ * Tests {@link SpringCloudServiceManager}. We assume that the test artifacts are prepared for MQTT v3.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -161,7 +161,7 @@ public class TestServiceManager {
     }
     
     /**
-     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager} with two processes. This test requires 
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} with two processes. This test requires 
      * an actual version of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact 
      * in the compile phase.
      * 
@@ -211,7 +211,7 @@ public class TestServiceManager {
     }
 
     /**
-     * Tests a simple start-stop cycle of the {@ink SpringCloudServiceManager} in one process as an ensemble. As 
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble. As 
      * {@link #testSimpleStartStop()}, this test requires an actual version of {@code test.simpleStream.spring}.
      * 
      * @throws ExecutionException shall not occur for successful test

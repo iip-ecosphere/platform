@@ -15,14 +15,12 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 import java.io.File;
 import java.util.List;
 
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service. The process implementation (whatever it is) will be extracted 
- * from {@link #getPath()}. For the execution in a shell, the home directory will be set to the folder where the files 
- * in {@link #getPath()} are located. {@link #getPath()} must not be empty, {@link #getCmdArg()} may be empty, 
- * {@link #getStreamEndpoint()} and {@link #getAasEndpoint()} must be given.
+ * from {@link #getHomePath()}. For the execution in a shell, the home directory will be set to the folder where the 
+ * files in {@link #getHomePath()} are located. {@link #getHomePath()} must not be empty, {@link #getCmdArg()} may be 
+ * empty, {@link #getStreamEndpoint()} and {@link #getAasEndpoint()} must be given.
  *  
  * @author Holger Eichelberger, SSE
  */
@@ -30,7 +28,7 @@ public interface ProcessSpec {
 
     /**
      * Returns the process implementing artifacts within the containing artifact to be extracted into the 
-     * {@link #getHome() process home directory}.
+     * {@link #getHomePath() process home directory}.
      * 
      * @return the relative paths to the artifacts, shall start with "/" as part of ZIP/JAR
      */
@@ -60,10 +58,10 @@ public interface ProcessSpec {
     
     /**
      * Returns the command line arguments to start the process. The shell will be executed within the folder where
-     * the files from {@link #getPath()} are extracted.
+     * the files from {@link #getHomePath()} are extracted.
      * 
      * @return the command line arguments (may be empty for none), {@link #getStreamEndpoint() streaming endpoint} and 
-     *     {@link #getAASEndpoint() AAS endpoint} will be added anyway
+     *     {@link #getAasEndpoint() AAS endpoint} will be added anyway
      */
     public List<String> getCmdArg();
 
@@ -71,8 +69,7 @@ public interface ProcessSpec {
      * Returns additional/optional command line arguments required to start the service. The port placeholder
      * {@link Endpoint#PORT_PLACEHOLDER} will be replaced with the command port the platform is using to send
      * administrative commands to the service (see {@link de.iip_ecosphere.platform.services.environment.Service}).
-     * Similarly {@link #PROTOCOL_PLACEHOLDER} will be replaced with the AAS {@link AasFactory#getProtocols() protocol}.
-     
+     *
      * @param port the port used for the command communication
      * @param protocol the protocol used for the command communication
      * @return the resolved command line arguments (may be empty for none)
@@ -105,7 +102,7 @@ public interface ProcessSpec {
     /**
      * Returns whether the underlying process is already started when firing up the service or it will be started 
      * through the service implementation. If specified, {@link #getArtifacts() artifacts} will be extracted anyway
-     * into the {@link #getHome() process home directory}, assuming that a pre-installed executable will not specify
+     * into the {@link #getHomePath() process home directory}, assuming that a pre-installed executable will not specify
      * artifacts to be extracted.
      * 
      * @return {@code true} for started, {@code false} else (default)

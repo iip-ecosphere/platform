@@ -68,6 +68,7 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
      * 
      * @param in the input stream (may be <b>null</b>)
      * @return the artifact info
+     * @throws IOException if reading the Yaml file fails
      */
     public static YamlArtifact readFromYaml(InputStream in) throws IOException {
         YamlArtifact result = AbstractSetup.readFromYaml(YamlArtifact.class, in);

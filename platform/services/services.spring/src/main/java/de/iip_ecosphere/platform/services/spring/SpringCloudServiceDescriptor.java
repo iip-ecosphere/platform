@@ -236,7 +236,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     
     /**
      * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
-     * {@link #createDeploymentRequest(SpringCloudServiceSetup)} before.
+     * {@link #createDeploymentRequest(SpringCloudServiceSetup, List)} before.
      */
     void attachStub() {
         InvocablesCreator iCreator = getInvocablesCreator();

@@ -122,10 +122,11 @@ public class DescriptorUtils {
     }
 
     /**
-     * Throws an execution exception for the given throwable.
+     * Throws an execution exception for the given throwable and logs an error in the same step.
+     * 
      * @param action the actual action to log
      * @param th the throwable
-     * @throws ExecutionException
+     * @throws ExecutionException the exception based on {@code th}
      */
     public static void throwExecutionException(String action, Throwable th) throws ExecutionException {
         getLogger().error(action + ": " + th.getMessage());
@@ -133,10 +134,11 @@ public class DescriptorUtils {
     }
     
     /**
-     * Throws an execution exception for the given message.
+     * Throws an execution exception for the given message and logs an error in the same step.
+     * 
      * @param action the actual action to log
      * @param message the message for the exception
-     * @throws ExecutionException
+     * @throws ExecutionException the exception based on {@code message}
      */
     public static void throwExecutionException(String action, String message) throws ExecutionException {
         getLogger().error(action + ": " + message);

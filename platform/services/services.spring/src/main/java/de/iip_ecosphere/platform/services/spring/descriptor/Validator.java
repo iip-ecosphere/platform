@@ -290,7 +290,8 @@ public class Validator {
     }
 
     /**
-     * Asserts that {@code type} is a known type, either in {@link #primitives}, {@code types} or as a Java type.
+     * Asserts that {@code type} is a known type, either in {@link TypeResolver#isPrimitive(String) primitives}, 
+     * {@code types} or as a Java type.
      * 
      * @param type the type name to check
      * @param types the declared types
@@ -444,7 +445,7 @@ public class Validator {
     /**
      * Asserts a condition.
      * 
-     * @param condition
+     * @param condition the evaluated condition
      * @param msg the message if {@code condition} does not hold. A missing trailing "." is added. 
      * @param msgContext the context of the message/validate element for better location by the caller, ignored if 
      *   empty or <b>null</b>

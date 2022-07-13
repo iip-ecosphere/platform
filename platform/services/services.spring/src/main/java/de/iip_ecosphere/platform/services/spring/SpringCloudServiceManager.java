@@ -162,6 +162,29 @@ public class SpringCloudServiceManager
         return "--spring.cloud.function.definition=" 
             + SpringCloudServiceDescriptor.toFunctionDefinition(determineInternalConnections(this, serviceIds));
     }
+    
+    /**
+     * Returns the lead and ensemble services of service {@code id} (viewing {@code id} as potential 
+     * ensemble leader) from a given set of services.
+     * 
+     * @param id the service to return the lead/ensemble services for
+     * @param serviceIds the services to project the result from
+     * @return {@code id} and connected ensemble services stated in {@code serviceIds}
+     */
+    private String[] serviceAndEnsemble(String id, String[] serviceIds) {
+        List<String> tmp = new ArrayList<String>();
+        tmp.add(id);
+        for (String sId: serviceIds) {
+            if (!sId.equals(id)) {
+                SpringCloudServiceDescriptor service = getService(sId);
+                SpringCloudServiceDescriptor leader = service.getEnsembleLeader();
+                if (null != leader && leader.getId().equals(id)) {
+                    tmp.add(service.getId());
+                }
+            }
+        }
+        return tmp.toArray(new String[0]);
+    }
 
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
@@ -171,42 +194,43 @@ public class SpringCloudServiceManager
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
         // re-link binders if needed, i.e., subset shall be started locally
-        List<String> externalServiceArgs = determineExternalServiceArgs(serviceIds);
-        for (String ids : sortByDependency(serviceIds, true)) {
-            SpringCloudServiceDescriptor service = getService(ids);
+        for (String sId : sortByDependency(serviceIds, true)) {
+            SpringCloudServiceDescriptor service = getService(sId);
             if (null == service) {
-                errors.add("No service for id '" + ids + "' known.");
+                errors.add("No service for id '" + sId + "' known.");
             } else {
+                String[] sIdEns = serviceAndEnsemble(sId, serviceIds);
+                List<String> externalServiceArgs = determineExternalServiceArgs(sIdEns);
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
-                    LOGGER.info("Starting " + ids);
-                    String id = deployer.deploy(req);
-                    waitFor(id, null, s -> null == s || s == DeploymentState.deploying);
-                    LOGGER.info("Starting " + id + ": " + deployer.status(id));
-                    AppStatus status = deployer.status(id); 
-                    service.setDeploymentId(id);
+                    LOGGER.info("Starting " + sId);
+                    String dId = deployer.deploy(req);
+                    waitFor(dId, null, s -> null == s || s == DeploymentState.deploying);
+                    LOGGER.info("Starting " + dId + ": " + deployer.status(dId));
+                    AppStatus status = deployer.status(dId); 
+                    service.setDeploymentId(dId);
                     if (DeploymentState.deployed == status.getState()) {
                         service.attachStub();
                         setState(service, ServiceState.STARTING);
-                        LOGGER.info("Starting " + ids + " completed");
+                        LOGGER.info("Starting " + sId + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
-                        errors.add("Starting service id '" + ids + "' failed:\n" + getDeployer().getLog(id));
-                        LOGGER.info("Starting " + id + " failed");
+                        errors.add("Starting service id '" + sId + "' failed:\n" + getDeployer().getLog(dId));
+                        LOGGER.info("Starting " + dId + " failed");
                     }
                 } else {
-                    LOGGER.info("Starting ensemble service " + ids);
+                    LOGGER.info("Starting ensemble service " + sId);
                     ServiceState ensState = service.getEnsembleLeader().getState();
                     if (ServiceState.RUNNING == ensState) {
                         service.attachStub();
                         setState(service, ServiceState.STARTING);
-                        LOGGER.info("Starting ensemble service " + ids + " completed");
+                        LOGGER.info("Starting ensemble service " + sId + " completed");
                     } else {
                         setState(service, ServiceState.FAILED);
-                        errors.add("Starting ensemble service id '" + ids + "' failed: See " 
+                        errors.add("Starting ensemble service id '" + sId + "' failed: See " 
                             + service.getEnsembleLeader().getId());
-                        LOGGER.info("Starting ensemble service " + ids + " failed");
+                        LOGGER.info("Starting ensemble service " + sId + " failed");
                     }
                 }
             }
