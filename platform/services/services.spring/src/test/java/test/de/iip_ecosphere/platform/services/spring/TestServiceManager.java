@@ -26,7 +26,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -527,9 +526,9 @@ public class TestServiceManager {
      * @throws ExecutionException shall not occur
      */
     @Test
-    @Ignore("Needs fix, does not work stable on Jenkins for now.")
     public void testWithZipArchiveNoClasspath() throws ExecutionException {
         testWithZipArchive(false);
+        assertReceiverLog();
     }
 
     /**
@@ -539,9 +538,9 @@ public class TestServiceManager {
      * @throws ExecutionException shall not occur
      */
     @Test
-    @Ignore("Needs fix, does not work stable on Jenkins for now.")
     public void testWithZipArchiveAndClasspath() throws ExecutionException {
         testWithZipArchive(true);
+        assertReceiverLog();
     }
 
     /**
