@@ -482,9 +482,17 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             new ${conn.class}<>(createConnectorAdapter());
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
-        service = new ConnectorServiceWrapper${getConnectorGenerics(conn, true)}(serviceData, conn, 
+        service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> createConnectorParameter());
         service.setReceptionCallback(new ConnectorReceptionCallback());'
+    }
+    
+    def wrapperCls(Connector conn) {
+        String wrapperCls = "ConnectorServiceWrapper";
+        if (isDefined(conn.mock) and conn.mock) {
+            wrapperCls = "MockingConnectorServiceWrapper";
+        }
+        wrapperCls;
     }
     
     def initIngestors(MeshElement elt, Connector conn) {

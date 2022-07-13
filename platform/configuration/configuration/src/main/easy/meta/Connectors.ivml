@@ -181,6 +181,7 @@ project Connectors {
        Port port;
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
+       Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
 
        fwdTypes(output).size() < 2;
        fwdTypes(input).size() < 2;
