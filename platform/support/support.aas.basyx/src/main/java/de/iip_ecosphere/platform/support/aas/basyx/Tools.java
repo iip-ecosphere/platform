@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -283,7 +284,12 @@ public class Tools {
         IReference result = null;
         if (id != null) {
             if (id.startsWith("irdi:")) {
-                result = new Reference(new Key(KeyElements.PROPERTY, false, id.substring(5), KeyType.IRDI));
+                //result = new Reference(new Key(KeyElements.PROPERTY, false, id.substring(5), KeyType.IRDI));
+                result = new Reference(Collections.singletonList(new Key(KeyElements.CONCEPTDESCRIPTION, false, 
+                    id.substring(5), KeyType.IRDI)));
+            } else if (id.startsWith("iri:")) {
+                result = new Reference(Collections.singletonList(new Key(KeyElements.CONCEPTDESCRIPTION, false, 
+                    id.substring(4), KeyType.IRI)));
             }
         }
         return result;
