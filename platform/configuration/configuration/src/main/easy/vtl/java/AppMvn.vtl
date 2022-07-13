@@ -131,9 +131,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
         String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
         appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
-            phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="compile"); 
+            phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime"); 
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
-            prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="compile"); 
+            prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
     }
 
 }
