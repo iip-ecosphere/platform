@@ -251,7 +251,7 @@
                        <overWriteReleases>false</overWriteReleases>
                        <overWriteSnapshots>true</overWriteSnapshots>
                        <overWriteIfNewer>true</overWriteIfNewer>
-                       <includeScope>compile</includeScope>
+                       <includeScope>runtime</includeScope>
                        <excludeArtifactIds>tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, 
                            tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli,
                            tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api
@@ -272,7 +272,7 @@
 	                <overWriteIfNewer>true</overWriteIfNewer>
 	                <fileSeparator>/</fileSeparator>
 	                <pathSeparator>:</pathSeparator>
-                    <includeScope>compile</includeScope>
+                    <includeScope>runtime</includeScope>
 	              <!-- configure the plugin here -->
 	            </configuration>
 	          </execution>
