@@ -74,6 +74,7 @@ public class MetricsAasConstructor {
 
     private static Map<String, TransportConnector> conns = new HashMap<>();
     private static Map<String, JsonObjectHolder> holders = new HashMap<>();
+    private static final boolean METRICS_AS_VALUES = false; // TODO aim, clarify with Chris
 
     /**
      * Adds all the Metric Provider's meters as submodel properties and provides
@@ -350,7 +351,37 @@ public class MetricsAasConstructor {
         
         @Override
         public Object get() {
-            return getHolder(id, channel, setup).getMeter(name);
+            String json = getHolder(id, channel, setup).getMeter(name);
+            return METRICS_AS_VALUES ? getMeasurement(json) : json;
+        }
+
+        /**
+         * Extracts the measurement out of the metrics JSON.
+         * 
+         * @param json the JSON, may be empty or <b>null</b>
+         * @return the measurement
+         */
+        private Object getMeasurement(String json) {
+            Object result = null;
+            if (null != json && json.length() > 0) {
+                JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+                JsonArray meas = obj.getJsonArray("measurements");
+                if (null != meas && meas.size() > 0) {
+                    JsonObject measurement = meas.getJsonObject(0);
+                    if (null != measurement) {
+                        String str = measurement.getString("value");
+                        if (null != str) {
+                            try {
+                                result = Double.valueOf(str);
+                            } catch (NumberFormatException e) {
+                                LoggerFactory.getLogger(getClass()).error("Converting measurement value {}: {}", 
+                                    str, e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
         }
         
     }
@@ -384,6 +415,27 @@ public class MetricsAasConstructor {
     }
     
     /**
+     * Returns the semantic id to use depending on {@link #METRICS_AS_VALUES}.
+     * 
+     * @param semId the id for {@link #METRICS_AS_VALUES}
+     * @return the {@code semId} or <b>null</b>
+     */
+    private static String semId(String semId) {
+        return METRICS_AS_VALUES ? semId : null;
+    }
+
+    /**
+     * Returns the property type to use depending on {@link #METRICS_AS_VALUES}.
+     * 
+     * @param mAsVType the type for {@link #METRICS_AS_VALUES}
+     * @param other the type if {@link #METRICS_AS_VALUES} is disabled
+     * @return {@code mAsVType} or {@code other}
+     */
+    private static Type propType(Type mAsVType, Type other) {
+        return METRICS_AS_VALUES ? mAsVType : other;
+    }
+    
+    /**
      * Adds metrics to the submodel/elements. Metric values are bound against a transport connector receiver.
      * 
      * @param smBuilder submodel/elements builder of the AAS
@@ -394,48 +446,41 @@ public class MetricsAasConstructor {
      */
     public static void addProviderMetricsToAasSubmodel(SubmodelElementContainerBuilder smBuilder, 
         Predicate<String> filter, String channel, String id, TransportSetup setup) {
-        
-        /* Meter lists */
-        /*smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
-            .bind(new ListGetter(channel, id, setup, MetricsProvider.GAUGE_LIST), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(COUNTER_LIST).setType(Type.STRING)
-            .bind(new ListGetter(channel, id, setup, MetricsProvider.COUNTER_LIST), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(TIMER_LIST).setType(Type.STRING)
-            .bind(new ListGetter(channel, id, setup, MetricsProvider.TIMER_LIST), InvocablesCreator.READ_ONLY).build();
-        smBuilder.createPropertyBuilder(TAGGED_METER_LIST).setType(Type.STRING)
-            .bind(new ListGetter(channel, id, setup, MetricsProvider.TAGGED_METER_LIST), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(SIMPLE_METER_LIST).setType(Type.STRING)
-            .bind(new ListGetter(channel, id, setup, MetricsProvider.SIMPLE_METER_LIST), InvocablesCreator.READ_ONLY)
-            .build();*/
 
         /* System Disk Capacity metrics, string as JSON meter is transferred  */
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_FREE), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_TOTAL), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USABLE), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003"))//byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USED), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("0173-1#05-AAA129#003")) //percent
             .build();
 
         /* System Physical Memory metrics, string as JSON meter is transferred  */
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_FREE), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_TOTAL), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USAGE), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
             .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(Type.STRING)
+        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId("0173-1#05-AAA129#003")) //percent
             .build();
     }
 

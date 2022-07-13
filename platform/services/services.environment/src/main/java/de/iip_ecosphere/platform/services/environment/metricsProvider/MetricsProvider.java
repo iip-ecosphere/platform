@@ -81,6 +81,9 @@ public class MetricsProvider {
     public static final String SYS_DISK_FREE = "system.disk.free";
     public static final String SYS_DISK_USABLE = "system.disk.usable";
     public static final String SYS_DISK_USED = "system.disk.used";
+    
+    public static final CapacityBaseUnit DFLT_MEMORY = CapacityBaseUnit.BYTES;
+    public static final CapacityBaseUnit DFLT_DISK = CapacityBaseUnit.BYTES;
 
     // Error Messages
     protected static final String ID_NOT_FOUND_ERRMSG = ": no item found with this identifier!";
@@ -97,10 +100,10 @@ public class MetricsProvider {
     private List<UpdatingMonitoringService> updaters;
     
     /* By default, the base unit for the memory metrics is bytes */
-    private CapacityBaseUnit memoryBaseUnit = CapacityBaseUnit.BYTES;
+    private CapacityBaseUnit memoryBaseUnit = DFLT_MEMORY;
 
     /* By default the base unit for disk capacity is kilobytes */
-    private CapacityBaseUnit diskBaseUnit = CapacityBaseUnit.KILOBYTES;
+    private CapacityBaseUnit diskBaseUnit = DFLT_DISK;
 
     // Metric containers
     private final Map<String, AtomicDouble> gauges;

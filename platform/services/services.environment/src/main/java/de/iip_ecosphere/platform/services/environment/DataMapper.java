@@ -80,7 +80,7 @@ public class DataMapper {
          * result of the invocation is not <b>null</b>, calls the registered {@link #translator} to accept the 
          * value of the {@link #getter} call. Exceptions are logged.
          * 
-         * @param instance
+         * @param instance the data instance to accept/process
          */
         private void accept(T instance) {
             try {
