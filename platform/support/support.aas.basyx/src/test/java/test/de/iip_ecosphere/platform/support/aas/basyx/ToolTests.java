@@ -208,10 +208,21 @@ public class ToolTests {
         Assert.assertTrue(ref.getKeys().size() > 0);
         IKey key = ref.getKeys().get(0);
         Assert.assertNotNull(key);
-        Assert.assertEquals(KeyElements.PROPERTY, key.getType());
+        Assert.assertEquals(KeyElements.CONCEPTDESCRIPTION, key.getType());
         Assert.assertEquals(false, key.isLocal());
         Assert.assertEquals(irdi, key.getValue());
         Assert.assertEquals(KeyType.IRDI, key.getIdType());
+        
+        final String iri = "https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1";
+        ref = Tools.translateReference("iri:" + iri);
+        Assert.assertNotNull(ref);
+        Assert.assertTrue(ref.getKeys().size() > 0);
+        key = ref.getKeys().get(0);
+        Assert.assertNotNull(key);
+        Assert.assertEquals(KeyElements.CONCEPTDESCRIPTION, key.getType());
+        Assert.assertEquals(false, key.isLocal());
+        Assert.assertEquals(iri, key.getValue());
+        Assert.assertEquals(KeyType.IRI, key.getIdType());
     }
 
     /**
