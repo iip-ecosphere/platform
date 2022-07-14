@@ -1,26 +1,42 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (summer/fall 2022):
+### Next release (fall 2022):
 Planned:
-* Asynchronous service streams via Transport Layer
-* Service test frames
-* Monitoring
-* Integrated container management for Kubernetes
-* Automatic creation of containers.
+* Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
+* More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
+* Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 
-Improvements:
-* #30: Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
-* #27: Move `iip.app.` prefix and system settings into `service.environment`.
-* #31: Python service cleanup including `__pycache__` by terminating all external service implementations via alive-wait and destroy forcibly (from HM'22 example).
-* #32: Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
-* #33: Split `IvmlTests` into separated tests in `configuration.configuration` to speed up automated container creation on Github.
-* #37: Delay service mapping to allow for longer service startup.
-* #47: Starting services with correct service state (STARTING, not RUNNING)
-* #46: Validating/securing container lifecycle
-* #45: Validating/securing service lifecycle
-* #43: Additional IVML model datatypes for OPC UA
-* #34: Fixed monitoring integration
-* #22: Transport considers identity store, user/pwd deprecated and discouraged but still available.
+### Next release (summer 2022, TddT'22):
+Planned:
+* Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35)
+
+In progress:
+* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
+* Monitoring improvements [#41](https://github.com/iip-ecosphere/platform/issues/41), [#63](https://github.com/iip-ecosphere/platform/issues/63) + [#15](https://github.com/iip-ecosphere/platform/issues/15)
+* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
+* Example improvements [#40](https://github.com/iip-ecosphere/platform/issues/40), [#54](https://github.com/iip-ecosphere/platform/issues/54)
+* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
+* Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
+
+Completed improvements:
+* [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
+* [#27](https://github.com/iip-ecosphere/platform/issues/27): Move `iip.app.` prefix and system settings into `service.environment`.
+* [#31](https://github.com/iip-ecosphere/platform/issues/31): Python service cleanup including `__pycache__` by terminating all external service implementations via alive-wait and destroy forcibly (from HM'22 example).
+* [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
+* [#33](https://github.com/iip-ecosphere/platform/issues/33): Split `IvmlTests` into separated tests in `configuration.configuration` to speed up automated container creation on Github.
+* [#37](https://github.com/iip-ecosphere/platform/issues/37): Delay service mapping to allow for longer service startup.
+* [#47](https://github.com/iip-ecosphere/platform/issues/47): Starting services with correct service state (STARTING, not RUNNING)
+* [#46](https://github.com/iip-ecosphere/platform/issues/46): Validating/securing container lifecycle
+* [#45](https://github.com/iip-ecosphere/platform/issues/45): Validating/securing service lifecycle
+* [#43](https://github.com/iip-ecosphere/platform/issues/43): Additional IVML model datatypes for OPC UA
+* [#34](https://github.com/iip-ecosphere/platform/issues/34): Fixed monitoring integration
+* [#22](https://github.com/iip-ecosphere/platform/issues/22): Transport considers identity store, user/pwd deprecated and discouraged but still available.
+* [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
+* [#24](https://github.com/iip-ecosphere/platform/issues/24): Unify resource loading.
+* [#61](https://github.com/iip-ecosphere/platform/issues/61): Runtime dependency missing in alternative service package formats.
+* [#60](https://github.com/iip-ecosphere/platform/issues/60): Nested connector paths not correctly composed in generation.
+* [#28](https://github.com/iip-ecosphere/platform/issues/28): Asynchronous service streams via Transport Layer for better stability.
+* [#25](https://github.com/iip-ecosphere/platform/issues/25): Enable application-specific connector triggers via code plugins.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

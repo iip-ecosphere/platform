@@ -2,6 +2,16 @@
 
 The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
+
+## News
+
+* Preparation of platform demonstrator for [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
+* Successful presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
+* Code of both demonstrators shall become available as platform example around/after TddT'22.
+* Platform release 0.3.0 (2022/06/4)
+
+## Documentation
+
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
@@ -9,14 +19,6 @@ The platform concepts and realization are developed by the IIP-Ecosphere consort
   * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.6620882) [link may be updated some days after platform releases]
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
-
-## News
-
-* Successful presentation of robot-based visual quality inspection app on HM'22 (with 3 sources, Python-based AI, AAS-based Angular application).
-* Platform release 0.3.0 (2022/06/4)
-* Start of Angular-based Platform Management UI, integrated with the platform instantiation process.
-
-## Documentation
 
 For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md). 
 
