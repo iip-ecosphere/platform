@@ -98,6 +98,29 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         }
         return emit;
     }
+
+    /**
+     * Mapping EASy executor logger information into this logger.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class ExecLogger implements net.ssehub.easy.producer.core.mgmt.EasyExecutor.Logger {
+
+        @Override
+        public void warn(String text) {
+            getLogger().warn(text);
+        }
+
+        @Override
+        public void error(String text) {
+            getLogger().error(text);
+        }
+
+        @Override
+        public void info(String text) {
+        }
+        
+    }
     
     @Override
     public void startup(String[] args) {
@@ -118,6 +141,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
                 easySetup.getBase(), 
                 easySetup.getIvmlMetaModelFolder(), 
                 easySetup.getIvmlModelName());
+            exec.setLogger(new ExecLogger());
             // VIL model name is fix, IVML/Configuration name may change
             exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
             // self-instantiation into gen, assumed to be empty, may be cleaned up
