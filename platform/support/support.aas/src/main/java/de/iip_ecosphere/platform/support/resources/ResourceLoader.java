@@ -35,6 +35,11 @@ public class ResourceLoader {
     public static final ResourceResolver MAVEN_RESOLVER = new ResourceResolver() {
         
         @Override
+        public String getName() {
+            return "Maven resources";
+        }
+        
+        @Override
         public InputStream resolve(ClassLoader loader, String resource) {
             InputStream result = null;
             File f = new File("src/main/resources/" + resource);
