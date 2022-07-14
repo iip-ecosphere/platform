@@ -1,10 +1,8 @@
-# IIP-Ecosphere platform: Variability Instantiation Templates for platform services
+# IIP-Ecosphere platform: Variability Instantiation Templates for Operating scripts
 
 The templates target the following tasks
 
-* `KodexActions` KODEX specification file to define anonymization/pseudonymization actions.
-* `KodexApi` KODEX specification for the REST API (access).
-* `KodexApi` KODEX specification definitin the structure of the input/output data.
-* `KodexArtifactsAssembly` Maven assembly specification to collect generated application-specific files for executing KODEX. The result is a ZIP file that is packaged with the service artifact.
-
-The templates shall start with the "name" of the service, e.g., "Kodex".
+* `LinuxBash` creates Linux Bash startup scripts.
+* `LinuxSysd` creates Linux system.d service startup scripts (assuming Java as symlink in installation directory, platform instantiated into gen in installation directory; both base paths optional in configuration).
+* `WinBatch` creates Windows Bash startup scripts.
+* `JavaOsBasics` Helper functions to determine Java arguments.

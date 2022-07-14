@@ -20,7 +20,7 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         Description=${description}
         
         [Service]
-        WorkingDirectory=${instDir}
+        WorkingDirectory=${instDir}/gen
         Type=forking
         Restart=on-failure
         PIDFile=${cfg.pidDir}/${pidFile}
