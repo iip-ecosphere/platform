@@ -140,14 +140,12 @@ public class SpringCloudServiceManager
      * @return the command line arguments
      * @see #determineExternalConnections(ServiceManager, String...)
      */
-    private List<String> determineExternalServiceArgs(String... serviceIds) {
+    private List<String> determineBindingServiceArgs(String... serviceIds) {
         List<String> result = determineExternalConnections(this, serviceIds)
             .stream()
             .filter(c -> isValidId(c.getName()))
             .map(c -> "--spring.cloud.stream.bindings." + c.getName() + ".binder=external")
             .collect(Collectors.toList());
-        // adjust spring function definition from application.yml if subset of services shall be started 
-        result.add(determineCloudFunctionArg(serviceIds));
         return result;
     }
     
@@ -193,14 +191,17 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
-        // re-link binders if needed, i.e., subset shall be started locally
+        // re-link binders if needed, i.e., subset shall be started locally; bindings "global", function local
+        List<String> bindingServiceArgs = determineBindingServiceArgs(serviceIds);
         for (String sId : sortByDependency(serviceIds, true)) {
             SpringCloudServiceDescriptor service = getService(sId);
             if (null == service) {
                 errors.add("No service for id '" + sId + "' known.");
             } else {
                 String[] sIdEns = serviceAndEnsemble(sId, serviceIds);
-                List<String> externalServiceArgs = determineExternalServiceArgs(sIdEns);
+                List<String> externalServiceArgs = new ArrayList<String>(bindingServiceArgs);
+                // adjust spring function definition from application.yml if subset of services shall be started 
+                externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
