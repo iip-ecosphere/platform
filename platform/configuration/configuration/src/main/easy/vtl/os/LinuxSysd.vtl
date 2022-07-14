@@ -6,14 +6,25 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
 	
     def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true, String addJavaOpts="") {
         IIPEcosphere cfg = config;
+        String instDir = cfg.instDirDflt;
+        String javaExe = cfg.javaExeDflt;
+        if (isDefined(cfg.instDir)) {
+            instDir = cfg.instDir;
+        }
+        if (isDefined(cfg.javaExe)) {
+            javaExe = cfg.javaExe;
+        }
+        
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '[Unit]
         Description=${description}
         
         [Service]
+        WorkingDirectory=${instDir}
         Type=forking
+        Restart=on-failure
         PIDFile=${cfg.pidDir}/${pidFile}
-        ExecStart=java -cp "\\$IIP_HOME/${dir}/*:\\$IIP_HOME/common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${m}" \\$*
+        ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${m}"
         ${requires(requires)}'
     }
     

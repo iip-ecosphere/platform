@@ -7,6 +7,10 @@ project IIPEcosphere {
     String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
     String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
     String pidDir = "/run"; // linux only, windows goes to tmp
+    const String instDirDflt = "/opt/iip";
+    String instDir = instDirDflt; // linux/system.d only; values taken as default if not frozen
+    const String javaExeDflt = "/opt/iip/java";
+    String javaExe = javaExeDflt; // symlink in instDir
     String artifactsFolder = "artifacts";
     String artifactsUriPrefix = "";
     
@@ -14,4 +18,8 @@ project IIPEcosphere {
     Boolean sharedInterfaces = false;
     String sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfaces:" + iipVer;
    
+    freeze {
+        instDirDflt;
+        javaExeDflt;
+    }
 }
