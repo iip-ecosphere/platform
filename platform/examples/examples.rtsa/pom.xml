@@ -26,11 +26,6 @@
     </dependency>
     
             <!-- the application itself, generated code -->   	
-     <dependency>
-		<artifactId>apps.ExampleRTSAAppInterfaces</artifactId>
-		<groupId>de.iip-ecosphere.platform</groupId>
-		<version>${project.version}</version>
-	 </dependency> 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -60,6 +55,11 @@
 			      <groupId>de.iip-ecosphere.platform.apps</groupId>
 			      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
 			    </dependency>
+		  <dependency>
+					<artifactId>apps.ExampleRTSAAppInterfaces</artifactId>
+					<groupId>de.iip-ecosphere.platform</groupId>
+					<version>${project.version}</version>
+	 	</dependency> 
         </dependencies>
         <build>
           <plugins>
