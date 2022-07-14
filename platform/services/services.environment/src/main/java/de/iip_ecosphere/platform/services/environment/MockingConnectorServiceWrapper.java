@@ -53,11 +53,19 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
      */
+    @SuppressWarnings("unchecked")
     public MockingConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
         Supplier<ConnectorParameter> connParamSupplier) {
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
         connectorOutType = connector.getConnectorOutputType();
+        // adjust to IIP-Ecosphere separated interface conventions
+        if (connectorOutType.isInterface()) {
+            try {
+                connectorOutType = (Class<? extends CO>) Class.forName(connectorOutType.getName() + "Impl");
+            } catch (ClassNotFoundException e) {
+            }
+        }
         fileName = "testData-" + connector.getClass().getSimpleName() + "_" + connectorOutType.getSimpleName() + ".yml";
     }
 
