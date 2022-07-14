@@ -114,7 +114,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     }
     
     @Override
-    protected void handleState(ServiceState state) throws ExecutionException {
+    public void setState(ServiceState state) throws ExecutionException {
         doSetState(state);
         try {
             if (ServiceState.STARTING == state) {

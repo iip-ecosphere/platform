@@ -113,22 +113,14 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     }
     
     /**
-     * Changes the state by calling {@link AbstractService#setState(ServiceState)}.
+     * Changes the state by calling {@link AbstractService#setState(ServiceState)}. Introduced, so that super 
+     * functionality is made availalbe to super-classes as-is.
      * 
      * @param state the new state
      * @throws ExecutionException if changing the state fails for some reason
      */
     protected void doSetState(ServiceState state) throws ExecutionException {
         super.setState(state);
-    }
-
-    /**
-     * Implements the state change.
-     * 
-     * @param state the state
-     * @throws ExecutionException if changing the state fails
-     */
-    protected void handleState(ServiceState state) throws ExecutionException {
     }
     
     @Override
