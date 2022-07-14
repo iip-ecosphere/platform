@@ -24,11 +24,11 @@ public class QRCodeServiceTest {
      */
     public static void main(String[] args) {
         String image = testingImageFromTemp();
-        QRCodeScanner service = new QRCodeScanner();
         /**
          * //Does not seem to work, is noted on the class itself, that windows might break it!
          */
-        service.pythonFallbackQRDetection(image); 
+        String test = QRCodeScanner.pythonFallbackQRDetection(image); 
+        System.out.print(test);
     }
     
     /**
@@ -39,7 +39,7 @@ public class QRCodeServiceTest {
         InputStream readImage;
         byte[] imageBytes = new byte[0];
         try {
-            readImage = new FileInputStream(tmpPath + "" + testFileName);
+            readImage = new FileInputStream(ImageProcessingTests.TEST_FILE_PATH);
             imageBytes = IOUtils.toByteArray(readImage);
             readImage.close();
         } catch (IOException e) {

@@ -25,7 +25,7 @@ public class QRCodeScanner {
     //Shall set the result folder appropriate for each operating system.
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
-            resultScript = "%temp%/qr.res";
+            resultScript = System.getProperty("java.io.tmpdir") + "qr.res";
         } else {
             resultScript = "/tmp/qr.res";
         }
@@ -85,7 +85,9 @@ public class QRCodeScanner {
         try {
             System.out.println("TRYING QR");
             File f = File.createTempFile("hm22-qr", "b64");
+            System.out.println("TRYING QR FORWARD");
             FileUtils.writeStringToFile(f, b64Image, StandardCharsets.UTF_8);
+            System.out.println("TRYING QR FORWARD ONWARDS");
             ProcessSupport.callPython(qrScriptOwner, "qr_scanner.py", qr -> {
                 System.out.println("PYTHON QR " + qr);
                 if (qr.isEmpty()) {
