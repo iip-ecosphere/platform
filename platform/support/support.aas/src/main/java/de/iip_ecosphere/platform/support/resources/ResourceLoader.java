@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.support.resources;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,33 @@ import org.slf4j.LoggerFactory;
  * @author Holger Eichelberger, SSE
  */
 public class ResourceLoader {
+
+    /**
+     * Optional Maven resource resolver looking in src/main/resources and src/test/resources in this sequence.
+     */
+    public static final ResourceResolver MAVEN_RESOLVER = new ResourceResolver() {
+        
+        @Override
+        public InputStream resolve(ClassLoader loader, String resource) {
+            InputStream result = null;
+            File f = new File("src/main/resources/" + resource);
+            if (f.exists()) {
+                try {
+                    result = new FileInputStream(f);
+                } catch (IOException e) {
+                }
+            } else {
+                try {
+                    f = new File("src/test/resources/" + resource);
+                    if (f.exists()) {
+                        result = new FileInputStream(f);    
+                    }
+                } catch (IOException e) {
+                }
+            }
+            return result;
+        }
+    };
 
     private static List<ResourceResolver> resolvers = new ArrayList<>();
     

@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
@@ -62,9 +63,11 @@ public class ResourceLoaderTest {
 
     /**
      * Tests resource resolution.
+     * 
+     * @throws IOException shall not occur in successful tests
      */
     @Test
-    public void testResolver() {
+    public void testResolver() throws IOException {
         MyResolver2 res = new MyResolver2();
         ResourceLoader.registerResourceResolver(res);
         InputStream is = ResourceLoader.getResourceAsStream("Logo.jpg");
@@ -82,6 +85,11 @@ public class ResourceLoaderTest {
         Assert.assertTrue(myResolverCalled > 0);
         Assert.assertTrue(myResolver2Called > 0);
         ResourceLoader.unregisterResourceResolver(res);
+        
+        // Here it works per class loader. This may fail in generated parts.
+        is = ResourceLoader.MAVEN_RESOLVER.resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
     }
     
     /**
