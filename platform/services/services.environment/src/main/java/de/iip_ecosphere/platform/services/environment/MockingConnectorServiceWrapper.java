@@ -59,6 +59,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
         connectorOutType = connector.getConnectorOutputType();
+        fileName = "testData-" + connector.getClass().getSimpleName() + "_" + connectorOutType.getSimpleName() + ".yml";
         // adjust to IIP-Ecosphere separated interface conventions
         if (connectorOutType.isInterface()) {
             try {
@@ -66,7 +67,6 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             } catch (ClassNotFoundException e) {
             }
         }
-        fileName = "testData-" + connector.getClass().getSimpleName() + "_" + connectorOutType.getSimpleName() + ".yml";
     }
 
     /**
@@ -99,7 +99,11 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @return the stream
      */
     protected InputStream getDataStream(String name) {
-        return ResourceLoader.getResourceAsStream(name);
+        InputStream result = ResourceLoader.getResourceAsStream(name);
+        if (null == result) {
+            result = ResourceLoader.getResourceAsStream("resources/" + name); // app packaging
+        }
+        return result;
     }
     
     /**
@@ -113,6 +117,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
         DataMapper.mapJsonData(getDataStream(fileName), connectorOutType, d -> {
             if (callback != null) {
+                LoggerFactory.getLogger(MockingConnectorServiceWrapper.class).info("Received {}", d);
                 callback.received(d);
                 if (notifInterval > 0) {
                     TimeUtils.sleep(notifInterval);
