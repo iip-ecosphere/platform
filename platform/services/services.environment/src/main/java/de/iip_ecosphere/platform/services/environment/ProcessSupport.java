@@ -39,6 +39,12 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 public class ProcessSupport {
 
     /**
+     * A simple default customizer always requesting to inherit the process IO (standard in/out/err). May particularly
+     * be helpful for debugging.
+     */
+    public static final Consumer<ProcessBuilder> INHERIT_IO = p -> p.inheritIO();
+    
+    /**
      * Holds the script context.
      * 
      * @author Holger Eichelberger, SSE
@@ -51,6 +57,7 @@ public class ProcessSupport {
         private String testFallbackPath;
         private String zipFileName;
         private String resultFile;
+        private Consumer<ProcessBuilder> processCustomizer;
 
         /**
          * Creates an instance.
@@ -149,6 +156,26 @@ public class ProcessSupport {
         public String getResultFile() {
             return resultFile;
         }
+        
+        /**
+         * Adds an optional process customizer.
+         * 
+         * @param customizer the customizer
+         * @return <b>thi</b>
+         */
+        public ScriptOwner withProcessCustomizer(Consumer<ProcessBuilder> customizer) {
+            this.processCustomizer = customizer;
+            return this;
+        }
+        
+        /**
+         * Returns the optional process customizer.
+         * 
+         * @return the customizer, may be <b>null</b>
+         */
+        public Consumer<ProcessBuilder> getProcessCustomizer() {
+            return processCustomizer;
+        }
 
     }
     
@@ -186,7 +213,8 @@ public class ProcessSupport {
             }
         }
         if (owner.getPythonFolder() != null) {
-            callPythonWaitForAndKill(owner.getPythonFolder(), script, cmdResult, owner.getResultFile(), args);
+            callPythonWaitForAndKill(owner.getPythonFolder(), script, cmdResult, owner.getResultFile(), 
+                owner.getProcessCustomizer(), args);
         }
     }
 
@@ -212,7 +240,7 @@ public class ProcessSupport {
         }
         
         LoggerFactory.getLogger(ProcessSupport.class).info("Cmd line: {} in {}", tmp, dir);
-        ProcessBuilder processBuilder = new ProcessBuilder(tmp);        
+        ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
         if (null != procCustomizer) {
             procCustomizer.accept(processBuilder);
@@ -257,6 +285,8 @@ public class ProcessSupport {
         return procResult;
     }
     
+    // checkstyle: stop parameter number check
+    
     /**
      * Call python, wait for ending and kill it if needed. Catch all exceptions.
      * 
@@ -264,16 +294,17 @@ public class ProcessSupport {
      * @param script the script to execute
      * @param cmdResult a consumer for the result, may be <b>null</b> for none
      * @param resultFile file to read result from, e.g., short lived processes, if {@code null} use standard in
+     * @param cust optional process customizer, may be <b>null</b> for none
      * @param args the process arguments for the script including python arguments (first), script and script arguments
      * @return the process status, <code>-1</code> if the process was not executed
      * @see #createPythonProcess(File, String, Consumer, String...)
      * @see #waitForAndKill(Process, String, Consumer, String)
      */
     public static int callPythonWaitForAndKill(File dir, String script, Consumer<String> cmdResult, String resultFile, 
-        String... args) {
+        Consumer<ProcessBuilder> cust, String... args) {
         try {
-            Consumer<ProcessBuilder> customizer = null;
-            if (null == cmdResult) { // just for convenience
+            Consumer<ProcessBuilder> customizer = cust;
+            if (null == cust && null == cmdResult) { // just for convenience
                 customizer = pb -> pb.inheritIO();
             }
             return waitForAndKill(createPythonProcess(dir, script, customizer, args), script, cmdResult, resultFile);
@@ -283,5 +314,7 @@ public class ProcessSupport {
             return -1;
         } 
     }
+
+    // checkstyle: resume parameter number check
 
 }
