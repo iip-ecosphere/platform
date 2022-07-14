@@ -186,12 +186,25 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         ''
     }
     
+    protected def toImplTypeName(IOType type) {
+        toImplTypeName(type.type);
+    }
+    
+    protected def toImplTypeName(DataType type) {
+        toTypeName(type);
+    }
+
+    protected def toImplTypeName(RecordType type) {
+        toTypeName(type) + typeAdd;
+    }
+    
     protected def getDataUnitAttributes(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
+                String implTypeName = toImplTypeName(in);
                 String attributeName = firstToLowerCase(toTypeName(in));
-                'private ${typeName}${typeAdd} ${attributeName};
+                'private ${implTypeName} ${attributeName};
                 '
             }
         }
@@ -201,13 +214,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
+                String implTypeName = toImplTypeName(in);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Returns ${attributeName}.
                 *
                 * @return ${attributeName}, may be <b>null</b>
                 */
-                public ${typeName}${typeAdd} get${typeName}() {
+                public ${implTypeName} get${typeName}() {
                     return ${attributeName};
                 }
                 '
@@ -219,13 +233,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
+                String implTypeName = toImplTypeName(in);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Changes ${attributeName}. [required by Jackson]
                 *
                 * @param ${attributeName}, the new value, may be <b>null</b>
                 */
-                public void set${typeName}(${typeName}${typeAdd} ${attributeName}) {
+                public void set${typeName}(${implTypeName} ${attributeName}) {
                     this.${attributeName} = ${attributeName};
                 }
                 '
