@@ -21,6 +21,62 @@ project Devices {
     };
     isDefined(containerManager);
     
+    // --------------- Dependencies -------------------------
+    
+    abstract compound Dependency {
+    }
+   
+    // must be installed on system level
+    // Instantiation shall create installedDependencies.yml with this key and install path!
+    compound SystemDependency refines Dependency {
+        String key; 
+    }
+
+    // preliminary, to record that
+    compound LinuxCommandBasedSystemDependency refines SystemDependency {
+        sequenceOf(String) downloads = {};
+        sequenceOf(String) installCommands = {};
+        sequenceOf(String) bashSetups = {};
+    }
+
+    enum JavaVersion {jdk8, jdk11, jdk16}; 
+
+    SystemDependency JRE8 = {
+        key = "JAVA8"
+    };
+   
+    SystemDependency JDK8 = {
+        key = "JAVA8"
+    };
+
+    SystemDependency JRE11 = {
+        key = "JAVA11"
+    };
+
+    SystemDependency JDK11 = {
+        key = "JAVA11"
+    };
+    
+    
+    SystemDependency PYTHON2 = {
+        key = "PYTHON2"
+    };
+
+    SystemDependency PYTHON3 = {
+        key = "PYTHON3"
+    };
+
+    SystemDependency PYTHON39 = {
+        key = "PYTHON39"
+    };
+   
+    compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
+        String name;
+        String version;
+    }
+    
+    // ------------------ Devices --------------------------- 
+    
     enum CpuArchitecture {x86, ARM};
     enum CpuBits {bit32, bit64};
     
@@ -28,6 +84,24 @@ project Devices {
         String id;
         CpuArchitecture cpu;
         CpuBits bits;
+        setOf(refTo(Dependency)) provides = {};
+        setOf(String) requiredModules = {};
     }
+    
+    compound PhoenixContactDevice refines EcsDevice {
+        setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
+    }
+    
+    // --------------- constant freezes --------------------
+    
+    freeze {
+        JRE8;
+        JDK8;
+        JRE11;
+        JDK11;
+        PYTHON2;
+        PYTHON3;
+        PYTHON39;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }
