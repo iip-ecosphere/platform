@@ -11,6 +11,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
     setOf(String) doneIngestors = {};
+    String typeAdd = "";
 
     // ------------------------ specialization of MeshBasics --------
     
@@ -190,7 +191,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
                 String attributeName = firstToLowerCase(toTypeName(in));
-                'private ${typeName} ${attributeName};'
+                'private ${typeName}${typeAdd} ${attributeName};
+                '
             }
         }
     }
@@ -205,7 +207,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                 *
                 * @return ${attributeName}, may be <b>null</b>
                 */
-                public ${typeName} get${typeName}() {
+                public ${typeName}${typeAdd} get${typeName}() {
                     return ${attributeName};
                 }
                 '
@@ -223,7 +225,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                 *
                 * @param ${attributeName}, the new value, may be <b>null</b>
                 */
-                public void set${typeName}(${typeName} ${attributeName}) {
+                public void set${typeName}(${typeName}${typeAdd} ${attributeName}) {
                     this.${attributeName} = ${attributeName};
                 }
                 '
@@ -592,6 +594,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
 
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }
         String clsName = getClsName(elt);
         String fileName = getFileName(elt.impl);
         if (familyInterface <> "") {
@@ -644,7 +652,6 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         */        
         @SpringBootTest
         @RunWith(SpringRunner.class)
-        // TODO specify spring setup
         public class ${clsName}Test extends SpringAsyncServiceBase {
         
             ${genAttributes(elt, elt.impl, clsName)|e}
