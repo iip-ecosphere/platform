@@ -153,15 +153,23 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         generateRelations(elt, elt.next);
     }
     
-    def String removeNewlines(String str) {
-        str.replace("\r", "").replace("\n", "");
+    def String substNewlines(String str, String subst) {
+        str.replace("\r", "").replace("\n", subst);
+    }
+    
+    def String trimTrailingComma(String str) {
+        if (str.length() > 1 and str.endsWith(",")) {
+            str.substring(0, str.length() - 1);
+        } else {
+            str;
+        }
     }
     
     def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
-        String eltMet = removeNewlines(generateDataMethods(elt, true));
+        String eltMet = substNewlines(generateDataMethods(elt, true), "");
         returnType = true;
         inputType = true;
-        String eltType = removeNewlines(generateDataMethods(elt, true));
+        String eltType = trimTrailingComma(substNewlines(generateDataMethods(elt, true), ","));
         returnType = false;
         '- channel: ${eltMet}-out-0
           direction: OUT
@@ -169,10 +177,10 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         if (conns.size() > 0) {
             for (MeshConnector conn : conns, "\n") {
                 MeshInnerElement next = conn.next;
-                String nextMeth = removeNewlines(generateDataMethods(next, true));
+                String nextMeth = substNewlines(generateDataMethods(next, true), "");
                 returnType = true;
                 inputType = true;
-                String nextType = removeNewlines(generateDataMethods(next, true));
+                String nextType = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
                 returnType = false;
                 '
                 - channel: ${nextMeth}-in-0
@@ -189,9 +197,9 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     def generateSelect(String inType, String outType, String methodSuffixWithServiceId) {
         if (returnType) {
             if (inputType) {
-                inType;
+                inType + ",";
             } else {
-                outType;
+                outType + ",";
             }
         } else {
             methodSuffixWithServiceId;
@@ -238,9 +246,11 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
 
     def generateType(RecordType type) {
-        '- name: ${toTypeName(type)}
-          fields:
-            ${generateFields(type.fields)}'
+        '- name: ${toTypeName(type)}'
+        if (type.fields.size() > 0) {
+            '  fields:
+                ${generateFields(type.fields)}'
+        }
     }
     
     def generateFields(Fields fields) {
@@ -251,19 +261,13 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def collectTypes(MeshElement elt, setOf(DataType) types) {
+        collectServiceTypes(elt.impl, types);
     }
 
-    def collectTypes(MeshSource elt, setOf(DataType) types) {
-        collectIOTypes(elt.output, types);
-    }
-
-    def collectTypes(MeshProcessor elt, setOf(DataType) types) {
-        collectIOTypes(elt.input, types);
-        collectIOTypes(elt.output, types);
-    }
-
-    def collectTypes(MeshSink elt, setOf(DataType) types) {
-        collectIOTypes(elt.input, types);
+    // just take everything, input/output may be backward/async also for sources, sinks
+    def collectServiceTypes(ServiceBase base, setOf(DataType) types) {
+        collectIOTypes(base.input, types);
+        collectIOTypes(base.output, types);
     }
     
     def collectIOTypes(sequenceOf(IOType) declTypes, setOf(DataType) types) {
