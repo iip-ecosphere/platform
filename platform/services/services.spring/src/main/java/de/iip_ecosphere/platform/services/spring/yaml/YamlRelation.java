@@ -58,6 +58,11 @@ public class YamlRelation implements Relation {
     public String getType() {
         return type;
     }
+    
+    @Override
+    public String[] getTypes() {
+        return type.split(",");
+    }
 
     @Override
     public Direction getDirection() {

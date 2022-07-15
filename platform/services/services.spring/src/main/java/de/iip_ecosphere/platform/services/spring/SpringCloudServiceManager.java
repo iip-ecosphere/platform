@@ -38,7 +38,6 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
-import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -117,12 +116,6 @@ public class SpringCloudServiceManager
             } else {
                 DescriptorUtils.throwExecutionException("Adding " + location, 
                     "Cannot load " + location + ". Must be a (resolved) file.");
-            }
-            Validator val = new Validator();
-            val.validate(yamlArtifact);
-            if (val.hasMessages()) {
-                DescriptorUtils.throwExecutionException("Adding " + location, 
-                    "Problems in descriptor:\n" + val.getMessages());
             }
             SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
                 yamlArtifact, location, jarFile);

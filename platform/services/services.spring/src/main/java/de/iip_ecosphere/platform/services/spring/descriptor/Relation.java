@@ -89,12 +89,19 @@ public interface Relation {
     public String getDescription();
 
     /**
-     * Returns the type of the data.
+     * Returns the type of the data. May be multiple types, separated by commas.
      * 
      * @return the type as qualified Java name (may be <b>null</b> for the relation with empty {@link #getChannel()}
      */
     public String getType();
 
+    /**
+     * Returns the types of data. {@link #getType()} parsed into potentially many types}.
+     * 
+     * @return the types, may contain just a single value
+     */
+    public String[] getTypes();
+    
     /**
      * Returns the direction of the relation.
      * 

@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
+import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
@@ -69,6 +70,13 @@ public class DescriptorUtils {
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream);
                     FileUtils.closeQuietly(descStream);
+                    
+                    Validator val = new Validator();
+                    val.validate(result);
+                    if (val.hasMessages()) {
+                        DescriptorUtils.throwExecutionException("Adding " + file, 
+                            "Problems in descriptor:\n" + val.getMessages());
+                    }
                 } else {
                     throwExecutionException("Reading artifact " + file, descName + " does not exist in " + file);
                 }
