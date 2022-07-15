@@ -69,8 +69,8 @@ public class AppTest {
         String qr = QRCodeServiceTest.testJavaQRCodeDetection(image);
         Assert.assertTrue(qr.equals("https://aas.uni-h.de/0016"));
         qr = "";
-        qr = QRCodeServiceTest.testPythonFallback(base64Iamge);
-        Assert.assertTrue(qr.equals("https://aas.uni-h.de/0016"));
+        //qr = QRCodeServiceTest.testPythonFallback(base64Iamge);
+        //Assert.assertTrue(qr.equals("https://aas.uni-h.de/0016"));
     }
     
     /**

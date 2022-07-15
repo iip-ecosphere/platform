@@ -18,7 +18,7 @@ public class ImageEncodingDecodingTests {
     public static final String TEST_FILE_PATH = AppTest.TEST_FILE_FOLDER + "/testImage.jpg";
     
     public static final String TEST_FILE_OUT_PATH = 
-            AppTest.TEST_FILE_FOLDER + "/testImageOutEndcoding1,.jpg";
+            AppTest.TEST_FILE_FOLDER + "/testImageOutEndcoding1.jpg";
     
     /**
      * Will first try to read the image as base64, if no exception happens, will try to turn the string back into image.
