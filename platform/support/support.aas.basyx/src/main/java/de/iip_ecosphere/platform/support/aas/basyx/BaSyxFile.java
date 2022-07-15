@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 
 import de.iip_ecosphere.platform.support.aas.FileDataElement;
@@ -22,7 +23,12 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement;
  * @author Holger Eichelberger, SSE
  */
 public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement {
-
+    
+    /**
+     * The builder for a file data element.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     public static class BaSyxFileDataElementBuilder implements FileDataElementBuilder {
 
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
@@ -46,7 +52,16 @@ public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement
         public FileDataElement build() {
             return parentBuilder.register(instance);
         }
-        
+
+        @Override
+        public FileDataElementBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (ref != null) {
+                instance.getDataElement().setSemanticId(ref);
+            }
+            return this;
+        }
+
     }
     
     /**

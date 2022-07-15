@@ -289,7 +289,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
      def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
-         if (base.kind <> ServiceKind::SOURCE_SERVICE) { // then we do flux to enable/disable service
+         if (not(base.isKindOf(Connector))) { 
              setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
              for (IOType t: backward(base.output)) {
                  outBack.add(t.type);
@@ -347,7 +347,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
                              (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
 
-                             String conn = toTypeName(in);
+                             String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
                              if (not(conns.includes(conn))) {
                                  result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
                                  first = false;

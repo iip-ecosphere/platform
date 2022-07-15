@@ -54,6 +54,12 @@ public class FakeFileDataElement implements FileDataElement {
         public FileDataElement build() {
             return parent.register(instance);
         }
+
+        @Override
+        public FileDataElementBuilder setSemanticId(String refValue) {
+            // ignored here for now
+            return this;
+        }
         
     }
     

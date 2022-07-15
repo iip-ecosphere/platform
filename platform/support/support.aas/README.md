@@ -19,7 +19,6 @@ We apply the following principles (with links also in the package description of
  
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
-- Further deployment abstractions (remote)
 - Authentication/RBAC
 - AAS Events (currently occurring in BaSyx)
 
