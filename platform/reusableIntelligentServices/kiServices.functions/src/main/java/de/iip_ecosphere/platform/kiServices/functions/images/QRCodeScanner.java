@@ -38,7 +38,7 @@ public class QRCodeScanner {
      * .withProcessCustomizer(ProcessSupport.INHERIT_IO);. 
      */ 
     private static ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
-            "python-qr.zip", resultScript).withProcessCustomizer(ProcessSupport.INHERIT_IO);
+            "python-qr.zip", resultScript);
     
     /**
      * Enables the QR code detection for base64 encoded images.
