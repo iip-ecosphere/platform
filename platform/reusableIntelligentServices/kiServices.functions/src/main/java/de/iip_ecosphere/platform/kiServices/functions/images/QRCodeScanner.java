@@ -32,8 +32,11 @@ public class QRCodeScanner {
     }
     
     private static String resultScript;
-    
-    // will probably not work on windows!(Set files location for windows, might be changed)
+    /**
+     * will probably not work on windows!(Set files location for windows, might be changed)
+     * Maybe different way to enable debug information instead of deleting/adding 
+     * .withProcessCustomizer(ProcessSupport.INHERIT_IO);. 
+     */ 
     private static ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
             "python-qr.zip", resultScript);
     
@@ -83,11 +86,8 @@ public class QRCodeScanner {
         System.out.println(qrScriptOwner.getResultFile());
         AtomicReference<String> resultRef = new AtomicReference<>("");
         try {
-            System.out.println("TRYING QR");
             File f = File.createTempFile("hm22-qr", "b64");
-            System.out.println("TRYING QR FORWARD");
             FileUtils.writeStringToFile(f, b64Image, StandardCharsets.UTF_8);
-            System.out.println("TRYING QR FORWARD ONWARDS");
             ProcessSupport.callPython(qrScriptOwner, "qr_scanner.py", qr -> {
                 System.out.println("PYTHON QR " + qr);
                 if (qr.isEmpty()) {

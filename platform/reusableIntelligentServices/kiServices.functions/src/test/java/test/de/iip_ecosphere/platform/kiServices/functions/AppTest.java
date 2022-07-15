@@ -22,6 +22,8 @@ import org.junit.Test;
  */
 public class AppTest {
     
+    public static final String TEST_FILE_FOLDER = "src/test/resources";
+    
     /**
      * Template test.
      */
