@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 import io
 import sys
-
+import tempfile
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True, help="the path to the car image you want to inspect")
@@ -21,7 +21,8 @@ def get_qr(img):
 
 if __name__ == "__main__":
     sys.stderr.write('>>>>>>>>>>>>>>>>>Version1.1\n')
-    image_path = args['image']
+    image_path = args['image'] #here we are takling about a file in a base64 encoded manor which can be an image
+    print(image_path)
     fileread = open(image_path, "rb")
     image_bytes = fileread.read()
     decoded = base64.b64decode(image_bytes) #decode the input
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     #cv2.imshow("image", gray)
     #cv2.waitKey(0)
     qr = get_qr(gray)
-    text_file = open("/tmp/qr.res", "w") # workaround; Java does not take up results
+    text_file = open((tempfile.gettempdir() + "/qr.res"), "w") # workaround; Java does not take up results
     text_file.write(qr)
     text_file.close()
     print(qr) # initial: command line passing, this is not in the service environment!

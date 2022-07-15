@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.kiServices.functions.images;
 
+import java.awt.Image;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -48,5 +49,17 @@ public class ImageProcessing {
         }
         return image;
     }
-
+    /**
+     * To shrink the pixelcount in an image without changing its content. 
+     * @param image The image to rescale.
+     * @param targetHeight The pixel hight it should have.
+     * @param targetWidth The pixel width it should have.
+     * @return A smaller version of the original image.
+     */
+    public static BufferedImage rescaleImage(BufferedImage image, int targetHeight, int targetWidth) {
+        Image resultingImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
+    }
 }

@@ -11,13 +11,14 @@ import de.iip_ecosphere.platform.kiServices.functions.images.QRCodeScanner;
 
 public class QRCodeServiceTest {
     
-    private static String tmpPath;
     
-    private static String testFileName = "hm22-qr1975022415332487959b64";
+    public static final String TEST_FILE_PATH = ImageProcessingTests.TEST_FILE_FOLDER + "/testImageAsBytesb64";
     
-    static {
-        tmpPath =  System.getProperty("java.io.tmpdir");                  
-    }
+    public static final String TEST_FILE_OUT_PATH = ImageProcessingTests.TEST_FILE_FOLDER + "/testImageOut2.jpg";
+    
+//    static {
+//        tmpPath =  System.getProperty("java.io.tmpdir");                  
+//    }
     /**
      * Method to quickly test functionality.
      * @param args Args.
@@ -39,7 +40,7 @@ public class QRCodeServiceTest {
         InputStream readImage;
         byte[] imageBytes = new byte[0];
         try {
-            readImage = new FileInputStream(ImageProcessingTests.TEST_FILE_PATH);
+            readImage = new FileInputStream(TEST_FILE_PATH);
             imageBytes = IOUtils.toByteArray(readImage);
             readImage.close();
         } catch (IOException e) {
