@@ -25,6 +25,7 @@ import java.io.InputStream;
 public class FolderResourceResolver implements ResourceResolver {
     
     private File basePath;
+    private String removePrefix;
 
     /**
      * Creates a resolver.
@@ -32,7 +33,17 @@ public class FolderResourceResolver implements ResourceResolver {
      * @param basePath the base path to be taken into account
      */
     public FolderResourceResolver(String basePath) {
-        this.basePath = new File(basePath);
+        this(new File(basePath));
+    }
+    
+    /**
+     * Creates a resolver.
+     * 
+     * @param basePath the base path to be taken into account
+     * @param removePrefix prefix to be removed from requested resource name, may be empty or null for none
+     */
+    public FolderResourceResolver(String basePath, String removePrefix) {
+        this(new File(basePath), removePrefix);
     }
 
     /**
@@ -41,11 +52,27 @@ public class FolderResourceResolver implements ResourceResolver {
      * @param basePath the base path to be taken into account
      */
     public FolderResourceResolver(File basePath) {
+        this(basePath, null);
+    }
+    
+    /**
+     * Creates a resolver.
+     * 
+     * @param basePath the base path to be taken into account
+     * @param removePrefix prefix to be removed from requested resource name, may be empty or null for none
+     */
+    public FolderResourceResolver(File basePath, String removePrefix) {
         this.basePath = basePath;
+        this.removePrefix = removePrefix;
     }
 
     @Override
     public InputStream resolve(ClassLoader loader, String resource) {
+        if (null != removePrefix && removePrefix.length() > 0) {
+            if (resource.startsWith(removePrefix)) {
+                resource = resource.substring(removePrefix.length());
+            }
+        }
         try {
             return new FileInputStream(new File(basePath, resource));
         } catch (IOException e) {
