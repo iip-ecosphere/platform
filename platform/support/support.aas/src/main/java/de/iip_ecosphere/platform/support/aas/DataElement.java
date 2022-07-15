@@ -30,6 +30,14 @@ public interface DataElement extends SubmodelElement {
         
         // incomplete
         
+        /**
+         * Sets the semantic ID of the property in terms of a reference.
+         * 
+         * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
+         * @return <b>this</b>
+         */
+        public DataElementBuilder<T> setSemanticId(String refValue);
+
     }
 
 }
