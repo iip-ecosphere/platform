@@ -24,11 +24,7 @@ import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner
 public class QRCodeScanner {
     //Shall set the result folder appropriate for each operating system.
     static {
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            resultScript = System.getProperty("java.io.tmpdir") + "qr.res";
-        } else {
-            resultScript = "/tmp/qr.res";
-        }
+        resultScript = de.iip_ecosphere.platform.support.FileUtils.getTempDirectoryPath() + "qr.res";
     }
     
     private static String resultScript;
@@ -38,7 +34,7 @@ public class QRCodeScanner {
      * .withProcessCustomizer(ProcessSupport.INHERIT_IO);. 
      */ 
     private static ScriptOwner qrScriptOwner = new ScriptOwner("hm22-qr", "src/main/python/qrScan", 
-            "python-qr.zip", resultScript);
+            "python-qr.zip", resultScript).withProcessCustomizer(ProcessSupport.INHERIT_IO);
     
     /**
      * Enables the QR code detection for base64 encoded images.

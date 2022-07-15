@@ -33,21 +33,22 @@ public class QRCodeServiceTest {
          */
         String test = QRCodeScanner.pythonFallbackQRDetection(image); 
         System.out.print(test);
-    }
-    /**
-     * Test if the python fallback solution is running.
-     * @param path the path to the file to read in.
-     * @return the resutlt of the python qr scann.
-     */
-    public static String testPythonFallback(String path) {
-        String output = "";
-        String imageAsBase64 = "";
+        test = "";
         try {
-            imageAsBase64 = ImageEncodingDecoding.readBase64ImageFromBase64File(path);
+            test = testJavaQRCodeDetection(ImageEncodingDecoding.base64StringToBufferdImage(image));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        output = QRCodeScanner.pythonFallbackQRDetection(imageAsBase64);
+        System.out.println(test);
+    }
+    /**
+     * Test if the python fallback solution is running.
+     * @param base64Image the image in base64 version.
+     * @return the resutlt of the python qr scann.
+     */
+    public static String testPythonFallback(String base64Image) {
+        String output = "";
+        output = QRCodeScanner.pythonFallbackQRDetection(base64Image);
         return output;
     }
     /**

@@ -23,6 +23,7 @@ public class ImageEncodingDecodingTests {
     /**
      * Will first try to read the image as base64, if no exception happens, will try to turn the string back into image.
      * If both things work will try to write the image to confirm it actually is an image!
+     * (to resources//testImageOutEndcoding1.jpg )
      * @param imagePath the Path to the testImage.
      */
     public static void testImageToBase64String(String imagePath) {

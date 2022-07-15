@@ -12,8 +12,19 @@
 
 package test.de.iip_ecosphere.platform.kiServices.functions;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
+import test.de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecodingTests;
+import test.de.iip_ecosphere.platform.kiServices.functions.images.ImageProcessingTests;
+import test.de.iip_ecosphere.platform.kiServices.functions.images.QRCodeServiceTest;
 
 /**
  * Template test.
@@ -28,8 +39,56 @@ public class AppTest {
      * Template test.
      */
     @Test
-    public void testApp() {
-        Assert.assertTrue(true);
+    public void testEncodingDecoding() {
+        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
+        File control = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
+        Assert.assertTrue(control.exists());
+        if (control.exists()) {
+            control.delete();       //cleanup to not clutter the test enviroment.
+        }
+        //nothing to assert, error if complete fail, warning through exception.
+        BufferedImage image = ImageEncodingDecodingTests
+                .testBase64StringToBufferedImage(ImageEncodingDecodingTests.TEST_FILE_PATH);
+        Assert.assertTrue(image != null);
     }
     
+    /**
+     * Testing QR Code functionality.
+     */
+    @Test
+    public void testQRFunctionality() {
+        String base64Iamge = null;
+        BufferedImage image = null;
+        try {
+            //the image for the qr test is in base64 format thus the need to load it like this
+            base64Iamge = ImageEncodingDecoding.readBase64ImageFromBase64File(QRCodeServiceTest.TEST_FILE_PATH);
+            image = ImageEncodingDecoding.base64StringToBufferdImage(base64Iamge);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String qr = QRCodeServiceTest.testJavaQRCodeDetection(image);
+        Assert.assertTrue(qr.equals("https://aas.uni-h.de/0016"));
+        qr = "";
+        qr = QRCodeServiceTest.testPythonFallback(base64Iamge);
+        Assert.assertTrue(qr.equals("https://aas.uni-h.de/0016"));
+    }
+    
+    /**
+     * Testing image processing.
+     */
+    @Test
+    public void testImageProcesssing() {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(ImageProcessingTests.TEST_FILE_PATH));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedImage gray = ImageProcessingTests.testGrayscaling(image);
+        Assert.assertTrue(gray != null);
+        BufferedImage rescale = ImageProcessingTests.testRescalingOfImage(image, 500, 500);
+        Assert.assertTrue(rescale != null);
+        BufferedImage blackWhite = ImageProcessingTests.testThresholdingImage(image, 120);
+        Assert.assertTrue(blackWhite != null);
+    }
 }
