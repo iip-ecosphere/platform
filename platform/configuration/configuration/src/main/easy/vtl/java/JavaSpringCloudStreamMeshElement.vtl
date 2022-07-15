@@ -232,7 +232,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         if (springConnId <> "") {
             'SerializerMessageConverter.serializeAndSend(streamBridge, "${springConnId}", data);'
         } else {
-            'Transport.send(c -> c.asyncSend("${sender.id}_${type}", data), "${sender.id}")'
+            // subsequent nodes do not know anything about the active member, only the family  
+            String senderId = sender.id;
+            if (familyInterface <> "" and familyMember == sender) {
+                senderId = elt.impl.id;
+            }
+            'Transport.send(c -> c.asyncSend("${senderId}_${type}", data), "${senderId}")'
         }
     }
     
