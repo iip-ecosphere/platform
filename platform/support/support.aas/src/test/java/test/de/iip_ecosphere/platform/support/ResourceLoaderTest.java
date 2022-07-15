@@ -18,6 +18,7 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
@@ -92,8 +93,14 @@ public class ResourceLoaderTest {
         Assert.assertNotNull(is);
         is.close();
 
-        // once again, resolver known, must work anyway
-        is = ResourceLoader.getAllRegisteredResolver(res).resolve("Logo.jpg");
+        // temporary own resolver
+        FolderResourceResolver fRes = new FolderResourceResolver("./src/test/resources/META-INF/services");
+        ResourceResolver myResolver = ResourceLoader.getAllRegisteredResolver(fRes); 
+        is = myResolver.resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
+        
+        is = myResolver.resolve("de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor");
         Assert.assertNotNull(is);
         is.close();
         

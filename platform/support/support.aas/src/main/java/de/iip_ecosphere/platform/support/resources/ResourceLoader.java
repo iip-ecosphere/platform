@@ -60,7 +60,7 @@ public class ResourceLoader {
             return result;
         }
     };
-
+    
     private static List<ResourceResolver> resolvers = new ArrayList<>();
     
     static {
