@@ -17,6 +17,7 @@ In progress:
 * Example improvements [#40](https://github.com/iip-ecosphere/platform/issues/40), [#54](https://github.com/iip-ecosphere/platform/issues/54)
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
+* Increasing number of semanticIDs in platform AAS.
 
 Completed improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
