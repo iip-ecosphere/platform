@@ -277,19 +277,19 @@ public class Tools {
      * Translates a reference. (supports IRDI)
      * 
      * @param id the for declaring the reference showing some form of type, e.g., prefix "irdi:", may be empty or 
-     * <b>null</b> leading to <b>null</b>
+     *   <b>null</b> leading to <b>null</b>, see {@link IdentifierType}
      * @return the reference or <b>null</b>
      */
     public static IReference translateReference(String id) {
         IReference result = null;
         if (id != null) {
-            if (id.startsWith("irdi:")) {
+            if (id.startsWith(IdentifierType.IRDI_PREFIX)) {
                 //result = new Reference(new Key(KeyElements.PROPERTY, false, id.substring(5), KeyType.IRDI));
                 result = new Reference(Collections.singletonList(new Key(KeyElements.CONCEPTDESCRIPTION, false, 
-                    id.substring(5), KeyType.IRDI)));
-            } else if (id.startsWith("iri:")) {
+                    id.substring(IdentifierType.IRDI_PREFIX.length()), KeyType.IRDI)));
+            } else if (id.startsWith(IdentifierType.IRI_PREFIX)) {
                 result = new Reference(Collections.singletonList(new Key(KeyElements.CONCEPTDESCRIPTION, false, 
-                    id.substring(4), KeyType.IRI)));
+                    id.substring(IdentifierType.IRI_PREFIX.length()), KeyType.IRI)));
             }
         }
         return result;
