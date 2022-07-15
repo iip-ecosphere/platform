@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -42,5 +44,19 @@ public class ImageEncodingDecoding {
         inputstream.close();
         base64EncodedImage = Base64.getEncoder().encodeToString(array);
         return base64EncodedImage;
+    }
+    /**
+     * Reads a base64 encoded String out of a file.
+     * @param path the path to the file.
+     * @return the base64 encoded String.
+     * @throws IOException If the file does not exists or cannot be read.
+     */
+    public static String readBase64ImageFromBase64File(String path) throws IOException {
+        InputStream readImage;
+        byte[] imageBytes = new byte[0];
+        readImage = new FileInputStream(path);
+        imageBytes = IOUtils.toByteArray(readImage);
+        readImage.close();
+        return new String(imageBytes, StandardCharsets.UTF_8);
     }
 }
