@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -450,37 +451,37 @@ public class MetricsAasConstructor {
         /* System Disk Capacity metrics, string as JSON meter is transferred  */
         smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_FREE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_TOTAL), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USABLE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003"))//byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("0173-1#05-AAA129#003")) //percent
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
             .build();
 
         /* System Physical Memory metrics, string as JSON meter is transferred  */
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_FREE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_TOTAL), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USAGE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("irdi:0173-1#05-AAA766#003")) //byte
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId("0173-1#05-AAA129#003")) //percent
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
             .build();
     }
 

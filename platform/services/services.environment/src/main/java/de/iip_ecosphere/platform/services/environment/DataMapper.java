@@ -145,7 +145,7 @@ public class DataMapper {
         }
         
     }
-
+    
     /**
      * Maps the data in {@code stream} to instances of {@code cls}, one instance per line. Calls {@code cons} per
      * instance/line. Closes {@code stream}. Ignores unknown attributes in {@code cls}.
@@ -154,12 +154,28 @@ public class DataMapper {
      * @param stream the stream to read (may be <b>null</b> for none)
      * @param cls the type of data to read
      * @param cons the consumer to be called per instance
-     * @throws IOException if I/O or Json parsing errors occur
+     * @throws IOException if I/O or JSON parsing errors occur
      */
     public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons) throws IOException {
+        mapJsonData(stream, cls, cons, false);
+    }
+
+    /**
+     * Maps the data in {@code stream} to instances of {@code cls}, one instance per line. Calls {@code cons} per
+     * instance/line. Closes {@code stream}.
+     *  
+     * @param <T> the type of data to read
+     * @param stream the stream to read (may be <b>null</b> for none)
+     * @param cls the type of data to read
+     * @param cons the consumer to be called per instance
+     * @param failOnUnknownProperties whether parsing shall be tolerant or not, the latter may be helpful for debugging
+     * @throws IOException if I/O or JSON parsing errors occur
+     */
+    public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons, 
+        boolean failOnUnknownProperties) throws IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
             
             JsonFactory jf = new JsonFactory();
             JsonParser jp = jf.createParser(stream);
