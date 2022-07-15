@@ -3,7 +3,7 @@
 template JavaBasics(Configuration config, FileArtifact target) {
 
     def String asIdentifier(String s) {
-        s;
+        s.toIdentifier();
     }
 
     def String asMethodNameSuffix(String s) {
