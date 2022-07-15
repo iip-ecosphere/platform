@@ -74,6 +74,8 @@ public class ResourceLoaderTest {
         Assert.assertNotNull(is);
         is = ResourceLoader.getResourceAsStream("/Logo.jpg");
         Assert.assertNotNull(is);
+        is.close();
+        
         // via classloader
         Assert.assertTrue(myResolverCalled == 0);
         Assert.assertTrue(myResolver2Called == 0);
@@ -84,6 +86,17 @@ public class ResourceLoaderTest {
         // also the other resolvers are taken into account
         Assert.assertTrue(myResolverCalled > 0);
         Assert.assertTrue(myResolver2Called > 0);
+        
+        // if we need a resolver for somewhere else
+        is = ResourceLoader.getAllRegisteredResolver().resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
+
+        // once again, resolver known, must work anyway
+        is = ResourceLoader.getAllRegisteredResolver(res).resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
+        
         ResourceLoader.unregisterResourceResolver(res);
         
         // Here it works per class loader. This may fail in generated parts.

@@ -114,6 +114,26 @@ public class ResourceLoader {
     public static InputStream getResourceAsStream(String name) {
         return getResourceAsStream(ResourceLoader.class, name);
     }
+    
+    /**
+     * Returns a resolver for all registered resolvers.
+     * 
+     * @param resolver additional resolver that shall be part of the result
+     * @return a resolver for all registered resolvers 
+     */
+    public static ResourceResolver getAllRegisteredResolver(ResourceResolver... resolver) {
+        List<ResourceResolver> res;
+        if (resolver.length > 0) {
+            res = new ArrayList<ResourceResolver>();
+            res.addAll(resolvers);
+            for (ResourceResolver r : resolver) {
+                res.add(r);
+            }
+        } else {
+            res = resolvers;
+        }
+        return new MultiResourceResolver(res);
+    }
 
     /**
      * Returns a resource as string.
