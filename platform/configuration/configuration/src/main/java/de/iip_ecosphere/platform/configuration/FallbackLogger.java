@@ -27,11 +27,13 @@ import org.slf4j.Marker;
  * 
  * While it delegates all logging to some rather simple (formatting) function, it completely ignores markers and 
  * cause throwables. If somebody needs this, please add. In it's current version, this logger is not intended for reuse,
- * but who knows the future. 
+ * but who knows the future.
+ * 
+ * Public for testing.
  * 
  * @author Holger Eichelberger, SSE
  */
-class FallbackLogger implements Logger {
+public class FallbackLogger implements Logger {
 
     private LoggingLevel level;
         
@@ -67,7 +69,7 @@ class FallbackLogger implements Logger {
      * @param fallbackLevel if there is no configured official logger, return a fallback logger for the given level
      * @return the new logger instance or {@code logger}
      */
-    static Logger getLogger(Logger logger, Class<?> cls, LoggingLevel fallbackLevel) {
+    public static Logger getLogger(Logger logger, Class<?> cls, LoggingLevel fallbackLevel) {
         if (null == logger) {
             try {
                 Class.forName("org.slf4j.impl.StaticLoggerBinder");

@@ -29,6 +29,7 @@ import org.junit.runners.Suite;
     IvmlRoutingTestTests.class,
     IvmlContainerTests.class,
     StorageFactoryTest.class,
+    FallbackLoggerTest.class
 })
 public class AllTests {
 }
