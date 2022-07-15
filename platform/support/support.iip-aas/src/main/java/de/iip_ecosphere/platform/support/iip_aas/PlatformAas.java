@@ -129,6 +129,7 @@ public class PlatformAas implements AasContributor {
                 .build();
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
                 .setValue(Type.STRING, buildId)
+                .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
                 .build();
             smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS) // TODO restrict access
                 .addInputVariable("id", Type.STRING)
@@ -149,16 +150,16 @@ public class PlatformAas implements AasContributor {
         if (null != appSetup.getId()) {
             smB.createPropertyBuilder(NAME_PROPERTY_ID)
                 .setValue(Type.STRING, appSetup.getId())
-                .setSemanticId("irdi:0173-1#02-ABF809#001")
+                .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
                 .build();
         }
         smB.createPropertyBuilder(NAME_PROPERTY_NAME)
             .setValue(Type.STRING, appSetup.getName())
-            .setSemanticId("irdi:0173-1#02-AAO247#002")
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         smB.createPropertyBuilder(NAME_PROPERTY_VERSION)
             .setValue(Type.STRING, null == appSetup.getVersion() ? "" : appSetup.getVersion().toString())
-            .setSemanticId("irdi:0173-1#02-AAM737#002")
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
             .build();
     }
 
@@ -172,16 +173,22 @@ public class PlatformAas implements AasContributor {
     public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
         SubmodelBuilder sBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
         AasUtils.resolveImage(appSetup.getProductImage(), imageResolver, true, (n, r, m) -> {
-            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m).build();
+            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m)
+                .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1")
+                .build();
         });
         AasUtils.resolveImage(appSetup.getManufacturerLogo(), imageResolver, true, (n, r, m) -> {
-            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m).build();
+            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m)
+                .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerLogo/1/1")
+                .build();
         });
         sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerName())
+            .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerName/1/1")
             .build();
         sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerProductDesignation())
+            .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerProductDesignation/1/1")
             .build();
         createAddress(sBuilder, appSetup.getAddress());
         return sBuilder;

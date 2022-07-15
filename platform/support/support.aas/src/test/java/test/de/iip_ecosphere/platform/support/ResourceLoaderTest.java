@@ -18,6 +18,7 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
@@ -74,6 +75,8 @@ public class ResourceLoaderTest {
         Assert.assertNotNull(is);
         is = ResourceLoader.getResourceAsStream("/Logo.jpg");
         Assert.assertNotNull(is);
+        is.close();
+        
         // via classloader
         Assert.assertTrue(myResolverCalled == 0);
         Assert.assertTrue(myResolver2Called == 0);
@@ -84,6 +87,23 @@ public class ResourceLoaderTest {
         // also the other resolvers are taken into account
         Assert.assertTrue(myResolverCalled > 0);
         Assert.assertTrue(myResolver2Called > 0);
+        
+        // if we need a resolver for somewhere else
+        is = ResourceLoader.getAllRegisteredResolver().resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
+
+        // temporary own resolver
+        FolderResourceResolver fRes = new FolderResourceResolver("./src/test/resources/META-INF/services");
+        ResourceResolver myResolver = ResourceLoader.getAllRegisteredResolver(fRes); 
+        is = myResolver.resolve("Logo.jpg");
+        Assert.assertNotNull(is);
+        is.close();
+        
+        is = myResolver.resolve("de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor");
+        Assert.assertNotNull(is);
+        is.close();
+        
         ResourceLoader.unregisterResourceResolver(res);
         
         // Here it works per class loader. This may fail in generated parts.

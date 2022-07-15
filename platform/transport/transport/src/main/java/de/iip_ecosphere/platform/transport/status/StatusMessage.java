@@ -34,6 +34,7 @@ public class StatusMessage {
     private String id;
     private String[] aliasIds;
     private String deviceId;
+    private int progress = -1;
 
     /**
      * Creates an empty status message. [deserialization]
@@ -171,6 +172,27 @@ public class StatusMessage {
      */
     public void send(TransportConnector conn) throws IOException {
         conn.asyncSend(STATUS_STREAM, this);
+    }
+    
+    /**
+     * Defines the progress.
+     * 
+     * @param progress the progress in [0;100]; if 100 longer running process is assumed to be completed
+     * @return <b>this</b>
+     */
+    public StatusMessage withProgress(int progress) {
+        this.progress = progress;
+        return this;
+    }
+    
+    /**
+     * Returns the progress.
+     * 
+     * @return the progress in percent: if negative, no progress will be reported. If positive, further messages shall 
+     * follow until 100.
+     */
+    public int getProgress() {
+        return progress;
     }
 
 }
