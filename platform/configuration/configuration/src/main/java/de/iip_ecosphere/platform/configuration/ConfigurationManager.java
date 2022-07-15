@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.configuration;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
@@ -31,6 +30,7 @@ import net.ssehub.easy.varModel.confModel.Configuration;
  */
 public class ConfigurationManager {
     
+    private static Logger logger;
     private static EasyExecutor executor;
     private static boolean initialized = false;
     
@@ -88,7 +88,12 @@ public class ConfigurationManager {
      */
     public static ReasoningResult validateAndPropagate() {
         init();
-        return executor != null ? executor.propagateOnIvmlModel() : null;
+        try {
+            return executor != null ? executor.propagateOnIvmlModel() : null;
+        } catch (IllegalStateException e) {
+            getLogger().error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -112,7 +117,7 @@ public class ConfigurationManager {
             try {
                 executor.setVilStartRuleName(startRuleName);
                 executor.executeVil();
-            } catch (ModelManagementException | VilException e) {
+            } catch (ModelManagementException | VilException | IllegalStateException e) {
                 throw new ExecutionException(e);
             }
         }
@@ -124,7 +129,10 @@ public class ConfigurationManager {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        return LoggerFactory.getLogger(ConfigurationLifecycleDescriptor.class);
+        logger = FallbackLogger.getLogger(logger, 
+            ConfigurationManager.class, 
+            FallbackLogger.LoggingLevel.WARN);
+        return logger;
     }
 
 }

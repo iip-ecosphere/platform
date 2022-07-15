@@ -17,7 +17,6 @@ import java.io.IOException;
 
 import org.apache.log4j.lf5.LogLevel;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.uni_hildesheim.sse.easy.loader.ListLoader;
@@ -34,6 +33,7 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  */
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
+    private static Logger logger;
     private ListLoader loader;
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
@@ -44,7 +44,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * @author Holger Eichelberger, SSE
      */
     private class Slf4EasyLogger implements ILogger {
-
+        
         @Override
         public void info(String msg, Class<?> clazz, String bundleName) {
             if (allowLogging(msg, clazz, bundleName, LogLevel.INFO)) {
@@ -93,8 +93,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      */
     private boolean allowLogging(String msg, Class<?> clazz, String bundleName, LogLevel level) {
         boolean emit = doLogging;
-        if (doFilterLogs) {
-            emit = clazz == EasyExecutor.class; 
+        if (doFilterLogs && (LogLevel.ERROR != level && LogLevel.WARN != level)) { // limit main decision override 
+            emit = clazz == EasyExecutor.class;
         }
         return emit;
     }
@@ -202,7 +202,10 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        return LoggerFactory.getLogger(ConfigurationLifecycleDescriptor.class);
+        logger = FallbackLogger.getLogger(logger, 
+            ConfigurationLifecycleDescriptor.class, 
+            FallbackLogger.LoggingLevel.WARN);
+        return logger;
     }
     
 }

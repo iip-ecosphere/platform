@@ -158,6 +158,9 @@ public class PlatformInstantiator {
         lcd.startup(new String[0]); // shall register executor
         configurer.validateConfiguration(ConfigurationManager.getIvmlConfiguration());
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
+        if (null == rRes) {
+            throw new ExecutionException("No valid IVML model loaded/found.", null);
+        }
         EasyExecutor.printReasoningMessages(rRes);
         configurer.validateReasoningResult(rRes);
         try {
