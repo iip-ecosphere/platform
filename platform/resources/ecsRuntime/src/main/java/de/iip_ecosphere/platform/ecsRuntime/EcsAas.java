@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
@@ -125,7 +126,7 @@ public class EcsAas implements AasContributor {
             .build();
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
             .setValue(Type.INTEGER, 1)
-            .setSemanticId("irdi:0173-1#02-AAM737#002")
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
             .build();
         jB.createPropertyBuilder(NAME_PROP_DEVICE_AAS)
             .setValue(Type.STRING, DeviceAasProvider.getInstance().getDeviceAasAddress())
@@ -139,7 +140,7 @@ public class EcsAas implements AasContributor {
         if (null != mgr) {
             jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
                 .setValue(Type.STRING, mgr.getContainerSystemVersion())
-                .setSemanticId("irdi:0173-1#02-AAM737#002")
+                .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
                 .build();
     
             createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
