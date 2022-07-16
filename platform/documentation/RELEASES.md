@@ -38,7 +38,9 @@ Completed improvements:
 * [#60](https://github.com/iip-ecosphere/platform/issues/60): Nested connector paths not correctly composed in generation.
 * [#28](https://github.com/iip-ecosphere/platform/issues/28): Asynchronous service streams via Transport Layer for better stability.
 * [#25](https://github.com/iip-ecosphere/platform/issues/25): Enable application-specific connector triggers via code plugins.
-* Ability to mock connectors in applications for testing. Data to be provdided to the application is loaded from connector-specific JSON file.
+* [#66](https://github.com/iip-ecosphere/platform/issues/66): Improvements of examples.KODEX and identifier check/fixing for generated Java code.
+* [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
+* Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

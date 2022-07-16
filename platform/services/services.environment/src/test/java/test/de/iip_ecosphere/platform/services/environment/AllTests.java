@@ -41,6 +41,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     DataMapperTest.class,
     MonitoringServiceTest.class,
     ConnectorServiceWrapperTest.class,
+    HeartbeatWatcherTest.class,
     
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
