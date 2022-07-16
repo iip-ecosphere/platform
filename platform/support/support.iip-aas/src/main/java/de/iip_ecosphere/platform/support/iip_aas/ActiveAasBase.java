@@ -13,15 +13,20 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
  * Basic functions for active AAS with notification calls.
@@ -150,5 +155,49 @@ public class ActiveAasBase {
         return submodel;
     }
 
-    
+    /**
+     * Clears a collection from elements responding to the given with the given predicate.
+     * 
+     * @param coll the collection to be cleared
+     * @param pred the predicate
+     */
+    public static void clearCollection(SubmodelElementCollection coll, Predicate<SubmodelElementCollection> pred) {
+        if (null != coll) {
+            for (SubmodelElement e: coll.elements()) {
+                if (e instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection ec = (SubmodelElementCollection) e;
+                    if (pred.test(ec)) {
+                        coll.deleteElement(e.getIdShort());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a predicate, e.g., for {@link #clearCollection(SubmodelElementCollection, Predicate)} to delete the given
+     * collection based on a property value.
+     * 
+     * @param propertyIdShort the property to look for
+     * @param propertyValue the value to cause the deletion
+     * @param failMessage if an exception occurs, the message lead in (will be followed by the exception message)
+     * @return the predicate
+     */
+    public static Predicate<SubmodelElementCollection> createPropertyPredicate(String propertyIdShort, 
+        Object propertyValue, String failMessage) {
+        return s -> {
+            boolean result = false;
+            try {
+                Property prop = s.getProperty(propertyIdShort);
+                if (null != prop && propertyValue.equals(prop.getValue())) {
+                    result = true;
+                }
+            } catch (ExecutionException ex) {
+                LoggerFactory.getLogger(ActiveAasBase.class).error("{}: {} ", 
+                    failMessage, ex.getMessage());
+            }
+            return result;
+        };
+    }
+
 }
