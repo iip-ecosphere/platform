@@ -181,13 +181,13 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             .builder("service.sent")
             .baseUnit("tuple/s")
             .description("Tuples sent out by a service")
-            .tags("service", "${elt.impl.id}", "application", "${app.id}")
+            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
             .register(metrics.getRegistry());'
         'io.micrometer.core.instrument.Counter
             .builder("service.received")
             .baseUnit("tuple/s")
             .description("Tuples received by a service")
-            .tags("service", "${elt.impl.id}", "application", "${app.id}")
+            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
             .register(metrics.getRegistry());'
         for (String s: serviceVars) {
             '${attachMetricsProvider("${s}")}'
@@ -1194,6 +1194,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
+        import de.iip_ecosphere.platform.support.iip_aas.Id;
         import de.iip_ecosphere.platform.transport.Transport;
         import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;

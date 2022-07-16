@@ -9,7 +9,7 @@ import EcsRuntimeDockerContainerManagerYaml;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) extends MeshBasics {
+template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) extends MeshBasics {
 
     sequenceOf(String) tmp = {};
     setOf(String) beans = {};
@@ -147,7 +147,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
     
     // ----------------------------------------- main -------------------------------------
  
-    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Boolean debug) {
+    def main(Configuration config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) {
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
@@ -157,7 +157,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
         '${produceTransport(config)}'
         '${produceAas(config, withDocker=false, implLocalEphemerial=true)}'
         '${produceBinders(config)}'
-        if (debug) {
+        if (app.debug) {
             'logging: 
                level: 
                  org: 

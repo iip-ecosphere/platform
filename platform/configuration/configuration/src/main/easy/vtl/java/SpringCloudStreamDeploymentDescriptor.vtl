@@ -39,6 +39,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - --iip.port=\\${port}
             - --iip.protocol=\\${protocol}
             ${generateMemLimitOpt(service)|e}
+            ${generateAppOpt()|e}
           relations:
             - endpoint:
                 portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
@@ -131,6 +132,14 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             cmdArg:
               - --iip.rtsa.path=${service.path}
             started: true'
+    }
+    
+    def generateAppOpt() {
+        if (app.cmdArg.size() > 0) { // EASY-bug
+            for (String a: app.cmdArg) {
+                "- ${a}"
+            }
+        }
     }
     
     def generateMemLimitOpt(Service service) {
