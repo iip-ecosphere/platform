@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -103,6 +104,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_ARTIFACT = "artifact";
     public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
+    public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
@@ -747,6 +749,56 @@ public class ServicesAas implements AasContributor {
             }
         }
     }
+    
+    /**
+     * Sets the cleanup flag to {@code true}.
+     * 
+     * @param sm the submodel to set the cleanup flag on
+     * @param deviceId the device ID of the device to set into cleanup
+     */
+    public static void setCleanup(Submodel sm, String deviceId) {
+        String aasDeviceId = fixId(deviceId);
+        SubmodelElementCollection sec = sm.getSubmodelElementCollection(aasDeviceId);
+        if (null != sec) {
+            Property prop = sec.getProperty(NAME_PROP_IN_CLEANUP);
+            if (null != prop) {
+                try {
+                    prop.setValue(true);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(ServicesAas.class).warn("Cannot set {}:{}", 
+                            NAME_PROP_IN_CLEANUP, e.getMessage());
+                }
+            } // if not there, we are anyway in cleanup
+        }
+    }
+    
+    /**
+     * Defers the creation of {@code smBuilder} if the device is still in cleanup.
+     * 
+     * @param smBuilder the device submodel builder
+     */
+    public static void deferForCleanup(SubmodelElementCollectionBuilder smBuilder) {
+        boolean inCleanup = false;
+        PropertyBuilder builder = smBuilder.createPropertyBuilder(NAME_PROP_IN_CLEANUP);
+        do {
+            try {
+                Object tmp = builder.getValue();
+                if (tmp instanceof Boolean) {
+                    inCleanup = (Boolean) tmp;
+                    if (inCleanup) {
+                        LoggerFactory.getLogger(ServicesAas.class).info(
+                            "Device in cleanup. Deferring AAS creation by 500 ms.");
+                        TimeUtils.sleep(500);
+                    }
+                }
+            } catch (ExecutionException e) {
+                // assume that there is no AAS, ok to go on
+            }
+        } while (inCleanup);
+        builder.setValue(Type.BOOLEAN, false); // finally, we are not in cleanup (anymore)
+    }
+    
+    // TODO EcsAAS/ServiceAAS deferForCleanup in buildup
 
     /**
      * Returns the logger instance.
