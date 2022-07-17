@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
@@ -96,7 +97,9 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_TYPE = "type";
     public static final String NAME_PROP_RESOURCE = "resource";
     public static final String NAME_PROP_FROM = "from";
+    public static final String NAME_PROP_FROM_RESOURCE = "fromResource";
     public static final String NAME_PROP_TO = "to";
+    public static final String NAME_PROP_TO_RESOURCE = "toResource";
     public static final String NAME_PROP_ARTIFACT = "artifact";
     public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
@@ -433,6 +436,10 @@ public class ServicesAas implements AasContributor {
             dBuilder.createReferenceElementBuilder(name)
                 .setValue(serviceRef)
                 .build();
+            name = input ? NAME_PROP_TO_RESOURCE : NAME_PROP_FROM_RESOURCE;
+            dBuilder.createPropertyBuilder(name)
+                .setValue(Type.STRING, Id.getDeviceIdAas())
+                .build();
             dBuilder.defer();
         }
     }
@@ -557,9 +564,11 @@ public class ServicesAas implements AasContributor {
         }
         for (TypedDataConnectorDescriptor c : service.getInputDataConnectors()) {
             deleteSubmodelElement(coll, c.getName(), NAME_PROP_TO);
+            deleteSubmodelElement(coll, c.getName(), NAME_PROP_TO_RESOURCE);
         }
         for (TypedDataConnectorDescriptor c : service.getOutputDataConnectors()) {
             deleteSubmodelElement(coll, c.getName(), NAME_PROP_FROM);
+            deleteSubmodelElement(coll, c.getName(), NAME_PROP_FROM_RESOURCE);
         }
         return coll;
     }
@@ -677,6 +686,66 @@ public class ServicesAas implements AasContributor {
         addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
         addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
         connectionBuilder.build();
+    }
+
+    /**
+     * Removes a specific device.
+     * 
+     * @param deviceId the device id
+     * @see #removeDevice(Submodel, String)
+     */
+    public static void removeDevice(String deviceId) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            removeDevice(sub, deviceId);
+        });
+    }
+
+    /**
+     * Removes a specific device from {@code sub}.
+     * 
+     * @param sub the submodel to delete from
+     * @param deviceId the device id
+     */
+    public static void removeDevice(Submodel sub, String deviceId) {
+        String aasDeviceId = fixId(deviceId);
+
+        Predicate<SubmodelElementCollection> pred = ActiveAasBase.createPropertyPredicate(NAME_PROP_RESOURCE, 
+            aasDeviceId, "While deleting resource " + deviceId);
+        SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_ARTIFACTS);
+        ActiveAasBase.clearCollection(coll, pred);
+        coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+        ActiveAasBase.clearCollection(coll, pred);
+        coll = sub.getSubmodelElementCollection(NAME_COLL_RELATIONS);
+        clearRelations(coll, aasDeviceId, deviceId);
+    }
+
+    /**
+     * Clears a relations collection from elements with the given resource property and value {@code aasDeviceId}.
+     * 
+     * @param coll the collection to be cleared
+     * @param aasDeviceId the AAS device id
+     * @param deviceId the readable device ID
+     */
+    private static void clearRelations(SubmodelElementCollection coll, String aasDeviceId, String deviceId) {
+        if (null != coll) {
+            for (SubmodelElement e: coll.elements()) {
+                if (e instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection ec = (SubmodelElementCollection) e;
+                    try {
+                        if (aasDeviceId.equals(ec.getProperty(NAME_PROP_FROM_RESOURCE).getValue())) {
+                            ec.deleteElement(NAME_PROP_FROM_RESOURCE);
+                            ec.deleteElement(NAME_PROP_FROM);
+                        } else if (aasDeviceId.equals(ec.getProperty(NAME_PROP_TO_RESOURCE).getValue())) {
+                            ec.deleteElement(NAME_PROP_TO_RESOURCE);
+                            ec.deleteElement(NAME_PROP_TO);
+                        }
+                    } catch (ExecutionException ex) {
+                        LoggerFactory.getLogger(ServicesAas.class).error("While deleting device {}: {} ", 
+                            deviceId, ex.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     /**
