@@ -361,13 +361,17 @@ public class EcsAas implements AasContributor {
      * Removes a specific device.
      * 
      * @param deviceId the device id
+     * @param marker optional marker consumer when we start to remove the device entry, may be <b>null</b>
      * @param piggyback optional piggyback to be executed on the same submodel, may be <b>null</b>
      */
-    public static void removeDevice(String deviceId, Consumer<Submodel> piggyback) {
+    public static void removeDevice(String deviceId, Consumer<Submodel> marker, Consumer<Submodel> piggyback) {
         String aasDeviceId = fixId(deviceId);
         ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             ContainerManager mgr = EcsFactory.getContainerManager();
             if (null != mgr) {
+                if (null != marker) {
+                    marker.accept(sub);
+                }
                 SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
                 ActiveAasBase.clearCollection(coll, ActiveAasBase.createPropertyPredicate(NAME_PROP_RESOURCE, 
                     aasDeviceId, "While deleting resource " + deviceId));
