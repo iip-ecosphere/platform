@@ -20,7 +20,7 @@ package de.iip_ecosphere.platform.transport.status;
 public enum ActionTypes implements ActionType {
     
     /**
-     * Component was added and occured.
+     * Component was added and occurred.
      */
     ADDED,
 
@@ -32,6 +32,11 @@ public enum ActionTypes implements ActionType {
     /**
      * Component was removed and disappeared.
      */
-    REMOVED
+    REMOVED,
+    
+    /**
+     * Something is being processed.
+     */
+    PROCESS
 
 }
