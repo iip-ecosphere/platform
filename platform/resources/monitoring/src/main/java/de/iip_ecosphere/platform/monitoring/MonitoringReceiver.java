@@ -72,7 +72,7 @@ public abstract class MonitoringReceiver {
                     String id = obj.getString("id");
                     notifyMeterReception(stream, id, obj);
                     if (null != id) {
-                        obtainExporter(id).addMeters(obj.getJsonObject("meters"));
+                        obtainExporter(id).addMeters(id, obj.getJsonObject("meters"));
                     }
                 } catch (JsonParsingException e) {
                     LoggerFactory.getLogger(MonitoringReceiver.class).error("Cannot parse JSON: " 
@@ -221,11 +221,13 @@ public abstract class MonitoringReceiver {
         /**
          * Adds a set of received meters.
          * 
+         * @param deviceId the id of the message (deviceId)
          * @param mtrs the meters
          */
-        protected void addMeters(JsonObject mtrs) {
+        protected void addMeters(String deviceId, JsonObject mtrs) {
             for (Map.Entry<String, JsonValue> e : mtrs.entrySet()) {
-                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString());
+                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), 
+                    "device:" + deviceId); // we are a bridge, let's add the deviceId
                 addMeter(meter);
                 notifyMeterAdded(meter);
             }
