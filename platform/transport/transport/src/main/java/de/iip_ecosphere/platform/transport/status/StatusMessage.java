@@ -35,6 +35,7 @@ public class StatusMessage {
     private String[] aliasIds;
     private String deviceId;
     private int progress = -1;
+    private String description = "";
 
     /**
      * Creates an empty status message. [deserialization]
@@ -175,7 +176,7 @@ public class StatusMessage {
     }
     
     /**
-     * Defines the progress.
+     * Defines the progress for {@link ActionTypes#PROCESS}.
      * 
      * @param progress the progress in [0;100]; if 100 longer running process is assumed to be completed
      * @return <b>this</b>
@@ -186,13 +187,33 @@ public class StatusMessage {
     }
     
     /**
-     * Returns the progress.
+     * Returns the progress for {@link ActionTypes#PROCESS}.
      * 
      * @return the progress in percent: if negative, no progress will be reported. If positive, further messages shall 
      * follow until 100.
      */
     public int getProgress() {
         return progress;
+    }
+
+    /**
+     * Sets the description for {@link #getProgress()}, {@link ActionTypes#PROCESS}.
+     * 
+     * @param description the description, may be <b>null</b> or ""
+     * @return <b>this</b>
+     */
+    public StatusMessage withDescription(String description) {
+        this.description = null == description ? "" : description;
+        return this;
+    }
+    
+    /**
+     * Returns the description, {@link ActionTypes#PROCESS}.
+     * 
+     * @return the description, may be empty but not <b>null</b>
+     */
+    public String getDescription() {
+        return description;
     }
 
 }
