@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
@@ -348,6 +350,34 @@ public class EcsAas implements AasContributor {
                     coll.deleteElement(fixId(desc.getId()));
                 }
                 SubmodelElement elt = sub.getSubmodelElement(fixId(Id.getDeviceIdAas()));
+                if (null != elt) {
+                    sub.delete(elt);
+                }
+            }
+        });
+    }
+
+    /**
+     * Removes a specific device.
+     * 
+     * @param deviceId the device id
+     * @param piggyback optional piggyback to be executed on the same submodel, may be <b>null</b>
+     */
+    public static void removeDevice(String deviceId, Consumer<Submodel> piggyback) {
+        String aasDeviceId = fixId(deviceId);
+        ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            ContainerManager mgr = EcsFactory.getContainerManager();
+            if (null != mgr) {
+                SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
+                ActiveAasBase.clearCollection(coll, ActiveAasBase.createPropertyPredicate(NAME_PROP_RESOURCE, 
+                    aasDeviceId, "While deleting resource " + deviceId));
+                if (null != piggyback) {
+                    piggyback.accept(sub);
+                }
+                for (ContainerDescriptor desc : mgr.getContainers()) {
+                    coll.deleteElement(fixId(desc.getId()));
+                }
+                SubmodelElement elt = sub.getSubmodelElement(aasDeviceId);
                 if (null != elt) {
                     sub.delete(elt);
                 }
