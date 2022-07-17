@@ -95,6 +95,11 @@ public class FakeProperty extends FakeElement implements Property {
         public Property build() {
             return parent.register(instance);
         }
+
+        @Override
+        public Object getValue() throws ExecutionException {
+            return instance.getValue();
+        }
         
     }
     

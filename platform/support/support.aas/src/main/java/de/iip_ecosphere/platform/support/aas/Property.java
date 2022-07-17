@@ -66,6 +66,14 @@ public interface Property extends Element, DataElement {
         public PropertyBuilder setValue(Object value);
         
         /**
+         * Returns the value of the property.
+         * 
+         * @return the value, may be <b>null</b> if not present
+         * @throws ExecutionException if obtaining the property value fails
+         */
+        public Object getValue() throws ExecutionException;
+        
+        /**
          * Sets the actual type and value. [convenience]
          * 
          * @param type the type
