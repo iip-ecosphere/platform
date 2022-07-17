@@ -129,6 +129,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             return parentBuilder.register(instance);
         }
 
+        @Override
+        public Object getValue() throws ExecutionException {
+            return property.getValue();
+        }
+
     }
     
     /**
