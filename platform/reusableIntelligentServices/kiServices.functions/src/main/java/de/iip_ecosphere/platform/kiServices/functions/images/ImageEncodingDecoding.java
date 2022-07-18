@@ -2,6 +2,7 @@ package de.iip_ecosphere.platform.kiServices.functions.images;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,6 +29,53 @@ public class ImageEncodingDecoding {
         ByteArrayInputStream byteInput = new ByteArrayInputStream(bytes);
         image = ImageIO.read(byteInput);
         byteInput.close();
+        return image;
+    }
+    
+    /**
+     * Utility function to turn a buffered image into a base64 encoded byte string for transportation.
+     * @param bimage the buffered image to convert
+     * @return the image in string form
+     */
+    public static String bufferedImageToBase64String(BufferedImage bimage) {
+        String image = "";
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(bimage, "jpg", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] array = baos.toByteArray();
+        image = Base64.getEncoder().encodeToString(array);
+        return image;
+    }
+    
+    /**
+     * Utility to read an BufferedImage from a base64 file.
+     * @param inPath the location of the file.
+     * @return the BufferedImage.
+     * @throws IOException If the file cannot be found or the content does not match.
+     */
+    public static BufferedImage readBase64FileAsBufferedImage(String inPath) throws IOException {
+        BufferedImage image = null;
+        String imageString = readBase64ImageFromBase64File(inPath);
+        image = base64StringToBufferdImage(imageString);
+        
+        return image;
+    }
+    
+    /**
+     * Utility to read an BufferedImage from an image file. Using ImageIO.
+     * @param inPath the location of the File.
+     * @return the read Image.
+     * @throws IOException If the file cannot be found or cannot be read properly.
+     */
+    public static BufferedImage readBufferedImageFromFile(String inPath) throws IOException {
+        BufferedImage image = null;
+        
+        image = ImageIO.read(new File(inPath));
+        
         return image;
     }
     
