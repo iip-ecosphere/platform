@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.Assert;
+
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
 import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
 /**
@@ -32,9 +34,11 @@ public class ImageEncodingDecodingTests {
         try {
             //unsure about the assertion to make
             imageString  = ImageEncodingDecoding.readImageAsBase64String(imagePath);
-          //As validation that it worked, as it would break otherwise
-            image = ImageEncodingDecoding.base64StringToBufferdImage(imageString); 
-            ImageIO.write(image, ".jpg", new File(TEST_FILE_OUT_PATH));
+            //As validation that it worked, as it would break otherwise
+            image = ImageEncodingDecoding.base64StringToBufferdImage(imageString);
+            System.out.println(image == null);
+            boolean written = ImageIO.write(image, "jpg", new File(TEST_FILE_OUT_PATH));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,9 +53,47 @@ public class ImageEncodingDecodingTests {
         BufferedImage image = null;
         try {
             image = ImageEncodingDecoding.base64StringToBufferdImage(base64Image);
+            System.out.println("early : " + (image == null));
         } catch (IOException e) {
             e.printStackTrace();
         }
         return image;
+    }
+    /**
+     * Testing main method.
+     * @param args args.
+     */
+    public static void main(String[] args) {
+        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
+        File control = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
+        if (control.exists()) {
+            control.delete();
+        }
+        BufferedImage image = null;
+        try {
+            image = ImageEncodingDecodingTests
+                    .testBase64StringToBufferedImage(
+                            ImageEncodingDecoding.readBase64ImageFromBase64File(QRCodeServiceTest.TEST_FILE_PATH));
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        System.out.println("image "  + (image == null));
+        
+        try {
+            boolean written = ImageIO.write(image, "jpg", new File(TEST_FILE_OUT_PATH));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+//        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
+//        File controlF = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
+//        if (controlF.exists()) {
+//            //controlF.delete();       //cleanup to not clutter the test enviroment.
+//        }
+//        //nothing to assert, error if complete fail, warning through exception.
+//        BufferedImage image2 = ImageEncodingDecodingTests
+//                .testBase64StringToBufferedImage(ImageEncodingDecodingTests.TEST_FILE_PATH);
     }
 }
