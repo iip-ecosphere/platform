@@ -16,7 +16,11 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 
+import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
+import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.basics.progress.BasicProgressObserver;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -33,6 +37,67 @@ public class ConfigurationManager {
     private static Logger logger;
     private static EasyExecutor executor;
     private static boolean initialized = false;
+    private static BasicProgressObserver observer = new BasicProgressObserver();
+
+    /**
+     * Bridges between EASy progress monitoring and IIP progress notifications.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class IipProgressMonitor implements BasicProgressObserver.IProgressMonitor {
+
+        private String taskName;
+        private int maxSteps;
+        private int steps;
+        private String subTask;
+        
+        @Override
+        public void setTaskName(String name) {
+            // ignore
+        }
+
+        /**
+         * Sends the status via transport.
+         */
+        private void sendStatus() {
+            String[] alias;
+            if (null != subTask) {
+                alias = new String[] {taskName, subTask};
+            } else {
+                alias = new String[] {taskName};
+            }
+            Transport.sendStatus(
+                new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
+                    .withProgress(steps / maxSteps));
+        }
+        
+        @Override
+        public void beginTask(String name, int max) {
+            this.taskName = name;
+            this.subTask = null;
+            this.maxSteps = max;
+            this.steps = 0;
+            sendStatus();
+        }
+
+        @Override
+        public void worked(int step) {
+            this.steps = step;
+            sendStatus();
+        }
+
+        @Override
+        public void subTask(String name) {
+            this.subTask = name;
+            sendStatus();
+        }
+
+    }
+    
+    static {
+        observer = new BasicProgressObserver();
+        observer.register(new IipProgressMonitor());
+    }
     
     /**
      * Defines the executor instance. Called from {@link ConfigurationLifecycleDescriptor}.
@@ -43,6 +108,8 @@ public class ConfigurationManager {
         executor = instance;
         if (null == instance) {
             initialized = false;
+        } else {
+            executor.setProgressObserver(observer);
         }
     }
     
