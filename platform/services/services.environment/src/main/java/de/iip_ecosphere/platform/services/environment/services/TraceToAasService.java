@@ -14,17 +14,11 @@ package de.iip_ecosphere.platform.services.environment.services;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
@@ -34,26 +28,18 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter.TypeConverter;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
-import de.iip_ecosphere.platform.transport.Transport;
-import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
@@ -80,46 +66,10 @@ public class TraceToAasService extends AbstractService {
     public static final String PROPERTY_PAYLOAD_TYPE = "PayloadType";
     public static final String PROPERTY_PAYLOAD = "Payload";
 
-    public static final ValueConverter IDENTITY_CONVERTER = v -> v;
-    public static final ValueConverter JSON_CONVERTER = v -> JsonUtils.toJson(v);
-    public static final ValueConverter SHORT2INT_CONVERTER = v -> Integer.valueOf((Short) v);
-    
-    private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = new HashMap<>();
-    private static final String PREFIX_GETTER = "get";
-    private static final Set<String> METHODS_TO_IGNORE = new HashSet<>();
-
-    private Map<Class<?>, TypeConverter> converters = new HashMap<>();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
-    private long timeout = 20 * 60 * 1000; // cleanup after 1 hour
-    private long lastCleanup = System.currentTimeMillis();
-    private long cleanupTimeout = 5 * 1000;
-    private TraceRecordReceptionCallback callback;
-    
-    static {
-        DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Boolean.TYPE, new TypeConverter(Type.BOOLEAN, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Boolean.class, new TypeConverter(Type.BOOLEAN, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Integer.TYPE, new TypeConverter(Type.INTEGER, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Integer.class, new TypeConverter(Type.INTEGER, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Long.TYPE, new TypeConverter(Type.INTEGER, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Long.class, new TypeConverter(Type.INTEGER, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Float.TYPE, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Float.class, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Double.TYPE, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Double.class, new TypeConverter(Type.DOUBLE, IDENTITY_CONVERTER));
-        DEFAULT_CONVERTERS.put(Short.TYPE, new TypeConverter(Type.INTEGER, SHORT2INT_CONVERTER));
-        DEFAULT_CONVERTERS.put(Short.class, new TypeConverter(Type.INTEGER, SHORT2INT_CONVERTER));
-        DEFAULT_CONVERTERS.put(int[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        DEFAULT_CONVERTERS.put(long[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        DEFAULT_CONVERTERS.put(float[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        DEFAULT_CONVERTERS.put(double[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        DEFAULT_CONVERTERS.put(byte[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        DEFAULT_CONVERTERS.put(boolean[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
-        
-        METHODS_TO_IGNORE.add("getClass");
-    }
+    private Converter converter = new Converter();
 
     /**
      * Creates a service instance.
@@ -129,11 +79,10 @@ public class TraceToAasService extends AbstractService {
      */
     public TraceToAasService(ApplicationSetup app, YamlService yaml) {
         super(yaml);
-        this.converters.putAll(DEFAULT_CONVERTERS);
         this.appSetup = new ApplicationSetup(app); // prevent later changes in app
         // parameter must be declared in this form in model!
         addParameterConfigurer(new ParameterConfigurer<>(
-            "timeout", Long.class, TypeTranslators.LONG, t -> timeout = t));
+            "timeout", Long.class, TypeTranslators.LONG, t -> converter.setTimeout(t)));
     }
     
     /**
@@ -194,7 +143,7 @@ public class TraceToAasService extends AbstractService {
      * @param timeout the timeout in ms
      */
     protected void setTimeout(long timeout) {
-        this.timeout = timeout;
+        converter.setTimeout(timeout);
     }
     
     /**
@@ -225,7 +174,7 @@ public class TraceToAasService extends AbstractService {
      * @param converter the converter instance
      */
     protected void addConverter(Class<?> cls, TypeConverter converter) {
-        converters.put(cls, converter);
+        this.converter.addConverter(cls, converter);
     }
     
     /**
@@ -247,123 +196,6 @@ public class TraceToAasService extends AbstractService {
     }
     
     /**
-     * Encapsulates a Java-to-AAS type converter.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class TypeConverter implements ValueConverter {
-        
-        private ValueConverter conv;
-        private Type type;
-        
-        /**
-         * Creates the converter instance.
-         * 
-         * @param type the AAS type
-         * @param conv the value converter
-         */
-        private TypeConverter(Type type, ValueConverter conv) {
-            this.type = type;
-            this.conv = conv;
-        }
-        
-        @Override
-        public Object convert(Object value) {
-            return conv.convert(value);
-        }
-        
-        /**
-         * Returns the AAS type.
-         * 
-         * @return the AAS type
-         */
-        public Type getType() {
-            return type;
-        }
-        
-    }
-
-    /**
-     * Converts a Java value to an AAS value.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private interface ValueConverter {
-
-        /**
-         * Performs the conversion.
-         * 
-         * @param value the value to convert
-         * @return the converted value
-         */
-        Object convert(Object value);
-        
-    }
-    
-    /**
-     * Handles a new trace record and cleans up outdated ones. [protected for mocking]
-     * 
-     * @param data the trace record data
-     */
-    protected void handleNew(TraceRecord data) {
-        // add new record
-        try {
-            Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
-            SubmodelBuilder smBuilder = aas.createSubmodelBuilder(SUBMODEL_TRACES, null);
-
-            SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                AasUtils.fixId(data.getSource() + "_" + data.getTimestamp()), true, true);
-            smcBuilder.createPropertyBuilder(PROPERTY_SOURCE)
-                .setValue(Type.STRING, data.getSource())
-                .build();
-            smcBuilder.createPropertyBuilder(PROPERTY_ACTION)
-                .setValue(Type.STRING, data.getAction())
-                .build();
-            smcBuilder.createPropertyBuilder(PROPERTY_TIMESTAMP)
-                .setValue(Type.INTEGER, data.getTimestamp())
-                .build();
-            if (null != data.getPayload()) {
-                Class<?> cls = data.getPayload().getClass();
-                smcBuilder.createPropertyBuilder(PROPERTY_PAYLOAD_TYPE)
-                    .setValue(Type.STRING, mapPayloadType(cls))
-                    .build();
-                SubmodelElementCollectionBuilder payloadBuilder = smcBuilder
-                    .createSubmodelElementCollectionBuilder(PROPERTY_PAYLOAD, false, false);
-                for (Method m : cls.getMethods()) {
-                    if (isGetter(m)) {
-                        String field = m.getName().substring(PREFIX_GETTER.length());
-                        TypeConverter tConv = converters.get(m.getReturnType());
-                        if (null != tConv) {
-                            try {
-                                payloadBuilder.createPropertyBuilder(AasUtils.fixId(field))
-                                    .setValue(tConv.getType(), tConv.convert(m.invoke(data.getPayload())))
-                                    .build();
-                            } catch (SecurityException | InvocationTargetException | IllegalAccessException e) {
-                                LoggerFactory.getLogger(getClass()).error(
-                                    "Cannot map value of operation {}/field {} to AAS: {}", 
-                                    m.getName(), field, e.getMessage());
-                            }
-                        } else {
-                            if (!METHODS_TO_IGNORE.contains(m.getName())) {
-                                LoggerFactory.getLogger(getClass()).warn(
-                                    "Cannot map value of operation {}/field {} to AAS: No converter is defined", 
-                                    m.getName(), field);
-                            }
-                        }
-                    }
-                }
-                payloadBuilder.build();
-            }
-            smcBuilder.build();
-            smBuilder.build();
-            cleanup(aas);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error(
-                "Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
-        }
-    }
-    
-    /**
      * Allows for application specific payload type names.
      * 
      * @param cls the type
@@ -373,106 +205,11 @@ public class TraceToAasService extends AbstractService {
         return cls.getName();
     }
     
-    /**
-     * Returns whether {@code method} is an usual getter.
-     * 
-     * @param method the method to analyze
-     * @return {@code true} for getter, {@code false} else
-     */
-    private static boolean isGetter(Method method) {
-        int modifier = method.getModifiers();
-        boolean pubNonStatic = Modifier.isPublic(modifier) && !Modifier.isStatic(modifier);
-        return method.getName().startsWith(PREFIX_GETTER) && method.getParameterCount() == 0 && pubNonStatic; 
-    }
-    
-    /**
-     * Cleans up outdated trace entries. [protected for mocking]
-     * 
-     * @param aas the AAS to clean up
-     */
-    protected void cleanup(Aas aas) {
-        // remove outdated ones
-        long now = System.currentTimeMillis();
-        if (now - lastCleanup > cleanupTimeout) {
-            long timestamp = now - timeout;
-            Submodel sm = aas.getSubmodel(SUBMODEL_TRACES);
-            List<SubmodelElement> delete = new ArrayList<>();
-            for (SubmodelElement elt : sm.submodelElements()) {
-                if (elt instanceof SubmodelElementCollection) {
-                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                    Property prop = coll.getProperty(PROPERTY_TIMESTAMP);
-                    if (null != prop) {
-                        try {
-                            Object val = prop.getValue();
-                            boolean del = false;
-                            if (val instanceof Integer) {
-                                del = ((Integer) val) < timestamp;
-                            } else if (val instanceof Long) {
-                                del = ((Long) val) < timestamp;
-                            }
-                            if (del) {
-                                delete.add(elt);
-                            }
-                        } catch (ExecutionException e) {
-                            
-                        }
-                    }
-                }
-            }
-            for (SubmodelElement elt : delete) {
-                sm.delete(elt);
-            }
-            lastCleanup = now;
-        }
-    }
-
-    /**
-     * A trace reception callback calling {@link TraceToAasService#handleNew(TraceRecord) TraceToAas} in own threads.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private class TraceRecordReceptionCallback implements ReceptionCallback<TraceRecord> {
-        
-        @Override
-        public void received(TraceRecord data) {
-            new Thread(() -> handleNew(data)).start(); // thread pool?
-        }
-
-        @Override
-        public Class<TraceRecord> getType() {
-            return TraceRecord.class;
-        }
-        
-    }
-    
     @Override
     protected ServiceState start() throws ExecutionException {
-        ServiceState result;
-        try {
-            AasFactory factory = AasFactory.getInstance();
-            AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-            SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
-            PlatformAas.addSoftwareInfo(smBuilder, appSetup);
-            smBuilder.build();
-            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
-            augmentCommandsSubmodel(smBuilder);
-            smBuilder.build();                
-            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
-            augmentServicesSubmodel(smBuilder);
-            smBuilder.build();
-            aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null).build();
-            List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
-            AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
-            callback = new TraceRecordReceptionCallback();
-            TransportConnector conn = Transport.createConnector();
-            if (null != conn) {
-                conn.setReceptionCallback(TraceRecord.TRACE_STREAM, callback);
-            } else {
-                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
-            }
-            result = super.start();
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
+        boolean ok = converter.start();
+        ServiceState result = super.start();
+        if (!ok) {
             result = ServiceState.FAILED;
         }
         return result;
@@ -481,25 +218,10 @@ public class TraceToAasService extends AbstractService {
     @Override
     protected ServiceState stop() {
         ServiceState result = super.stop();
-        try {
-            TransportConnector conn = Transport.getConnector();
-            if (null != conn) {
-                conn.detachReceptionCallback(TraceRecord.TRACE_STREAM, callback);
-            }
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
-        }
-        try {
-            // unclear how to get rid of AAS itself
-            Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
-            aas.delete(aas.getSubmodel(SUBMODEL_TRACES));
-            aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
-            aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
-        } catch (IOException e ) {
-            LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
+        if (!converter.stop()) {
             result = ServiceState.FAILED;
         }
-        return result; // default, just go for from stopping to stopped
+        return result;
     }
     
     /**
@@ -550,6 +272,106 @@ public class TraceToAasService extends AbstractService {
     @Override
     public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
         return paramConfigurers.get(paramName);
+    }
+    
+    /**
+     * A configured transport to AAS converter for {@link TraceRecord}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected class Converter extends TransportToAasConverter<TraceRecord> {
+
+        /**
+         * Creates a configured converter instance.
+         */
+        public Converter() {
+            super(SUBMODEL_TRACES, TraceRecord.TRACE_STREAM, TraceRecord.class);
+        }
+
+        @Override
+        public String getAasId() {
+            return TraceToAasService.this.getAasId();
+        }
+
+        @Override
+        public String getAasUrn() {
+            return TraceToAasService.this.getAasUrn();
+        }
+
+        @Override
+        protected Function<TraceRecord, String> getSubmodelElementIdFunction() {
+            return data -> AasUtils.fixId(data.getSource() + "_" + data.getTimestamp());
+        }
+
+        @Override
+        public CleanupPredicate getCleanupPredicate() {
+            return (coll, timestamp) -> {
+                boolean del = false;
+                Property prop = coll.getProperty(PROPERTY_TIMESTAMP);
+                if (null != prop) {
+                    try {
+                        Object val = prop.getValue();
+                        if (val instanceof Integer) {
+                            del = ((Integer) val) < timestamp;
+                        } else if (val instanceof Long) {
+                            del = ((Long) val) < timestamp;
+                        }
+                    } catch (ExecutionException e) {
+                    }
+                }
+                return del;
+            };
+        }
+        
+        @Override
+        protected boolean buildUpAas(AasBuilder aasBuilder) {
+            SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
+            PlatformAas.addSoftwareInfo(smBuilder, appSetup);
+            smBuilder.build();
+            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
+            augmentCommandsSubmodel(smBuilder);
+            smBuilder.build();                
+            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+            augmentServicesSubmodel(smBuilder);
+            smBuilder.build();
+            return true;
+        }
+        
+        @Override
+        protected boolean cleanUpAas(Aas aas) {
+            aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
+            aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
+            return true;
+        }
+        
+        @Override
+        protected void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder, 
+            TraceRecord data) {
+            smcBuilder.createPropertyBuilder(PROPERTY_SOURCE)
+                .setValue(Type.STRING, data.getSource())
+                .build();
+            smcBuilder.createPropertyBuilder(PROPERTY_ACTION)
+                .setValue(Type.STRING, data.getAction())
+                .build();
+            smcBuilder.createPropertyBuilder(PROPERTY_TIMESTAMP)
+                .setValue(Type.INTEGER, data.getTimestamp())
+                .build();
+            if (null != data.getPayload()) {
+                Class<?> cls = data.getPayload().getClass();
+                smcBuilder.createPropertyBuilder(PROPERTY_PAYLOAD_TYPE)
+                    .setValue(Type.STRING, mapPayloadType(cls))
+                    .build();
+                SubmodelElementCollectionBuilder payloadBuilder = smcBuilder
+                    .createSubmodelElementCollectionBuilder(PROPERTY_PAYLOAD, false, false);
+                createPayloadEntries(payloadBuilder, data.getPayload());
+            }
+        }
+        
+        @Override
+        protected String mapPayloadType(Class<?> cls) {
+            return TraceToAasService.this.mapPayloadType(cls);
+        }        
+        
     }
 
 }
