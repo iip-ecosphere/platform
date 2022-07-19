@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import javax.json.Json;
 import javax.json.JsonObject;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
@@ -37,7 +39,7 @@ import de.iip_ecosphere.platform.transport.streams.StreamNames;
  */
 public class HeartbeatWatcher {
 
-    private long timeout = 2000; // ms
+    private long timeout = 4000; // ms
     private Map<String, Long> received = Collections.synchronizedMap(new HashMap<String, Long>());
     private ReceptionCallback<?> metricsCallback;
     private ReceptionCallback<?> statusCallback;
@@ -107,6 +109,8 @@ public class HeartbeatWatcher {
         connector.setReceptionCallback(StreamNames.SERVICE_METRICS, metricsCallback);
         connector.setReceptionCallback(StreamNames.RESOURCE_METRICS, metricsCallback);
         connector.setReceptionCallback(StreamNames.STATUS_STREAM, statusCallback);
+        LoggerFactory.getLogger(HeartbeatWatcher.class).info("Installed watcher on {}, {} and {}", 
+            StreamNames.SERVICE_METRICS, StreamNames.RESOURCE_METRICS, StreamNames.STATUS_STREAM);
     }
     
     /**
@@ -123,9 +127,13 @@ public class HeartbeatWatcher {
         if (null != metricsCallback) {
             connector.detachReceptionCallback(StreamNames.SERVICE_METRICS, metricsCallback);
             connector.detachReceptionCallback(StreamNames.RESOURCE_METRICS, metricsCallback);
+            LoggerFactory.getLogger(HeartbeatWatcher.class).info("Uninstalled watcher from {} and {}", 
+                StreamNames.SERVICE_METRICS, StreamNames.RESOURCE_METRICS);
         }
         if (null != statusCallback) {
             connector.detachReceptionCallback(StreamNames.STATUS_STREAM, statusCallback);
+            LoggerFactory.getLogger(HeartbeatWatcher.class).info("Uninstalled watcher from {}", 
+                StreamNames.STATUS_STREAM);
         }
         metricsCallback = null;
         statusCallback = null;

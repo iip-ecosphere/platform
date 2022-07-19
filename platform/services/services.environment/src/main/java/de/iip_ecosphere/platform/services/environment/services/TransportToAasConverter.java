@@ -43,7 +43,6 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 /**
  * Implements a generic converter from transport stream entries to AAS.
@@ -349,7 +348,7 @@ public abstract class TransportToAasConverter<T> {
     public abstract CleanupPredicate getCleanupPredicate();
 
     /**
-     * A trace reception callback calling {@link TransportToAasConverter#handleNew(TraceRecord) TraceToAas} 
+     * A trace reception callback calling {@link TransportToAasConverter#handleNew(Object)} 
      * in own threads.
      * 
      * @author Holger Eichelberger, SSE

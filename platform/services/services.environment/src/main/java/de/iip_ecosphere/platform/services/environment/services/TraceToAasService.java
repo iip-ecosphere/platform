@@ -69,7 +69,7 @@ public class TraceToAasService extends AbstractService {
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
-    private Converter converter = new Converter();
+    private Converter converter = createConverter();
 
     /**
      * Creates a service instance.
@@ -136,7 +136,16 @@ public class TraceToAasService extends AbstractService {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
     }
-    
+
+    /**
+     * Creates the actual converter instance.
+     * 
+     * @return the converter
+     */
+    protected Converter createConverter() {
+        return new Converter();
+    }
+
     /**
      * Changes the timeout until trace events are deleted.
      * 
