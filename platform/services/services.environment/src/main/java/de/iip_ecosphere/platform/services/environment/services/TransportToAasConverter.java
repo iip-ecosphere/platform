@@ -113,8 +113,17 @@ public abstract class TransportToAasConverter<T> {
      * 
      * @param timeout the timeout in ms
      */
-    protected void setTimeout(long timeout) {
+    public void setTimeout(long timeout) {
         this.timeout = timeout;
+    }
+    
+    /**
+     * Returns the timeout.
+     * 
+     * @return the timeout
+     */
+    public long getTimeout() { 
+        return timeout;
     }
     
     /**
