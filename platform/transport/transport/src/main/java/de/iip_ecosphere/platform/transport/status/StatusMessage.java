@@ -36,6 +36,7 @@ public class StatusMessage {
     private String deviceId;
     private int progress = -1;
     private String description = "";
+    private String subDescription = "";
 
     /**
      * Creates an empty status message. [deserialization]
@@ -214,6 +215,26 @@ public class StatusMessage {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Sets the sub(-task) description for {@link #getProgress()}, {@link ActionTypes#PROCESS}.
+     * 
+     * @param subDescription the sub(-task) description, may be <b>null</b> or ""
+     * @return <b>this</b>
+     */
+    public StatusMessage withSubDescription(String subDescription) {
+        this.subDescription = null == subDescription ? "" : subDescription;
+        return this;
+    }
+    
+    /**
+     * Returns the sub(-task) description, {@link ActionTypes#PROCESS}.
+     * 
+     * @return the sub(-task) description, may be empty but not <b>null</b>
+     */
+    public String getSubDescription() {
+        return subDescription;
     }
 
 }

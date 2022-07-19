@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.ActionType;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.Alert;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -149,6 +150,35 @@ public class Transport {
         if (null == traceFilter || traceFilter.test(record)) {
             send(c -> record.send(c), "trace"); 
         }
+    }
+    
+    /**
+     * Sends information about a processing status.
+     * 
+     * @param componentId the component id
+     * @param step the step [0; max]
+     * @param max the maximum step
+     * @param description the description of the task
+     */
+    public static void sendProcessStatus(String componentId, int step, int max, String description) {
+        sendProcessStatus(componentId, step, max, description, null);
+    }
+
+    /**
+     * Sends information about a processing status.
+     * 
+     * @param componentId the component id
+     * @param step the step [0; max]
+     * @param max the maximum step
+     * @param description the description of the task
+     * @param subDescription the description of an optional sub-task within the actual task, may be <b>null</b> or empty
+     */
+    public static void sendProcessStatus(String componentId, int step, int max, String description, 
+        String subDescription) {
+        StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, componentId, Id.getDeviceId())
+            .withDescription(description)
+            .withSubDescription(subDescription);
+        send(c -> msg.send(c), "progress status");
     }
 
     /**
