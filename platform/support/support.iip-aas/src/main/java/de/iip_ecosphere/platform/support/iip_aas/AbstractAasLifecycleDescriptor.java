@@ -52,6 +52,15 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         this.setupSupplier = setupSupplier;
     }
     
+    /**
+     * Returns the AAS setup via the passed in setup supplier.
+     * 
+     * @return the actual AAS setup
+     */
+    public AasSetup getAasSetup() {
+        return setupSupplier.get();
+    }
+    
     @Override
     public void startup(String[] args) {
         int port = CmdLine.getIntArg(args, PARAM_IIP_PORT, -1);
@@ -60,7 +69,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             LoggerFactory.getLogger(getClass()).info("Using port " + port + " for the AAS implementation server.");
         }
         if (AasFactory.isFullInstance()) {
-            AasSetup setup = setupSupplier.get();
+            AasSetup setup = getAasSetup();
             AasPartRegistry.setAasSetup(setup);
             AasPartRegistry.AasBuildResult res = AasPartRegistry.build(true); // true due to incremental deployment
             implServer = res.getProtocolServer();
