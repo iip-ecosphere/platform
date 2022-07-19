@@ -18,7 +18,7 @@ project Applications {
         NameplateInfo nameplateInfo;
         Boolean createContainer = false;
         Boolean debug = false;
-        setOf(String) cmdArg = {};
+        String cmdArg; // for now, comma separated
     }
     
     compound ServiceMesh {

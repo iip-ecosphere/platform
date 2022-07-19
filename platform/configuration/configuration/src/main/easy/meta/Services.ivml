@@ -19,7 +19,7 @@ project Services {
        // logging.level.root: INFO
        Boolean deleteFilesOnExit = true;
        Boolean deleteArtifacts = true;
-       Integer waitingTime = 30000;
+       Integer waitingTime = 120000;
        String brokerHost = "localhost";
        Integer brokerPort = 8883;
        Integer availabilityRetryDelay = 500;

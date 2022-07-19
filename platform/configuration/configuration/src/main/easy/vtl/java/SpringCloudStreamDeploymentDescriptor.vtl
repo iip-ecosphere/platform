@@ -15,26 +15,42 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
 
     def generateServices(sequenceOf(MeshElement) elements) {
         for (MeshElement elt: elements) {
-            '${generateService(elt, elt.impl)}'
+            '${generateService(elt, elt.impl, true)}'
         }
     }
     
-    def generateService(MeshElement elt, ServiceBase service) {
+    def generateService(MeshElement elt, ServiceBase service, Boolean topLevel) {
     }
 
-    def generateService(MeshElement elt, ServiceFamily family) {
+    def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel) {
+        '- id: ${family.id}
+          name: ${family.name}
+          description: ${family.description}
+          version: 0.0.1
+          kind: ${family.kind}
+          topLevel: ${topLevel}
+          cmdArg: 
+            - --iip.port=\\${port}
+            - --iip.protocol=\\${protocol}
+            ${generateAppOpt()|e}
+          relations:
+            - endpoint:
+                portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
+                hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+            ${generateRelations(elt)|e}'
         for (Service m : family.members) {
-            '${generateService(elt, m)}'
+            '${generateService(elt, m, false)}'
         }
     }
-    
-    def generateService(MeshElement elt, Service service) {
+
+    def generateService(MeshElement elt, Service service, Boolean topLevel) {
         '- id: ${service.id}
           name: ${service.name}
           version: ${service.ver}
           description: ${service.description}
           deployable: ${service.deployable}
           kind: ${service.kind}
+          topLevel: ${topLevel}
           cmdArg: 
             - --iip.port=\\${port}
             - --iip.protocol=\\${protocol}
@@ -48,7 +64,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           ${generateProcess(elt, service)|e}
           ${generateEnsemble(elt, service)|e}'
     }
-    
+        
     def generateEnsemble(MeshElement elt, Service service) {
        if (elt.ensemble <> null) {
            'ensemble: ${elt.ensemble.impl.id}'
@@ -135,8 +151,9 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     }
     
     def generateAppOpt() {
-        if (app.cmdArg.size() > 0) { // EASY-bug
-            for (String a: app.cmdArg) {
+        if (isDefined(app.cmdArg) and app.cmdArg.length() > 0) { // EASY-bug
+            sequenceOf(String) tmp = app.cmdArg.split(",");
+            for (String a: tmp) {
                 "- ${a}"
             }
         }
