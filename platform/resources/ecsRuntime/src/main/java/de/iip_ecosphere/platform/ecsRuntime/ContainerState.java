@@ -49,13 +49,13 @@ public enum ContainerState {
     
     /**
      * The container is not operating as it is about or in the process of being migrated. Next state may be 
-     * {@link #DEPLOYED}, {@link #FAILING} or {@link #STOPPING}. 
+     * {@link #DEPLOYED}, {@link #FAILED} or {@link #STOPPING}. 
      */
     MIGRATING,
     
     /**
      * The container is not operating as it is being updated with a more recent version. Next state may be 
-     * {@link #DEPLOYED}, {@link #FAILING} or {@link #STOPPING}. 
+     * {@link #DEPLOYED}, {@link #FAILED} or {@link #STOPPING}. 
      */
     UPDATING,
     
@@ -71,7 +71,7 @@ public enum ContainerState {
     STOPPED,
     
     /**
-     * The container is about to be removed from this resource. Next state may be {@link #UNKOWN}.
+     * The container is about to be removed from this resource. Next state may be {@link #UNKNOWN}.
      */
     UNDEPLOYING,
     
@@ -98,7 +98,7 @@ public enum ContainerState {
     }
     
     /**
-     * Adds a valid transition. Transitions to {@link #FAILED} or {@link #UNKOWN} are implicitly
+     * Adds a valid transition. Transitions to {@link #FAILED} or {@link #UNKNOWN} are implicitly
      * valid.
      * 
      * @param source the source state to transition from

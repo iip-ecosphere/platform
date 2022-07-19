@@ -63,6 +63,7 @@ public class DeviceManagement {
      *   platform ({@code true}) or is this just the startup registration ({@code false})
      * @return <b>null</b> if no operation was needed, an instance if a device registration/onboarding (trial) 
      *   was performed
+     * @throws ExecutionException if the operation cannot be performed
      */
     public static DeviceRegistrationResponse addDevice(boolean onboard) throws ExecutionException {
         DeviceRegistrationResponse result = null;
@@ -90,6 +91,7 @@ public class DeviceManagement {
      * 
      * @param offboard does this operation remove the device intentionally from the 
      *   platform ({@code true}) or is this just a shutdown unregistration ({@code false})
+     * @throws ExecutionException if the operation cannot be performed
      */
     public static void removeDevice(boolean offboard) throws ExecutionException {
         try {

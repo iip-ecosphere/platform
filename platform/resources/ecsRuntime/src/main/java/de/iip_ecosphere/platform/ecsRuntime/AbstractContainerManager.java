@@ -173,7 +173,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
      * Throws an execution exception for the given throwable.
      * @param action the actual action to log (may be <b>null</b> or empty)
      * @param th the throwable
-     * @throws ExecutionException
+     * @throws ExecutionException the constructed exception
      */
     protected void throwExecutionException(String action, Throwable th) throws ExecutionException {
         if (action != null && action.length() > 0) {
@@ -191,7 +191,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
      * Throws an execution exception for the given message.
      * @param action the actual action to log (may be <b>null</b> or empty)
      * @param message the message for the exception
-     * @throws ExecutionException
+     * @throws ExecutionException the constructed exception
      */
     protected void throwExecutionException(String action, String message) throws ExecutionException {
         if (action != null && action.length() > 0) {

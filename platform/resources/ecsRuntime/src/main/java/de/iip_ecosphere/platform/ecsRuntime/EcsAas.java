@@ -16,6 +16,7 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -367,24 +368,19 @@ public class EcsAas implements AasContributor {
     public static void removeDevice(String deviceId, Consumer<Submodel> marker, Consumer<Submodel> piggyback) {
         String aasDeviceId = fixId(deviceId);
         ActiveAasBase.processNotification(NAME_SUBMODEL, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
-            ContainerManager mgr = EcsFactory.getContainerManager();
-            if (null != mgr) {
-                if (null != marker) {
-                    marker.accept(sub);
-                }
-                SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
-                ActiveAasBase.clearCollection(coll, ActiveAasBase.createPropertyPredicate(NAME_PROP_RESOURCE, 
-                    aasDeviceId, "While deleting resource " + deviceId));
-                if (null != piggyback) {
-                    piggyback.accept(sub);
-                }
-                for (ContainerDescriptor desc : mgr.getContainers()) {
-                    coll.deleteElement(fixId(desc.getId()));
-                }
-                SubmodelElement elt = sub.getSubmodelElement(aasDeviceId);
-                if (null != elt) {
-                    sub.delete(elt);
-                }
+            if (null != marker) {
+                marker.accept(sub);
+            }
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
+            Predicate<SubmodelElementCollection> pred = ActiveAasBase.createPropertyPredicate(NAME_PROP_RESOURCE, 
+                aasDeviceId, "While deleting resource " + deviceId);
+            ActiveAasBase.clearCollection(coll, pred);
+            if (null != piggyback) {
+                piggyback.accept(sub);
+            }
+            SubmodelElement elt = sub.getSubmodelElement(aasDeviceId);
+            if (null != elt) {
+                sub.delete(elt);
             }
         });
     }

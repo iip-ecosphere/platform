@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -106,24 +107,26 @@ public class EcsSetup extends AasBasedSetup {
     }
 
     /**
-     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder of 
-     * the jar/classpath. This method shall be used by subclasses akin to {@link #readFromYaml()}. 
+     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME} in the root folder of 
+     * the jar/classpath. 
      *
      * @param <C> the specific type of configuration to read (extended from {@code Configuration}}
      * @param cls the class of configuration to read
      * @return the configuration instance
      * @see #readFromYaml(Class, String)
+     * @throws IOException if the setup cannot be read
      */
     public static <C extends EcsSetup> C readConfiguration(Class<C> cls) throws IOException {
         return readFromYaml(cls);
     }
     
     /**
-     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder of 
+     * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME} in the root folder of 
      * the jar/classpath. 
      *
      * @return the configuration instance
      * @see #readFromYaml(Class)
+     * @throws IOException if the setup cannot be read
      */
     public static EcsSetup readConfiguration() throws IOException {
         return readFromYaml(EcsSetup.class);

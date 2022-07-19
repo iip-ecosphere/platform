@@ -21,6 +21,7 @@ import java.net.URI;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
