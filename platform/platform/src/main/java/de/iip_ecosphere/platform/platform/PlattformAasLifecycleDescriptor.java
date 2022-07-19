@@ -80,7 +80,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         
         final long statusTimeout = PlatformSetup.getInstance().getAasStatusTimeout();
         statusConverter.setTimeout(statusTimeout); 
-        statusConverter.start(getAasSetup());
+        statusConverter.start(getAasSetup(), false);
         timer.schedule(new TimerTask() {
 
             @Override
