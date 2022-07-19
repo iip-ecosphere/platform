@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
@@ -58,6 +59,7 @@ import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 public class SpringCloudServiceManager 
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
+    private static final String PROGRESS_COMPONENT_ID = "Spring Cloud Service Manager";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private Predicate<TypedDataConnectorDescriptor> available = c -> true;
     
@@ -108,6 +110,7 @@ public class SpringCloudServiceManager
     @Override
     public String addArtifact(URI location) throws ExecutionException {
         LOGGER.info("Adding " + location);
+        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Adding artifact " + location);
         try {
             File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
             YamlArtifact yamlArtifact = null;
@@ -119,7 +122,9 @@ public class SpringCloudServiceManager
             }
             SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
                 yamlArtifact, location, jarFile);
-            return super.addArtifact(artifact.getId(), artifact);
+            String artifactId = super.addArtifact(artifact.getId(), artifact);
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, "Added artifact " + location + "  " + artifactId);
+            return artifactId;
         } catch (IOException e) {
             DescriptorUtils.throwExecutionException("Adding " + location, e);
             return null;
@@ -185,8 +190,10 @@ public class SpringCloudServiceManager
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
         // re-link binders if needed, i.e., subset shall be started locally; bindings "global", function local
+        int step = 0;
         List<String> bindingServiceArgs = determineBindingServiceArgs(serviceIds);
         for (String sId : sortByDependency(serviceIds, true)) {
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Starting " + sId);
             SpringCloudServiceDescriptor service = getService(sId);
             if (null == service) {
                 errors.add("No service for id '" + sId + "' known.");
@@ -228,6 +235,7 @@ public class SpringCloudServiceManager
                     }
                 }
             }
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Started " + sId);
         }
         checkErrors(errors);
         LOGGER.info("Started services " + Arrays.toString(serviceIds));
@@ -284,7 +292,9 @@ public class SpringCloudServiceManager
         AppDeployer deployer = getDeployer();
         LOGGER.info("Stopping services " + Arrays.toString(serviceIds));
         // TODO add/check causes for failing
+        int step = 0;
         for (String ids : sortByDependency(serviceIds, false)) {
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Stopping service " + ids);
             SpringCloudServiceDescriptor service = getService(ids);
             String id = service.getDeploymentId();
             if (null != id) {
@@ -310,6 +320,7 @@ public class SpringCloudServiceManager
                 setState(service, ServiceState.STOPPING);
             }
             service.detachStub();
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Stopped service " + ids);
         }
         checkErrors(errors);
         LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
@@ -324,6 +335,7 @@ public class SpringCloudServiceManager
     @Override
     public void removeArtifact(String artifactId) throws ExecutionException {
         LOGGER.info("Removing artifact " + artifactId);
+        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Removing artifact " + artifactId);
         checkId(artifactId, "artifactId");
         SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
         super.removeArtifact(artifactId);
@@ -337,6 +349,7 @@ public class SpringCloudServiceManager
             }
         }
         LOGGER.info("Removed artifact " + artifactId);
+        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, "Removied artifact " + artifactId);
     }
 
     @Override
