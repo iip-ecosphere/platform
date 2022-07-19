@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -379,9 +380,10 @@ public abstract class TransportToAasConverter<T> {
     /**
      * Starts the transport tracer.
      * 
+     * @param aasSetup the AAS setup to use
      * @return {@code true} for success, {@code false} else
      */
-    public boolean start() {
+    public boolean start(AasSetup aasSetup) {
         boolean success = true;
         try {
             AasFactory factory = AasFactory.getInstance();
@@ -389,7 +391,7 @@ public abstract class TransportToAasConverter<T> {
             success = buildUpAas(aasBuilder);
             aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
             List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
-            AasPartRegistry.remoteDeploy(Starter.getSetup().getAas(), aasList);
+            AasPartRegistry.remoteDeploy(aasSetup, aasList);
             callback = new TraceRecordReceptionCallback();
             TransportConnector conn = Transport.createConnector();
             if (null != conn) {
