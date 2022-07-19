@@ -243,7 +243,7 @@ public class CliTest {
         }
 
         @Override
-        public String[] getServices(String artifactId) {
+        public String[] getServices(String artifactId, boolean topLevelOnly) {
             return null;
         }
 

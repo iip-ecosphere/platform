@@ -210,7 +210,7 @@ public class Cli extends CliBackend {
                 changedArtifacts = callWithUri(provider, uri -> client.addArtifact(uri));
                 break;
             case "startall":
-                changedServices = callWithArtifactId(provider, id -> client.startService(client.getServices(id)));
+                changedServices = callWithArtifactId(provider, id -> client.startService(client.getServices(id, true)));
                 break;
             case "start":
                 List<String> sIds = new ArrayList<String>();
@@ -234,7 +234,7 @@ public class Cli extends CliBackend {
                 }
                 break;
             case "stopall":
-                changedServices = callWithArtifactId(provider, id -> client.stopService(client.getServices(id)));
+                changedServices = callWithArtifactId(provider, id -> client.stopService(client.getServices(id, true)));
                 break;
             case "remove":
                 changedArtifacts = callWithArtifactId(provider, id -> client.removeArtifact(id));

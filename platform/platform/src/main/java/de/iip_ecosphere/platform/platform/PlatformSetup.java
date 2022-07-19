@@ -42,6 +42,8 @@ public class PlatformSetup extends AbstractSetup {
     private TransportSetup transport;
     private File artifactsFolder = new File("artifacts");
     private String artifactsUriPrefix = "";
+    private int aasHeartbeatTimeout = -1; //4000; // disabled for now
+    private int aasStatusTimeout = 2 * 60 * 1000;
     
     /**
      * Returns the AAS setup.
@@ -134,4 +136,42 @@ public class PlatformSetup extends AbstractSetup {
         return instance;
     }
     
+    /**
+     * Returns the AAS heartbeat/cleanup timeout.
+     * 
+     * @return the timeout in ms, shall be significantly larger than the ECS-Runtime/service manager 
+     * monitoring periods, disable heartbeat monitoring if not positive
+     */
+    public int getAasHeartbeatTimeout() {
+        return aasHeartbeatTimeout;
+    }
+
+    /**
+     * Changes the AAS heartbeat/cleanup timeout. [snakeyaml]
+     * 
+     * @param aasHeartbeatTimeout the timeout in ms, shall be significantly larger than the ECS-Runtime/service manager 
+     * monitoring periods, disable heartbeat monitoring if not positive
+     */
+    public void setAasHeartbeatTimeout(int aasHeartbeatTimeout) {
+        this.aasHeartbeatTimeout = aasHeartbeatTimeout;
+    }
+
+    /**
+     * Returns the AAS status list cleanup timeout.
+     * 
+     * @return the timeout in ms
+     */
+    public int getAasStatusTimeout() {
+        return aasStatusTimeout;
+    }
+
+    /**
+     * Changes the AAS status list cleanup timeout. [snakeyaml]
+     * 
+     * @param aasStatusTimeout the timeout in ms
+     */
+    public void setAasStatusTimeout(int aasStatusTimeout) {
+        this.aasStatusTimeout = aasStatusTimeout;
+    }
+
 }

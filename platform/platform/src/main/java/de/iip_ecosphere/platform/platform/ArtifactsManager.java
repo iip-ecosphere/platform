@@ -453,7 +453,7 @@ public class ArtifactsManager {
     /**
      * Informs the manager that an artifact was created. Called while watching the 
      * {@link PlatformSetup#getArtifactsFolder()}.
-     * If the file is a service artifact, calls {@link PlatformAas#notifyArtifactRemoved(Artifact)} 
+     * If the file is a service artifact, calls {@link PlatformAas#notifyArtifactDeleted(Artifact)} 
      * if the artifact was known. Does not add artifacts twice.
      * 
      * @param path the path to the artifact, ignored if <b>null</b>
@@ -584,7 +584,7 @@ public class ArtifactsManager {
     /**
      * Informs the manager that an artifact was deleted. Called while watching the 
      * {@link PlatformSetup#getArtifactsFolder()}.
-     * Calls {@link PlatformAas#notifyArtifactRemoved(Artifact)} if the artifact was known.
+     * Calls {@link PlatformAas#notifyArtifactDeleted(Artifact)} if the artifact was known.
      * 
      * @param path the path to the artifact, ignored if <b>null</b>
      * @return the artifact (or <b>null</b> if none was deleted)

@@ -85,7 +85,7 @@ public class ServiceAasTest {
     /**
      * Tests the service AAS.
      * 
-     * @throws shall not occur
+     * @throws IOException shall not occur in a successful test
      */
     @Test
     public void testServiceAas() throws IOException {

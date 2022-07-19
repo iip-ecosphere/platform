@@ -39,7 +39,8 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
  */
 public class PlatformAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "Artifacts";
+    public static final String NAME_SUBMODEL_ARTIFACTS = "Artifacts";
+    public static final String NAME_SUBMODEL_STATUS = "Status";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
     public static final String NAME_COLL_DEPLOYMENT_PLANS = "DeploymentPlans";
@@ -53,7 +54,7 @@ public class PlatformAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_ARTIFACTS, null);
 
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER, false, false).build();
@@ -75,6 +76,8 @@ public class PlatformAas implements AasContributor {
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
             .build(Type.NONE);
         smB.build();
+        
+        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build(); // just that it is there
         
         return null;
     }
@@ -137,7 +140,7 @@ public class PlatformAas implements AasContributor {
      * @param art the artifact
      */
     static void notifyArtifactCreated(Artifact art) {
-        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+        ActiveAasBase.processNotification(NAME_SUBMODEL_ARTIFACTS, (sub, aas) -> {
             
             String collName = null;
             switch (art.getKind()) {
@@ -191,7 +194,7 @@ public class PlatformAas implements AasContributor {
      * @param art the artifact
      */
     static void notifyArtifactDeleted(Artifact art) {
-        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+        ActiveAasBase.processNotification(NAME_SUBMODEL_ARTIFACTS, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(fixId(art.getId()));
             if (null != coll) {
                 sub.delete(coll);

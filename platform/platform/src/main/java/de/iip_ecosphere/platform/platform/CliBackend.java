@@ -376,7 +376,7 @@ class CliBackend {
      * @param artifact the global artifact
      * @param assng the assignment
      * @return either {@code artifact} or the specific one specified in {@code assng}
-     * @throws URISyntaxException
+     * @throws URISyntaxException if the resulting URI cannot be created due to syntax reasons
      */
     private static URI getArtifact(URI artifact, ServiceResourceAssignment assng) throws URISyntaxException {
         URI result = artifact;
@@ -671,6 +671,7 @@ class CliBackend {
      * @param func the function to be executed
      * @return {@code true} for successful execution, {@code false} if not successful (and no exception is thrown)
      * @throws ExecutionException if the execution of {@code func} fails for some reason
+     * @throws URISyntaxException if the required UI cannot be constructed
      * @see #toUri(String)
      */
     protected static boolean callWithUri(CommandProvider provider, CliFunction<URI> func) 

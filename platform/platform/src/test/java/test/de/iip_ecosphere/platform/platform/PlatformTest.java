@@ -107,6 +107,8 @@ public class PlatformTest {
     
     /**
      * Tests the artifact manager.
+     * 
+     * @throws IOException shall not occur in a successful test
      */
     private void testArtifactManager() throws IOException {
         ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
@@ -153,7 +155,7 @@ public class PlatformTest {
         
         Assert.assertEquals(mgr.getArtifactCount(), CollectionUtils.toList(mgr.artifacts().iterator()).size());
         
-        SubmodelElementsCollectionClient sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
+        SubmodelElementsCollectionClient sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL_ARTIFACTS, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         SubmodelElementCollection coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
@@ -172,7 +174,7 @@ public class PlatformTest {
         TimeUtils.sleep(1000); // wait for watcher
         Assert.assertEquals(5, mgr.getArtifactCount());
         
-        sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL, 
+        sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL_ARTIFACTS, 
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);        

@@ -29,6 +29,8 @@ public class ServiceDeploymentPlanTest {
     
     /**
      * Tests the plan in {@code plan.yml}.
+     * 
+     * @throws IOException shall not occur in a successful test
      */
     @Test
     public void testPlan() throws IOException {

@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.transport.Transport;
 
 /**
  * Defines the parts to be started directly by the platform code.
@@ -40,6 +41,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     @Override
     public void startup(String[] args) {
         PlatformSetup setup = PlatformSetup.getInstance();
+        Transport.setTransportSetup(() -> setup.getTransport());
         AasSetup aasSetup = setup.getAas();
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.adaptEndpoint(aasSetup.getRegistryEndpoint());

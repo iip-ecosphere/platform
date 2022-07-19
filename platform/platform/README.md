@@ -26,11 +26,15 @@ The basic YAML configuration of the platform services (in ``iipecosphere.yml``) 
       persistence: <INMEMORY|MONGO>
     artifactsFolder: <Path>
     artifactsUriPrefix: <Uri>
+    aasHeartbeatTimeout: <int>
+    aasStatusTimeout: <int>
     
 The `aas` settings are similar to [ECS (Edge-Cloud-Server) runtime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime/README.md), while `mode` is ignored/fixed to `REMOTE_DEPLOY`. `aas:persistence` defines the AAS persistence mechanism and may require further software installation, e.g. MongoDB.
 
 `artifactsFolder` denotes a folder where artifacts are located for download by the devices/resources. Artifacts may be service artifacts (artifact including service deployment descriptor) or container image artifacts (usually one per folder, consisting of a container descriptor and an image file). By default, artifacts found in this folder are addressed by
 their local file URI. If the folder is empty or does not exist, no artifacts will be added to the artifacts manager/AAS. However, if the folder is part of a web server installation, `artifactsUriPrefix` can be used to turn the relative artifacts path into a webserver URL (shall end with a /, empty by default). Please note that the artifacts folder is a preliminary solution to be replaced by the S3 storage of the device management.
+
+`aasHeartbeatTimeout` specifies the timeout when a device (through the monitoring of ECS-Runtime or service manager) shall be considered as dead. The default is `4000` and shall be larger than the observed monitoring periods. If negative, no heartbeat monitoring will be performed. The `aasStatusTimeout` specifies when the AAS status list shall be cleaned up, i.e., list entries that are out of time shall be cleaned up (timeout in ms).
 
 ## Running the services
 
