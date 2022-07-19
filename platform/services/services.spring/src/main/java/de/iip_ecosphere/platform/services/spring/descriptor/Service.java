@@ -120,6 +120,13 @@ public interface Service {
      * @return {@code true} for deployable, {@code false} for not deployable 
      */
     public boolean isDeployable();
+    
+    /**
+     * Whether this is a top-level service or a nested service, e.g., in a family.
+     * 
+     * @return {@code true} for top-level, {@code false} for nested
+     */
+    public boolean isTopLevel();
 
     /**
      * Returns the desired number of instances of this service to be started in the same process. This property is 

@@ -36,6 +36,7 @@ public class YamlService extends AbstractYamlService implements Service {
     private long memory = -1;
     private long disk = -1;
     private int cpus = 1;
+    private boolean topLevel = true;
     
     @Override
     public List<String> getCmdArg() {
@@ -178,6 +179,20 @@ public class YamlService extends AbstractYamlService implements Service {
      */
     public void setCpus(int cpus) {
         this.cpus = cpus;
+    }
+
+    @Override
+    public boolean isTopLevel() {
+        return topLevel;
+    }
+    
+    /**
+     * Sets whether this represents a top-level or a nested service.
+     * 
+     * @param topLevel {@code true} for top-level, {@code false} for nested
+     */
+    public void setTopLevel(boolean topLevel) {
+        this.topLevel = topLevel;
     }
 
 }

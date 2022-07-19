@@ -13,6 +13,7 @@ In addition, service deployment properties are given in a separate descriptor, t
 * `services` consisting of individual service entries, each with: 
     * Unique identifier `id`, `name`, `version` (numbers separated by dots) and an optional `description` of the service (default is empty). 
     * Optional specification whether the service is `deployable` in distributed manner (default is `true`).
+    Optional specification whether the service is `topLevel` or nested, e.g., family member (default is `true`).
     * The Service `kind` (see `de.iip_ecosphere.platform.services.ServiceKind`). 
     * `cmdArg`: Optional list of command line arguments to be passed when the service is started. Within this list, `${port}` is substituted with the service command port and `${protocol}` with the command protocol, one of the AAS protocols. Further `${tmp}` is replaced by the temporary folder and `${user}` by the user home directory.
     * `instances`: The optional number of service replicas to be launched. Ignored if negative. Default value is `1`.
@@ -51,6 +52,7 @@ The schematic descriptor structure looks as given below (lists are indicates by 
         version: <VersionString>
         description: <String>
         deployable: <Boolean>
+        topLevel: <Boolean>
         kind: <value from de.iip_ecosphere.platform.services.ServiceKind>
         cmdArg: 
           - <String>
