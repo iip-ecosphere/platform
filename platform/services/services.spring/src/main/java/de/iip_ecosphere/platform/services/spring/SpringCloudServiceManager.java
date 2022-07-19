@@ -280,6 +280,8 @@ public class SpringCloudServiceManager
                 TimeUtils.sleep(500);
             }
             if (System.currentTimeMillis() - start > waitingTime) {
+                LoggerFactory.getLogger(SpringCloudServiceManager.class).error("While deploying {}: timeout {}", 
+                    id, waitingTime);
                 break;
             }
         } while (endCond.test(state));

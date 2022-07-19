@@ -36,7 +36,7 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     private boolean deleteArtifacts = true;
     private File downloadDir;
     private String descriptorName = "deployment.yml";
-    private int waitingTime = 60000; // 30000 is sufficient, increasing the default for AXC 3152
+    private int waitingTime = 120000;
     private int availabilityRetryDelay = 500;
     private HashMap<String, String> executables = new HashMap<String, String>();
     private List<String> javaOpts = CollectionUtils.toList("-Dlog4j2.formatMsgNoLookups=true"); 
