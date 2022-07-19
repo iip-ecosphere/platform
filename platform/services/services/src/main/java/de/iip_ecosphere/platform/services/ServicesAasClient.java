@@ -123,11 +123,11 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     }
     
     @Override
-    public String[] getServices(String artifactId) {
+    public String[] getServices(String artifactId, boolean topLevelOnly) {
         List<String> result = new ArrayList<String>();
         SubmodelElementCollection coll = getServices();
         if (null != coll) {
-            getServices(coll, artifactId, result);
+            getServices(coll, artifactId, result, topLevelOnly);
         }
         String[] tmp = new String[result.size()];
         return result.toArray(tmp);
@@ -139,19 +139,29 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
      * @param coll the collection containing the services
      * @param artifactId the artifactId to search for
      * @param serviceIds the service ids to be modified as a side effect
+     * @param topLevelOnly whether only top-level services or all services shall be returned
      */
-    private void getServices(SubmodelElementCollection coll, String artifactId, List<String> serviceIds) {
+    private void getServices(SubmodelElementCollection coll, String artifactId, List<String> serviceIds, 
+        boolean topLevelOnly) {
         for (SubmodelElement elt : coll.elements()) {
             if (elt instanceof SubmodelElementCollection) {
                 SubmodelElementCollection service = (SubmodelElementCollection) elt;
                 Property id = service.getProperty(ServicesAas.NAME_PROP_ID);
                 Property art = service.getProperty(ServicesAas.NAME_PROP_ARTIFACT);
+                Property topLevel = null;
+                if (topLevelOnly) {
+                    topLevel = service.getProperty(ServicesAas.NAME_PROP_TOPLEVEL);
+                }
                 if (null != id && null != art) {
                     try {
                         Object artId = art.getValue();
                         if (artifactId.equals(artId)) {
+                            boolean tlOk = true;
+                            if (topLevel != null) {
+                                tlOk = Boolean.TRUE.equals(topLevel.getValue());
+                            }
                             Object serId = id.getValue();
-                            if (null != serId) {
+                            if (null != serId && tlOk) {
                                 serviceIds.add(serId.toString());
                             }
                         }

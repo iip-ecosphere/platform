@@ -88,7 +88,14 @@ public interface ServiceDescriptor {
      * @return {@code true} for deployable, {@code false} for fixed
      */
     public boolean isDeployable();
-    
+
+    /**
+     * Returns whether the service is top-level or nested, e.g., as family member.
+     * 
+     * @return {@code true} for top-level, {@code false} else
+     */
+    public boolean isTopLevel();
+
     /**
      * Returns the service kind.
      * 

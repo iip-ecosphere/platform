@@ -49,6 +49,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private ServiceState state;
     private ServiceKind kind = ServiceKind.TRANSFORMATION_SERVICE;
     private boolean isDeployable = true;
+    private boolean isTopLevel = true;
     private List<TypedDataDescriptor> parameters = new ArrayList<>(); 
     private List<TypedDataConnectorDescriptor> input = new ArrayList<>(); 
     private List<TypedDataConnectorDescriptor> output = new ArrayList<>(); 
@@ -97,10 +98,12 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
      * 
      * @param kind the service kind
      * @param isDeployable whether the service can be deployed in distributed manner or not (fixed, centralized)
+     * @param isTopLevel whether the service is a top-level service or whether it is nested, e.g., family member
      */
-    protected void setClassification(ServiceKind kind, boolean isDeployable) {
+    protected void setClassification(ServiceKind kind, boolean isDeployable, boolean isTopLevel) {
         this.kind = kind;
         this.isDeployable = isDeployable;
+        this.isTopLevel = isTopLevel;
     }
     
     @Override
@@ -168,6 +171,11 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     @Override
     public boolean isDeployable() {
         return isDeployable; // no stub here, we shall have consistent information
+    }
+
+    @Override
+    public boolean isTopLevel() {
+        return isTopLevel; // no stub here, we shall have consistent information
     }
 
     @Override

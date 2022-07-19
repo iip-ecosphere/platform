@@ -102,6 +102,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_TO = "to";
     public static final String NAME_PROP_TO_RESOURCE = "toResource";
     public static final String NAME_PROP_ARTIFACT = "artifact";
+    public static final String NAME_PROP_TOPLEVEL = "topLevel";
     public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
@@ -343,6 +344,9 @@ public class ServicesAas implements AasContributor {
                 .setValue(Type.STRING, desc.getArtifact().getId())
                 .build();
         }
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_TOPLEVEL)
+            .setValue(Type.BOOLEAN, desc.isTopLevel())
+            .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
             .build();

@@ -25,9 +25,10 @@ public interface ServicesClient extends ServiceOperations {
      * Returns the services associated to a given {@code artifactId}.
      * 
      * @param artifactId the artifactId to search for
+     * @param topLevelOnly whether only top-level services or all shall be returned
      * @return the associated service ids, empty if none was found
      */
-    public String[] getServices(String artifactId);
+    public String[] getServices(String artifactId, boolean topLevelOnly);
     
     /**
      * Returns the collection with all services of the resources this client was created for.

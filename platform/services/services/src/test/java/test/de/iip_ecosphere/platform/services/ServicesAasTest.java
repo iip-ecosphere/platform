@@ -179,7 +179,7 @@ public class ServicesAasTest {
         Assert.assertTrue(aDesc.getServiceIds().contains(sDesc.getId()));
         Assert.assertTrue(aDesc.getServices().contains(sDesc));
         Assert.assertEquals(ServiceState.AVAILABLE, client.getServiceState(sId));
-        String[] ids = client.getServices(aDesc.getId());
+        String[] ids = client.getServices(aDesc.getId(), false);
         Assert.assertEquals(aDesc.getServices().size(), ids.length);
         boolean foundAll = true;
         for (ServiceDescriptor s : aDesc.getServices()) {
