@@ -1,12 +1,7 @@
 package test.de.iip_ecosphere.platform.kiServices.functions.images;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import org.junit.Assert;
 
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
 import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
@@ -23,77 +18,98 @@ public class ImageEncodingDecodingTests {
             AppTest.TEST_FILE_FOLDER + "/testImageOutEndcoding1.jpg";
     
     /**
-     * Will first try to read the image as base64, if no exception happens, will try to turn the string back into image.
-     * If both things work will try to write the image to confirm it actually is an image!
-     * (to resources//testImageOutEndcoding1.jpg )
-     * @param imagePath the Path to the testImage.
+     * Tests the method to read in an image as a base64 string. Returns the string.
+     * @return the converted image.
      */
-    public static void testImageToBase64String(String imagePath) {
+    public static String testReadImageToBase64String() {
         String imageString = "";
-        BufferedImage image = null;
         try {
             //unsure about the assertion to make
-            imageString  = ImageEncodingDecoding.readImageAsBase64String(imagePath);
-            //As validation that it worked, as it would break otherwise
-            image = ImageEncodingDecoding.base64StringToBufferdImage(imageString);
-            System.out.println(image == null);
-            boolean written = ImageIO.write(image, "jpg", new File(TEST_FILE_OUT_PATH));
+            imageString  = ImageEncodingDecoding.readImageAsBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return imageString;
+    }
+    /**
+     * Tests the method to read in an image as a bufferedImage and returns that.
+     * @return The image as BufferedImage or null if it cannot be read.
+     */
+    public static BufferedImage testReadingInImageAsBufferedImage() {
+        BufferedImage image = null;
+        
+        try {
+            image = ImageEncodingDecoding.readBufferedImageFromFile(ImageEncodingDecodingTests.TEST_FILE_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return image;
+    }
+    /**
+     * Tests if a base64 String can be read in from a base64 file as used in this project.
+     * @return the string from the file. It will be empty if the file cannot be read properly.
+     */
+    public static String testReadingBase64AsString() {
+        String image = "";
+        
+        try {
+            image = ImageEncodingDecoding.readBase64ImageFromBase64File(QRCodeServiceTest.TEST_FILE_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return image;
     }
     
     /**
-     * A method to test the conversion of a base64 encoded byte string back into an bufferd image.
-     * @param base64Image the base64 encoded String of the image
+     * Tests if a base64 file can be read and output as a BufferedImage.
      * @return image the buffered image derived from the input string.
      */
-    public static BufferedImage testBase64StringToBufferedImage(String base64Image) {
+    public static BufferedImage testReadBase64StringAsBufferedImage() {
         BufferedImage image = null;
         try {
-            image = ImageEncodingDecoding.base64StringToBufferdImage(base64Image);
-            System.out.println("early : " + (image == null));
+            image = ImageEncodingDecoding.readBase64FileAsBufferedImage(QRCodeServiceTest.TEST_FILE_PATH);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return image;
     }
     /**
+     * Tests the conversion of bufferedImages to base64 Strings. Firstly reads in an imgae, converts
+     *  it and tried to revert that.
+     * @return The image string.
+     */
+    public static String testBufferedImageToBase64() {
+        BufferedImage image = null;
+        String imageString = "";
+        
+        try {
+            image = ImageEncodingDecoding.readBufferedImageFromFile(ImageEncodingDecodingTests.TEST_FILE_PATH);
+            imageString = ImageEncodingDecoding.bufferedImageToBase64String(image);
+            image = ImageEncodingDecoding.base64StringToBufferdImage(imageString); // to confirm the conversion.
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return imageString;
+    }
+    
+    
+    
+    /**
      * Testing main method.
      * @param args args.
      */
     public static void main(String[] args) {
-        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
-        File control = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
-        if (control.exists()) {
-            control.delete();
-        }
-        BufferedImage image = null;
-        try {
-            image = ImageEncodingDecodingTests
-                    .testBase64StringToBufferedImage(
-                            ImageEncodingDecoding.readBase64ImageFromBase64File(QRCodeServiceTest.TEST_FILE_PATH));
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        System.out.println("image "  + (image == null));
-        
-        try {
-            boolean written = ImageIO.write(image, "jpg", new File(TEST_FILE_OUT_PATH));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-//        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
-//        File controlF = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
-//        if (controlF.exists()) {
-//            //controlF.delete();       //cleanup to not clutter the test enviroment.
-//        }
-//        //nothing to assert, error if complete fail, warning through exception.
-//        BufferedImage image2 = ImageEncodingDecodingTests
-//                .testBase64StringToBufferedImage(ImageEncodingDecodingTests.TEST_FILE_PATH);
+        BufferedImage image = testReadBase64StringAsBufferedImage();
+        System.out.println(image == null);
+        String imageString = testReadImageToBase64String();
+        System.out.println(imageString.isEmpty());
+        imageString = testReadingBase64AsString();
+        System.out.println(imageString.isEmpty());
+        image = testReadingInImageAsBufferedImage();
+        System.out.println(image == null);
     }
 }

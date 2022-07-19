@@ -40,21 +40,13 @@ public class AppTest {
      */
     @Test
     public void testEncodingDecoding() {
-        ImageEncodingDecodingTests.testImageToBase64String(ImageEncodingDecodingTests.TEST_FILE_PATH);
-        File control = new File(ImageEncodingDecodingTests.TEST_FILE_OUT_PATH);
-        //Assert.assertTrue(control.exists()); //this works locally just fine, seems to be not possible on jenkins
-        if (control.exists()) {
-            control.delete();       //cleanup to not clutter the test enviroment.
-        }
-        //nothing to assert, error if complete fail, warning through exception.
-        BufferedImage image = null;
-        try {
-            image = ImageEncodingDecodingTests
-                    .testBase64StringToBufferedImage(
-                            ImageEncodingDecoding.readBase64ImageFromBase64File(QRCodeServiceTest.TEST_FILE_PATH));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BufferedImage image = ImageEncodingDecodingTests.testReadBase64StringAsBufferedImage();
+        Assert.assertTrue(image != null);
+        String imageString = ImageEncodingDecodingTests.testReadImageToBase64String();
+        Assert.assertFalse(imageString.isEmpty());
+        imageString = ImageEncodingDecodingTests.testReadingBase64AsString();
+        Assert.assertFalse(imageString.isEmpty());
+        image = ImageEncodingDecodingTests.testReadingInImageAsBufferedImage();
         Assert.assertTrue(image != null);
     }
     
