@@ -216,7 +216,7 @@ public class TraceToAasService extends AbstractService {
     
     @Override
     protected ServiceState start() throws ExecutionException {
-        boolean ok = converter.start(Starter.getSetup().getAas());
+        boolean ok = converter.start(Starter.getSetup().getAas(), true); // deploy, it's the App AAS
         ServiceState result = super.start();
         if (!ok) {
             result = ServiceState.FAILED;

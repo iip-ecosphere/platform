@@ -381,17 +381,21 @@ public abstract class TransportToAasConverter<T> {
      * Starts the transport tracer.
      * 
      * @param aasSetup the AAS setup to use
+     * @param deploy whether the AAS represented by this converter shall be deployed
      * @return {@code true} for success, {@code false} else
      */
-    public boolean start(AasSetup aasSetup) {
+    public boolean start(AasSetup aasSetup, boolean deploy) {
         boolean success = true;
         try {
             AasFactory factory = AasFactory.getInstance();
             AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
             success = buildUpAas(aasBuilder);
             aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
-            List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aasBuilder.build());
-            AasPartRegistry.remoteDeploy(aasSetup, aasList);
+            Aas aas = aasBuilder.build();
+            if (deploy) {
+                List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
+                AasPartRegistry.remoteDeploy(aasSetup, aasList);
+            }
             callback = new TraceRecordReceptionCallback();
             TransportConnector conn = Transport.createConnector();
             if (null != conn) {
