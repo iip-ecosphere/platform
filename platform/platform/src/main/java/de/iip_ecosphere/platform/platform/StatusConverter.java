@@ -41,7 +41,7 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
     @Override
     protected Function<StatusMessage, String> getSubmodelElementIdFunction() {
-        return s -> String.valueOf(System.currentTimeMillis());
+        return s -> "time-" + String.valueOf(System.currentTimeMillis());
     }
 
     @Override
