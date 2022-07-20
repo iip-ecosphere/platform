@@ -64,7 +64,7 @@ public class DefaultServiceImpl extends AbstractService {
     }
     
     /**
-     * Creates an abstract service from a service id and a YAML artifact.
+     * Creates an default service from a service id and a YAML artifact.
      * 
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
@@ -72,8 +72,6 @@ public class DefaultServiceImpl extends AbstractService {
     public DefaultServiceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
-    
-    // TODO include ServiceBase and overlay status for families?
     
     @Override
     public void migrate(String resourceId) throws ExecutionException {
