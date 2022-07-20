@@ -46,7 +46,22 @@ public interface ServiceOperations {
      * @throws ExecutionException in case that starting the service fails for some reason
      */
     public void startService(String... serviceId) throws ExecutionException;
-    
+
+    /**
+     * Starts one or multiple service. The service implementation must be already within the management domain of this 
+     * instance by {@link #addArtifact(URI)}. The service(s) shall after some time be in state 
+     * {@link ServiceState#STARTING}, {@link ServiceState#RUNNING} or {@link ServiceState#FAILED}.
+     * 
+     * @param options optional map of optional options to be passed to the service manager, may modify the 
+     *   service descriptors, e.g., to change services to be started together on demand, may be empty for none; options 
+     *   are a name-value mapping with values that come either as primitive values or as JSON structures. The 
+     *   service manager is responsible for correct JSON de-serialization
+     * @param serviceId the id(s) of the service(s)
+     * @throws ExecutionException in case that starting the service fails for some reason
+     * @see #startService(String...)
+     */
+    public void startService(Map<String, String> options, String... serviceId) throws ExecutionException;
+
     /**
      * Stops one or multiple services. The service shall afterwards be in state {@link ServiceState#STOPPED}.
      * 

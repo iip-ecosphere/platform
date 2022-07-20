@@ -107,6 +107,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
     public static final String NAME_OP_SERVICE_START = "startService";
+    public static final String NAME_OP_SERVICE_START_WITH_OPTS = "startServiceWithOptions";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
     public static final String NAME_OP_SERVICE_MIGRATE = "migrateService";
@@ -132,6 +133,7 @@ public class ServicesAas implements AasContributor {
         
             // probably relevant ops only
             createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_START_WITH_OPTS, iCreator, "options");
             createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
@@ -221,6 +223,12 @@ public class ServicesAas implements AasContributor {
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START), 
             new JsonResultWrapper(p -> {
                 ServiceFactory.getServiceManager().startService(readStringArray(p, 0)); 
+                return null;
+            }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START_WITH_OPTS), 
+            new JsonResultWrapper(p -> {
+                ServiceFactory.getServiceManager().startService(readMap(p, 1, null), readStringArray(p, 0)); 
                 return null;
             }
         ));

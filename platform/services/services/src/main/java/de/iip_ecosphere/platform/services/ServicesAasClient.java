@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -84,6 +85,15 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     @Override
     public void startService(String... serviceId) throws ExecutionException {
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START).invoke(JsonUtils.toJson(serviceId)));
+    }
+
+    @Override
+    public void startService(Map<String, String> options, String... serviceId) throws ExecutionException {
+        if (null == options) {
+            options = new HashMap<>();
+        }
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_WITH_OPTS).invoke(JsonUtils.toJson(serviceId), 
+            writeMap(options)));
     }
     
     @Override

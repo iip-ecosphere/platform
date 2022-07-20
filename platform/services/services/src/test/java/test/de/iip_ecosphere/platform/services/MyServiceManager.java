@@ -111,9 +111,13 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
         }
         return sd;
     }
-
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
+        startService(null, serviceIds);
+    }
+
+    @Override
+    public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
         for (String s: serviceIds) {
             setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
             setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING);
