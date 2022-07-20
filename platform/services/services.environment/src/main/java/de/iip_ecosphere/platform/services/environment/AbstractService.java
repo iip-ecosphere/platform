@@ -181,8 +181,8 @@ public abstract class AbstractService implements Service {
      * @param resource the resource name/path
      * @return the input stream if the resource was found, <b>null</b> else
      */
-    private static InputStream getResourceAsStream(ClassLoader loader, String resource) {
-        InputStream desc = loader.getResourceAsStream(resource);
+    public static InputStream getResourceAsStream(ClassLoader loader, String resource) {
+        InputStream desc = loader.getResourceAsStream(resource); // TODO unify with resource loader
         if (null == desc) {
             String tmp = resource;
             while (tmp.startsWith("/")) {
