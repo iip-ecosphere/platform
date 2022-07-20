@@ -350,6 +350,7 @@ public class TraceToAasService extends AbstractService {
         protected boolean cleanUpAas(Aas aas) {
             aas.delete(aas.getSubmodel(PlatformAas.SUBMODEL_NAMEPLATE));
             aas.delete(aas.getSubmodel(SUBMODEL_COMMANDS));
+            // unclear how to get rid of AAS itself
             return true;
         }
         

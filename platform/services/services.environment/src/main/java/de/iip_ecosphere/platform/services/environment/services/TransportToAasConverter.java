@@ -26,7 +26,6 @@ import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -70,6 +69,7 @@ public abstract class TransportToAasConverter<T> {
     private String submodelIdShort;
     private String transportStream;
     private Class<T> dataType;
+    private AasSetup aasSetup;
     
     static {
         DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
@@ -215,7 +215,7 @@ public abstract class TransportToAasConverter<T> {
     protected void handleNew(T data) {
         // add new record
         try {
-            Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
+            Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
             SubmodelBuilder smBuilder = aas.createSubmodelBuilder(submodelIdShort, null);
             SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
                 getSubmodelElementIdFunction().apply(data), true, true); 
@@ -385,6 +385,7 @@ public abstract class TransportToAasConverter<T> {
      * @return {@code true} for success, {@code false} else
      */
     public boolean start(AasSetup aasSetup, boolean deploy) {
+        this.aasSetup = aasSetup;
         boolean success = true;
         try {
             AasFactory factory = AasFactory.getInstance();
@@ -437,10 +438,9 @@ public abstract class TransportToAasConverter<T> {
             success = false;
         }
         try {
-            // unclear how to get rid of AAS itself
-            Aas aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
-            success = cleanUpAas(aas);
+            Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
             aas.delete(aas.getSubmodel(submodelIdShort));
+            success = cleanUpAas(aas);
         } catch (IOException e ) {
             LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
             success = false;
@@ -449,7 +449,7 @@ public abstract class TransportToAasConverter<T> {
     }
 
     /**
-     * Cleans up the AAS.
+     * Cleans up the AAS. Last action, may delete the AAS itself.
      * 
      * @param aas the AAS to clean up
      * @return {@code true} for success, {@code false} else

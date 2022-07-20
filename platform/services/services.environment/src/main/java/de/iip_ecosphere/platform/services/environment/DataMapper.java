@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
@@ -173,6 +174,24 @@ public class DataMapper {
      */
     public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons, 
         boolean failOnUnknownProperties) throws IOException {
+        mapJsonData(stream, cls, cons, failOnUnknownProperties, null);
+    }
+    
+    /**
+     * Maps the data in {@code stream} to instances of {@code cls}, one instance per line. Calls {@code cons} per
+     * instance/line. Closes {@code stream}.
+     *  
+     * @param <T> the type of data to read
+     * @param stream the stream to read (may be <b>null</b> for none)
+     * @param cls the type of data to read
+     * @param cons the consumer to be called per instance
+     * @param failOnUnknownProperties whether parsing shall be tolerant or not, the latter may be helpful for debugging
+     * @param continueFunction optional function that tells the data mapper to go on reading the input, 
+     *     may be <b>null</b> for none
+     * @throws IOException if I/O or JSON parsing errors occur
+     */
+    public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons, 
+        boolean failOnUnknownProperties, Supplier<Boolean> continueFunction) throws IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
@@ -182,7 +201,7 @@ public class DataMapper {
             jp.setCodec(objectMapper);
             jp.nextToken();
 
-            while (jp.hasCurrentToken()) {
+            while (jp.hasCurrentToken() && (null == continueFunction || continueFunction.get())) {
                 T data = jp.readValueAs(cls);
                 jp.nextToken();
                 cons.accept(data);

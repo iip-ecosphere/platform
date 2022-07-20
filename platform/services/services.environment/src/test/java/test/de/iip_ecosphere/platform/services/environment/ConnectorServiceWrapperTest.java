@@ -58,6 +58,7 @@ public class ConnectorServiceWrapperTest {
         ConnectorServiceWrapper<Object, Object, Object, Object> wrapper 
             = new ConnectorServiceWrapper<>(getYamlService(), conn, () -> param);
         testWrapper(wrapper, yaml);
+        testStopWrapper(wrapper);
         ActiveAasBase.setNotificationMode(mo);
     }
     
@@ -110,6 +111,7 @@ public class ConnectorServiceWrapperTest {
         TimeUtils.sleep(1000);
         Assert.assertTrue(inRcv.get() > 0);
         Assert.assertTrue(rcv.get() > 0);
+        testStopWrapper(wrapper);
         
         ActiveAasBase.setNotificationMode(mo);
     }
@@ -195,6 +197,7 @@ public class ConnectorServiceWrapperTest {
     
     /**
      * Generic test for a wrapper instance based on the constituting {@code yaml} instance.
+     * The wrapper is started but not stopped.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -203,7 +206,8 @@ public class ConnectorServiceWrapperTest {
      * @param wrapper the wrapper instance to be tested
      * @param yaml the service deployment information
      * 
-     * @throws ExecutionException shall not occur in successful tests
+     * @throws ExecutionException shall not occur in successful tests#
+     * @see #testStopWrapper(ConnectorServiceWrapper)
      */
     private <O, I, CO, CI> void testWrapper(ConnectorServiceWrapper<O, I, CO, CI> wrapper, YamlService yaml) 
         throws ExecutionException {
@@ -223,9 +227,23 @@ public class ConnectorServiceWrapperTest {
 
         wrapper.enableNotifications(false);
         wrapper.enablePolling(true);
-        
+    }
+
+    /**
+     * Generic stopping test for a wrapper instance.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param wrapper the wrapper instance to be tested
+     * 
+     * @throws ExecutionException shall not occur in successful tests#
+     */
+    private <O, I, CO, CI> void testStopWrapper(ConnectorServiceWrapper<O, I, CO, CI> wrapper) 
+            throws ExecutionException {
         wrapper.setState(ServiceState.STOPPING);
         Assert.assertEquals(ServiceState.STOPPED, wrapper.getState());
     }
-    
+
 }

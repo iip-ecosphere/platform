@@ -45,6 +45,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private Supplier<ConnectorParameter> connParamSupplier;
     private boolean enableNotifications;
     private String fileName;
+    private DataRunnable dataRunnable;
     
     /**
      * Creates a service wrapper instance.
@@ -109,9 +110,12 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     /**
      * Starts data ingestion.
      * 
+     * @param continueFunction supplier indicating whether further data shall be ingested although still potential
+     *    input data may be available
+     * 
      * @throws IOException if the data file cannot be found/opened
      */
-    private void startData() throws IOException {
+    private void startData(Supplier<Boolean> continueFunction) throws IOException {
         LoggerFactory.getLogger(getClass()).info("Starting data with resource: {}", fileName);
         ConnectorParameter param = connParamSupplier.get();
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
@@ -126,21 +130,57 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         });
     }
     
+    /**
+     * Runnable for parallel data ingestion.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class DataRunnable implements Runnable {
+
+        private boolean cont = true;
+        
+        @Override
+        public void run() {
+            try {
+                startData(() -> cont);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MockingConnectorServiceWrapper.class).info(
+                    "Starting data: {}", e.getMessage());
+            }
+        }
+
+        /**
+         * Stops ingestion.
+         */
+        public void stop() {
+            cont = false;
+        }
+        
+    }
+    
+    /**
+     * Starts a parallel thread for data ingestion. Non-blocking execution is typically required by a streaming engine.
+     */
+    private void startDataThread() {
+        if (null == dataRunnable) {
+            dataRunnable = new DataRunnable();
+            new Thread(dataRunnable).start();
+        }
+    }
+    
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         doSetState(state);
-        try {
-            if (ServiceState.STARTING == state) {
-                if (enableNotifications) {
-                    startData();
-                }
-                doSetState(ServiceState.RUNNING);
-            } else if (ServiceState.STOPPING == state) {
-                callback = null;
-                doSetState(ServiceState.STOPPED);
+        if (ServiceState.STARTING == state) {
+            if (enableNotifications) {
+                startDataThread();
             }
-        } catch (IOException e) {
-            throw new ExecutionException(e);
+            doSetState(ServiceState.RUNNING);
+        } else if (ServiceState.STOPPING == state) {
+            dataRunnable.stop();
+            dataRunnable = null;
+            callback = null;
+            doSetState(ServiceState.STOPPED);
         }
     }
     
@@ -163,11 +203,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     @Override
     public void enablePolling(boolean enablePolling) {
         if (!enableNotifications && enablePolling) {
-            try {
-                startData();
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot start polling: {}", e.getMessage());
-            }
+            startDataThread();
         }
     }
 
