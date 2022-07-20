@@ -45,6 +45,7 @@ Completed improvements:
 * [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Improvements of service, family and stream generation.
+* Allowing to change service ensembles on demand via deployment plans.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

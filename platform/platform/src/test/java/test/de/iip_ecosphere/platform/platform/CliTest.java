@@ -202,6 +202,10 @@ public class CliTest {
         }
 
         @Override
+        public void startService(Map<String, String> options, String... serviceId) throws ExecutionException {
+        }
+
+        @Override
         public void stopService(String... serviceId) throws ExecutionException {
         }
 

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -42,10 +43,13 @@ import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -62,7 +66,9 @@ import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 public class SpringCloudServiceManager 
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
+    public static final String OPT_SERVICE_PREFIX = "iip.service.";
     private static final String PROGRESS_COMPONENT_ID = "Spring Cloud Service Manager";
+    private static final String OPTION_ENSEMBLE = "ensemble";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private Predicate<TypedDataConnectorDescriptor> available = c -> true;
     
@@ -163,18 +169,19 @@ public class SpringCloudServiceManager
     }
     
     /**
-     * Determines the command line values for the spring component conditionals.
+     * Determines the command line values for the spring component conditionals. [public, static for testing]
      * 
+     * @param mgr the manager instance
      * @param serviceIds the services to determine the arguments for
      * @return the arguments
      */
-    private List<String> determineSpringConditionals(String... serviceIds) {
+    public static List<String> determineSpringConditionals(ServiceManager mgr, String... serviceIds) {
         List<String> result = new ArrayList<>();
 
         Set<ArtifactDescriptor> artifacts = new HashSet<>();
         Set<String> activeServices = new HashSet<>();
         for (String id: serviceIds) {
-            ServiceDescriptor service = getService(id);
+            ServiceDescriptor service = mgr.getService(id);
             artifacts.add(service.getArtifact());
             activeServices.add(id);
         }
@@ -186,7 +193,8 @@ public class SpringCloudServiceManager
 
         if (activeServices.size() != allServices.size()) {
             for (String id: allServices) {
-                result.add("--iip.service." + id + "=" + activeServices.contains(id));
+                result.add(CmdLine.PARAM_PREFIX + OPT_SERVICE_PREFIX + id 
+                    + CmdLine.PARAM_VALUE_SEP + activeServices.contains(id));
             }
         }
         
@@ -218,6 +226,66 @@ public class SpringCloudServiceManager
 
     @Override
     public void startService(String... serviceIds) throws ExecutionException {
+        startService(null, serviceIds);
+    }
+    
+    /**
+     * Handles service start options.
+     * 
+     * @param options the options
+     * @param serviceIds the service ids to start
+     */
+    private void handleOptions(Map<String, String> options, String[] serviceIds) {
+        handleOptions(options, this, serviceIds);
+    }
+
+    /**
+     * Handles service start options. [public, static for testing]
+     * 
+     * @param options the options
+     * @param serviceIds the service ids to start
+     * @param mgr the service manager
+     */
+    public static void handleOptions(Map<String, String> options, ServiceManager mgr, String... serviceIds) {
+        if (null != options) {
+            String opt = options.get(OPTION_ENSEMBLE);
+            if (null != opt) {
+                handleOptionEnsemble(opt, serviceIds, mgr);
+            }
+        }
+    }
+    
+    /**
+     * Handles the ensemble option for service start.
+     * 
+     * @param opt the option as JSON string
+     * @param serviceIds the service ids to start
+     * @param mgr the service manager
+     */
+    private static void handleOptionEnsemble(String opt, String[] serviceIds, ServiceManager mgr) {
+        Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
+        Set<String> actServices = new HashSet<>();
+        CollectionUtils.addAll(actServices, serviceIds);
+        if (null != optMap) {
+            for (Map.Entry<?, ?> ent: optMap.entrySet()) {
+                String ensemble = ent.getKey().toString();
+                String leader = ent.getValue().toString();
+                if (actServices.contains(ensemble)) { // leader may be null to reset, must not be there
+                    ServiceDescriptor ensDesc = mgr.getService(ensemble);
+                    ServiceDescriptor leaderDesc = mgr.getService(leader);
+                    if (ensDesc instanceof SpringCloudServiceDescriptor 
+                        && (leaderDesc == null || leaderDesc instanceof SpringCloudServiceDescriptor)) {
+                        ((SpringCloudServiceDescriptor) ensDesc).setEnsembleLeader(
+                            (SpringCloudServiceDescriptor) leaderDesc);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        handleOptions(options, serviceIds);
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
@@ -236,7 +304,7 @@ public class SpringCloudServiceManager
                 List<String> externalServiceArgs = new ArrayList<String>(bindingServiceArgs);
                 // adjust spring function definition from application.yml if subset of services shall be started 
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
-                externalServiceArgs.addAll(determineSpringConditionals(sIdEns));
+                externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);

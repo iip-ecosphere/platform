@@ -8,3 +8,6 @@ assignments:
     services:
       - AI
       - End
+ensembles:
+  AI: End
+  Start:  

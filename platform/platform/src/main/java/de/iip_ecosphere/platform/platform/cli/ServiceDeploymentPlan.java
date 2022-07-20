@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.platform.cli;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
@@ -153,9 +155,10 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private String artifact;
     private List<ContainerResourceAssignment> container = new ArrayList<>();
     // naming: initially only for services without container!
-    private List<ServiceResourceAssignment> assignments  = new ArrayList<>();
+    private List<ServiceResourceAssignment> assignments = new ArrayList<>();
     private boolean parallelize = false;
     private boolean onUndeployRemoveArtifact = true;
+    private Map<String, String> ensembles = new HashMap<>();
 
     /**
      * Returns the name of the application.
@@ -246,6 +249,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     public List<ContainerResourceAssignment> getContainer() {
         return container;
     }
+    
+    /**
+     * Returns the optional ensembles.
+     * 
+     * @return the ensembles (member-leader mapping)
+     */
+    public Map<String, String> getEnsembles() {
+        return ensembles;
+    }
 
     /**
      * Changes the name of the application. [snakeyaml]
@@ -329,12 +341,21 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
 
     /**
-     * Changes whether artifacts shall be removed from the platform on undeployment.
+     * Changes whether artifacts shall be removed from the platform on undeployment. [required by SnakeYaml]
      * 
      * @param onUndeployRemoveArtifact {@code true} for removal, {@code false} else
      */
     public void setOnUndeployRemoveArtifact(boolean onUndeployRemoveArtifact) {
         this.onUndeployRemoveArtifact = onUndeployRemoveArtifact;
+    }
+    
+    /**
+     * Defines the optional ensembles. [required by SnakeYaml]
+     * 
+     * @param ensembles the ensembles (member-leader mapping)
+     */
+    public void setEnsembles(Map<String, String> ensembles) {
+        this.ensembles = ensembles;
     }
     
     /**

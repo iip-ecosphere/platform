@@ -324,6 +324,7 @@ class CliBackend {
         private String[] serviceIds;
         private ExecutionException exception;
         private String resourceId;
+        private Map<String, String> options;
 
         /**
          * Creates the runnable.
@@ -331,18 +332,21 @@ class CliBackend {
          * @param resourceId the resource id (for failure identification)
          * @param client the services client to be used
          * @param serviceIds the ids of the services to be started
+         * @param options the service start options, may be <b>null</b>
          */
-        private StartServicesRunnable(String resourceId, ServicesClient client, String[] serviceIds) {
+        private StartServicesRunnable(String resourceId, ServicesClient client, String[] serviceIds, 
+            Map<String, String> options) {
             this.client = client;
             this.serviceIds = serviceIds;
             this.resourceId = resourceId;
+            this.options = options;
         }
 
         @Override
         public void run() {
             try {
                 println(getMessagePrefix());
-                client.startService(serviceIds);
+                client.startService(options, serviceIds);
                 println(getMessagePrefix() + ": Done.");
             } catch (ExecutionException e) {
                 exception = e;
@@ -421,7 +425,7 @@ class CliBackend {
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 if (a.getServices().size() > 0) {
                     StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                        serviceClients.get(a.getResource()), a.getServicesAsArray());
+                        serviceClients.get(a.getResource()), a.getServicesAsArray(), p.getEnsembles());
                     runnables.add(r);
                     if (null != es) {
                         es.execute(r);

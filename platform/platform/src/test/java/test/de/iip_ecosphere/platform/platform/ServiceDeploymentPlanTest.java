@@ -59,6 +59,11 @@ public class ServiceDeploymentPlanTest {
         Assert.assertEquals(2, assng.getServicesAsArray().length);
         Assert.assertEquals("AI", assng.getServices().get(0));
         Assert.assertEquals("End", assng.getServices().get(1));
+        
+        Assert.assertNotNull(plan.getEnsembles());
+        Assert.assertTrue(plan.getEnsembles().size() == 2);
+        Assert.assertNull(plan.getEnsembles().get("Start"));
+        Assert.assertEquals("End", plan.getEnsembles().get("AI"));
     }
 
 }

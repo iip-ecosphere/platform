@@ -36,7 +36,9 @@ import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnec
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
+import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
  * Tests selected service manager functionality based on simplified instances of a service manager loaded from 
@@ -82,8 +84,13 @@ public class ServiceMgrAndDescriptorTest {
         
         @Override
         public void startService(String... serviceId) throws ExecutionException {
+            startService(null, serviceId);
         }
-        
+
+        @Override
+        public void startService(Map<String, String> options, String... serviceId) throws ExecutionException {
+        }
+
         @Override
         public void setServiceState(String serviceId, ServiceState state) throws ExecutionException {
         }
@@ -226,6 +233,61 @@ public class ServiceMgrAndDescriptorTest {
         assertFunctionDef(
             "receiveRec13_SimpleReceiver3;createRec13_SimpleSource3;transformRec13Rec13_SimpleTransformer3", mgr, 
              "SimpleSource3", "SimpleReceiver3", "SimpleTransformer3");
+    }
+    
+    /**
+     * Tests {@link SpringCloudServiceManager#determineSpringConditionals(ServiceManager, String...)}.
+     * 
+     * @throws IOException if loading the test descriptor "ServiceMesh3Deployment.yml" fails
+     */
+    @Test
+    public void testSpringConditionals() throws IOException  {
+        ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
+        List<String> args = SpringCloudServiceManager.determineSpringConditionals(mgr, 
+            "SimpleTransformer3", "SimpleReceiver3");
+        String[] tmp = args.toArray(new String[0]);
+        Assert.assertTrue(args.size() == 3); // 3 services in yml, subset, must mention all
+        Assert.assertTrue(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleTransformer3", false));
+        Assert.assertTrue(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleReceiver3", false));
+        Assert.assertFalse(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleSource3", true));
+
+        args = SpringCloudServiceManager.determineSpringConditionals(mgr, 
+            "SimpleSource3");
+        tmp = args.toArray(new String[0]);
+        Assert.assertTrue(args.size() == 3); // 3 services in yml, subset, must mention all
+        Assert.assertFalse(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleTransformer3", true));
+        Assert.assertFalse(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleReceiver3", true));
+        Assert.assertTrue(CmdLine.getBooleanArg(tmp, 
+            SpringCloudServiceManager.OPT_SERVICE_PREFIX + "SimpleSource3", false));
+    }
+    
+    /**
+     * Tests {@link SpringCloudServiceManager#handleOptions(Map, ServiceManager, String...)}.
+     * 
+     * @throws IOException if loading the test descriptor "ServiceMesh3Deployment.yml" fails
+     */
+    @Test
+    public void testOptions() throws IOException {
+        ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
+        Map<String, String> opts = new HashMap<>();
+        opts.put("DONTKNOW", null);
+        opts.put("ensemble", "{\"SimpleReceiver3\":\"SimpleTransformer3\", \"a\":\"b\", \"SimpleSource3\":\"c\"}");
+        SpringCloudServiceManager.handleOptions(opts, mgr, "SimpleTransformer3", "SimpleReceiver3");
+        Assert.assertEquals(mgr.getService("SimpleReceiver3").getEnsembleLeader(), 
+            mgr.getService("SimpleTransformer3"));
+        Assert.assertNull(mgr.getService("SimpleTransformer3").getEnsembleLeader());
+        Assert.assertNull(mgr.getService("SimpleSource3").getEnsembleLeader());
+
+        opts.put("ensemble", "{\"SimpleReceiver3\":\"\", \"a\":\"b\", \"SimpleSource3\":\"c\"}");
+        SpringCloudServiceManager.handleOptions(opts, mgr, "SimpleTransformer3", "SimpleReceiver3");
+        Assert.assertNull(mgr.getService("SimpleReceiver3").getEnsembleLeader());
+        Assert.assertNull(mgr.getService("SimpleTransformer3").getEnsembleLeader());
+        Assert.assertNull(mgr.getService("SimpleSource3").getEnsembleLeader());
     }
 
 }
