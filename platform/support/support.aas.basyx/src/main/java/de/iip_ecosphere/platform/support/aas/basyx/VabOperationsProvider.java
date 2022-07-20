@@ -376,9 +376,6 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             o = new HashMap<String, Entry>();
             this.operations.put(category, o);
         }
-        if (o.containsKey(name)) {
-            throw new IllegalArgumentException("Operation " + category + "/" + name + "is already known.");
-        }
         o.put(name, new Entry(Kind.OPERATION, uName));
         operationFunctions.put(uName, function);
         LoggerFactory.getLogger(getClass()).info("Operation " + category + "/" 
@@ -411,9 +408,6 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public VabOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
-        if (properties.containsKey(name)) {
-            throw new IllegalArgumentException("Property " + name + " is already known");
-        }
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
         LoggerFactory.getLogger(getClass()).info("Property " + name + " defined");
