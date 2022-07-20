@@ -5,8 +5,13 @@ import java.util.function.Function;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter;
+import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.transport.status.ActionType;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
+import de.iip_ecosphere.platform.transport.status.ComponentType;
+import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 
 /**
@@ -16,11 +21,17 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
  */
 class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
+    private static final String IDSHORT_PREFIX = "time_";
+    
     /**
      * Creates an instance.
      */
     public StatusConverter() {
         super(PlatformAas.NAME_SUBMODEL_STATUS, StatusMessage.STATUS_STREAM, StatusMessage.class);
+        addConverter(ActionType.class, new TypeConverter(Type.STRING, STRING_CONVERTER));
+        addConverter(ActionTypes.class, new TypeConverter(Type.STRING, ENUM_NAME_CONVERTER));
+        addConverter(ComponentType.class, new TypeConverter(Type.STRING, STRING_CONVERTER));
+        addConverter(ComponentTypes.class, new TypeConverter(Type.STRING, ENUM_NAME_CONVERTER));
     }
 
     @Override
@@ -41,7 +52,7 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
     @Override
     protected Function<StatusMessage, String> getSubmodelElementIdFunction() {
-        return s -> "time-" + String.valueOf(System.currentTimeMillis());
+        return s -> IDSHORT_PREFIX + String.valueOf(System.currentTimeMillis());
     }
 
     @Override
@@ -49,11 +60,16 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
         return (coll, borderTimestamp) -> {
             boolean delete = false;
             String idShort = coll.getIdShort();
+            String id = idShort;
+            if (id.startsWith(IDSHORT_PREFIX)) {
+                id = id.substring(IDSHORT_PREFIX.length());
+            }
             try {
-                long entryTimestamp = Long.parseLong(idShort);
+                long entryTimestamp = Long.parseLong(id);
                 delete = entryTimestamp < borderTimestamp;
             } catch (NumberFormatException e) {
-                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot delete AAS status entry {}", idShort);
+                LoggerFactory.getLogger(PlatformAas.class).warn(
+                    "Cannot check AAS status entry {} ({}) for deletion: {}", idShort, id, e.getMessage());
             }
             return delete;
         };
