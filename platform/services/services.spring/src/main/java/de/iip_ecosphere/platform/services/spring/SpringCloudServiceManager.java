@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -32,6 +34,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
+import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
@@ -160,6 +163,37 @@ public class SpringCloudServiceManager
     }
     
     /**
+     * Determines the command line values for the spring component conditionals.
+     * 
+     * @param serviceIds the services to determine the arguments for
+     * @return the arguments
+     */
+    private List<String> determineSpringConditionals(String... serviceIds) {
+        List<String> result = new ArrayList<>();
+
+        Set<ArtifactDescriptor> artifacts = new HashSet<>();
+        Set<String> activeServices = new HashSet<>();
+        for (String id: serviceIds) {
+            ServiceDescriptor service = getService(id);
+            artifacts.add(service.getArtifact());
+            activeServices.add(id);
+        }
+        
+        Set<String> allServices = new HashSet<>();
+        for (ArtifactDescriptor a: artifacts) {
+            allServices.addAll(a.getServiceIds());
+        }
+
+        if (activeServices.size() != allServices.size()) {
+            for (String id: allServices) {
+                result.add("--iip.service." + id + "=" + activeServices.contains(id));
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
      * Returns the lead and ensemble services of service {@code id} (viewing {@code id} as potential 
      * ensemble leader) from a given set of services.
      * 
@@ -202,6 +236,7 @@ public class SpringCloudServiceManager
                 List<String> externalServiceArgs = new ArrayList<String>(bindingServiceArgs);
                 // adjust spring function definition from application.yml if subset of services shall be started 
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
+                externalServiceArgs.addAll(determineSpringConditionals(sIdEns));
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);

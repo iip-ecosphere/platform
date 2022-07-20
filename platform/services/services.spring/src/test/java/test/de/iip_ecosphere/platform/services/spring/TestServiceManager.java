@@ -416,7 +416,7 @@ public class TestServiceManager {
          */
         protected ServiceImpl(ServiceDescriptor desc) {
             super(desc.getId(), desc.getName(), desc.getVersion(), desc.getDescription(), 
-                desc.isDeployable(), desc.getKind());
+                desc.isDeployable(), desc.isTopLevel(), desc.getKind());
         }
 
         @Override
