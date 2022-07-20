@@ -176,7 +176,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
 
-    def registerService() {
+    def registerService(MeshElement elt, ServiceBase service) {
         'io.micrometer.core.instrument.Counter
             .builder("service.sent")
             .baseUnit("tuple/s")
@@ -194,7 +194,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '${genMapService("${s}")}'
         }
     }
-    
+
     def initIngestors(MeshElement elt, ServiceBase base) {
         ''
     }
@@ -676,7 +676,15 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         Service init = defaultService(family);
         String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
         'service = new ${clsName}(streamBridge, metrics);
-        selector.initial("${init.id}");'
+        selector.initial("${init.id}");
+        service.initService();'
+        for (String s: serviceVars) {
+            '${genMapService("${s}")}'
+        }        
+    }
+    
+    def registerService(MeshElement elt, ServiceFamily service) {
+        'familyStub.setActiveMemberSupplier(() -> service);'
     }
     
     def generateImports(ServiceFamily service) {
@@ -689,7 +697,14 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             '${generateSelectorServiceAttribute(family, family.selector)|e}'
         }
         'private ${familyInterfaceName(getClsName(elt))} service;
-        private String actServiceId = "${init.id}";'
+        private String actServiceId = "${init.id}";
+        private FamilyServiceStub familyStub;'
+    }
+
+    def initialService(MeshElement elt, ServiceFamily family) {
+        serviceVars.add("familyStub");
+        'familyStub = new FamilyServiceStub("${family.id}", 
+            AbstractService.getResourceAsStream(${getClsName(elt)}.class.getClassLoader(), "${getDeploymentDescriptorPath()}"));'
     }
 
     def generateSelectorServiceAttribute(ServiceFamily family, FamilyMemberSelector selector) {
@@ -718,7 +733,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
-        'service.initService();'
+        ''
     }
     
     def generateSinkMethodBody(MeshSink snk, ServiceFamily service, String methodName, String methodSuffixWithServiceId, String type) {
@@ -1133,7 +1148,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def genClassAnnotations(MeshElement elt) {
+        String serviceId = elt.impl.id.toIdentifier();
         '@Component
+        @ConditionalOnProperty(value="iip.service.${serviceId}", havingValue="true", matchIfMissing=true)
         @EnableScheduling'
     }
     
@@ -1175,7 +1192,6 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
             constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
-        String implMonId = impl.id.toIdentifier();
         'package ${pkg};
         
         import java.io.*;
@@ -1191,6 +1207,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import org.springframework.context.annotation.ComponentScan;
         import org.springframework.context.annotation.Import;
         import org.springframework.scheduling.annotation.EnableScheduling;
+        import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
@@ -1248,7 +1265,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             ${nodeAnnotation("@PostConstruct")|e}
             public void initService() {
-                ${registerService()}
+                ${registerService(elt, impl)}
                 ${initIngestors(elt, impl)}
                 ${attachIngestors(elt, impl)}
             }

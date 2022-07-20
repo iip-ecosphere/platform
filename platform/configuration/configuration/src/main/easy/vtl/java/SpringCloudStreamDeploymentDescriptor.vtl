@@ -185,37 +185,54 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     
     def String trimTrailingComma(String str) {
         if (str.length() > 1 and str.endsWith(",")) {
-            str.substring(0, str.length() - 1);
-        } else {
-            str;
-        }
+            str = str.substring(0, str.length() - 1);
+        } 
+        if (str.length() > 1 and str.startsWith(",")) {
+            str = str.substring(1);
+        } 
+        str;
     }
     
     def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
-        String eltMet = substNewlines(generateDataMethods(elt, true), "");
-        returnType = true;
-        inputType = true;
-        String eltType = trimTrailingComma(substNewlines(generateDataMethods(elt, true), ","));
-        returnType = false;
+        String res = "";
+        String tmp = substNewlines(generateDataMethods(elt, true), ",");
+        sequenceOf(String) eltM = tmp.split(",");
+        for (String eltMet: eltM) {
+            returnType = true;
+            inputType = true;
+            String eltType = trimTrailingComma(substNewlines(generateDataMethods(elt, true), ","));
+            returnType = false;
+            if (res.length() > 0) {
+                res = res + "\n";
+            }
+            res = res + 
         '- channel: ${eltMet}-out-0
           direction: OUT
-          type: ${eltType}'
-        if (conns.size() > 0) {
-            for (MeshConnector conn : conns, "\n") {
-                MeshInnerElement next = conn.next;
-                String nextMeth = substNewlines(generateDataMethods(next, true), "");
-                returnType = true;
-                inputType = true;
-                String nextType = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
-                returnType = false;
-                '
-                - channel: ${nextMeth}-in-0
-                  id: ${conn.name}
-                  service: ${next.impl.id}
-                  direction: IN
-                  type: ${nextType}'
+          type: ${eltType}';
+            if (conns.size() > 0) {
+                for (MeshConnector conn : conns, "\n") {
+                    MeshInnerElement next = conn.next;
+                    tmp = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
+                    sequenceOf(String) nextM = tmp.split(",");
+                    for (String nextMeth: nextM) {
+                        returnType = true;
+                        inputType = true;
+                        String nextType = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
+                        returnType = false;
+                        if (res.length() > 0) {
+                            res = res + "\n";
+                        }
+                        res = res + 
+        '- channel: ${nextMeth}-in-0
+          id: ${conn.name}
+          service: ${next.impl.id}
+          direction: IN
+          type: ${nextType}';
+                    }
+                }
             }
         }
+        '${res}'
     }
 
     // -------------------------- mesh basics refinement, extract stream names ---------------------------------
@@ -228,7 +245,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
                 outType + ",";
             }
         } else {
-            methodSuffixWithServiceId;
+            methodSuffixWithServiceId + ",";
         }
     }
 

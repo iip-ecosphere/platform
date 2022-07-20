@@ -6,7 +6,7 @@ Planned:
 * More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 
-### Next release (summer 2022, TddT'22):
+### Next release (august 2022, TddT'22):
 Planned:
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35)
 
@@ -17,7 +17,10 @@ In progress:
 * Example improvements [#40](https://github.com/iip-ecosphere/platform/issues/40), [#54](https://github.com/iip-ecosphere/platform/issues/54)
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
-* Increasing number of semanticIDs in platform AAS.
+* Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
+* Platform component heartbeat: [#62](https://github.com/iip-ecosphere/platform/issues/62)
+* UI progress reporting: [#67](https://github.com/iip-ecosphere/platform/issues/67)
+* Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 Completed improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
@@ -41,6 +44,7 @@ Completed improvements:
 * [#66](https://github.com/iip-ecosphere/platform/issues/66): Improvements of examples.KODEX and identifier check/fixing for generated Java code.
 * [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
+* Improvements of service, family and stream generation.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 
