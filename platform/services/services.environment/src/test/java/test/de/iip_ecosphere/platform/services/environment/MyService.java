@@ -31,7 +31,8 @@ public class MyService extends AbstractService {
      * Creates an instance.
      */
     public MyService() {
-        super("1234", "MyService", new Version("1.2.3"), "Default Service", true, ServiceKind.TRANSFORMATION_SERVICE);
+        super("1234", "MyService", new Version("1.2.3"), "Default Service", true, 
+            true, ServiceKind.TRANSFORMATION_SERVICE);
     }
     
     @Override

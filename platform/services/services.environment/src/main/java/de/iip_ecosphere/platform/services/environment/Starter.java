@@ -67,6 +67,33 @@ public class Starter {
             }
         }
     }
+    
+    /**
+     * Transfers {@link #IIP_APP_PREFIX} as system property or usual command line
+     * argument to the system properties if not already set.
+     * 
+     * @param args the arguments to be analyzed
+     */
+    public static void transferArgsToEnvironment(String[] args) {
+        for (String a : args) {
+            String tmp = null;
+            if (a.startsWith("-D" + IIP_APP_PREFIX)) {
+                tmp = a.substring(2);
+            } else if (a.startsWith("--" + IIP_APP_PREFIX)) {
+                tmp = a.substring(2);
+            }
+            if (null != tmp) {
+                int pos = tmp.indexOf('=');
+                if (pos > 0) {
+                    String key = tmp.substring(0, pos);
+                    if (null == System.getProperty(key)) {
+                        String value = tmp.substring(pos + 1);
+                        System.setProperty(key, value);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Returns the network manager key used by this descriptor to allocate dynamic network ports for service commands.
@@ -138,6 +165,7 @@ public class Starter {
      * @param args the arguments
      */
     public static void parse(String... args) {
+        transferArgsToEnvironment(args);
         AasFactory factory = AasFactory.getInstance();
         int port = getIntArg(args, PARAM_IIP_PORT, -1);
         if (port < 0) {
@@ -234,7 +262,7 @@ public class Starter {
                 mapper.mapService(service);
             }
             // TODO -> ServiceState.DEPLOYED
-            if (serviceAutostart && enableAutostart) {
+            if (serviceAutostart && enableAutostart && service.isTopLevel()) {
                 try {
                     getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
                     service.setState(ServiceState.STARTING);

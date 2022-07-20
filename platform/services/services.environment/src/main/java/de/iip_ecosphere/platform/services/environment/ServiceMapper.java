@@ -36,6 +36,7 @@ public class ServiceMapper {
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_STATE = "state";
     public static final String NAME_PROP_DEPLOYABLE = "deployable";
+    public static final String NAME_PROP_TOPLEVEL = "topLevel";
     public static final String NAME_PROP_KIND = "kind";
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_DESCRIPTION = "description";
@@ -48,7 +49,7 @@ public class ServiceMapper {
     public static final String NAME_OP_SET_STATE = "setState";
     
     public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_STATE, NAME_PROP_DEPLOYABLE, 
-        NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION}; 
+        NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION}; 
     public static final String[] PROP_WRITEONLY = {}; 
     public static final String[] PROP_READWRITE = {}; 
     public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, NAME_OP_UPDATE, 
@@ -86,6 +87,8 @@ public class ServiceMapper {
                 () -> service.getName(), null);
             builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
                 () -> service.isDeployable(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_TOPLEVEL), 
+                () -> service.isTopLevel(), null);
             builder.defineOperation(getQName(service, NAME_OP_ACTIVATE), 
                 new JsonResultWrapper(p -> {
                     service.activate(); 

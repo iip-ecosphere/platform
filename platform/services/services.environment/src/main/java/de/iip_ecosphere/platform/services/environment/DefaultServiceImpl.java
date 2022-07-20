@@ -44,11 +44,12 @@ public class DefaultServiceImpl extends AbstractService {
      * @param version the version of the service
      * @param description a description of the service, may be empty
      * @param isDeployable whether the service is decentrally deployable
+     * @param isTopLevel whether the service is a top-level (non-nested) service
      * @param kind the service kind
      */
     protected DefaultServiceImpl(String id, String name, Version version, String description, boolean isDeployable, 
-        ServiceKind kind) {
-        super(id, name, version, description, isDeployable, kind);
+        boolean isTopLevel, ServiceKind kind) {
+        super(id, name, version, description, isDeployable, isTopLevel, kind);
     }
 
     // checkstyle: resume parameter number check

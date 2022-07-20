@@ -53,7 +53,14 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
      * @return {@code true} for deployable, {@code false} for fixed
      */
     public boolean isDeployable();
-    
+
+    /**
+     * Returns whether the service is a top-level service.
+     * 
+     * @return {@code true} for top-level, {@code false} for nested
+     */
+    public boolean isTopLevel();
+
     /**
      * Returns the service kind.
      * 

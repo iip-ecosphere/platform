@@ -210,6 +210,11 @@ public class ServiceStub implements Service {
     }
 
     @Override
+    public boolean isTopLevel() {
+        return convertGetterResult(NAME_PROP_TOPLEVEL, false, r -> Boolean.valueOf(r.toString()));
+    }
+
+    @Override
     public ServiceKind getKind() {
         return convertGetterResultToEnum(NAME_PROP_KIND, null, ServiceKind.class);
     }

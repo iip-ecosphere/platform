@@ -29,6 +29,7 @@ public abstract class AbstractYamlService {
     private String description = "";
     private ServiceKind kind;
     private boolean deployable = false;
+    private boolean topLevel = true;
 
     /**
      * Returns the name of the service.
@@ -83,7 +84,16 @@ public abstract class AbstractYamlService {
     public boolean isDeployable() {
         return deployable;
     }
-    
+
+    /**
+     * Returns whether this service is top-level.
+     * 
+     * @return {@code true} for top-level, {@code false} for nested
+     */
+    public boolean isTopLevel() {
+        return topLevel;
+    }
+
     /**
      * Defines the id of the service. [required by SnakeYaml]
      * 
@@ -130,7 +140,16 @@ public abstract class AbstractYamlService {
     public void setDeployable(boolean deployable) {
         this.deployable = deployable;
     }
-    
+
+    /**
+     * Sets whether this service is a top-level service.
+     * 
+     * @param topLevel {@code true} for topLevel, {@code false} for nested
+     */
+    public void setTopLevel(boolean topLevel) {
+        this.topLevel = topLevel;
+    }
+
     /**
      * Sets the service kind. [required by SnakeYaml]
      * 

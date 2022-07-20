@@ -50,6 +50,7 @@ public abstract class AbstractService implements Service {
     private Version version;
     private String description;
     private boolean isDeployable; 
+    private boolean isTopLevel; 
     private ServiceKind kind;
     private ServiceState state;
 
@@ -69,7 +70,7 @@ public abstract class AbstractService implements Service {
      * @param kind the service kind
      */
     protected AbstractService(String id, ServiceKind kind) {
-        this(id, "", new Version(0, 0, 0), "", true, kind);
+        this(id, "", new Version(0, 0, 0), "", true, true, kind);
     }
 
     // checkstyle: stop parameter number check
@@ -82,15 +83,17 @@ public abstract class AbstractService implements Service {
      * @param version the version of the service
      * @param description a description of the service, may be empty
      * @param isDeployable whether the service is decentrally deployable
+     * @param isTopLevel whether the service is a top-level (non-nested) service
      * @param kind the service kind
      */
     protected AbstractService(String id, String name, Version version, String description, boolean isDeployable, 
-        ServiceKind kind) {
+        boolean isTopLevel, ServiceKind kind) {
         this.id = id;
         this.name = name;
         this.version = version;
         this.description = description;
         this.isDeployable = isDeployable;
+        this.isTopLevel = isTopLevel;
         this.kind = kind;
         this.state = ServiceState.AVAILABLE;
     }
@@ -105,7 +108,7 @@ public abstract class AbstractService implements Service {
      */
     protected AbstractService(YamlService yaml) {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
-            yaml.getKind());
+            yaml.isTopLevel(), yaml.getKind());
         initializeFrom(yaml);
     }
     
@@ -350,6 +353,11 @@ public abstract class AbstractService implements Service {
     @Override
     public boolean isDeployable() {
         return isDeployable;
+    }
+
+    @Override
+    public boolean isTopLevel() {
+        return isTopLevel;
     }
 
     @Override
