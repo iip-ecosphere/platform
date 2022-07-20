@@ -55,6 +55,8 @@ public abstract class TransportToAasConverter<T> {
     public static final ValueConverter IDENTITY_CONVERTER = v -> v;
     public static final ValueConverter JSON_CONVERTER = v -> JsonUtils.toJson(v);
     public static final ValueConverter SHORT2INT_CONVERTER = v -> Integer.valueOf((Short) v);
+    public static final ValueConverter STRING_CONVERTER = v -> String.valueOf(v);
+    public static final ValueConverter ENUM_NAME_CONVERTER = v -> ((Enum<?>) v).name();
     
     private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = new HashMap<>();
     private static final String PREFIX_GETTER = "get";
@@ -91,6 +93,7 @@ public abstract class TransportToAasConverter<T> {
         DEFAULT_CONVERTERS.put(double[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(byte[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(boolean[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
+        DEFAULT_CONVERTERS.put(String[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         
         METHODS_TO_IGNORE.add("getClass");
     }
@@ -156,7 +159,7 @@ public abstract class TransportToAasConverter<T> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class TypeConverter implements ValueConverter {
+    public static class TypeConverter implements ValueConverter {
         
         private ValueConverter conv;
         private Type type;
@@ -167,7 +170,7 @@ public abstract class TransportToAasConverter<T> {
          * @param type the AAS type
          * @param conv the value converter
          */
-        private TypeConverter(Type type, ValueConverter conv) {
+        public TypeConverter(Type type, ValueConverter conv) {
             this.type = type;
             this.conv = conv;
         }
@@ -193,7 +196,7 @@ public abstract class TransportToAasConverter<T> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private interface ValueConverter {
+    public interface ValueConverter {
 
         /**
          * Performs the conversion.
@@ -201,7 +204,7 @@ public abstract class TransportToAasConverter<T> {
          * @param value the value to convert
          * @return the converted value
          */
-        Object convert(Object value);
+        public Object convert(Object value);
         
     }
     
