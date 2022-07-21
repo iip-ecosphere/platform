@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 
 import org.junit.Assert;
 
@@ -398,6 +399,11 @@ public class CliTest {
         @Override
         public String snapshotAas(String id) throws ExecutionException {
             return "";
+        }
+
+        @Override
+        public SemanticIdResolutionResult resolveSemanticId(String id) throws ExecutionException {
+            return null;
         }
         
     }

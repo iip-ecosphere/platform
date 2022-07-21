@@ -22,6 +22,8 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 
 /**
  * A factory for platform client instances. [testing]
@@ -57,6 +59,11 @@ public interface PlatformClientFactory {
                     } catch (IOException e) {
                         throw new ExecutionException(e);
                     }
+                }
+
+                @Override
+                public SemanticIdResolutionResult resolveSemanticId(String id) throws ExecutionException {
+                    return SemanticIdResolver.resolve(id);
                 }
                 
             };
