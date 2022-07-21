@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.platform;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
 class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
     private static final String IDSHORT_PREFIX = "time_";
+    private AtomicInteger counter = new AtomicInteger(0);
     
     /**
      * Creates an instance.
@@ -52,7 +54,10 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
     @Override
     protected Function<StatusMessage, String> getSubmodelElementIdFunction() {
-        return s -> IDSHORT_PREFIX + String.valueOf(System.currentTimeMillis());
+        return s -> {
+            int c = Math.abs(counter.incrementAndGet()); // something temporarily unique, may also be random
+            return IDSHORT_PREFIX + c + "_" + String.valueOf(System.currentTimeMillis());
+        };
     }
 
     @Override
@@ -62,7 +67,7 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
             String idShort = coll.getIdShort();
             String id = idShort;
             if (id.startsWith(IDSHORT_PREFIX)) {
-                id = id.substring(IDSHORT_PREFIX.length());
+                id = id.substring(id.lastIndexOf('_') + 1);
             }
             try {
                 long entryTimestamp = Long.parseLong(id);
