@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Defines the interface for resolution of semantic ids, IRDIs, IRIs ...
  * 
@@ -24,6 +26,15 @@ import java.util.ServiceLoader;
 public abstract class SemanticIdResolver {
 
     private static List<SemanticIdResolver> resolvers;
+    
+    /**
+     * Returns the name of the resolver.
+     * 
+     * @return the name of the resolver, by default the class name
+     */
+    public String getName() {
+        return getClass().getName();
+    }
     
     /**
      * Tries to resolve a given semantic id.
@@ -53,7 +64,12 @@ public abstract class SemanticIdResolver {
         if (null == resolvers) {
             resolvers = new ArrayList<>();
             ServiceLoader<SemanticIdResolverDescriptor> loader = ServiceLoader.load(SemanticIdResolverDescriptor.class);
-            loader.forEach(l -> resolvers.add(l.createResolver()));
+            loader.forEach(l -> {
+                SemanticIdResolver resolver = l.createResolver();
+                resolvers.add(resolver);
+                LoggerFactory.getLogger(SemanticIdResolver.class).info("Registered semanticId resolver {}", 
+                    resolver.getName());
+            });
         }
         for (SemanticIdResolver resolver : resolvers) {
             if (resolver.isResponsible(semanticId)) {
