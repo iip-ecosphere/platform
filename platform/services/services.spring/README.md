@@ -64,8 +64,7 @@ The schematic descriptor structure looks as given below (lists are indicates by 
           - name: <String>
             description: <String>
             type: <QString>
-        ensembleWith:
-          - <String>
+        ensembleWith: <String>
         relations:
           - channel: <String>
             id: <String>
@@ -137,7 +136,7 @@ The configuration structure is as shown below (the `executables` mapping is indi
       
 ## Service start options
 One of the service start commands can take a map of options. The Spring Cloud Service manager implements the following options:
-* `ensemble`: Change the ensemble/leader assignments at startup. Existing assignments from the artifact deployment descriptor are overridden. Unwanted assignments must be overridden too. The value of the option is a map in JSON format, i.e., `{"ens":"leader",...}` assigning the service with id `leader` as ensemble leader to the service with id `ens`. If leader cannot be resolved, e.g., an empty string, the leader assignment is cleared.
+* `ensemble`: Change the ensemble/leader assignments at startup. Existing assignments from the artifact deployment descriptor can be overridden for top-level services. Unwanted assignments must be overridden too. The value of the option is a map in JSON format, i.e., `{"ens":"leader",...}` assigning the service with id `leader` as ensemble leader to the service with id `ens`. If leader cannot be resolved, e.g., an empty string, the leader assignment is cleared.
 
 ## Hint
 Service startup on slow machines may fail due to Spring timeouts. Might be some deployer settings could help then.      

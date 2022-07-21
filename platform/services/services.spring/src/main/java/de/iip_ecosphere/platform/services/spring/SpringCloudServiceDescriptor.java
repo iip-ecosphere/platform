@@ -281,7 +281,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @return the process port, valid if positive
      * @throws ExecutionException when preparing the service fails for some reason
      */
-    private int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
+    int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
         int result = -1;
         try {
             processDir = DescriptorUtils.extractProcessArtifacts(getId(), pSpec, getArtifact().getJar(), 

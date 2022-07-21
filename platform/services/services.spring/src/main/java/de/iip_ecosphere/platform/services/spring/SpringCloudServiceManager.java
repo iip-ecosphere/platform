@@ -273,7 +273,7 @@ public class SpringCloudServiceManager
                 if (actServices.contains(ensemble)) { // leader may be null to reset, must not be there
                     ServiceDescriptor ensDesc = mgr.getService(ensemble);
                     ServiceDescriptor leaderDesc = mgr.getService(leader);
-                    if (ensDesc instanceof SpringCloudServiceDescriptor 
+                    if (ensDesc instanceof SpringCloudServiceDescriptor && ensDesc.isTopLevel()
                         && (leaderDesc == null || leaderDesc instanceof SpringCloudServiceDescriptor)) {
                         ((SpringCloudServiceDescriptor) ensDesc).setEnsembleLeader(
                             (SpringCloudServiceDescriptor) leaderDesc);
@@ -294,6 +294,7 @@ public class SpringCloudServiceManager
         // re-link binders if needed, i.e., subset shall be started locally; bindings "global", function local
         int step = 0;
         List<String> bindingServiceArgs = determineBindingServiceArgs(serviceIds);
+        handleFamilyProcesses(serviceIds, true);
         for (String sId : sortByDependency(serviceIds, true)) {
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Starting " + sId);
             SpringCloudServiceDescriptor service = getService(sId);
@@ -342,6 +343,39 @@ public class SpringCloudServiceManager
         }
         checkErrors(errors);
         LOGGER.info("Started services " + Arrays.toString(serviceIds));
+    }
+    
+    /**
+     * Prepares the processes of the family members.
+     * 
+     * @param serviceIds the service ids of the top-level services to be started
+     * @param start do startup or shutdown of the family services
+     * @throws ExecutionException when preparing the service fails for some reason
+     */
+    private void handleFamilyProcesses(String[] serviceIds, boolean start) throws ExecutionException {
+        Set<ArtifactDescriptor> artifacts = new HashSet<>();
+        Set<String> activeServices = new HashSet<>();
+        for (String id: serviceIds) {
+            ServiceDescriptor service = getService(id);
+            artifacts.add(service.getArtifact());
+            activeServices.add(id);
+        }
+        for (ArtifactDescriptor a: artifacts) {
+            for (ServiceDescriptor s: a.getServices()) {
+                if (!s.isTopLevel() && s.getEnsembleLeader() != null 
+                    && activeServices.contains(s.getEnsembleLeader().getId())) {
+                    SpringCloudServiceDescriptor famMember = getService(s.getId());
+                    LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
+                        "Preparing processes for non-top-level ensemble service {}", s.getId());
+                    if (start) {
+                        // TODO if there is a real process, what to do with the port?
+                        famMember.startProcess(getConfig(), famMember.getSvc().getProcess());
+                    } else {
+                        famMember.setState(ServiceState.STOPPING);
+                    }
+                }
+            }
+        }
     }
     
     /**
@@ -398,6 +432,7 @@ public class SpringCloudServiceManager
         LOGGER.info("Stopping services " + Arrays.toString(serviceIds));
         // TODO add/check causes for failing
         int step = 0;
+        handleFamilyProcesses(serviceIds, false);
         for (String ids : sortByDependency(serviceIds, false)) {
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Stopping service " + ids);
             SpringCloudServiceDescriptor service = getService(ids);

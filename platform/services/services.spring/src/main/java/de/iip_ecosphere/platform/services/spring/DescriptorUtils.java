@@ -112,10 +112,7 @@ public class DescriptorUtils {
     public static YamlArtifact readFromClasspath() throws ExecutionException {
         YamlArtifact result = null;
         String descName = getDescriptorName();
-        InputStream descStream = DescriptorUtils.class.getResourceAsStream("/BOOT-INF/classes/" + descName);
-        if (null == descStream) {
-            descStream = DescriptorUtils.class.getResourceAsStream("/" + descName);
-        }
+        InputStream descStream = ResourceLoader.getResourceAsStream(DescriptorUtils.class, descName);
         if (null != descStream) {
             try {
                 result = YamlArtifact.readFromYaml(descStream);
