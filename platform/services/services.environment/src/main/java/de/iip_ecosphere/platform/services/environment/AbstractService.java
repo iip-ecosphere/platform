@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -28,6 +27,8 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -182,25 +183,8 @@ public abstract class AbstractService implements Service {
      * @return the input stream if the resource was found, <b>null</b> else
      */
     public static InputStream getResourceAsStream(ClassLoader loader, String resource) {
-        InputStream desc = loader.getResourceAsStream(resource); // TODO unify with resource loader
-        if (null == desc) {
-            String tmp = resource;
-            while (tmp.startsWith("/")) {
-                tmp = tmp.substring(1);
-            }
-            desc = loader.getResourceAsStream(tmp);
-            if (null == desc) {
-                File f = new File(tmp);
-                if (f.exists()) {
-                    try {
-                        desc = new FileInputStream(f);
-                    } catch (IOException e) {
-                        // also not there
-                    }
-                }
-            }
-        }
-        return desc;
+        return ResourceLoader.getResourceAsStream(loader, resource, 
+            new FolderResourceResolver(new File(".")));  // TODO do we need the folderresolver?
     }
 
     /**

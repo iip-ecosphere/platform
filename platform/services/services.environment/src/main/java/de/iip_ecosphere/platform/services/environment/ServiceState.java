@@ -119,7 +119,7 @@ public enum ServiceState {
     static {
         // error, unknown is always possible
         addValidTransition(UNKNOWN, AVAILABLE);
-        addValidTransition(AVAILABLE, DEPLOYING, CREATED, STARTING, UNDEPLOYING); // preliminary: created, starting 
+        addValidTransition(AVAILABLE, DEPLOYING, CREATED, STARTING, STOPPING, UNDEPLOYING); // prelim: created, starting
         addValidTransition(STARTING, STOPPING); // test fallback :/
         addValidTransition(DEPLOYING, CREATED, STARTING); // preliminary: starting 
         addValidTransition(CREATED, STARTING);
