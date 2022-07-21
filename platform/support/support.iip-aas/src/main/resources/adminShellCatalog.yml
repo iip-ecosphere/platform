@@ -1,0 +1,49 @@
+definitions:
+  - semanticId: https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1
+    version: 1
+    revision: 1
+    naming:
+      de: 
+        name: Produktbild
+        structuredName: ProductImage
+        description: Bilddatei für zugehöriges Produkt im gängigen Format (.png, .jpg).
+      en:
+        name: Product image
+        structuredName: ProductImage 
+        description: Image file for associated product provided in common format (.png, .jpg).
+  - semanticId: https://admin-shell.io/ZVEI/TechnicalData/ManufacturerLogo/1/1
+    version: 1
+    revision: 1
+    naming:
+      de: 
+        name: Hersteller-Logo
+        structuredName: ManufacturerLogo
+        description: Bilddatei für Logo des Herstellers im gängigen Format (.png, .jpg).
+      en:
+        name: Manufacturer logo
+        structuredName: ManufacturerLogo
+        description: Imagefile for logo of manufacturer provided in common format (.png, .jpg).
+  - semanticId: https://admin-shell.io/ZVEI/TechnicalData/ManufacturerName/1/1
+    version: 1
+    revision: 1
+    naming:
+      de: 
+        name: Herstellername
+        structuredName: ManufacturerName 
+        description: Rechtsgültige Bezeichnung der natürlichen oder juristischen Stelle, die für die Gestaltung, Herstellung, Verpackung und Kennzeichnung eines Produkts im Hinblick auf sein Inverkehrbringen unmittelbar verantwortlich ist. 
+      en:
+        name: Manufacturer name
+        structuredName: ManufacturerName 
+        description: Legally valid designation of the natural or judicial body which is directly responsible for the design, production, packaging and labeling of a product in respect to its being brought into the market.
+  - semanticId: https://admin-shell.io/ZVEI/TechnicalData/ManufacturerProductDesignation/1/1
+    version: 1
+    revision: 1
+    naming:
+      de: 
+        name: Produktbezeichnung des Herstellers
+        structuredName: ManufacturerProductDesignation
+        description: Produktbezeichnung wie vom Hersteller angegeben. Kurze Beschreibung des Produkts, der Produktgruppe oder der Funktion (Kurztext) in allgemeiner Sprache. 
+      en:
+        name: Manufacturer product designation
+        structuredName: ManufacturerProductDesignation
+        description: Product designation as given by the manufacturer. Short description of the product, product group or function (short text) in common language.

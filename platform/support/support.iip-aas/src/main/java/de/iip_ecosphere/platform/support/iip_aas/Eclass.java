@@ -21,7 +21,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
 public class Eclass {
 
     /**
-     * Denotes a generic identifier (as string).
+     * Denotes a generic identifier (as string). Use is not completely compliant as we do not use an URI. No other 
+     * form of identifier found.
      */
     public static final String IRDI_PROPERTY_IDENTIFIER = "0173-1#02-ABF809#001";
 

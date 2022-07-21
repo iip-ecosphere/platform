@@ -32,8 +32,10 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 
 /**
  * The platform name/typeplate.
@@ -49,6 +51,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
     public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
+    public static final String NAME_OPERATION_RESOLVE_SEMANTICID = "resolveSemanticId";
     public static final String NAME_PROPERTY_ID = "Id";
     public static final String NAME_PROPERTY_PRODUCTIMAGE = "ProductImage";
     public static final String NAME_PROPERTY_MANUFACTURER_LOGO = "ManufacturerLogo";
@@ -134,6 +137,10 @@ public class PlatformAas implements AasContributor {
             smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS) // TODO restrict access
                 .addInputVariable("id", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_SNAPSHOTAAS))
+                .build(Type.STRING);
+            smB.createOperationBuilder(NAME_OPERATION_RESOLVE_SEMANTICID) // TODO restrict access
+                .addInputVariable("semanticId", Type.STRING)
+                .setInvocable(iCreator.createInvocable(NAME_OPERATION_RESOLVE_SEMANTICID))
                 .build(Type.STRING);
             smB.build();
         }
@@ -225,6 +232,9 @@ public class PlatformAas implements AasContributor {
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(NAME_OPERATION_SNAPSHOTAAS, new JsonResultWrapper(p -> { 
             return snapshotAas(AasUtils.readString(p));
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_RESOLVE_SEMANTICID, new JsonResultWrapper(p -> { 
+            return JsonUtils.toJson(SemanticIdResolver.resolve(AasUtils.readString(p)));
         }));
     }
     

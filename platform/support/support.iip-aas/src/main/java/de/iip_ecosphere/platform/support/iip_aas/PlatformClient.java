@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
+
 /**
  * Interface to platform nameplate operations.
  * 
@@ -29,4 +31,13 @@ public interface PlatformClient {
      */
     public String snapshotAas(String id) throws ExecutionException; 
 
+    /**
+     * Resolves a semantic id.
+     * 
+     * @param id the id to be resolved
+     * @return the resolved result or null
+     * @throws ExecutionException
+     */
+    public SemanticIdResolutionResult resolveSemanticId(String id) throws ExecutionException;
+    
 }

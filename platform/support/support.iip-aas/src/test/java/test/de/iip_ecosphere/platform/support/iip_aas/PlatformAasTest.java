@@ -27,7 +27,9 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.Eclass;
 
 /**
  * Tests the platform AAS.
@@ -94,6 +96,9 @@ public class PlatformAasTest {
         } catch (ExecutionException e) {
             // this is desired
         }
+        
+        SemanticIdResolutionResult sres = client.resolveSemanticId(Eclass.IRDI_UNIT_BYTE);
+        Assert.assertNotNull(sres);
 
         AasPartRegistry.setAasSupplier(() -> res.getAas());
         // seems to work only once with BaSyx

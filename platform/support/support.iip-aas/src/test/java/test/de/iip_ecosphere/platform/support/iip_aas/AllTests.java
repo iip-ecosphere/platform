@@ -31,7 +31,8 @@ import org.junit.runners.Suite;
     NetworkManagerAasTest.class,
     PlatformAasTest.class,
     AbstractSetupTest.class,
-    CmdLineTest.class
+    CmdLineTest.class,
+    YamlSemanticIdResolverDescriptorTest.class
 })
 public class AllTests {
 }

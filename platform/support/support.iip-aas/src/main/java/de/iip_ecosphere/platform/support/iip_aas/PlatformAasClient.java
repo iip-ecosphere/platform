@@ -17,6 +17,15 @@ import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.f
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
+
 /**
  * Implemented client for platform nameplate operations.
  * 
@@ -37,6 +46,12 @@ public class PlatformAasClient extends SubmodelClient implements PlatformClient 
     @Override
     public String snapshotAas(String id) throws ExecutionException {
         return fromJson(getOperation(PlatformAas.NAME_OPERATION_SNAPSHOTAAS).invoke(id));
+    }
+
+    @Override
+    public SemanticIdResolutionResult resolveSemanticId(String id) throws ExecutionException {
+        String json = fromJson(getOperation(PlatformAas.NAME_OPERATION_RESOLVE_SEMANTICID).invoke(id));
+        return JsonUtils.fromJson(json, DefaultSemanticIdResolutionResult.class);
     }
 
 }

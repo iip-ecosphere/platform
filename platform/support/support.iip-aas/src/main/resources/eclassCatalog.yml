@@ -1,0 +1,397 @@
+definitions:
+  - semanticId: 0173-1#05-AAA114#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: ms
+        structuredName: Millisekunde
+        description: 0,001-faches der SI-Basiseinheit Sekunde
+      en:
+        name: ms
+        structuredName: Millisecond
+        description: 0,001 times of the SI base unit second
+  - semanticId: 0173-1#02-ABF809#001
+    version: 1
+    revision: 1
+    naming:
+      de: 
+        name: Identifikator
+        structuredName: Objekt Identifikator innerhalb der Anlage
+        description: eindeutige globale Identifikation des Objekts innerhalb einer Anlage durch die Verwendung eines Universal Resource Identifiers (URI)
+      en:
+        name: Identifier
+        structuredName: object identifier within a factory floor
+        description: unique global identification of an object within a factory floor by using an Universal Resource Identifier (URI)
+  - semanticId: 0173-1#02-AAO247#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Softwareversion
+        structuredName: Software Version 
+        description: Version der Software, die vom Gerät verwendet wird
+      en:
+        name: Software version
+        structuredName: Software version 
+        description: Version of the software being used by the devide
+  - semanticId: 0173-1#05-AAA766#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: byte
+        structuredName: Byte
+        description: "Synonym für Oktett mit der Beziehung: 1 byte = 8 bit"
+      en:
+        name: byte
+        structuredName: byte 
+        description: "Synonym for octett with relation: 1 byte = 8 bit"
+  - semanticId: 0173-1#05-AAA654#005
+    version: 5
+    revision: 1
+    naming:
+      de: 
+        name: Kbyte
+        structuredName: Kilobyte 
+        description: 1 000-faches der Einheit Byte
+      en:
+        name: Kbyte
+        structuredName: Kilobyte 
+        description: 1000 times of the unit byte
+  - semanticId: 0173-1#05-AAA042#005
+    version: 5
+    revision: 1
+    naming:
+      de: 
+        name: Mbyte
+        structuredName: Megabyte 
+        description: 1 000 000-faches der Einheit Byte
+      en:
+        name: Mbyte
+        structuredName: Megabyte 
+        description: 1 000 000 times of the unit byte
+  - semanticId: 0173-1#05-AAB066#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Gbyte
+        structuredName: Gigabyte
+        description: 1 000 000 000-faches der Einheit Byte
+      en:
+        name: Gbyte
+        structuredName: Gigabyte
+        description: 1 000 000 000 times of the unit byte  
+  - semanticId: 0173-1#05-AAB067#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Tbyte
+        structuredName: Terabyte
+        description: 1 000 000 000 000-faches der Einheit Byte
+      en:
+        name: Tbyte
+        structuredName: Terabyte
+        description: 1 000 000 000 000 times of the unit byte
+  - semanticId: 0173-1#05-AAB072#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Mbyte/s
+        structuredName: Megabyte Sekunde^-1
+        description: Megabyte pro Sekunde
+      en:
+        name: Mbyte/s
+        structuredName: Megabyte second^-1
+        description: Megabyte per second         
+  - semanticId: 0173-1#05-AAA517#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Gbyte/s
+        structuredName: Gigabyte second^-1
+        description: Gigabyte pro second 
+      en:
+        name: Gbyte/s
+        structuredName: Gigabyte second^-1
+        description: Gigabyte per second        
+  - semanticId: 0173-1#05-AAA072#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Kibyte
+        structuredName: Kibibyte
+        description: 1024-faches der Einheit Byte
+      en:
+        name: Kibyte
+        structuredName: Kibibyte
+        description: 1024 times of the unit byte        
+  - semanticId: 0173-1#05-AAA444#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Mibyte
+        structuredName: Mebibyte
+        description: 1 048 576-faches der Einheit Byte
+      en:
+        name: Mibyte
+        structuredName: Mebibyte
+        description: 1 048 576 times of the unit byte
+  - semanticId: 0173-1#05-AAA215#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Gibyte
+        structuredName: Gibibyte
+        description: 1 073 741 824-faches der Einheit Byte
+      en:
+        name: Gibyte
+        structuredName: Gibibyte
+        description: 1 073 741 824 times of the unit byte        
+  - semanticId: 0173-1#05-AAA283#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Tebyte
+        structuredName: Tebibyte 
+        description: 1 099 511 627 776-faches der Einheit Byte
+      en:
+        name: Tebyte
+        structuredName: Tebibyte
+        description: 1 099 511 627 776 times of the unit byte        
+  - semanticId: 0173-1#05-AAA584#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Exbyte
+        structuredName: Exbibyte 
+        description: 1 125 899 906 842 624-faches der Einheit Byte
+      en:
+        name: Exbyte
+        structuredName: Exbibyte
+        description: 1 125 899 906 842 624 times of the unit byte
+  - semanticId: 0173-1#05-AAA600#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Pebyte
+        structuredName: Pebibyte
+        description: 1,152921504606847e+18-faches der Einheit Byte
+      en:
+        name: Pebyte
+        structuredName: Pebibyte
+        description: 1,152921504606847e+18 times of the unit byte
+  - semanticId: 0173-1#05-AAA129#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Prozent
+        structuredName: Prozent 
+        description: Prozent
+      en:
+        name: Percent
+        structuredName: Percent 
+        description: Percent
+  - semanticId: 0173-1#05-AAA351#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Hertz
+        structuredName: Hertz 
+        description: Einheit der Schwingungen pro Sekunde
+      en:
+        name: Hertz
+        structuredName: Hertz 
+        description: Unit of oscillations per second
+  - semanticId: 0173-1#05-AAA033#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Kilohertz
+        structuredName: Kilohertz 
+        description: 1 000-faches der Einheit Hertz
+      en:
+        name: Kilohertz
+        structuredName: Kilohertz 
+        description: 1 000 times of the unit Hertz
+  - semanticId: 0173-1#05-AAA581#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Metahertz
+        structuredName: Metahertz 
+        description: 1 000 000-faches der Einheit Hertz
+      en:
+        name: Metahertz
+        structuredName: Metahertz
+        description: 1 000 000 times of the unit Hertz
+  - semanticId: 0173-1#05-AAA505#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Gigahertz
+        structuredName: Gigahertz 
+        description: 1 000 000 000-faches der Einheit Hertz
+      en:
+        name: Gigahertz
+        structuredName: Gigahertz 
+        description: 1 000 000 000 times of the unit Hertz
+  - semanticId: 0173-1#05-AAA190#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Terahertz
+        structuredName: Terahertz 
+        description: 1 000 000 000 000-faches der Einheit Hertz
+      en:
+        name: Terahertz
+        structuredName: Terahertz 
+        description: 1 000 000 000 000 times of the unit Hertz
+  - semanticId: 0173-1#05-AAA095#004
+    version: 4
+    revision: 1
+    naming:
+      de: 
+        name: ps
+        structuredName: Picosekunde 
+        description: 1 000 000 000 stel der Einheit Sekunde
+      en:
+        name: ps
+        structuredName: Picosecond 
+        description: 1 000 000 000 th of the unit second
+  - semanticId: 0173-1#05-AAA496#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: ys
+        structuredName: Mikrosekunde 
+        description: 1 000 000 stel der Einheit Sekunde
+      en:
+        name: ys
+        structuredName: Microsecond
+        description: 1 000 000 th of the unit second        
+  - semanticId: 0173-1#05-AAA114#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: ms
+        structuredName: Millisekunde 
+        description: 1 000 stel der Einheit Sekunde
+      en:
+        name: ms
+        structuredName: Millisecond 
+        description: 1 000 th of the unit second
+  - semanticId: 0173-1#05-AAA203#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: s
+        structuredName: Sekunde 
+        description: SI-Einheit Sekunde
+      en:
+        name: s
+        structuredName: Second
+        description: SI unit second
+  - semanticId: 0173-1#05-AAA109#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: min
+        structuredName: Minute 
+        description: 60-faches der Einheit Sekunde
+      en:
+        name: min
+        structuredName: Minute 
+        description: 60 times of the unit second
+  - semanticId: 0173-1#05-AAA390#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: h
+        structuredName: Stunde 
+        description: 3600-faches der Einheit Sekunde
+      en:
+        name: h
+        structuredName: Hour 
+        description: 3600 times of the unit second
+  - semanticId: 0173-1#05-AAA480#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: mm
+        structuredName: Millimeter 
+        description: 1000 stel der Einheit Meter
+      en:
+        name: mm
+        structuredName: Millimeter 
+        description: 1000 th of the unit Meter
+  - semanticId: 0173-1#05-AAA008#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: cm
+        structuredName: Zentimenter 
+        description: 100 stel der Einheit Meter
+      en:
+        name: cm
+        structuredName: Centimeter
+        description: 100 th of the unit Meter
+  - semanticId: 0173-1#05-AAA551#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: m
+        structuredName: Meter
+        description: SI-Einheit Meter
+      en:
+        name: m
+        structuredName: Meter
+        description: SI unit Meter
+  - semanticId: 0173-1#05-AAA595#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: km
+        structuredName: Kilometer 
+        description: 1000-faches der Einheit Meter
+      en:
+        name: km
+        structuredName: Kilometer
+        description: 1000 times of the unit Meter 
+  - semanticId: 0173-1#05-AAA208#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: km/h
+        structuredName: Kilometer pro Stunde
+        description: Kilometer pro Stunde
+      en:
+        name: km/h
+        structuredName: Kilometers per hour
+        description: Kilometers per hour
