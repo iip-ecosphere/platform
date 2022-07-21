@@ -104,6 +104,10 @@ public class ResourceLoaderTest {
         Assert.assertNotNull(is);
         is.close();
         
+        is = ResourceLoader.getResourceAsStream("de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor", fRes);
+        Assert.assertNotNull(is);
+        is.close();
+        
         ResourceLoader.unregisterResourceResolver(res);
         
         // Here it works per class loader. This may fail in generated parts.

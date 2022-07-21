@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -109,10 +110,11 @@ public class ResourceLoader {
      * Returns a resource as string taking the class loader of this class.
      * 
      * @param name the name of the resource to load
+     * @param optional further, optional on-the fly resolvers
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
-    public static InputStream getResourceAsStream(String name) {
-        return getResourceAsStream(ResourceLoader.class, name);
+    public static InputStream getResourceAsStream(String name, ResourceResolver... optional) {
+        return getResourceAsStream(ResourceLoader.class, name, optional);
     }
     
     /**
@@ -140,10 +142,11 @@ public class ResourceLoader {
      * 
      * @param cls the class to take the class loader from 
      * @param name the name of the resource to load
+     * @param optional further, optional on-the fly resolvers
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
-    public static InputStream getResourceAsStream(Class<?> cls, String name) {
-        return getResourceAsStream(cls.getClassLoader(), name);
+    public static InputStream getResourceAsStream(Class<?> cls, String name, ResourceResolver... optional) {
+        return getResourceAsStream(cls.getClassLoader(), name, optional);
     }
 
     /**
@@ -151,14 +154,21 @@ public class ResourceLoader {
      * 
      * @param loader the class loader to use
      * @param name the name of the resource to load (shall not start with "/", used as fallback alternative)
+     * @param optional further, optional on-the fly resolvers
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
-    public static InputStream getResourceAsStream(ClassLoader loader, String name) {
+    public static InputStream getResourceAsStream(ClassLoader loader, String name, ResourceResolver... optional) {
         InputStream result = null;
         while (name.startsWith("/")) {
             name = name.substring(1);
         }
-        for (ResourceResolver r: resolvers) {
+        List<ResourceResolver> res = resolvers;
+        if (null != optional && optional.length > 0) {
+            res = new ArrayList<>();
+            res.addAll(resolvers);
+            Collections.addAll(res, optional);
+        }
+        for (ResourceResolver r: res) {
             result = r.resolve(loader, name);    
             if (result != null) {
                 LoggerFactory.getLogger(ResourceLoader.class).info("Loading resource '{}' via {}", name, r.getName());
