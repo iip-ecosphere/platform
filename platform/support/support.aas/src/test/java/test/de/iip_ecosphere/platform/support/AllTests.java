@@ -49,6 +49,7 @@ import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
     OsUtilsTest.class, 
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
+    SemanticIdResolverTest.class,
     
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
     
