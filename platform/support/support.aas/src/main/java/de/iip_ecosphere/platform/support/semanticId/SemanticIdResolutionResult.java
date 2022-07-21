@@ -87,6 +87,6 @@ public interface SemanticIdResolutionResult {
      * 
      * @return the language (code) - naming mapping
      */
-    public Map<String, Naming> getNaming();
+    public Map<String, ? extends Naming> getNaming();
 
 }
