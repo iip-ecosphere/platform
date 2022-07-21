@@ -17,11 +17,6 @@ import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.f
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;

@@ -19,8 +19,8 @@ In progress:
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat: [#62](https://github.com/iip-ecosphere/platform/issues/62)
-* UI progress reporting: [#67](https://github.com/iip-ecosphere/platform/issues/67)
-* Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63)
+* UI progress reporting: [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63) and extensible semanticId resolution [#68](https://github.com/iip-ecosphere/platform/issues/68) as well as use in UI
 
 Completed improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
@@ -43,6 +43,7 @@ Completed improvements:
 * [#25](https://github.com/iip-ecosphere/platform/issues/25): Enable application-specific connector triggers via code plugins.
 * [#66](https://github.com/iip-ecosphere/platform/issues/66): Improvements of examples.KODEX and identifier check/fixing for generated Java code.
 * [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
+* [#67](https://github.com/iip-ecosphere/platform/issues/67): UI progress reporting support on platform side
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Improvements of service, family and stream generation.
 * Allowing to change service ensembles on demand via deployment plans.

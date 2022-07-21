@@ -215,8 +215,7 @@ public class AasUtils {
     }
 
     /**
-     * Resolves an image from a nameplate/application JAML file. May call {@link #upload(File, String)}
-     * to upload the file to the AAS server.
+     * Resolves an image from a nameplate/application JAML file.
      * 
      * @param image the image as URL or as local resource name (may be <b>null</b> or empty)
      * @param resolver the resolver to use, {@link #CLASSPATH_RESOURCE_RESOLVER} used as default

@@ -106,7 +106,7 @@ public class SubmodelClient {
      * 
      * @param name the name 
      * @param dflt the default value to be used if reading the value fails
-     * @return the string value, <b></b>
+     * @return the string value or {@code dflt}
      */
     protected String getPropertyStringValue(String name, String dflt) {
         String result = dflt;

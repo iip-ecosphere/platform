@@ -81,6 +81,8 @@ public class AbstractSetupTest {
     
     /**
      * Tests the setup (reading).
+     * 
+     * @throws IOException shall not occur
      */
     @Test
     public void testSetup() throws IOException {

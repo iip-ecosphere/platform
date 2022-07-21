@@ -129,7 +129,7 @@ public class AasPartRegistryTest {
         /**
          * Creates an instance.
          * 
-         * @param submodel
+         * @param submodel the submodel
          */
         MyAasClient(Submodel submodel) {
             super(submodel);

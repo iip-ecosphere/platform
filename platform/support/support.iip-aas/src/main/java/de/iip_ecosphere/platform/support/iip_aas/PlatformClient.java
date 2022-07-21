@@ -28,6 +28,7 @@ public interface PlatformClient {
      * 
      * @param id an optional id to characterize the snapshot
      * @return the name of the written file
+     * @throws ExecutionException if the snapshot cannot be created
      */
     public String snapshotAas(String id) throws ExecutionException; 
 
@@ -36,7 +37,7 @@ public interface PlatformClient {
      * 
      * @param id the id to be resolved
      * @return the resolved result or null
-     * @throws ExecutionException
+     * @throws ExecutionException if a serious (I/O) problem in the resolution occurs 
      */
     public SemanticIdResolutionResult resolveSemanticId(String id) throws ExecutionException;
     

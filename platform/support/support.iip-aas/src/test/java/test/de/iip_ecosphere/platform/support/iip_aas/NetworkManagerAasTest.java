@@ -42,6 +42,7 @@ public class NetworkManagerAasTest {
      * the {@link NetworkManagerAasClient}.
      * 
      * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
     public void testAas() throws ExecutionException, IOException {

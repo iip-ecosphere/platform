@@ -62,6 +62,10 @@ public class UriResolverTest {
     
     /**
      * Tests {@link UriResolver}.
+     * 
+     * @throws IOException shall not occur if successful
+     * @throws LifecycleException shall not occur if successful
+     * @throws URISyntaxException shall not occur if successful
      */
     @Test
     public void testUriResolution() throws IOException, LifecycleException, URISyntaxException {
