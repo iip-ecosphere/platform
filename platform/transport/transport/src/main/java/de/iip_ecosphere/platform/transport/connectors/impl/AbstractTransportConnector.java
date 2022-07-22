@@ -121,7 +121,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
         List<ReceptionCallback<?>> l = callbacks.get(stream);
         if (null == l) {
-            l = new ArrayList<ReceptionCallback<?>>();
+            l = Collections.synchronizedList(new ArrayList<ReceptionCallback<?>>());
             callbacks.put(stream, l);
         }
         l.add(callback);
@@ -132,7 +132,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         List<ReceptionCallback<?>> l = callbacks.get(stream);
         if (l != null) {
             boolean removed = l.remove(callback);
-            if (removed && callbacks.isEmpty()) {
+            if (removed && l.isEmpty()) {
                 callbacks.remove(stream);
                 unsubscribe(stream, true);
             }
