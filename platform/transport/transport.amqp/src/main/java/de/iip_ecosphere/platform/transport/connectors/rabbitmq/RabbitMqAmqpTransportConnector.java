@@ -20,10 +20,13 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.AlreadyClosedException;
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.AMQP.Queue;
 
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -44,6 +47,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     private boolean tlsEnabled = false;
     private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
     private boolean closing = false;
+    private Map<String, String> queueStream = Collections.synchronizedMap(new HashMap<>());
 
     @Override
     public void syncSend(String stream, Object data) throws IOException {
@@ -56,6 +60,25 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     }
     
     /**
+     * Checks the given {@code stream}.
+     * 
+     * @param stream the stream
+     * @param send sending or receiving
+     * @throws IOException if stream operations cannot be carried out
+     */
+    private void checkStream(String stream, boolean send) throws IOException {
+        if (!isStreamKnown(stream)) {
+            channel.exchangeDeclare(stream, BuiltinExchangeType.FANOUT, false, true, null);
+            if (!send) {
+                Queue.DeclareOk qRes = channel.queueDeclare();
+                queueStream.put(stream, qRes.getQueue()); 
+                channel.queueBind(qRes.getQueue(), stream, "");
+            }
+            registerStream(stream);
+        }
+    }
+    
+    /**
      * Sends data to {@code stream}.
      * 
      * @param stream the stream to send to
@@ -64,33 +87,35 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
      * @throws IOException in cases that sending fails
      */
     private void send(String stream, Object data, boolean block) throws IOException {
-        if (!isStreamKnown(stream)) {
-            channel.queueDeclare(stream, false, false, true, null);
-            registerStream(stream);
-        }
+        checkStream(stream, true);
         // if not known
         byte[] payload = serialize(stream, data);
         try {
-            channel.basicPublish("", stream, null, payload);
+            channel.basicPublish(stream, "", null, payload);
         } catch (IOException e) {
             if (!closing) {
                 throw e;
             }
+        } catch (AlreadyClosedException e) {
+            // ok, let's forget about that
         }
     }
 
     @Override
     public void setReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
-        if (!isStreamKnown(stream)) {
-            channel.queueDeclare(stream, false, false, true, null);
-        }
+        checkStream(stream, false);
         super.setReceptionCallback(stream, callback);
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-            notifyCallback(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
-            //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false); // autoack below
+            Envelope env = delivery.getEnvelope();
+            String st = env.getExchange(); // new approach
+            if (null == st || st.length() == 0) { // legacy
+                st = env.getRoutingKey();
+            }
+            notifyCallback(st, delivery.getBody());
+            //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         };
         String tag = UUID.randomUUID().toString();
-        channel.basicConsume(stream, true, tag, deliverCallback, consumerTag -> { });
+        channel.basicConsume(queueStream.get(stream), true, tag, deliverCallback, consumerTag -> { });
         tags.put(stream, tag);
     }
 
@@ -152,7 +177,7 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
                 "AMQP: Connecting to " + params.getHost() + " " + params.getPort());
             connection = factory.newConnection();
             channel = connection.createChannel();
-            channel.basicQos(0, 0, true);
+            //channel.basicQos(10); //channel.basicQos(0, 0, true);
         } catch (TimeoutException e) {
             throw new IOException(e.getMessage(), e);
         }
