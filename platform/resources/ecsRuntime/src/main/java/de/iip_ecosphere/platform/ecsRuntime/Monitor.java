@@ -30,7 +30,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Monitor extends Transport {
+public class Monitor {
     
     public static final String TRANSPORT_METRICS_CHANNEL = StreamNames.RESOURCE_METRICS;
     private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
@@ -51,15 +51,15 @@ public class Monitor extends Transport {
      */
     public static void startScheduling() {
         final String id = Id.getDeviceId();
-        createConnector();
+        Transport.createConnector();
         timer.schedule(new TimerTask() {
 
             @Override
             public void run() {
                 provider.calculateMetrics();
-                if (null != getConnector()) {
+                if (null != Transport.getConnector()) {
                     try {
-                        getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
+                        Transport.getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Monitor.class).error(
                             "Cannot sent monitoring message: " + e.getMessage());
@@ -77,7 +77,7 @@ public class Monitor extends Transport {
     public static void stopScheduling() {
         MetricsAasConstructor.clear();
         timer.cancel();
-        releaseConnector();
+        Transport.releaseConnector();
     }
 
 }

@@ -49,6 +49,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 
 /**
@@ -310,7 +311,7 @@ public class EcsAas implements AasContributor {
         dBuilder.build();
         
         cBuilder.build();
-        Monitor.sendContainerStatus(ActionTypes.ADDED, desc.getId());
+        Transport.sendContainerStatus(ActionTypes.ADDED, desc.getId());
     }
     
     /**
@@ -335,7 +336,7 @@ public class EcsAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_CONTAINERS);
             coll.deleteElement(fixId(desc.getId()));
-            Monitor.sendContainerStatus(ActionTypes.REMOVED, desc.getId());
+            Transport.sendContainerStatus(ActionTypes.REMOVED, desc.getId());
         });
     }
 
@@ -411,7 +412,7 @@ public class EcsAas implements AasContributor {
             } else {
                 getLogger().error("Container state change - cannot find container `" + desc.getId() + "`");
             }
-            Monitor.sendContainerStatus(ActionTypes.CHANGED, desc.getId());
+            Transport.sendContainerStatus(ActionTypes.CHANGED, desc.getId());
         });
     }
 

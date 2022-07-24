@@ -178,7 +178,13 @@ public class EcsAasTest {
         LifecycleHandler.startup(new String[] {});
 
         EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
+        long start = System.currentTimeMillis();
         test(client);
+        long end = System.currentTimeMillis();
+        long minDiff = 3 * EcsFactory.getSetup().getMonitoringUpdatePeriod() - (end - start);
+        if (minDiff > 0) { // ensure that some metrics can be sent
+            TimeUtils.sleep((int) minDiff);
+        }
         
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);

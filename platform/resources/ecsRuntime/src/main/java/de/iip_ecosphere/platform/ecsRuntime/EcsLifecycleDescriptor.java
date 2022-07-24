@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.transport.Transport;
 
 /**
  * The basic ECS lifecycle descriptor for powering up the AAS.
@@ -44,7 +45,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
     @Override
     public void startup(String[] args) {
         System.out.println("IIP-Ecosphere ECS Runtime.");
-        Monitor.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
+        Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
         EcsAas.enable(); // before super.startup/AAS creation!
         super.startup(args);
         EcsSetup setup = EcsFactory.getSetup();
