@@ -47,6 +47,7 @@ Completed improvements:
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Improvements of service, family and stream generation.
 * Allowing to change service ensembles on demand via deployment plans.
+* Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

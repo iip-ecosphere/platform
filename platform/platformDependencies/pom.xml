@@ -109,6 +109,18 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>JimmiAppel</id>
+      <name>Alexander Weber</name>
+      <email>weber@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>  
   
   <scm>
@@ -129,7 +141,7 @@
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
     <!-- If changed, check against forced JUnit provider -->
     <junit.version>4.12</junit.version>
-    <rabbitmq.version>5.10.0</rabbitmq.version>
+    <rabbitmq.version>5.15.0</rabbitmq.version>
     <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
     <io.moquette.version>0.13</io.moquette.version>
     <org.apache.qpid.version>8.0.2</org.apache.qpid.version>
