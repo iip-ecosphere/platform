@@ -15,10 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -27,10 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.AlreadyClosedException;
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.AMQP.Queue;
 
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
@@ -51,7 +52,7 @@ public class AmqpClient {
     private Connection connection;
     private Channel channel;
     private AmqpConfiguration configuration;
-    private Set<String> topics = Collections.synchronizedSet(new HashSet<>());
+    private Map<String, String> topics = Collections.synchronizedMap(new HashMap<>());
     private Map<String, String> tags = Collections.synchronizedMap(new HashMap<>());
     
     /**
@@ -86,17 +87,24 @@ public class AmqpClient {
         public void messageArrived(String topic, byte[] payload);
 
     }
-    
+
+ 
     /**
      * Ensures the existence of a queue for the given {@code topic}.
      * 
      * @param topic the topic
+     * @param send for sending or for receiving/registring callback
      * @throws IOException if registering the queue fails
      */
-    private void ensureTopicQueue(String topic) throws IOException {
-        if (!topics.contains(topic)) {
-            channel.queueDeclare(topic, false, false, true, null);
-            topics.add(topic);
+    private void ensureTopicQueue(String topic, boolean send) throws IOException {
+        if (!topics.containsKey(topic)) {
+            channel.exchangeDeclare(topic, BuiltinExchangeType.FANOUT, false, true, null);
+            topics.put(topic, null);
+        }
+        if (!send && null == topics.get(topic)) {
+            Queue.DeclareOk qRes = channel.queueDeclare();
+            topics.put(topic, qRes.getQueue()); 
+            channel.queueBind(qRes.getQueue(), topic, "");
         }
     }
     
@@ -158,7 +166,7 @@ public class AmqpClient {
      */
     public void stopClient() {
         try {
-            List<String> tpcs = new ArrayList<String>(topics);
+            List<String> tpcs = new ArrayList<String>(topics.keySet());
             for (String t: tpcs) {
                 unsubscribeFrom(t);
             }
@@ -184,13 +192,18 @@ public class AmqpClient {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != channel) {
             try {
-                ensureTopicQueue(topic);
+                ensureTopicQueue(topic, false);
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                    arrivedCallback.messageArrived(delivery.getEnvelope().getRoutingKey(), delivery.getBody());
+                    Envelope env = delivery.getEnvelope();
+                    String st = env.getExchange(); // new approach
+                    if (null == st || st.length() == 0) { // legacy
+                        st = env.getRoutingKey();
+                    }
+                    arrivedCallback.messageArrived(st, delivery.getBody());
                     //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false); autoack below
                 };
                 String tag = UUID.randomUUID().toString();
-                channel.basicConsume(topic, true, tag, deliverCallback, consumerTag -> { });
+                channel.basicConsume(topics.get(topic), true, tag, deliverCallback, consumerTag -> { });
                 tags.put(topic, tag);
                 LOGGER.info("Subscribed to " + topic);
                 done = true;
@@ -211,7 +224,7 @@ public class AmqpClient {
     boolean unsubscribeFrom(String topic) {
         boolean done = false;
         if (null != channel && !configuration.isFilteredTopic(topic)) {
-            if (!topics.contains(topic)) {
+            if (!topics.containsKey(topic)) {
                 try {
                     topics.remove(topic);
                     String tag = tags.remove(topic);
@@ -237,8 +250,8 @@ public class AmqpClient {
     void send(String topic, byte[] payload) {
         if (null != channel) {
             try {
-                ensureTopicQueue(topic);
-                channel.basicPublish("", topic, null, payload);
+                ensureTopicQueue(topic, true);
+                channel.basicPublish(topic, "", null, payload);
             } catch (AlreadyClosedException | IOException e) {
                 LOGGER.error("Sending to AMQP broker: " + e.getMessage());
             }
