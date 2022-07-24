@@ -335,6 +335,7 @@ public class Starter {
                     setup.getTransport().setPort(transportPort);
                 }
                 Transport.setTransportSetup(() -> setup.getTransport());
+                Transport.createConnector(); // warmup
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
                 LoggerFactory.getLogger(Starter.class).warn("Cannot read application.yml. Aas/Transport setup invalid");

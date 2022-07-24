@@ -21,6 +21,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
 
+import org.slf4j.LoggerFactory;
+
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
@@ -189,15 +191,15 @@ public abstract class MeterRepresentation implements Meter {
      * @param json   JSON string representation of the meter
      * @param tags   tags that the counter has following the format
      *               {@code key:value}
-     * @return a Meter representation of the JsonObject
-     * @throws IllegalArgumentException if the object is {@code null}, or if the
-     *                                  JsonObject doesn't represent a valid meter.
+     * @return a Meter representation of the JsonObject (<b>null</b> if invalid, unknown)
      */
     public static Meter parseMeter(String json, String... tags) {
         try {
             return parseMeter(Json.createReader(new StringReader(json)).readObject(), tags);
         } catch (JsonParsingException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            LoggerFactory.getLogger(MeterRepresentation.class).info("Cannot parse meter JSON '{}' : {}", 
+                json, e.getMessage());
+            return null;
         }
     }
     
@@ -207,9 +209,7 @@ public abstract class MeterRepresentation implements Meter {
      * @param object JsonObject representing the Timer we wish to parse
      * @param tags   tags that the counter has following the format
      *               {@code key:value}
-     * @return a Meter representation of the JsonObject
-     * @throws IllegalArgumentException if the object is {@code null}, or if the
-     *                                  JsonObject doesn't represent a valid meter.
+     * @return a Meter representation of the JsonObject (<b>null</b> if invalid, unknown)
      */
     public static Meter parseMeter(JsonObject object, String... tags) {
         Meter result = null;
@@ -234,8 +234,6 @@ public abstract class MeterRepresentation implements Meter {
             result = CounterRepresentation.parseCounter(object, tags);
         } else if (valueFound) {
             result = GaugeRepresentation.parseGauge(object, tags);
-        } else {
-            throw new IllegalArgumentException("Invalid meter JSON: " + object);
         }
         return result;
     }
