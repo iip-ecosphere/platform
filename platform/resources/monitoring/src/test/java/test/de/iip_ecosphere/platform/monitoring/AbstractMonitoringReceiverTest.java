@@ -85,14 +85,14 @@ public abstract class AbstractMonitoringReceiverTest {
         Transport.setTransportSetup(() -> transSetup);
 
         // a part of ECS runtime
-        Monitor.setTransportSetup(() -> transSetup);
+        Transport.setTransportSetup(() -> transSetup);
 
         System.out.println("Creating/starting receiver");
         mrl.start(transSetup);
         
         // part of onboarding
         System.out.println("Onboarding device");
-        Monitor.sendResourceStatus(ActionTypes.ADDED);
+        Transport.sendResourceStatus(ActionTypes.ADDED);
         Monitor.startScheduling();
         
         System.out.println("Device onboarded");
@@ -121,7 +121,7 @@ public abstract class AbstractMonitoringReceiverTest {
         TimeUtils.sleep(getSleepTime());
         // part of offboarding
         System.out.println("Device offboarding");
-        Monitor.sendResourceStatus(ActionTypes.REMOVED);
+        Transport.sendResourceStatus(ActionTypes.REMOVED);
 
         System.out.println("Stopping");
         timer.cancel();
@@ -132,7 +132,7 @@ public abstract class AbstractMonitoringReceiverTest {
         qpid.stop(true);
 
         Transport.setTransportSetup(null);
-        Monitor.setTransportSetup(null);
+        Transport.setTransportSetup(null);
     }
     
     /**

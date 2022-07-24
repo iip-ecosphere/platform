@@ -228,8 +228,10 @@ public abstract class MonitoringReceiver {
             for (Map.Entry<String, JsonValue> e : mtrs.entrySet()) {
                 Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), 
                     "device:" + deviceId); // we are a bridge, let's add the deviceId
-                addMeter(meter);
-                notifyMeterAdded(meter);
+                if (null != meter) {
+                    addMeter(meter);
+                    notifyMeterAdded(meter);
+                }
             }
         }
 
