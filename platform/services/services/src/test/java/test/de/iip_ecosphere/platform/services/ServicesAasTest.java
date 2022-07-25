@@ -112,7 +112,7 @@ public class ServicesAasTest {
     }
 
     /**
-     * Tests the {@link EcsAas} via the lifecycle descriptors.
+     * Tests the {@link ServicesAas} via the lifecycle descriptors.
      * 
      * @throws IOException shall not occur
      * @throws ExecutionException shall not occur 

@@ -82,8 +82,8 @@ public class AbstractServiceDescriptorTest {
     }
     
     /**
-     * Tests {@link AbstractServiceDescriptor#ensembleConnectionNames(
-     * de.iip_ecosphere.platform.services.ServiceDescriptor)}.
+     * Tests {@link AbstractServiceDescriptor#ensembleConnectorNames(
+     *     de.iip_ecosphere.platform.services.ServiceDescriptor)}.
      */
     @Test
     public void testEnsembleConnectionNames() {

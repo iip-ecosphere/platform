@@ -620,7 +620,7 @@ public class ServicesAas implements AasContributor {
      * @param act the actual state after the change
      * @param desc the service descriptor (depending on implementation, may have the new state or not)
      * @param mode explicit notification mode to be used (if <b>null</b>, use the mode defined 
-     *     in {@link AbstractAasBase})
+     *     in {@link ActiveAasBase})
      */
     public static void notifyServiceStateChanged(ServiceState old, ServiceState act, ServiceDescriptor desc, 
         NotificationMode mode) {

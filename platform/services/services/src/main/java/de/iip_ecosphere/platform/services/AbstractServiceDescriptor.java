@@ -56,7 +56,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private ServiceStub stub;
     
     /**
-     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
+     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean, boolean)} afterwards.
      * 
      * @param id the service id
      * @param name the name of this service

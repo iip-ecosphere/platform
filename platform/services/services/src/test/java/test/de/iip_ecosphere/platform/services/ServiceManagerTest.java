@@ -112,6 +112,9 @@ public class ServiceManagerTest {
     
     /**
      * Tests {@link AbstractServiceManager#determineExternalConnections(ServiceManager, String...)}.
+     * 
+     * @throws ExecutionException shall not occur in a successful run
+     * @throws URISyntaxException shall not occur in a successful run
      */
     @Test
     public void testExternalConnections() throws ExecutionException, URISyntaxException {
@@ -138,7 +141,6 @@ public class ServiceManagerTest {
 
         conn = AbstractServiceManager.determineExternalConnections(mgr, "service_0", "service_1");
         assertContains(conn, "conn-2", "conn-3");
-
     }
     
     /**
@@ -227,8 +229,7 @@ public class ServiceManagerTest {
     }
     
     /**
-     * Basic tests for {@link AbstractServiceManager#sortByDependency(List, java.util.Collection, 
-     * java.util.function.Predicate)}.
+     * Basic tests for {@link AbstractServiceManager#sortByDependency(List, Collection, Predicate, boolean)}.
      */
     @Test
     public void testSortByDependencyBasic() {
@@ -262,8 +263,10 @@ public class ServiceManagerTest {
     }
 
     /**
-     * Tests for {@link AbstractServiceManager#sortByDependency(List, java.util.Collection, 
-     * java.util.function.Predicate)} with other services.
+     * Tests for {@link AbstractServiceManager#sortByDependency(List, Collection, Predicate, boolean)} 
+     * with other services.
+     * 
+     * @throws URISyntaxException shall not occur in a successful run
      */
     @Test
     public void testSortByDependency() throws URISyntaxException {
@@ -311,8 +314,7 @@ public class ServiceManagerTest {
     }
 
     /**
-     * Tests for {@link AbstractServiceManager#sortByDependency(List, java.util.Collection, 
-     * java.util.function.Predicate)} for ensembles.
+     * Tests for {@link AbstractServiceManager#sortByDependency(List, Collection, Predicate, boolean)} for ensembles.
      * 
      * @throws URISyntaxException shall not occur
      */

@@ -111,7 +111,7 @@ public interface ServiceDescriptor {
     public ArtifactDescriptor getArtifact();
     
     /**
-     * Returns all information about parameter for {@link #reconfigure(Map)}.
+     * Returns all information about parameter for {@link ServiceManager#reconfigureService(String, Map)}.
      * 
      * @return the name-descriptor mapping for all supported parameters
      */

@@ -29,7 +29,8 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
     private MyServiceDescriptor ensembleLeader;
     
     /**
-     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean)} afterwards.
+     * Creates an instance. Call {@link #setClassification(
+     *     de.iip_ecosphere.platform.services.environment.ServiceKind, boolean, boolean)} afterwards.
      * 
      * @param id the service id
      * @param name the name of this service

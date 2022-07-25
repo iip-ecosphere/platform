@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
- * {@link #removeService(String)}, {@link #switchToService(String, String)}, {@link #migrateService(String, String)}
+ * {@link #switchToService(String, String)}, {@link #migrateService(String, String)}
  * and call the implementation of this class to perform the changes. Implementations shall call the notify methods 
  * in {@link ServicesAas}.
  *
@@ -539,7 +539,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         Set<ArtifactDescriptor> artifacts = new HashSet<>();
         for (String id : serviceIds) {
             ServiceDescriptor service = mgr.getService(id);
-            if (null != service) {
+            if (null != service && service.isTopLevel()) {
                 artifacts.add(service.getArtifact());
                 for (TypedDataConnectorDescriptor c: service.getDataConnectors()) {
                     if (isValidIdBut(c.getService(), id) && !containsIdSafe(ids, c.getService())) {
@@ -553,7 +553,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         
         for (ArtifactDescriptor a : artifacts) {
             for (ServiceDescriptor s: a.getServices()) {
-                if (!containsIdSafe(ids, s.getId())) { // no connections within the given serviceIds
+                if (s.isTopLevel() && !containsIdSafe(ids, s.getId())) { // no connections within the given serviceIds
                     for (TypedDataConnectorDescriptor c: s.getDataConnectors()) {
                         if (!s.getId().equals(c.getService()) && containsIdSafe(ids, c.getService())) {
                             result.add(new TypedDataConnection(c, s.getId()));
@@ -581,21 +581,23 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         Set<ArtifactDescriptor> artifacts = new HashSet<>();
         for (String id : serviceIds) {
             ServiceDescriptor service = mgr.getService(id);
-            if (null != service) {
+            if (null != service && service.isTopLevel()) {
                 artifacts.add(service.getArtifact());
             }
         }
 
         for (ArtifactDescriptor a : artifacts) {
             for (ServiceDescriptor s: a.getServices()) {
-                if (containsIdSafe(ids, s.getId())) { 
-                    for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
-                        result.add(new TypedDataConnection(c, null));
+                if (s.isTopLevel()) {
+                    if (containsIdSafe(ids, s.getId())) { 
+                        for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
+                            result.add(new TypedDataConnection(c, null));
+                        }
                     }
-                }
-                for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
-                    if (containsIdSafe(ids, c.getService())) {
-                        result.add(new TypedDataConnection(c, null));
+                    for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
+                        if (containsIdSafe(ids, c.getService())) {
+                            result.add(new TypedDataConnection(c, null));
+                        }
                     }
                 }
             }
