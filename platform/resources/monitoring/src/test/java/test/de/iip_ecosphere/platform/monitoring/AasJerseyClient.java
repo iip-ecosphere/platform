@@ -62,7 +62,7 @@ public class AasJerseyClient {
         System.out.println("Connection established successfully, retrieving data...");
         System.out.println();
         client.retrieveBaseProperties();
-        client.testLists();
+        //client.testLists();
         client.testBasics();
         client.testRest();
         client.testConfiguration();
@@ -103,7 +103,7 @@ public class AasJerseyClient {
      * 
      * @throws ExecutionException if accessing the AAS fails
      */
-    private void testLists() throws ExecutionException {
+    /*private void testLists() throws ExecutionException {
         JsonArray gaugesList = retrieveArray(sm.getProperty(GAUGE_LIST).getValue());
         JsonArray counterList = retrieveArray(sm.getProperty(COUNTER_LIST).getValue());
         JsonArray timerList = retrieveArray(sm.getProperty(TIMER_LIST).getValue());
@@ -132,7 +132,7 @@ public class AasJerseyClient {
             System.out.println("\t\t" + simpleList.getString(i));
         }
         System.out.println();
-    }
+    }*/
 
     /**
      * Tests the basic functionalities, i.e., counters, gauges and timers.
