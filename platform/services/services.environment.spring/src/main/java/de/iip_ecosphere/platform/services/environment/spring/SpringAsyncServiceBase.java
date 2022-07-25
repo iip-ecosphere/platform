@@ -108,8 +108,9 @@ public class SpringAsyncServiceBase {
      * 
      * @param sender the sender including the message
      * @param kind the kind of the message for logging
-     * @param routingKeys if <b>null</b>, empty or in {@link #globalRoutingKeys} then use the {@link #globalTransport}
-     *     instance, else the {@link #localTransport} instance; may use both transport instances
+     * @param routingKeys if <b>null</b>, empty or in {@link Transport#addGlobalRoutingKey(String)} then use the 
+     *     global transport instance, else the local transport instance from {@link Transport}; may use both 
+     *     transport instances
      * @see Transport#addGlobalRoutingKey(String)
      */
     public static void send(IOConsumer<TransportConnector> sender, String kind, String... routingKeys) {
