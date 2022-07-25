@@ -87,10 +87,10 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
      * @throws IOException in cases that sending fails
      */
     private void send(String stream, Object data, boolean block) throws IOException {
-        checkStream(stream, true);
-        // if not known
-        byte[] payload = serialize(stream, data);
         try {
+            checkStream(stream, true);
+            // if not known
+            byte[] payload = serialize(stream, data);
             channel.basicPublish(stream, "", null, payload);
         } catch (IOException e) {
             if (!closing) {
