@@ -222,5 +222,24 @@ public class TransportSetup implements Serializable {
             .setAuthenticationKey(authenticationKey)
             .build();
     }
+    
+    /**
+     * Copies this setup into a new instance.
+     * 
+     * @return the copied instance
+     */
+    public TransportSetup copy() {
+        TransportSetup setup = new TransportSetup();
+        setup.setAuthenticationKey(authenticationKey);
+        setup.setHost(host);
+        setup.setPort(port);
+        setup.setHostnameVerification(hostnameVerification);
+        setup.setKeyAlias(keyAlias);
+        setup.setKeystore(keystore);
+        setup.setKeystorePassword(keyPassword);
+        setup.setPassword(keyPassword);
+        setup.setUser(user);
+        return setup;
+    }
 
 }

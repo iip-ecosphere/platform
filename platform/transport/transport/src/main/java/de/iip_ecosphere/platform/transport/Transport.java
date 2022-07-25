@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -415,24 +416,28 @@ public class Transport {
      * @see #addGlobalRoutingKey(String)
      */
     public static void send(IOConsumer<TransportConnector> sender, String kind, String... routingKeys) {
-        boolean global = false;
-        boolean local = false;
-        if (null == routingKeys || routingKeys.length == 0) {
-            global = true;
+        if (globalTransport == localTransport) {
+            globalTransport.send(sender, kind);
         } else {
-            for (int k = 0; k < routingKeys.length; k++) {
-                if (globalRoutingKeys.contains(routingKeys[k])) {
-                    global = true;
-                } else {
-                    local = true;
+            boolean global = false;
+            boolean local = false;
+            if (null == routingKeys || routingKeys.length == 0) {
+                global = true;
+            } else {
+                for (int k = 0; k < routingKeys.length; k++) {
+                    if (globalRoutingKeys.contains(routingKeys[k])) {
+                        global = true;
+                    } else {
+                        local = true;
+                    }
                 }
             }
-        }
-        if (global) {
-            globalTransport.send(sender, kind);
-        }
-        if (local && globalTransport != localTransport) {
-            localTransport.send(sender, kind);
+            if (global) {
+                globalTransport.send(sender, kind);
+            }
+            if (local) {
+                localTransport.send(sender, kind);
+            }
         }
     }
 
@@ -534,7 +539,7 @@ public class Transport {
     }
 
     /**
-     * Tries creating a (global) connector. If successful, {@link #connector} will be initialized for caching. The 
+     * Tries creating a (global) connector. If successful, {@link #globalTransport} will be initialized for caching. The
      * instance is cached. The transport information must be set up before {@link #setTransportSetup(Supplier)}. After 
      * successfully creating a connector, queued messages are sent and removed from the queue. However, there is no 
      * guarantee that a connector can be created.
