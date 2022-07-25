@@ -130,7 +130,7 @@ public class MetricsAasConstructor {
         InvocablesCreator iCreator, Predicate<String> filter, Function<String, String> nameMapper) {
 
         /* Meter lists */
-        smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
+        /*smBuilder.createPropertyBuilder(GAUGE_LIST).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(GAUGE_LIST)), InvocablesCreator.READ_ONLY).build();
         smBuilder.createPropertyBuilder(COUNTER_LIST).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(COUNTER_LIST)), InvocablesCreator.READ_ONLY).build();
@@ -139,7 +139,7 @@ public class MetricsAasConstructor {
         smBuilder.createPropertyBuilder(TAGGED_METER_LIST).setType(Type.STRING)
             .bind(iCreator.createGetter(nameMapper.apply(TAGGED_METER_LIST)), InvocablesCreator.READ_ONLY).build();
         smBuilder.createPropertyBuilder(SIMPLE_METER_LIST).setType(Type.STRING)
-            .bind(iCreator.createGetter(nameMapper.apply(SIMPLE_METER_LIST)), InvocablesCreator.READ_ONLY).build();
+            .bind(iCreator.createGetter(nameMapper.apply(SIMPLE_METER_LIST)), InvocablesCreator.READ_ONLY).build();*/
 
         /* System Disk Capacity metrics, string as JSON meter is transferred  */
         smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(Type.STRING)
@@ -492,11 +492,11 @@ public class MetricsAasConstructor {
      */
     public static void removeProviderMetricsFromAasSubmodel(SubmodelElementCollection sub) {
         /* Meter lists */
-        sub.deleteElement(GAUGE_LIST);
+        /*sub.deleteElement(GAUGE_LIST);
         sub.deleteElement(COUNTER_LIST);
         sub.deleteElement(TIMER_LIST);
         sub.deleteElement(TAGGED_METER_LIST);
-        sub.deleteElement(SIMPLE_METER_LIST);
+        sub.deleteElement(SIMPLE_METER_LIST);*/
 
         /* System Disk Capacity metrics */
         sub.deleteElement(SYSTEM_DISK_FREE);
@@ -606,11 +606,11 @@ public class MetricsAasConstructor {
     public static void addMetricsProtocols(ProtocolServerBuilder pBuilder, MetricsExtractorRestClient client, 
         Predicate<String> filter, Function<String, String> nameMapper) {
         /* Meter lists */
-        pBuilder.defineProperty(nameMapper.apply(GAUGE_LIST), () -> client.getGaugeList(), null);
+        /*pBuilder.defineProperty(nameMapper.apply(GAUGE_LIST), () -> client.getGaugeList(), null);
         pBuilder.defineProperty(nameMapper.apply(COUNTER_LIST), () -> client.getCounterList(), null);
         pBuilder.defineProperty(nameMapper.apply(TIMER_LIST), () -> client.getTimerList(), null);
         pBuilder.defineProperty(nameMapper.apply(TAGGED_METER_LIST), () -> client.getTaggedMeterList(), null);
-        pBuilder.defineProperty(nameMapper.apply(SIMPLE_METER_LIST), () -> client.getSimpleMeterList(), null);
+        pBuilder.defineProperty(nameMapper.apply(SIMPLE_METER_LIST), () -> client.getSimpleMeterList(), null);*/
 
         /* Java Virtual Machine (JVM) Buffer Metrics */
         pBuilder.defineProperty(nameMapper.apply(JVM_BUFFER_COUNT), () -> client.getJvmBufferCount(), null);
@@ -681,11 +681,11 @@ public class MetricsAasConstructor {
     public static void addMetricsProtocols(ProtocolServerBuilder pBuilder, MetricsProvider provider, 
         Predicate<String> filter, Function<String, String> nameMapper) {
         /* Meter lists */
-        pBuilder.defineProperty(nameMapper.apply(GAUGE_LIST), () -> provider.getCustomGaugeList(), null);
+        /*pBuilder.defineProperty(nameMapper.apply(GAUGE_LIST), () -> provider.getCustomGaugeList(), null);
         pBuilder.defineProperty(nameMapper.apply(COUNTER_LIST), () -> provider.getCustomCounterList(), null);
         pBuilder.defineProperty(nameMapper.apply(TIMER_LIST), () -> provider.getCustomTimerList(), null);
         pBuilder.defineProperty(nameMapper.apply(TAGGED_METER_LIST), () -> provider.getTaggedMeterList(), null);
-        pBuilder.defineProperty(nameMapper.apply(SIMPLE_METER_LIST), () -> provider.getSimpleMeterList(), null);
+        pBuilder.defineProperty(nameMapper.apply(SIMPLE_METER_LIST), () -> provider.getSimpleMeterList(), null);*/
 
         // initial set, some seem to come with micrometer/spring
         // align with addProviderMetricsToAasSubmodel

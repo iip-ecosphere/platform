@@ -92,10 +92,10 @@ public class MetricsAasConstants {
     public static final String METER_ATTR = "meter";
 
     /* List Properties */
-    public static final String GAUGE_LIST = "gaugelist";
+    /*public static final String GAUGE_LIST = "gaugelist";
     public static final String COUNTER_LIST = "counterlist";
     public static final String TIMER_LIST = "timerlist";
     public static final String TAGGED_METER_LIST = "taggedmeterlist";
-    public static final String SIMPLE_METER_LIST = "simplemeterlist";
+    public static final String SIMPLE_METER_LIST = "simplemeterlist";*/
 
 }

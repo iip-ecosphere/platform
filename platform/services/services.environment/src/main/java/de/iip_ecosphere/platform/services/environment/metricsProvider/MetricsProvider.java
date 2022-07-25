@@ -65,11 +65,11 @@ public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
     
-    public static final String GAUGE_LIST = "gaugelist";
+    /*public static final String GAUGE_LIST = "gaugelist";
     public static final String COUNTER_LIST = "counterlist";
     public static final String TIMER_LIST = "timerlist";
     public static final String TAGGED_METER_LIST = "taggedmeterlist";
-    public static final String SIMPLE_METER_LIST = "simplemeterlist";
+    public static final String SIMPLE_METER_LIST = "simplemeterlist";*/
     
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
@@ -746,12 +746,13 @@ public class MetricsProvider {
             sb.append(jsonParser(meter));
             first = false;
         }
-        sb.append("},");
-        appendNameValue(sb, GAUGE_LIST, getCustomGaugeList(), true);
-        appendNameValue(sb, COUNTER_LIST, getCustomCounterList(), true);
-        appendNameValue(sb, TIMER_LIST, getCustomTimerList(), true);
-        appendNameValue(sb, TAGGED_METER_LIST, getTaggedMeterList(), true);
-        appendNameValue(sb, SIMPLE_METER_LIST, getSimpleMeterList(), false);
+        sb.append("}");
+        //sb.append(",");
+        //appendNameValue(sb, GAUGE_LIST, getCustomGaugeList(), true);
+        //appendNameValue(sb, COUNTER_LIST, getCustomCounterList(), true);
+        //appendNameValue(sb, TIMER_LIST, getCustomTimerList(), true);
+        //appendNameValue(sb, TAGGED_METER_LIST, getTaggedMeterList(), true);
+        //appendNameValue(sb, SIMPLE_METER_LIST, getSimpleMeterList(), false);
         sb.append("}");
         return sb.toString();
     }
@@ -764,12 +765,12 @@ public class MetricsProvider {
      * @param value the value (unquoted)
      * @param separator add a separator or not
      */
-    private void appendNameValue(StringBuilder sb, String name, String value, boolean separator) {
+    /*private void appendNameValue(StringBuilder sb, String name, String value, boolean separator) {
         sb.append("\"" + name + "\":" + value);
         if (separator) {
             sb.append(",");
         }
-    }
+    }*/
 
     /**
      * Retrieves a custom gauge as a JSON object.<br>
