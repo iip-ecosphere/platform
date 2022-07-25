@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 import static de.iip_ecosphere.platform.support.iip_aas.config.CmdLine.*;
 
@@ -336,6 +337,14 @@ public class Starter {
                 }
                 Transport.setTransportSetup(() -> setup.getTransport());
                 Transport.createConnector(); // warmup
+                
+                // globalhost is part of transport setup.
+                TransportSetup globalSetup = setup.getTransport();
+                if (!globalSetup.getHost().equals("localhost") && !globalSetup.getHost().equals("127.0.0.1")) {
+                    TransportSetup localSetup = setup.getTransport().copy(); // TODO same authentication assumed
+                    localSetup.setHost("localhost");
+                    Transport.setLocalSetup(() -> localSetup);
+                }
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
                 LoggerFactory.getLogger(Starter.class).warn("Cannot read application.yml. Aas/Transport setup invalid");
