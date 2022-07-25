@@ -2,6 +2,8 @@
 
 #Explanation see README.MD
 
+rm -rf gen
+
 #build with broker
 
 mvn -U -P EasyGen generate-sources
