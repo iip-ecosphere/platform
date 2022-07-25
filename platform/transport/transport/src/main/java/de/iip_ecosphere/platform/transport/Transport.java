@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
