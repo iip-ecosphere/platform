@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -148,11 +149,14 @@ public class SpringCloudServiceManager
      * @see #determineExternalConnections(ServiceManager, String...)
      */
     private List<String> determineBindingServiceArgs(String... serviceIds) {
-        List<String> result = determineExternalConnections(this, serviceIds)
+        Set<String> tmp = determineExternalConnections(this, serviceIds)
             .stream()
             .filter(c -> isValidId(c.getName()))
-            .map(c -> "--spring.cloud.stream.bindings." + c.getName() + ".binder=external")
-            .collect(Collectors.toList());
+            .map(c -> CmdLine.PARAM_PREFIX + Starter.OPT_SPRING_BINDINGS_PREFIX + c.getName() 
+                + Starter.OPT_SPRING_BINDER_POSTFIX + CmdLine.PARAM_VALUE_SEP + Starter.EXTERNAL_BINDER_NAME)
+            .collect(Collectors.toSet());
+        List<String> result = new ArrayList<>();
+        result.addAll(tmp);
         return result;
     }
     
@@ -164,7 +168,7 @@ public class SpringCloudServiceManager
      * @see #determineInternalConnections(ServiceManager, String...)
      */
     private String determineCloudFunctionArg(String... serviceIds) {
-        return "--spring.cloud.function.definition=" 
+        return CmdLine.PARAM_PREFIX + Starter.OPT_SPRING_FUNCTION_DEF + CmdLine.PARAM_VALUE_SEP 
             + SpringCloudServiceDescriptor.toFunctionDefinition(determineInternalConnections(this, serviceIds));
     }
     
@@ -222,6 +226,24 @@ public class SpringCloudServiceManager
             }
         }
         return tmp.toArray(new String[0]);
+    }
+    
+    /**
+     * Returns only top-level services from {@code serviceIds}.
+     * 
+     * @param mgr the service manager to take the descriptors from
+     * @param serviceIds the service ids to filter out
+     * @return {@code serviceIds} or a subset of {@code serviceIds}
+     */
+    public static String[] topLevel(ServiceManager mgr, String... serviceIds) {
+        List<String> result = new ArrayList<>();
+        for (String id: serviceIds) {
+            ServiceDescriptor desc = mgr.getService(id);
+            if (desc.isTopLevel()) {
+                result.add(id);
+            }
+        }
+        return result.toArray(new String[result.size()]);
     }
 
     @Override
@@ -285,16 +307,17 @@ public class SpringCloudServiceManager
 
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
         handleOptions(options, serviceIds);
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
         LOGGER.info("Starting services " + Arrays.toString(serviceIds));
         SpringCloudServiceSetup config = getConfig();
-        // re-link binders if needed, i.e., subset shall be started locally; bindings "global", function local
         int step = 0;
-        List<String> bindingServiceArgs = determineBindingServiceArgs(serviceIds);
         handleFamilyProcesses(serviceIds, true);
+        // re-link binders if needed, i.e., subset shall be started locally
+        List<String> commonServiceArgs = determineBindingServiceArgs(serviceIds);
         for (String sId : sortByDependency(serviceIds, true)) {
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Starting " + sId);
             SpringCloudServiceDescriptor service = getService(sId);
@@ -302,7 +325,7 @@ public class SpringCloudServiceManager
                 errors.add("No service for id '" + sId + "' known.");
             } else {
                 String[] sIdEns = serviceAndEnsemble(sId, serviceIds);
-                List<String> externalServiceArgs = new ArrayList<String>(bindingServiceArgs);
+                List<String> externalServiceArgs = new ArrayList<>(commonServiceArgs);
                 // adjust spring function definition from application.yml if subset of services shall be started 
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));
@@ -427,6 +450,7 @@ public class SpringCloudServiceManager
 
     @Override
     public void stopService(String... serviceIds) throws ExecutionException {
+        serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
         List<String> errors = new ArrayList<>();
         AppDeployer deployer = getDeployer();
         LOGGER.info("Stopping services " + Arrays.toString(serviceIds));

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
@@ -288,6 +290,24 @@ public class ServiceMgrAndDescriptorTest {
         Assert.assertNull(mgr.getService("SimpleReceiver3").getEnsembleLeader());
         Assert.assertNull(mgr.getService("SimpleTransformer3").getEnsembleLeader());
         Assert.assertNull(mgr.getService("SimpleSource3").getEnsembleLeader());
+    }
+
+    /**
+     * Tests {@link SpringCloudServiceManager#handleOptions(Map, ServiceManager, String...)}.
+     * 
+     * @throws IOException if loading the test descriptor "ServiceMesh3Deployment.yml" fails
+     */
+    @Test
+    public void testTopLevel() throws IOException {
+        ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
+        String[] res = SpringCloudServiceManager.topLevel(mgr, "SimpleTransformer3", "SimpleReceiver3");
+        
+        // all are top-level
+        List<String> resList = new ArrayList<>();
+        CollectionUtils.addAll(resList, res);
+        Assert.assertTrue(resList.size() == 2);
+        Assert.assertTrue(resList.contains("SimpleTransformer3"));
+        Assert.assertTrue(resList.contains("SimpleReceiver3"));
     }
 
 }
