@@ -340,7 +340,7 @@ public class Starter {
                 
                 // globalhost is part of transport setup.
                 TransportSetup globalSetup = setup.getTransport();
-                if (!globalSetup.getHost().equals("localhost") && !globalSetup.getHost().equals("127.0.0.1")) {
+                if (!"localhost".equals(globalSetup.getHost()) && !"127.0.0.1".equals(globalSetup.getHost())) {
                     TransportSetup localSetup = setup.getTransport().copy(); // TODO same authentication assumed
                     localSetup.setHost("localhost");
                     Transport.setLocalSetup(() -> localSetup);
