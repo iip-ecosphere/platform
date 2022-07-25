@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,9 @@ import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.transport.Transport;
 
 /**
  * A specialized starter for Spring Cloud Stream in including the metrics provider.
@@ -46,6 +49,11 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 public abstract class Starter extends de.iip_ecosphere.platform.services.environment.Starter 
     implements CommandLineRunner {
 
+    public static final String OPT_SPRING_FUNCTION_DEF = "spring.cloud.function.definition";
+    public static final String OPT_SPRING_BINDINGS_PREFIX = "spring.cloud.stream.bindings.";
+    public static final String OPT_SPRING_BINDER_POSTFIX = ".binder";
+    public static final String EXTERNAL_BINDER_NAME = "external";
+    
     private static ConfigurableApplicationContext ctx;
     private static Environment environment;
     private static int port = 8080; // assumed default
@@ -157,6 +165,23 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
     
     /**
+     * Parses the external binder connections and turns them into external routing keys. [public for testing]
+     * 
+     * @param args the command line arguments
+     * @param externalBindingConsumer consumer for the external connections
+     */
+    public static void parseExternConnections(String[] args, Consumer<String> externalBindingConsumer) {
+        final String leadIn = CmdLine.PARAM_PREFIX + OPT_SPRING_BINDINGS_PREFIX;
+        final String leadOut = OPT_SPRING_BINDER_POSTFIX + CmdLine.PARAM_VALUE_SEP + EXTERNAL_BINDER_NAME;
+        for (String a: args) {
+            if (a.startsWith(leadIn) && a.endsWith(leadOut)) {
+                externalBindingConsumer.accept(
+                    a.substring(0, a.length() - leadOut.length()).substring(leadIn.length()));
+            }
+        }
+    }
+    
+    /**
      * Main function.
      * 
      * @param cls the class to start
@@ -165,6 +190,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     public static void main(Class<? extends Starter> cls, String[] args) {
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         Starter.parse(args);
+        parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
+        getSetup(); // ensure instance
         // start spring cloud app
         SpringApplication app = new SpringApplication(cls);
         ctx = app.run(args);

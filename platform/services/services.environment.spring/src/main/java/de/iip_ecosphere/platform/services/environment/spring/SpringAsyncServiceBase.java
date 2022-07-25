@@ -23,9 +23,11 @@ import javax.annotation.PreDestroy;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 /**
  * Basic Spring Service functions for asynchronous forward/backward data flows via the transport layer.
@@ -90,6 +92,38 @@ public class SpringAsyncServiceBase {
         }
         return result;
     }
+    
+    /**
+     * Sends a message of a certain {@code kind} and cares fore queuing.
+     * 
+     * @param sender the sender including the message
+     * @param kind the kind of the message for logging
+     */
+    protected void send(IOConsumer<TransportConnector> sender, String kind) {
+        Transport.send(sender, kind);
+    }
+    
+    /**
+     * Sends a message of a certain {@code kind} and cares fore queuing.
+     * 
+     * @param sender the sender including the message
+     * @param kind the kind of the message for logging
+     * @param routingKeys if <b>null</b>, empty or in {@link #globalRoutingKeys} then use the {@link #globalTransport}
+     *     instance, else the {@link #localTransport} instance; may use both transport instances
+     * @see Transport#addGlobalRoutingKey(String)
+     */
+    public static void send(IOConsumer<TransportConnector> sender, String kind, String... routingKeys) {
+        Transport.send(sender, kind, routingKeys);
+    }
+    
+    /**
+     * Sends a trace record. Caches messages if no connector is available.
+     * 
+     * @param record the record to be sent
+     */
+    public void sendTraceRecord(TraceRecord record) {
+        Transport.sendTraceRecord(record);
+    }
 
     /**
      * Called at end of lifecycle to get rid of callbacks.
@@ -110,6 +144,7 @@ public class SpringAsyncServiceBase {
             LoggerFactory.getLogger(getClass()).warn("No transport setup, cannot unregister callbacks.");
         }
         callbacks.clear();
+        Transport.releaseConnector();
     }
 
 }
