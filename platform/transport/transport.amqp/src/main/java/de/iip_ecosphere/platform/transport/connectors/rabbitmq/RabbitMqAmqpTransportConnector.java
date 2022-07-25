@@ -69,12 +69,12 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
     private void checkStream(String stream, boolean send) throws IOException {
         if (!isStreamKnown(stream)) {
             channel.exchangeDeclare(stream, BuiltinExchangeType.FANOUT, false, true, null);
-            if (!send) {
-                Queue.DeclareOk qRes = channel.queueDeclare();
-                queueStream.put(stream, qRes.getQueue()); 
-                channel.queueBind(qRes.getQueue(), stream, "");
-            }
             registerStream(stream);
+        }
+        if (!send && queueStream.get(stream) == null) {
+            Queue.DeclareOk qRes = channel.queueDeclare();
+            queueStream.put(stream, qRes.getQueue()); 
+            channel.queueBind(qRes.getQueue(), stream, "");
         }
     }
     
