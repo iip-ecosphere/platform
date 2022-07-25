@@ -155,18 +155,14 @@ public class PrintVisitor implements AasVisitor {
             try {
                 val = property.getValue();
                 if (null != val) {
-                    try {
-                        Meter m = MeterRepresentation.parseMeter(val.toString());
-                        if (m instanceof Gauge) {
-                            double value = ((Gauge) m).value();
-                            if (value > 1000) { // heuristic, assumption
-                                val = String.format("%.0f", value);
-                            } else {
-                                val = String.format("%f", value);
-                            }
+                    Meter m = MeterRepresentation.parseMeter(val.toString());
+                    if (m instanceof Gauge) {
+                        double value = ((Gauge) m).value();
+                        if (value > 1000) { // heuristic, assumption
+                            val = String.format("%.0f", value);
+                        } else {
+                            val = String.format("%f", value);
                         }
-                    } catch (IllegalArgumentException e) {
-                        // ignore
                     }
                 }
             } catch (ExecutionException e) {
