@@ -237,7 +237,7 @@ public class TransportSetup implements Serializable {
         setup.setKeyAlias(keyAlias);
         setup.setKeystore(keystore);
         setup.setKeystorePassword(keyPassword);
-        setup.setPassword(keyPassword);
+        setup.setPassword(password);
         setup.setUser(user);
         return setup;
     }

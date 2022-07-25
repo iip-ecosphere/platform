@@ -75,6 +75,13 @@ public class TransportSetupTest {
         Assert.assertEquals("pass", transport.getPassword());
         Assert.assertEquals("user", transport.getUser());
         
+        TransportSetup copy = transport.copy();
+        Assert.assertNotNull(copy);
+        Assert.assertEquals("me.de", copy.getHost());
+        Assert.assertEquals(1234, copy.getPort());
+        Assert.assertEquals("pass", copy.getPassword());
+        Assert.assertEquals("user", copy.getUser());
+        
         TransportParameter param = transport.createParameter();
         Assert.assertNotNull(param);
         Assert.assertEquals("me.de", param.getHost());
