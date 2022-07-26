@@ -188,6 +188,7 @@ template JavaSpringCloudStreamYaml(Configuration config, FileArtifact target, ma
                     ${poller(nodes)|e}
                     default:
                         contentType: application/iip
+                    defaultBinder: internal
                     ${generateDestinations(destinations)}
                     ${produceBinders(config)}'
     }

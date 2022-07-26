@@ -1,5 +1,7 @@
 import JavaBasics;
 import DataOperationBasics;
+import MeshBasics;
+import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -439,18 +441,40 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // --------------------------------------- reception callback -----------------------------------------
     
     def generateReceptionCallback(MeshElement elt) {
-        generateReceptionCallback(elt.impl);
+        generateReceptionCallback(elt, elt.impl);
     }
 
-    def generateReceptionCallback(ServiceBase service) {
+    def generateReceptionCallback(MeshElement elt, ServiceBase service) {
         ''
     }
 
-    def generateReceptionCallback(Connector conn) {
+    def generateReceptionCallback(MeshElement elt, Connector conn) {
         String serviceId = "_" + toIdentifier(conn.id);
         String coType = asTypeName(getFirstTypeName(conn.output));
         String suffix = coType.firstToUpperCase() + serviceId;
         String methodSuffix = "create" + suffix;
+        
+        setOf(String) connections = {};        
+        setOf(DataType) outFwd = {}; // are we allowed to sendthis?
+        for (IOType t: forward(conn.output)) {
+            outFwd.add(t.type);
+        }
+        for (MeshConnector c: nextConnectors(elt)) {
+            MeshElement target = c.next;
+            for (IOType t: target.impl.input) {
+               if (outFwd.includes(t.type)) {
+                     String type = toTypeName(t.type);
+                     String outName = getOutName(target, type);
+                     String connId = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+                     connections.add(connId + "-in-0");
+               }
+            }
+        }
+        String connectionIds = "";
+        for (String c: connections->sortedBy(n|n)) {
+            connectionIds = connectionIds + ", \"${c}\"";
+        }        
+        
         'private class ConnectorReceptionCallback implements ReceptionCallback<${coType}> {
         
             {
@@ -460,7 +484,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public void received(${coType} data) {
                 metrics.increaseCounter("service.sent"); 
-                Transport.send(c -> c.asyncSend("${conn.id}_${coType}", data), "${conn.id}");
+                Transport.send(c -> c.asyncSend("${conn.id}_${coType}", data), "${conn.id}"${connectionIds});
             }
         
             @Override
