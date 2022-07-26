@@ -16,7 +16,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------------ specialization of MeshBasics --------
     
     // via processOutput
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         if (not(doneIngestors.includes(type))) {
             doneIngestors.add(type);
             if (springConnId(base, conn, target) <> "") { 

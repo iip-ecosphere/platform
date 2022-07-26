@@ -77,7 +77,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             MeshElement target = c.next;
             String outName = getOutName(target, type);
             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
-            generateIngestor(base, methodSuffix, conn, type, "in", target.impl);
+            generateIngestor(base, methodSuffix, conn, type, "in", target.impl, "");
         }
     }
     
@@ -213,22 +213,22 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
     
     def attachIngestors(MeshElement elt, ServiceBase base) {
-        processIngestors(elt, base, nodes);
+        processIngestors(elt, base, nodes, ", #CONNS#");
     }
     
     //specialization of MeshBasics
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         String methodName;
         if (sharedInterfaces) {
             methodName = "attach${type.firstToUpperCase()}Ingestor";
         } else {
             methodName = "attach${methodSuffix}Ingestor";
         }
-        String expr = generateTransportSend(base, type, springConnId(base, conn, target));
+        String expr = generateTransportSend(base, type, springConnId(base, conn, target), connPlaceHolder);
         'service.${methodName}(data -> ${genSentProbe(base, expr, false, type, "data")});'
     }
     
-    def generateTransportSend(ServiceBase sender, String type, String springConnId) {
+    def generateTransportSend(ServiceBase sender, String type, String springConnId, String connPlaceHolder) {
         if (springConnId <> "") {
             'SerializerMessageConverter.serializeAndSend(streamBridge, "${springConnId}", data);'
         } else {
@@ -237,7 +237,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             if (familyInterface <> "" and familyMember == sender) {
                 senderId = elt.impl.id;
             }
-            'Transport.send(c -> c.asyncSend("${senderId}_${type}", data), "${senderId}")'
+            'Transport.send(c -> c.asyncSend("${senderId}_${type}", data), "${senderId}"${connPlaceHolder})'
         }
     }
     
@@ -539,7 +539,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              String type = toTypeName(out.type);
              String methodSuffixEnd = type.firstToUpperCase() + serviceId;
              String methodSuffix = "create" + methodSuffixEnd;
-             String sendEx = generateTransportSend(service, type, "");
+             String sendEx = generateTransportSend(service, type, "", "");
 
             '/**
              * Reception callback.
@@ -732,7 +732,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> ${svc}.${methodSuffixWithServiceId}().apply(data);'
     }
 
-    def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         ''
     }
     
@@ -935,8 +935,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
     }
         
-    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target));
+    def generateIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
         'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
@@ -965,10 +965,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         "de.iip_ecosphere.platform.security.services.kodex.KodexService";
     }
     
-    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(KodexService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         for (IOType in : pairs.keys()) {
             IOType out = pairs.get(in);
-            String expr = generateTransportSend(service, type, springConnId(service, conn, target));
+            String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
             if (typeAdd <> "") {
                 '${kodexServiceName(in, out)}.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
             }
@@ -1093,8 +1093,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
     }    
 
-    def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target));
+    def generateIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
         if (typeAdd <> "") {
             'service.attachIngestor(${type}${typeAdd}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
         }
@@ -1137,7 +1137,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'return data -> null; // ignore, shall not be called'
     }
 
-    def generateIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
     }
 
     def generateReceptionCallback(MeshProcessor elt, TraceToAasService service) {

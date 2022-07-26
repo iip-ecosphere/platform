@@ -285,10 +285,22 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     // --------------------------------- iterating ingestors ---------------------------------------------
  
+     def addIngestor(mapOf(String, setOf(String)) ingestors, String ingestor, String conn) {
+        setOf(String) conns;
+        if (not(ingestors.containsKey(ingestor))) {
+            conns = {};
+            ingestors.add(ingestor, conns);
+        } else {
+            conns = ingestors.get(ingestor);
+        }
+        conns.add(conn);
+    }
+ 
      // requires generateDataMethods to be called before
-     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
+         mapOf(String, setOf(String)) ings = {};
          if (not(base.isKindOf(Connector))) { 
              setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
              for (IOType t: backward(base.output)) {
@@ -306,7 +318,9 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              String outName = getOutName(target, type);
                              String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
                              if (not(conns.includes(conn))) {
-                                 result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
+                                 String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
+                                 addIngestor(ings, ingCode, conn + "-in-0");
+                                 //result = appendWithNewline(result, ingCode);
                                  conns.add(conn);
                                  conns.add(type);
                              }
@@ -323,7 +337,9 @@ template MeshBasics(Configuration config, FileArtifact target) {
                                             conn = "process" + conn.substring(6);
                                         }
                                         if (not(conns.includes(conn)) and not(conns.includes(type)) and conn.startsWith("process")) {
-                                            result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "in", target.impl));
+                                            String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
+                                            addIngestor(ings, ingCode, conn + "-in-0");
+                                            //result = appendWithNewline(result, ingCode);
                                             conns.add(type);
                                             conns.add(conn);
                                         }
@@ -335,6 +351,19 @@ template MeshBasics(Configuration config, FileArtifact target) {
                  }
              }
          }
+ 
+          // emit collected ingestors  
+         for (String ing : ings.keys()->sortedBy(i|i)) {
+            if (connPlaceHolder <> "") {
+                String conns = "";
+                for (String c: ings.get(ing)->sortedBy(n|n)) {
+                    conns = conns + ", \"${c}\"";
+                }
+                ing = ing.substitute(connPlaceHolder, conns);
+            }
+            result = appendWithNewline(result, ing);
+         }
+ 
          // go over all possibilities, in particular for backward
          Boolean first = true;
          for (MeshElement n: nodes) {
@@ -365,7 +394,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
         ''
     }
     
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target) {
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         ''
     }
 
@@ -381,7 +410,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                         String type = toTypeName(eltOut.type);
                         String methodSuffix = getMethodSuffix(target, toTypeName(cOut), outType(target, cOut));
                         //"receive" + type.firstToUpperCase();
-                        result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "out", target.impl));
+                        result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "out", target.impl, ""));
                     }
                 }
             }
