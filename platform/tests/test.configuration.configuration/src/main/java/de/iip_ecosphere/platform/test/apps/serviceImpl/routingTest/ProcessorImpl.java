@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -30,7 +32,7 @@ import iip.impl.RoutingProcessorImpl;
  */
 public class ProcessorImpl extends RoutingProcessorImpl {
 
-    private DataIngestor<RoutingTestData> routingIngestor;
+    private List<DataIngestor<RoutingTestData>> routingIngestors = new ArrayList<>();
     
     /**
      * Fallback constructor.
@@ -52,28 +54,28 @@ public class ProcessorImpl extends RoutingProcessorImpl {
     @Override
     public void processRoutingTestData(RoutingTestData data) {
         System.out.println("Processor received: " + data);
-        if (null != routingIngestor) {
+        for (DataIngestor<RoutingTestData> ingestor: routingIngestors) {
             RoutingTestData result = new RoutingTestDataImpl();
             result.setSerNr(data.getSerNr());
             result.setStringField(data.getStringField());
-            routingIngestor.ingest(result);
+            ingestor.ingest(result);
             System.out.println("Processor sent: " + result);
         }
     }
 
     @Override
     public void attachRoutingTestDataIngestor(DataIngestor<RoutingTestData> ingestor) {
-        this.routingIngestor = ingestor;
+        this.routingIngestors.add(ingestor);
     }
 
     @Override
     public void processRoutingConnOut(RoutingConnOut data) {
         System.out.println("Processor received: " + data);
-        if (null != routingIngestor) {
+        for (DataIngestor<RoutingTestData> ingestor: routingIngestors) {
             RoutingTestData result = new RoutingTestDataImpl();
             result.setSerNr(-data.getSerNr());
             result.setStringField(data.getData());
-            routingIngestor.ingest(result);
+            ingestor.ingest(result);
             System.out.println("Processor sent: " + result);
         }
     }
