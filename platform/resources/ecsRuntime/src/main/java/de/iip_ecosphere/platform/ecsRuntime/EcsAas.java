@@ -108,12 +108,13 @@ public class EcsAas implements AasContributor {
 
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         
         SystemMetrics sysM = SystemMetricsFactory.getSystemMetrics();
-        // this may require an ECS plugin if Java cannot detect
         jB.createPropertyBuilder(NAME_PROP_OPERATING_SYSTEM)
             .setValue(Type.STRING, sysM.getOsName())
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         jB.createPropertyBuilder(NAME_PROP_CPU_ARCHITECTURE)
             .setValue(Type.STRING, sysM.getOsArch())
@@ -127,6 +128,7 @@ public class EcsAas implements AasContributor {
         
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
             .setValue(Type.STRING, "defaultEcsRuntime")
+            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
             .setValue(Type.INTEGER, 1)
