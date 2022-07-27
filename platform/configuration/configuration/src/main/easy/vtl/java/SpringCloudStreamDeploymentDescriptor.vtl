@@ -38,7 +38,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             - endpoint:
                 portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
                 hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
-            ${generateRelations(elt)|e}'
+            ${generateRelations(elt)|e}
+          ${generateEnsemble(elt, family, familyId)|e}'
         for (Service m : family.members) {
             '${generateService(elt, m, false, famId)}'
         }
@@ -66,7 +67,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           ${generateEnsemble(elt, service, familyId)|e}'
     }
         
-    def generateEnsemble(MeshElement elt, Service service, String familyId) {
+    def generateEnsemble(MeshElement elt, ServiceBase service, String familyId) {
        if (familyId <> "") {
            'ensembleWith: ${familyId}'
        } else if (elt.ensemble <> null) {
