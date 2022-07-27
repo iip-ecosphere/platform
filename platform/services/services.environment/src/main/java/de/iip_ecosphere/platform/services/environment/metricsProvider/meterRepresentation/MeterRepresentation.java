@@ -186,7 +186,7 @@ public abstract class MeterRepresentation implements Meter {
     public abstract JsonObject getUpdater();
 
     /**
-     * Generically parses a meter.
+     * Generically parses a meter. Emits a log message if the {@code json} cannot be parsed.
      * 
      * @param json   JSON string representation of the meter
      * @param tags   tags that the counter has following the format
@@ -202,7 +202,23 @@ public abstract class MeterRepresentation implements Meter {
             return null;
         }
     }
-    
+
+    /**
+     * Generically parses a meter. Does not emit anything if the {@code json} cannot be parsed.
+     * 
+     * @param json   JSON string representation of the meter
+     * @param tags   tags that the counter has following the format
+     *               {@code key:value}
+     * @return a Meter representation of the JsonObject (<b>null</b> if invalid, unknown)
+     */
+    public static Meter parseMeterQuiet(String json, String... tags) {
+        try {
+            return parseMeter(Json.createReader(new StringReader(json)).readObject(), tags);
+        } catch (JsonParsingException e) {
+            return null;
+        }
+    }
+
     /**
      * Generically parses a meter.
      * 
