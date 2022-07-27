@@ -23,7 +23,7 @@ definitions:
         name: Identifier
         structuredName: object identifier within a factory floor
         description: unique global identification of an object within a factory floor by using an Universal Resource Identifier (URI)
-  - semanticId: 0173-1#02-AAO247#002
+  - semanticId: 0173-1#02-AAM737#002
     version: 2
     revision: 1
     naming:
@@ -34,7 +34,19 @@ definitions:
       en:
         name: Software version
         structuredName: Software version 
-        description: Version of the software being used by the devide
+        description: Version of the software being used by the device
+  - semanticId: 0173-1#02-AAO247#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Softwarename
+        structuredName: Software Name
+        description: Name der Software, die vom Gerät verwendet wird
+      en:
+        name: Software name
+        structuredName: Software name 
+        description: Name of the software being used by the device
   - semanticId: 0173-1#05-AAA766#003
     version: 3
     revision: 1
