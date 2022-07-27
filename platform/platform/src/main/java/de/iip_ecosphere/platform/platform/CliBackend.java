@@ -288,7 +288,7 @@ class CliBackend {
     protected static void print(SubmodelElement elt, String collPrefix, Predicate<SubmodelElementCollection> filter, 
         PrintType... skipLevel) {
         if (null != elt) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, filter, skipLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, filter, platformFactory, skipLevel);
             elt.accept(vis);
         } else {
             println("None.");
@@ -555,7 +555,7 @@ class CliBackend {
     private static void print(Submodel submodel, String collPrefix, Predicate<SubmodelElementCollection> filter, 
         PrintType... skipLevel) {
         if (null != submodel) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, filter, skipLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, filter, platformFactory, skipLevel);
             submodel.accept(vis);
         } else {
             println("None.");

@@ -1,5 +1,7 @@
 package de.iip_ecosphere.platform.platform.cli;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -14,6 +16,9 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult.Naming;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 
@@ -77,6 +82,7 @@ public class PrintVisitor implements AasVisitor {
     private PrintType[] skipLevel;
     private Predicate<SubmodelElementCollection> filter;
     private Stack<CollectionInfo> collectionLevel = new Stack<CollectionInfo>();
+    private PlatformClientFactory platformFactory;
 
     /**
      * Creates a visitor instance.
@@ -84,12 +90,15 @@ public class PrintVisitor implements AasVisitor {
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
      * @param filter a predicate to exclude certain submodel elements collection from output 
+     * @param platformFactory platform client factory
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#ID_SHORT} is used
      */
-    public PrintVisitor(String collPrefix, Predicate<SubmodelElementCollection> filter, PrintType... skipLevel) {
+    public PrintVisitor(String collPrefix, Predicate<SubmodelElementCollection> filter, 
+        PlatformClientFactory platformFactory, PrintType... skipLevel) {
         this.collPrefix = collPrefix;
         this.skipLevel = skipLevel;
         this.filter = filter;
+        this.platformFactory = platformFactory;
     }
     
     /**
@@ -152,6 +161,7 @@ public class PrintVisitor implements AasVisitor {
         }
         if (null == info || !info.skip) {
             Object val;
+            String conceptName = "";
             try {
                 val = property.getValue();
                 if (null != val) {
@@ -165,14 +175,53 @@ public class PrintVisitor implements AasVisitor {
                         }
                     }
                 }
+                conceptName = getConceptName(property);
+                if (conceptName.length() > 0) {
+                    conceptName = " (" + conceptName + ")";
+                }
             } catch (ExecutionException e) {
                 val = "?";
             }
-            System.out.println(indent + property.getIdShort() + ": " + val);
+            System.out.println(indent + property.getIdShort() + ": " + val + conceptName);
             if (null != info) {
                 info.emitted = true; // assuming that collections at least have a property
             }
         }
+    }
+
+    /**
+     * Returns the concept name by resolving the semantic id of {@code property} if it exists/is specified.
+     * 
+     * @param property the property
+     * @return the concept name
+     */
+    private String getConceptName(Property property) {
+        String result = "";
+        String semanticId = property.getSemanticId(true);
+        if (null != semanticId) {
+            try {
+                SemanticIdResolutionResult res = platformFactory.create().resolveSemanticId(semanticId);
+                // local alternative: SemanticIdResolver.resolve(semanticId);
+                if (null != res) {
+                    Map<String, ? extends Naming> naming = res.getNaming();
+                    Naming n = null;
+                    if (naming.size() > 0) {
+                        n = naming.get(SemanticIdResolver.ENGLISH);
+                        if (null == n) {
+                            n = naming.get(SemanticIdResolver.GERMAN);
+                        }
+                        if (null == n) {
+                            n = naming.values().iterator().next();
+                        }
+                    }
+                    if (n != null) {
+                        result = n.getName();
+                    }
+                }
+            } catch (ExecutionException | IOException e) {
+            }
+        }
+        return result;
     }
 
     @Override
