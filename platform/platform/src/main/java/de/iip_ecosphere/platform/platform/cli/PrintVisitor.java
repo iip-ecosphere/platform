@@ -155,7 +155,7 @@ public class PrintVisitor implements AasVisitor {
             try {
                 val = property.getValue();
                 if (null != val) {
-                    Meter m = MeterRepresentation.parseMeter(val.toString());
+                    Meter m = MeterRepresentation.parseMeterQuiet(val.toString());
                     if (m instanceof Gauge) {
                         double value = ((Gauge) m).value();
                         if (value > 1000) { // heuristic, assumption
