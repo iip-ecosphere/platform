@@ -332,7 +332,7 @@ public class SpringCloudServiceManager
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
-                    LOGGER.info("Starting " + sId);
+                    LOGGER.info("Starting " + sId + " with " + req.getCommandlineArguments());
                     String dId = deployer.deploy(req);
                     waitFor(dId, null, s -> null == s || s == DeploymentState.deploying);
                     LOGGER.info("Starting " + dId + ": " + deployer.status(dId));
@@ -465,7 +465,7 @@ public class SpringCloudServiceManager
                 AppStatus status = deployer.status(id);
                 if (null != status) {
                     DeploymentState state = status.getState();
-                    if (state == DeploymentState.deployed) {
+                    if (state != null) { // if it was in a failure, also try to get rid of it, #50
                         setState(service, ServiceState.STOPPING);
                         LOGGER.info("Stopping " + id + "... ");
                         deployer.undeploy(id);

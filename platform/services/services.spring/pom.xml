@@ -53,11 +53,6 @@
      <artifactId>support.aas</artifactId>
      <version>${project.version}</version>
     </dependency>  
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>services.environment.spring</artifactId>
-     <version>${project.version}</version>
-    </dependency>      
 	
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -107,6 +102,12 @@
      <type>test-jar</type>
      <scope>test</scope>
     </dependency>
+    <!-- Don't move it from here, interferes with Tomcat :/ -->
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services.environment.spring</artifactId>
+     <version>${project.version}</version>
+    </dependency>      
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
