@@ -46,6 +46,8 @@ Completed improvements:
 * [#67](https://github.com/iip-ecosphere/platform/issues/67): UI progress reporting support on platform side
 * [#72](https://github.com/iip-ecosphere/platform/issues/72): Generated ingestor handling in default service implementation
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
+* [#48](https://github.com/iip-ecosphere/platform/issues/48): Start a library with basic data processing functionalities (based on the HM'22 demonstrator)
+* [#49](https://github.com/iip-ecosphere/platform/issues/49): Check whether there is a TensorFlow inference-only library - no.
 * Improvements of service, family and stream generation.
 * Allowing to change service ensembles on demand via deployment plans.
 * Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
