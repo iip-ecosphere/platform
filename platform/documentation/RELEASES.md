@@ -44,6 +44,7 @@ Completed improvements:
 * [#66](https://github.com/iip-ecosphere/platform/issues/66): Improvements of examples.KODEX and identifier check/fixing for generated Java code.
 * [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
 * [#67](https://github.com/iip-ecosphere/platform/issues/67): UI progress reporting support on platform side
+* [#72](https://github.com/iip-ecosphere/platform/issues/72): Generated ingestor handling in default service implementation
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Improvements of service, family and stream generation.
 * Allowing to change service ensembles on demand via deployment plans.
