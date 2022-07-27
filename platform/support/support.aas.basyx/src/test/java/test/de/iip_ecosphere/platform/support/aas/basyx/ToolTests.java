@@ -199,7 +199,7 @@ public class ToolTests {
      */
     @Test
     public void testTranslateReference() {
-        Assert.assertNull(Tools.translateReference(null));
+        Assert.assertNull(Tools.translateReference((String) null));
         Assert.assertNull(Tools.translateReference(""));
         Assert.assertNull(Tools.translateReference("aas"));
         final String irdi = "0173-1#02-AAV232#002";
@@ -213,6 +213,14 @@ public class ToolTests {
         Assert.assertEquals(irdi, key.getValue());
         Assert.assertEquals(KeyType.IRDI, key.getIdType());
         
+        Assert.assertNull(Tools.translateReference(null, false));
+        String tmp = Tools.translateReference(ref, false);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals("irdi:" + irdi, tmp);
+        tmp = Tools.translateReference(ref, true);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(irdi, tmp);
+        
         final String iri = "https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1";
         ref = Tools.translateReference("iri:" + iri);
         Assert.assertNotNull(ref);
@@ -223,6 +231,14 @@ public class ToolTests {
         Assert.assertEquals(false, key.isLocal());
         Assert.assertEquals(iri, key.getValue());
         Assert.assertEquals(KeyType.IRI, key.getIdType());
+
+        tmp = Tools.translateReference(ref, false);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals("iri:" + iri, tmp);
+        
+        tmp = Tools.translateReference(ref, true);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(iri, tmp);
     }
 
     /**

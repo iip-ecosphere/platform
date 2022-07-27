@@ -75,7 +75,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
 
         /**
          * Creates an uninitialized instance, e.g., for delayed creation. Use 
-         * {@link #setInstance(BaSyxSubmodel, org.eclipse.basyx.submodel.metamodel.map.Submodel)}.
+         * {@link #setInstance(BaSyxSubmodel)}.
          * 
          * @param parentBuilder the parent builder (may be <b>null</b> for a standalone sub-model)
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given

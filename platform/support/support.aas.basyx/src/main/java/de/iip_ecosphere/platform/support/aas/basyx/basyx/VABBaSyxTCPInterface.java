@@ -295,6 +295,7 @@ public class VABBaSyxTCPInterface<ModelProvider extends IModelProvider> extends 
      * 
      * @param bytes the buffer to read from
      * @param expectedBytes the expected bytes
+     * @throws IOException if the information cannot be read
      */
     protected void readBytes(ByteBuffer bytes, int expectedBytes) throws IOException {
         // Read bytes until buffer is full

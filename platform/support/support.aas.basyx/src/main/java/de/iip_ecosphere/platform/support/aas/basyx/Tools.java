@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyElements;
 import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
@@ -274,7 +275,7 @@ public class Tools {
     }
 
     /**
-     * Translates a reference. (supports IRDI)
+     * Translates a reference. (supports IRDI, IRI)
      * 
      * @param id the for declaring the reference showing some form of type, e.g., prefix "irdi:", may be empty or 
      *   <b>null</b> leading to <b>null</b>, see {@link IdentifierType}
@@ -291,6 +292,50 @@ public class Tools {
                 result = new Reference(Collections.singletonList(new Key(KeyElements.CONCEPTDESCRIPTION, false, 
                     id.substring(IdentifierType.IRI_PREFIX.length()), KeyType.IRI)));
             }
+        }
+        return result;
+    }
+    
+    /**
+     * Translates a reference back to its string format. (supports IRDI, IRI)
+     * 
+     * @param ref the reference to translate back
+     * @param stripPrefix whether the prefix shall be included
+     * @return the translated reference or <b>null</b> if {@code ref} was <b>null</b> or it cannot be translated
+     */
+    public static String translateReference(IReference ref, boolean stripPrefix) {
+        String result = null;
+        if (ref != null && ref.getKeys().size() > 0) {
+            IKey key = ref.getKeys().get(0);
+            switch (key.getIdType()) {
+            case IRDI:
+                result = compose(IdentifierType.IRDI_PREFIX, key.getValue(), stripPrefix);
+                break;
+            case IRI:
+                result = compose(IdentifierType.IRI_PREFIX, key.getValue(), stripPrefix);
+                break;
+            default:
+                // we stay with null for now
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Composes a prefix and a value if desired.
+     * 
+     * @param prefix the prefix
+     * @param value the value
+     * @param stripPrefix whether the prefix shall be included
+     * @return {@code value} or {@code prefix} + {@code value}
+     */
+    private static String compose(String prefix, String value, boolean stripPrefix) {
+        String result;
+        if (stripPrefix) {
+            result = value;
+        } else {
+            result = prefix + value;
         }
         return result;
     }

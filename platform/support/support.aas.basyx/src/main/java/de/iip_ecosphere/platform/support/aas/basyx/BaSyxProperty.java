@@ -115,10 +115,8 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         @Override
         public PropertyBuilder setSemanticId(String refValue) {
             IReference ref = Tools.translateReference(refValue);
-            if (instance.property instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement 
-                && ref != null) {
-                ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) 
-                    instance.property).setSemanticId(ref);
+            if (ref != null) {
+                property.setSemanticId(ref);
             }
             return this;
         }
@@ -160,6 +158,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
             return "";
         }
+    }
+    
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(property.getSemanticId(), stripPrefix);
     }
     
     @Override
