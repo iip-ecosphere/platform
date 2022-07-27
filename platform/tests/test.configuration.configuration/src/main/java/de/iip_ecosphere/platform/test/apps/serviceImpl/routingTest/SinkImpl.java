@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.RoutingCommand;
 import iip.datatypes.RoutingCommandImpl;
@@ -28,8 +27,6 @@ import iip.impl.RoutingSinkImpl;
  */
 public class SinkImpl extends RoutingSinkImpl {
 
-    private DataIngestor<RoutingCommand> cmdIngestor;
-    
     /**
      * Fallback constructor.
      */
@@ -50,17 +47,12 @@ public class SinkImpl extends RoutingSinkImpl {
     @Override
     public void processRoutingTestData(RoutingTestData data) {
         System.out.println("RECEIVED: " + data);
-        if (data.getSerNr() % 10 == 0 && cmdIngestor != null) {
+        if (data.getSerNr() % 10 == 0 && hasRoutingCommandIngestor()) {
             RoutingCommand cmd = new RoutingCommandImpl();
             cmd.setCmd("Batch completed");
-            cmdIngestor.ingest(cmd);
+            ingestRoutingCommand(cmd);
             System.out.println("Sending command: " + cmd);
         }
-    }
-
-    @Override
-    public void attachRoutingCommandIngestor(DataIngestor<RoutingCommand> ingestor) {
-        this.cmdIngestor = ingestor;
     }
 
 }

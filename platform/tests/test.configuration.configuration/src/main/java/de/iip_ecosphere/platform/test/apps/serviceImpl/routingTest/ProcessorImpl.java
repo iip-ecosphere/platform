@@ -13,10 +13,7 @@
 package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.RoutingCommand;
 import iip.datatypes.RoutingConnOut;
@@ -31,8 +28,6 @@ import iip.impl.RoutingProcessorImpl;
  * @author Holger Eichelberger, SSE
  */
 public class ProcessorImpl extends RoutingProcessorImpl {
-
-    private List<DataIngestor<RoutingTestData>> routingIngestors = new ArrayList<>();
     
     /**
      * Fallback constructor.
@@ -54,30 +49,21 @@ public class ProcessorImpl extends RoutingProcessorImpl {
     @Override
     public void processRoutingTestData(RoutingTestData data) {
         System.out.println("Processor received: " + data);
-        for (DataIngestor<RoutingTestData> ingestor: routingIngestors) {
-            RoutingTestData result = new RoutingTestDataImpl();
-            result.setSerNr(data.getSerNr());
-            result.setStringField(data.getStringField());
-            ingestor.ingest(result);
-            System.out.println("Processor sent: " + result);
-        }
-    }
-
-    @Override
-    public void attachRoutingTestDataIngestor(DataIngestor<RoutingTestData> ingestor) {
-        this.routingIngestors.add(ingestor);
+        RoutingTestData result = new RoutingTestDataImpl();
+        result.setSerNr(data.getSerNr());
+        result.setStringField(data.getStringField());
+        ingestRoutingTestData(data);
+        System.out.println("Processor sent: " + result);
     }
 
     @Override
     public void processRoutingConnOut(RoutingConnOut data) {
         System.out.println("Processor received: " + data);
-        for (DataIngestor<RoutingTestData> ingestor: routingIngestors) {
-            RoutingTestData result = new RoutingTestDataImpl();
-            result.setSerNr(-data.getSerNr());
-            result.setStringField(data.getData());
-            ingestor.ingest(result);
-            System.out.println("Processor sent: " + result);
-        }
+        RoutingTestData result = new RoutingTestDataImpl();
+        result.setSerNr(-data.getSerNr());
+        result.setStringField(data.getData());
+        ingestRoutingTestData(result);
+        System.out.println("Processor sent: " + result);
     }
 
     @Override

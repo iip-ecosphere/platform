@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.RoutingCommand;
 import iip.datatypes.RoutingTestData;
@@ -27,8 +26,6 @@ import iip.impl.ParallelRoutingProcessor2Impl;
  * @author Holger Eichelberger, SSE
  */
 public class ProcessorP2Impl extends ParallelRoutingProcessor2Impl {
-
-    private DataIngestor<RoutingTestData> routingIngestor;
     
     /**
      * Fallback constructor.
@@ -50,18 +47,11 @@ public class ProcessorP2Impl extends ParallelRoutingProcessor2Impl {
     @Override
     public void processRoutingTestData(RoutingTestData data) {
         System.out.println("Processor P2 received: " + data);
-        if (null != routingIngestor) {
-            RoutingTestData result = new RoutingTestDataImpl();
-            result.setSerNr(data.getSerNr());
-            result.setStringField(data.getStringField() + " - P2");
-            routingIngestor.ingest(result);
-            System.out.println("Processor P2 sent: " + result);
-        }
-    }
-
-    @Override
-    public void attachRoutingTestDataIngestor(DataIngestor<RoutingTestData> ingestor) {
-        this.routingIngestor = ingestor;
+        RoutingTestData result = new RoutingTestDataImpl();
+        result.setSerNr(data.getSerNr());
+        result.setStringField(data.getStringField() + " - P2");
+        ingestRoutingTestData(data);
+        System.out.println("Processor P2 sent: " + result);
     }
 
     @Override
