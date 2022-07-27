@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.semanticId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ServiceLoader;
 
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SemanticIdResolver {
 
+    public static final String GERMAN = Locale.GERMAN.getLanguage();
+    public static final String ENGLISH = Locale.ENGLISH.getLanguage();
+    
     private static List<SemanticIdResolver> resolvers;
     
     /**

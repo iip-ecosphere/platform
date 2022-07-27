@@ -127,4 +127,9 @@ public class FakeProperty extends FakeElement implements Property {
         this.value = value;
     }
 
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return semanticId;
+    }
+
 }
