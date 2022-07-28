@@ -209,6 +209,47 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             }
         }
     }
+    
+    protected def getDataUnitJson(ServiceBase service) {
+        String result = "{";
+        for (IOType in: service.input) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            String typeName = toTypeName(in);
+            String implTypeName = toImplTypeName(in);
+            String attributeName = firstToLowerCase(toTypeName(in));
+            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
+        }
+        result + ", \\$period=p}";
+    }
+    
+    protected def getDataTypeJson(DataType type) {
+        ''
+    }
+    
+    protected def getDataTypeJson(RecordType type) {
+        String result = "{";
+        for (Field f: type.fields) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
+        }
+        result + "}";
+    }
+    
+    protected def getFieldValueJson(DataType type, Field f) {
+        if (f.optional) {
+            'o';
+        } else {
+            'm';
+        }
+    }
+    
+    protected def getFieldValueJson(RecordType type, Field f) {
+        getDataTypeJson(type);
+    }
 
     protected def getDataUnitGetters(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
@@ -590,12 +631,16 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genClassComment(MeshElement elt, ServiceBase service, String fileName) {
         '* There is no guarantee on the sequence of received data, in particular not when 
         * the service is declared to be asynchronous. The test loads input data file from the system 
-        * property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".
+        * property "iip.test.dataFile", "../../src/test/resources/${fileName}", the default resource "${fileName}" 
+        * or "resources/software" if you want to deploy it, e.g., in case of a mocked connector.
         * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
         * A data unit consists of one optional object entry per input type of the service under test (attribute name
         * is the type name with first character in small case) - the contents of the same structure as defined in the
-        * configuration model. Further, "\\$period" is a generic entry that defines the delay period between the actual
-        * and the next data entry (initial by {@link #getInitialPeriod()}.'
+        * configuration model. The structure for this service is: {@code ${getDataUnitJson(service)}}. Depending
+        * on your data type definitions in the model, individual fields may be mandatory (indicated by <i>m</i>), 
+        * optional (indicated by <i>o</i>) or nested fields (not indicated further). "\\$period" is 
+        * an optional generic entry that defines the delay period <i>p</i> between the actual
+        * and the next data entry (if unspecified the initial value is {@link #getInitialPeriod()}.'
     }
 
     def genClassComment(MeshElement elt, Connector conn, String fileName) {
