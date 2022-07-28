@@ -578,6 +578,46 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
     // ------------------- main method ----------------------
     
+    def genClassAnnotations(MeshElement elt, ServiceBase service) {
+        '@SpringBootTest
+        @RunWith(SpringRunner.class)'
+    }
+
+    def genClassAnnotations(MeshElement elt, Connector conn) {
+        ''
+    }
+
+    def genClassComment(MeshElement elt, ServiceBase service, String fileName) {
+        '* There is no guarantee on the sequence of received data, in particular not when 
+        * the service is declared to be asynchronous. The test loads input data file from the system 
+        * property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".
+        * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
+        * A data unit consists of one optional object entry per input type of the service under test (attribute name
+        * is the type name with first character in small case) - the contents of the same structure as defined in the
+        * configuration model. Further, "\\$period" is a generic entry that defines the delay period between the actual
+        * and the next data entry (initial by {@link #getInitialPeriod()}.'
+    }
+
+    def genClassComment(MeshElement elt, Connector conn, String fileName) {
+        ''
+    }
+
+    def genPropertySource(MeshElement elt, ServiceBase service, String clsName) {
+        '/**
+        * Defining the spring properties to set up the test.
+        *
+        * @param registry a properties registry that can be modifier
+        */
+        @DynamicPropertySource
+        static void setDynamicProperties(DynamicPropertyRegistry registry) {
+            ${genDynamicProperties(elt, elt.impl, clsName)}
+        }'
+    }
+
+    def genPropertySource(MeshElement elt, Connector conn, String clsName) {
+        ''
+    }
+    
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
         'JUnitCore junit = new JUnitCore();
         junit.addListener(new TextListener(System.out));
@@ -653,20 +693,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         /**
         * Implements tests for "${clsName}". The generated class is meant to be re-usable and extensible, e.g.,
-        * regarding the assert predicates. If possible, we provide a main method to ease startup (unsure for Spring
-        * components at the moment). There is no guarantee on the sequence of received data, in particular not when 
-        * the service is declared to be asynchronous. The test loads input data file from the system 
-        * property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".
-        * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
-        * A data unit consists of one optional object entry per input type of the service under test (attribute name
-        * is the type name with first character in small case) - the contents of the same structure as defined in the
-        * configuration model. Further, "\\$period" is a generic entry that defines the delay period between the actual
-        * and the next data entry (initial by {@link #getInitialPeriod()}.
+        * regarding the assert predicates. We provide a main method to ease startup. 
+        ${genClassComment(elt, elt.impl, fileName)|e}
         *
         * @author EASy-Producer
         */        
-        @SpringBootTest
-        @RunWith(SpringRunner.class)
+        ${genClassAnnotations(elt, elt.impl)|e}
         public class ${clsName}Test extends SpringAsyncServiceBase {
         
             ${genAttributes(elt, elt.impl, clsName)|e}
@@ -719,15 +751,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
             ${genTests(elt, elt.impl, clsName)|e}
             
-            /**
-            * Defining the spring properties to set up the test.
-            *
-            * @param registry a properties registry that can be modifier
-            */
-            @DynamicPropertySource
-            static void setDynamicProperties(DynamicPropertyRegistry registry) {
-                ${genDynamicProperties(elt, elt.impl, clsName)}
-            }
+            ${genPropertySource(elt, elt.impl, clsName)|e}
                     
             /**
             * Starts the configured version of this service/connector as main program.
