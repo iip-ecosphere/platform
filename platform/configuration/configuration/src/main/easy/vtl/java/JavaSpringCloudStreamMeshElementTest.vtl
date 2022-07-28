@@ -224,6 +224,11 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         result + ", \\$period=p}";
     }
     
+    protected def getDataUnitJson(Connector conn) {
+        DataType outType = getFirstType(conn.output);
+        getDataTypeJson(outType);
+    }
+    
     protected def getDataTypeJson(DataType type) {
         ''
     }
@@ -644,7 +649,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
 
     def genClassComment(MeshElement elt, Connector conn, String fileName) {
-        ''
+        '* The connector test directly approaches the configured connector, i.e., the addressed device or server must 
+        * be accessible.'
     }
 
     def genPropertySource(MeshElement elt, ServiceBase service, String clsName) {
