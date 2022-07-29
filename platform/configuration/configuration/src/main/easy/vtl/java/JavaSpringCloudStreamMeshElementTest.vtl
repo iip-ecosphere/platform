@@ -37,9 +37,16 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genImports(MeshElement elt, ServiceBase service) {
         'import de.iip_ecosphere.platform.services.environment.*;
         import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+        import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         
         import java.io.InputStream;
         import org.hamcrest.core.IsAnything;
+
+        import org.springframework.boot.SpringBootConfiguration;
+        import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.context.junit4.SpringRunner;
+        import org.springframework.test.context.DynamicPropertyRegistry;
+        import org.springframework.test.context.DynamicPropertySource;
         import org.springframework.beans.factory.annotation.*;
         import org.springframework.integration.support.MessageBuilder;
         import org.springframework.messaging.Message;
@@ -47,6 +54,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import org.springframework.cloud.stream.test.binder.MessageCollector;
         import org.springframework.messaging.Message;
         import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.*;
+
         import static org.junit.Assert.*;'
     }
 
@@ -326,8 +334,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
     
     def genQueue(MeshElement elt, ServiceBase service) {
-        'private BlockingQueue<Message<?>> messages = collector.forChannel(channels.output());
-        private TestMatcher matcher = new TestMatcher();'
+        'private TestMatcher matcher = new TestMatcher();'
     }
 
     def genQueue(MeshSink elt, ServiceBase service) {
@@ -364,6 +371,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
+            ${genMessagesInit(elt, service, "messages")|e}
             ${processOutput(elt, service, nodes)}
             ${genMatcherAssert(elt)}
         }
@@ -379,6 +387,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @throws IOException if the data cannot be loaded/mapped to the service input data
         */
         public void testService(InputStream in) throws IOException {
+            ${genMessagesInit(elt, service, "messages")|e}
             TimedMappingConsumer consumer = new TimedMappingConsumer();
             ${genConsumerBindings(service, "consumer")}
             DataMapper.mapJsonData(in, DataUnit.class, consumer);
@@ -403,6 +412,18 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             testService(in);
         }
         '
+    }
+    
+    protected def genMessagesInit(MeshElement elt, ServiceBase service, String var) {
+        'BlockingQueue<Message<?>> ${var} = collector.forChannel(channels.output());'
+    }
+
+    protected def genMessagesInit(MeshSink elt, ServiceBase service, String var) {
+        ''
+    }
+    
+    protected def genMessagesInit(MeshElement elt, Connector conn, String var) {
+        ''
     }
     
     protected def genConsumerBindings(ServiceBase service, String var) {
@@ -625,7 +646,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------- main method ----------------------
     
     def genClassAnnotations(MeshElement elt, ServiceBase service) {
-        '@SpringBootTest
+        '@SpringBootTest(classes=iip.Starter.class, properties= {"spring.main.allow-bean-definition-overriding=true"})
         @RunWith(SpringRunner.class)'
     }
 
@@ -672,7 +693,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
         'JUnitCore junit = new JUnitCore();
         junit.addListener(new TextListener(System.out));
-        junit.run(${clsName}.class);'
+        junit.run(${clsName}Test.class);'
     }
 
     def genMain(MeshSource elt, Connector connector, String clsName) {
@@ -693,6 +714,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         };
         test.testConnector(test.createConnectorParameter(), callback);
         System.exit(0);'
+    }
+
+    def genExtends(MeshElement elt, ServiceBase service) {
+        'extends SpringAsyncServiceBase '
+    }
+
+    def genExtends(MeshSource elt, Connector connector) {
+        ''
     }
 
     // ------------------- main ----------------------
@@ -724,18 +753,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.support.TimeUtils;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-        import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         ${genImports(elt, elt.impl)|e}
         
         import org.junit.*;
         import org.junit.runner.RunWith;
         import org.junit.internal.TextListener;
         import org.junit.runner.JUnitCore;
-        
-        import org.springframework.boot.test.context.SpringBootTest;
-        import org.springframework.test.context.junit4.SpringRunner;
-        import org.springframework.test.context.DynamicPropertyRegistry;
-        import org.springframework.test.context.DynamicPropertySource;
         
         import iip.datatypes.*;
         import iip.interfaces.*;
@@ -750,7 +773,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @author EASy-Producer
         */        
         ${genClassAnnotations(elt, elt.impl)|e}
-        public class ${clsName}Test extends SpringAsyncServiceBase {
+        public class ${clsName}Test ${genExtends(elt, elt.impl)}{
         
             ${genAttributes(elt, elt.impl, clsName)|e}
             private Map<Class<?>, Integer> received = new HashMap<>();

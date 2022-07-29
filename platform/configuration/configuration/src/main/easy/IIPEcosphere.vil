@@ -172,6 +172,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
+                vilTemplateProcessor("AppMvnTest", config, "${target}/test-pom.xml", nodes=elements, appName=appName, appVersion=appVersion, appDescription="Test POM example", tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
                 maven("${appRoot}", true);

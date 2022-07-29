@@ -1,0 +1,49 @@
+import Basics;
+import MavenBasics;
+import JavaMapping;
+import MeshBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+
+    def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String gId = groupId;
+        if (length(gId) == 0) {
+            gId = "${iipGroup}.apps";
+        }
+        String projectVersion = config.iipVer;
+        
+        XmlElement project = createMavenRoot(target);
+        createMavenProjectAttributes(project, "${appName}", "${appName}", "${appDescription}");
+        new XmlElement(project, "groupId", gId);
+        new XmlElement(project, "version", "${appVersion}");
+        // app version cannot be used with maven parent, use import??
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        
+        new XmlComment(project, "This is a demonstration POM fragment showing how generated tests can be used in an application POM.");
+        
+        XmlElement dep = createDependencies(project);
+        new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
+        appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
+        new XmlComment(dep, "Remaining dependencies go here."); 
+        new XmlComment(dep, "Following must be somewhere repeated in your dependencies."); 
+        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream-test-support", scope="test");
+     
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        new XmlComment(dep, "Your other plugins extending/overriding the parent build plugins go here or after.");
+        XmlElement execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
+        XmlElement execPluginExecs = appendExecutionsParent(execPlugin);
+        
+        for (MeshElement elt: nodes) {
+            String clsName = getClsName(elt); 
+            XmlElement exec = new XmlElement(execPluginExecs, "execution");
+            new XmlElement(exec, "id", "${clsName}Test");
+            XmlElement execCfg = new XmlElement(exec, "configuration");
+            new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
+            new XmlElement(execCfg, "classpathScope", "test");
+        }
+    }
+
+}
