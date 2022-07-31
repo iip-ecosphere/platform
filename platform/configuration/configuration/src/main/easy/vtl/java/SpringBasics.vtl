@@ -44,7 +44,6 @@ template SpringBasics(Configuration config, FileArtifact target) {
         mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc) {
         for (MeshElement elt: mappedMesh.keys()) {
             ServiceBase eltImpl = elt.impl;
-            Boolean includeInFunc = filterFunc == "" or filterFunc == elt.impl.id;
           
             mapOf(DataType, IOType) eltOutput = {};
             for (IOType eo: forward(eltImpl.output)) { // backward via ingestors/transport
@@ -76,7 +75,7 @@ template SpringBasics(Configuration config, FileArtifact target) {
                             }
                         }
                         
-                        if (eltImpl.kind==ServiceKind::SOURCE_SERVICE and includeInFunc) {
+                        if (eltImpl.kind==ServiceKind::SOURCE_SERVICE and includeInFunc(filterFunc, eltId)) {
                             functions.add(eltId); // flux and poller-based sources must be in
                         }
                         

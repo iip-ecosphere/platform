@@ -436,7 +436,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                     if (connId <> "") {
                         String assert = "";
                         if (not(service.asynchronous)) {
-                            assert = "Assert.assertThat(target.receive().getPayload(), matcher));";
+                            assert = "Assert.assertThat(target.receive().getPayload(), matcher);";
                         }
                         '${var}.addHandler(${typeName}.class, d -> {
                             Message<${typeName}> msg = MessageBuilder.withPayload(d).build();
