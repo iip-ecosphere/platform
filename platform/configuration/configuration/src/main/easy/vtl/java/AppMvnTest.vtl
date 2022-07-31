@@ -29,7 +29,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
         new XmlComment(dep, "Remaining dependencies go here."); 
         new XmlComment(dep, "Following must be somewhere repeated in your dependencies."); 
-        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream-test-support", scope="test");
+        appendDependency(dep, "org.springframework", "spring-test", scope="test");
+        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
+        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
      
         XmlElement plugins = createMavenBuildElement(project, "", true);
         new XmlComment(dep, "Your other plugins extending/overriding the parent build plugins go here or after.");

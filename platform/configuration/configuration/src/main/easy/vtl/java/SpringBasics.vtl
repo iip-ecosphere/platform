@@ -32,6 +32,10 @@ template SpringBasics(Configuration config, FileArtifact target) {
         tmp.add(dest);
     }
     
+    def includeInFunc(String filterFunc, String id) {
+        filterFunc == "" or id.endsWith("_"+filterFunc);
+    }
+    
     /*
     * Calculates Spring bindings, functions and sources, based on mappedMesh, nodes as fallback, the others are for 
     * output by ref.
@@ -58,7 +62,7 @@ template SpringBasics(Configuration config, FileArtifact target) {
                         if (not(eltImpl.kind==ServiceKind::SOURCE_SERVICE and eltImpl.asynchronous)) { // bindings for async sources cause troubles
                             if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
                                 addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
-                                if (includeInFunc) {
+                                if (includeInFunc(filterFunc, eltId)) {
                                     functions.add(eltId);
                                 }
                             } else {
@@ -67,7 +71,7 @@ template SpringBasics(Configuration config, FileArtifact target) {
                             }
                             
                             addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
-                            if (includeInFunc) {
+                            if (includeInFunc(filterFunc, nextId)) {
                                 functions.add(nextId);
                             }
                         }
