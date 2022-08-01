@@ -263,11 +263,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         */
         ${nodeAnnotation("@Bean")|e}'
         if (service.asynchronous) {
+            // ${genIngestors(src, service, methodSuffix, type)}          
             'public Supplier<Flux<${type}>> ${methodSuffixWithServiceId}() {
                 // this is no real use of flux, but ensures that method is called only once to set the ingestor
                 // when the mesh element is really active
                 return () -> Flux.from(emitter -> {
-                    ${genIngestors(src, service, methodSuffix, type)}          
+                    // empty emitter, else duplicates the effort of #28
                 });
             }'
         } else {
