@@ -6,7 +6,7 @@ The details are described in the platform handbook. For short:
   * Run `mvn install` in `platformDependencies`.
   * Run `mvn package -DskipTests` in the main folder of the package.
   * Modify `src/main/easy/InstallTest.ivml` in particular to reflect your IP addresses.
-  * Run `mvn exec:java -Dexec.args="InstallTest src/main/easy gen"`
+  * Run `mvn exec:java`
   * Copy the created artifacts in `gen` (`broker`, `ecsJars`, `ecs.*`, `serviceMgr`, `serviceMgr.*`, `SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar`) to the target machines.
   * Start the broker, e.g., using `broker` (sh or bat) on the "server" and the "device" machine(s).
   * Run `platform` (sh or bat) on the "server" machine.
