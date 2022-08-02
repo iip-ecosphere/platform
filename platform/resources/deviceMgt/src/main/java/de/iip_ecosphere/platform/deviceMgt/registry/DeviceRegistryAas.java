@@ -20,9 +20,6 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
-
-import java.io.IOException;
-
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.readString;
 
@@ -194,16 +191,12 @@ public class DeviceRegistryAas implements AasContributor {
      */
     public static void notifyDeviceRemoved(String resourceId) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            try {
-                DeviceRegistryAasClient client = new DeviceRegistryAasClient();
-                SubmodelElementCollection device = client.getDevice(fixId(resourceId));
+            DeviceRegistryAasClient client = new DeviceRegistryAasClient();
+            SubmodelElementCollection device = client.getDevice(fixId(resourceId));
 
-                // SubmodelElementCollection device = sub.getSubmodelElementCollection(fixId(id));
-                device.deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
-                device.deleteElement(NAME_PROP_DEVICE_IP);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // SubmodelElementCollection device = sub.getSubmodelElementCollection(fixId(id));
+            device.deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
+            device.deleteElement(NAME_PROP_DEVICE_IP);
         });
     }
 

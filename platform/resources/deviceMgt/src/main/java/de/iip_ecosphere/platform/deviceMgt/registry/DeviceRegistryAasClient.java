@@ -16,7 +16,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -38,42 +38,45 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
 
     /**
      * Creates an instance.
-     * 
-     * @throws IOException in case that the AAS cannot be found/connection cannot be established
      */
-    public DeviceRegistryAasClient() throws IOException {
-        super(DeviceRegistryAas.NAME_SUBMODEL, DeviceRegistryAas.NAME_COLL_DEVICE_REGISTRY);
+    public DeviceRegistryAasClient() {
+        super(DeviceRegistryAas.NAME_SUBMODEL, DeviceRegistryAas.NAME_COLL_DEVICE_REGISTRY, null);
     }
 
     @Override
     public Set<SubmodelElementCollection> getDevices() {
-        Submodel resources = this.getSubmodel();
-
-        return StreamSupport.stream(resources.submodelElements().spliterator(), false)
+        Submodel resources = getSubmodel();
+        if (null != resources) {
+            return StreamSupport.stream(resources.submodelElements().spliterator(), false)
                 .filter(e -> e instanceof SubmodelElementCollection)
                 .map(e -> (SubmodelElementCollection) e)
                 .filter(e -> e.getProperty(DeviceRegistryAas.NAME_PROP_MANAGED_DEVICE_ID) != null)
                 .collect(Collectors.toSet());
+        } else {
+            return new HashSet<>();
+        }
     }
 
     @Override
     public SubmodelElementCollection getDevice(String resourceId) {
         return this.getDevices().stream()
-                .filter(e -> e.getIdShort().equals(resourceId))
-                .findFirst()
-                .orElse(null);
+            .filter(e -> e.getIdShort().equals(resourceId))
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
     public DeviceRegistrationResponse addDevice(String id, String ip) throws ExecutionException {
-        String json = fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
         DeviceRegistrationResponse result = null;
-        if (null != json) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                result = objectMapper.readValue(json.toString(), DeviceRegistrationResponse.class);
-            } catch (JsonProcessingException e) {
-                // result = null;
+        if (null != getSubmodel()) {
+            String json = fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
+            if (null != json) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    result = objectMapper.readValue(json.toString(), DeviceRegistrationResponse.class);
+                } catch (JsonProcessingException e) {
+                    // result = null;
+                }
             }
         }
         return result;        
@@ -81,16 +84,22 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
 
     @Override
     public void removeDevice(String id) throws ExecutionException {
-        getOperation(DeviceRegistryAas.NAME_OP_DEVICE_REMOVE).invoke(id);
+        if (null != getSubmodel()) {
+            getOperation(DeviceRegistryAas.NAME_OP_DEVICE_REMOVE).invoke(id);
+        }
     }
 
     @Override
     public void imAlive(String id) throws ExecutionException {
-        getOperation(DeviceRegistryAas.NAME_OP_IM_ALIVE).invoke(id);
+        if (null != getSubmodel()) {
+            getOperation(DeviceRegistryAas.NAME_OP_IM_ALIVE).invoke(id);
+        }
     }
 
     @Override
     public void sendTelemetry(String id, String telemetryData) throws ExecutionException {
-        getOperation(DeviceRegistryAas.NAME_OP_SEND_TELEMETRY).invoke(id, telemetryData);
+        if (null != getSubmodel()) {
+            getOperation(DeviceRegistryAas.NAME_OP_SEND_TELEMETRY).invoke(id, telemetryData);
+        }
     }
 }
