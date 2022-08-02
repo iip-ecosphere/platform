@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**
  * Creates an AAS for this device, deploys it to the platform AAS server and returns the address of the AAS. This may
