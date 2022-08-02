@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.identities;
 
+import java.io.IOException;
+import java.security.KeyStore;
 import java.util.Optional;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -49,7 +51,7 @@ public abstract class IdentityStore {
     /**
      * Returns an identity token returning <b>null</b> if none was found.
      * 
-     * @param identity the identity to return the token for
+     * @param identity the identity (key) to return the token for
      * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
      *     device group
      * @return the token, <b>null</b> if none was found
@@ -61,12 +63,23 @@ public abstract class IdentityStore {
     /**
      * Returns an identity token.
      * 
-     * @param identity the identity to return the token for
+     * @param identity the identity (key) to return the token for
      * @param defltAnonymous whether an anonymous token shall be returned instead of <b>null</b>
      * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
      *     device group
      * @return the token, <b>null</b> or anonymous if none was found
      */
     public abstract IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback);
+    
+    /**
+     * Returns a keystore for an identity key.
+     * 
+     * @param identity the identity (key) to return the keystore for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the keystore, <b>null</b> if none was found
+     * @throws IOException if creating/reading/opening a specified keystore fails
+     */
+    public abstract KeyStore getKeystoreFile(String identity, String... fallback) throws IOException;
     
 }

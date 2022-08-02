@@ -24,6 +24,10 @@ For detailed documentation and development hints see [documentation overview](ht
 
 We also prepare a set of [examples and demonstration use cases](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/README.md).
 
+## Building the Platform
+
+The platform consists of some core and many alternative components. We use a Continuous Integration server to build the platform upon changes (snapshot builds) and releases. To speed up this process, the build sequence is incremental and (currently) not a Maven module build. So we recommend that you install Java, Maven and an IDE (supported/working versions see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md)) and let Maven resolve the actual binaries for you. Prerequisite is the installation of the actual platform dependencies (see [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md)). For more detailed information on the build dependencies, please refer to the platform handbook.
+
 ## Available components
 
 ![Architecture Overview](ArchitectureOverview.png)

@@ -73,6 +73,14 @@ public class YamlIdentityFileTest {
         Assert.assertNotNull(info.getSignatureAsBytes());
         Assert.assertEquals("token", info.getTokenData());
         Assert.assertEquals("bla", info.getTokenEncryptionAlgorithm());
+        
+        info = file.getData("keystore");
+        Assert.assertNotNull(info);
+        Assert.assertEquals(TokenType.USERNAME, info.getType());
+        Assert.assertEquals("a1234567", info.getTokenData());
+        Assert.assertNotNull(info.getTokenDataAsBytes());
+        Assert.assertEquals("UTF-8", info.getTokenEncryptionAlgorithm());
+        Assert.assertEquals("keystore.jks", info.getFile());
     }
 
 }

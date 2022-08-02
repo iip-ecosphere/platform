@@ -58,6 +58,7 @@ public class YamlIdentityFile {
         private String tokenEncryptionAlgorithm;
         private String signatureAlgorithm;
         private String signature;
+        private String file;
         
         /**
          * Returns the token identity type.
@@ -102,6 +103,15 @@ public class YamlIdentityFile {
          */
         public String getUserName() {
             return userName;
+        }
+        
+        /**
+         * Attached file, e.g., keystore (must then be a {@link TokenType#USERNAME}, only password is used).
+         * 
+         * @return the file, may be <b>null</b>
+         */
+        public String getFile() {
+            return file;
         }
 
         /**
@@ -204,6 +214,15 @@ public class YamlIdentityFile {
          */
         public void setSignature(String signature) {
             this.signature = signature;
+        }
+        
+        /**
+         * Attached file, e.g., keystore (must then be a {@link TokenType#USERNAME}, only password is used).
+         * 
+         * @param file the file, may be <b>null</b>
+         */
+        public void setFile(String file) {
+            this.file = file;
         }
 
     }

@@ -1,4 +1,6 @@
-# AAS abstraction Component in the Support Layer of the IIP-Ecosphere platform
+# Basic support and AAS abstraction Component in the Support Layer of the IIP-Ecosphere platform
+
+## Asset Administration Shell (AAS)
 
 Asset Administration Shell (AAS) abstraction to ease use of AAS in IIP-Ecosphere and to make the integration
 of AAS implementations more flexible/stable. For now, we not aim to be complete here rather than useful for the the 
@@ -16,6 +18,42 @@ We apply the following principles (with links also in the package description of
  - Identifiers like URNs are stated as strings and, if adequate, shall be parsed by the respective implementation. Expected 
  - Optional TLS encryption based on keystores can be set up through respective methods of the factory. With a BaSyx implementation backend, the AAS registry will not be encrypted, while the AAS will be encrypted.
  - Agreed and standardized AAS structures can be integrated into the AAS frontend. One example is the product nameplate (see [ZVEI specification](https://www.zvei.org/fileadmin/user_upload/Presse_und_Medien/Publikationen/2020/Dezember/Submodel_Templates_of_the_Asset_Administration_Shell/201117_I40_ZVEI_SG2_Submodel_Spec_ZVEI_Technical_Data_Version_1_1.pdf)).
+ 
+ 
+## Identity Support
+
+This component also introduces basic identity support, i.e., identity tokens and security certificates. The realization is extensible, i.e., we provide a simple basic mechanism for local YAML files, but more complex mechanisms may be added as JSL extensions.
+
+The structure of an identity YAML file (must be resolvable as `identityStore.yml` on the classpath) is
+
+    identities:
+        <String>: 
+            type: USERNAME
+            userName: <String>
+            tokenData: <String>
+            tokenEncryptionAlgorithm: <String>
+        <String>:
+            type: ANONYMOUS
+        <String>:
+            type: X509
+            tokenPolicyId: <String>
+            signatureAlgorithm: <String>
+            signature: <String>
+            tokenData: <String>
+        <String>:
+            type: ISSUED
+            tokenPolicyId: <String>
+            signatureAlgorithm: <String>
+            signature: <String>
+            tokenData: <String>
+            tokenEncryptionAlgorithm: <String>
+        <String>:
+            type: USERNAME
+            tokenData: <String>
+            tokenEncryptionAlgorithm: <String>
+            file: <String>
+
+The identity mechanism currently supports 4 different token types, namely USERNAME (and password), ISSUED, X509 and ANONYMOUS. The required entries are illustrated above, while the first entries below `identities` denote the respective identity keys and must be unique within this file. The `tokenEncryptionAlgorithm` for discouraged USERNAME tokens is usually `UTF-8`. The identity keys can be used in respective configuration elements of the configuration model while in background the identity mechanism is queried for the token. One specific case is the last entry, a USERNAME token with attached `file` (may be a file or an URI) representing a keystore to be opened with `tokenData` as password. 
  
 **Missing**
 - Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
