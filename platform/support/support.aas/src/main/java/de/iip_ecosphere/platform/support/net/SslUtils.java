@@ -79,7 +79,16 @@ public class SslUtils {
      * @return "JKS" (default) or "PKCS12"
      */
     public static final String getKeystoreType(File trustStore) {
-        String tName = trustStore.getName();
+        return getKeystoreType(trustStore.getName());
+    }
+    
+    /**
+     * Returns the keystore type based on the file name extension.
+     * 
+     * @param tName the file name of the truststore (JKS or PKCS12 with file extension ".p12")
+     * @return "JKS" (default) or "PKCS12"
+     */
+    public static final String getKeystoreType(String tName) {
         String keystoreType = KEYSTORE_JKS;
         if (tName.endsWith(".p12")) {
             keystoreType = KEYSTORE_PCKS12;

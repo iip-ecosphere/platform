@@ -18,4 +18,9 @@ identities:
         signatureAlgorithm: yourSigAlg
         signature: sig-2
         tokenData: token
-        tokenEncryptionAlgorithm: bla    
+        tokenEncryptionAlgorithm: bla
+    keystore:
+        type: USERNAME
+        tokenData: a1234567    
+        tokenEncryptionAlgorithm: UTF-8
+        file: keystore.jks

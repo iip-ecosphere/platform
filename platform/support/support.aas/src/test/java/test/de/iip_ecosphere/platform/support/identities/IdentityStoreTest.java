@@ -18,6 +18,9 @@ import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityStore;
 
+import java.io.IOException;
+import java.security.KeyStore;
+
 import org.junit.Assert;
 
 /**
@@ -45,6 +48,13 @@ public class IdentityStoreTest {
         Assert.assertEquals(TokenType.USERNAME, store.getToken("axc3151-2", false).getType());
         Assert.assertEquals(TokenType.ISSUED, store.getToken("UI", false).getType());
         Assert.assertEquals(TokenType.USERNAME, store.getToken("myEdge", false, "plcEdges", "axc3151-2").getType());
+        
+        try {
+            KeyStore ks = store.getKeystoreFile("keystore");
+            Assert.assertNotNull(ks);
+        } catch (IOException e) {
+            Assert.fail("No exception shall occur here");
+        }
     }
 
 }

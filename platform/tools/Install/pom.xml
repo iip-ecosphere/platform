@@ -86,6 +86,11 @@
          <configuration>
            <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+           <arguments>
+              <argument>InstallTest</argument>
+              <argument>src/main/easy</argument>
+              <argument>gen</argument>
+           </arguments>
          </configuration>
        </plugin>
     </plugins>

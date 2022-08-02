@@ -16,10 +16,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityFile.IdentityInformation;
+import de.iip_ecosphere.platform.support.net.SslUtils;
+import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
@@ -49,45 +58,63 @@ public class YamlIdentityStore extends IdentityStore {
      * Creates a YAML identity store. Usually, shall be created via JSL ({@link IdentityStoreDescriptor}). [testing]
      */
     public YamlIdentityStore() {
+        data = YamlIdentityFile.load(resolve("identityStore.yml")); // can cope with null
+    }
+    
+    /**
+     * Resolves a resource, identity store file or key file listed in identity store.
+     * 
+     * @param resource the resource to resolve
+     * @return the resolved resource or <b>null</b> if not found
+     */
+    private static InputStream resolve(String resource) {
         String source = "classpath";
-        InputStream in = ResourceLoader.getResourceAsStream("identityStore.yml");
+        InputStream in = ResourceLoader.getResourceAsStream(resource);
+        // this is old style, could delegate more into resolvers...
         if (null == in) {
-            in = ResourceLoader.getResourceAsStream("resources/identityStore.yml");
+            in = ResourceLoader.getResourceAsStream("resources/" + resource);
             source = "classpath: resources";
         }
         if (null == in) {
             String storeFolder = System.getProperty("iip.identityStore", ".");
-            File f = new File(storeFolder, "identityStore.yml");
+            File f = new File(storeFolder, resource);
             // for local testing
             if (!f.exists()) {
-                f = new File("src/test/resources/identityStore.yml");
+                f = new File("src/test/resources/" + resource);
             }
             // for local development/deployment preparation
             if (!f.exists()) {
-                f = new File("src/main/resources/identityStore.yml");
+                f = new File("src/main/resources/" + resource);
             }
             if (f.exists()) {
                 try {
                     in = new FileInputStream(f);
                     source = f.getAbsolutePath();
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(getClass()).info("Cannot load identityStore.yml: {}", e.getMessage());
+                    LoggerFactory.getLogger(YamlIdentityFile.class)
+                        .info("Cannot load identityStore.yml: {}", e.getMessage());
                 }
             } else {
                 in = null;
             }
         }
         if (null != in) {
-            LoggerFactory.getLogger(getClass()).info("Loading identityStore.yml from {}", source);
+            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading identityStore.yml from {}", source);
         } else {
-            LoggerFactory.getLogger(getClass()).warn("identityStore.yml not found!");
+            LoggerFactory.getLogger(YamlIdentityFile.class).warn("identityStore.yml not found!");
         }
-        data = YamlIdentityFile.load(in); // can cope with null
+        return in;
     }
-
-    @Override
-    public IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback) {
-        IdentityToken result = null;
+    
+    /**
+     * Resolves the requested {@link IdentityInformation}.
+     * 
+     * @param identity the identity (key) to return the information instance for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the identity information or <b>null</b>
+     */
+    private IdentityInformation resolve(String identity, String... fallback) {
         IdentityInformation info = data.getData(identity);
         if (null == info) {
             for (String f : fallback) {
@@ -97,6 +124,13 @@ public class YamlIdentityStore extends IdentityStore {
                 }
             }
         }
+        return info;
+    }
+
+    @Override
+    public IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback) {
+        IdentityToken result = null;
+        IdentityInformation info = resolve(identity, fallback);
         IdentityToken.IdentityTokenBuilder builder = null;
         if (null == info && defltAnonymous) {
             builder = IdentityToken.IdentityTokenBuilder.newBuilder();
@@ -122,8 +156,56 @@ public class YamlIdentityStore extends IdentityStore {
             result = builder.build();
         } else {
             LoggerFactory.getLogger(getClass()).warn(
-                "No token found for {} (with fallbacks {}). Using anonymous token: {}", 
+                "No identity information found for {} (with fallbacks {}). Using anonymous token: {}", 
                 identity, fallback, defltAnonymous);
+        }
+        return result;
+    }
+
+    @Override
+    public KeyStore getKeystoreFile(String identity, String... fallback) throws IOException {
+        KeyStore result = null;
+        IdentityInformation info = resolve(identity, fallback);
+        if (null != info) {
+            if (TokenType.USERNAME != info.getType() && null != info.getTokenData()) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Keystore information found for {} (with fallbacks {}), but type is not USERNAME/has no token data",
+                        identity, fallback);
+            } else if (null == info.getFile()) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Keystore information found for {} (with fallbacks {}), but no keystore file specified", 
+                        identity, fallback);
+            } else {
+                try {
+                    InputStream stream = null;
+                    try {
+                        URI uri = new URI(info.getFile());
+                        File f = UriResolver.resolveToFile(uri, null);
+                        if (null != f && f.exists()) {
+                            stream = new FileInputStream(f);
+                        }
+                    } catch (URISyntaxException | IllegalArgumentException e) {
+                        // ignore, we just figure out whether it could be an URI
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(getClass()).warn(
+                            "Resolving key file {} failed: {}. Falling back to resource resolution.", 
+                                info.getFile(), e.getMessage());
+                    }
+                    if (null == stream) {
+                        stream = resolve(info.getFile());
+                    }
+                    String keystoreType = SslUtils.getKeystoreType(info.getFile());
+                    result = KeyStore.getInstance(keystoreType);
+                    result.load(stream, info.getTokenData().toCharArray());
+                    stream.close();
+                } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
+                    throw new IOException(e);
+                }
+            }                
+        }  else {
+            LoggerFactory.getLogger(getClass()).warn(
+                "No identity information found for {} (with fallbacks {})", 
+                    identity, fallback);
         }
         return result;
     }
