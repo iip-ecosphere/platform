@@ -1,6 +1,7 @@
 project Devices {
 
     import MetaConcepts;
+    import DataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
         
@@ -30,6 +31,10 @@ project Devices {
     // Instantiation shall create installedDependencies.yml with this key and install path!
     compound SystemDependency refines Dependency {
         String key; 
+    }
+    
+    compound LinuxSystemDependency refines SystemDependency {
+        String name;
     }
 
     // preliminary, to record that
@@ -73,6 +78,7 @@ project Devices {
     compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
         String name;
         String version;
+        setOf(refTo(Dependency)) dependencies = {};
     }
     
     // ------------------ Devices --------------------------- 

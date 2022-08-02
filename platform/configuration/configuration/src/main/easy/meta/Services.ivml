@@ -1,7 +1,6 @@
 project Services {
 
    import MetaConcepts;
-   import DataTypes;
    import Devices;
    import Resources;
    import Transport;
