@@ -105,6 +105,46 @@ project ContainerCreation {
        version = "1.20.1"
     };
     
+    PythonDependency Tflite_Runtime28 = {
+       name = "tflite_runtime",
+       version = "2.8"
+    };
+
+    PythonDependency Pandas135 = {
+       name = "pandas",
+       version = "1.3.5"
+    };
+    
+    PythonDependency Sklearn = {
+       name = "sklearn",
+       version = "0.0"
+    };
+    
+    PythonDependency Pillow = {
+       name = "Pillow",
+       version = "9.1.0"
+    };
+    
+    PythonDependency Kreas-Applications108 = {
+       name = "Keras-Applications",
+       version = "1.0.8"
+    };
+    
+    PythonDependency Psutil = {
+       name = "psutil",
+       version = "5.9.0"
+    };
+    
+    PythonDependency Glob2 = {
+       name = "glob2",
+       version = "0.7"
+    };
+    
+    PythonDependency OpenCV-Python45564 = {
+       name = "opencv-python",
+       version = "4.5.5.64"
+    };
+    
     Service myReceiverService = JavaService {
         id = "SimpleReceiver",
         name = "Simple Data Receiver",
