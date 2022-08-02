@@ -52,6 +52,7 @@ Completed improvements:
 * Allowing to change service ensembles on demand via deployment plans.
 * Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
 * Transport message sending support with simple key-based routing for local and global transport connector.
+* Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

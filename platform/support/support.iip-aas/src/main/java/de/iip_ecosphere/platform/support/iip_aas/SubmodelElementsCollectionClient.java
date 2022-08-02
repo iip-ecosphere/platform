@@ -43,7 +43,19 @@ public class SubmodelElementsCollectionClient extends SubmodelClient {
     public SubmodelElementsCollectionClient(String submodel, String collectionId) throws IOException {
         this(ActiveAasBase.getSubmodel(submodel), collectionId);
     }
-    
+
+    /**
+     * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a specified
+     * submodel and a collection id.
+     * 
+     * @param submodel the submode to refer to
+     * @param collectionId the id used as key in {@code submodel} to denote the collection to operate on
+     * @param fallback submodel to be used if retrieving {@code sumbodel} fails
+     */
+    public SubmodelElementsCollectionClient(String submodel, String collectionId, Submodel fallback) {
+        this(getSubmodel(submodel, fallback), collectionId);
+    }
+
     /**
      * Creates a client instance based on the given {@code submodel}. Operation and properties will be taken from the 
      * submodel elements collection {@code collectionId} within {@code submodel},
@@ -55,6 +67,23 @@ public class SubmodelElementsCollectionClient extends SubmodelClient {
     public SubmodelElementsCollectionClient(Submodel submodel, String collectionId) {
         super(submodel);
         this.collectionId = collectionId;
+    }
+    
+    /**
+     * Returns the submodel with name {@code submodel} or of retrieving it fails {@code fallback}.
+     * 
+     * @param submodel the submodel name
+     * @param fallback the fallback submodel, may be <b>null</b>
+     * @return the submodel or {@code fallback}
+     */
+    private static Submodel getSubmodel(String submodel, Submodel fallback) {
+        Submodel result;
+        try {
+            result = ActiveAasBase.getSubmodel(submodel);
+        } catch (IOException e) {
+            result = fallback;
+        }
+        return result;
     }
 
     @Override
