@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
