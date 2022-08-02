@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import de.iip_ecosphere.platform.support.iip_aas.uri.UriResolver;
+import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**
  * A Storage grants access to different files/objects.
