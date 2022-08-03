@@ -6,7 +6,7 @@ Planned:
 * More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 
-### Next release (august 2022, TddT'22):
+### Next release (August 2022, TddT'22):
 Planned:
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35)
 
@@ -20,6 +20,7 @@ In progress:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * UI progress reporting: [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* UI server improvements: [#73](https://github.com/iip-ecosphere/platform/issues/73)
 * Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63) and extensible semanticId resolution [#68](https://github.com/iip-ecosphere/platform/issues/68) as well as use in UI
 
 Completed improvements:
@@ -48,7 +49,7 @@ Completed improvements:
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * [#48](https://github.com/iip-ecosphere/platform/issues/48): Start a library with basic data processing functionalities (based on the HM'22 demonstrator)
 * [#49](https://github.com/iip-ecosphere/platform/issues/49): Check whether there is a TensorFlow inference-only library - no.
-* Improvements of service, family and stream generation.
+* Improvements of service, family and stream generation (also [#44](https://github.com/iip-ecosphere/platform/issues/44) and [#42](https://github.com/iip-ecosphere/platform/issues/42)).
 * Allowing to change service ensembles on demand via deployment plans.
 * Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
 * Transport message sending support with simple key-based routing for local and global transport connector.

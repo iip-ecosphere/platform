@@ -554,8 +554,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             SecuritySettings sec = conn.security;
             if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 'Map<String, IdentityToken> identities = new HashMap<>();
-                IdentityToken tok = IdentityStore.getInstance().getToken("${conn.host}:${conn.port}", true); 
-                identities.put(ConnectorParameter.ANY_ENDPOINT, tok);'
+                IdentityToken tok = IdentityStore.getInstance().getToken("${sec.authenticationKey}", true, "${conn.host}:${conn.port}"); 
+                identities.put(ConnectorParameter.ANY_ENDPOINT, tok);
+                identities.put("opc.tcp://${conn.host}:${conn.port}", tok);'
             }
             if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
                 'IdentityToken kTok = IdentityStore.getInstance().getToken("${sec.keystorePasswordKey}", true);' 
