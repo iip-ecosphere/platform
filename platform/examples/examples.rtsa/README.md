@@ -23,6 +23,8 @@ As stated above, directly after obtaining this project, the application will not
   * Compile the project with `mvn -P App install -DskipTests`. This makes the service implementations for source and receiver available to the instantiation.
   * Re-instantiate the application as done above. This step binds the service implementation provided by this project to the application (please note the `generateApps` argument): `mvn -P EasyGen exec:java@generateApps`
     
+* In case you have to change the resources folder, you should add `-Diip.resources="NewFolderName"` to the commands. For example `mvn -P EasyGen exec:java@generateApps -Diip.resources="NewFolderName"`
+
 If you want to execute the example in a platform installation, add `gen/rtsa/SimpleRTSADemoFlowApp/target/SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
     
   * Instantiate a communication broker: `mvn -P EasyGen exec:java@generateBroker`
