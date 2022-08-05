@@ -9,7 +9,7 @@ rm -rf gen
 mvn -U -P EasyGen generate-sources
 mvn -P EasyGen exec:java@generateBroker
 mvn -P EasyGen exec:java@generateAppsNoDeps
-mvn -U -P Example install -DskipTests
+mvn -U -P App install -DskipTests
 mvn -P EasyGen exec:java@generateApps
 
 #execute and test
@@ -30,7 +30,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
-mvn -P Example exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P App exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 
