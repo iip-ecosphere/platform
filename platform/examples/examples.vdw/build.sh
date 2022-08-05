@@ -13,6 +13,6 @@ mvn compile
 #execute and 'test'
 
 rm -f log
-mvn -P Example exec:java@generatedConnector -Dexec.args="--skip" > log 
+mvn -P App exec:java@generatedConnector -Dexec.args="--skip" > log 
 echo "WARNING: Jenkins cannot contact UMATI OPCUA service. Disabling execution!"
 grep -Fq "UMATI OPCUA Connector test" log

@@ -71,7 +71,7 @@
 
   <profiles>
      <profile>
-        <id>Example</id>
+        <id>App</id>
           <build>
              <plugins>
                 <plugin>

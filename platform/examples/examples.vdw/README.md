@@ -10,10 +10,10 @@ This example currently contains two parts:
     * Obtain the platform configuration meta-model, which is intentionally not included here: `mvn -P EasyGen generate-sources` (use `-U` to update it if it is already in place) 
     * Instantiate the pseudo-application using the OPC UA connector: `mvn -P EasyGen exec:java@generateApps`
     * If you try the example from within Eclipse, we would now need here now a Maven project refresh.
-    * Compile the project with `mvn -P Example compile`
-    * Run the generated connector with `mvn -P Example exec:java@generatedConnector`
+    * Compile the project with `mvn -P App compile`
+    * Run the generated connector with `mvn -P App exec:java@generatedConnector`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
-* A hand-crafted connector for comparison: `mvn -P Example exec:java@manualConnector`
+* A hand-crafted connector for comparison: `mvn -P App exec:java@manualConnector`
 
 Shortcuts for Eclipse: 
   * Run `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 
