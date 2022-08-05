@@ -15,6 +15,8 @@ This example currently contains two parts:
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
 * A hand-crafted connector for comparison: `mvn -P App exec:java@manualConnector`
 
+* In case you have to change the resources folder, you should add `-Diip.resources="NewFolderName"` to the commands. For example `mvn -P EasyGen exec:java@generateApps -Diip.resources="NewFolderName"`
+
 Shortcuts for Eclipse: 
   * Run `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 
   * Run then `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` 

@@ -52,7 +52,11 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
+  <properties>
+        <iip.resources>resources</iip.resources>
+  </properties>
+    
   <profiles>
      <profile>
         <id>App</id>
@@ -177,7 +181,7 @@
 	                           <systemProperties>
 	                              <systemProperty>
 	                                <key>iip.resources</key>
-	                                <value>${project.basedir}/resources</value>
+	                                <value>${project.basedir}/${iip.resources}</value>
 	                              </systemProperty>
 	                           </systemProperties>
                            </configuration>
@@ -196,7 +200,7 @@
 	                           <systemProperties>
 	                              <systemProperty>
 	                                <key>iip.resources</key>
-	                                <value>${project.basedir}/resources</value>
+	                                <value>${project.basedir}/${iip.resources}</value>
 	                              </systemProperty>
 	                           </systemProperties>
                            </configuration>

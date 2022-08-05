@@ -67,6 +67,7 @@
   <properties>
         <generated.class>de.iip_ecosphere.platform.examples.vdw.GeneratedConnector</generated.class>
         <manual.class>de.iip_ecosphere.platform.examples.vdw.ManualConnector</manual.class>
+        <iip.resources>resources</iip.resources>
   </properties>
 
   <profiles>
@@ -216,7 +217,7 @@
                          <systemProperties>
                             <systemProperty>
                               <key>iip.resources</key>
-                              <value>${project.basedir}/resources</value>
+                              <value>${project.basedir}/${iip.resources}</value>
                             </systemProperty>
                          </systemProperties>
                         </configuration>
