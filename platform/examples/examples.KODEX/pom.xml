@@ -55,7 +55,7 @@
   
   <profiles>
      <profile>
-        <id>Example</id>
+        <id>App</id>
         <dependencies>    
         	<dependency>
       			<artifactId>apps.AppInterfacesKodexExample</artifactId>
