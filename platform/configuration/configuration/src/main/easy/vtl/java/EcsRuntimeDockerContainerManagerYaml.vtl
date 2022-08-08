@@ -119,7 +119,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     
     def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target) {
         '${produceTransport(config)}'
-        '${produceAas(config, implLocalEphemerial=true)}'
+        '${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}'
         '${produceNetMgr(config)}'
     }    
 

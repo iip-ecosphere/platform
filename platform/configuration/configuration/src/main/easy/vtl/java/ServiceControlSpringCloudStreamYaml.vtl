@@ -26,7 +26,7 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
             availabilityRetryDelay: ${mgr.availabilityRetryDelay}
             serviceProtocol: ${aasProtocolName(config)}
             ${produceTransport(config)}
-            ${produceAas(config, implLocalEphemerial=true)}
+            ${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}
             ${produceNetMgr(config)}'
         // executables based on target device
     }
