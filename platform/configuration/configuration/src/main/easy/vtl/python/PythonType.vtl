@@ -34,15 +34,18 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     // generates code for the setters
     def setters(RecordType type) {
         for (Field f: type.fields) {
-            'def set${asMethodNameSuffix(f.name)}(self, v : ${toTypeName(f.type)}):
-                """Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
+            'def set${asMethodNameSuffix(f.name)}(self, v):
+                """Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                 
-                   Returns:
-                     - the value of ${f.name}"""'
+                   Parameters:
+                     - v -- the new value of ${f.name}, may be of type ${toTypeName(f.type)} or the corresponding numpy type"""'
             if (interface) {
             '    raise NotImplementedError'
             } else {
-            '    self.${asIdentifier(f.name)} = v'
+            '    if ("numpy" in str(type(v))):'
+            '        self.${asIdentifier(f.name)} = v.item()'
+            '    else:'
+            '        self.${asIdentifier(f.name)} = v'
             }
             ''
         }
