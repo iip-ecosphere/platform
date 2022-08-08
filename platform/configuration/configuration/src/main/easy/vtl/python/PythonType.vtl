@@ -34,21 +34,59 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     // generates code for the setters
     def setters(RecordType type) {
         for (Field f: type.fields) {
-            'def set${asMethodNameSuffix(f.name)}(self, v):
+            'def set${asMethodNameSuffix(f.name)}(self, v${genSetterTypeAnnotation(f, f.type)}):
                 """Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                 
                    Parameters:
-                     - v -- the new value of ${f.name}, may be of type ${toTypeName(f.type)} or the corresponding numpy type"""'
+                     - v -- the new value of ${f.name}${genSetterParamVDoc(f, f.type)}"""'
             if (interface) {
             '    raise NotImplementedError'
             } else {
-            '    if ("numpy" in str(type(v))):'
-            '        self.${asIdentifier(f.name)} = v.item()'
-            '    else:'
-            '        self.${asIdentifier(f.name)} = v'
+            '    ${genSetterAssignment(f, f.type)}'
             }
             ''
         }
+    }
+    
+    def genSetterAssignment(Field f, DataType type) {
+        'self.${asIdentifier(f.name)} = v'
+    }
+
+    def genSetterTypeAnnotation(Field f, DataType type) {
+        ': ${toTypeName(f.type)}'
+    }
+
+    def genSetterParamVDoc(Field f, DataType type) {
+        ''
+    }
+    
+    // numpy conversion
+    
+    def genSetterAssignment(Field f, NumericPrimitiveType type) {
+        '${genNumpyConversion(f, type)}'
+    }
+    
+    def genSetterAssignment(Field f, BooleanTypeType type) {
+        '${genNumpyConversion(f, type)}'
+    }
+
+    def genSetterAssignment(Field f, ArrayType type) {
+        genSetterAssignment(f, type.type);
+    }
+    
+    protected def genNumpyConversion(Field f, DataType type) {
+        'if ("numpy" in str(type(v))):
+            self.${asIdentifier(f.name)} = v.item()
+         else:
+            self.${asIdentifier(f.name)} = v'
+    }
+    
+    def genSetterTypeAnnotation(Field f, NumericPrimitiveType type) {
+        ''
+    }
+    
+    def genSetterParamVDoc(Field f, NumericPrimitiveType type) {
+        ', may be of type ${toTypeName(f.type)} or the corresponding numpy type'
     }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {

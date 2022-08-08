@@ -22,6 +22,9 @@ project DataTypes {
     // toTypeName(.) in PythonBasics, convName(.) and convParam(.) in DataOperationBasics    
     compound PrimitiveType refines DataType {
     }
+
+    compound NumericPrimitiveType refines PrimitiveType {
+    }
     
     compound ArrayType refines PrimitiveType {
         refTo(DataType) type;
@@ -65,25 +68,25 @@ project DataTypes {
 
     // defining the basic type; if further ones are added, adjust the basic vtls in the generation
     // do not change the names!
-    compound IntegerTypeType refines PrimitiveType {
+    compound IntegerTypeType refines NumericPrimitiveType {
     }
     IntegerTypeType IntegerType = {
         name = "Integer"
     };
 
-    compound ShortTypeType refines PrimitiveType {
+    compound ShortTypeType refines NumericPrimitiveType {
     }
     ShortTypeType ShortType = {
         name = "Short"
     };
 
-    compound UInt16TypeType refines PrimitiveType {
+    compound UInt16TypeType refines NumericPrimitiveType {
     }
     UInt16TypeType UInt16Type = {
         name = "UInt16"
     };
 
-    compound LongTypeType refines PrimitiveType {
+    compound LongTypeType refines NumericPrimitiveType {
     }
     LongTypeType LongType = {
         name = "Long"
@@ -107,18 +110,18 @@ project DataTypes {
         name = "Boolean"
     };
 
-    compound FloatTypeType refines PrimitiveType {
+    compound FloatTypeType refines NumericPrimitiveType {
     }
     FloatTypeType FloatType = {
         name = "Float"
     };
 
-    compound DoubleTypeType refines PrimitiveType {
+    compound DoubleTypeType refines NumericPrimitiveType {
     }
     DoubleTypeType DoubleType = {
         name = "Double"
     };
-    compound ByteTypeType refines PrimitiveType {
+    compound ByteTypeType refines NumericPrimitiveType {
     }
     ByteTypeType ByteType = {
         name = "Byte"
@@ -130,44 +133,43 @@ project DataTypes {
         name = "Object"
     };
 
-	// Start - Added types OPC UA - by Ahmad
-    compound Integer16TypeType refines PrimitiveType {
+    compound Integer16TypeType refines NumericPrimitiveType {
     }
     Integer16TypeType Integer16Type = {
         name = "Int16"
     };
     
-    compound Integer32TypeType refines PrimitiveType {
+    compound Integer32TypeType refines NumericPrimitiveType {
     }
     Integer32TypeType Integer32Type = {
         name = "Int32"
     };
     
-    compound Integer64TypeType refines PrimitiveType {
+    compound Integer64TypeType refines NumericPrimitiveType {
     }
     Integer64TypeType Integer64Type = {
         name = "Int64"
     };
     
-    compound SByteTypeType refines PrimitiveType {
+    compound SByteTypeType refines NumericPrimitiveType {
     }
     SByteTypeType SByteType = {
         name = "SByte"
     };
     
-    compound UnsignedInteger16TypeType refines PrimitiveType {
+    compound UnsignedInteger16TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger16TypeType UnsignedInteger16Type = {
         name = "UInt16"
     };
     
-    compound UnsignedInteger32TypeType refines PrimitiveType {
+    compound UnsignedInteger32TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger32TypeType UnsignedInteger32Type = {
        name = "UInt32"
     };
     
-    compound UnsignedInteger64TypeType refines PrimitiveType {
+    compound UnsignedInteger64TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger64TypeType UnsignedInteger64Type = {
         name = "UInt64"
@@ -184,7 +186,6 @@ project DataTypes {
     DateTimeTypeType DateTimeType = {
         name = "DateTime"
     };
-	//End - Added types OPC UA - by Ahmad
 	
     compound ByteArrayTypeType refines ArrayType {
     }
