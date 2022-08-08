@@ -641,6 +641,9 @@ class CliBackend {
      */
     protected static URI toUri(String text) throws URISyntaxException {
         URI result;
+        if (null == text) {
+            text = ""; // shall result in an URISyntaxException, not an NPE  
+        }
         if (text.indexOf(':') < 0) {
             File f = new File(text).getAbsoluteFile();
             result = f.toURI();
