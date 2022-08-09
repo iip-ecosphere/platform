@@ -7,6 +7,20 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template SpringBasics(Configuration config, FileArtifact target) {
 
+    /*
+    * Generates the serializer registration code for the given set of serializer class names.
+    */
+    def generateSerializerRegistration(setOf(String) serializers) {
+        for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
+            'SerializerRegistry.registerSerializer(${cls}.class);'
+        }
+    }
+
+    /*
+    * Determines a Spring connection id from source to target based on the given connection name.
+    * Returns an empty string if the connection shall be realized via the transport layer. Returns
+    * A connection id if the connection shall happen through the active Spring binder.
+    */
     def springConnId(ServiceBase source, String conn, ServiceBase target) {
         String springConnId = "";
         if (source.kind <> ServiceKind::SOURCE_SERVICE // source always via transfer 
@@ -31,7 +45,11 @@ template SpringBasics(Configuration config, FileArtifact target) {
         }
         tmp.add(dest);
     }
-    
+
+    /**
+    * Shall the given connection id be included in the spring cloud function definition.
+    * filterFunc is the required postfix in id, may be empty.
+    */    
     def includeInFunc(String filterFunc, String id) {
         filterFunc == "" or id.endsWith("_"+filterFunc);
     }
@@ -137,6 +155,9 @@ template SpringBasics(Configuration config, FileArtifact target) {
     
     // ---------------------------- formatting, emitting ---------------------------------------
 
+    /**
+    * Composes the given set of strings to a sorted string of semicolon separated entries.
+    */
     def semicolonList(setOf(String) elt) {
         String result = "";
         if (elt.size() > 0) {

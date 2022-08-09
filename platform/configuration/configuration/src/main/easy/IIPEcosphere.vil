@@ -140,11 +140,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                             vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
                                 "${javaNodesTestSrc}/${clsName}Test.java", 
                                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                                familyInterface="", familyMember=no.impl, nodes=nodes2, serializers=javaSerializers);
                         }
                         setOf(Service) mbs = {};
                         generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
-                            a, artifacts, noDeps, mbs, nodes2);
+                            a, artifacts, noDeps, mbs, nodes2, javaSerializers);
                         elements.add(no);
                         generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         for (Service m: mbs) {
@@ -328,11 +328,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
     // dispatch basis
     generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, 
+        setOf(MeshElement) nodes, setOf(String) javaSerializers) = {
     }
 
     generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
-        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, setOf(MeshElement) nodes) = {
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, 
+        setOf(MeshElement) nodes, setOf(String) javaSerializers) = {
+        
         IIPEcosphere cfg = config;
         String familyInterface = familyInterfaceName(clsName);
         vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
@@ -344,7 +347,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
             if (not(noDeps)) {
                 vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
-                     elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
+                     elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, 
+                     nodes=nodes, serializers=javaSerializers);
             }
             mbs.add(m);
         }
