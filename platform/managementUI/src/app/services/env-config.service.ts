@@ -28,8 +28,9 @@ export class EnvConfigService {
     private env: Configuration | undefined;
 
     public load(): Configuration {
-      console.log('load');
+      console.log('loading ip');
       this.env = environment;
+      console.log(environment);
       return this.env;
     }
 

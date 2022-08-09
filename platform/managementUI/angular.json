@@ -29,6 +29,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -82,6 +83,10 @@
             "development": {
               "browserTarget": "IIPES_Web:build:development"
             }
+          },
+          "options": {
+            "browserTarget": "project-name:build",
+            "proxyConfig": "src/proxy.conf.json"
           },
           "defaultConfiguration": "development"
         },
