@@ -108,12 +108,15 @@ public class TestServiceManager {
      * A predicate testing whether the value of a JSON gauge is positive.
      */
     private static final Predicate<Object> POSITIVE_GAUGE_VALUE = o -> {
-        try {
+        if (o instanceof Number) {
+            return ((Number) o).doubleValue() > 0; 
+        } else if (o != null) { // TODO remove with METRICS_AS_VALUES
             Meter meter = MeterRepresentation.parseMeter(o.toString());
             Assert.assertTrue(meter instanceof Gauge); 
-            return ((Gauge) meter).value() > 0;
-        } catch (IllegalArgumentException e) {
-            return true; // may occur during shutdown; we may need a counter for received values
+            return ((Gauge) meter).value() > 0; 
+        } else {
+            Assert.fail("predicate value is null");
+            return false;
         }
     };
 
