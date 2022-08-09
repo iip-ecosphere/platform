@@ -9,7 +9,8 @@ import ServiceBasics;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
-    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, 
+    setOf(MeshElement) nodes, setOf(String) serializers) extends MeshBasics {
 
     setOf(String) doneIngestors = {};
     String typeAdd = "";
@@ -740,7 +741,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------- main ----------------------
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
-        Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
+        Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes, 
+        setOf(String) serializers) {
 
         IIPEcosphere cfg = config;
         if (cfg.sharedInterfaces) {
@@ -767,6 +769,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
         import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+        import de.iip_ecosphere.platform.transport.serialization.*;
         ${genImports(elt, elt.impl)|e}
         
         import org.junit.*;
@@ -794,6 +797,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             private static String[] cmdArgs = new String[0];
             
             ${genClasses(elt, elt.impl, clsName)|e}
+            
+            /**
+            * Creates an instance and registers the application serializers.
+            */
+            protected ${clsName}Test() {
+                ${generateSerializerRegistration(serializers)}
+            }
+            
             ${genMethods(elt, elt.impl, clsName)|e}
             
             /**

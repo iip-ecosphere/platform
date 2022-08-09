@@ -284,10 +284,10 @@ public abstract class AbstractTransportConnector implements TransportConnector {
                     try {
                         callback.received(serializer.from(data));
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(getClass()).error("Cannot deserialize: %s", e.getMessage());
+                        LoggerFactory.getLogger(getClass()).error("Cannot deserialize: {}", e.getMessage());
                     }
                 } else {
-                    LoggerFactory.getLogger(getClass()).warn("No serializer registered for %s", 
+                    LoggerFactory.getLogger(getClass()).warn("No serializer registered for {}", 
                         callback.getType().getName());
                 }
             }

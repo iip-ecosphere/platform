@@ -1,14 +1,9 @@
 import JavaBasics;
+import SpringBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaSpringCloudStreamStarter(Configuration config, FileArtifact target, String pkg, setOf(String) serializers) {
-
-    def generateSerializerRegistration(setOf(String) serializers) {
-        for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
-            'SerializerRegistry.registerSerializer(${cls}.class);'
-        }
-    }
 
     def main(Configuration config, FileArtifact target, String pkg, setOf(String) serializers) {
         'package ${pkg};
