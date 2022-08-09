@@ -164,7 +164,14 @@ public class PrintVisitor implements AasVisitor {
             String conceptName = "";
             try {
                 val = property.getValue();
-                if (null != val) {
+                if (val instanceof Double) {
+                    double dVal = ((Double) val).doubleValue();
+                    if (dVal > 1000) { // heuristic, assumption
+                        val = String.format("%.0f", dVal);
+                    } else {
+                        val = String.format("%f", dVal);
+                    }
+                } else if (val instanceof String) { // TODO remove -> metrics as values
                     Meter m = MeterRepresentation.parseMeterQuiet(val.toString());
                     if (m instanceof Gauge) {
                         double value = ((Gauge) m).value();
