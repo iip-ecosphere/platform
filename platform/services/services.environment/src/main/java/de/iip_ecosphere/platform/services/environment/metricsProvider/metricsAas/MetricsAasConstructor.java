@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 
 import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
 
@@ -75,7 +76,7 @@ public class MetricsAasConstructor {
 
     private static Map<String, TransportConnector> conns = new HashMap<>();
     private static Map<String, JsonObjectHolder> holders = new HashMap<>();
-    private static final boolean METRICS_AS_VALUES = false; // TODO aim, clarify with Chris
+    private static final boolean METRICS_AS_VALUES = true;
 
     /**
      * Adds all the Metric Provider's meters as submodel properties and provides
@@ -370,14 +371,9 @@ public class MetricsAasConstructor {
                 if (null != meas && meas.size() > 0) {
                     JsonObject measurement = meas.getJsonObject(0);
                     if (null != measurement) {
-                        String str = measurement.getString("value");
-                        if (null != str) {
-                            try {
-                                result = Double.valueOf(str);
-                            } catch (NumberFormatException e) {
-                                LoggerFactory.getLogger(getClass()).error("Converting measurement value {}: {}", 
-                                    str, e.getMessage());
-                            }
+                        JsonNumber num = measurement.getJsonNumber("value");
+                        if (null != num) {
+                            result = num.doubleValue();
                         }
                     }
                 }
@@ -463,7 +459,7 @@ public class MetricsAasConstructor {
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
 
         /* System Physical Memory metrics, string as JSON meter is transferred  */
@@ -477,11 +473,11 @@ public class MetricsAasConstructor {
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USAGE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
             .build();
         smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(propType(Type.DOUBLE, Type.STRING))
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
     }
 
