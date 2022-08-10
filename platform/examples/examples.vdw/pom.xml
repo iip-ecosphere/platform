@@ -32,17 +32,7 @@
       <artifactId>configuration.configuration</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>apps.VdwOpcAppInterfaces</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <version>${project.version}</version>
-    </dependency>    
-    <dependency>
-      <artifactId>SimpleVDWOPCDemoApp</artifactId>
-      <groupId>de.iip-ecosphere.platform.apps</groupId>
-      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
-    </dependency>    
+    </dependency>   
       
     <dependency>
       <groupId>junit</groupId>
@@ -73,6 +63,18 @@
   <profiles>
      <profile>
         <id>App</id>
+          <dependencies>
+            <dependency>
+              <artifactId>apps.VdwOpcAppInterfaces</artifactId>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <version>${project.version}</version>
+            </dependency>    
+            <dependency>
+              <artifactId>SimpleVDWOPCDemoApp</artifactId>
+              <groupId>de.iip-ecosphere.platform.apps</groupId>
+              <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+            </dependency>
+          </dependencies>
           <build>
              <plugins>
                 <plugin>
