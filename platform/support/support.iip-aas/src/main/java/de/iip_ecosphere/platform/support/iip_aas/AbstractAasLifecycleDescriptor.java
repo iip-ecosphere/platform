@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
@@ -36,9 +37,10 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      */
     public static final String PARAM_IIP_PORT = "iip.port";
     
+    private static Server implServer; // static if multiple ones share the same, e.g., ecs/svcMgr
+    private static ProtocolServerBuilder implServerBuilder;
     private String name;
     private Supplier<AasSetup> setupSupplier;
-    private Server implServer;
     private Server aasServer;
     
     /**
@@ -78,8 +80,13 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         if (AasFactory.isFullInstance()) {
             AasSetup setup = getAasSetup();
             AasPartRegistry.setAasSetup(setup);
-            AasPartRegistry.AasBuildResult res = AasPartRegistry.build(true); // true due to incremental deployment
-            implServer = res.getProtocolServer();
+            // startImplServer=true due to incremental deployment; chain implServerBuilders
+            AasPartRegistry.AasBuildResult res = AasPartRegistry.build(
+                c -> true, null == implServer, implServerBuilder);
+            if (null == implServer) {
+                implServerBuilder = res.getProtocolServerBuilder();
+                implServer = res.getProtocolServer();
+            }
 
             boolean success = true;
             if (AasMode.REGISTER == setup.getMode()) {

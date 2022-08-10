@@ -495,7 +495,7 @@ public class AasPartRegistry {
     public static AasBuildResult build(Predicate<AasContributor> filter) {
         return build(filter, false);
     }
-    
+
     /**
      * Build up all AAS of the currently running platform part. [public for testing]
      * 
@@ -507,6 +507,23 @@ public class AasPartRegistry {
      * @return the list of AAS
      */
     public static AasBuildResult build(Predicate<AasContributor> filter, boolean startImplServer) {
+        return build(filter, startImplServer, null);
+    }
+
+    /**
+     * Build up all AAS of the currently running platform part. [public for testing]
+     * 
+     * @param filter filter out contributors, in particular for testing, e.g., active AAS that require an 
+     *   implementation server
+     * @param startImplServer whether the implementation server shall be started before creating the AAS, this may be 
+     *   required for incremental deployment
+     * @param sBuilder the protocol server builder. May be <b>null</b> then the method creates a new one, may 
+     *   be an instance that must then match the settings in {@link AasSetup#getImplementation()}.
+     * 
+     * @return the list of AAS
+     */
+    public static AasBuildResult build(Predicate<AasContributor> filter, boolean startImplServer, 
+        ProtocolServerBuilder sBuilder) {
         List<Aas> aas = new ArrayList<>();
         AasFactory factory = AasFactory.getInstance();
         
@@ -530,8 +547,10 @@ public class AasPartRegistry {
         }
         InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, implPort, 
             impl.getKeystoreDescriptor());
-        ProtocolServerBuilder sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort, 
-            impl.getKeystoreDescriptor());
+        if (null == sBuilder) {
+            sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort, 
+                impl.getKeystoreDescriptor());
+        }
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
             AasContributor contributor = iter.next();
