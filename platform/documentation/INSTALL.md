@@ -105,7 +105,7 @@ On devices, the installation may differ as Java/Maven could be part of the conta
 
 Log out and log back so that your group membership is re-evaluated.
 
-**On server and devices:** Obtain the IIP-Ecosphere platform install package. Snapshots can be obtained from SSE Jenkins for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.zip), [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz) or from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install). The install package for the actual release can be obtained from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/v0.2.0/platform/tools/Install).
+**On server and devices:** Obtain the IIP-Ecosphere platform install package. Snapshots can be obtained from SSE Jenkins for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.zip), [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz) or from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install). The install package for the actual release can be obtained from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/v0.4.0/platform/tools/Install).
 
 **On server and devices:** Unpack the install package. Using Maven, obtain the IIP-Ecosphere platform dependencies first. 
 
@@ -138,7 +138,7 @@ Depending on the Java version, various settings to open the Java module system m
 
 **On the server:** Instantiate the platform using 
 
-    ~/Install$ mvn exec:java -Dexec.args="InstallTest src/main/easy gen"
+    ~/Install$ mvn exec:java
 
 This executes the PlatformInstantiator through Maven, passing it three parameters, namely the name of the model to instantiate (`InstallTest`), the relative folder where the model is located (`src/main/easy`) and the folder where to store the instantiated artifacts (the relative folder `gen`). Please note that this may fail if your modifications to the configuration file are syntactically or semantically incorrect. Alternatively, you can check out the full code from github and run the PlatformInstantiator from your IDE or force maven to copy all dependencies into a folder and run Java manually on the command line. As several files and folders are produced by the instantiation process, also a `README.txt` file is generated, which provides some explanation on the individual files and folders.
 
@@ -170,8 +170,8 @@ With a running platform server and a running ECS runtime, you may also start the
 
 If you also want to containerize the ECS runtime (one of the possible edge device installations), ensure that the folder `container/EcsRuntime` is on the “device”. For simplicity and to save resources, we map the `SimpleMeshTestingApp` folder as volume into the ECS container (mount point `/SimpleMeshTestingApp`). 
 
-    ~/Install$ docker build -t iip/ecsruntime:0.2 -f EcsRuntime/Dockerfile .
-    ~/Install$ docker run -v /var/run/docker.sock:/var/run/docker.sock -P --network=host --mount type=bind,source="$(pwd)"/SimpleMeshTestingApp,target=/SimpleMeshTestingApp -it iip/ecsruntime:0.2
+    ~/Install$ docker build -t iip/ecsruntime:0.4 -f EcsRuntime/Dockerfile .
+    ~/Install$ docker run -v /var/run/docker.sock:/var/run/docker.sock -P --network=host --mount type=bind,source="$(pwd)"/SimpleMeshTestingApp,target=/SimpleMeshTestingApp -it iip/ecsruntime:0.4
 
 Akin to the app container, both steps are available as respective scripts in the install package. Before running the ECS container, it is important that the the app container has been created and stored. As administrative operations for installing Docker into the container are executed, Docker may issue certain warnings during the creation of the container. The default port for the ECS Runtime AAS implementation server in this Dockerfile is `9000`.
 
