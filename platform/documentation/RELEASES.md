@@ -14,7 +14,7 @@ In progress:
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Monitoring improvements [#41](https://github.com/iip-ecosphere/platform/issues/41), [#63](https://github.com/iip-ecosphere/platform/issues/63) + [#15](https://github.com/iip-ecosphere/platform/issues/15)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
-* Example improvements [#40](https://github.com/iip-ecosphere/platform/issues/40), [#54](https://github.com/iip-ecosphere/platform/issues/54)
+* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
@@ -49,6 +49,7 @@ Completed improvements:
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * [#48](https://github.com/iip-ecosphere/platform/issues/48): Start a library with basic data processing functionalities (based on the HM'22 demonstrator)
 * [#49](https://github.com/iip-ecosphere/platform/issues/49): Check whether there is a TensorFlow inference-only library - no.
+* [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
 * Improvements of service, family and stream generation (also [#44](https://github.com/iip-ecosphere/platform/issues/44) and [#42](https://github.com/iip-ecosphere/platform/issues/42)).
 * Allowing to change service ensembles on demand via deployment plans.
 * Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
