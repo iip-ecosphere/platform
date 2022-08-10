@@ -23,38 +23,40 @@ In progress:
 * UI server improvements: [#73](https://github.com/iip-ecosphere/platform/issues/73)
 * Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63) and extensible semanticId resolution [#68](https://github.com/iip-ecosphere/platform/issues/68) as well as use in UI
 
-Completed improvements:
+New features:
+* Allowing to change service ensembles on demand via deployment plans.
+* Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
+* Transport message sending support with simple key-based routing for local and global transport connector.
+* [#28](https://github.com/iip-ecosphere/platform/issues/28): Asynchronous service streams via Transport Layer for better stability.
+* [#43](https://github.com/iip-ecosphere/platform/issues/43): Additional IVML model datatypes for OPC UA
+* [#48](https://github.com/iip-ecosphere/platform/issues/48): Start of a platform-integrated library with basic data processing functionalities (based on the HM'22 demonstrator)
+* [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
+* [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
+* Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
+
+Improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
 * [#27](https://github.com/iip-ecosphere/platform/issues/27): Move `iip.app.` prefix and system settings into `service.environment`.
 * [#31](https://github.com/iip-ecosphere/platform/issues/31): Python service cleanup including `__pycache__` by terminating all external service implementations via alive-wait and destroy forcibly (from HM'22 example).
-* [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
 * [#33](https://github.com/iip-ecosphere/platform/issues/33): Split `IvmlTests` into separated tests in `configuration.configuration` to speed up automated container creation on Github.
 * [#37](https://github.com/iip-ecosphere/platform/issues/37): Delay service mapping to allow for longer service startup.
 * [#47](https://github.com/iip-ecosphere/platform/issues/47): Starting services with correct service state (STARTING, not RUNNING)
 * [#46](https://github.com/iip-ecosphere/platform/issues/46): Validating/securing container lifecycle
 * [#45](https://github.com/iip-ecosphere/platform/issues/45): Validating/securing service lifecycle
-* [#43](https://github.com/iip-ecosphere/platform/issues/43): Additional IVML model datatypes for OPC UA
 * [#34](https://github.com/iip-ecosphere/platform/issues/34): Fixed monitoring integration
 * [#22](https://github.com/iip-ecosphere/platform/issues/22): Transport considers identity store, user/pwd deprecated and discouraged but still available.
-* [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
 * [#24](https://github.com/iip-ecosphere/platform/issues/24): Unify resource loading.
 * [#61](https://github.com/iip-ecosphere/platform/issues/61): Runtime dependency missing in alternative service package formats.
 * [#60](https://github.com/iip-ecosphere/platform/issues/60): Nested connector paths not correctly composed in generation.
-* [#28](https://github.com/iip-ecosphere/platform/issues/28): Asynchronous service streams via Transport Layer for better stability.
 * [#25](https://github.com/iip-ecosphere/platform/issues/25): Enable application-specific connector triggers via code plugins.
 * [#66](https://github.com/iip-ecosphere/platform/issues/66): Improvements of examples.KODEX and identifier check/fixing for generated Java code.
 * [#65](https://github.com/iip-ecosphere/platform/issues/65): No configuration error messages issues by platform instantiator.
 * [#67](https://github.com/iip-ecosphere/platform/issues/67): UI progress reporting support on platform side
 * [#72](https://github.com/iip-ecosphere/platform/issues/72): Generated ingestor handling in default service implementation
-* Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
-* [#48](https://github.com/iip-ecosphere/platform/issues/48): Start a library with basic data processing functionalities (based on the HM'22 demonstrator)
 * [#49](https://github.com/iip-ecosphere/platform/issues/49): Check whether there is a TensorFlow inference-only library - no.
-* [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
 * Improvements of service, family and stream generation (also [#44](https://github.com/iip-ecosphere/platform/issues/44) and [#42](https://github.com/iip-ecosphere/platform/issues/42)).
-* Allowing to change service ensembles on demand via deployment plans.
-* Upgrade of AMQP library rabbitmq client to 5.15.0 to enable ensemble service communication. Switching from direct queue to exchange-based AMQP communication.
-* Transport message sending support with simple key-based routing for local and global transport connector.
 * Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
+* [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 
