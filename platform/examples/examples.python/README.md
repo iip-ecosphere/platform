@@ -10,7 +10,7 @@ The application consists of three (micro)-services, which are composed in the co
 This example consists of several pieces:
   * An IVML configuration for the application in `src/test/easy/ExamplePython.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
-  * `src/main/python/ExamplePythonService.py` the "AI" service realized in Python. Executing this example requires ***Python installed in your path***. As example, the service states a system dependency to Python 3.9, but probably also other Python 3 installations shall work. No further framework, e.g., numpy or tensorflow is required here (this will be subject to automatic container creation).
+  * `src/main/python/ExamplePythonService.py` the "AI" service realized in Python. Executing this example requires ***Python installed in your path***. As example, the service states a system dependency to Python 3.9, the minimum required version for the IIP-Ecosphere service environment. No further framework, e.g., numpy or tensorflow is required here (this will be subject to automatic container creation).
   * `src/test/python` contains the IIP-Ecosphere service environment (from Maven, see below).
   * A specific starter class for the example `src/main/java` so that the example can run even without a running platform. Please note that the starter class is not part of an usual service implementation.
   * A Maven assembly descriptor `src/main/assembly/python.xml` for packaging the Python service code into a ZIP (to be deployed, basis for the automated integration).
