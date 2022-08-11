@@ -441,6 +441,32 @@ public class Transport {
     }
 
     /**
+     * Returns a connector for a routing key.
+     * 
+     * @param routingKey if <b>null</b>, empty or in {@link #globalRoutingKeys} then return the result of 
+     *     creating the connector in {@link #globalTransport}, else the result for creating the connector 
+     *     in {@link #localTransport}
+     * @return the connector
+     */
+    public static TransportConnector createConnector(String routingKey) {
+        TransportInstance result;
+        if (globalTransport == localTransport) {
+            result = globalTransport;
+        } else {
+            if (null == routingKey || routingKey.length() == 0) {
+                result = globalTransport;
+            } else {
+                if (globalRoutingKeys.contains(routingKey)) {
+                    result = globalTransport;
+                } else {
+                    result = localTransport;
+                }
+            }
+        }
+        return result.createConnector();
+    }
+
+    /**
      * Adds a global routing key.
      * 
      * @param routingKey the routing key, may be any string, <b>null</b> or empty is ignored
