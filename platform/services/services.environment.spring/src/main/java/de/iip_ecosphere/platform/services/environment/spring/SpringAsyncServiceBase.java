@@ -59,9 +59,26 @@ public class SpringAsyncServiceBase {
      * @return the callback or <b>null</b> if the callback cannot be created/registered with {@link Transport}
      */
     protected <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls) {
+        return createReceptionCallback(channel, consumer, cls, null);
+    }
+
+    /**
+     * Creates a reception callback.
+     * 
+     * @param <T> the type of data handled by the callback
+     * @param channel the channel to listen to
+     * @param consumer the consumer function of the service
+     * @param cls the type of data handled by the callback
+     * @param routingKey if <b>null</b>, empty or in {@link Transport#addGlobalRoutingKey(String)} then use the 
+     *     global transport instance, else the local transport instance from {@link Transport}; may use both 
+     *     transport instances
+     * @return the callback or <b>null</b> if the callback cannot be created/registered with {@link Transport}
+     */
+    protected <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls, 
+        String routingKey) {
         ReceptionCallback<T> result = null;
         Starter.getSetup();
-        TransportConnector conn = Transport.createConnector();
+        TransportConnector conn = Transport.createConnector(routingKey);
         if (null != conn) {
             try {
                 result = new ReceptionCallback<T>() {
