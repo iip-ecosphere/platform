@@ -21,7 +21,7 @@ On the Python side, this component provides a simple framework around the "abstr
 
 Prerequisites/requirements:
 
-- Python at least version 3.5
+- Python at least version 3.9
 - pyyaml for YAML parsing 
 
 ## Developing against the Application AAS
