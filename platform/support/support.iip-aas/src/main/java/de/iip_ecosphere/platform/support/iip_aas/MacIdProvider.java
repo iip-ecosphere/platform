@@ -41,11 +41,13 @@ public class MacIdProvider implements IdProvider {
                 while (ne.hasMoreElements()) {
                     ni = ne.nextElement();                    
                     byte[] hardwareAddress = ni.getHardwareAddress();
-                    String[] hexadecimal = new String[hardwareAddress.length];
-                    for (int i = 0; i < hardwareAddress.length; i++) {
-                        hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+                    if (null != hardwareAddress) {
+                        String[] hexadecimal = new String[hardwareAddress.length];
+                        for (int i = 0; i < hardwareAddress.length; i++) {
+                            hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+                        }
+                        macAddresses.add(String.join("", hexadecimal));
                     }
-                    macAddresses.add(String.join("", hexadecimal));
                 }
             }
         } catch (IOException e) {
