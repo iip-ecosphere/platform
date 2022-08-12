@@ -208,8 +208,9 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         if (receiver.impl.kind == ServiceKind::SINK_SERVICE) {
             prefix = "receive";
         }
+        String func = "${prefix}${coType}_${toIdentifier(receiver.impl.id)}";
 
-        'createReceptionCallback("${source.impl.id}_${coType}", ${prefix}${coType}_${toIdentifier(receiver.impl.id)}(), ${coType}.class);'
+        'createReceptionCallback("${source.impl.id}_${coType}", ${func}(), ${coType}.class, "${func}-in-0");'
     }
     
     def attachIngestors(MeshElement elt, ServiceBase base) {

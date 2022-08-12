@@ -196,8 +196,80 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         } 
         str;
     }
-    
+
     def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
+        String res = "";
+        for (MeshConnector c: nextConnectors(elt)) {
+            MeshElement target = c.next;
+            res = appendNL(res, generateConnections(elt, target, "OUT", "-out-0", target.impl.id));
+        }
+        for (MeshElement e: elements) {
+            if (e <> elt) {
+                res = appendNL(res, generateConnections(e, elt, "IN", "-in-0", e.impl.id));
+            }
+        }
+        '${res}'
+    }
+    
+    // -> basics after impact check
+    def String appendNL(String text1, String text2) {
+        if (text1.length() > 0) {
+            if (text2.length() > 0) {
+                text1 + "\n" + text2;
+            } else {
+                text1;
+            }
+        } else {
+            text2;
+        }
+    }
+    
+    def generateConnections(MeshElement start, MeshElement end, String dir, String connSuffix, String service) {
+        String res = "";
+        for (IOType out : start.impl.output) {
+            for (IOType in: end.impl.input) {
+                if (in.type == out.type and (
+                    nextConnectors(start)->collect(c|c.next).includes(end) or // configured forward conn 
+                    (not(in.forward) and not(out.forward)))) { // configured backward conn
+                    res = appendNL(res, generateConnection(start, end, out, dir, connSuffix, service));
+                 }
+             }
+         }
+         if (dir == "IN") { // backwards
+             for (IOType in : start.impl.input) {
+                for (IOType out: end.impl.output) {
+                    if (in.type == out.type and (not(in.forward) and not(out.forward))) {
+                        res = appendNL(res, generateConnection(end, start, out, "OUT", "-out-0", service));
+                    }
+                }
+             }
+         }
+         res;
+    }
+    
+    def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service) {
+        String res = "";
+        String outName = getOutName(end, type.type);
+        String typeName = toTypeName(type.type);
+        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, outName), end);
+        if (not(type.forward)) {
+            if (conn.startsWith("create")) {
+                conn = "process" + conn.substring(6);
+            }
+        }
+        res = appendNL(res, 
+          "- channel: ${conn}${connSuffix}\n" +
+          "  direction: ${dir}\n" +
+          "  id: ${start.impl.id} -> ${end.impl.id}\n" +
+          "  type: ${typeName}");
+        if (service <> "") {
+            res = res + 
+            "\n  service: ${service}";
+        }
+        res;
+    }
+    
+    /*def generateRelations1(MeshElement elt, setOf(MeshConnector) conns) {
         String res = "";
         String tmp = substNewlines(generateDataMethods(elt, true), ",");
         sequenceOf(String) eltM = tmp.split(",");
@@ -237,10 +309,11 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             }
         }
         '${res}'
-    }
+    }*/
 
     // -------------------------- mesh basics refinement, extract stream names ---------------------------------
 
+    // TODO check removal
     def generateSelect(String inType, String outType, String methodSuffixWithServiceId) {
         if (returnType) {
             if (inputType) {
@@ -253,18 +326,22 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         }
     }
 
+    // TODO check removal
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
 
+    // TODO check removal
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 
 
+    // TODO check removal
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(inType, outType, methodSuffixWithServiceId);
     } 
     
+    // TODO check removal
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
         generateSelect(type, type, methodSuffixWithServiceId);
     } 

@@ -317,13 +317,10 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              done.add(target);
                              String outName = getOutName(target, type);
                              String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
-                             if (not(conns.includes(conn))) {
-                                 String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
-                                 addIngestor(ings, ingCode, conn + "-in-0");
-                                 //result = appendWithNewline(result, ingCode);
-                                 conns.add(conn);
-                                 conns.add(type);
-                             }
+                             String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
+                             addIngestor(ings, ingCode, conn + "-in-0");
+                             conns.add(conn); // TODO still needed?
+                             conns.add(type); // TODO still needed?
                          }
                          for (MeshElement target: nodes) {
                             if (not(done.includes(target))) {
@@ -336,12 +333,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
                                         if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
                                             conn = "process" + conn.substring(6);
                                         }
-                                        if (not(conns.includes(conn)) and not(conns.includes(type)) and conn.startsWith("process")) {
+                                        if (conn.startsWith("process")) {
                                             String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
                                             addIngestor(ings, ingCode, conn + "-in-0");
-                                            //result = appendWithNewline(result, ingCode);
-                                            conns.add(type);
-                                            conns.add(conn);
+                                            conns.add(type); // TODO still needed?
+                                            conns.add(conn); // TODO still needed?
                                         }
                                     }
                                 }
@@ -371,7 +367,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                  for (IOType out : n.impl.output) {
                      for (IOType in: base.input) {
                          // if types are equal and both are backward, n is async or n is a connector sending to elt
-                         if (in.type == out.type and (
+                         if (in.type == out.type and ( 
                              (not(in.forward) and not(out.forward)) or // anyway ingest/transport
                              (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
                              (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
