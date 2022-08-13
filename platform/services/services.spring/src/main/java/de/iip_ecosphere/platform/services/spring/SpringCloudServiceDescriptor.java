@@ -200,7 +200,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
-                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, config.getBrokerPort(), config.getBrokerHost());
+                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, config.getTransport().getPort(), 
+                        config.getTransport().getHost());
                 } else {
                     ManagedServerAddress adr = registerPort(mgr, r.getChannel());
                     DescriptorUtils.addEndpointArgs(cmdLine, endpoint, adr);
@@ -382,8 +383,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     public static String toFunctionDefinition(Set<TypedDataConnection> conn) {
         return conn.stream()
-            .map(c -> channelToFunction(c.getName()))
-            .distinct()
+            .map(c -> channelToFunction(c.getName())) // remove -in-x, -out-x
+            .distinct() // make entries unique
             .collect(Collectors.joining(";"));        
     }
     
