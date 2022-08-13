@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -34,21 +35,15 @@ public class MacIdProvider implements IdProvider {
         List<String> macAddresses = new ArrayList<String>();
         try {
             InetAddress localHost = InetAddress.getLocalHost();
-            NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-            if (ni == null) { // Ubuntu :(
-                // https://stackoverflow.com/questions/23900172/how-to-get-localhost-network-interface-in-java-or-scala
-                Enumeration<NetworkInterface> ne = NetworkInterface.getNetworkInterfaces();
-                while (ne.hasMoreElements()) {
-                    ni = ne.nextElement();                    
-                    byte[] hardwareAddress = ni.getHardwareAddress();
-                    if (null != hardwareAddress) {
-                        String[] hexadecimal = new String[hardwareAddress.length];
-                        for (int i = 0; i < hardwareAddress.length; i++) {
-                            hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
-                        }
-                        macAddresses.add(String.join("", hexadecimal));
-                    }
-                }
+            addAddress(NetworkInterface.getByInetAddress(localHost), macAddresses);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(MacIdProvider.class).error("Obtaining MAC-based device ID: " + e.getMessage());
+        }
+        try {
+            // https://stackoverflow.com/questions/23900172/how-to-get-localhost-network-interface-in-java-or-scala
+            Enumeration<NetworkInterface> ne = NetworkInterface.getNetworkInterfaces();
+            while (ne.hasMoreElements()) {
+                addAddress(ne.nextElement(), macAddresses);
             }
         } catch (IOException e) {
             LoggerFactory.getLogger(MacIdProvider.class).error("Obtaining MAC-based device ID: " + e.getMessage());
@@ -58,9 +53,32 @@ public class MacIdProvider implements IdProvider {
             // network interfaces seems to change on Ubuntu/Docker after restart; sorting for a bit more dynamism
             // selection criteria such as netmask could improve that
             Collections.sort(macAddresses); 
-            macAddress = macAddresses.get(0);
+            macAddress = macAddresses.get(macAddresses.size() - 1); // starting with 00 may be generated
         }
         return macAddress;
+    }
+
+    /**
+     * Adds the hardware address of {@code ni} to {@code addresses} if possible.
+     * 
+     * @param ni the network interface
+     * @param addresses the list of addresses to be modified as a side effect
+     */
+    private void addAddress(NetworkInterface ni, List<String> addresses) {
+        if (null != ni) {
+            try {
+                byte[] hardwareAddress = ni.getHardwareAddress();
+                if (null != hardwareAddress) {
+                    String[] hexadecimal = new String[hardwareAddress.length];
+                    for (int i = 0; i < hardwareAddress.length; i++) {
+                        hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+                    }
+                    addresses.add(String.join("", hexadecimal));
+                }
+            } catch (SocketException e) {
+                LoggerFactory.getLogger(MacIdProvider.class).warn("Obtaining MAC-based device ID: " + e.getMessage());
+            }
+        }        
     }
 
     @Override
