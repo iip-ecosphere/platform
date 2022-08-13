@@ -130,7 +130,7 @@ public enum ServiceState {
         addValidTransition(PASSIVATED, MIGRATING, ACTIVATING);
         addValidTransition(MIGRATING, ACTIVATING);
         addValidTransition(ACTIVATING, RUNNING);
-        addValidTransition(FAILED, RECOVERING, STOPPING);
+        addValidTransition(FAILED, RECOVERING, STOPPING, STOPPED);
         addValidTransition(RECOVERING, RECOVERED);
         addValidTransition(RECOVERED, RUNNING);
         addValidTransition(STOPPING, STOPPED);
