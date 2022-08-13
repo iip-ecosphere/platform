@@ -591,22 +591,20 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                 if (s.isTopLevel()) {
                     if (containsIdSafe(ids, s.getId())) { 
                         for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
-                            if (containsIdSafe(ids, c.getService())) {
-                                result.add(new TypedDataConnection(c, null));
-                            }
+                            result.add(new TypedDataConnection(c, null));
                         }
-                        for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
-                            if (containsIdSafe(ids, c.getService())) {
-                                result.add(new TypedDataConnection(c, null));
-                            }
+                    }
+                    for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
+                        if (containsIdSafe(ids, c.getService())) {
+                            result.add(new TypedDataConnection(c, null));
                         }
                     }
                 }
             }
         }
-
         return result;
     }
+
     
     /**
      * Clears the internal data. [testing]
