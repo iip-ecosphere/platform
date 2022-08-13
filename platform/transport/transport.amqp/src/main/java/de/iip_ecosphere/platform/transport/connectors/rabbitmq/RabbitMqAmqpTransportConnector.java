@@ -203,7 +203,11 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
             } catch (AlreadyClosedException e) {
                 // ok, fine
             }
-            connection.close();
+            try {
+                connection.close();
+            }  catch (AlreadyClosedException e) {
+                // ok, fine
+            }
         }
     }
 
