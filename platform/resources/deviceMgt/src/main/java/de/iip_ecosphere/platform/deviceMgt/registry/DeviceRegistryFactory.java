@@ -44,7 +44,7 @@ public class DeviceRegistryFactory {
             if (first.isPresent()) {
                 desc = first.get();
             } else {
-                LOGGER.error("No Device Registry implementation available.");
+                LOGGER.warn("No Device Registry implementation available.");
             }
         }
 
