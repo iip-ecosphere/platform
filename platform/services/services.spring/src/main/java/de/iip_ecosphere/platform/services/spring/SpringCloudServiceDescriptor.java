@@ -200,8 +200,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
-                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, config.getTransport().getPort(), 
-                        config.getTransport().getHost());
+                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, getTransportPort(config), 
+                        getTransportHost(config));
                 } else {
                     ManagedServerAddress adr = registerPort(mgr, r.getChannel());
                     DescriptorUtils.addEndpointArgs(cmdLine, endpoint, adr);
@@ -235,6 +235,38 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         return result;
     }
     
+    /**
+     * Returns the actual transport host. [legacy fallback, due to testing]
+     * 
+     * @param setup the instance to take the information from
+     * @return the host
+     */
+    private String getTransportHost(SpringCloudServiceSetup setup) {
+        String result;
+        if (setup.getTransport().getHost() == null) {
+            result = setup.getBrokerHost();
+        } else {
+            result = setup.getTransport().getHost();
+        }
+        return result;
+    }
+
+    /**
+     * Returns the actual transport port. [legacy fallback, due to testing]
+     * 
+     * @param setup the instance to take the information from
+     * @return the port
+     */
+    private int getTransportPort(SpringCloudServiceSetup setup) {
+        int result;
+        if (setup.getTransport().getHost() == null) { // yes, check host
+            result = setup.getBrokerPort();
+        } else {
+            result = setup.getTransport().getPort();
+        }
+        return result;
+    }
+
     /**
      * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
      * {@link #createDeploymentRequest(SpringCloudServiceSetup, List)} before.

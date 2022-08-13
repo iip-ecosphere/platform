@@ -186,7 +186,7 @@ public class ServiceMgrAndDescriptorTest {
      * @return the service manager instance
      * @throws IOException if the descriptor cannot be loaded for some reason
      */
-    private static ServiceManager createServiceManager(File descriptor) throws IOException {
+    static ServiceManager createServiceManager(File descriptor) throws IOException {
         YamlArtifact art = YamlArtifact.readFromYaml(new FileInputStream(descriptor));
         SpringCloudArtifactDescriptor aDesc = SpringCloudArtifactDescriptor.createInstance(art, 
             descriptor.toURI(), descriptor);
@@ -223,6 +223,7 @@ public class ServiceMgrAndDescriptorTest {
     public void testInternalConnections() throws IOException {
         ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
         
+        // single services shall be activatable
         assertFunctionDef("receiveRec13_SimpleReceiver3", mgr, "SimpleReceiver3");
         assertFunctionDef("createRec13_SimpleSource3", mgr, "SimpleSource3");
         assertFunctionDef("transformRec13Rec13_SimpleTransformer3", mgr, "SimpleTransformer3");

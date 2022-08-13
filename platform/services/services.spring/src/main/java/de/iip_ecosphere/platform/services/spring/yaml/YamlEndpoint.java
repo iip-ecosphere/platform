@@ -31,12 +31,12 @@ public class YamlEndpoint implements Endpoint {
     
     @Override
     public boolean isPortArgGeneric() {
-        return portArg.contains(PORT_PLACEHOLDER);
+        return containsSafe(portArg, PORT_PLACEHOLDER);
     }
 
     @Override
     public String getPortArg(int port) {
-        return portArg.replace(PORT_PLACEHOLDER, String.valueOf(port));
+        return replaceSafe(portArg, PORT_PLACEHOLDER, String.valueOf(port));
     }
 
     @Override
@@ -46,12 +46,44 @@ public class YamlEndpoint implements Endpoint {
 
     @Override
     public boolean isHostArgGeneric() {
-        return portArg.contains(HOST_PLACEHOLDER);
+        return containsSafe(hostArg, HOST_PLACEHOLDER);
     }
 
     @Override
     public String getHostArg(String hostname) {
-        return hostArg.replace(HOST_PLACEHOLDER, hostname);
+        return replaceSafe(hostArg, HOST_PLACEHOLDER, hostname);
+    }
+    
+    /**
+     * Returns whether {@code text} contains {@code target}.
+     *  
+     * @param text the text to look for
+     * @param target the target to search within {@code text}
+     * @return if {@code text} and {@code target} are not <b>null</b>, whether {@code text} contains {@code target}
+     */
+    private static boolean containsSafe(String text, String target) {
+        return null != text && null != target && text.contains(target);
+    }
+
+    /**
+     * Replaces {@code target} in {@code text} by {@code replacement}.
+     *  
+     * @param text the text to perform the replacement on
+     * @param target the target to search within {@code text}
+     * @param replacement the text replacing {@code target}
+     * @return if {@code text} is <b>null</b> then an empty string, if {@code replacement} is <b>null</b> {@code text} 
+     *    else {@code text} with {@code target} replaced by {@code replacement}
+     */
+    private String replaceSafe(String text, String target, String replacement) {
+        String result;
+        if (null == text) {
+            result = "";
+        } else if (null == replacement) {
+            result = text;
+        } else {
+            result = text.replace(target, replacement);
+        }
+        return result;
     }
     
     /**

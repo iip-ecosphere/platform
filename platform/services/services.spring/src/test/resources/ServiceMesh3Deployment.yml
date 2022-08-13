@@ -21,7 +21,11 @@ services:
      relations:
        - endpoint:
          portArg: --mqtt.port=${port} --amqp.port=${port}
-         hostArg: --mqtt.host=${host} --amqp.host=${host}   
+         hostArg: --mqtt.host=${host} --amqp.host=${host}       - channel: receiveRec13_SimpleReceiver3-in-0
+         id: Transformer->Receiver
+         service: Transformer
+         direction: IN
+         type: Rec13
    - id: SimpleSource3
      name: Simple Data Source3
      version: 0.1.0
@@ -38,6 +42,7 @@ services:
        - channel: createRec13_SimpleSource3-out-0
          direction: OUT
          type: Rec13
+         service: SimpleTransformer3
        - channel: transformRec13Rec13_SimpleTransformer3-in-0
          id: Source->Transformer
          service: SimpleTransformer3
@@ -59,6 +64,7 @@ services:
        - channel: transformRec13Rec13_SimpleTransformer3-out-0
          direction: OUT
          type: Rec13
+         service: SimpleReceiver3
        - channel: receiveRec13_SimpleReceiver3-in-0
          id: Transformer->Receiver
          service: SimpleReceiver3
