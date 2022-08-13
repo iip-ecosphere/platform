@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -49,6 +50,7 @@ public class Starter {
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
     private static int transportPort = -1; // -1 -> use configured one
+    private static String transportHost = null;
     private static EnvironmentSetup setup;
 
     /**
@@ -172,8 +174,10 @@ public class Starter {
         if (port < 0) {
             port = NetUtils.getEphemeralPort();
         }
-        transportPort = getIntArg(args, PARAM_IIP_TEST_TRANSPORT_PORT, -1);
-        if (transportPort > 0) {
+        transportHost = getArg(args, "transport.host", transportHost);
+        transportPort = getIntArg(args, PARAM_IIP_TEST_TRANSPORT_PORT, 
+            getIntArg(args, "transport.port", transportPort));
+        if (transportPort > 0 || transportHost != null) {
             getSetup();
         }
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, false);
@@ -335,14 +339,18 @@ public class Starter {
                 if (transportPort > 0) {
                     setup.getTransport().setPort(transportPort);
                 }
+                if (transportHost != null) {
+                    setup.getTransport().setHost(transportHost);
+                }
                 Transport.setTransportSetup(() -> setup.getTransport());
                 Transport.createConnector(); // warmup
                 
                 // globalhost is part of transport setup.
                 TransportSetup globalSetup = setup.getTransport();
-                if (!"localhost".equals(globalSetup.getHost()) && !"127.0.0.1".equals(globalSetup.getHost())) {
+                if (!ServerAddress.LOCALHOST.equals(globalSetup.getHost()) 
+                    && !"127.0.0.1".equals(globalSetup.getHost())) {
                     TransportSetup localSetup = setup.getTransport().copy(); // TODO same authentication assumed
-                    localSetup.setHost("localhost");
+                    localSetup.setHost(ServerAddress.LOCALHOST);
                     Transport.setLocalSetup(() -> localSetup);
                 }
             } catch (IOException e) {
