@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -483,6 +484,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         
         private TypedDataConnectorDescriptor connector;
         private String service;
+        private boolean isInput;
 
         /**
          * Creates an instance.
@@ -490,10 +492,12 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
          * @param connector the connector to be wrapped
          * @param service the service id to override the service id in {@code connector}, may be <b>null</b> for the 
          *     result of {@link TypedDataConnectorDescriptor#getService()}
+         * @param isInput whether this is an input connection
          */
-        public TypedDataConnection(TypedDataConnectorDescriptor connector, String service) {
+        public TypedDataConnection(TypedDataConnectorDescriptor connector, String service, boolean isInput) {
             this.connector = connector;
             this.service = service;
+            this.isInput = isInput;
         }
         
         @Override
@@ -520,6 +524,29 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         public String getId() {
             return connector.getId();
         }
+
+        /**
+         * Is this an input connector.
+         * 
+         * @return {@code true} for an input connector, {@code false} for an output connector
+         */
+        public boolean isInput() {
+            return isInput;
+        }
+
+        /**
+         * Is this an output connector.
+         * 
+         * @return {@code true} for an output connector, {@code false} for an input connector 
+         */
+        public boolean isOutput() {
+            return !isInput;
+        }
+
+        @Override
+        public String getFunction() {
+            return connector.getFunction();
+        }
         
     }
 
@@ -543,7 +570,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                 artifacts.add(service.getArtifact());
                 for (TypedDataConnectorDescriptor c: service.getDataConnectors()) {
                     if (isValidIdBut(c.getService(), id) && !containsIdSafe(ids, c.getService())) {
-                        result.add(new TypedDataConnection(c, null));
+                        result.add(new TypedDataConnection(c, null, service.getInputDataConnectors().contains(c)));
                     }
                 }
             }
@@ -556,7 +583,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                 if (s.isTopLevel() && !containsIdSafe(ids, s.getId())) { // no connections within the given serviceIds
                     for (TypedDataConnectorDescriptor c: s.getDataConnectors()) {
                         if (!s.getId().equals(c.getService()) && containsIdSafe(ids, c.getService())) {
-                            result.add(new TypedDataConnection(c, s.getId()));
+                            result.add(new TypedDataConnection(c, s.getId(), s.getInputDataConnectors().contains(c)));
                         }
                     }
                 }
@@ -591,12 +618,12 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                 if (s.isTopLevel()) {
                     if (containsIdSafe(ids, s.getId())) { 
                         for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
-                            result.add(new TypedDataConnection(c, null));
+                            result.add(new TypedDataConnection(c, null, false));
                         }
                     }
                     for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
                         if (containsIdSafe(ids, c.getService())) {
-                            result.add(new TypedDataConnection(c, null));
+                            result.add(new TypedDataConnection(c, null, true));
                         }
                     }
                 }
@@ -605,6 +632,45 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         return result;
     }
 
+    /**
+     * Determines all connections characterizing the functional output/input services in {@code serviceIds}.
+     * 
+     * @param mgr the service manager
+     * @param serviceIds the services to determine the connections for
+     * @return the internal connections
+     */
+    public static Set<TypedDataConnection> determineFunctionalConnections(ServiceManager mgr, 
+        String... serviceIds) {
+        Set<TypedDataConnection> result = new HashSet<TypedDataConnection>();
+        Set<String> ids = CollectionUtils.addAll(new HashSet<>(), serviceIds);
+
+        Set<ArtifactDescriptor> artifacts = new HashSet<>();
+        for (String id : serviceIds) {
+            ServiceDescriptor service = mgr.getService(id);
+            if (null != service && service.isTopLevel()) {
+                artifacts.add(service.getArtifact());
+            }
+        }
+
+        for (ArtifactDescriptor a : artifacts) {
+            for (ServiceDescriptor s: a.getServices()) {
+                if (s.isTopLevel()) {
+                    if (containsIdSafe(ids, s.getId())) {
+                        if (ServiceKind.SINK_SERVICE == s.getKind()) {
+                            for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
+                                result.add(new TypedDataConnection(c, null, true));
+                            }
+                        } else {
+                            for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
+                                result.add(new TypedDataConnection(c, null, false));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
     
     /**
      * Clears the internal data. [testing]

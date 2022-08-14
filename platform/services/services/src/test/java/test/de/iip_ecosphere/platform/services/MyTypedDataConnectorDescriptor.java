@@ -11,6 +11,9 @@ public class MyTypedDataConnectorDescriptor extends MyTypedDataDescriptor implem
 
     private String id;
     private String service;
+    private String function;
+    
+    // checkstyle: stop parameter number check
     
     /**
      * Creates a data descriptor.
@@ -20,12 +23,17 @@ public class MyTypedDataConnectorDescriptor extends MyTypedDataDescriptor implem
      * @param description the description
      * @param type the type
      * @param service the id of the connected/target service
+     * @param function the associated function
      */
-    public MyTypedDataConnectorDescriptor(String id, String name, String description, Class<?> type, String service) {
+    public MyTypedDataConnectorDescriptor(String id, String name, String description, Class<?> type, String service, 
+        String function) {
         super(name, description, type);
         this.id = id;
         this.service = service;
+        this.function = function;
     }
+
+    // checkstyle: resume parameter number check
 
     @Override
     public String getId() {
@@ -40,6 +48,11 @@ public class MyTypedDataConnectorDescriptor extends MyTypedDataDescriptor implem
     @Override
     public String getService() {
         return service;
+    }
+
+    @Override
+    public String getFunction() {
+        return function;
     }
 
 }

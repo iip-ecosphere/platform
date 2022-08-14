@@ -103,11 +103,11 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     private MyServiceDescriptor setupData(MyServiceDescriptor sd, MyServiceDescriptor... out) {
         sd.addParameter(new MyTypedDataDescriptor("NAME", "reconfigures the name", String.class));
         sd.addInputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, "conn-" + connectorCount, 
-            "", Integer.TYPE, null));
+            "", Integer.TYPE, null, null));
         for (MyServiceDescriptor o: out) {
             connectorCount++;
             sd.addOutputDataConnector(new MyTypedDataConnectorDescriptor("conn-" + connectorCount, 
-                "conn-" + connectorCount, "", Integer.TYPE, o.getId()));
+                "conn-" + connectorCount, "", Integer.TYPE, o.getId(), "func-" + connectorCount));
         }
         return sd;
     }
