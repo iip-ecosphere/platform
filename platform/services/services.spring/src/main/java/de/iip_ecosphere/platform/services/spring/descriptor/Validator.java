@@ -213,6 +213,7 @@ public class Validator {
         assertFieldNotNull(relation.getDescription(), "description", msgContext); // optional
         if (chOk && relation.getChannel().length() > 0) {
             assertFieldNotNull(relation.getDirection(), "direction", msgContext);
+            //assertFieldNotNull(relation.getFunction(), "function", msgContext);
             for (String t : relation.getTypes()) {
                 assertType(t, types, "type", msgContext);
             }

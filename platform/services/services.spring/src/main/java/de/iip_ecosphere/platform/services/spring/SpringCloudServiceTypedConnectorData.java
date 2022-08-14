@@ -24,6 +24,9 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
 
     private String id;
     private String service;
+    private String function;
+    
+    // checkstyle: stop parameter number check
     
     /**
      * Creates an instance.
@@ -34,12 +37,17 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
      * @param type the type, either a standard java class or a dynamic proxy for types declared by the services that are
      *   not available in this (execution/platform) environment
      * @param service the id of the service this connector is pointing to
+     * @param function the function associated to this connector
      */
-    SpringCloudServiceTypedConnectorData(String id, String name, String description, Class<?> type, String service) {
+    SpringCloudServiceTypedConnectorData(String id, String name, String description, Class<?> type, String service, 
+        String function) {
         super(name, description, type);
         this.id = id;
         this.service = service;
+        this.function = function;
     }
+
+    // checkstyle: resume parameter number check
 
     @Override
     public String getId() {
@@ -49,6 +57,11 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
     @Override
     public String getService() {
         return service;
+    }
+    
+    @Override
+    public String getFunction() {
+        return function;
     }
     
 }

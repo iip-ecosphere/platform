@@ -75,6 +75,13 @@ public interface Relation {
     public String getService();
     
     /**
+     * Returns the function at the containing service associated with this relation.
+     * 
+     * @return the function name (may be <b>null</b> or empty for implicit functions that shall not be exibited)
+     */
+    public String getFunction();
+    
+    /**
      * Returns communication endpoint (port/host) the service shall communicate with. 
      * 
      * @return the communication endpoint (may be <b>null</b> for internal relations}

@@ -26,6 +26,7 @@ services:
          service: Transformer
          direction: IN
          type: Rec13
+         function: receiveRec13_SimpleReceiver3
    - id: SimpleSource3
      name: Simple Data Source3
      version: 0.1.0
@@ -43,11 +44,13 @@ services:
          direction: OUT
          type: Rec13
          service: SimpleTransformer3
+         function: createRec13_SimpleSource3
        - channel: transformRec13Rec13_SimpleTransformer3-in-0
          id: Source->Transformer
          service: SimpleTransformer3
          direction: IN
          type: Rec13
+         function: transformRec13Rec13_SimpleTransformer3
    - id: SimpleTransformer3
      name: Simple Data Transformer3
      version: 0.1.0
@@ -65,9 +68,11 @@ services:
          direction: OUT
          type: Rec13
          service: SimpleReceiver3
+         function: transformRec13Rec13_SimpleTransformer3
        - channel: receiveRec13_SimpleReceiver3-in-0
          id: Transformer->Receiver
          service: SimpleReceiver3
          direction: IN
          type: Rec13
+         function: receiveRec13_SimpleReceiver3
 

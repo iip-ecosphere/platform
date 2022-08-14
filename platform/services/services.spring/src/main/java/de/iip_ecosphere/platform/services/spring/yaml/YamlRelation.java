@@ -24,6 +24,7 @@ public class YamlRelation implements Relation {
     private String id;
     private String channel = "";
     private String service = "";
+    private String function = "";
     private YamlEndpoint endpoint;
     private String description = "";
     private String type;
@@ -42,6 +43,11 @@ public class YamlRelation implements Relation {
     @Override
     public String getService() {
         return service;
+    }
+
+    @Override
+    public String getFunction() {
+        return function;
     }
     
     @Override
@@ -99,6 +105,15 @@ public class YamlRelation implements Relation {
         this.service = service;
     }
 
+    /**
+     * Defines the function at the containing service associated with this relation.
+     * 
+     * @param function the function name
+     */
+    public void setFunction(String function) {
+        this.function = function;
+    }
+    
     /**
      * Defines communication endpoint (port/host) the service shall communicate with. 
      * 

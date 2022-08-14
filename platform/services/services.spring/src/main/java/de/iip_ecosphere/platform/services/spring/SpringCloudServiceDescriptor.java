@@ -86,10 +86,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         for (Relation r : service.getRelations()) {
             if (Direction.IN == r.getDirection()) {
                 addInputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
-                    r.getDescription(), resolver.resolve(r.getType()), r.getService()));
+                    r.getDescription(), resolver.resolve(r.getType()), r.getService(), r.getFunction()));
             } else if (Direction.OUT == r.getDirection()) {
                 addOutputDataConnector(new SpringCloudServiceTypedConnectorData(r.getId(), r.getChannel(), 
-                    r.getDescription(), resolver.resolve(r.getType()), r.getService()));
+                    r.getDescription(), resolver.resolve(r.getType()), r.getService(), r.getFunction()));
             }
         }
     }
@@ -388,24 +388,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     public Service getSvc() {
         return service;
     }
-    
-    /**
-     * Turns a channel name to a function name.
-     * 
-     * @param channel the channel
-     * @return the function name
-     */
-    public static String channelToFunction(String channel) {
-        String result = channel;
-        int pos = channel.lastIndexOf('-');
-        if (pos > 0) {
-            pos = channel.lastIndexOf('-', pos - 1);
-            if (pos > 0) {
-                result = result.substring(0, pos);
-            }
-        }
-        return result;
-    }
 
     /**
      * Turns typed data connections into a Spring cloud function definition argument.
@@ -415,7 +397,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     public static String toFunctionDefinition(Set<TypedDataConnection> conn) {
         return conn.stream()
-            .map(c -> channelToFunction(c.getName())) // remove -in-x, -out-x
+            .filter(c -> c.getFunction() != null && c.getFunction().length() > 0)
+            .map(c -> c.getFunction()) 
             .distinct() // make entries unique
             .collect(Collectors.joining(";"));        
     }

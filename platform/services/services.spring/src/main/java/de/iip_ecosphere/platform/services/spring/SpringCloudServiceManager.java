@@ -151,7 +151,7 @@ public class SpringCloudServiceManager
     private List<String> determineBindingServiceArgs(String... serviceIds) {
         Set<String> tmp = determineExternalConnections(this, serviceIds)
             .stream()
-            .filter(c -> isValidId(c.getName()))
+            .filter(c -> isValidId(c.getName()) && c.isInput()) // isInput is preliminary
             .map(c -> CmdLine.PARAM_PREFIX + Starter.OPT_SPRING_BINDINGS_PREFIX + c.getName() 
                 + Starter.OPT_SPRING_BINDER_POSTFIX + CmdLine.PARAM_VALUE_SEP + Starter.EXTERNAL_BINDER_NAME)
             .collect(Collectors.toSet());
@@ -165,11 +165,11 @@ public class SpringCloudServiceManager
      * 
      * @param serviceIds the services to determine the arguments for
      * @return the command line arguments
-     * @see #determineInternalConnections(ServiceManager, String...)
+     * @see #determineFunctionalConnections(ServiceManager, String...)
      */
     private String determineCloudFunctionArg(String... serviceIds) {
         return CmdLine.PARAM_PREFIX + Starter.OPT_SPRING_FUNCTION_DEF + CmdLine.PARAM_VALUE_SEP 
-            + SpringCloudServiceDescriptor.toFunctionDefinition(determineInternalConnections(this, serviceIds));
+            + SpringCloudServiceDescriptor.toFunctionDefinition(determineFunctionalConnections(this, serviceIds));
     }
     
     /**

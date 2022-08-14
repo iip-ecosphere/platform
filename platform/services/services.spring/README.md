@@ -24,7 +24,7 @@ In addition, service deployment properties are given in a separate descriptor, t
       * A relation may have an `id` which identifies relations on the same logical channel. Via `id`, relations can implicitly define service dependencies, i.e., outgoing relations must be fulfilled before the declaring service may start. 
       * The `channel` is the technical name identifying the relation on the service implementation, i.e., it is implementation dependent (see `application.yml`). If no `channel` is given, the settings of this relations apply to all local connections within the resource the service is deployed to. 
       * `endpoint` defines the port and host command line arguments defining the broker for the respective channel/topic. Within these arguments, `${port}` and `${host}` are substituted by actual values, respectively. `hostArg` is optional - if not given, localhost is used. Multiple command line arguments can be given separated by whitespaces, double quotes are considered to escape strings/keep strings together.
-      * A relation may have an  optional `description`, one or multiple (comma-separated) qualified Java `type` names either pointing to Java (primitive) types, platform types or types declared in the `types` section of the containing artifact and a `direction` (either `IN` or `OUT`).
+      * A relation may have an  optional `description`, one or multiple (comma-separated) qualified Java `type` names either pointing to Java (primitive) types, platform types or types declared in the `types` section of the containing artifact and a `direction` (either `IN` or `OUT`). The `function` denotes the implementing bean spring function (may be left empty if it shall not exhibited, e.g., in asynchronous connections). The `service` denotes the service id of the opposite service in the relation.
       * As the default relation with empty channel declares the endpoint information for all internal process local relations, it must neither have a description, a direction or a type. All internal relations must be declared but must not have an endpoint (as they indicate direction and data type). All external relations must provide all data. `ensembleWith` takes priority over implicit service dependencies stated by `relations`.
     * `process`: Optional structure indicating that the service is not directly implemented in Java rather than in terms of a further process, e.g., in a different programming language. A process may already be `started` or it might be started implicitly if realized as a platform service. In this case, the process information can be used to configure the ports of a running service or the home path/artifacts to be extracted for a service to be started implicitly.
       * `homePath` path in which the process shall be executed. If given, `${tmp}` will be replaced by the system temporary directory, `${user}` by the user home directory path. If not given, a temporary one will be created. (default is empty)
@@ -74,6 +74,8 @@ The schematic descriptor structure looks as given below (lists are indicates by 
               hostArg: <String, ${host} is substituted by the actual host name>
             type: <QString>
             direction: <IN|OUT>
+            function: <String>
+            service: <String>
         process:
           homePath: <String>
           artifacts: 
