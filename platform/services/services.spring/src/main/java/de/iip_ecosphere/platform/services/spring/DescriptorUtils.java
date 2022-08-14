@@ -300,6 +300,8 @@ public class DescriptorUtils {
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
         result.add("--" + Starter.PARAM_IIP_TEST_TRANSPORT_PORT + "=" + brokerPort); // only for testing
+        result.add("--amqp.port" + "=" + brokerPort); // overwrite local default
+        result.add("--mqtt.port" + "=" + brokerPort); // overwrite local default
         result.add("--server.port=" + springPort);
         List<String> tmp = new ArrayList<String>();
         for (YamlService service : art.getServices()) {
