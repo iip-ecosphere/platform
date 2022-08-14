@@ -335,7 +335,8 @@ public class SpringCloudServiceManager
                     LOGGER.info("Starting " + sId + " with " + req.getCommandlineArguments());
                     String dId = deployer.deploy(req);
                     waitFor(dId, null, s -> null == s || s == DeploymentState.deploying);
-                    LOGGER.info("Starting " + dId + ": " + deployer.status(dId));
+                    LOGGER.info("Started " + dId + ": " + deployer.status(dId));
+                    service.waitForAdminServer(getConfig().getWaitingTime()); // well, full waiting time for now
                     AppStatus status = deployer.status(dId); 
                     service.setDeploymentId(dId);
                     if (DeploymentState.deployed == status.getState()) {

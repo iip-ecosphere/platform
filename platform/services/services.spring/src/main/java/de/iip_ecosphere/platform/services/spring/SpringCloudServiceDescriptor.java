@@ -22,8 +22,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
@@ -46,6 +44,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -229,7 +228,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             }
             Starter.addAppEnvironment(cmdLine);
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
-            getLogger().info("Creates deployment request for " + getName() + " " + cmdLine);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;
@@ -275,6 +273,19 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         InvocablesCreator iCreator = getInvocablesCreator();
         if (null != iCreator) {
             setStub(new ServiceStub(iCreator, getId()));
+        }
+    }
+    
+    /**
+     * Waits that the server on {@link #adminAddr} becomes available.
+     *   
+     * @param waitingTime maximum waiting time in ms
+     */
+    void waitForAdminServer(int waitingTime) {
+        if (null != adminAddr) {
+            ProtocolServerBuilder psb = AasFactory.getInstance()
+                .createProtocolServerBuilder(serviceProtocol, adminAddr.getPort());
+            psb.isAvailable(adminAddr.getHost(), waitingTime);
         }
     }
     
@@ -401,15 +412,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             .map(c -> c.getFunction()) 
             .distinct() // make entries unique
             .collect(Collectors.joining(";"));        
-    }
-    
-    /**
-     * Returns the logger.
-     * 
-     * @return the logger
-     */
-    private Logger getLogger() {
-        return LoggerFactory.getLogger(SpringCloudServiceDescriptor.class);
     }
     
 }
