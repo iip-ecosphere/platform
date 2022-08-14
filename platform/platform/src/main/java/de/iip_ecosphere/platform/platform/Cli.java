@@ -27,6 +27,8 @@ import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 
 /**
  * A simple (optional interactive) command line client providing initial platform functionality through the various AAS.
@@ -47,13 +49,14 @@ public class Cli extends CliBackend {
         CommandProvider provider;
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
-            println("IIP-Ecosphere, interactive platform command line");
+            println("IIP-Ecosphere, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
             println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
             println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
             println("Type \"help\" to see commands and their description.");
         } else {
             provider = new ArgsCommandProvider(args);
         }
+        SemanticIdResolver.resolve(""); // warm-up, initialize
         TopLevelCommandInterpreter tci = new TopLevelCommandInterpreter();
         tci.interpret(provider, Level.TOP);
         //interpretTopLevel(provider);

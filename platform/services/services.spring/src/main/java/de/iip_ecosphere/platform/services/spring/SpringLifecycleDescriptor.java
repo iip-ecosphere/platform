@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
@@ -74,7 +75,8 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
-            System.out.println("IIP-Ecosphere Service Manager (Spring Cloud Streams).");
+            System.out.println("IIP-Ecosphere Service Manager (Spring Cloud Streams, " 
+                + IipVersion.getInstance().getVersion() + ").");
             System.out.println("Configuration: " + SpringInstances.getConfig().getClass().getName());
             System.out.println("Deployer: " + SpringInstances.getDeployer().getClass().getName());
         };

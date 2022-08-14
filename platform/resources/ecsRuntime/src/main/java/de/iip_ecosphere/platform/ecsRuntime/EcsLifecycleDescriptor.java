@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 
@@ -44,7 +45,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
 
     @Override
     public void startup(String[] args) {
-        System.out.println("IIP-Ecosphere ECS Runtime.");
+        System.out.println("IIP-Ecosphere ECS Runtime " + IipVersion.getInstance().getVersion() + ".");
         Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
         EcsAas.enable(); // before super.startup/AAS creation!
         super.startup(args);

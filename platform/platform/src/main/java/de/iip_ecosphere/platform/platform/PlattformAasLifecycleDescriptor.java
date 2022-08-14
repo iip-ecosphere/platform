@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas
 import de.iip_ecosphere.platform.support.LifecycleExclude;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.transport.Transport;
 
 /**
@@ -49,7 +50,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
 
     @Override
     public void startup(String[] args) {
-        System.out.println("IIP-Ecosphere Platform Server.");
+        System.out.println("IIP-Ecosphere Platform Server " + IipVersion.getInstance().getVersion() + ".");
         super.startup(args);
         ArtifactsManager.startWatching();
 
