@@ -59,4 +59,9 @@ public class LocalProtocolServerBuilder implements ProtocolServerBuilder {
         return new SerialPayloadCodec();
     }
 
+    @Override
+    public boolean isAvailable(String host) {
+        return true; // NoOpServer
+    }
+
 }

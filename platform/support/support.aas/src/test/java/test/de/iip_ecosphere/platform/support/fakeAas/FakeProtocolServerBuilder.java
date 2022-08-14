@@ -35,4 +35,9 @@ public class FakeProtocolServerBuilder implements ProtocolServerBuilder {
         return null;
     }
 
+    @Override
+    public boolean isAvailable(String host) {
+        return true; // NoOpServer
+    }
+
 }

@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * The implementing counterpart of {@link InvocablesCreator} in terms of a builder.
@@ -148,4 +149,52 @@ public interface ProtocolServerBuilder extends Builder<Server> {
      */
     public PayloadCodec createPayloadCodec();
     
+    /**
+     * Checks whether the port assigned to this builder is available. May be used without 
+     * {@link #build()} before.
+     * 
+     * @param host the host to look for
+     * @return {@code true} if available, {@code false} else
+     */
+    public boolean isAvailable(String host);
+
+    /**
+     * Checks whether the port assigned to this builder is available. May be used without 
+     * {@link #build()} before.
+     *
+     * @param host the host to look for
+     * @param maxWaitingTime the maximum waiting time in ms, shall be positive, otherwise waits endless
+     * @param waitingPeriod the time in ms to wait between two trials of calling {@link #isAvailable(String)}, if 
+     *     negative set to 500 ms 
+     * @return {@code true} if available, {@code false} else
+     */
+    public default boolean isAvailable(String host, int maxWaitingTime, int waitingPeriod) {
+        boolean result = false;
+        int timeTaken = 0;
+        if (waitingPeriod <= 0) {
+            waitingPeriod = 500;
+        }
+        while (timeTaken < maxWaitingTime) {
+            if (isAvailable(host)) {
+                result = true;
+                break;
+            }
+            TimeUtils.sleep(waitingPeriod);
+            timeTaken += waitingPeriod;
+        }
+        return result;
+    }
+
+    /**
+     * Checks whether the port assigned to this builder is available. May be used without 
+     * {@link #build()} before. Uses 500 ms as default time between to trials of calling {@link #isAvailable(String)}
+     *
+     * @param host the host to look for
+     * @param maxWaitingTime the maximum waiting time in ms, shall be positive, otherwise waits endless
+     * @return {@code true} if available, {@code false} else
+     */
+    public default boolean isAvailable(String host, int maxWaitingTime) {
+        return isAvailable(host, maxWaitingTime, 500);
+    }
+
 }

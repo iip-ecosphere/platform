@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
@@ -118,6 +119,27 @@ public class NetUtils {
             result = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             result = "localhost";
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether {@code port} on {@code host} is available and some process is listening.
+     * 
+     * @param host the host name
+     * @param port the port number
+     * @return {@code true} for available, {@code false} else
+     */
+    public static boolean isAvailable(String host, int port) {
+        boolean result = false;
+        try {
+            Socket sock = new Socket(host, port);          
+            sock.close();
+            result = true;
+        } catch (IOException e) {         
+            /*if (e.getMessage().contains("refused")) {
+                result = false;
+            }*/
         }
         return result;
     }

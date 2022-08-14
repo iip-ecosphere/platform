@@ -239,6 +239,10 @@ public class AasTest {
         Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine, protocol, 
             getKeyStoreDescriptor(protocol));
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
+        ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(protocol, 
+            VAB_SERVER.getPort(), getKeyStoreDescriptor(protocol));
+        Assert.assertTrue(builder.isAvailable(VAB_SERVER.getHost(), 5000));
+
         Aas aas = createAas(machine, protocol);
         
         Server httpServer = AasFactory.getInstance()

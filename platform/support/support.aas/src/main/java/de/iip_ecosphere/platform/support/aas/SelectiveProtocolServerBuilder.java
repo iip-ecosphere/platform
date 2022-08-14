@@ -80,4 +80,9 @@ public class SelectiveProtocolServerBuilder implements ProtocolServerBuilder {
         return builder1.createPayloadCodec();
     }
 
+    @Override
+    public boolean isAvailable(String host) {
+        return builder1.isAvailable(host) || builder2.isAvailable(host);
+    }
+
 }
