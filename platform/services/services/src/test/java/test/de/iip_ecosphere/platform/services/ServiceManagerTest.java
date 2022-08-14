@@ -194,16 +194,16 @@ public class ServiceManagerTest {
         assertContains(conn);
         
         conn = AbstractServiceManager.determineFunctionalConnections(mgr, "service_0");
-        assertContains(conn, "conn-1");
+        assertContains(conn, "conn-0");
         
         conn = AbstractServiceManager.determineFunctionalConnections(mgr, "service_2");
-        assertContains(conn);
+        assertContains(conn, "conn-3");
 
         conn = AbstractServiceManager.determineFunctionalConnections(mgr, "service_3");
-        assertContains(conn);
+        assertContains(conn, "conn-3");
 
         conn = AbstractServiceManager.determineFunctionalConnections(mgr, "service_1");
-        assertContains(conn, "conn-2", "conn-3");
+        assertContains(conn, "conn-1");
 
         conn = AbstractServiceManager.determineInternalConnections(mgr, "service_0", "service_1");
         assertContains(conn, "conn-1", "conn-2", "conn-3");

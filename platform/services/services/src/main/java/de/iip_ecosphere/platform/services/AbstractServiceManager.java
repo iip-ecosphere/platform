@@ -656,13 +656,13 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             for (ServiceDescriptor s: a.getServices()) {
                 if (s.isTopLevel()) {
                     if (containsIdSafe(ids, s.getId())) {
-                        if (ServiceKind.SINK_SERVICE == s.getKind()) {
-                            for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
-                                result.add(new TypedDataConnection(c, null, true));
-                            }
-                        } else {
+                        if (ServiceKind.SOURCE_SERVICE == s.getKind()) {
                             for (TypedDataConnectorDescriptor c: s.getOutputDataConnectors()) {
                                 result.add(new TypedDataConnection(c, null, false));
+                            }
+                        } else {
+                            for (TypedDataConnectorDescriptor c: s.getInputDataConnectors()) {
+                                result.add(new TypedDataConnection(c, null, true));
                             }
                         }
                     }
