@@ -21,6 +21,24 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
     
     def generateService(MeshElement elt, ServiceBase service, Boolean topLevel, String familyId) {
     }
+    
+    /*
+    * Maps the configured protocol into the spring protocol binder configuration key.
+    */
+    def getProtocolKey() {
+        IIPEcosphere cfg = config;
+        switch (cfg.serviceProtocol.type) {
+            ProtocolType::Mqttv3 : "mqtt",
+            ProtocolType::Mqttv5 : "mqtt",
+            default: "amqp"
+        }
+    }
+
+    /*
+    * Maps the given service protocol into the spring protocol binder configuration key.
+    */
+    def getProtocolKey(ServiceProtocol prot) {
+    }
 
     def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel, String familyId) {
         String famId = family.id;
@@ -36,8 +54,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             ${generateAppOpt()|e}
           relations:
             - endpoint:
-                portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
-                hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
+                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
             ${generateRelations(elt)|e}
           ${generateEnsemble(elt, family, familyId)|e}'
         for (Service m : family.members) {
@@ -60,8 +78,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
             ${generateAppOpt()|e}
           relations:
             - endpoint:
-                portArg: --mqtt.port=\\${port} --amqp.port=\\${port}
-                hostArg: --mqtt.host=\\${host} --amqp.host=\\${host}
+                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
+                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
             ${generateRelations(elt)|e}
           ${generateProcess(elt, service)|e}
           ${generateEnsemble(elt, service, familyId)|e}'
@@ -247,11 +265,28 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
          res;
     }
     
+    def Boolean isAsyncSource(MeshElement elt) {
+        false;
+    }
+    
+    def Boolean isAsyncSource(MeshSource elt) {
+        elt.impl.asynchronous == true and elt.impl.isKindOf(Connector);
+    }
+    
     def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service) {
         String res = "";
-        String outName = getOutName(end, type.type);
         String typeName = toTypeName(type.type);
-        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, outName), end);
+        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, getOutName(end, type.type)), end);
+        String func = conn;
+        if (dir == "OUT") {
+            if (isAsyncSource(start)) {
+                func = "";
+            } else {
+                func = getMethodSuffixId(getMethodSuffix(start, typeName, getOutName(start, type.type)), start);
+            }
+        } else {
+            func = conn;
+        }
         if (not(type.forward)) {
             if (conn.startsWith("create")) {
                 conn = "process" + conn.substring(6);
@@ -261,7 +296,8 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
           "- channel: ${conn}${connSuffix}\n" +
           "  direction: ${dir}\n" +
           "  id: ${start.impl.id} -> ${end.impl.id}\n" +
-          "  type: ${typeName}");
+          "  type: ${typeName}\n" + 
+          "  function: ${func}");
         if (service <> "") {
             res = res + 
             "\n  service: ${service}";
