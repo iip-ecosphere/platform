@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    IipVersionTest.class,
     IdTest.class,
     VersionTest.class,
     ClassUtilityTest.class,

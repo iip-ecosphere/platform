@@ -14,9 +14,7 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
@@ -33,7 +31,6 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
-import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 
@@ -63,7 +60,6 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_STREET = "Street";
     public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
     
-    private static final String MAVEN_SNAPSHOT_POSTFIX = "-SNAPSHOT";
     private static ResourceResolver imageResolver = AasUtils.CLASSPATH_RESOURCE_RESOLVER;
     
     /**
@@ -90,27 +86,9 @@ public class PlatformAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
-            String ver = "";
-            String buildId = "??";
-            boolean isRelease = false;
-            InputStream is = ResourceLoader.getResourceAsStream("iip-version.properties");
-            if (null != is) {
-                Properties prop = new Properties();
-                try {
-                    prop.load(is);
-                    is.close();
-                } catch (IOException e) {
-                }
-                ver = prop.getOrDefault("version", ver).toString();
-                if (ver.endsWith(MAVEN_SNAPSHOT_POSTFIX)) {
-                    ver = ver.substring(0, ver.length() - MAVEN_SNAPSHOT_POSTFIX.length());
-                } else {
-                    isRelease = true;
-                }
-                buildId = prop.getOrDefault("buildId", buildId).toString();
-            }
+            IipVersion versionInfo = IipVersion.getInstance();
             ApplicationSetup setup = new ApplicationSetup();
-            setup.setVersion(ver);
+            setup.setVersion(versionInfo.getVersion());
             setup.setName("IIP-Ecosphere platform");
             setup.setManufacturerName("IIP-Ecosphere Consortium@de");
             setup.setManufacturerLogo("IIP-Ecosphere-Logo.png"); // in software
@@ -128,10 +106,10 @@ public class PlatformAas implements AasContributor {
             smBuilder.build();
             addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
-                .setValue(Type.BOOLEAN, isRelease)
+                .setValue(Type.BOOLEAN, versionInfo.isRelease())
                 .build();
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
-                .setValue(Type.STRING, buildId)
+                .setValue(Type.STRING, versionInfo.getBuildId())
                 .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
                 .build();
             smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS) // TODO restrict access
