@@ -61,7 +61,7 @@ public class ConfigurationTests {
      * @param test the test string to search within {@code output}
      */
     private static final void assertContains(String output, String test) {
-        Assert.assertTrue("Output does not contain '" + test + "'", output.indexOf(test) > 0);
+        Assert.assertTrue("Output does not contain '" + test + "':\n" + output, output.indexOf(test) > 0);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ConfigurationTests {
      */
     private static final void assertMatches(String output, String regEx) {
         Pattern p = Pattern.compile(regEx, Pattern.DOTALL | Pattern.MULTILINE);
-        Assert.assertTrue("Output does not match '" + regEx + "'", p.matcher(output).matches());
+        Assert.assertTrue("Output does not match '" + regEx + "':\n" + output, p.matcher(output).matches());
     }
 
     /**
