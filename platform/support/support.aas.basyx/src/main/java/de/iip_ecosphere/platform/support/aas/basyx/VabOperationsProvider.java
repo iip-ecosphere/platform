@@ -31,6 +31,7 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.OperationsProvider;
@@ -233,6 +234,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         public PayloadCodec createPayloadCodec() {
             return new BaSyxVABTCPPayloadCodec();
         }
+
+        @Override
+        public boolean isAvailable(String host) {
+            return NetUtils.isAvailable(host, port);
+        }
         
     }
     
@@ -301,6 +307,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         @Override
         public PayloadCodec createPayloadCodec() {
             return new BaSyxVABTCPPayloadCodec(); // TODO preliminary
+        }
+        
+        @Override
+        public boolean isAvailable(String host) {
+            return NetUtils.isAvailable(host, port); // may be more specific if required
         }
         
     }
