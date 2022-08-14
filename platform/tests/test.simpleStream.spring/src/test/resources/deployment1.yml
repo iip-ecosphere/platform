@@ -19,6 +19,7 @@ services:
       - channel: create-out-0
         id: intern
         type: String
+        function: create
         service: simpleStream-log
         direction: OUT        
   - id: simpleStream-log
@@ -36,6 +37,7 @@ services:
           hostArg: --mqtt.host=${host} --amqp.host=${host} --transport.host=${host}
       - channel: log-in-0
         id: intern
+        function: log
         type: String
         direction: IN
         service: simpleStream-create
