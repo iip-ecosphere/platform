@@ -407,3 +407,15 @@ definitions:
         name: km/h
         structuredName: Kilometers per hour
         description: Kilometers per hour
+  - semanticId: 0173-1#05-AAA567#004
+    version: 4
+    revision: 1
+    naming:
+      de: 
+        name: °C
+        structuredName: Grad Celsius
+        description: nach Anders Celsius benannte Einheit der Temperatur, deren Skala durch zwei Fixpunkte, den Temperaturen von Gefrier- und Siedepunkt des Wassers bei Normaldruck (Luftdruck von 1 013,25 hPa) festgelegt ist
+      en:
+        name: °C
+        structuredName: degree Celsius
+        description: temperature unit named after Anders Celsous with a scale defined by two fixpoints, the temperatures of freezing/cooking water at normal pressure (air pressure of 1 013,25 hPa)

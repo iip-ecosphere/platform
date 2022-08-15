@@ -192,4 +192,10 @@ public class Eclass {
      */
     public static final String IRDI_UNIT_KILOMETERPERHOUR = "0173-1#05-AAA208#003";
 
+    
+    /**
+     * Unit of temperature in degree Celsius.
+     */
+    public static final String IRDI_UNIT_DEGREE_CELSIUS = "0173-1#05-AAA567#004";
+
 }

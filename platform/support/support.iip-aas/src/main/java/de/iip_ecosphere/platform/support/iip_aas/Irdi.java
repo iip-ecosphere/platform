@@ -227,4 +227,11 @@ public class Irdi {
     public static final String AAS_IRDI_UNIT_KILOMETERPERHOUR 
         = IdentifierType.IRDI_PREFIX + Eclass.IRDI_UNIT_KILOMETERPERHOUR;
 
+    
+    /**
+     * Unit of temperature in {@link Eclass#IRDI_UNIT_DEGREE_CELSIUS}.
+     */
+    public static final String AAS_IRDI_UNIT_DEGREE_CELSIUS 
+        = IdentifierType.IRDI_PREFIX + Eclass.IRDI_UNIT_DEGREE_CELSIUS;
+
 }
