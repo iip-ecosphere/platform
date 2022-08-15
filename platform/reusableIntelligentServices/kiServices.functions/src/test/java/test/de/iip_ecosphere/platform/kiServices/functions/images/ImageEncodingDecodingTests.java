@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
-import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
+import test.de.iip_ecosphere.platform.kiServices.functions.ImageTests;
 /**
  * A class dedicated to testing the methods of ImageEndiginDecoding.
  * @author Weber
@@ -12,10 +12,10 @@ import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
  */
 public class ImageEncodingDecodingTests {
     
-    public static final String TEST_FILE_PATH = AppTest.TEST_FILE_FOLDER + "/testImage.jpg";
+    public static final String TEST_FILE_PATH = ImageTests.TEST_FILE_FOLDER + "/testImage.jpg";
     
     public static final String TEST_FILE_OUT_PATH = 
-            AppTest.TEST_FILE_FOLDER + "/testImageOutEndcoding1.jpg";
+            ImageTests.TEST_FILE_FOLDER + "/testImageOutEndcoding1.jpg";
     
     /**
      * Tests the method to read in an image as a base64 string. Returns the string.

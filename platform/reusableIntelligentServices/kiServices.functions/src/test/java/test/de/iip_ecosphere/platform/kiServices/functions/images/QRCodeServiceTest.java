@@ -5,14 +5,14 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
 import de.iip_ecosphere.platform.kiServices.functions.images.QRCodeScanner;
-import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
+import test.de.iip_ecosphere.platform.kiServices.functions.ImageTests;
 
 public class QRCodeServiceTest {
     
     
-    public static final String TEST_FILE_PATH = AppTest.TEST_FILE_FOLDER + "/testImageAsBytesb64";
+    public static final String TEST_FILE_PATH = ImageTests.TEST_FILE_FOLDER + "/testImageAsBytesb64";
     
-    public static final String TEST_FILE_OUT_PATH = AppTest.TEST_FILE_FOLDER + "/testImageOut2.jpg";
+    public static final String TEST_FILE_OUT_PATH = ImageTests.TEST_FILE_FOLDER + "/testImageOut2.jpg";
     
 //    static {
 //        tmpPath =  System.getProperty("java.io.tmpdir");                  

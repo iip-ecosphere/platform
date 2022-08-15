@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageEncodingDecoding;
 import de.iip_ecosphere.platform.kiServices.functions.images.ImageProcessing;
-import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
+import test.de.iip_ecosphere.platform.kiServices.functions.ImageTests;
 /**
  * Class to test the method of image processing.
  * @author Weber
@@ -17,9 +17,9 @@ import test.de.iip_ecosphere.platform.kiServices.functions.AppTest;
  */
 public class ImageProcessingTests {
     
-    public static final String TEST_FILE_PATH = AppTest.TEST_FILE_FOLDER + "/testImage.jpg";
+    public static final String TEST_FILE_PATH = ImageTests.TEST_FILE_FOLDER + "/testImage.jpg";
     
-    public static final String TEST_FILE_OUT_PATH = AppTest.TEST_FILE_FOLDER + "/testImageOut1.jpg";
+    public static final String TEST_FILE_OUT_PATH = ImageTests.TEST_FILE_FOLDER + "/testImageOut1.jpg";
     /**
      * Method to test the imageprocessing tasks in isolation.
      * @param args Args.
@@ -27,7 +27,7 @@ public class ImageProcessingTests {
     public static void main(String[] args) {
         
         try {
-            createB64ImageStringFromImage(AppTest.TEST_FILE_FOLDER + "/testImageQR1.jpg");
+            createB64ImageStringFromImage(ImageTests.TEST_FILE_FOLDER + "/testImageQR1.jpg");
         } catch (IOException e1) {
             e1.printStackTrace();
         }

@@ -16,11 +16,11 @@ import org.junit.runners.Suite;
 /**
  * Defines the tests to be executed.
  * 
- * @author Holger Eichelberger, SSE
+ * @author Alexander Weber, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AppTest.class,
+    ImageTests.class,
 })
 public class AllTests {
 }

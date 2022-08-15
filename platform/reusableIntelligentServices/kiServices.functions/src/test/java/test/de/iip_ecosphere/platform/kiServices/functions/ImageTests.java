@@ -27,11 +27,11 @@ import test.de.iip_ecosphere.platform.kiServices.functions.images.ImageProcessin
 import test.de.iip_ecosphere.platform.kiServices.functions.images.QRCodeServiceTest;
 
 /**
- * Template test.
+ * Image processing tests.
  * 
- * @author Holger Eichelberger, SSE
+ * @author Alexander Weber, SSE
  */
-public class AppTest {
+public class ImageTests {
     
     public static final String TEST_FILE_FOLDER = "src/test/resources";
     

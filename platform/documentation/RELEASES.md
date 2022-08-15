@@ -5,10 +5,9 @@ Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
+* Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
 
 ### Next release (August 2022, TddT'22):
-Planned:
-* Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35)
 
 In progress:
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
@@ -54,7 +53,8 @@ Improvements:
 * [#67](https://github.com/iip-ecosphere/platform/issues/67): UI progress reporting support on platform side
 * [#72](https://github.com/iip-ecosphere/platform/issues/72): Generated ingestor handling in default service implementation
 * [#49](https://github.com/iip-ecosphere/platform/issues/49): Check whether there is a TensorFlow inference-only library - no.
-* Improvements of service, family and stream generation (also [#44](https://github.com/iip-ecosphere/platform/issues/44) and [#42](https://github.com/iip-ecosphere/platform/issues/42)).
+* Improvements of service, family and stream generation: [#44](https://github.com/iip-ecosphere/platform/issues/44) and [#42](https://github.com/iip-ecosphere/platform/issues/42).
+* Improvements of service execution: [#50](https://github.com/iip-ecosphere/platform/issues/50)
 * Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
 * [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
 
