@@ -89,7 +89,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String mon = "";
             String trace = "";
             if (base.monitorSentCount) {
-                mon = 'metrics.increaseCounter("service.sent");';
+                mon = 'MetricsProvider.increaseCounterBy(serviceSent, 1.0);';
             }
             if (base.traceSent <> TraceKind::NONE) {
                 String d;                
@@ -130,7 +130,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             String mon = "";
             String trace = "";
             if (base.monitorRcvCount) {
-                mon = 'metrics.increaseCounter("service.received");';
+                mon = 'MetricsProvider.increaseCounterBy(serviceReceived, 1.0);';
             }
             if (base.traceRcv <> TraceKind::NONE) {
                 String d;
@@ -177,14 +177,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     }
 
     def registerService(MeshElement elt, ServiceBase service) {
-        'io.micrometer.core.instrument.Counter
-            .builder("service.sent")
+        'serviceSent = Counter.builder("service.sent")
             .baseUnit("tuple/s")
             .description("Tuples sent out by a service")
             .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
             .register(metrics.getRegistry());'
-        'io.micrometer.core.instrument.Counter
-            .builder("service.received")
+        'serviceReceived = Counter.builder("service.received")
             .baseUnit("tuple/s")
             .description("Tuples received by a service")
             .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
@@ -395,7 +393,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     } 
     
     def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type) {
-        'return data -> ${fallbackToNull(snk, "service.${methodName}(data)", false)};'
+        String expr = '${fallbackToNull(snk, "service.${methodName}(data)", false)}';
+        'return data -> ${genRcvProbe(service, expr, type, "data")};'
     }
     
     // ----------------------- initial service parameters -----------------------------------------------
@@ -1210,6 +1209,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import org.springframework.context.annotation.Import;
         import org.springframework.scheduling.annotation.EnableScheduling;
         import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+        import io.micrometer.core.instrument.Counter;
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
@@ -1248,6 +1248,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             // so far plain delegation, preparation but so far no support for service switching
             @Autowired
             private MetricsProvider metrics;
+            private Counter serviceSent;
+            private Counter serviceReceived;
             ${generateInputEventHandlers(elt, impl)|e}
 
             ${generateReceptionCallback(elt, impl)|e}

@@ -11,7 +11,6 @@ Planned:
 
 In progress:
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
-* Monitoring improvements [#41](https://github.com/iip-ecosphere/platform/issues/41), [#63](https://github.com/iip-ecosphere/platform/issues/63) + [#15](https://github.com/iip-ecosphere/platform/issues/15)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
@@ -45,6 +44,7 @@ Improvements:
 * [#34](https://github.com/iip-ecosphere/platform/issues/34): Fixed monitoring integration
 * [#22](https://github.com/iip-ecosphere/platform/issues/22): Transport considers identity store, user/pwd deprecated and discouraged but still available.
 * [#24](https://github.com/iip-ecosphere/platform/issues/24): Unify resource loading.
+* [#41](https://github.com/iip-ecosphere/platform/issues/41), [#15](https://github.com/iip-ecosphere/platform/issues/15): Platform monitoring improvements 
 * [#61](https://github.com/iip-ecosphere/platform/issues/61): Runtime dependency missing in alternative service package formats.
 * [#60](https://github.com/iip-ecosphere/platform/issues/60): Nested connector paths not correctly composed in generation.
 * [#25](https://github.com/iip-ecosphere/platform/issues/25): Enable application-specific connector triggers via code plugins.

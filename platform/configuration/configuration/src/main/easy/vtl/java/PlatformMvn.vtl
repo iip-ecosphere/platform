@@ -24,6 +24,10 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         if (monitoring) {
+            if (config.platformMonitoring.isKindOf(PrometheusPlatformMonitoring)) {
+                // does not override somehow in monitoring.prometheus, wrong version occurs here
+                appendDependency(dep, "io.micrometer", "micrometer-registry-prometheus", "1.8.3");
+            }
             appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
             appendDependency(dep, iipGroup, "monitoring", projectVersion);
         } else {
