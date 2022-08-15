@@ -244,6 +244,19 @@ public abstract class MeterRepresentation implements Meter {
                 }
             }
         }
+        JsonArray tgs = object.getJsonArray("availableTags");
+        if (null != tgs) {
+            String[] tmp = new String[tags.length + tgs.size()];
+            int pos = 0;
+            for (int i = 0; i < tags.length; i++) {
+                tmp[pos++] = tags[i];
+            }
+            // just add them, may override values from call parameter but given tags shall take precedence
+            for (int i = 0; i < tgs.size(); i++) {
+                tmp[pos++] = tgs.getString(i);
+            }
+            tags = tmp;
+        }
         if (totalTimeFound && countFound) {
             result = TimerRepresentation.parseTimer(object, tags);
         } else if (countFound) {

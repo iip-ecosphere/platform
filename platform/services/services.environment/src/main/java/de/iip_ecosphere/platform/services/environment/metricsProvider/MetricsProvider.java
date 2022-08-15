@@ -176,8 +176,10 @@ public class MetricsProvider {
     public void registerNonNativeSystemMetrics() {
         registerMemoryMetrics();
         registerDiskMetrics();
-        Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage).description("Current percentage of physical memory in use")
-                .register(registry);
+        Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage)
+            .description("Current percentage of physical memory in use")
+            .baseUnit("percent")
+            .register(registry);
     }
 
     /**
@@ -187,12 +189,18 @@ public class MetricsProvider {
      * unit.
      */
     public void registerMemoryMetrics() {
-        Gauge.builder(SYS_MEM_TOTAL, () -> sysMemTotal).description("Total Physical memory of the system")
-                .baseUnit(memoryBaseUnit.stringValue()).register(registry);
-        Gauge.builder(SYS_MEM_FREE, () -> sysMemFree).description("Free Physical memory of the system")
-                .baseUnit(memoryBaseUnit.stringValue()).register(registry);
-        Gauge.builder(SYS_MEM_USED, () -> sysMemUsed).description("Physical memory currently in use")
-                .baseUnit(memoryBaseUnit.stringValue()).register(registry);
+        Gauge.builder(SYS_MEM_TOTAL, () -> sysMemTotal)
+            .description("Total Physical memory of the system")
+            .baseUnit(memoryBaseUnit.stringValue())
+            .register(registry);
+        Gauge.builder(SYS_MEM_FREE, () -> sysMemFree)
+            .description("Free Physical memory of the system")
+            .baseUnit(memoryBaseUnit.stringValue())
+            .register(registry);
+        Gauge.builder(SYS_MEM_USED, () -> sysMemUsed)
+            .description("Physical memory currently in use")
+            .baseUnit(memoryBaseUnit.stringValue())
+            .register(registry);
     }
 
     /**
@@ -202,15 +210,22 @@ public class MetricsProvider {
      * base unit.
      */
     public void registerDiskMetrics() {
-        Gauge.builder(SYS_DISK_TOTAL, () -> sysDiskTotal).description("Total disk capacity of the system")
-                .baseUnit(diskBaseUnit.stringValue()).register(registry);
-        Gauge.builder(SYS_DISK_FREE, () -> sysDiskFree).description("Total free disk capacity of the system")
-                .baseUnit(diskBaseUnit.stringValue()).register(registry);
-        Gauge.builder(SYS_DISK_USABLE, () -> sysDiskUsable).description("Total usable disk capacity of the system")
-                .baseUnit(diskBaseUnit.stringValue()).register(registry);
+        Gauge.builder(SYS_DISK_TOTAL, () -> sysDiskTotal)
+            .description("Total disk capacity of the system")
+            .baseUnit(diskBaseUnit.stringValue())
+            .register(registry);
+        Gauge.builder(SYS_DISK_FREE, () -> sysDiskFree)
+            .description("Total free disk capacity of the system")
+            .baseUnit(diskBaseUnit.stringValue())
+            .register(registry);
+        Gauge.builder(SYS_DISK_USABLE, () -> sysDiskUsable)
+            .description("Total usable disk capacity of the system")
+            .baseUnit(diskBaseUnit.stringValue())
+            .register(registry);
         Gauge.builder(SYS_DISK_USED, () -> sysDiskUsed)
-                .description("Current total disk capacity currently in use or unavailable")
-                .baseUnit(diskBaseUnit.stringValue()).register(registry);
+            .description("Current total disk capacity currently in use or unavailable")
+            .baseUnit(diskBaseUnit.stringValue())
+            .register(registry);
     }
 
     /**
@@ -368,7 +383,20 @@ public class MetricsProvider {
         if (!counters.containsKey(counterId)) {
             addCounter(counterId);
         }
-        counters.get(counterId).increment(value);
+        increaseCounterBy(counters.get(counterId), value);
+    }
+    
+    /**
+     * Helper method to increase/increment the given {@code counter} by the specified {@code value}.
+     * Does nothing if {@code counter} is <b>null</b>.
+     * 
+     * @param counter the counter
+     * @param value the value
+     */
+    public static void increaseCounterBy(Counter counter, double value) {
+        if (null != counter) {
+            counter.increment(value);
+        }
     }
 
     /**
@@ -859,7 +887,16 @@ public class MetricsProvider {
         }
 
         sb.deleteCharAt(sb.length() - 1);
-        sb.append("],\"availableTags\":[]}");
+        sb.append("],\"availableTags\":[");
+        boolean first = true;
+        for (Tag t : meter.getId().getTagsAsIterable()) {
+            if (!first) {
+                sb.append(", ");
+            }
+            sb.append("\"" + t.getKey() + ":" + t.getValue() + "\"");
+            first = false;
+        }
+        sb.append("]}");
 
         return sb.toString();
     }

@@ -2,17 +2,28 @@ package test.de.iip_ecosphere.platform.services.environment.metricsProvider;
 
 import static org.junit.Assert.*;
 
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Measurement;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -119,7 +130,7 @@ public class MetricsProviderTest {
         assertThrows(IllegalArgumentException.class, () -> provider.removeCounter(ID_BAD));
         assertThrows(IllegalArgumentException.class, () -> provider.removeCounter(null));
         assertThrows(IllegalArgumentException.class, () -> provider.increaseCounter(null));
-        assertThrows(IllegalArgumentException.class, () -> provider.increaseCounterBy(null, value));
+        assertThrows(IllegalArgumentException.class, () -> provider.increaseCounterBy((String) null, value));
         assertEquals(0, provider.getNumberOfCustomCounters());
 
         provider.increaseCounter(ID_GOOD);
@@ -302,6 +313,41 @@ public class MetricsProviderTest {
         } else {
             assertTrue(list.length() > 2);
             assertTrue(list.matches("\\[(\"\\S+\"(,\\s*\"\\S+\")*)?\\]"));
+        }
+    }
+    
+    /**
+     * Tests serializing/deserializing.
+     */
+    @Test
+    public void testJson() {
+        Counter counter = Counter
+            .builder("service.sent")
+            .baseUnit("tuple/s")
+            .description("Tuples sent out by a service")
+            .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
+            .register(provider.getRegistry());
+        MetricsProvider.increaseCounterBy(counter, 1);
+        String json = provider.toJson("id0", false);
+
+        JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+        String id = obj.getString("id");
+        assertEquals("id0", id);
+        if (null != id) {
+            for (Map.Entry<String, JsonValue> e : obj.getJsonObject("meters").entrySet()) {
+                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), "device:dev1");
+                assertNotNull(meter);
+                if (meter.getId().getName().equals(counter.getId().getName())) {
+                    meter.getId().getBaseUnit().equals("tuple/s");
+                    meter.getId().getDescription().equals("Tuples sent out by a service");
+                    assertEquals("SimpleReceiver", meter.getId().getTag("service"));
+                    assertEquals("SimpleMeshApp", meter.getId().getTag("application"));
+                    assertEquals("dev0", meter.getId().getTag("device")); // shall not override
+                    Iterator<Measurement> iter = meter.measure().iterator();
+                    assertTrue(iter.hasNext());
+                    assertEquals(1, iter.next().getValue(), 0.001);
+                }
+            }
         }
     }
 
