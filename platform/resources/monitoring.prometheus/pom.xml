@@ -64,7 +64,6 @@
 	<dependency>
      <groupId>io.micrometer</groupId>
      <artifactId>micrometer-registry-prometheus</artifactId>
-     <version>1.8.3</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform.external.si.matjazcerkvenik</groupId>
@@ -162,4 +161,15 @@
     </dependency>
 
    </dependencies>
+   
+	<dependencyManagement>
+	  <dependencies>
+	    <dependency>    
+		     <groupId>io.micrometer</groupId>
+		     <artifactId>micrometer-registry-prometheus</artifactId>
+		     <version>1.8.3</version>
+	    </dependency>
+	  </dependencies>
+	</dependencyManagement>
+   
 </project>
