@@ -47,6 +47,7 @@ public class Cli extends CliBackend {
         PlatformSetup setup = PlatformSetup.getInstance();
         AasPartRegistry.setAasSetup(setup.getAas());
         CommandProvider provider;
+        SemanticIdResolver.resolve(""); // warm-up, initialize
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
             println("IIP-Ecosphere, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
@@ -56,7 +57,6 @@ public class Cli extends CliBackend {
         } else {
             provider = new ArgsCommandProvider(args);
         }
-        SemanticIdResolver.resolve(""); // warm-up, initialize
         TopLevelCommandInterpreter tci = new TopLevelCommandInterpreter();
         tci.interpret(provider, Level.TOP);
         //interpretTopLevel(provider);
