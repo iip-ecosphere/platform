@@ -202,6 +202,7 @@ public class MetricsProvider {
     public void registerNonNativeSystemMetrics() {
         registerMemoryMetrics();
         registerDiskMetrics();
+        registerDeviceMetrics();
         if (monitorNonNative) {
             Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage)
                 .description("Current percentage of physical memory in use")
