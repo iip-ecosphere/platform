@@ -13,6 +13,10 @@
 package de.iip_ecosphere.platform.support.metrics.plcnext;
 
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
+import io.grpc.ManagedChannel;
+import io.grpc.netty.NettyChannelBuilder;
+import io.grpc.netty.shaded.io.netty.channel.epoll.EpollDomainSocketChannel;
+import io.grpc.netty.shaded.io.netty.channel.unix.DomainSocketAddress;
 
 /**
  * System metrics implementation for Phoenix Contact/PLCnext.
@@ -28,6 +32,16 @@ public class PlcNextSystemMetrics implements SystemMetrics {
      */
     protected PlcNextSystemMetrics() {
     }
+    
+    /*private void initialize() {
+        //https://www.plcnext.help/te/Service_Components/gRPC_Introduction.htm
+        ManagedChannel channel = NettyChannelBuilder.forAddress(new DomainSocketAddress("run/plcnext/grpc.sock"))
+            .eventLoopGroup(new EpollEventLoopGroup())
+            .channelType(EpollDomainSocketChannel.class)
+            .usePlaintext(true)
+            .build();
+        GrpcServicesGrpc.GrpcServicesBlockingStub client = GrpcServicesGrpc.newBlockingStub(channel);        
+    }*/
     
     @Override
     public float getCaseTemperature() {
