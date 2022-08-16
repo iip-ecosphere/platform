@@ -8,7 +8,7 @@ rm -rf gen
 
 mvn -P EasyGen generate-sources
 mvn -P EasyGen exec:java@generateApps
-mvn compile
+mvn -P App compile
 
 #execute and 'test'
 
