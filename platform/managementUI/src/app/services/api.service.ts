@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources, PlatformServices } from 'src/interfaces';
+import { PlatformResources, platformResponse, PlatformServices } from 'src/interfaces';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
@@ -84,8 +84,9 @@ export class ApiService {
       basyxFunc = "deployPlan";
     }
     try {
-      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
+      response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
+      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      , {responseType: 'json', reportProgress: true});
     } catch(e) {
       console.log(e);
     }

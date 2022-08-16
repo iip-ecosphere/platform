@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { outputArgument, PlatformResources, platformResponse, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
 
@@ -22,6 +23,9 @@ export class DeploymentPlansComponent implements OnInit {
   undeployPlanInput: any;
   message: string = '';
 
+  subscription: Subscription | undefined;
+  deployResponse: platformResponse | undefined;
+
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
     if(response.submodelElements) {
@@ -42,14 +46,19 @@ export class DeploymentPlansComponent implements OnInit {
        if (value) {
         params[0].value.value = value.value;
        }
-      const response = await this.api.deployPlan(params) as platformResponse;
+      const response = await this.api.deployPlan(params);
       this.selected = undefined;
       console.log(response);
+      this.subscription = response?.subscribe((dep: platformResponse) => {this.updateMessage(dep)});
 
-      this.openSnackbar(response.outputArguments);
+      //this.openSnackbar(response.outputArguments);
 
     }
 
+  }
+  private updateMessage(dep: platformResponse) {
+    this.deployResponse = dep;
+    this.openSnackbar(dep.outputArguments);
   }
 
   private openSnackbar(output: outputArgument[]) {
@@ -76,7 +85,7 @@ export class DeploymentPlansComponent implements OnInit {
        if (value) {
         params[0].value.value = value.value;
        }
-      const response = await this.api.deployPlan(params, true);
+      const response = this.api.deployPlan(params, true);
       this.selected = undefined;
       console.log(response);
     }
