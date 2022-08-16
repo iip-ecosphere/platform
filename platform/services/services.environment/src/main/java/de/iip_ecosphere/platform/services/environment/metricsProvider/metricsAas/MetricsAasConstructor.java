@@ -479,6 +479,17 @@ public class MetricsAasConstructor {
             .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
             .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
             .build();
+        
+        smBuilder.createPropertyBuilder(DEVICE_CPU_TEMPERATURE).setType(propType(Type.DOUBLE, Type.STRING))
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.DEVICE_CPU_TEMPERATURE), 
+                InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS))
+            .build();
+        smBuilder.createPropertyBuilder(DEVICE_CASE_TEMPERATURE).setType(propType(Type.DOUBLE, Type.STRING))
+            .bind(new MeterGetter(channel, id, setup, MetricsProvider.DEVICE_CPU_TEMPERATURE), 
+                InvocablesCreator.READ_ONLY)
+            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS))
+            .build();
     }
 
     /**

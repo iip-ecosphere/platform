@@ -78,6 +78,9 @@ public class MetricsAasConstants {
     public static final String SYSTEM_MEMORY_USAGE = "Allocated_Memory";
     public static final String SYSTEM_MEMORY_USED = "Memory_Used"; // IDTA
 
+    public static final String DEVICE_CPU_TEMPERATURE = "CPU_Temperature";
+    public static final String DEVICE_CASE_TEMPERATURE = "Case_Temperature";
+    
     /* Custom tags */
     public static final String UPDATE = "update";
     public static final String DELETE = "delete";
@@ -90,12 +93,5 @@ public class MetricsAasConstants {
     /* Attributes for the JsonArrays from tagged meters */
     public static final String TAGS_ATTR = "tags";
     public static final String METER_ATTR = "meter";
-
-    /* List Properties */
-    /*public static final String GAUGE_LIST = "gaugelist";
-    public static final String COUNTER_LIST = "counterlist";
-    public static final String TIMER_LIST = "timerlist";
-    public static final String TAGGED_METER_LIST = "taggedmeterlist";
-    public static final String SIMPLE_METER_LIST = "simplemeterlist";*/
 
 }

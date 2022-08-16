@@ -39,6 +39,9 @@ import io.micrometer.core.instrument.search.MeterNotFoundException;
 import com.sun.management.OperatingSystemMXBean;
 
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter;
+import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
+import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 
 /**
  * This class represents an interface to manage the Micrometer-API meters.<br>
@@ -65,12 +68,6 @@ public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
     
-    /*public static final String GAUGE_LIST = "gaugelist";
-    public static final String COUNTER_LIST = "counterlist";
-    public static final String TIMER_LIST = "timerlist";
-    public static final String TAGGED_METER_LIST = "taggedmeterlist";
-    public static final String SIMPLE_METER_LIST = "simplemeterlist";*/
-    
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
     public static final String SYS_MEM_FREE = "system.memory.free";
@@ -81,7 +78,13 @@ public class MetricsProvider {
     public static final String SYS_DISK_FREE = "system.disk.free";
     public static final String SYS_DISK_USABLE = "system.disk.usable";
     public static final String SYS_DISK_USED = "system.disk.used";
-    
+
+    public static final String DEVICE_CPU_TEMPERATURE = "device.cpu.temperature";
+    public static final String DEVICE_CASE_TEMPERATURE = "device.case.temperature";
+    public static final String DEVICE_TPU_CORES = "device.tpu.cores";
+    public static final String DEVICE_GPU_CORES = "device.gpu.cores";
+    public static final String DEVICE_CPU_CORES = "device.cpu.cores";
+
     public static final CapacityBaseUnit DFLT_MEMORY = CapacityBaseUnit.BYTES;
     public static final CapacityBaseUnit DFLT_DISK = CapacityBaseUnit.BYTES;
 
@@ -109,6 +112,8 @@ public class MetricsProvider {
     private final Map<String, AtomicDouble> gauges;
     private final Map<String, Counter> counters;
     private final Map<String, Timer> timers;
+    
+    private boolean monitorNonNative;
 
     // Attributes to simplify gauges
     private double sysMemTotal;
@@ -119,20 +124,40 @@ public class MetricsProvider {
     private double sysDiskFree;
     private double sysDiskUsable;
     private double sysDiskUsed;
+    
+    private float deviceCpuTemperature;
+    private float deviceCaseTemperature;
 
     /**
      * Create a new Metrics Provider Instance.<br>
      * The Metrics Provider will have a map of metrics that can be operated by the
      * client via the appropriate methods, allowing the user to add new custom
      * metrics when needed and manipulate them in a uniform manner. <br>
-     * This constructor should be called automatically by the Spring boot framework
-     * and accessed by an autowired attribute as a result.
+     * This constructor enables monitoring of (default IIP-Ecosphere) non-native 
+     * system metrics; requires {@link #calculateNonNativeSystemMetrics()} to be called regularly.
      * 
      * @param registry where new Meters are registered. Injected by the Spring Boot
      *                 Application
      * @throws IllegalArgumentException if the registry is null
+     * @see #MetricsProvider(MeterRegistry, boolean)
      */
     public MetricsProvider(MeterRegistry registry) {
+        this(registry, true);
+    }
+
+    /**
+     * Create a new Metrics Provider Instance.<br>
+     * The Metrics Provider will have a map of metrics that can be operated by the
+     * client via the appropriate methods, allowing the user to add new custom
+     * metrics when needed and manipulate them in a uniform manner. <br>
+     * 
+     * @param registry where new Meters are registered. Injected by the Spring Boot
+     *     Application
+     * @param monitorNonNative enable/disable monitoring of (default IIP-Ecosphere) non-native 
+     *     system metrics, requires {@link #calculateNonNativeSystemMetrics()} to be called regularly
+     * @throws IllegalArgumentException if the registry is null
+     */
+    public MetricsProvider(MeterRegistry registry, boolean monitorNonNative) {
         if (registry == null) {
             throw new IllegalArgumentException("Registry is null!");
         }
@@ -148,6 +173,7 @@ public class MetricsProvider {
         timers = new HashMap<String, Timer>();
 
         init = true;
+        this.monitorNonNative = monitorNonNative;
     }
     
     /**
@@ -176,56 +202,91 @@ public class MetricsProvider {
     public void registerNonNativeSystemMetrics() {
         registerMemoryMetrics();
         registerDiskMetrics();
-        Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage)
-            .description("Current percentage of physical memory in use")
-            .baseUnit("percent")
-            .register(registry);
+        if (monitorNonNative) {
+            Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage)
+                .description("Current percentage of physical memory in use")
+                .baseUnit("percent")
+                .register(registry);
+        }
     }
 
     /**
      * Registers the physical memory metrics except for the usage percentage.<br>
-     * It can be
-     * called multiple times during execution in order to update the memory base
-     * unit.
+     * It can be called multiple times during execution in order to update the memory base unit.
      */
     public void registerMemoryMetrics() {
-        Gauge.builder(SYS_MEM_TOTAL, () -> sysMemTotal)
-            .description("Total Physical memory of the system")
-            .baseUnit(memoryBaseUnit.stringValue())
-            .register(registry);
-        Gauge.builder(SYS_MEM_FREE, () -> sysMemFree)
-            .description("Free Physical memory of the system")
-            .baseUnit(memoryBaseUnit.stringValue())
-            .register(registry);
-        Gauge.builder(SYS_MEM_USED, () -> sysMemUsed)
-            .description("Physical memory currently in use")
-            .baseUnit(memoryBaseUnit.stringValue())
-            .register(registry);
+        if (monitorNonNative) {
+            Gauge.builder(SYS_MEM_TOTAL, () -> sysMemTotal)
+                .description("Total Physical memory of the system")
+                .baseUnit(memoryBaseUnit.stringValue())
+                .register(registry);
+            Gauge.builder(SYS_MEM_FREE, () -> sysMemFree)
+                .description("Free Physical memory of the system")
+                .baseUnit(memoryBaseUnit.stringValue())
+                .register(registry);
+            Gauge.builder(SYS_MEM_USED, () -> sysMemUsed)
+                .description("Physical memory currently in use")
+                .baseUnit(memoryBaseUnit.stringValue())
+                .register(registry);
+        }
     }
 
     /**
      * Registers the disk capacity metrics.<br>
-     * It can be
-     * called multiple times during execution in order to update the disk capacity
-     * base unit.
+     * It can be called multiple times during execution in order to update the disk capacity base unit.
      */
     public void registerDiskMetrics() {
-        Gauge.builder(SYS_DISK_TOTAL, () -> sysDiskTotal)
-            .description("Total disk capacity of the system")
-            .baseUnit(diskBaseUnit.stringValue())
-            .register(registry);
-        Gauge.builder(SYS_DISK_FREE, () -> sysDiskFree)
-            .description("Total free disk capacity of the system")
-            .baseUnit(diskBaseUnit.stringValue())
-            .register(registry);
-        Gauge.builder(SYS_DISK_USABLE, () -> sysDiskUsable)
-            .description("Total usable disk capacity of the system")
-            .baseUnit(diskBaseUnit.stringValue())
-            .register(registry);
-        Gauge.builder(SYS_DISK_USED, () -> sysDiskUsed)
-            .description("Current total disk capacity currently in use or unavailable")
-            .baseUnit(diskBaseUnit.stringValue())
-            .register(registry);
+        if (monitorNonNative) {
+            Gauge.builder(SYS_DISK_TOTAL, () -> sysDiskTotal)
+                .description("Total disk capacity of the system")
+                .baseUnit(diskBaseUnit.stringValue())
+                .register(registry);
+            Gauge.builder(SYS_DISK_FREE, () -> sysDiskFree)
+                .description("Total free disk capacity of the system")
+                .baseUnit(diskBaseUnit.stringValue())
+                .register(registry);
+            Gauge.builder(SYS_DISK_USABLE, () -> sysDiskUsable)
+                .description("Total usable disk capacity of the system")
+                .baseUnit(diskBaseUnit.stringValue())
+                .register(registry);
+            Gauge.builder(SYS_DISK_USED, () -> sysDiskUsed)
+                .description("Current total disk capacity currently in use or unavailable")
+                .baseUnit(diskBaseUnit.stringValue())
+                .register(registry);
+        }
+    }
+
+    /**
+     * Registers the default device metrics.<br>
+     * It can be called multiple times during execution in order to update the base units.
+     */
+    public void registerDeviceMetrics() {
+        if (monitorNonNative) {
+            Gauge.builder(DEVICE_CPU_TEMPERATURE, () -> deviceCpuTemperature)
+                .description("The CPU temperature of the device.")
+                .baseUnit("degrees celsius")
+                .register(registry);
+            Gauge.builder(DEVICE_CASE_TEMPERATURE, () -> deviceCaseTemperature)
+                .description("The case temperature (if available)")
+                .baseUnit("degrees celsius")
+                .register(registry);
+        }
+    }
+
+    /**
+     * Removes the default device metrics from the registry.<br>
+     * This method is required as the
+     * previous memory metrics have to be removed and registered again after
+     * changing the base unit in order for the description to update correctly.
+     */
+    public void removeDeviceMetrics() {
+        if (monitorNonNative) {
+            registry.remove(registry.get(DEVICE_CPU_TEMPERATURE).meter());
+            registry.remove(registry.get(DEVICE_CASE_TEMPERATURE).meter());
+            registry.remove(registry.get(DEVICE_TPU_CORES).meter());
+            registry.remove(registry.get(DEVICE_GPU_CORES).meter());
+            registry.remove(registry.get(DEVICE_CPU_CORES).meter());
+        }
     }
 
     /**
@@ -235,9 +296,11 @@ public class MetricsProvider {
      * changing the base unit in order for the description to update correctly.
      */
     public void removeMemoryMetrics() {
-        registry.remove(registry.get(SYS_MEM_TOTAL).meter());
-        registry.remove(registry.get(SYS_MEM_FREE).meter());
-        registry.remove(registry.get(SYS_MEM_USED).meter());
+        if (monitorNonNative) {
+            registry.remove(registry.get(SYS_MEM_TOTAL).meter());
+            registry.remove(registry.get(SYS_MEM_FREE).meter());
+            registry.remove(registry.get(SYS_MEM_USED).meter());
+        }
     }
 
     /**
@@ -247,10 +310,12 @@ public class MetricsProvider {
      * the base unit in order for the description to update correctly.
      */
     public void removeDiskMetrics() {
-        registry.remove(registry.get(SYS_DISK_TOTAL).meter());
-        registry.remove(registry.get(SYS_DISK_FREE).meter());
-        registry.remove(registry.get(SYS_DISK_USABLE).meter());
-        registry.remove(registry.get(SYS_DISK_USED).meter());
+        if (monitorNonNative) {
+            registry.remove(registry.get(SYS_DISK_TOTAL).meter());
+            registry.remove(registry.get(SYS_DISK_FREE).meter());
+            registry.remove(registry.get(SYS_DISK_USABLE).meter());
+            registry.remove(registry.get(SYS_DISK_USED).meter());
+        }
     }
 
     /**
@@ -685,6 +750,10 @@ public class MetricsProvider {
         sysDiskUsable /= diskBaseUnit.byteValue();
 
         sysDiskUsed = sysDiskTotal - sysDiskFree;
+        
+        SystemMetrics sysM = SystemMetricsFactory.getSystemMetrics();
+        deviceCaseTemperature = sysM.getCaseTemperature();
+        deviceCpuTemperature = sysM.getCpuTemperature();
     }
 
     /**
@@ -755,9 +824,10 @@ public class MetricsProvider {
      * 
      * @param identifier optional identifier to be added to the structure, no identifier is added if <b>null</b>
      * @param update is this an update or an initial serialization to Json
+     * @param filter optional filters on the meters to be exported
      * @return all meters and their values/structures, all lists
      */
-    public String toJson(String identifier, boolean update) {
+    public String toJson(String identifier, boolean update, MeterFilter... filter) {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         if (null != identifier) {
@@ -765,8 +835,7 @@ public class MetricsProvider {
         }
         sb.append("\"meters\":{");
         boolean first = true;
-        for (Meter meter: registry.getMeters()) {
-            
+        for (Meter meter: MeterFilter.filter(registry.getMeters(), true, filter)) {
             if (!first) {
                 sb.append(",");
             }
@@ -775,30 +844,9 @@ public class MetricsProvider {
             first = false;
         }
         sb.append("}");
-        //sb.append(",");
-        //appendNameValue(sb, GAUGE_LIST, getCustomGaugeList(), true);
-        //appendNameValue(sb, COUNTER_LIST, getCustomCounterList(), true);
-        //appendNameValue(sb, TIMER_LIST, getCustomTimerList(), true);
-        //appendNameValue(sb, TAGGED_METER_LIST, getTaggedMeterList(), true);
-        //appendNameValue(sb, SIMPLE_METER_LIST, getSimpleMeterList(), false);
         sb.append("}");
         return sb.toString();
     }
-    
-    /**
-     * Appends a name-value pair, value unquoted.
-     * 
-     * @param sb the string builder to append to
-     * @param name the name of the value
-     * @param value the value (unquoted)
-     * @param separator add a separator or not
-     */
-    /*private void appendNameValue(StringBuilder sb, String name, String value, boolean separator) {
-        sb.append("\"" + name + "\":" + value);
-        if (separator) {
-            sb.append(",");
-        }
-    }*/
 
     /**
      * Retrieves a custom gauge as a JSON object.<br>

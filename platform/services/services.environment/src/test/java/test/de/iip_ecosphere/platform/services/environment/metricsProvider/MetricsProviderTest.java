@@ -17,6 +17,9 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter.Type;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterNameFilter;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterNamePrefixFilter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
@@ -327,8 +330,21 @@ public class MetricsProviderTest {
             .description("Tuples sent out by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
             .register(provider.getRegistry());
+        Counter
+            .builder("service.received")
+            .baseUnit("tuple/s")
+            .description("Tuples received by a service")
+            .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
+            .register(provider.getRegistry());
+        Counter.builder("system.online")
+            .baseUnit("ms")
+            .description("Time the system is online")
+            .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
+            .register(provider.getRegistry());
         MetricsProvider.increaseCounterBy(counter, 1);
-        String json = provider.toJson("id0", false);
+        String json = provider.toJson("id0", false,
+            new MeterNamePrefixFilter(Type.INCLUSION, "service.sent"),
+            new MeterNameFilter(Type.EXCLUSION, "services.received"));
 
         JsonObject obj = Json.createReader(new StringReader(json)).readObject();
         String id = obj.getString("id");
