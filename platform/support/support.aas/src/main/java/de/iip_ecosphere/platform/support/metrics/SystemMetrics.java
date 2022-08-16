@@ -51,21 +51,30 @@ public interface SystemMetrics {
     /**
      * Returns the number of CPU cores.
      * 
-     * @return the number of CPU cores (valid = positive)
+     * @return the number of CPU cores (valid = non-negative)
      */
     public int getNumGpuCores();
-    
+
+    /**
+     * Returns the number of CPU cores.
+     * 
+     * @return the number of CPU cores (valid = non-negative)
+     */
+    public default int getNumTpuCores() {
+        return 0;
+    }
+
     /**
      * Returns the case temperature.
      * 
-     * @return case temperature in degrees centigrade (valid = positive)
+     * @return case temperature in degrees centigrade (invalid = minimum float value)
      */
     public float getCaseTemperature();
 
     /**
      * Returns the CPU temperature.
      * 
-     * @return CPU temperature in degrees centigrade (valid = positive)
+     * @return CPU temperature in degrees centigrade (invalid = minimum float value)
      */
     public float getCpuTemperature();
 
