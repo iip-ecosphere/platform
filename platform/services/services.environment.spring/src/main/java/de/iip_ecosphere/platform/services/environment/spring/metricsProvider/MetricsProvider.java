@@ -110,7 +110,7 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
      * @throws IllegalArgumentException if the registry is null
      */
     public MetricsProvider(MeterRegistry registry) {
-        super(registry);
+        super(registry, false);
     }
     
     /**
