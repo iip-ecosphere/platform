@@ -601,6 +601,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         mgtUiRoot.mkdir();
         vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
         vilTemplateProcessor("UiAngularLinux", config, "${target}/mgtUi.sh");
+        FileArtifact f = "${target}/mgtUi.sh";
+        f.setExecutable(false);
         vilTemplateProcessor("UiAngularExpress", config, "${mgtUiRoot}/server.js");
         vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
         maven("${mgtUiRoot}", true);
