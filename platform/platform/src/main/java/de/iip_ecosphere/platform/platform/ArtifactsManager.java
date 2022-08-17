@@ -461,6 +461,7 @@ public class ArtifactsManager {
      * @return the artifact (or <b>null</b> if none was created/added)
      */
     public Artifact artifactCreated(Path path, URI accessUri) {
+        String folder = PlatformSetup.getInstance().getArtifactsFolder().toPath().normalize().toString();
         Artifact result = null;
         if (null != path && path.toFile().exists()) {
             LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file created: {}", path);
@@ -471,8 +472,9 @@ public class ArtifactsManager {
                 if (null == accessUri) {
                     String prefix = PlatformSetup.getInstance().getArtifactsUriPrefix();
                     if (prefix != null && prefix.length() > 0) {
+                        String fPath = makeRelative(folder, path);
                         try {
-                            accessUri = new URI(prefix + path.toString().replace('\\', '/'));
+                            accessUri = new URI(prefix + fPath.replace('\\', '/'));
                         } catch (URISyntaxException e) {
                             LoggerFactory.getLogger(ArtifactsManager.class)
                                 .warn("While creating artifact {}: {}", path, e.getMessage());
@@ -496,6 +498,25 @@ public class ArtifactsManager {
             }
         }
         return result;
+    }
+    
+    /**
+     * Makes {@code file} relative by removing a trailing {@code basePath} and further training 
+     * path separators.
+     * 
+     * @param basePath the base path
+     * @param file the file within base path
+     * @return the relative file, {@code file} if it seems that file is not in {@code basePath}.
+     */
+    private String makeRelative(String basePath, Path file) {
+        String fPath = file.toString();
+        if (fPath.startsWith(basePath)) {
+            fPath = fPath.substring(basePath.length());
+            while (fPath.startsWith("/") || fPath.startsWith("\\")) {
+                fPath = fPath.substring(1);
+            }
+        }
+        return fPath;
     }
     
     /**
