@@ -364,5 +364,33 @@ public class MetricsProviderTest {
             }
         }
     }
+    
+    /**
+     * Tests {@link MetricsProvider#include(String, MeterFilter...)}.
+     */
+    @Test
+    public void testInclude() {
+        assertTrue(MetricsProvider.include("jvm_memory_pool_collection_max_bytes", 
+            MetricsProvider.DEFAULT_METER_FILTERS)); // filters use dot
+        assertFalse(MetricsProvider.include("jvm_memory_pool_collection_max_bytes".replaceAll("_", "."), 
+            MetricsProvider.DEFAULT_METER_FILTERS)); // filters use dot
+    }
+
+    /**
+     * Tests {@link MetricsProvider#append(MeterFilter[], MeterFilter...)}.
+     */
+    @Test
+    public void testAppend() {
+        MeterFilter add = MeterFilter.deny();
+        MeterFilter[] t = MetricsProvider.append(MetricsProvider.DEFAULT_METER_FILTERS, add);
+        assertTrue(t.length == MetricsProvider.DEFAULT_METER_FILTERS.length + 1);
+        for (int i = 0; i < t.length; i++) {
+            assertNotNull(t[i]);
+        }
+        for (int i = 0; i < MetricsProvider.DEFAULT_METER_FILTERS.length; i++) {
+            assertTrue(t[i] == MetricsProvider.DEFAULT_METER_FILTERS[i]);
+        }
+        assertTrue(t[t.length - 1] == add);
+    }
 
 }

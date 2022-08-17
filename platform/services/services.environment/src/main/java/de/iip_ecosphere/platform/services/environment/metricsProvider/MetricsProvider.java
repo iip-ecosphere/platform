@@ -922,9 +922,28 @@ public class MetricsProvider {
      * @return {@code true} for apply, {@code false} else
      */
     public static boolean include(String id, MeterFilter... filters) {
-        return include(new Meter.Id(id, null, null, null, null));
+        return include(new Meter.Id(id, null, null, null, null), filters);
     }
     
+    /**
+     * Appends {@code addition} to {@code base}.
+     * 
+     * @param base the base filters
+     * @param addition the addition filters
+     * @return the combined filter array
+     */
+    public static MeterFilter[] append(MeterFilter[] base, MeterFilter... addition) {
+        MeterFilter[] result = new MeterFilter[base.length + addition.length];
+        int pos = 0;
+        for (int i = 0; i < base.length; i++) {
+            result[pos++] = base[i];
+        }
+        for (int i = 0; i < addition.length; i++) {
+            result[pos++] = addition[i];
+        }
+        return result;
+    }
+
     /**
      * Applies the given list of meter filters.
      * 
