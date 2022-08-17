@@ -17,9 +17,6 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter.Type;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterNameFilter;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterNamePrefixFilter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
@@ -28,6 +25,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
@@ -343,8 +341,8 @@ public class MetricsProviderTest {
             .register(provider.getRegistry());
         MetricsProvider.increaseCounterBy(counter, 1);
         String json = provider.toJson("id0", false,
-            new MeterNamePrefixFilter(Type.INCLUSION, "service.sent"),
-            new MeterNameFilter(Type.EXCLUSION, "services.received"));
+            MeterFilter.acceptNameStartsWith("service.sent"),
+            MeterFilter.denyNameStartsWith("services.received"));
 
         JsonObject obj = Json.createReader(new StringReader(json)).readObject();
         String id = obj.getString("id");

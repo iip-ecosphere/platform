@@ -34,12 +34,13 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.config.MeterFilter;
+import io.micrometer.core.instrument.config.MeterFilterReply;
 import io.micrometer.core.instrument.search.MeterNotFoundException;
 
 import com.sun.management.OperatingSystemMXBean;
 
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 
@@ -67,6 +68,12 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
+    public static final MeterFilter[] DEFAULT_METER_FILTERS = {
+        MeterFilter.denyNameStartsWith("jvm."),
+        MeterFilter.denyNameStartsWith("spring."),
+        MeterFilter.denyNameStartsWith("logback."),
+        MeterFilter.denyNameStartsWith("tomcat.")
+    };
     
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
@@ -836,7 +843,7 @@ public class MetricsProvider {
         }
         sb.append("\"meters\":{");
         boolean first = true;
-        for (Meter meter: MeterFilter.filter(registry.getMeters(), true, filter)) {
+        for (Meter meter: filter(registry.getMeters(), true, filter)) {
             if (!first) {
                 sb.append(",");
             }
@@ -848,6 +855,58 @@ public class MetricsProvider {
         sb.append("}");
         return sb.toString();
     }
+    
+    /**
+     * Filters the given meters according to the specified filters.
+     * 
+     * @param meters the meters to be filtered
+     * @param copy copy the {@code meters} if filters are to be applied or if {@code false} modify meters directly
+     * @param filters the filters to be applied. The first matching filter returning {@link MeterFilterReply#DENY} will 
+     *    remove a metric from the result list, an {@link MeterFilterReply#NEUTRAL} will keep it as long as there is no 
+     *    {@link MeterFilterReply#DENY} filter until the end of the filter list and {@link MeterFilterReply#ACCEPT} will
+     *    immediately accept the actual meter.
+     * @return the filtered metrics list
+     */
+    public static List<Meter> filter(List<Meter> meters, boolean copy, MeterFilter... filters) {
+        List<Meter> result = meters;
+        if (filters.length > 0 && meters.size() > 0) {
+            if (copy) {
+                result = new ArrayList<Meter>(meters);
+            }
+            for (int m = meters.size() - 1; m >= 0; m--) {
+                Meter meter = meters.get(m);
+                boolean keep = true;
+                for (int f = 0; keep && f < filters.length; f++) {
+                    MeterFilterReply reply = filters[f].accept(meter.getId());
+                    if (MeterFilterReply.DENY == reply) {
+                        keep = false; // if filter applies, throw out metric
+                    } else if (MeterFilterReply.ACCEPT == reply) {
+                        keep = true;
+                        break;
+                    } else {
+                        keep = true; // if filter applies, keep metric
+                    }
+                }
+                if (!keep) {
+                    result.remove(m);
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Applies the given list of meter filters.
+     * 
+     * @param registry the registry to apply the filters to
+     * @param filters the filters to apply
+     */
+    public static void apply(MeterRegistry registry, MeterFilter... filters) {
+        for (MeterFilter f: filters) {
+            registry.config().meterFilter(f);
+        }
+    }
+
 
     /**
      * Retrieves a custom gauge as a JSON object.<br>
