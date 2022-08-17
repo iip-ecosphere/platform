@@ -472,9 +472,9 @@ public class ArtifactsManager {
                 if (null == accessUri) {
                     String prefix = PlatformSetup.getInstance().getArtifactsUriPrefix();
                     if (prefix != null && prefix.length() > 0) {
-                        String fPath = makeRelative(folder, path);
+                        String fPath = removeLeadingFileSeps(makeRelative(folder, path));
                         try {
-                            accessUri = new URI(prefix + fPath.replace('\\', '/'));
+                            accessUri = new URI(removeTrailingFileSeps(prefix) + "/" + fPath.replace('\\', '/'));
                         } catch (URISyntaxException e) {
                             LoggerFactory.getLogger(ArtifactsManager.class)
                                 .warn("While creating artifact {}: {}", path, e.getMessage());
@@ -501,8 +501,7 @@ public class ArtifactsManager {
     }
     
     /**
-     * Makes {@code file} relative by removing a trailing {@code basePath} and further training 
-     * path separators.
+     * Makes {@code file} relative by removing a trailing {@code basePath}.
      * 
      * @param basePath the base path
      * @param file the file within base path
@@ -512,13 +511,36 @@ public class ArtifactsManager {
         String fPath = file.toString();
         if (fPath.startsWith(basePath)) {
             fPath = fPath.substring(basePath.length());
-            while (fPath.startsWith("/") || fPath.startsWith("\\")) {
-                fPath = fPath.substring(1);
-            }
         }
         return fPath;
     }
     
+    /**
+     * Removes leading file separators.
+     * 
+     * @param file the file/path name
+     * @return {@code file} without leading separators
+     */
+    private String removeLeadingFileSeps(String file) {
+        while (file.startsWith("/") || file.startsWith("\\")) {
+            file = file.substring(1);
+        }
+        return file;
+    }
+
+    /**
+     * Removes trailing file separators.
+     * 
+     * @param file the file/path name
+     * @return {@code file} without trailing separators
+     */
+    private String removeTrailingFileSeps(String file) {
+        while (file.endsWith("/") || file.endsWith("\\")) {
+            file = file.substring(0, file.length() - 1);
+        }
+        return file;
+    }
+
     /**
      * Tries to create an artifact instance for a ZIP/JAR file.
      * 
