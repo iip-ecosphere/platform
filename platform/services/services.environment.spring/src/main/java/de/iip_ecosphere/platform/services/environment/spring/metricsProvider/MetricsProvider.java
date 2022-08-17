@@ -25,9 +25,6 @@ import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterFilter.Type;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.filter.MeterNamePrefixFilter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
@@ -86,12 +83,6 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
 
     /* By default, the scheduled task runs every 2 seconds */
     private static final String SCHEDULE_RATE = "${metricsprovider.schedulerrate:2000}";
-    private static final MeterFilter[] METER_FILTERS = {
-        new MeterNamePrefixFilter(Type.EXCLUSION, "jvm."),
-        new MeterNamePrefixFilter(Type.EXCLUSION, "spring."),
-        new MeterNamePrefixFilter(Type.EXCLUSION, "logback."),
-        new MeterNamePrefixFilter(Type.EXCLUSION, "tomcat."),
-    };
     
     /* By default, the base unit for the memory metrics is bytes */
     @Value("${metricsprovider.memorybaseunit:bytes}")
@@ -170,7 +161,7 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
         if (null != connector && !connectorFailed) {
             try {
                 connector.asyncSend(MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, 
-                    toJson(id, update, METER_FILTERS));
+                    toJson(id, update, DEFAULT_METER_FILTERS));
             } catch (IOException e) {
                 LoggerFactory.getLogger(MetricsProvider.class).error(
                     "Cannot sent monitoring message: " + e.getMessage());
