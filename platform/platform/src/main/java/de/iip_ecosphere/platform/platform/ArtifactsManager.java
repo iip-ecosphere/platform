@@ -485,7 +485,7 @@ public class ArtifactsManager {
                 if (name.endsWith(".zip") || name.endsWith(".jar")) { // could be a service artifact
                     result = createForZip(path, accessUri);
                 }
-                if (name.endsWith(".yml")) { // could be a container descriptor
+                if (name.endsWith(".yml") || name.endsWith(".yaml")) { // could be a container descriptor
                     result = createForYaml(file, accessUri);
                 }
             }
