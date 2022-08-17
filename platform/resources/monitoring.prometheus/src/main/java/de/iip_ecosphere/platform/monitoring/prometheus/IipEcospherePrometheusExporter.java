@@ -45,7 +45,9 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
 import io.prometheus.client.hotspot.DefaultExports;
-import si.matjazcerkvenik.alertmonitor.web.PrometheusMetricsServlet;
+import si.matjazcerkvenik.alertmonitor.data.DAO;
+import si.matjazcerkvenik.alertmonitor.model.DEvent;
+import si.matjazcerkvenik.alertmonitor.util.AmMetrics;
 
 /**
  * Observes IIP-Ecosphere standard transport channels and feeds the information into Prometheus. [public for testing]
@@ -122,6 +124,65 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         } catch (Exception  e) {
             LoggerFactory.getLogger(getClass()).error("Starting prometheus export endpoint: {}", e.getMessage());
         }
+    }
+
+    /**
+     * The default metrics servlet. Adapted from 
+     * {@link import si.matjazcerkvenik.alertmonitor.web.PrometheusMetricsServlet} as that class is not sufficiently 
+     * configurable/reusable. 
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class PrometheusMetricsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 7153742267407172657L;
+
+        @Override
+        protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+                throws IOException {
+
+            AmMetrics.alertmonitor_active_alerts_count.clear();
+            for (DEvent n : DAO.getInstance().getActiveAlerts().values()) {
+                AmMetrics.alertmonitor_active_alerts_count.labels(n.getAlertname(), n.getSeverity()).inc();
+            }
+            AmMetrics.alertmonitor_alerts_balance_factor.set(DAO.getInstance().calculateAlertsBalanceFactor());
+            AmMetrics.alertmonitor_last_event_timestamp.set(AmMetrics.lastEventTimestamp);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType(TextFormat.CONTENT_TYPE_004);
+
+            Writer writer = resp.getWriter();
+            try {
+                Set<String> included = parse(req);
+                TextFormat.write004(writer, AmMetrics.registry.filteredMetricFamilySamples(
+                    id -> included.contains(id) || MetricsProvider.include(id, MetricsProvider.DEFAULT_METER_FILTERS)));
+                writer.flush();
+            } finally {
+                writer.close();
+            }
+        }
+
+        /**
+         * Parses the names to be included from the servlet request.
+         * 
+         * @param req the request
+         * @return the set of names, may be empty
+         */
+        private Set<String> parse(HttpServletRequest req) {
+            String[] includedParam = req.getParameterValues("name[]");
+            if (includedParam == null) {
+                return Collections.emptySet();
+            } else {
+                return new HashSet<String>(Arrays.asList(includedParam));
+            }
+        }
+
+        @Override
+        protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
+                throws IOException {
+            doGet(req, resp);
+        }
+        
     }
     
     @Override
