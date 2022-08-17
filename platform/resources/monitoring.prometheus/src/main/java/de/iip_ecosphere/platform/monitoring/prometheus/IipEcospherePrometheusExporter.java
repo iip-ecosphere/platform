@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
@@ -58,6 +59,8 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
     public static final String DEFAULT_METRICS_SERVLET_NAME = "metrics";
     public static final String DEFAULT_METRICS_ENDPOINT = "/" + DEFAULT_METRICS_SERVLET_NAME;
+    private static final MeterFilter[] METER_FILTERS = MetricsProvider.append(
+        MetricsProvider.DEFAULT_METER_FILTERS, MeterFilter.denyNameStartsWith("alertmonitor."));
     
     private Tomcat server;
     private Context context;
@@ -155,7 +158,8 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
             try {
                 Set<String> included = parse(req);
                 TextFormat.write004(writer, AmMetrics.registry.filteredMetricFamilySamples(
-                    id -> included.contains(id) || MetricsProvider.include(id, MetricsProvider.DEFAULT_METER_FILTERS)));
+                    id -> included.contains(id) // below: names in scrape format, filter potentially with "."
+                        || MetricsProvider.include(id.replaceAll("_", "."), METER_FILTERS)));
                 writer.flush();
             } finally {
                 writer.close();
