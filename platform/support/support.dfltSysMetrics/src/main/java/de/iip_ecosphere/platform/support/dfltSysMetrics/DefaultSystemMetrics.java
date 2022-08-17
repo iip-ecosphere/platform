@@ -56,7 +56,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
                 }
             }
         }
-        return count == 0 ? 0 : result / count;
+        return count == 0 ? Float.MIN_VALUE : result / count;
     }
     
     @Override
