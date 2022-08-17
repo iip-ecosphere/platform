@@ -35,6 +35,10 @@ export class EnvConfigService {
     }
 
     public getEnv() {
-      return this.env
+      if(!this.env) {
+        return this.load();
+      } else {
+        return this.env;
+      }
     }
 }

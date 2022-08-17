@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources, PlatformServices } from 'src/interfaces';
-import { environment } from 'src/environments/environment';
+import { PlatformResources, platformResponse, PlatformServices } from 'src/interfaces';
 import { firstValueFrom } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -10,21 +9,19 @@ import { EnvConfigService } from './env-config.service';
 })
 export class ApiService {
 
-  ip = environment.ip;
-  urn = environment.urn;
+  ip: string = "";
+  urn: string = "";
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
-    const env = envConfigService.getEnv();
-
+    const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
-    //if theconfig doesnt contain values, then the ip and urn are taken from the environment.ts
     if(env && env.ip) {
       this.ip = env.ip;
     }
     if (env && env.urn) {
       this.urn = env.urn;
     }
-
+    console.log( "ip: " + this.ip)
    }
 
   resources: PlatformResources = {};
@@ -33,6 +30,7 @@ export class ApiService {
 
   public async getResources() {
     this.resources = await this.getData('aas/submodels/resources/submodel') as PlatformResources;
+    console.log(this.resources);
     return this.resources;
   }
 
@@ -84,8 +82,9 @@ export class ApiService {
       basyxFunc = "deployPlan";
     }
     try {
-      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
+      response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
+      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      , {responseType: 'json', reportProgress: true});
     } catch(e) {
       console.log(e);
     }
