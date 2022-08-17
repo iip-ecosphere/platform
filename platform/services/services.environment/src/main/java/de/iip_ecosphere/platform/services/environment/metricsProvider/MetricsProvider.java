@@ -31,6 +31,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
@@ -875,24 +876,53 @@ public class MetricsProvider {
             }
             for (int m = meters.size() - 1; m >= 0; m--) {
                 Meter meter = meters.get(m);
-                boolean keep = true;
-                for (int f = 0; keep && f < filters.length; f++) {
-                    MeterFilterReply reply = filters[f].accept(meter.getId());
-                    if (MeterFilterReply.DENY == reply) {
-                        keep = false; // if filter applies, throw out metric
-                    } else if (MeterFilterReply.ACCEPT == reply) {
-                        keep = true;
-                        break;
-                    } else {
-                        keep = true; // if filter applies, keep metric
-                    }
-                }
-                if (!keep) {
+                boolean include = include(meter.getId(), filters);
+                if (!include) {
                     result.remove(m);
                 }
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns whether a meter id shall be included into a result set.
+     * 
+     * @param id the meter id
+     * @param filters the filters to be applied. The first matching filter returning {@link MeterFilterReply#DENY} will 
+     *    remove a metric from the result list, an {@link MeterFilterReply#NEUTRAL} will keep it as long as there is no 
+     *    {@link MeterFilterReply#DENY} filter until the end of the filter list and {@link MeterFilterReply#ACCEPT} will
+     *    immediately accept the actual meter.
+     * @return {@code true} for apply, {@code false} else
+     */
+    public static boolean include(Id id, MeterFilter... filters) {
+        boolean include = true;
+        for (int f = 0; include && f < filters.length; f++) {
+            MeterFilterReply reply = filters[f].accept(id);
+            if (MeterFilterReply.DENY == reply) {
+                include = false; // if filter applies, throw out metric
+            } else if (MeterFilterReply.ACCEPT == reply) {
+                include = true;
+                break;
+            } else {
+                include = true; // if filter applies, keep metric
+            }
+        }
+        return include;
+    }
+
+    /**
+     * Returns whether a meter id shall be included into a result set.
+     * 
+     * @param id the meter id
+     * @param filters the filters to be applied. The first matching filter returning {@link MeterFilterReply#DENY} will 
+     *    remove a metric from the result list, an {@link MeterFilterReply#NEUTRAL} will keep it as long as there is no 
+     *    {@link MeterFilterReply#DENY} filter until the end of the filter list and {@link MeterFilterReply#ACCEPT} will
+     *    immediately accept the actual meter.
+     * @return {@code true} for apply, {@code false} else
+     */
+    public static boolean include(String id, MeterFilter... filters) {
+        return include(new Meter.Id(id, null, null, null, null));
     }
     
     /**
