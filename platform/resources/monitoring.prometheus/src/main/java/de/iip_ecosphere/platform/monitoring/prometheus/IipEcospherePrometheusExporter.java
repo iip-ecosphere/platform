@@ -35,12 +35,12 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
 import de.iip_ecosphere.platform.monitoring.prometheus.ConfigModifier.ScrapeEndpoint;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
@@ -153,10 +153,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         MyPrometheusMeterRegistry() {
             super(PrometheusConfig.DEFAULT);
             // usual stuff added automatically in a spring environment
-            config().meterFilter(MeterFilter.denyNameStartsWith("jvm"));
-            config().meterFilter(MeterFilter.denyNameStartsWith("spring"));
-            config().meterFilter(MeterFilter.denyNameStartsWith("logback"));
-            config().meterFilter(MeterFilter.denyNameStartsWith("tomcat"));
+            MetricsProvider.apply(this, MetricsProvider.DEFAULT_METER_FILTERS);
         }
         
         /**
