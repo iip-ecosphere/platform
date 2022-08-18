@@ -13,9 +13,12 @@ template UiAngularLinuxSysd(Configuration config, FileArtifact target) {
         
         [Service]
         WorkingDirectory=${instDir}/gen
-        Type=forking
+        Type=simple
         Restart=on-failure
-        ExecStart=mgtUi.sh'
+        ExecStart=mgtUi.sh
+        
+        [Install]
+        WantedBy=multi-user.target'
     }
     
 }
