@@ -2,7 +2,7 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AmqpLinuxSysd(Configuration config, FileArtifact target) {
+template MqttLinuxSysd(Configuration config, FileArtifact target) {
     
     def main(Configuration config, FileArtifact target) {
         IIPEcosphere cfg = config;
@@ -20,10 +20,14 @@ template AmqpLinuxSysd(Configuration config, FileArtifact target) {
         Description=IIP-Ecosphere communication broker (MQTT)
         
         [Service]
-        WorkingDirectory=${instDir}/gen
-        Type=forking
+        WorkingDirectory=${instDir}/gen/broker
+        Type=simple
         Restart=on-failure
-        ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port}'
+        KillMode=control-group
+        ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port}
+        
+        [Install]
+        WantedBy=multi-user.target'
     }
     
 }

@@ -21,18 +21,20 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         
         [Service]
         WorkingDirectory=${instDir}/gen
-        Type=forking
+        Type=simple
         Restart=on-failure
+        KillMode=control-group
         PIDFile=${cfg.pidDir}/${pidFile}
         ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${m}"
-        ${requires(requires)}'
+        
+        [Install]
+        WantedBy=multi-user.target
+        ${requires(requires)|e}'
     }
     
     def requires(String requires) {
         if (requires.length() > 0) {
-            '
-            [Install]
-            Requires=${requires}'
+            'Requires=${requires}'
         }
     }
 	
