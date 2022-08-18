@@ -545,7 +545,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
         maven("${ecsRuntimeRoot}", true);
-        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
+        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
             cfg.containerManager.memLimit)), sysd="${target}/iip-ecs");
         
         serviceMgrRoot.mkdir();
@@ -557,7 +557,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
         maven("${serviceMgrRoot}", true);
-        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service", 
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
 
         ecsServiceMgrRoot.mkdir();
@@ -583,8 +583,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
         maven("${platformRoot}", true);
-        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "", withJava8=false,
-            sysd="${target}/iip-platform");
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
+            withJava8=false, sysd="${target}/iip-platform");
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
 
         // preliminary, as long as BaSyx conflicts with Tomcat
@@ -597,7 +597,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
         maven("${monitoringRoot}", true);
-        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "", 
+        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
             withJava8=false, sysd="${target}/iip-monitoring");
  
         artifactsRoot.mkdir();
@@ -605,7 +605,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
         mgtUiRoot.mkdir();
         vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
-        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service");
+        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service", 
+            requires="iip-platform.service", after="iip-platform.service");
         vilTemplateProcessor("UiAngularLinux", config, "${target}/mgtUi.sh");
         FileArtifact f = "${target}/mgtUi.sh";
         f.setExecutable(false);
@@ -677,9 +678,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
            if (sysd <> "") {
                sName = sysd;
            }
-           vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, addJavaOpts=addJavaOpts);
+           vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, addJavaOpts=addJavaOpts);
            if (withJava8) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
+               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
            }
            if (requires.length() > 0) {
                vilTemplateProcessor("LinuxSysd", config, "${sName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);

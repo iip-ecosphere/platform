@@ -2,14 +2,16 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template UiAngularLinuxSysd(Configuration config, FileArtifact target) {
+template UiAngularLinuxSysd(Configuration config, FileArtifact target, String requires="", String after="") {
 	
-    def main(Configuration config, FileArtifact target) {
+    def main(Configuration config, FileArtifact target, String requires="", String after="") {
         IIPEcosphere cfg = config;
         String instDir = cfg.instDirDflt;
         
         '[Unit]
         Description=IIP-Ecosphere Management Web UI
+        ${after(after)|e}
+        ${requires(requires)|e}
         
         [Service]
         WorkingDirectory=${instDir}/gen
@@ -19,6 +21,18 @@ template UiAngularLinuxSysd(Configuration config, FileArtifact target) {
         
         [Install]
         WantedBy=multi-user.target'
+    }
+
+    def requires(String requires) {
+        if (requires.length() > 0) {
+            'Requires=${requires}'
+        }
+    }
+
+    def after(String after) {
+        if (after.length() > 0) {
+            'After=${after}'
+        }
     }
     
 }

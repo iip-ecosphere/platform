@@ -2,9 +2,9 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true, String addJavaOpts="") {
+template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", String after="", Boolean withModuleOpts=true, String addJavaOpts="") {
 	
-    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", Boolean withModuleOpts=true, String addJavaOpts="") {
+    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", String after="", Boolean withModuleOpts=true, String addJavaOpts="") {
         IIPEcosphere cfg = config;
         String instDir = cfg.instDirDflt;
         String javaExe = cfg.javaExeDflt;
@@ -14,10 +14,12 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         if (isDefined(cfg.javaExe)) {
             javaExe = cfg.javaExe;
         }
-        
-        String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
+
+        // no escaping here, no shell expansion in system.d        
         '[Unit]
         Description=${description}
+        ${after(after)|e}
+        ${requires(requires)|e}
         
         [Service]
         WorkingDirectory=${instDir}/gen
@@ -25,16 +27,21 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         Restart=on-failure
         KillMode=control-group
         PIDFile=${cfg.pidDir}/${pidFile}
-        ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${m}"
+        ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${main}"
         
         [Install]
-        WantedBy=multi-user.target
-        ${requires(requires)|e}'
+        WantedBy=multi-user.target'
     }
     
     def requires(String requires) {
         if (requires.length() > 0) {
             'Requires=${requires}'
+        }
+    }
+
+    def after(String after) {
+        if (after.length() > 0) {
+            'After=${after}'
         }
     }
 	
