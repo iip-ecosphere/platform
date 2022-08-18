@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { from, map } from 'rxjs';
 import  * as environment  from '../../assets/config/config.json';
-
+declare var window: any;
 
 export enum Environment {
   Prod = 'prod',
@@ -27,18 +28,33 @@ export class EnvConfigService {
 
     private env: Configuration | undefined;
 
-    public load(): Configuration {
-      console.log('loading ip');
-      this.env = environment;
-      console.log(environment);
-      return this.env;
+    // public load(): Configuration {
+    //   console.log('loading ip');
+    //   this.env = environment;
+    //   console.log(environment);
+    //   return this.env;
+    // }
+
+    public init() {
+      return from(
+          fetch('../../assets/config/config.json').then(function(response) {
+            return response.json();
+          })
+        ).pipe(
+          map((config) => {
+          window.config = config;
+
+          return
+        })).toPromise();
     }
 
+
     public getEnv() {
-      if(!this.env) {
-        return this.load();
-      } else {
-        return this.env;
-      }
+      return window.config
+      // if(!this.env) {
+      //   return this.load();
+      // } else {
+      //   return this.env;
+      // }
     }
 }

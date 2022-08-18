@@ -1,3 +1,5 @@
+<div *ngIf="errorMsg">{{ errorMsg }}</div>
+<div *ngIf="errorMsg"> Please check CORS and reload the page</div>
 <div *ngIf="Data && Data.submodelElements">
   <div *ngFor="let element of Data.submodelElements">
     <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0">

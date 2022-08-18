@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources, platformResponse, PlatformServices } from 'src/interfaces';
-import { firstValueFrom } from 'rxjs';
+import { PlatformResources, PlatformServices } from 'src/interfaces';
+import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
 @Injectable({
@@ -12,7 +12,12 @@ export class ApiService {
   ip: string = "";
   urn: string = "";
 
+  errorMsg : any;
+
+  errorEmitter: Subject<HttpErrorResponse>;
+
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
+    this.errorEmitter = new Subject();
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
@@ -51,6 +56,7 @@ export class ApiService {
       Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
     } catch(e) {
       console.log(e);
+      this.errorEmitter.next(e as HttpErrorResponse);
     }
     return Data;
   }

@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
 
@@ -11,9 +12,16 @@ import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/i
 })
 export class ResourcesComponent implements OnInit {
 
-  constructor(public http: HttpClient, public api: ApiService, public router: Router) { }
-
   Data: PlatformResources = {};
+
+  errorSub: Subscription;
+  errorMsg: string | undefined;
+
+  constructor(public http: HttpClient, public api: ApiService, public router: Router) {
+    this.errorSub = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
+  }
+
+
 
   ngOnInit(): void {
     this.getData();
@@ -21,6 +29,7 @@ export class ResourcesComponent implements OnInit {
 
   public async getData() {
     this.Data = await this.api.getResources();
+    console.log(this.Data);
   }
 
   public isArray(value: any) {

@@ -62,7 +62,7 @@ import { DeploymentPlansComponent } from './components/deployment-plans/deployme
     },
     {
     provide: APP_INITIALIZER,
-    useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.load(),
+    useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.init(),
     deps: [EnvConfigService],
     multi: true,
 
