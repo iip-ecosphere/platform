@@ -1,0 +1,29 @@
+import JavaOsBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template AmqpLinuxSysd(Configuration config, FileArtifact target) {
+    
+    def main(Configuration config, FileArtifact target) {
+        IIPEcosphere cfg = config;
+        Integer port = cfg.transportProtocol.port;
+        String instDir = cfg.instDirDflt;
+        String javaExe = cfg.javaExeDflt;
+        if (isDefined(cfg.instDir)) {
+            instDir = cfg.instDir;
+        }
+        if (isDefined(cfg.javaExe)) {
+            javaExe = cfg.javaExe;
+        }
+        
+        '[Unit]
+        Description=IIP-Ecosphere communication broker (MQTT)
+        
+        [Service]
+        WorkingDirectory=${instDir}/gen
+        Type=forking
+        Restart=on-failure
+        ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port}'
+    }
+    
+}

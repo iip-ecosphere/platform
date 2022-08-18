@@ -619,6 +619,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
         vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml");
+        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/broker.service");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
         FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
@@ -639,6 +640,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     generateBrokerScriptsHiveMq(Configuration config) = {
         vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml");
+        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/broker.service");
         vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh");
         FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
