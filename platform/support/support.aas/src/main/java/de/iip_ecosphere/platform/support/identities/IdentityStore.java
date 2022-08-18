@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.util.Optional;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
@@ -81,5 +84,32 @@ public abstract class IdentityStore {
      * @throws IOException if creating/reading/opening a specified keystore fails
      */
     public abstract KeyStore getKeystoreFile(String identity, String... fallback) throws IOException;
+ 
+    /**
+     * Returns the key manager(s) for an identity key using a specific key manager factory algorithm.
+     * 
+     * @param identity the identity (key) to return the key manager(s) for
+     * @param algorithm the key manager factory algorithm (see {@link KeyManagerFactory}).
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the key manager(s), <b>null</b> if none was found
+     * @throws IOException if creating/reading/opening a specified key manager fails
+     */
+    public abstract KeyManager[] getKeyManagers(String identity, String algorithm, String... fallback) 
+        throws IOException;
+
+    /**
+     * Returns the key manager(s) for an identity key with the (see {@link KeyManagerFactory#getAlgorithm()} default 
+     * key manager factory algorithm).
+     * 
+     * @param identity the identity (key) to return the key manager(s) for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the key manager(s), <b>null</b> if none was found
+     * @throws IOException if creating/reading/opening a specified key manager fails
+     */
+    public KeyManager[] getKeyManagers(String identity, String... fallback) throws IOException {
+        return getKeyManagers(identity, KeyManagerFactory.getDefaultAlgorithm(), fallback);
+    }
     
 }

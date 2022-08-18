@@ -81,12 +81,36 @@ public class SemanticIdResolverTest {
         }
         
     }
+ 
+    /**
+     * We just need an unknown type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static final class MyResolver2 extends SemanticIdResolver {
+
+        @Override
+        public SemanticIdResolutionResult resolveSemanticId(String semanticId) {
+            return null;
+        }
+
+        @Override
+        public boolean isResponsible(String semanticId) {
+            return false;
+        }
+        
+    }
     
     /**
      * Tests the resolver.
      */
     @Test
     public void testResolver() {
+        // shall be there via JSL
+        Assert.assertTrue(SemanticIdResolver.hasResolver(MyResolver.class));
+        // no JSL descriptor, shall not be there
+        Assert.assertFalse(SemanticIdResolver.hasResolver(MyResolver2.class));
+        
         // responsible, not found
         SemanticIdResolutionResult res = SemanticIdResolver.resolve("myId:abcs");
         Assert.assertNull(res); 

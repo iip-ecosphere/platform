@@ -21,7 +21,11 @@ import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +130,24 @@ public class YamlIdentityStore extends IdentityStore {
         }
         return info;
     }
+    
+    /**
+     * Resolves the requested {@link IdentityInformation} and logs if none was found.
+     * 
+     * @param identity the identity (key) to return the information instance for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the identity information or <b>null</b>
+     */
+    private IdentityInformation resolveWithLogging(String identity, String... fallback) {
+        IdentityInformation info = resolve(identity, fallback);
+        if (null == info) {
+            LoggerFactory.getLogger(getClass()).warn(
+                "No identity information found for {} (with fallbacks {})", 
+                    identity, fallback);
+        }
+        return info;
+    }
 
     @Override
     public IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback) {
@@ -165,7 +187,7 @@ public class YamlIdentityStore extends IdentityStore {
     @Override
     public KeyStore getKeystoreFile(String identity, String... fallback) throws IOException {
         KeyStore result = null;
-        IdentityInformation info = resolve(identity, fallback);
+        IdentityInformation info = resolveWithLogging(identity, fallback);
         if (null != info) {
             if (TokenType.USERNAME != info.getType() && null != info.getTokenData()) {
                 LoggerFactory.getLogger(getClass()).warn(
@@ -202,12 +224,28 @@ public class YamlIdentityStore extends IdentityStore {
                     throw new IOException(e);
                 }
             }                
-        }  else {
-            LoggerFactory.getLogger(getClass()).warn(
-                "No identity information found for {} (with fallbacks {})", 
-                    identity, fallback);
-        }
+        } 
         return result;
     }
+
+    @Override
+    public KeyManager[] getKeyManagers(String identity, String algorithm, String... fallback) throws IOException {
+        KeyManager[] result = null;
+        IdentityInformation info = resolveWithLogging(identity, fallback);
+        if (null != info) {
+            KeyStore ks = getKeystoreFile(identity, fallback);
+            if (null != ks) {
+                try {
+                    KeyManagerFactory factory = KeyManagerFactory.getInstance(algorithm);
+                    factory.init(ks, info.getTokenData().toCharArray());
+                    result = factory.getKeyManagers();
+                } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
+                    throw new IOException(e);
+                }
+            }
+        } 
+        return result;
+    }
+
 
 }

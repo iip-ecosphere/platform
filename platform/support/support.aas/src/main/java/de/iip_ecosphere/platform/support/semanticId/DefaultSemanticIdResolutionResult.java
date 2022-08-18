@@ -161,7 +161,7 @@ public class DefaultSemanticIdResolutionResult implements SemanticIdResolutionRe
     }
 
     /**
-     * Changes the naming. [snakeyaml]
+     * Changes the naming by conversion. [snakeyaml]
      * 
      * @param naming the new naming
      */
@@ -180,6 +180,15 @@ public class DefaultSemanticIdResolutionResult implements SemanticIdResolutionRe
             }
         }
         this.naming = Collections.unmodifiableMap(this.naming);
+    }
+    
+    /**
+     * Changes the naming by replacement.
+     * 
+     * @param naming the new naming
+     */
+    public void setNamingTyped(Map<String, DefaultNaming> naming) {
+        this.naming = naming;
     }
 
     /**

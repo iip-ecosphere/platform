@@ -65,6 +65,22 @@ public abstract class SemanticIdResolver {
      */
     public static SemanticIdResolutionResult resolve(String semanticId) {
         SemanticIdResolutionResult result = null;
+        initialize();
+        for (SemanticIdResolver resolver : resolvers) {
+            if (resolver.isResponsible(semanticId)) {
+                result = resolver.resolveSemanticId(semanticId);
+                if (result != null) {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Lazy initialization of the resolvers.
+     */
+    private static void initialize() {
         if (null == resolvers) {
             resolvers = new ArrayList<>();
             ServiceLoader<SemanticIdResolverDescriptor> loader = ServiceLoader.load(SemanticIdResolverDescriptor.class);
@@ -75,12 +91,21 @@ public abstract class SemanticIdResolver {
                     resolver.getName());
             });
         }
+    }
+    
+    /**
+     * Returns whether the given resolver class is known.
+     * 
+     * @param cls the class to look for
+     * @return {@code true} if {@code cls} is known, {@code false} else
+     */
+    public static boolean hasResolver(Class<? extends SemanticIdResolver> cls) {
+        boolean result = false;
+        initialize();
         for (SemanticIdResolver resolver : resolvers) {
-            if (resolver.isResponsible(semanticId)) {
-                result = resolver.resolveSemanticId(semanticId);
-                if (result != null) {
-                    break;
-                }
+            if (cls.isInstance(resolver)) {
+                result = true;
+                break;
             }
         }
         return result;
