@@ -39,7 +39,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
     
     @Override
     public float getCaseTemperature() {
-        return Float.MIN_VALUE; // we don't know
+        return INVALID_CELSIUS_TEMPERATURE; // we don't know
     }
 
     @Override
@@ -56,7 +56,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
                 }
             }
         }
-        return count == 0 ? Float.MIN_VALUE : result / count;
+        return count == 0 ? INVALID_CELSIUS_TEMPERATURE : result / count;
     }
     
     @Override

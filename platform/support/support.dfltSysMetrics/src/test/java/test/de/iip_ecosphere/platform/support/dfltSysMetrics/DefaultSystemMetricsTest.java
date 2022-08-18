@@ -41,8 +41,13 @@ public class DefaultSystemMetricsTest {
         Assert.assertTrue(gpuNum >= 0); // does not make much sense, but is optional
         System.out.println("#GPU: " + gpuNum); 
 
+        int tpuNum = m.getNumTpuCores();
+        Assert.assertTrue(tpuNum >= 0); // does not make much sense, but is optional
+        System.out.println("#TPU: " + tpuNum); 
+
         float cpuTemp = m.getCpuTemperature();
-        Assert.assertTrue(cpuTemp >= 0); // shall be the case, but only if executed in admin mode
+        // shall be the case, but only if executed in admin mode
+        Assert.assertTrue(cpuTemp >= SystemMetrics.INVALID_CELSIUS_TEMPERATURE); 
         System.out.println("temp CPU: " + cpuTemp); 
 
         System.out.println("temp case: " + m.getCaseTemperature()); // not implemented here
