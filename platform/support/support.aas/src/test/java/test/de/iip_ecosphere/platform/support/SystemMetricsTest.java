@@ -61,4 +61,16 @@ public class SystemMetricsTest {
         System.out.println("#CPU: " + cpuNum);        
     }
     
+    /**
+     * Tests invalid values.
+     */
+    @Test
+    public void testInvalid() {
+        Assert.assertTrue(SystemMetrics.isCelsiusTemperatureValid(0));
+        Assert.assertTrue(SystemMetrics.isCelsiusTemperatureValid(-10));
+        Assert.assertTrue(SystemMetrics.isCelsiusTemperatureValid(25));
+        Assert.assertTrue(SystemMetrics.isCelsiusTemperatureValid(-273));
+        Assert.assertFalse(SystemMetrics.isCelsiusTemperatureValid(SystemMetrics.INVALID_CELSIUS_TEMPERATURE));
+    }
+    
 }

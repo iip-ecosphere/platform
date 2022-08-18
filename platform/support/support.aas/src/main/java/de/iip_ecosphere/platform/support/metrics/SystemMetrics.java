@@ -21,6 +21,18 @@ import de.iip_ecosphere.platform.support.OsUtils;
  */
 public interface SystemMetrics {
 
+    public static final float INVALID_CELSIUS_TEMPERATURE = -274;
+    
+    /**
+     * Returns whether a temperature can be considered valid.
+     * 
+     * @param value the value to be tested
+     * @return {@code true} for valid, {@code false} for invalid
+     */
+    public static boolean isCelsiusTemperatureValid(float value) {
+        return value > INVALID_CELSIUS_TEMPERATURE;
+    }
+    
     /**
      * Returns the operating system name.
      * 
@@ -67,14 +79,14 @@ public interface SystemMetrics {
     /**
      * Returns the case temperature.
      * 
-     * @return case temperature in degrees centigrade (invalid = minimum float value)
+     * @return case temperature in degrees centigrade (invalid = {@link #INVALID_CELSIUS_TEMPERATURE})
      */
     public float getCaseTemperature();
 
     /**
      * Returns the CPU temperature.
      * 
-     * @return CPU temperature in degrees centigrade (invalid = minimum float value)
+     * @return CPU temperature in degrees centigrade (invalid = {@link #INVALID_CELSIUS_TEMPERATURE})
      */
     public float getCpuTemperature();
 

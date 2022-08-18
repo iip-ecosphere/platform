@@ -29,12 +29,12 @@ public class DefaultSystemMetrics implements SystemMetrics {
 
     @Override
     public float getCaseTemperature() {
-        return Float.MIN_VALUE; // we don't know
+        return INVALID_CELSIUS_TEMPERATURE; // we don't know
     }
 
     @Override
     public float getCpuTemperature() {
-        return Float.MIN_VALUE; // we don't know
+        return INVALID_CELSIUS_TEMPERATURE; // we don't know
     }
     
     @Override
