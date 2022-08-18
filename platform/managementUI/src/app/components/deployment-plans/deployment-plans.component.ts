@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
-import { outputArgument, PlatformResources, platformResponse, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
+import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -10,21 +11,30 @@ import { outputArgument, PlatformResources, platformResponse, ResourceSubmodelEl
 })
 export class DeploymentPlansComponent implements OnInit {
 
-  constructor(public api: ApiService) { }
-
-  async ngOnInit() {
-    await this.getArtifacts();
-  }
-
   artifacts: PlatformResources = {};
   deploymentPlans: ResourceSubmodelElement | undefined = {};
   selected: ResourceSubmodelElement | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
-  message: string = '';
 
-  subscription: Subscription | undefined;
-  deployResponse: platformResponse | undefined;
+  //subscription: Subscription | undefined;
+  //deployResponse: platformResponse | undefined;
+
+  messageSub: Subscription;
+  status = {
+    executionState: "",
+    messages: [""]
+  }
+
+  constructor(public api: ApiService, private deployer: PlanDeployerService) {
+    this.messageSub = this.deployer.emitter.subscribe((status: { executionState: string,messages: string[]}) => {this.status = status});
+  }
+
+  async ngOnInit() {
+    await this.getArtifacts();
+  }
+
+
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
@@ -46,37 +56,37 @@ export class DeploymentPlansComponent implements OnInit {
        if (value) {
         params[0].value.value = value.value;
        }
-      const response = await this.api.deployPlan(params);
+      const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
       console.log(response);
-      this.subscription = response?.subscribe((dep: platformResponse) => {this.updateMessage(dep)});
+      //this.subscription = response?.subscribe((dep: platformResponse) => {this.updateMessage(dep)});
 
       //this.openSnackbar(response.outputArguments);
 
     }
 
   }
-  private updateMessage(dep: platformResponse) {
-    this.deployResponse = dep;
-    this.openSnackbar(dep.outputArguments);
-  }
+  // private updateMessage(dep: platformResponse) {
+  //   this.deployResponse = dep;
+  //   this.openSnackbar(dep.outputArguments);
+  //   console.log(dep)  }
 
-  private openSnackbar(output: outputArgument[]) {
-    try {
-      let message = '';
-      if(output[0].value) {
-        //this.bar.openSnackbar(output[0].value.value);
-        for(let bit of output) {
-          message = message.concat(bit.value.value);
-          message = message.concat('  ')
-        }
-      }
-      this.message = message;
-    } catch(e) {
-      console.log(e);
-    }
+  // private openSnackbar(output: outputArgument[]) {
+  //   try {
+  //     let message = '';
+  //     if(output[0].value) {
+  //       //this.bar.openSnackbar(output[0].value.value);
+  //       for(let bit of output) {
+  //         message = message.concat(bit.value.value);
+  //         message = message.concat('  ')
+  //       }
+  //     }
+  //     this.message = message;
+  //   } catch(e) {
+  //     console.log(e);
+  //   }
 
-  }
+  // }
 
   public async undeploy() {
     if(this.selected && this.selected.value) {
@@ -85,7 +95,7 @@ export class DeploymentPlansComponent implements OnInit {
        if (value) {
         params[0].value.value = value.value;
        }
-      const response = this.api.deployPlan(params, true);
+      const response = this.deployer.deployPlan(params, true);
       this.selected = undefined;
       console.log(response);
     }

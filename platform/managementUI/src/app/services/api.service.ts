@@ -73,22 +73,5 @@ export class ApiService {
     return this.resources.submodelElements?.find(resource => resource.idShort === id);
   }
 
-  public async deployPlan(params: any, undeploy?: boolean) {
-    let response
-    let basyxFunc;
-    if (undeploy) {
-      basyxFunc = "undeployPlan";
-    } else {
-      basyxFunc = "deployPlan";
-    }
-    try {
-      response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
-      , {responseType: 'json', reportProgress: true});
-    } catch(e) {
-      console.log(e);
-    }
-    return response;
-  }
 
 }
