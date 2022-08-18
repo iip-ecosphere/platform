@@ -600,6 +600,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
         mgtUiRoot.mkdir();
         vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
+        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/mgtUi.service");
         vilTemplateProcessor("UiAngularLinux", config, "${target}/mgtUi.sh");
         FileArtifact f = "${target}/mgtUi.sh";
         f.setExecutable(false);

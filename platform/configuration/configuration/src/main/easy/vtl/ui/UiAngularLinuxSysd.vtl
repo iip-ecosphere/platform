@@ -1,0 +1,21 @@
+import JavaOsBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularLinuxSysd(Configuration config, FileArtifact target) {
+	
+    def main(Configuration config, FileArtifact target) {
+        IIPEcosphere cfg = config;
+        String instDir = cfg.instDirDflt;
+        
+        '[Unit]
+        Description=IIP-Ecosphere Management Web UI
+        
+        [Service]
+        WorkingDirectory=${instDir}/gen
+        Type=forking
+        Restart=on-failure
+        ExecStart=mgtUi.sh'
+    }
+    
+}
