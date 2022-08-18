@@ -81,7 +81,7 @@ public class AlertManagerImporter {
 
         @Override
         public void run() {
-            logger.debug("PSYNC: === starting periodic synchronization ===");
+            //logger.debug("PSYNC: === starting periodic synchronization ===");
             AmMetrics.lastPsyncTimestamp = System.currentTimeMillis();
 
             try {
@@ -158,7 +158,7 @@ public class AlertManagerImporter {
                 //logger.error("PSYNC: failed to synchronize alarms; root cause: " + e.getMessage());
             }
 
-            logger.debug("PSYNC: === Periodic synchronization complete ===");
+            //logger.debug("PSYNC: === Periodic synchronization complete ===");
         }
         
         // checkstyle: resume exception type check
