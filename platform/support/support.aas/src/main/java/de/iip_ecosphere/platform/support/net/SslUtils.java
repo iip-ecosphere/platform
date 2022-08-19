@@ -40,6 +40,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+
 /**
  * Some basic SSL helper methods.
  * 
@@ -111,7 +113,7 @@ public class SslUtils {
             try {
                 String keystoreType = getKeystoreType(store);
                 tks = KeyStore.getInstance(keystoreType);
-                InputStream stream = SslUtils.class.getClassLoader().getResourceAsStream(store.toString());
+                InputStream stream = ResourceLoader.getResourceAsStream(store.toString());
                 if (null == stream) {
                     stream = new FileInputStream(store);    
                 }
