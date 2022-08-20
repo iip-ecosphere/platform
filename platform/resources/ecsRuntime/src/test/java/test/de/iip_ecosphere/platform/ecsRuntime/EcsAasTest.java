@@ -56,7 +56,6 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
-import test.de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProviderTest;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
