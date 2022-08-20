@@ -14,13 +14,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed.
+ * Defines the tests to be executed. Jenkins has problems with TLS tests, jacoco, ... This test suite is 
+ * for local execution.
  * 
  * @author Holger Eichelberger, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    OpcUaConnectorTest.class
+    OpcUaConnectorTest.class,
+    OpcUaTlsConnectorTest.class
 })
-public class AllTests {
+public class AllLocalTests {
 }
