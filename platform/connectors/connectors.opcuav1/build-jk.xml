@@ -7,7 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="package">
+            <arg value="-Djacoco.skip=true"/>
+	    </maven>
 		<mvnDeployResolveArtifact folderName="IIP-connectors-opcua" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.opcuav1-*.*.*.jar" />
 	</target>
 </project>
