@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -51,6 +52,7 @@ public class Transport {
     private static TransportInstance globalTransport = new TransportInstance();
     private static TransportInstance localTransport = globalTransport;
     private static Set<String> globalRoutingKeys = new HashSet<>();
+    private static final boolean DEBUG = false; // for now, the "traditional" non-logging way
     
     /**
      * An instance of the transport.
@@ -416,6 +418,10 @@ public class Transport {
      */
     public static void send(IOConsumer<TransportConnector> sender, String kind, String... routingKeys) {
         if (globalTransport == localTransport) {
+            if (DEBUG) {
+                System.out.println("SEND1-global " + kind + " " + Arrays.toString(routingKeys) + " " 
+                    + getHostSafe(globalTransport));
+            }
             globalTransport.send(sender, kind);
         } else {
             boolean global = false;
@@ -432,9 +438,17 @@ public class Transport {
                 }
             }
             if (global) {
+                if (DEBUG) {
+                    System.out.println("SEND2-global " + kind + " " + Arrays.toString(routingKeys) + " "
+                        + getHostSafe(globalTransport));
+                }
                 globalTransport.send(sender, kind);
             }
             if (local) {
+                if (DEBUG) {
+                    System.out.println("SEND3-local " + kind + " " + Arrays.toString(routingKeys) + " " 
+                        + getHostSafe(globalTransport));            
+                }
                 localTransport.send(sender, kind);
             }
         }
@@ -451,19 +465,53 @@ public class Transport {
     public static TransportConnector createConnector(String routingKey) {
         TransportInstance result;
         if (globalTransport == localTransport) {
+            if (DEBUG) {
+                System.out.println("CREATE-CONN1-global " + routingKey + " " + getHostSafe(globalTransport));
+            }
             result = globalTransport;
         } else {
             if (null == routingKey || routingKey.length() == 0) {
+                if (DEBUG) {
+                    System.out.println("CREATE-CONN2-global "  + routingKey + " " + getHostSafe(globalTransport));
+                }
                 result = globalTransport;
             } else {
                 if (globalRoutingKeys.contains(routingKey)) {
+                    if (DEBUG) {
+                        System.out.println("CREATE-CONN3-global " + routingKey + " " + getHostSafe(globalTransport));
+                    }
                     result = globalTransport;
                 } else {
+                    if (DEBUG) {
+                        System.out.println("CREATE-CONN4-local " + routingKey + " " + getHostSafe(localTransport));
+                    }
                     result = localTransport;
                 }
             }
         }
         return result.createConnector();
+    }
+    
+    /**
+     * Returns the target host/port of the given transport {@code instance}. [DEBUGGING]
+     * 
+     * @param instance the instance
+     * @return the host name/port or information which part is currently not initialized
+     */
+    private static final String getHostSafe(TransportInstance instance) {
+        String result;
+        Supplier<TransportSetup> supplier = instance.transportSupplier;
+        if (null != supplier) {
+            TransportSetup setup = supplier.get();
+            if (null != setup) {
+                result = setup.getHost() + ":" + setup.getPort();
+            } else {
+                result = "<no setup>";
+            }
+        } else {
+            result = "<no supplier>";
+        }
+        return result;
     }
 
     /**
@@ -473,10 +521,13 @@ public class Transport {
      */
     public static void addGlobalRoutingKey(String routingKey) {
         if (null != routingKey && routingKey.length() > 0) {
+            if (DEBUG) {
+                System.out.println("ADD-GLOBAL-KEY " + routingKey);            
+            }
             globalRoutingKeys.add(routingKey);
         }
     }
-
+    
     /**
      * Defines a (global, local) trace filter.
      * 

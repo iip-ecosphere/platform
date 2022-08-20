@@ -58,4 +58,21 @@
      <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <testResources>
+        <testResource>
+            <!-- transport-tests is intended as basis for other tests - dangerous - may lead to inclusion
+                of test identity store even in apps -->
+            <directory>src/test/resources</directory>
+            <excludes>
+                <exclude>identityStore.yml</exclude>
+                <exclude>keystore.jks</exclude>
+                <exclude>test.yml</exclude>
+            </excludes>
+            <filtering>false</filtering>
+        </testResource>
+    </testResources>
+ </build>
+  
 </project>

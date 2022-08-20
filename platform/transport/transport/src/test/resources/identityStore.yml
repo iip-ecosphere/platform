@@ -1,3 +1,4 @@
+name: Test/Transport
 identities:
     "amqp": 
         type: USERNAME
