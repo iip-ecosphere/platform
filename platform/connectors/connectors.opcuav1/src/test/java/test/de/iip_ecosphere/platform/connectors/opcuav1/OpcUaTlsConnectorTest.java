@@ -29,10 +29,10 @@ import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class OpcUaConnectorTest extends AbstractOpcUaConnectorTest {
+public class OpcUaTlsConnectorTest extends AbstractOpcUaConnectorTest {
     
     private static TestServer testServer;
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnectorTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaTlsConnectorTest.class);
     
     /**
      * Sets the test up by starting an embedded OPC UA server.
@@ -42,7 +42,7 @@ public class OpcUaConnectorTest extends AbstractOpcUaConnectorTest {
      */
     @BeforeClass
     public static void init() throws ExecutionException, InterruptedException {
-        setSetup(new NoSecuritySetup("milo", NetUtils.getEphemeralPort(), NetUtils.getEphemeralPort()));
+        setSetup(new SecureSetup("milo", NetUtils.getEphemeralPort(), NetUtils.getEphemeralPort()));
         testServer = new TestServer((server) -> new Namespace(server), getSetup());
         testServer.startup().get();
         LOGGER.info("OPC UA server started");

@@ -69,7 +69,7 @@ class ServerKeystoreLoader {
     
             File serverKeyStore = baseDir.toPath().resolve("example-server.pfx").toFile();
     
-            logger.info("Loading KeyStore at {}", serverKeyStore);
+            logger.info("Creating RSA 2048 KeyStore at {}", serverKeyStore);
     
             if (!serverKeyStore.exists()) {
                 keyStore.load(null, PASSWORD);

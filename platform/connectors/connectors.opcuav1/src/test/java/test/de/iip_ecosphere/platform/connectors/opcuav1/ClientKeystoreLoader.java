@@ -62,7 +62,6 @@ class ClientKeystoreLoader {
     ClientKeystoreLoader load(File baseDir) throws ExecutionException {
         try {
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
-    
             Path serverKeyStore = baseDir.toPath().resolve("example-client.pfx");
     
             logger.info("Loading KeyStore at {}", serverKeyStore);

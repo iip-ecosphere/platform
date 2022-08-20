@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    OpcUaConnectorTest.class
+    OpcUaConnectorTest.class,
+    OpcUaTlsConnectorTest.class
 })
 public class AllTests {
 }
