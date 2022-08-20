@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
  */
 public class YamlIdentityFile {
     
+    private String name = "<undefined>";
     private Map<String, IdentityInformation> identities = new HashMap<>();
 
     /**
@@ -245,6 +246,15 @@ public class YamlIdentityFile {
     public IdentityInformation getData(String key) {
         return identities.get(key);
     }
+    
+    /**
+     * Returns the name of the identity store.
+     * 
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * Returns the identities. [snakeyaml]
@@ -253,6 +263,15 @@ public class YamlIdentityFile {
      */
     public void setIdentities(Map<String, IdentityInformation> data) {
         this.identities = data;
+    }
+
+    /**
+     * Changes the name of the identity store. [snakeyaml]
+     * 
+     * @param name the name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

@@ -63,6 +63,7 @@ public class YamlIdentityStore extends IdentityStore {
      */
     public YamlIdentityStore() {
         data = YamlIdentityFile.load(resolve("identityStore.yml")); // can cope with null
+        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore {}", data.getName());
     }
     
     /**
@@ -143,8 +144,8 @@ public class YamlIdentityStore extends IdentityStore {
         IdentityInformation info = resolve(identity, fallback);
         if (null == info) {
             LoggerFactory.getLogger(getClass()).warn(
-                "No identity information found for {} (with fallbacks {})", 
-                    identity, fallback);
+                "No identity information found for {} in store {} (with fallbacks {})", 
+                    identity, data.getName(), fallback);
         }
         return info;
     }
@@ -178,8 +179,8 @@ public class YamlIdentityStore extends IdentityStore {
             result = builder.build();
         } else {
             LoggerFactory.getLogger(getClass()).warn(
-                "No identity information found for {} (with fallbacks {}). Using anonymous token: {}", 
-                identity, fallback, defltAnonymous);
+                "No identity information found for {} (with fallbacks {}) in store {}. Using anonymous token: {}", 
+                identity, fallback, data.getName(), defltAnonymous);
         }
         return result;
     }
