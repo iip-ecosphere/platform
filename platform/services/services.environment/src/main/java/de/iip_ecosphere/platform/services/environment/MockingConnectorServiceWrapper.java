@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
@@ -118,6 +119,17 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private void startData(Supplier<Boolean> continueFunction) throws IOException {
         LoggerFactory.getLogger(getClass()).info("Starting data with resource: {}", fileName);
         ConnectorParameter param = connParamSupplier.get();
+        // output as debugging support
+        IdentityToken tok = param.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
+        if (null != tok) {
+            LoggerFactory.getLogger(getClass()).info("Hint: AnyEndpoint has id token: {} with token data {}", 
+                tok.getType(), tok.getTokenData() != null && tok.getTokenData().length > 0);
+        }
+        if (null != param.getKeystore()) {
+            LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS: {} with password {}", param.getKeystore(), 
+                param.getKeystorePassword() != null && param.getKeystorePassword().length() > 0);
+        }
+        // setup mock output
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
         DataMapper.mapJsonData(getDataStream(fileName), connectorOutType, d -> {
             if (callback != null) {
