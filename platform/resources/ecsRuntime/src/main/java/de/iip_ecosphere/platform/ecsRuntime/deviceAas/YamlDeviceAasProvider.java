@@ -136,6 +136,7 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
                 try {
                     Registry reg = factory.obtainRegistry(AasPartRegistry.getSetup().getRegistryEndpoint());
                     aasAddress = reg.getEndpoint(aas);
+                    LoggerFactory.getLogger(getClass()).info("Device AAS address for {}/{}: {}", id, urn, aasAddress);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Obtaining factory/endpoint: {}", e.getMessage());
                 }
