@@ -1183,6 +1183,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         }
         String implements = "";
         ServiceBase impl = elt.impl;
+        String serviceId = impl.id.toIdentifier();
         mainClsName = getClsName(elt);
         String constructorParams = "";
         String constructorInit = "";
@@ -1242,6 +1243,8 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         ${genClassAnnotations(elt)|e}
         public class ${mainClsName} extends SpringAsyncServiceBase${implements} {
         
+            @Value("\\${iip.service.${serviceId}:true}")
+            private String activated;
             @Autowired
             private StreamBridge streamBridge;
             ${generateServiceAttribute(elt, impl)}
@@ -1269,9 +1272,12 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
              */
             ${nodeAnnotation("@PostConstruct")|e}
             public void initService() {
-                ${registerService(elt, impl)}
-                ${initIngestors(elt, impl)}
-                ${attachIngestors(elt, impl)}
+                if (null == activated || "".equals(activated) || "true".equals(activated)) {
+                    LoggerFactory.getLogger(getClass()).info("Initializing service ${serviceId}: {}", activated);
+                    ${registerService(elt, impl)}
+                    ${initIngestors(elt, impl)}
+                    ${attachIngestors(elt, impl)}
+                }
             }
             ${generateAdapterTranslators(elt)}
             ${generateReceptionCallback(elt)}
