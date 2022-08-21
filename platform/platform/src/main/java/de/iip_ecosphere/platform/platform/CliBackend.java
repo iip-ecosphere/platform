@@ -362,7 +362,7 @@ class CliBackend {
         private String getMessagePrefix(boolean withOptions) {
             String result = "On " + resourceId + " starting " + Arrays.toString(serviceIds);
             if (withOptions) {
-                result += "with options " + options;
+                result += " with options " + options;
             }
             return result;
         }
