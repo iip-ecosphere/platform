@@ -126,4 +126,14 @@ public class NetUtilsTest {
         sr.stop();
     }
     
+    /**
+     * Tests {@link NetUtils#isOwnAddress(String)}.
+     */
+    @Test
+    public void testIsOwnAddress() {
+        Assert.assertTrue(NetUtils.isOwnAddress(ServerAddress.LOCALHOST));
+        Assert.assertTrue(NetUtils.isOwnAddress("127.0.0.1"));
+        Assert.assertFalse(NetUtils.isOwnAddress("192.168.2.255")); // broadcast
+    }
+    
 }
