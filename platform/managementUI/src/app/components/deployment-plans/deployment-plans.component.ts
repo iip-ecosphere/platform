@@ -28,6 +28,7 @@ export class DeploymentPlansComponent implements OnInit {
 
   constructor(public api: ApiService, private deployer: PlanDeployerService) {
     this.messageSub = this.deployer.emitter.subscribe((status: { executionState: string,messages: string[]}) => {this.status = status});
+  
   }
 
   async ngOnInit() {
