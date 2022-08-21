@@ -64,6 +64,8 @@ public class ServiceDeploymentPlanTest {
         Assert.assertTrue(plan.getEnsembles().size() == 2);
         Assert.assertNull(plan.getEnsembles().get("Start"));
         Assert.assertEquals("End", plan.getEnsembles().get("AI"));
+        
+        Assert.assertFalse(plan.isDisabled());
     }
 
 }

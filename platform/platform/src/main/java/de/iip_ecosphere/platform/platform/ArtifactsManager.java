@@ -467,11 +467,13 @@ public class ArtifactsManager {
             Path pn = path.normalize();
             if (!artifactPaths.containsKey(pn)) {
                 result = createArtifactInfo(path, accessUri);
-            }
-            if (null != result) {
-                artifacts.put(result.getId(), result);
-                artifactPaths.put(pn, result);
-                PlatformAas.notifyArtifactCreated(result);
+                if (null != result) {
+                    artifacts.put(result.getId(), result);
+                    artifactPaths.put(pn, result);
+                    PlatformAas.notifyArtifactCreated(result);
+                }
+            } else { // even if modified on disk, on Debian this leads to a creation event
+                artifactModified(path);
             }
         }
         return result;
@@ -609,7 +611,7 @@ public class ArtifactsManager {
             try {
                 ServiceDeploymentPlan plan = ServiceDeploymentPlan.readFromYaml(
                     ServiceDeploymentPlan.class, new FileInputStream(file));
-                if (plan.getAssignments().size() > 0) {
+                if (plan.getAssignments().size() > 0 && !plan.isDisabled()) {
                     result = new DeploymentPlanArtifact(plan, accessUri);
                     LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}",
                         file.getAbsoluteFile(), accessUri);
