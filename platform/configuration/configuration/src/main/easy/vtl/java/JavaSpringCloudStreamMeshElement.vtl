@@ -677,8 +677,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         Service init = defaultService(family);
         String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
         'service = new ${clsName}(streamBridge, metrics);
-        selector.initial("${init.id}");
-        service.initService();'
+        selector.initial("${init.id}");'
         for (String s: serviceVars) {
             '${genMapService("${s}")}'
         }        
@@ -870,6 +869,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
                     if (oldService != service) {
                         service.initService(); // connect outputs
                         actServiceId = service.getId();
+                        oldService.detach();
                     }
                 }
                 selector.actionCompleted(actServiceId);

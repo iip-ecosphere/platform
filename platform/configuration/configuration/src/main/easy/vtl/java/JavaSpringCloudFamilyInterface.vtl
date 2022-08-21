@@ -90,6 +90,11 @@ template JavaSpringCloudFamilyInterface(Configuration config, FileArtifact targe
              */
             public void setState(ServiceState state) throws ExecutionException;
             
+            /**
+             * Detaches the service. Opposite of {@link #initService()}.
+             */
+            public void detach();
+            
         }'
     }
     
