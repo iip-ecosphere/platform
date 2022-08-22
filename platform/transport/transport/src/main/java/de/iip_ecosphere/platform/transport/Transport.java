@@ -447,7 +447,7 @@ public class Transport {
             if (local) {
                 if (DEBUG) {
                     System.out.println("SEND3-local " + kind + " " + Arrays.toString(routingKeys) + " " 
-                        + getHostSafe(globalTransport));            
+                        + getHostSafe(localTransport));            
                 }
                 localTransport.send(sender, kind);
             }
@@ -612,6 +612,9 @@ public class Transport {
             localTransport = new TransportInstance();
         }
         localTransport.setTransportSetup(supplier);
+        if (DEBUG) {
+            System.out.println("LOCAL-SETUP " + getHostSafe(localTransport));
+        }
     }
 
     /**
