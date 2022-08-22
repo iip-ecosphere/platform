@@ -193,10 +193,10 @@ public class DeviceRegistryAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             DeviceRegistryAasClient client = new DeviceRegistryAasClient();
             SubmodelElementCollection device = client.getDevice(fixId(resourceId));
-
-            // SubmodelElementCollection device = sub.getSubmodelElementCollection(fixId(id));
-            device.deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
-            device.deleteElement(NAME_PROP_DEVICE_IP);
+            if (null != device) { // for emergency situations
+                device.deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
+                device.deleteElement(NAME_PROP_DEVICE_IP);
+            }
         });
     }
 
