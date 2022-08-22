@@ -6,20 +6,21 @@ Planned:
 * More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
-
-### Next release (August 2022, TddT'22):
-
-In progress:
-* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
-* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
-* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
-* Platform component heartbeat: [#62](https://github.com/iip-ecosphere/platform/issues/62)
-* UI progress reporting: [#70](https://github.com/iip-ecosphere/platform/issues/70)
-* UI server improvements: [#73](https://github.com/iip-ecosphere/platform/issues/73)
-* Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63) and extensible semanticId resolution [#68](https://github.com/iip-ecosphere/platform/issues/68) as well as use in UI
+* Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
+
+### Next release (August 2022, TddT'22) - feature freeze:
+
+In progress:
+* Add HM'22/TddT'22 source code as example [#83](https://github.com/iip-ecosphere/platform/issues/83)
+* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
+* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
+* UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
+* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
 New features:
 * Allowing to change service ensembles on demand via deployment plans.
@@ -30,6 +31,7 @@ New features:
 * [#48](https://github.com/iip-ecosphere/platform/issues/48): Start of a platform-integrated library with basic data processing functionalities (based on the HM'22 demonstrator)
 * [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
+* [#68](https://github.com/iip-ecosphere/platform/issues/68): Increasing number of semanticIDs in platform AAS and extensible semanticId resolution 
 * [#77](https://github.com/iip-ecosphere/platform/issues/77): Initial semantic ID resolver based on ECLASS catalogue.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 
@@ -58,6 +60,7 @@ Improvements:
 * Improvements of service execution: [#50](https://github.com/iip-ecosphere/platform/issues/50)
 * Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
 * [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
+* [#73](https://github.com/iip-ecosphere/platform/issues/73): UI server improvements
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 
