@@ -10,6 +10,7 @@ Planned:
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
+* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
 ### Next release (August 2022, TddT'22) - feature freeze:
 
@@ -20,7 +21,6 @@ In progress:
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
-* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
 New features:
 * Allowing to change service ensembles on demand via deployment plans.
@@ -34,6 +34,8 @@ New features:
 * [#68](https://github.com/iip-ecosphere/platform/issues/68): Increasing number of semanticIDs in platform AAS and extensible semanticId resolution 
 * [#77](https://github.com/iip-ecosphere/platform/issues/77): Initial semantic ID resolver based on ECLASS catalogue.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
+* Initial Java-side (optional) time monitoring of service execution.
+* Explicit control of management port assignment in Spring Service execution to mitigate re-deployment limitations.
 
 Improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.

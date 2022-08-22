@@ -126,11 +126,16 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
     
     // generates a received probe expression (if configured) for the given functional expression 
     def genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
-        if (base.monitorRcvCount or base.traceRcv <> TraceKind::NONE) {
+        if (base.monitorRcvCount or base.monitorProcessingTime or base.traceRcv <> TraceKind::NONE) {
             String mon = "";
             String trace = "";
             if (base.monitorRcvCount) {
                 mon = 'MetricsProvider.increaseCounterBy(serviceReceived, 1.0);';
+            }
+            if (base.monitorProcessingTime) {
+                if (expr <> "") {
+                    expr = "processingTime.record(() -> ${expr})";
+                }
             }
             if (base.traceRcv <> TraceKind::NONE) {
                 String d;
@@ -185,6 +190,10 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         'serviceReceived = Counter.builder("service.received")
             .baseUnit("tuple/s")
             .description("Tuples received by a service")
+            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
+            .register(metrics.getRegistry());'
+        'processingTime = io.micrometer.core.instrument.Timer.builder("service.processed")
+            .description("Main processing time of a service")
             .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
             .register(metrics.getRegistry());'
         for (String s: serviceVars) {
@@ -1199,7 +1208,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import java.io.*;
         import java.util.*;
         import java.util.function.*;
-        import java.util.concurrent.ExecutionException;
+        import java.util.concurrent.*;
         import javax.annotation.PostConstruct;
         import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.*;
@@ -1210,7 +1219,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
         import org.springframework.context.annotation.Import;
         import org.springframework.scheduling.annotation.EnableScheduling;
         import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-        import io.micrometer.core.instrument.Counter;
+        import io.micrometer.core.instrument.*;
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
@@ -1253,6 +1262,7 @@ template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact tar
             private MetricsProvider metrics;
             private Counter serviceSent;
             private Counter serviceReceived;
+            private io.micrometer.core.instrument.Timer processingTime;
             ${generateInputEventHandlers(elt, impl)|e}
 
             ${generateReceptionCallback(elt, impl)|e}

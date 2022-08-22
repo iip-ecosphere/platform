@@ -136,6 +136,7 @@ project Services {
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
        Boolean monitorRcvCount = true;
        Boolean monitorSentCount = true;
+       Boolean monitorProcessingTime = true;
        TraceKind traceRcv = TraceKind::NONE;
        TraceKind traceSent = TraceKind::NONE;
        setOf(refTo(Dependency)) dependencies = {};
