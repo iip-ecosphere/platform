@@ -203,7 +203,8 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                         result.setNamingTyped(createNaming(data.getShortName(), data.getPreferredName()));
                     }
                 } catch (ApiException e) {
-                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {}", e.getMessage());
+                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
+                        e.getMessage(), e.getCode(), e.getResponseBody());
                 }
                 if (null == result) {
                     try {
@@ -215,7 +216,8 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                             result.setNamingTyped(createNaming(null, data.getPreferredName()));
                         }
                     } catch (ApiException e) {
-                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {}", e.getMessage());
+                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
+                            e.getMessage(), e.getCode(), e.getResponseBody());
                     }
                 }
             }
