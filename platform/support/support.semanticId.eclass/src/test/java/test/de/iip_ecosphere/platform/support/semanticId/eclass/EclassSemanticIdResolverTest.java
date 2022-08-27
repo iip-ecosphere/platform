@@ -12,12 +12,12 @@
 
 package test.de.iip_ecosphere.platform.support.semanticId.eclass;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
@@ -39,21 +39,24 @@ public class EclassSemanticIdResolverTest {
     /**
      * Tests the resolution. Through the test in the resolver, we feed the resolver with structurally valid IRDIs.
      */
-    @Ignore
     @Test
     public void testResolution() {
-        EclassSemanticIdResolver resolver = new EclassSemanticIdResolver();
-        SemanticIdResolutionResult res = resolver.resolveSemanticId(IRDI_UNIT_DEGREES_CELSIUS);
-        
-        Assert.assertNotNull(res);
-        Assert.assertEquals(IRDI_UNIT_DEGREES_CELSIUS, res.getSemanticId());
-        
-        // for now, let's see what Eclass webservice returns
-        Assert.assertNotNull(res.getKind());
-        Assert.assertNotNull(res.getPublisher());
-        Assert.assertNotNull(res.getRevision());
-        Assert.assertNotNull(res.getVersion());
-        Assert.assertNotNull(res.getNaming());
+        if (new File("./resources.ipr").exists() || new File("./resources").exists()) {
+            // we can only test against Eclass if there is a certificate
+            
+            EclassSemanticIdResolver resolver = new EclassSemanticIdResolver();
+            SemanticIdResolutionResult res = resolver.resolveSemanticId(IRDI_UNIT_DEGREES_CELSIUS);
+            
+            Assert.assertNotNull(res);
+            Assert.assertEquals(IRDI_UNIT_DEGREES_CELSIUS, res.getSemanticId());
+            
+            // for now, let's see what Eclass webservice returns
+            Assert.assertNotNull(res.getKind());
+            Assert.assertNotNull(res.getPublisher());
+            Assert.assertNotNull(res.getRevision());
+            Assert.assertNotNull(res.getVersion());
+            Assert.assertNotNull(res.getNaming());
+        }
     }
     
     /**

@@ -13,16 +13,16 @@
   </parent>
 
   <dependencies>
-	    <dependency>
-	     <groupId>de.iip-ecosphere.platform</groupId>
-	     <artifactId>support.aas</artifactId>
-	     <version>${project.version}</version>
-	    </dependency>
-	   <dependency>
+	  <dependency>
+	    <groupId>de.iip-ecosphere.platform</groupId>
+	    <artifactId>support.aas</artifactId>
+	    <version>${project.version}</version>
+	  </dependency>
+	  <dependency>
 	    <groupId>io.swagger.core.v3</groupId>
 	    <artifactId>swagger-annotations</artifactId>
 	    <version>2.1.7</version>
-	   </dependency>
+	  </dependency>
 	  <dependency>
 	    <groupId>javax.annotation</groupId>
 	    <artifactId>javax.annotation-api</artifactId>
@@ -31,36 +31,42 @@
 	    <groupId>com.fasterxml.jackson.core</groupId>
 	    <artifactId>jackson-databind</artifactId>
 	  </dependency>
+ 	  <dependency>
+	    <groupId>com.fasterxml.jackson.datatype</groupId>
+	    <artifactId>jackson-datatype-jsr310</artifactId>
+	  </dependency>   
+	  <dependency>
+	    <groupId>org.glassfish.jersey.core</groupId>
+	    <artifactId>jersey-client</artifactId>
+      </dependency>   
       <dependency>
-        <groupId>com.squareup.okhttp</groupId>
-         <artifactId>okhttp</artifactId>
-        <version>2.7.5</version>
-      </dependency>      
-      <dependency>
-          <groupId>com.squareup.okhttp</groupId>
-          <artifactId>logging-interceptor</artifactId>
-          <version>2.7.5</version>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-multipart</artifactId>
       </dependency>
       <dependency>
-          <groupId>com.google.code.gson</groupId>
-          <artifactId>gson</artifactId>
+        <groupId>org.glassfish.jersey.inject</groupId>
+        <artifactId>jersey-hk2</artifactId>
       </dependency>
-      <dependency>
-          <groupId>io.gsonfire</groupId>
-          <artifactId>gson-fire</artifactId>
-          <version>1.8.3</version>
-      </dependency>
+	  <dependency>
+	    <groupId>org.glassfish.jersey.media</groupId>
+	    <artifactId>jersey-media-json-jackson</artifactId>
+	  </dependency>      
+	  <dependency>
+	    <groupId>com.brsanthu</groupId>
+	    <artifactId>migbase64</artifactId>
+	    <version>2.2</version>
+	  </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>    
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <scope>test</scope>
+      </dependency>    
   </dependencies>
 
 	<build>
@@ -77,7 +83,7 @@
 	          <configuration>
 	            <inputSpec>${project.basedir}/src/main/eclass.json</inputSpec>
 	            <language>java</language>
-	            <library>okhttp-gson</library>
+	            <library>jersey2</library>
 	            <apiPackage>de.iip_ecosphere.platform.support.semanticId.eclass.api</apiPackage>
 	            <modelPackage>de.iip_ecosphere.platform.support.semanticId.eclass.model</modelPackage>
 	            <invokerPackage>de.iip_ecosphere.platform.support.semanticId.eclass.handler</invokerPackage>
@@ -88,7 +94,7 @@
 	            <generateSupportingFiles>true</generateSupportingFiles>
 	            <configOptions>
 	              <interfaceOnly>true</interfaceOnly>
-	              <dateLibrary>java8</dateLibrary>
+	              <dateLibrary>legacy</dateLibrary>
 	            </configOptions>
 	          </configuration>
 	        </execution>
