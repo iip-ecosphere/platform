@@ -18,13 +18,17 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Statistic;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -322,6 +326,7 @@ public class MetricsProviderTest {
      */
     @Test
     public void testJson() {
+        double gValue = 10;
         Counter counter = Counter
             .builder("service.sent")
             .baseUnit("tuple/s")
@@ -339,7 +344,18 @@ public class MetricsProviderTest {
             .description("Time the system is online")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
             .register(provider.getRegistry());
+        Timer timer = Timer.builder("system.time")
+            .description("Time the system is opeating")
+            .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
+            .register(provider.getRegistry());
+        Gauge gauge = Gauge.builder("system.value", () -> gValue)
+            .description("Some value")
+            .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
+            .register(provider.getRegistry());
+        
         MetricsProvider.increaseCounterBy(counter, 1);
+        timer.record(() -> { TimeUtils.sleep(400); return "ABBA"; });
+        
         String json = provider.toJson("id0", false,
             MeterFilter.acceptNameStartsWith("service.sent"),
             MeterFilter.denyNameStartsWith("services.received"));
@@ -360,6 +376,31 @@ public class MetricsProviderTest {
                     Iterator<Measurement> iter = meter.measure().iterator();
                     assertTrue(iter.hasNext());
                     assertEquals(1, iter.next().getValue(), 0.001);
+                } else if (meter.getId().getName().equals(timer.getId().getName())) {
+                    assertEquals("dev2", meter.getId().getTag("device")); // shall not override
+                    Iterator<Measurement> iter = meter.measure().iterator();
+                    boolean foundCount = false;
+                    boolean foundTotalTime = false;
+                    while (iter.hasNext()) {
+                        Measurement m = iter.next();
+                        if (Statistic.COUNT.name().equals(m.getStatistic().name())) {
+                            foundCount = true;
+                            assertTrue(m.getValue() > 0);
+                        } else if (Statistic.TOTAL_TIME.name().equals(m.getStatistic().name())) {
+                            foundTotalTime = true;
+                            assertTrue(m.getValue() > 0);
+                        }
+                    }
+                    assertTrue(foundCount && foundTotalTime);
+                } else if (meter.getId().getName().equals(gauge.getId().getName())) {
+                    assertEquals("dev2", meter.getId().getTag("device")); // shall not override
+                    Iterator<Measurement> iter = meter.measure().iterator();
+                    while (iter.hasNext()) {
+                        Measurement m = iter.next();
+                        if (Statistic.VALUE.name().equals(m.getStatistic().name())) {
+                            assertEquals(gValue, m.getValue(), 0.01);
+                        }
+                    }
                 }
             }
         }
