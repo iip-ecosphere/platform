@@ -11,6 +11,9 @@ Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
+* UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
+* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 
 ### Next release (August 2022, TddT'22) - feature freeze:
 
@@ -18,9 +21,6 @@ In progress:
 * Add HM'22/TddT'22 source code as example [#83](https://github.com/iip-ecosphere/platform/issues/83)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
-* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
-* UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
-* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 New features:
 * Allowing to change service ensembles on demand via deployment plans.
@@ -32,7 +32,7 @@ New features:
 * [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
 * [#68](https://github.com/iip-ecosphere/platform/issues/68): Increasing number of semanticIDs in platform AAS and extensible semanticId resolution 
-* [#77](https://github.com/iip-ecosphere/platform/issues/77): Initial semantic ID resolver based on ECLASS catalogue.
+* [#77](https://github.com/iip-ecosphere/platform/issues/77): Semantic ID resolver based on ECLASS catalogue web service.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Initial Java-side (optional) time monitoring of service execution.
 * Explicit control of management port assignment in Spring Service execution to mitigate re-deployment limitations.
