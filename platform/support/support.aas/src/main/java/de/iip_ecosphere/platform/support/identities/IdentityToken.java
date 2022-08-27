@@ -210,7 +210,7 @@ public class IdentityToken {
     }
 
     /**
-     * The token data, for all token types except for {@link TokenType#ANONYMOUS}.
+     * Returns the token data, for all token types except for {@link TokenType#ANONYMOUS}.
      * 
      * @return the token data, may be <b>null</b> for wrong token type
      */
@@ -219,7 +219,7 @@ public class IdentityToken {
     }
 
     /**
-     * The token data as String, for all token types except for {@link TokenType#ANONYMOUS}.
+     * Returns the token data as String, for all token types except for {@link TokenType#ANONYMOUS}.
      * 
      * @return the token data as String, may be <b>null</b> for wrong token type
      */
@@ -237,6 +237,16 @@ public class IdentityToken {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the token data as char array, for all token types except for {@link TokenType#ANONYMOUS}.
+     * 
+     * @return the token data as char array, may be <b>null</b> for wrong token type
+     */
+    public char[] getTokenDataAsCharArray() {
+        String tokenData = getTokenDataAsString();
+        return null == tokenData ? null : tokenData.toCharArray();
     }
 
     /**

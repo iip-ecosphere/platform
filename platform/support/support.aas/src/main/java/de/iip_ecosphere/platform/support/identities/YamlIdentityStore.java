@@ -184,6 +184,41 @@ public class YamlIdentityStore extends IdentityStore {
         }
         return result;
     }
+    
+    @Override
+    public InputStream getKeystoreAsStream(String identity, String... fallback) {
+        InputStream result = null;
+        IdentityInformation info = resolveWithLogging(identity, fallback);
+        if (null != info) {
+            if (TokenType.USERNAME != info.getType() && null != info.getTokenData()) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Keystore information found for {} (with fallbacks {}), but type is not USERNAME/has no token data",
+                        identity, fallback);
+            } else if (null == info.getFile()) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Keystore information found for {} (with fallbacks {}), but no keystore file specified", 
+                        identity, fallback);
+            } else {
+                try {
+                    URI uri = new URI(info.getFile());
+                    File f = UriResolver.resolveToFile(uri, null);
+                    if (null != f && f.exists()) {
+                        result = new FileInputStream(f);
+                    }
+                } catch (URISyntaxException | IllegalArgumentException e) {
+                    // ignore, we just figure out whether it could be an URI
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).warn(
+                        "Resolving key file {} failed: {}. Falling back to resource resolution.", 
+                            info.getFile(), e.getMessage());
+                }
+                if (null == result) {
+                    result = resolve(info.getFile());
+                }
+            }                
+        } 
+        return result;
+    }
 
     @Override
     public KeyStore getKeystoreFile(String identity, String... fallback) throws IOException {
@@ -200,23 +235,7 @@ public class YamlIdentityStore extends IdentityStore {
                         identity, fallback);
             } else {
                 try {
-                    InputStream stream = null;
-                    try {
-                        URI uri = new URI(info.getFile());
-                        File f = UriResolver.resolveToFile(uri, null);
-                        if (null != f && f.exists()) {
-                            stream = new FileInputStream(f);
-                        }
-                    } catch (URISyntaxException | IllegalArgumentException e) {
-                        // ignore, we just figure out whether it could be an URI
-                    } catch (IOException e) {
-                        LoggerFactory.getLogger(getClass()).warn(
-                            "Resolving key file {} failed: {}. Falling back to resource resolution.", 
-                                info.getFile(), e.getMessage());
-                    }
-                    if (null == stream) {
-                        stream = resolve(info.getFile());
-                    }
+                    InputStream stream = getKeystoreAsStream(identity, fallback);
                     String keystoreType = SslUtils.getKeystoreType(info.getFile());
                     result = KeyStore.getInstance(keystoreType);
                     result.load(stream, info.getTokenData().toCharArray());

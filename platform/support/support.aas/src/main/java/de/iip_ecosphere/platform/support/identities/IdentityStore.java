@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.identities;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.Optional;
 
@@ -73,6 +74,16 @@ public abstract class IdentityStore {
      * @return the token, <b>null</b> or anonymous if none was found
      */
     public abstract IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback);
+    
+    /**
+     * Returns a keystore as a stream for an identity key.
+     * 
+     * @param identity the identity (key) to return the keystore for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the keystore stream, <b>null</b> if none was found
+     */
+    public abstract InputStream getKeystoreAsStream(String identity, String... fallback);
     
     /**
      * Returns a keystore for an identity key.
