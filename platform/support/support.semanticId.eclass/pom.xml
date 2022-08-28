@@ -107,9 +107,9 @@
         <version>${org.jacoco.maven.jacoco.version}</version>
 	    <configuration>
 	        <excludes>
-	            <exclude>**/eclass/api/*.class</exclude>
-                <exclude>**/eclass/handler/*.class</exclude>
-                <exclude>**/eclass/model/*.class</exclude>
+	            <exclude>de/iip_ecosphere/platform/support/semanticId/eclass/api/*</exclude>
+                <exclude>de/iip_ecosphere/platform/support/semanticId/eclass/handler/*</exclude>
+                <exclude>de/iip_ecosphere/platform/support/semanticId/eclass/model/*</exclude>
 	        </excludes>
 	    </configuration>
         <executions>
