@@ -37,10 +37,17 @@ public class PlcNextSystemMetrics implements SystemMetrics {
             .newBuilder()
             .setIdentifier("Status.Board.Temperature.Centigrade")
             .build();
-    
+
+    private static final IDeviceStatusServiceGetItemRequest REQUEST_CPU_TEMPERATURE = 
+        IDeviceStatusServiceGetItemRequest
+            .newBuilder()
+            .setIdentifier("Status.Cpu.Temperature.Centigrade")
+            .build();
+
     private IDeviceStatusServiceBlockingStub client;
     private long lastRequest = -1;
     private float boardTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
+    private float cpuTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
 
     /**
      * Prevents external creation.
@@ -49,7 +56,8 @@ public class PlcNextSystemMetrics implements SystemMetrics {
     }
 
     //https://www.plcnext.help/te/Service_Components/gRPC_Introduction.htm
-    // https://www.plcnext-community.net/makersblog/how-to-create-a-client-for-the-plcnext-control-grpc-server-in-c/
+    //https://www.plcnext-community.net/makersblog/how-to-create-a-client-for-the-plcnext-control-grpc-server-in-c/
+    //https://www.plcnext.help/te/Service_Components/Remote_Service_Calls_RSC/RSC_device_interface_services.htm
 
     /**
      * Initialize the channel.
@@ -69,6 +77,7 @@ public class PlcNextSystemMetrics implements SystemMetrics {
                 
             }
             boardTemp = client.getItem(REQUEST_BOARD_TEMPERATURE).getReturnValue().getFloatValue();
+            cpuTemp = client.getItem(REQUEST_CPU_TEMPERATURE).getReturnValue().getFloatValue();
         }
     }
     
@@ -81,7 +90,7 @@ public class PlcNextSystemMetrics implements SystemMetrics {
     @Override
     public float getCpuTemperature() {
         request();
-        return INVALID_CELSIUS_TEMPERATURE; // TODO
+        return cpuTemp;
     }
     
     @Override
@@ -89,11 +98,11 @@ public class PlcNextSystemMetrics implements SystemMetrics {
         request();
         return 0; // TODO
     }
-    
+
     @Override
-    public int getNumCpuCores() {
+    public int getNumTpuCores() {
         request();
-        return 0;  // TODO
+        return 0; // TODO
     }
 
 }
