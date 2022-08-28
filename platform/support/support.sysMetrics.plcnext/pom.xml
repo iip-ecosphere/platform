@@ -11,6 +11,45 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.4.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <protobuf.version>3.11.0</protobuf.version>
+    <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
+    <grpc.version>1.36.2</grpc.version>
+    <protoc.version>3.9.0</protoc.version>
+  </properties>
+  
+  <profiles>
+      <profile>
+         <id>other</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+              <groupId>io.netty</groupId>
+              <artifactId>netty-transport-native-epoll</artifactId>
+              <version>4.1.79.Final</version>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>linux</id>
+         <activation>
+            <property>
+            <name>os.detected.classifier</name>
+            </property>
+         </activation>
+         <dependencies>
+		    <!-- <dependency>
+		      <groupId>io.netty</groupId>
+		      <artifactId>netty-transport-native-epoll</artifactId>
+		      <version>4.1.79.Final</version>
+		      <classifier>${os.detected.classifier}</classifier>
+		    </dependency> -->
+         </dependencies>
+      </profile>
+  </profiles>
 
   <dependencies>
     <dependency>
@@ -28,6 +67,23 @@
       <artifactId>grpc-all</artifactId>
       <version>1.36.2</version>
     </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>1.36.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>1.36.2</version>
+    </dependency>
+    <dependency> <!-- necessary for Java 9+ -->
+	  <groupId>org.apache.tomcat</groupId>
+	  <artifactId>annotations-api</artifactId>
+	  <version>6.0.53</version>
+	  <scope>provided</scope>
+	</dependency>
+    
   
     <dependency>
       <groupId>junit</groupId>
@@ -44,24 +100,61 @@
   </dependencies>
   
   <build>
+  <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>${kr.motd.maven.os.version}</version>
+      </extension>
+    </extensions>
     <plugins>
+    
       <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>${org.xolstice.maven.protobuf.version}</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
           <useArgumentFile>true</useArgumentFile>
         </configuration>    
         <executions>
           <execution>
             <goals>
               <goal>compile</goal>
+              <goal>compile-custom</goal>
               <goal>test-compile</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${org.jacoco.maven.jacoco.version}</version>
+        <configuration>
+            <excludes>
+                <exclude>**/Arp/*.class</exclude>
+            </excludes>
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>report</id>
+                <phase>test</phase>
+                <goals>
+                    <goal>report</goal>
+                </goals>
+            </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

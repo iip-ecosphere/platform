@@ -4,4 +4,9 @@
   <fileset name="all" enabled="true" check-config-name="IIP Code Conventions" local="false">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="target/generated-sources/protobuf/java"/>
+    <filter-data value="src/main/proto"/>
+    <filter-data value="target/generated-sources/protobuf/grpc-java"/>
+  </filter>
 </fileset-config>
