@@ -1,0 +1,13 @@
+path: iip_basic/score_v1
+mappings:
+  oneWindowConfidence: RANDOM_PROBABILITY
+  twoWindowsConfidence: RANDOM_PROBABILITY
+  threeWindowsConfidence: RANDOM_PROBABILITY
+  productId: PASS
+  wheelColour: RANDOM_SELECT("blue", "red", "purple")
+  engraving: RANDOM_BOOLEAN
+  engravingConfidence: RANDOM_PROBABILITY
+  scratch: RANDOM_BOOLEAN
+  scratchConfidence: RANDOM_PROBABILITY
+  image: PASS
+  qrCodeDetected: SKIP

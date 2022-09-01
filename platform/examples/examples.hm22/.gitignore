@@ -1,0 +1,12 @@
+/target/
+/src/main/easy
+/src/test/python/iip
+/gen/
+/resources.ipr/
+/log
+/derby.log
+/work/
+/tmp*.jpg
+__pycache__/
+*.pyc
+/tmp/
