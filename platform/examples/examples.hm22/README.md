@@ -13,6 +13,10 @@ The project contains an identity store (`src/main/resources/identityStore.yml`) 
 
 Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. Currently, the project does not include the Python AI code.
 
+## Model modes and regression test
+
+The model is set to `flowTest`, i.e., the application is generated for (regression) testing with mocking services. For the real application used in the demonstration, change `flowTest` to false.
+
 ## Command line switches
 
 This app has several command line switches (`mock` indicate mocking/testing parts). You can apply them togeher with `mvn -P App exec:java...` by adding e.g., `-Diip.app.hm22.mock.doEvents=false`.
