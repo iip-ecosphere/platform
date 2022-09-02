@@ -1,6 +1,7 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (fall 2022):
+### Next release (Winter 2022):
+
 Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
@@ -14,13 +15,10 @@ Planned:
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
-
-### Next release (August 2022, TddT'22) - feature freeze:
-
-In progress:
-* Add HM'22/TddT'22 source code as example [#83](https://github.com/iip-ecosphere/platform/issues/83)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+
+### Version 0.4.0 (2022/09/02, TddT'22):
 
 New features:
 * Allowing to change service ensembles on demand via deployment plans.
@@ -36,6 +34,7 @@ New features:
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
 * Initial Java-side (optional) time monitoring of service execution.
 * Explicit control of management port assignment in Spring Service execution to mitigate re-deployment limitations.
+* HM'22/TddT'22 source code as example [#83](https://github.com/iip-ecosphere/platform/issues/83)
 
 Improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
