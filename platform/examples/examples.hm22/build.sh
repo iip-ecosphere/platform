@@ -34,7 +34,7 @@ mvn -P App exec:java@app -Dexec.args="--iip.test.stop=180000 --iip.test.brokerPo
 pidTest=$!
 echo "Test started $pidTest"
 
-sleep 30 && pkill -9 -P "$pidTest" && kill -9 "$pidTest"
+sleep 180 && pkill -9 -P "$pidTest" && kill -9 "$pidTest"
 pkill -9 -P "$pidBroker" && kill -9 "$pidBroker"
 
 echo "Testing for APP: DecisionResultImpl in log"
