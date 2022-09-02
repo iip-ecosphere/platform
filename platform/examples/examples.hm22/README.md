@@ -2,6 +2,26 @@
 
 Source code for the IIP-Ecosphere "Hannover Messe 2022" (HM'22) demonstrator and the extended version to be shown at the exhibition of the "Tage der digitalen Technologien", Berlin (TddT'22).
 
+## Project Structure
+
+This example consists of the
+- Code of the services 
+  - Java: `src/main/java/de/iip_ecosphere/platform/examples/hm22`
+  - Python: `src/main/python/services`
+  - Robot movement via ROS: `src/main/python/robot`
+- Extensions of the productive services for mocking (for automated integration must not be in testing code)
+  - Java: `src/main/java/de/iip_ecosphere/platform/examples/hm22/mock`
+  - Python: `src/main/python/servicesMock`
+- Example-specific assembly descriptors in `src/main/assembly`
+- Custom docker container setup in `src/main/docker`
+- IVML model `src/test/easy` (including the currently separated platform setup)
+- Java Testing `src/test/java`
+- Documentation and deployment plans: `docs`. There, you can find a picture of the physical setup, a wiring diagram as well as a service interconnection diagram in [Overview.pdf](docs/Overview.pptx).
+
+A video of a run-though can be found at [youtube](https://youtu.be/36Xtw1L2XkQ).
+
+## Building
+
 For all Maven executions, please ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)). Maven commands may run into trouble under Powershell. Use a JDK 8 - 13, generation does not run, e.g., on JDK 17. Instantiation process:
 
 - `mvn -P EasyGen generate-sources` downloads and unpacks the actual sources of the configuration model/the instantiation process. Use `-P` to obtain the most recent snapshot. If already build, a short build as described below shall be sufficient.
@@ -11,11 +31,18 @@ For all Maven executions, please ensure that the Maven platformDependencies are 
 
 The project contains an identity store (`src/main/resources/identityStore.yml`) declaring all username/password combinations as identity tokes. This includes now the authentication token for the broker. For packaging reasons, the same file must also be located in (`resources/software`). The build process overwrites that file by `src/main/resources/identityStore.yml`, so please make changes only in `src/main/resources/identityStore.yml`. 
 
-Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. Currently, the project does not include the Python AI code.
+Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. 
 
 ## Model modes and regression test
 
 The model is set to `flowTest`, i.e., the application is generated for (regression) testing with mocking services. For the real application used in the demonstration, change `flowTest` to false.
+
+Most tests are generated, not all are yet hooked in here. Connector tests work, service tests may not work until platform version 0.5.0.
+
+- OPC UA input: `mvn -P App exec:java@plc-opc`
+- MDZH server `mvn -P App exec:java@mdzh-server``
+- Action decider: `mvn -P App exec:java@action-decider`
+- Full application standalone: `mvn -P App exec:java@app -Diip.app.hm22.mock.callRobot=false` does a single run-through with simulated OPC data. Requires MDZH server and broker to be started separately.
 
 ## Command line switches
 
@@ -28,14 +55,6 @@ This app has several command line switches (`mock` indicate mocking/testing part
 - `iip.app.hm22.camSource.timer` (default: `false`) use a timer integrated into the Cam source to create regular images for testing, one image all 40s
 - `iip.app.hm22.mock.callRobot` (default: `false`) allow to call the robot/PLC
 
-## Tests (in development)
-
-Most tests are generated, not all are yet hooked in here. Connector tests work, service tests may not work until platform version 0.5.0.
-
-- OPC UA input: `mvn -P App exec:java@plc-opc`
-- MDZH server `mvn -P App exec:java@mdzh-server``
-- Action decider: `mvn -P App exec:java@action-decider`
-- Full application standalone: `mvn -P App exec:java@app -Diip.app.hm22.mock.callRobot=false` does a single run-through with simulated OPC data. Requires MDZH server and broker to be started separately.
 
 ## Desirable
 
