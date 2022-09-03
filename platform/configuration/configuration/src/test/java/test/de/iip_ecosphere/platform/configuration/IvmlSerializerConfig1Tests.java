@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.configuration;
 
+import static org.junit.Assume.assumeFalse;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +38,7 @@ public class IvmlSerializerConfig1Tests extends IvmlSerializerConfigTests {
      */
     @Test
     public void testSerializerConfig1() throws ExecutionException, IOException {
+        assumeFalse(Boolean.valueOf(System.getProperty("iip.build.initial", "false")));
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
 
