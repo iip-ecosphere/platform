@@ -23,10 +23,10 @@ For performing a release...
 * Check whether the containers in github were created/are archived with the actual date/version number and tag most recent images.
     * `docker pull iipecosphere/platform:cli.latest`
     * `docker pull iipecosphere/platform:platform_all.latest`
-    * `docker images ls`
+    * `docker image ls`
     * `docker tag <id> iipecosphere/platform:cli.<ver>`
     * `docker tag <id> iipecosphere/platform:platform_all.<ver>`
-    * `docker login -u iioecosphere`
+    * `docker login -u iipecosphere`
     * `docker push iipecosphere/platform:cli.<ver>`
     * `docker push iipecosphere/platform:platform_all.<ver>`
     * `docker logout`
