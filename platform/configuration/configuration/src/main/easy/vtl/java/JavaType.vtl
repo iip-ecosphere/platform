@@ -94,6 +94,91 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             }'
         }
     }
+    
+    def genHashCodeEquals(String kw, String clsName, RecordType type) {
+        if (kw == "class") {
+            
+            '@Override
+            public int hashCode() {
+                int hc = 0;
+                ${genRecHashCode(type)|e}
+                return hc;
+            }
+            
+            @Override
+            public boolean equals(Object other) {
+                boolean eq;
+                if (other instanceof ${clsName}) {
+                    ${clsName} oth = (${clsName}) other;
+                    eq = true;
+                    ${genRecEquals(type)|e}
+                } else {
+                    eq = false;
+                }
+                return eq;
+            }'
+        }
+    }
+
+    def genHashCode(String access, DataType type, Boolean optional) {
+        '${considerWrapper(toTypeName(type))}.hashCode(${access})'
+    }
+    
+    def genHashCode(String access, RecordType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    def genHashCode(String access, StringTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    def genHashCode(String access, ArrayType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+    
+    def genHashCodeObject(String access, Boolean optional) {
+        if (optional) {
+            '${access} != null ? ${access}.hashCode() : 0'
+        } else {
+            '${access}.hashCode()'
+        }
+    }
+    
+    def genRecHashCode(RecordType type) {
+        for (Field f: type.fields) {
+            'hc += ${genHashCode("get${f.name.firstToUpper()}()", f.type, f.optional)};'
+        }
+    }
+
+    def genEquals(String access, DataType type, Boolean optional) {
+        '${access} == oth.${access}'
+    }
+
+    def genEquals(String access, RecordType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    def genEquals(String access, StringTypeType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    def genEquals(String access, ArrayType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+    
+    def genEqualsObject(String access, Boolean optional) {
+        if (optional) {
+            '${access} != null ? ${access}.equals(oth.${access}) : true'
+        } else {
+            '${access}.equals(oth.${access})'
+        }
+    }
+
+    def genRecEquals(RecordType type) {
+        for (Field f: type.fields) {
+            'eq &= ${genEquals("get${f.name.firstToUpper()}()", f.type, f.optional)};'
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
@@ -141,6 +226,8 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             ${getters(type)}
             
             ${setters(type)}
+
+            ${genHashCodeEquals(kw, clsName, type)|e}
             
             ${toString(kw)|e}
 
