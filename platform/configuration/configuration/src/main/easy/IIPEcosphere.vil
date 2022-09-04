@@ -181,7 +181,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             Boolean withTemplate = true; // preliminary
             if (withTemplate) {
-                appRoot = "${target}/templates/impl.${appName}";
+                appRoot = "${target}/templates/eclipse/impl.${appName}";
                 appRoot.mkdir();
                 javaSrc = "${appRoot}/src/main/java";
                 javaSrc.mkdir();
@@ -209,6 +209,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 }
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
     }
