@@ -172,14 +172,70 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
-                vilTemplateProcessor("AppMvnTest", config, "${target}/test-pom.xml", nodes=elements, appName=appName, appVersion=appVersion, appDescription="Test POM example", tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
                 maven("${appRoot}", true);
 
                 generateServiceContainer(appRoot, config, a, elements);
             }
+            
+            Boolean withTemplate = true; // preliminary
+            if (withTemplate) {
+                appRoot = "${target}/templates/impl.${appName}";
+                appRoot.mkdir();
+                javaSrc = "${appRoot}/src/main/java";
+                javaSrc.mkdir();
+                javaTestSrc = "${appRoot}/src/test/java";
+                javaTestSrc.mkdir();
+                pySrc = "${appRoot}/src/main/python";
+                resourcesSrc = "${appRoot}/src/main/resources";
+                resourcesSrc.mkdir();
+                Path testResourcesSrc = "${appRoot}/src/main/resources";
+                testResourcesSrc.mkdir();
+                vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName=appName);
+                vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName=appName);
+                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName=appName);
+                vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
+
+                setOf(String) assemblies = {}; 
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                sequenceOf(MeshElement) elements = {};
+                for (ServiceMesh n : a.services) {
+                    setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    for (MeshElement no : nodes) {
+                        generateTemplateElements(appRoot, config, no, no.impl, assemblies);
+                        elements.add(no);
+                    }
+                }
+                String appVersion = getAppMvnVersion(a);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+            }
         };
+    }
+
+    // ------------------------------------------ generating apps: generating template code -----------------------------------
+    
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(String) assemblies) = {
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies) = {
+        // do nothing, everything is here already generically in place
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies) = {
+        if (service.class <> "") {
+            JavaPath jp = service.class;
+            vilTemplateProcessor("JavaMeshElementTemplate", config, "${appRoot}/src/main/java/${jp.getPath()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
+        }
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies) = {
+        String clsName = asTypeName(no.name);
+        vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services");
+        Path assemblyPath = "${appRoot}/src/main/assembly";
+        assemblyPath.mkdir();
+        vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
+        assemblies.add("python|${assemblyPath}/python.xml|package|${mvnProjectBuildDir}/classes|");
     }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------

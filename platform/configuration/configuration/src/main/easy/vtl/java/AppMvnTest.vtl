@@ -5,9 +5,9 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+    def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -34,6 +34,19 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
      
         XmlElement plugins = createMavenBuildElement(project, "", true);
+        XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
+        for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
+            sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
+            String id = tmp[0];
+            String path = tmp[1];
+            String phase = tmp[2];
+            String outDir = tmp[3];
+            String fName = "";
+            if (tmp.size() > 4) {
+                fName = tmp[4];
+            }            
+            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir=outDir, finalName=fName, phase=phase);
+        }
         new XmlComment(dep, "Your other plugins extending/overriding the parent build plugins go here or after.");
         XmlElement execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
         XmlElement execPluginExecs = appendExecutionsParent(execPlugin);

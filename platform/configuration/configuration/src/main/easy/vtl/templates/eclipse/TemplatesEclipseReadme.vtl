@@ -1,0 +1,21 @@
+@advice(IIPEcosphere)
+template TemplatesEclipseReadme(IIPEcosphere config, FileArtifact target, String appName) {
+	
+    def main(IIPEcosphere config, FileArtifact target, String appName) {
+'# Service implementation project for ${appName}.
+    
+Contains the service implementation for ${appName}. The configuration model is managed by the platform.
+The project is set up for JavaSE 8 and without (platform-defined) checkstyle as this project contains your code.
+If python code is included, a basic assembly descriptor is created and hooked into the POM. The files to include via the assembly descriptor may need adjustment.
+    
+Typical build steps:
+ - Configure your application and generate application interfaces (done).
+ - Implement your services
+ - `mvn -P App install`.
+ - Test your services / application. Helper command line executions are hooked into the POM.
+ - Generate application integration code.
+ - Create a deployment plan and upload it into the artifacts folder of the platform.
+ - Run your application.'
+    }
+	
+}
