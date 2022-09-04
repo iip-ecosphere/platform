@@ -137,11 +137,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     }
     
     def genHashCodeObject(String access, Boolean optional) {
-        if (optional) {
-            '${access} != null ? ${access}.hashCode() : 0'
-        } else {
-            '${access}.hashCode()'
-        }
+        '${access} != null ? ${access}.hashCode() : 0'
     }
     
     def genRecHashCode(RecordType type) {
@@ -167,11 +163,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     }
     
     def genEqualsObject(String access, Boolean optional) {
-        if (optional) {
-            '${access} != null ? ${access}.equals(oth.${access}) : true'
-        } else {
-            '${access}.equals(oth.${access})'
-        }
+        '${access} != null ? ${access}.equals(oth.${access}) : true'
     }
 
     def genRecEquals(RecordType type) {
