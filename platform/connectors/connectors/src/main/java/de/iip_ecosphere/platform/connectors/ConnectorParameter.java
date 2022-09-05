@@ -32,6 +32,29 @@ public class ConnectorParameter {
     public static final int DEFAULT_NOTIFICATION_INTERVAL = 1000;
     public static final int DEFAULT_KEEP_ALIVE = 2000;
     
+    /**
+     * Modes for caching data avoiding repeated ingestion.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum CacheMode {
+        
+        /**
+         * No caching, the default.
+         */
+        NONE,
+        
+        /**
+         * Based on the hash value.
+         */
+        HASH,
+        
+        /**
+         * Based on a deep value comparison.
+         */
+        EQUALS
+    }
+    
     private Map<String, IdentityToken> identityToken;
     private Schema schema = DEFAULT_SCHEMA;
     private int port;
@@ -47,6 +70,7 @@ public class ConnectorParameter {
     private String keyPassword;
     private String keyAlias;
     private boolean hostnameVerification = false;
+    private CacheMode cacheMode = CacheMode.NONE;
     
     /**
      * Builds a connector parameter object.
@@ -218,13 +242,26 @@ public class ConnectorParameter {
         }
         
         /**
-         * Returns whether TLS hostname verification shall be performed.
+         * Defines whether TLS hostname verification shall be performed.
          * 
          * @param hostnameVerification {@code false} for no verification, {@code true} else
          * @return <b>this</b>
          */
         public ConnectorParameterBuilder setHostnameVerification(boolean hostnameVerification) {
             instance.hostnameVerification = hostnameVerification;
+            return this;
+        }
+
+        /**
+         * Defines the cache mode.
+         * 
+         * @param cacheMode the cache mode
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setCacheMode(CacheMode cacheMode) {
+            if (null != cacheMode) {
+                instance.cacheMode = cacheMode;
+            }
             return this;
         }
 
@@ -417,6 +454,15 @@ public class ConnectorParameter {
      */
     public boolean getHostnameVerification() {
         return hostnameVerification;
+    }
+    
+    /**
+     * Returns the cache mode.
+     * 
+     * @return the cache mode
+     */
+    public CacheMode getCacheMode() {
+        return cacheMode;
     }
 
 }

@@ -46,6 +46,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private TimerTask pollTask;
     private ConnectorParameter params;
     private boolean enablePolling = true; // enable by default
+    private Object cache;
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default selector for the first adapter.
@@ -269,10 +270,39 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      */
     protected CO received(O data, boolean notifyCallback) throws IOException {
         CO result = selector.selectSouthOutput(data).adaptOutput(data);
-        if (null != callback && notifyCallback) {
+        if (null != callback && notifyCallback && checkCache(data)) {
             callback.received(result);
         }
         return result;
+    }
+    
+    /**
+     * Checks the cache if configured. Override with {@code true} if not needed.
+     * 
+     * @param data the data to send
+     * @return {@code true} for sending {@code data}, {@code false} for not sending {@code data}
+     */
+    protected boolean checkCache(Object data) {
+        boolean send = true;
+        if (null != data) {
+            switch (params.getCacheMode()) {
+            case HASH:
+                if (null == cache || cache.hashCode() == data.hashCode()) {
+                    send = true;
+                    cache = data;
+                }
+                break;
+            case EQUALS:
+                if (null == cache || cache.equals(data)) {
+                    send = true;
+                    cache = data;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        return send;
     }
     
     @Override
