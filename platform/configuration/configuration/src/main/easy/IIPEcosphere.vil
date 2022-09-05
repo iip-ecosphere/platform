@@ -67,7 +67,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
-        setOf(Application) applications = Application.allInstances(); // VTL interference?
+        setOf(Application) applications = Application.allInstances();
         
         setOf(String) javaSerializers = {};
         setOf(String) artifacts = {};

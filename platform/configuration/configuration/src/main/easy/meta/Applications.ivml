@@ -1,6 +1,5 @@
 project Applications {
 
-    import Devices;
     import Connectors;
     import DataTypes;
     import Nameplate;

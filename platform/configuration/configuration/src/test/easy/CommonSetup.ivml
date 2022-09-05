@@ -1,7 +1,6 @@
 project CommonSetup {
 
     import IIPEcosphere;
-    import DataTypes;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
