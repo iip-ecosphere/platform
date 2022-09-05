@@ -13,10 +13,10 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## Documentation
 
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
-  * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
-  * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
+  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.7047640) [link may be updated some days after platform releases]
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
-  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.6620882) [link may be updated some days after platform releases]
+  * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
+  * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
