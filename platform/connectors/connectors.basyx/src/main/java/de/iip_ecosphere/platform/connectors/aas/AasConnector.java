@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -80,6 +81,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     private transient String pollingAas = "";
     private transient Thread pollingThread;
     private String nonPollingAas = "";
+    private Map<String, Object> cache;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -149,6 +151,9 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (connectedAAS.isEmpty()) {
             this.params = params;
+            if (params.getCacheMode() != CacheMode.NONE) {
+                cache = new HashMap<>();
+            }
             // BaSyx... stays HTTP, no TLS on the registry!!!
             Schema schema = params.getSchema();
             String epPath = params.getEndpointPath();
@@ -240,6 +245,46 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     }
     
     /**
+     * A functor indicating that two objects are considered the same.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private interface ConsideredSame {
+
+        /**
+         * Checks the given two objects.
+         * 
+         * @param o1 the first object
+         * @param o2 the second object
+         * @return {@code true} for equals, {@code false} else
+         */
+        public boolean isSame(Object o1, Object o2);
+    }
+    
+    /**
+     * Checks the cache.
+     * 
+     * @param key the AAS id to consider caches for different AAS
+     * @param data the data to send
+     * @param same a functor checking the data
+     * @return {@code true} for sending {@code data}, {@code false} for not sending {@code data}
+     */
+    private boolean checkCache(String key, Object data, ConsideredSame same) {
+        boolean send = true;
+        Object o = cache.get(key);
+        if (null != o) {
+            if (!same.isSame(data, o)) {
+                cache.put(key, data);
+            } else {
+                send = false;
+            }
+        } else {
+            cache.put(key, data);
+        }
+        return send;
+    }
+    
+    /**
      * Calls {@code #received(Object)} for each AAS in {@code connectedAAS}.
      * 
      * @param connectedAAS the received AAS to be ingested
@@ -250,12 +295,30 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             try {
                 Object data = read();
                 if (null != data) {
-                    received(data);
+                    boolean send = true;
+                    switch(params.getCacheMode()) {    
+                    case HASH:
+                        send = checkCache(key, data, (o1, o2) -> o1.hashCode() == o2.hashCode());
+                        break;
+                    case EQUALS:
+                        send = checkCache(key, data, (o1, o2) -> o1.equals(o2));
+                        break;
+                    default:
+                        break;
+                    }
+                    if (send) {
+                        received(data);
+                    }
                 }
             } catch (IOException e) {
                 error("While polling. Data discarded.", e);
             }
         }
+    }
+
+    @Override
+    protected boolean checkCache(Object data) {
+        return true; // don't do a double check
     }
     
     @Override
