@@ -162,6 +162,8 @@ project Connectors {
     
     // ------------------------ connector types --------------------------
       
+    enum CacheMode {NONE, HASH, EQUALS};
+      
     // IIP-Ecosphere provided connectors
     compound Connector refines Service {
        setOf(AssignmentOperation) operations = {};
@@ -182,6 +184,7 @@ project Connectors {
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
        Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
+       CacheMode cacheMode = CacheMode::NONE;
 
        fwdTypes(output).size() < 2;
        fwdTypes(input).size() < 2;

@@ -524,6 +524,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
         '.setEndpointPath("${url}")'
     }
+    
+    def getCacheMode(Connector conn) {
+        switch (conn.cacheMode) {
+            CacheMode::HASH : "CacheMode.HASH",
+            CacheMode::EQUALS : "CacheMode.EQUALS",
+            default: "CacheMode.NONE"
+        }
+    }
 
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
@@ -536,6 +544,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder("${conn.host}", ${conn.port})
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
+                .setCacheMode(${getCacheMode(conn)})
                 ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
                 ${generateNotificationInterval(conn)|e}
