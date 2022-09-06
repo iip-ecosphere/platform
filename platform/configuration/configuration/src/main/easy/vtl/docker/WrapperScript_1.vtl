@@ -1,0 +1,16 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template WrapperScript_1(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+    	    	
+    	'#!/bin/bash'
+		''
+		'bash ecs.sh &'
+		'sleep 10;'
+		'bash serviceMgr.sh'
+          
+    }	
+}
