@@ -1,0 +1,27 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+    	
+    	'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+    	''
+    	'# ECS and Service Manager'
+    	'COPY ecsJars/ ecsJars'
+    	'COPY common/ common'
+    	'COPY ecs.sh ecs.sh'
+    	''	
+    	'# Broker'
+    	'#COPY broker/brokerJars/ brokerJars'
+    	'#COPY broker/src/ src'
+    	'#COPY broker/broker.sh broker.sh'
+    	''
+    	'# Running ECS and Service Manager'
+    	'RUN apk update && apk add bash'
+		'CMD ./ecs.sh'
+          
+    }	
+}

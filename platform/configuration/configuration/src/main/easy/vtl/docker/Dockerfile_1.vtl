@@ -1,0 +1,37 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Dockerfile_1(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+    	
+    	'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+    	'WORKDIR /app'
+    	
+    	'COPY wrapper_script.sh wrapper_script.sh'
+    	
+    	'# App'
+    	'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+    	''
+    	'# Service Manager'
+    	'COPY svcJars/ svcJars'
+    	'COPY common/ common'
+    	'COPY serviceMgr.sh serviceMgr.sh'
+    	''
+    	'# ECS'
+    	'COPY ecsJars/ ecsJars'
+    	'COPY ecs.sh ecs.sh'
+    	''    	
+    	'# Broker'
+    	'COPY broker/brokerJars/ brokerJars'
+    	'COPY broker/src/ src'
+    	'COPY broker/broker.sh broker.sh'
+    	''
+		'RUN apk update && apk add bash'
+		'RUN chmod 777 wrapper_script.sh'
+		'CMD ./wrapper_script.sh'
+          
+    }	
+}

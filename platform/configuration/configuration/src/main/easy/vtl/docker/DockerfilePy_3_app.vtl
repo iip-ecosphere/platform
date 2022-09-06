@@ -1,0 +1,48 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template DockerfilePy_3_app(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+    	
+    	'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+    	/*
+    	sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+    	for (PythonService pyService : services) {          	
+        	setOf(Dependency) deps = pyService.dependencies;
+        	for (Dependency s : deps) {
+        		if (s.isTypeOf(SystemDependency)) {
+        		
+        		}
+        		'system dep: ${s}'
+        	}
+        }
+    	*/
+    	
+    	'COPY --from=python:3.8-slim-buster / /'
+    	'WORKDIR /app'
+    	''
+    	'# App'
+    	'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+    	''
+    	'# Service Manager'
+    	'COPY svcJars/ svcJars'
+    	'COPY common/ common'
+    	'COPY serviceMgr.sh serviceMgr.sh'
+    	''
+    	'# Broker'
+    	'#COPY broker/brokerJars/ brokerJars'
+    	'#COPY broker/src/ src'
+    	'#COPY broker/broker.sh broker.sh'
+    	''
+		'# Python Dependecies'
+    	'COPY requirements.txt requirements.txt'
+    	'RUN python3 -m pip install -r requirements.txt'
+    	''
+    	'# Running ServiceMgr'
+		'CMD ./serviceMgr.sh'
+          
+    }	
+}

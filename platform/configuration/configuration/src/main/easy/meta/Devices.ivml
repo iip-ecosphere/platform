@@ -93,11 +93,13 @@ project Devices {
         CpuBits bits;
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {};
+        String containerVariant = "1_joined";
     }
     
     compound PhoenixContactDevice refines EcsDevice {
         setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
     }
+    
     
     // --------------- constant freezes --------------------
     
