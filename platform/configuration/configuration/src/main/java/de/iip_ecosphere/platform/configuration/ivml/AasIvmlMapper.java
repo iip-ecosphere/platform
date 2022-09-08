@@ -20,6 +20,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -156,24 +158,31 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      */
     public void mapByType(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
         Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
-        Iterator<IDecisionVariable> iter = cfgSupplier.get().getConfiguration().iterator();
-        while (iter.hasNext()) {
-            IDecisionVariable var = iter.next();
-            if (variableFilter.test(var)) {
-                IDatatype type = var.getDeclaration().getType();
-                String typeName = type.getName();
-                SubmodelElementCollectionBuilder builder = types.get(typeName);
-                if (null == builder) {
-                    builder = smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName), true, false);
-                    types.put(typeName, builder);
+        Configuration cfg = cfgSupplier.get();
+        if (null != cfg) { // as long as we are in transition from platform without contained model to this
+            Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
+            while (iter.hasNext()) {
+                IDecisionVariable var = iter.next();
+                if (variableFilter.test(var)) {
+                    IDatatype type = var.getDeclaration().getType();
+                    String typeName = type.getName();
+                    SubmodelElementCollectionBuilder builder = types.get(typeName);
+                    if (null == builder) {
+                        builder = smBuilder.createSubmodelElementCollectionBuilder(
+                            AasUtils.fixId(typeName), true, false);
+                        types.put(typeName, builder);
+                    }
+                    mapVariable(var, builder, null);
                 }
-                mapVariable(var, builder, null);
             }
+            for (SubmodelElementCollectionBuilder builder : types.values()) {
+                builder.build();
+            }
+            addOperations(smBuilder, iCreator);
+        } else {
+            LoggerFactory.getLogger(AasIvmlMapper.class).warn("No IVML configuration found. "
+                + "Cannot create IVML-AAS model elements/operations.");
         }
-        for (SubmodelElementCollectionBuilder builder : types.values()) {
-            builder.build();
-        }
-        addOperations(smBuilder, iCreator);
     }
     
     /**
