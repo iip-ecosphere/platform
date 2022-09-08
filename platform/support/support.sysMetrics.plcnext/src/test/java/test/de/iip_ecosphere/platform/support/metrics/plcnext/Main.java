@@ -25,6 +25,7 @@ public class Main {
                 + metrics.getCaseTemperature() + " cpu tmp: " + metrics.getCpuTemperature());
             TimeUtils.sleep(1000);
         }
+        metrics.close();
     }
 
 }

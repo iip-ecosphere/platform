@@ -12,6 +12,11 @@
 
 package de.iip_ecosphere.platform.support.metrics.plcnext;
 
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+
+import org.slf4j.LoggerFactory;
+
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceGrpc;
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceOuterClass.IDeviceStatusServiceGetItemRequest;
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceGrpc.IDeviceStatusServiceBlockingStub;
@@ -46,6 +51,9 @@ public class PlcNextSystemMetrics implements SystemMetrics {
 
     private IDeviceStatusServiceBlockingStub client;
     private long lastRequest = -1;
+    private boolean failed = false;
+    private ManagedChannel channel;
+    private EpollEventLoopGroup eventLoopGroup;
     private float boardTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
     private float cpuTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
 
@@ -63,21 +71,37 @@ public class PlcNextSystemMetrics implements SystemMetrics {
      * Initialize the channel.
      */
     private void request() {
-        if (lastRequest < 1 || System.currentTimeMillis() - lastRequest > TIMEOUT) {
-            if (null == client) {
-                ManagedChannel channel = NettyChannelBuilder
-                    .forAddress(new DomainSocketAddress("/run/plcnext/grpc.sock"))
-                    .eventLoopGroup(new EpollEventLoopGroup())
-                    .channelType(EpollDomainSocketChannel.class)
-                    .usePlaintext()
-                    //.usePlaintext(true)
-                    .build();
-                client = IDeviceStatusServiceGrpc.newBlockingStub(channel);
-                
-                
+        if (!failed && (lastRequest < 1 || System.currentTimeMillis() - lastRequest > TIMEOUT)) {
+            if (null == channel) {
+                File sock = new File("/run/plcnext/grpc.sock");
+                if (sock.exists()) {
+                    try { // if we are in a container, user/permissions may be different; for now, just boldly set xrw
+                        sock.setExecutable(true);
+                        sock.setReadable(true);
+                        sock.setWritable(true);
+                    } catch (SecurityException e) {
+                        LoggerFactory.getLogger(PlcNextSystemMetrics.class).error("Cannot set permissions on {}. "
+                            + "Access may fail.", sock);
+                    }
+                    eventLoopGroup = new EpollEventLoopGroup();
+                    channel = NettyChannelBuilder
+                        .forAddress(new DomainSocketAddress(sock))
+                        .eventLoopGroup(eventLoopGroup)
+                        .channelType(EpollDomainSocketChannel.class)
+                        .usePlaintext()
+                        //.usePlaintext(true)
+                        .build();
+                    client = IDeviceStatusServiceGrpc.newBlockingStub(channel);
+                } else {
+                    LoggerFactory.getLogger(PlcNextSystemMetrics.class).error("Cannot find/open {}. Is your device a "
+                        + "Phoenix Contact AXC and your firmware at least 2022.0 LTS", sock);
+                    failed = true;
+                }
             }
-            boardTemp = client.getItem(REQUEST_BOARD_TEMPERATURE).getReturnValue().getFloatValue();
-            cpuTemp = client.getItem(REQUEST_CPU_TEMPERATURE).getReturnValue().getFloatValue();
+            if (null != client) { // in closing, closed
+                boardTemp = client.getItem(REQUEST_BOARD_TEMPERATURE).getReturnValue().getInt8Value();
+                cpuTemp = client.getItem(REQUEST_CPU_TEMPERATURE).getReturnValue().getInt8Value();
+            }
         }
     }
     
@@ -95,14 +119,27 @@ public class PlcNextSystemMetrics implements SystemMetrics {
     
     @Override
     public int getNumGpuCores() {
-        request();
-        return 0; // TODO
+        //request();
+        return 0; // so far not
     }
 
     @Override
     public int getNumTpuCores() {
         request();
         return 0; // TODO
+    }
+    
+    @Override
+    public void close() {
+        if (null != channel) {
+            client = null;
+            channel.shutdownNow();
+            try {
+                eventLoopGroup.shutdownGracefully().get();
+            } catch (ExecutionException | InterruptedException e) {
+                LoggerFactory.getLogger(PlcNextSystemMetrics.class).error("Shutting down: {}", e.getMessage());
+            }
+        }
     }
 
 }
