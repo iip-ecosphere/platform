@@ -208,6 +208,16 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    def getJavaServiceKind(ServiceKind kind) {
+        switch (kind) {
+            ServiceKind::SOURCE_SERVICE: "ServiceKind.SOURCE_SERVICE",
+            ServiceKind::SINK_SERVICE: "ServiceKind.SINK_SERVICE",
+            ServiceKind::TRANSFORMATION_SERVICE: "ServiceKind.TRANSFORMATION_SERVICE",
+            ServiceKind::PROBE_SERVICE: "ServiceKind.PROBE_SERVICE",
+            default: "null" // shall not occur
+        }
+    }
+    
     // ------------------------------------------ other -------------------------------------
 
     def String toPath(String pkg) {

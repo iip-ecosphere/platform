@@ -192,9 +192,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 resourcesSrc.mkdir();
                 Path testResourcesSrc = "${appRoot}/src/main/resources";
                 testResourcesSrc.mkdir();
-                vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName=appName);
-                vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName=appName);
-                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName=appName);
+                vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
 
                 setOf(String) assemblies = {}; 
@@ -226,7 +226,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies) = {
         if (service.class <> "") {
             JavaPath jp = service.class;
-            vilTemplateProcessor("JavaMeshElementTemplate", config, "${appRoot}/src/main/java/${jp.getPath()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
+            Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
+            p.mkdir();
+            vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
         }
     }
 

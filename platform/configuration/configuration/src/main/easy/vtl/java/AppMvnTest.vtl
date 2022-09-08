@@ -92,7 +92,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendDependency(dep, "junit", "junit", scope="test");
         new XmlComment(dep, "Initially, fixed protocol");
         appendDependency(dep, "de.iip-ecosphere.platform", "test.amqp.qpid", projectVersion, scope="test", type="test-jar");
-        appendDependency(dep, "org.apache.qpid", "qpid-broker", projectVersion, scope="test");
+        appendDependency(dep, "org.apache.qpid", "qpid-broker", scope="test");
         appendDependency(dep, "de.iip-ecosphere.platform", "support.aas.basyx", projectVersion, scope="test");
         appendDependency(dep, "de.iip-ecosphere.platform", "transport", projectVersion, scope="test", type="test-jar");
         appendDependency(dep, "de.iip-ecosphere.platform", "transport.amqp", projectVersion, scope="test");
