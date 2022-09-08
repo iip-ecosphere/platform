@@ -8,6 +8,7 @@ import MeshBasics;
 template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
 
     def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
+        IIPEcosphere cfg = config;
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -16,24 +17,37 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         String projectVersion = config.iipVer;
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "${appName}", "${appName}", "${appDescription}");
+        createMavenProjectAttributes(project, "${appName}Services", "${appName}-services", "${appDescription}");
         new XmlElement(project, "groupId", gId);
         new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
-        new XmlComment(project, "This is a demonstration POM fragment showing how generated tests can be used in an application POM.");
+        new XmlComment(project, "Template application/service implementation POM.");
         
-        XmlElement dep = createDependencies(project);
-        new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
-        appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
-        new XmlComment(dep, "Remaining dependencies go here."); 
-        new XmlComment(dep, "Following must be somewhere repeated in your dependencies."); 
+        XmlElement profiles = new XmlElement(project, "profiles");
+        XmlElement profile = new XmlElement(profiles, "profile");
+        new XmlElement(profile, "id", "App");
+        new XmlElement(new XmlElement(profile, "activation"), "activeByDefault", "true");
+        
+        XmlElement dep = createDependencies(profile);
+        
+        XmlElement d = appendArtifact(dep, cfg.sharedArtifact, projectVersion);
+        XmlElement e = appendExclusions(d);
+        appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
+        appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
+        appendExclusion(e, "org.springframework.boot", "spring-boot"); 
+        d = appendDependency(dep, gId, appName, appVersion);
+        e = appendExclusions(d);
+        appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
+        appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
+        appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
+        
         appendDependency(dep, "org.springframework", "spring-test", scope="test");
         appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
         appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
      
-        XmlElement plugins = createMavenBuildElement(project, "", true);
+        XmlElement plugins = createMavenBuildElement(profile, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
@@ -59,6 +73,34 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
             new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
             new XmlElement(execCfg, "classpathScope", "test");
         }
+        XmlElement exec = new XmlElement(execPluginExecs, "execution");
+        new XmlElement(exec, "id", "App");
+        XmlElement execCfg = new XmlElement(exec, "configuration");
+        new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.examples.SpringStartup");
+        XmlElement execArgs = new XmlElement(execCfg, "arguments");
+        new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
+        new XmlElement(execCfg, "classpathScope", "test");
+        
+        dep = createDependencies(project);
+        new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
+        appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
+        appendDependency(dep, "de.iip-ecosphere.platform", "services.environment", projectVersion);
+        appendDependency(dep, "de.iip-ecosphere.platform", "kiServices.functions", projectVersion);
+        d = appendDependency(dep, "de.iip-ecosphere.platform", "examples", projectVersion);
+        appendSingleExclusion(d, "de.iip-ecosphere.platform", "services.spring");
+        new XmlComment(dep, "Remaining global dependencies go here."); 
+        appendDependency(dep, "junit", "junit", scope="test");
+        new XmlComment(dep, "Initially, fixed protocol");
+        appendDependency(dep, "de.iip-ecosphere.platform", "test.amqp.qpid", projectVersion, scope="test", type="test-jar");
+        appendDependency(dep, "org.apache.qpid", "qpid-broker", projectVersion, scope="test");
+        appendDependency(dep, "de.iip-ecosphere.platform", "support.aas.basyx", projectVersion, scope="test");
+        appendDependency(dep, "de.iip-ecosphere.platform", "transport", projectVersion, scope="test", type="test-jar");
+        appendDependency(dep, "de.iip-ecosphere.platform", "transport.amqp", projectVersion, scope="test");
+        appendDependency(dep, "de.iip-ecosphere.platform", "services.spring", projectVersion, scope="test");
+        appendDependency(dep, "org.springframework", "spring-test", scope="test");
+        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
+        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
+        new XmlComment(dep, "Remaining test dependencies go here."); 
     }
 
 }
