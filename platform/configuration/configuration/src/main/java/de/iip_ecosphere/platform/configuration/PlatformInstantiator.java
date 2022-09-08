@@ -71,7 +71,7 @@ public class PlatformInstantiator {
          * 
          * @param setup the setup instance
          */
-        protected void configure(ConfigurationSetup setup) {
+        public void configure(ConfigurationSetup setup) {
             EasySetup easySetup = setup.getEasySetup();
             easySetup.setIvmlModelName(ivmlModelName);
             if (null != modelFolder) {
@@ -107,7 +107,7 @@ public class PlatformInstantiator {
          * 
          * @return the descriptor
          */
-        protected ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+        public ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
             return new ConfigurationLifecycleDescriptor();
         }
         

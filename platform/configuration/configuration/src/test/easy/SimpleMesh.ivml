@@ -64,7 +64,9 @@ project SimpleMesh {
     MeshSource mySource = {
         pollInterval = 800, // only if source is synchronous
         impl = refBy(mySourceService),
-        next = {refBy(myConnMySourceMyReceiver)}
+        next = {refBy(myConnMySourceMyReceiver)},
+        pos_x = 10,
+        pos_y = 10
     };
     
     MeshConnector myConnMySourceMyReceiver = {
@@ -73,7 +75,9 @@ project SimpleMesh {
     };
 
     MeshSink myReceiver = {
-        impl = refBy(myReceiverService)
+        impl = refBy(myReceiverService),
+        pos_x = 50,
+        pos_y = 10
     };
     
     // ---------- generation setup ------------

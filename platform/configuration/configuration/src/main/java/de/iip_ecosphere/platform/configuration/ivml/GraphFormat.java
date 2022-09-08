@@ -31,10 +31,17 @@ public interface GraphFormat {
     public String getName();
 
     /**
+     * Returns the kind of format produced.
+     * 
+     * @return the format kind, e.g., XML, JSON, ...
+     */
+    public String getFormatKind();
+
+    /**
      * Turns {@code graph} into this format.
      * 
-     * @param graph the graph
-     * @return the formatted graph
+     * @param graph the graph, may be <b></b>
+     * @return the formatted graph, an empty graph if {@code graph} is <b>null</b>
      * @throws ExecutionException if the translation fails
      */
     public String toString(IvmlGraph graph) throws ExecutionException;
@@ -42,10 +49,13 @@ public interface GraphFormat {
     /**
      * Parses {@code graph} from this format into an IVML graph structure.
      * 
-     * @param graph the graph
-     * @return the IVML graph structure
+     * @param graph the graph, may be <b></b>
+     * @param factory a factory to be used to create graph instances
+     * @param varProvider the provider allowing to access variables 
+     * @return the IVML graph structure, an empty graph if {@code graph} is <b>null</b>
      * @throws ExecutionException if the translation fails
      */
-    public IvmlGraph fromString(String graph) throws ExecutionException;
+    public IvmlGraph fromString(String graph, GraphFactory factory, DecisionVariableProvider varProvider) 
+        throws ExecutionException;
     
 }

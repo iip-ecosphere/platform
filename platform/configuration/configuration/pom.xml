@@ -96,6 +96,11 @@
     </dependency>
   
     <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+    </dependency>
+  
+    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
      <version>${project.version}</version>

@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -48,7 +49,7 @@ import net.ssehub.easy.varModel.model.values.ValueFactory;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasIvmlMapper {
+public class AasIvmlMapper implements DecisionVariableProvider {
     
     public static final String OP_CHANGE_VALUES = "changeValues";
     public static final String OP_GET_GRAPH = "getGraph";
@@ -59,9 +60,7 @@ public class AasIvmlMapper {
     public static final Predicate<IDecisionVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getDeclaration().getType());
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + capitalizeFirst(n);
-
-    private final TypeVisitor typeVisitor = new TypeVisitor();
-    private final ValueVisitor valueVisitor = new ValueVisitor();
+    private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     
     private Supplier<Configuration> cfgSupplier;
     private IvmlGraphMapper graphMapper;
@@ -98,6 +97,15 @@ public class AasIvmlMapper {
         if (null != format) {
             graphFormats.put(format.getName(), format);
         }
+    }
+    
+    /**
+     * Returns the factory to use to crate graphs.
+     * 
+     * @return the factory
+     */
+    public GraphFactory getGraphFactory() {
+        return graphMapper.getGraphFactory();
     }
 
     /**
@@ -159,7 +167,7 @@ public class AasIvmlMapper {
                     builder = smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName), true, false);
                     types.put(typeName, builder);
                 }
-                mapVariable(var, builder);
+                mapVariable(var, builder, null);
             }
         }
         for (SubmodelElementCollectionBuilder builder : types.values()) {
@@ -260,19 +268,13 @@ public class AasIvmlMapper {
     private Object setGraph(String qualifiedVarName, String format, String value) throws ExecutionException {
         GraphFormat gFormat = getGraphFormat(format);
         IDecisionVariable var = getVariable(qualifiedVarName);
-        IvmlGraph graph = gFormat.fromString(value);
+        IvmlGraph graph = gFormat.fromString(value, graphMapper.getGraphFactory(), this);
         graphMapper.synchronize(var, graph);
         return null;
     }
 
-    /**
-     * Returns an IVML variable from the configuration provided by {@link #cfgSupplier}.
-     * 
-     * @param qualifiedVarName the (qualified) variable name
-     * @return the variable
-     * @throws ExecutionException if the variable cannot be found
-     */
-    private IDecisionVariable getVariable(String qualifiedVarName) throws ExecutionException {
+    @Override
+    public IDecisionVariable getVariable(String qualifiedVarName) throws ExecutionException {
         return getVariable(cfgSupplier.get(), qualifiedVarName);
     }
 
@@ -282,7 +284,7 @@ public class AasIvmlMapper {
      * @param cfg the configuration to take the variable from
      * @param qualifiedVarName the (qualified) variable name
      * @return the variable
-     * @throws ExecutionException if the variable cannot be found
+     * @throws ExecutionException if querying the variable fails
      */
     private IDecisionVariable getVariable(Configuration cfg, String qualifiedVarName) throws ExecutionException {
         try {
@@ -352,7 +354,7 @@ public class AasIvmlMapper {
         smBuilder.createOperationBuilder(OP_SET_GRAPH)
             .addInputVariable("qualifiedName", Type.STRING)
             .addInputVariable("format", Type.STRING)
-            .addInputVariable("value", Type.STRING)
+            .addInputVariable("val", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_SET_GRAPH))
             .build(Type.NONE);
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
@@ -371,8 +373,10 @@ public class AasIvmlMapper {
      * 
      * @param var the variable to map as source
      * @param builder the builder as target
+     * @param id the id to use as variable name instead of the variable name itself, may be <b>null</b> for 
+     *     the variable name
      */
-    private void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder) {
+    private void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
         if (variableFilter.test(var)) {
             String varName = var.getDeclaration().getName();
             IDatatype varType = var.getDeclaration().getType();
@@ -380,7 +384,7 @@ public class AasIvmlMapper {
                 SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
-                    mapVariable(var.getNestedElement(member), varBuilder);
+                    mapVariable(var.getNestedElement(member), varBuilder, null);
                 }
                 varBuilder.build();
             } else if (TypeQueries.isContainer(varType)) {
@@ -390,21 +394,25 @@ public class AasIvmlMapper {
                 SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), isOrdered, allowsDuplicates);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
-                    mapVariable(var.getNestedElement(member), varBuilder);
+                    mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
                 }
+                varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("size")))
+                    .setValue(Type.INTEGER, var.getNestedElementsCount())
+                    .build();
                 varBuilder.build();
             } else {
-                Object aasValue = null;
-                if (null != var.getValue()) {
-                    var.getValue().accept(valueVisitor);
-                    aasValue = valueVisitor.getAasValue();
-                }
-                varType.getType().accept(typeVisitor);
-                Type aasType = typeVisitor.getAasType();
+                Object aasValue = getValue(var);
+                varType.getType().accept(TYPE_VISITOR);
+                Type aasType = TYPE_VISITOR.getAasType();
                 // TODO setSemanticId via annotation?
-                builder.createPropertyBuilder(AasUtils.fixId(varName))
-                    .setValue(aasType, aasValue)
-                    .build();
+                String propName = id == null ? varName : id;
+                PropertyBuilder pb = builder.createPropertyBuilder(AasUtils.fixId(propName));
+                if (var.getState() == AssignmentState.FROZEN) {
+                    pb.setValue(aasType, aasValue);
+                } else {
+                    pb.setType(aasType).bind(() -> getValue(var), PropertyBuilder.READ_ONLY);
+                }
+                pb.build();
             }
             builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
                 .setValue(Type.STRING, var.getState().toString())
@@ -413,6 +421,22 @@ public class AasIvmlMapper {
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
                 .build();
         }
+    }
+
+    /**
+     * Returns the value of a variable.
+     * 
+     * @param var the variable
+     * @return the value
+     */
+    private static Object getValue(IDecisionVariable var) {
+        Object aasValue = null;
+        if (null != var.getValue()) {
+            ValueVisitor valueVisitor = new ValueVisitor();
+            var.getValue().accept(valueVisitor);
+            aasValue = valueVisitor.getAasValue();
+        }
+        return aasValue;
     }
 
 }

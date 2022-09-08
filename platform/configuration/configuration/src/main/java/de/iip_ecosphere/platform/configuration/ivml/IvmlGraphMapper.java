@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.configuration.ivml;
 
-import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -39,6 +38,13 @@ public interface IvmlGraphMapper {
         public String getName();
 
         /**
+         * Changes the name of the element.
+         * 
+         * @param name the new name
+         */
+        public void setName(String name);
+        
+        /**
          * Returns the underlying IVML variable.
          * 
          * @return the variable
@@ -55,11 +61,25 @@ public interface IvmlGraphMapper {
     public interface IvmlGraph extends IvmlGraphElement {
         
         /**
+         * Adds a node to this graph.
+         * 
+         * @param node the node
+         */
+        public void addNode(IvmlGraphNode node);
+        
+        /**
          * Returns the nodes in the graph.
          * 
          * @return the nodes
          */
-        public Iterator<IvmlGraphNode> nodes();
+        public Iterable<? extends IvmlGraphNode> nodes();
+        
+        /**
+         * Returns the number of nodes of this graph.
+         * 
+         * @return the number of nodes
+         */
+        public int getNodeCount();
         
     }
     
@@ -71,60 +91,96 @@ public interface IvmlGraphMapper {
     public interface IvmlGraphNode extends IvmlGraphElement {
         
         /**
-         * Returns the left position of the node.
+         * Returns the left position of the node. May be ignored by the graph reader/writer.
          * 
-         * @return the left position
+         * @return the left position, invalid if negative
          */
         public int getXPos();
 
         /**
-         * Returns the top position of the node.
+         * Returns the top position of the node. May be ignored by the graph reader/writer.
          * 
-         * @return the top position
+         * @return the top position, invalid if negative
          */
         public int getYPos();
         
         /**
-         * Returns the width of the node.
+         * Returns the width of the node. May be ignored by the graph reader/writer.
          * 
-         * @return the width
+         * @return the width, invalid if negative
          */
         public int getWidth();
 
         /**
-         * Returns the height of the node.
+         * Returns the height of the node. May be ignored by the graph reader/writer.
          * 
-         * @return the heigt
+         * @return the height, invalid if negative
          */
         public int getHeight();
         
         /**
-         * Changes the left position of the node.
+         * Changes the left position of the node. May be ignored by the graph reader/writer.
          * 
-         * @param xPos the left position
+         * @param xPos the left position, invalid if negative
          */
         public void setXPos(int xPos);
 
         /**
-         * Changes the top position of the node.
+         * Changes the top position of the node. May be ignored by the graph reader/writer.
          * 
-         * @param yPos the left position
+         * @param yPos the left position, invalid if negative
          */
         public void setYPos(int yPos);
 
         /**
-         * Changes the width of the node.
+         * Changes the width of the node. May be ignored by the graph reader/writer.
          * 
-         * @param width the width of the node
+         * @param width the width of the node, invalid if negative
          */
         public void setWidth(int width);
         
         /**
-         * Changes the height of the node.
+         * Changes the height of the node. May be ignored by the graph reader/writer.
          * 
-         * @param height the height of the node
+         * @param height the height of the node, invalid if negative
          */
         public void setHeight(int height);
+
+        /**
+         * Adds an incoming/outgoing edge to this node.
+         * 
+         * @param edge the edge
+         */
+        public void addEdge(IvmlGraphEdge edge);
+        
+        /**
+         * Returns the edges ending at this node.
+         * 
+         * @return the edges
+         */
+        public Iterable<? extends IvmlGraphEdge> inEdges();
+        
+        /**
+         * Returns the number of edges ending at this node.
+         * 
+         * @return the number of in-edges
+         */
+        public int getInEdgesCount();
+
+        /**
+         * Returns the edges starting at this node.
+         * 
+         * @return the edges
+         */
+        public Iterable<? extends IvmlGraphEdge> outEdges();
+
+        /**
+         * Returns the number of edges starting at this node.
+         * 
+         * @return the number of out-edges
+         */
+        public int getOutEdgesCount();
+
     }
 
     /**
@@ -133,7 +189,6 @@ public interface IvmlGraphMapper {
      * @author Holger Eichelberger, SSE
      */
     public interface IvmlGraphEdge extends IvmlGraphElement {
-        // TODO positions unclear
         
         /**
          * Returns the start node.
@@ -169,4 +224,11 @@ public interface IvmlGraphMapper {
      */
     public void synchronize(IDecisionVariable var, IvmlGraph graph) throws ExecutionException;
 
+    /**
+     * Returns the factory to use to crate graphs.
+     * 
+     * @return the factory
+     */
+    public GraphFactory getGraphFactory();
+    
 }

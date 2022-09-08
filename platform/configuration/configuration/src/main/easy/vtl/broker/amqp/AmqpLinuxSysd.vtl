@@ -24,8 +24,8 @@ template AmqpLinuxSysd(Configuration config, FileArtifact target) {
         Type=simple
         Restart=on-failure
         KillMode=control-group
-        Requires=network.target
-        After=network.target
+        Requires=multi-user.target
+        After=multi-user.target
         ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port}
         
         [Install]

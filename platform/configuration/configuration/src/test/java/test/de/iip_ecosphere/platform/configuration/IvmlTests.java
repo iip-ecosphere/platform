@@ -105,7 +105,7 @@ public abstract class IvmlTests {
          * 
          * @return the descriptor
          */
-        protected ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+        public ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
             return assertLifecycleDescriptor();
         }
         
@@ -125,7 +125,7 @@ public abstract class IvmlTests {
         }
 
         @Override
-        protected void configure(ConfigurationSetup setup) {
+        public void configure(ConfigurationSetup setup) {
             super.configure(setup);
             setup.getEasySetup().setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
