@@ -26,13 +26,16 @@ public class PlcNextSystemMetricsDescriptor implements SystemMetricsDescriptor {
 
     @Override
     public SystemMetrics createInstance() {
-        return new PlcNextSystemMetrics();
+        return PlcNextSystemMetrics.INSTANCE;
     }
 
     @Override
     public boolean isEnabled() {
-        File f = new File("/opt/plcnext");
-        return f.exists(); // as discussed with Phoenix Contact
+        // if native on plcnext, but may not be in container; still PLCNEXT_SOCK may not be there
+        File f1 = new File("/opt/plcnext"); // as discussed with Phoenix Contact
+        // fallback - if not there, no metrics; if there, use it anyway
+        File f2 = new File(PlcNextSystemMetrics.PLCNEXT_SOCK); 
+        return f1.exists() || f2.exists(); 
     }
 
     @Override 

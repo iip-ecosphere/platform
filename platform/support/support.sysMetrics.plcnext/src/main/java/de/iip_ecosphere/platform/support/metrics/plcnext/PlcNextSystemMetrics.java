@@ -35,6 +35,8 @@ import io.netty.channel.unix.DomainSocketAddress;
 public class PlcNextSystemMetrics implements SystemMetrics {
 
     public static final SystemMetrics INSTANCE = new PlcNextSystemMetrics();
+    public static final String PLCNEXT_SOCK = System.getProperty("iip.devices.plcNext.grpc.sock", 
+        "/run/plcnext/grpc.sock");
     private static final long TIMEOUT = 500;
     
     private static final IDeviceStatusServiceGetItemRequest REQUEST_BOARD_TEMPERATURE = 
@@ -73,7 +75,7 @@ public class PlcNextSystemMetrics implements SystemMetrics {
     private void request() {
         if (!failed && (lastRequest < 1 || System.currentTimeMillis() - lastRequest > TIMEOUT)) {
             if (null == channel) {
-                File sock = new File("/run/plcnext/grpc.sock");
+                File sock = new File(PLCNEXT_SOCK);
                 if (sock.exists()) {
                     try { // if we are in a container, user/permissions may be different; for now, just boldly set xrw
                         sock.setExecutable(true);
