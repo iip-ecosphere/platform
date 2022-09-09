@@ -115,7 +115,8 @@ public class EasySetup {
     }
 
     /**
-     * Defines the IVML meta model folder containing the platform meta model. [required by SnakeYaml]
+     * Defines the IVML meta model folder containing the platform meta model. This folder is not
+     * interpreted relative to {@link #getBase()}. [required by SnakeYaml]
      * 
      * @param ivmlMetaModelFolder the IVML meta model folder
      */
@@ -124,7 +125,8 @@ public class EasySetup {
     }
 
     /**
-     * Defines the IVML configuration folder containing the platform configuration. [required by SnakeYaml]
+     * Defines the IVML configuration folder containing the platform configuration. This folder is not
+     * interpreted relative to {@link #getBase()}. [required by SnakeYaml]
      * 
      * @param ivmlConfigFolder the IVML configuration folder, shall be <b>null</b> if it is the same 
      * as {@link #getIvmlMetaModelFolder()}, ignored if given and the same as {@link #getIvmlMetaModelFolder()}   

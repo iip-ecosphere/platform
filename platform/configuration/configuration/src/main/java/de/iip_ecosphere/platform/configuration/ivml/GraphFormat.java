@@ -40,7 +40,7 @@ public interface GraphFormat {
     /**
      * Turns {@code graph} into this format.
      * 
-     * @param graph the graph, may be <b></b>
+     * @param graph the graph, may be <b>null</b>
      * @return the formatted graph, an empty graph if {@code graph} is <b>null</b>
      * @throws ExecutionException if the translation fails
      */
@@ -49,7 +49,7 @@ public interface GraphFormat {
     /**
      * Parses {@code graph} from this format into an IVML graph structure.
      * 
-     * @param graph the graph, may be <b></b>
+     * @param graph the graph, may be <b>null</b>
      * @param factory a factory to be used to create graph instances
      * @param varProvider the provider allowing to access variables 
      * @return the IVML graph structure, an empty graph if {@code graph} is <b>null</b>

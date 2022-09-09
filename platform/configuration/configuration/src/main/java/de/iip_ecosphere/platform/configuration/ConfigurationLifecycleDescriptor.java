@@ -130,7 +130,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
             loader = new ListLoader(); // file .easyStartup from classloader
-            EasySetup easySetup = setup.getEasySetup();
+            EasySetup easySetup = setup.getEasyProducer();
             loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");
             doFilterLogs = easySetup.getLogLevel() == EasyLogLevel.NORMAL;

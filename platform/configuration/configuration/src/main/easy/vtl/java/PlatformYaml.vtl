@@ -3,7 +3,7 @@ import EcsRuntimeDockerContainerManagerYaml;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PlatformYaml(IIPEcosphere config, FileArtifact target) {
+template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName) {
 
     def produceDevMgtServer(IIPEcosphere config) {
         DeviceMgtStorageServer s = config.deviceMgtStorageServer; 
@@ -66,14 +66,41 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target) {
           scrapeInterval: ${mon.scrapeInterval}
           scrapeTimeout: ${mon.scrapeTimeout}'
     }
+    
+    def produceEasy(IIPEcosphere config, String modelName) {
+        String base = ".";
+        if (config.modelBaseFolder <> null) {
+            base = config.modelBaseFolder;
+        }
+        String genTarget = "gen";
+        if (config.genTarget <> null) {
+            genTarget = config.genTarget;
+        }
+        String metaModelFolder = "src/main/easy";
+        if (config.metaModelFolder <> null) {
+            metaModelFolder = config.metaModelFolder;
+        }
+        String configFolder = "";
+        if (config.configFolder <> null) {
+            configFolder = config.configFolder;
+        }
+        'easyProducer: 
+          ivmlModelName: ${modelName}
+          base: ${base}
+          genTarget: ${genTarget}
+          ivmlMetaModelFolder: ${base}/${metaModelFolder}
+          ivmlConfigFolder: ${base}/${configFolder}
+        '
+    }
 
-    def main(IIPEcosphere config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target, String modelName) {
         String pers = "${config.aasPersistency}";
         produceTransport(config);
         produceAas(config, pers, false);
         produceNetMgr(config);
         produceDevMgt(config);
         produceCentralMonitoring(config);
+        produceEasy(config, modelName);
         'artifactsFolder: ${config.artifactsFolder}
         artifactsUriPrefix: ${config.artifactsUriPrefix}'
     }

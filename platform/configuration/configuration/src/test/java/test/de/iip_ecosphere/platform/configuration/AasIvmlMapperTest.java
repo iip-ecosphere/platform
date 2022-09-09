@@ -117,7 +117,7 @@ public class AasIvmlMapperTest {
         String res = assertSubmodel(smb.build(), appName, netIndex, servicesAsserter);
         psb.build();
         lcd.shutdown();
-        setup.getEasySetup().reset();
+        setup.getEasyProducer().reset();
         return format.fromString(res, mapper.getGraphFactory(), mapper);
     }
     

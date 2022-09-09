@@ -4,7 +4,7 @@
 
 Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
-* More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
+* More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
@@ -17,6 +17,11 @@ Planned:
 * Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+
+Improvements:
+* [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
+* [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
+* [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 

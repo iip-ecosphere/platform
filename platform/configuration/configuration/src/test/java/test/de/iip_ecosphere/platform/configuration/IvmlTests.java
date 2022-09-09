@@ -127,7 +127,7 @@ public abstract class IvmlTests {
         @Override
         public void configure(ConfigurationSetup setup) {
             super.configure(setup);
-            setup.getEasySetup().setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
+            setup.getEasyProducer().setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
 
     }
@@ -137,6 +137,7 @@ public abstract class IvmlTests {
      * {@link #pythonSourceCodeCheck(File, String)}.
      *  
      * @param srcMainPython the target folder where to extract the service environment to
+     * @throws IOException if the service environment archive cannot be extracted
      */
     protected void extractPythonServiceEnv(File srcMainPython) throws IOException {
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
