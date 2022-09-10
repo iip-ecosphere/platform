@@ -30,7 +30,7 @@ project Applications {
         ServiceKind kind;
         refTo(ServiceBase) impl; // allow for family or service
         refTo(MeshElement) ensemble = null; // in same process as referenced, usually not; here not in service to facilitate service reuse
-        assign (bindingTime = BindingTime::runtime) to {
+        assign (bindingTime = BindingTime::runtimeEnact) to {
             Integer pos_x = -1;
             Integer pos_y = -1;
         }

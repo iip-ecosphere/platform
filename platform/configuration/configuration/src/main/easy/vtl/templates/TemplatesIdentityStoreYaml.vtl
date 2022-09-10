@@ -1,0 +1,15 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, String appName) {
+	
+    def main(IIPEcosphere config, FileArtifact target, String appName) {
+    'name: ${appName}
+     identities:
+       "amqp": 
+          type: USERNAME
+          userName: user
+          tokenData: pwd
+          tokenEncryptionAlgorithm: UTF-8'
+    }
+	
+}

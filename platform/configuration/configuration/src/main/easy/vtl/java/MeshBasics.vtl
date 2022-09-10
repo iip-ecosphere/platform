@@ -30,6 +30,22 @@ template MeshBasics(Configuration config, FileArtifact target) {
         result;
     }
     
+    def DataType getFirstType(sequenceOf(IOType) types) {
+        if (types.size() > 0) {
+            IOType t = types.get(0);
+            t.type;
+        }    
+    }
+    
+    def getFirstTypeName(sequenceOf(IOType) types) {
+        DataType dt = getFirstType(types);
+        if (dt <> null) {
+            dt.name;
+        } else {
+            "Object";
+        }
+    }
+    
     // -------------------------------------------- suffixes -------------------------------
 
     def String getOutName(MeshElement elt, String inType) {
@@ -413,5 +429,70 @@ template MeshBasics(Configuration config, FileArtifact target) {
         }
         '${result}'
     }
+    
+    // ------------------------------ testing data format --------------------------------------
+    
+    def needsDataUnitJson(ServiceBase service) {
+        service.input.size() > 0;
+    }
+    
+    def getDataUnitJson(ServiceBase service, String typeAdd) {
+        String result = "{";
+        for (IOType in: service.input) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            String typeName = toTypeName(in);
+            String implTypeName = toImplTypeName(in, typeAdd);
+            String attributeName = firstToLowerCase(toTypeName(in));
+            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
+        }
+        result + ', "\\$period": p, "\\$repeats": r}';
+    }
+    
+    protected def getDataUnitJson(Connector conn, String typeAdd) {
+        DataType outType = getFirstType(conn.output);
+        getDataTypeJson(outType);
+    }
+    
+    protected def getDataTypeJson(DataType type) {
+        ''
+    }
+    
+    protected def getDataTypeJson(RecordType type) {
+        String result = "{";
+        for (Field f: type.fields) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
+        }
+        result + "}";
+    }
+    
+    protected def getFieldValueJson(DataType type, Field f) {
+        if (f.optional) {
+            'o';
+        } else {
+            'm';
+        }
+    }
+    
+    protected def getFieldValueJson(RecordType type, Field f) {
+        getDataTypeJson(type);
+    }
+    
+    protected def toImplTypeName(IOType type, String typeAdd) {
+        toImplTypeName(type.type, typeAdd);
+    }
+    
+    protected def toImplTypeName(DataType type, String typeAdd) {
+        toTypeName(type);
+    }
+
+    protected def toImplTypeName(RecordType type, String typeAdd) {
+        toTypeName(type) + typeAdd;
+    }
+    
     
 }

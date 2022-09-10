@@ -1,6 +1,7 @@
 import JavaBasics;
 import JavaMapping;
 import Basics;
+import MeshBasics;
 
 // TODO services, dynamic; similar Kodex
 import Rtsa;
@@ -190,11 +191,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 pySrc = "${appRoot}/src/main/python";
                 resourcesSrc = "${appRoot}/src/main/resources";
                 resourcesSrc.mkdir();
-                Path testResourcesSrc = "${appRoot}/src/main/resources";
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
                 testResourcesSrc.mkdir();
+                
                 vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName="impl." + appName);
                 vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName="impl." + appName);
-                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
 
                 setOf(String) assemblies = {}; 
@@ -207,8 +208,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         elements.add(no);
                     }
                 }
+                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
+
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
@@ -229,6 +234,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
             p.mkdir();
             vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
+            if (needsDataUnitJson(no.impl)) {
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
+                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.yml.tmpl", elt=no);
+            }
         }
     }
 

@@ -85,59 +85,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         *
         * @author EASy-Producer
         */
-        private static class DataUnit {
+        private static class DataUnit extends DataMapper.BaseDataUnit {
         
-            private int \\$period = 0;
             ${getDataUnitAttributes(service)}
 
             ${getDataUnitGetters(service)}
             
-            /**
-            * Returns the delay period between this and the next data unit.
-            *
-            * @return the period in ms, use default/last value if zero or negative
-            */
-            public int get\\$Period() {
-                return \\$period;
-            }
-
             ${getDataUnitSetters(service)}
-        
-            /**
-            * Changes the delay period between this and the next data unit.
-            *
-            * @param \\$period the period in ms, default/last value if zero or negative
-            */
-            public void set\\$Period(int \\$period) {
-                this.\\$period = \\$period;
-            }
             
-        }
-        
-        /**
-        * Extended data mapper taking {@link DataUnit#\\$period} into account.
-        */
-        private class TimedMappingConsumer extends DataMapper.MappingConsumer<DataUnit> {
-        
-            private int period = getInitialPeriod();
-        
-            /**
-             * Creates a timed mapping consumer.
-             */
-            public TimedMappingConsumer() {
-                super(DataUnit.class);
-            }
-        
-        
-            @Override
-            public void accept(DataUnit value) {
-                super.accept(value);
-                period = value.get\\$Period();
-                if (period > 0) {
-                    TimeUtils.sleep(period);
-                }
-            }
-         
         }
         
         ${genMatcher(elt, service, clsName)|e}'
@@ -201,82 +156,24 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genMatcher(MeshSink elt, ServiceBase service, String clsName) {
         ''
     }
-    
-    protected def toImplTypeName(IOType type) {
-        toImplTypeName(type.type);
-    }
-    
-    protected def toImplTypeName(DataType type) {
-        toTypeName(type);
-    }
-
-    protected def toImplTypeName(RecordType type) {
-        toTypeName(type) + typeAdd;
-    }
-    
+        
     protected def getDataUnitAttributes(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 'private ${implTypeName} ${attributeName};
                 '
             }
         }
     }
-    
-    protected def getDataUnitJson(ServiceBase service) {
-        String result = "{";
-        for (IOType in: service.input) {
-            if (result.length() > 1) {
-                 result = result + ", ";
-            }
-            String typeName = toTypeName(in);
-            String implTypeName = toImplTypeName(in);
-            String attributeName = firstToLowerCase(toTypeName(in));
-            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
-        }
-        result + ", \\$period=p}";
-    }
-    
-    protected def getDataUnitJson(Connector conn) {
-        DataType outType = getFirstType(conn.output);
-        getDataTypeJson(outType);
-    }
-    
-    protected def getDataTypeJson(DataType type) {
-        ''
-    }
-    
-    protected def getDataTypeJson(RecordType type) {
-        String result = "{";
-        for (Field f: type.fields) {
-            if (result.length() > 1) {
-                 result = result + ", ";
-            }
-            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
-        }
-        result + "}";
-    }
-    
-    protected def getFieldValueJson(DataType type, Field f) {
-        if (f.optional) {
-            'o';
-        } else {
-            'm';
-        }
-    }
-    
-    protected def getFieldValueJson(RecordType type, Field f) {
-        getDataTypeJson(type);
-    }
 
     protected def getDataUnitGetters(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Returns ${attributeName}.
@@ -295,7 +192,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Changes ${attributeName}. [required by Jackson]
@@ -386,7 +283,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                 InputDestination source = context.getBean(InputDestination.class);
                 OutputDestination target = context.getBean(OutputDestination.class);
             
-                TimedMappingConsumer consumer = new TimedMappingConsumer();
+                DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                    new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
                 ${genConsumerBindings(elt, service, "consumer")}
                 DataMapper.mapJsonData(in, DataUnit.class, consumer);
                 ${processOutput(elt, service, nodes)}
@@ -694,11 +592,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
         * A data unit consists of one optional object entry per input type of the service under test (attribute name
         * is the type name with first character in small case) - the contents of the same structure as defined in the
-        * configuration model. The structure for this service is: {@code ${getDataUnitJson(service)}}. Depending
+        * configuration model. The structure for this service is: {@code ${getDataUnitJson(service, typeAdd)}}. Depending
         * on your data type definitions in the model, individual fields may be mandatory (indicated by <i>m</i>), 
         * optional (indicated by <i>o</i>) or nested fields (not indicated further). "\\$period" is 
         * an optional generic entry that defines the delay period <i>p</i> between the actual
-        * and the next data entry (if unspecified the initial value is {@link #getInitialPeriod()}.'
+        * and the next data entry (if unspecified the initial value is {@link #getInitialPeriod()}.
+        * "\\$repeats" is the number of repeats of the specifying line (0: none, positive: #repeats, negative: endless).'
     }
 
     def genClassComment(MeshElement elt, Connector conn, String fileName) {
