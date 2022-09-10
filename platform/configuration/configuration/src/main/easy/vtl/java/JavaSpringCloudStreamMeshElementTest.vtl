@@ -47,6 +47,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         import org.springframework.boot.SpringBootConfiguration;
         import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.context.TestPropertySource;
         import org.springframework.test.context.junit4.SpringRunner;
         import org.springframework.beans.factory.annotation.*;
         import org.springframework.integration.support.MessageBuilder;
@@ -381,7 +382,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             try (ConfigurableApplicationContext context = new SpringApplicationBuilder(
                 TestChannelBinderConfiguration.getCompleteConfiguration())
                     .web(WebApplicationType.NONE)
-                    .run(${genDynamicProperties(elt, service, clsName)})) {
+                    .run()) {
                 InputDestination source = context.getBean(InputDestination.class);
                 OutputDestination target = context.getBean(OutputDestination.class);
             
@@ -614,7 +615,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     
     def genDynamicProperties(MeshElement elt, ServiceBase service, String clsName) {
         String result = "";
-        String sep = ",\n                        ";
+        String sep = ",\n    ";
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
@@ -650,9 +651,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         dst = dst + d;
                     }
                 }
-                result = appendWithSeparator(result, sep, '"--spring.cloud.stream.bindings.${k}.destination=${dst}"');
+                result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.destination=${dst}"');
                 if (useNativeEncoding) {
-                    result = appendWithSeparator(result, sep, '"--spring.cloud.stream.bindings.${k}.useNativeEncoding=true"');
+                    result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.useNativeEncoding=true"');
                 }
             }
         }
@@ -661,25 +662,27 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         pollNodes.add(elt);
         Integer pollInterval = calcPollerInterval(pollNodes);
         if (pollInterval > 0) {
-            result = appendWithSeparator(result, sep, '"--spring.cloud.stream.poller.fixedDelay=${pollInterval}"');
+            result = appendWithSeparator(result, sep, '"spring.cloud.stream.poller.fixedDelay=${pollInterval}"');
         }
-        result = appendWithSeparator(result, sep, '"--spring.cloud.function.definition=${semicolonList(functions)}"');
+        result = appendWithSeparator(result, sep, '"spring.cloud.function.definition=${semicolonList(functions)}"');
         for (MeshElement e : nodes->sortedBy(n|n.impl.id)) { // sorting for testing tests
             String sId = toIdentifier(e.impl.id);
-            result = appendWithSeparator(result, sep, '"--iip.service.${sId}=${e == elt}"');
+            result = appendWithSeparator(result, sep, '"iip.service.${sId}=${e == elt}"');
         }
         result;
     }
 
     // ------------------- main method ----------------------
     
-    def genClassAnnotations(MeshElement elt, ServiceBase service) {
+    def genClassAnnotations(MeshElement elt, ServiceBase service, String clsName) {
         '@SpringBootTest(classes = iip.Starter.class)
         @ImportAutoConfiguration(TestChannelBinderConfiguration.class)
+        @TestPropertySource(properties = {
+            ${genDynamicProperties(elt, service, clsName)}})
         @RunWith(SpringRunner.class)'
     }
 
-    def genClassAnnotations(MeshElement elt, Connector conn) {
+    def genClassAnnotations(MeshElement elt, Connector conn, String clsName) {
         ''
     }
 
@@ -789,7 +792,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         *
         * @author EASy-Producer
         */        
-        ${genClassAnnotations(elt, elt.impl)|e}
+        ${genClassAnnotations(elt, elt.impl, clsName)|e}
         public class ${clsName}Test ${genExtends(elt, elt.impl)}{
         
             ${genAttributes(elt, elt.impl, clsName)|e}
@@ -801,7 +804,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             /**
             * Creates an instance and registers the application serializers.
             */
-            protected ${clsName}Test() {
+            public ${clsName}Test() {
                 ${generateSerializerRegistration(serializers)}
             }
             
