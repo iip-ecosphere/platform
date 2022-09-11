@@ -6,11 +6,14 @@ import ServiceBasics;
 @indent(indentation = 4, additional = 0)
 template JavaMeshElementTemplate(Configuration config, FileArtifact target, MeshElement elt, String pkg, String name) extends ServiceBasics {
     
-        // called via produceForInputTypes/produceForOutputTypes
+    String typeAdd = "";
+    
+    // called via produceForInputTypes/produceForOutputTypes
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
         '@Override
         public void process${t.firstToUpperCase()}(${t} data) {
+            // TODO call ingest<Type>(instance)
         }'
     }
     
@@ -20,7 +23,9 @@ template JavaMeshElementTemplate(Configuration config, FileArtifact target, Mesh
         String t = toTypeName(dataType);
         '@Override
         public ${r} transform${t.firstToUpperCase()}(${t} data) {
-            return null; // TODO replace with real function
+            ${r} result = new ${r}${typeAdd}();
+            // TODO add your code here
+            return result;
         }'
     }
     
@@ -29,13 +34,21 @@ template JavaMeshElementTemplate(Configuration config, FileArtifact target, Mesh
         String t = toTypeName(type);
         '@Override
         public ${t} produce${t.firstToUpperCase()}() {
-            return null; // TODO replace with real function
+            ${t} result = new ${t}${typeAdd}();
+            // TODO add your code here
+            return result;
         }'
     }
     
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, String name) {
         String clsName = asTypeName(elt.name);
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }
         'package ${pkg};
 
         import java.io.*;        

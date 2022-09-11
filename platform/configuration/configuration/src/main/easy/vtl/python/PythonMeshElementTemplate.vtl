@@ -5,6 +5,8 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template PythonMeshElementTemplate(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
 
+    String typeAdd = "";
+
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         if (!src.impl.asynchronous) {
@@ -14,7 +16,9 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
             Return:
               - the created data
             """
-            raise NotImplementedError'
+            result = ${type}${typeAdd}()
+            #TODO add your code here
+            return result'
         }
     } 
 
@@ -26,6 +30,7 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
             Parameters:
               - data -- the data to process
             """
+            #create result instance and call self.ingest(data)
             raise NotImplementedError'
     } 
 
@@ -39,7 +44,9 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
             Returns:
               the processed data              
             """
-            raise NotImplementedError'
+            result = ${outType}${typeAdd}()
+            #TODO add your code here
+            return result'
     } 
     
     // called via MeshBasics.generateDataMethods for MeshSink
@@ -62,6 +69,12 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
     } 
 
     def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }
         String clsName = asTypeName(elt.name);
         'import iip.Registry
         from iip.Version import Version
