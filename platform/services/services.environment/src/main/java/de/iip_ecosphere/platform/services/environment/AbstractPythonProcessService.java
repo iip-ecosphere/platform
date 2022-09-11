@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractPythonProcessService extends AbstractService implements GenericMultiTypeService {
+public abstract class AbstractPythonProcessService extends AbstractRunnablesService implements GenericMultiTypeService {
 
     public static final char TYPE_SEPARATOR_CHAR = '|';
     
@@ -142,7 +142,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     }
 
     /**
-     * Creates an abstract service from a service id and a YAML artifact.
+     * Creates a service from a service id and a YAML artifact.
      * 
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
@@ -152,7 +152,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
     }
     
     /**
-     * Creates an abstract service from YAML information.
+     * Creates a service from YAML information.
      * 
      * @param yaml the service information as read from YAML. By default, the Python executable is 
      * "ServiceEnvironment.py", which can be overridden by {@link YamlProcess#getExecutable()}. 
@@ -410,7 +410,7 @@ public abstract class AbstractPythonProcessService extends AbstractService imple
      * @param err the process error stream
      */
     protected void handleErrorStream(InputStream err) {
-        AbstractProcessService.redirectIO(err, System.err);
+        register(AbstractProcessService.redirectIO(err, System.err));
     }
 
     /**

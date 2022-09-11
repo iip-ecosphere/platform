@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.AbstractProcessService.RunnableWithStop;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -261,11 +262,12 @@ public class ProcessSupport {
      */
     public static int waitForAndKill(Process proc, String script, Consumer<String> cmdResult, String resultFile) {
         int procResult = -1;
+        RunnableWithStop redirect = null;
         try {
             ByteArrayOutputStream res = null;
             if (null != cmdResult && null == resultFile) {
                 res = new ByteArrayOutputStream();
-                AbstractProcessService.redirectIO(proc.getInputStream(), new PrintStream(res));
+                redirect = AbstractProcessService.redirectIO(proc.getInputStream(), new PrintStream(res));
             }
             procResult = proc.waitFor();
             AbstractProcessService.waitAndDestroy(proc, 200);
@@ -281,7 +283,11 @@ public class ProcessSupport {
         } catch (IOException e) {
             LoggerFactory.getLogger(ProcessSupport.class).error(
                 "Reading for script {} results: {}", script, e.getMessage());
-        } 
+        } finally {
+            if (null != redirect) {
+                redirect.stop();
+            }
+        }
         return procResult;
     }
     

@@ -54,7 +54,8 @@ import oshi.software.os.OperatingSystem;
  * @param <O> the output data type
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractService implements MonitoringService {
+public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunnablesService 
+    implements MonitoringService {
 
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
@@ -364,22 +365,49 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
     }
     
     /**
+     * A runnable that can be stopped.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface RunnableWithStop extends Runnable {
+        
+        /**
+         * Stops this runnable.
+         */
+        public void stop();
+        
+    }
+    
+    /**
      * Redirects an input stream to another stream (in parallel).
      * 
      * @param in the input stream of the spawned process (e.g., input/error)
      * @param dest the destination stream within this class
+     * @return the runnable performing the redirection
      */
-    public static void redirectIO(final InputStream in, final PrintStream dest) {
-        new Thread(new Runnable() {
+    public static RunnableWithStop redirectIO(final InputStream in, final PrintStream dest) {
+        RunnableWithStop result = new RunnableWithStop() {
+            
+            private boolean cnt = true;
+            
+            @Override
             public void run() {
                 Scanner sc = new Scanner(in);
-                while (sc.hasNextLine()) {
+                while (cnt && sc.hasNextLine()) {
                     String line = sc.nextLine();
                     dest.println(line);
                 }
                 sc.close();
             }
-        }).start();
+            
+            @Override
+            public void stop() {
+                cnt = false;
+            }
+            
+        };
+        new Thread(result).start();
+        return result;
     }
 
     /**
@@ -429,7 +457,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
                 osProcess = null;
             }
         }
-        return ServiceState.STOPPED;
+        return super.stop();
     }
 
     /**
@@ -465,9 +493,9 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractServi
      * @param err the process error stream
      */
     protected void handleErrorStream(InputStream err) {
-        redirectIO(err, System.err);
+        register(redirectIO(err, System.err));
     }
-
+    
     /**
      * Creates, configures and starts a command line process.
      * 
