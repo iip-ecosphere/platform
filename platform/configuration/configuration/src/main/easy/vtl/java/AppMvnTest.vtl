@@ -42,10 +42,6 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
         appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
-        
-        appendDependency(dep, "org.springframework", "spring-test", scope="test");
-        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
-        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
      
         XmlElement plugins = createMavenBuildElement(profile, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
@@ -76,7 +72,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         XmlElement exec = new XmlElement(execPluginExecs, "execution");
         new XmlElement(exec, "id", "App");
         XmlElement execCfg = new XmlElement(exec, "configuration");
-        new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.examples.SpringStartup");
+        new XmlElement(execCfg, "mainClass", getStarterMainClass(cfg.serviceManager));
         XmlElement execArgs = new XmlElement(execCfg, "arguments");
         new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
         new XmlElement(execCfg, "classpathScope", "test");
@@ -85,22 +81,37 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
         appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
         appendDependency(dep, "de.iip-ecosphere.platform", "services.environment", projectVersion);
+        appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
         appendDependency(dep, "de.iip-ecosphere.platform", "kiServices.functions", projectVersion);
         d = appendDependency(dep, "de.iip-ecosphere.platform", "examples", projectVersion);
         appendSingleExclusion(d, "de.iip-ecosphere.platform", "services.spring");
         new XmlComment(dep, "Remaining global dependencies go here."); 
         appendDependency(dep, "junit", "junit", scope="test");
         new XmlComment(dep, "Initially, fixed protocol");
-        appendDependency(dep, "de.iip-ecosphere.platform", "test.amqp.qpid", projectVersion, scope="test", type="test-jar");
-        appendDependency(dep, "org.apache.qpid", "qpid-broker", scope="test");
-        appendDependency(dep, "de.iip-ecosphere.platform", "support.aas.basyx", projectVersion, scope="test");
+        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         appendDependency(dep, "de.iip-ecosphere.platform", "transport", projectVersion, scope="test", type="test-jar");
-        appendDependency(dep, "de.iip-ecosphere.platform", "transport.amqp", projectVersion, scope="test");
-        appendDependency(dep, "de.iip-ecosphere.platform", "services.spring", projectVersion, scope="test");
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion, scope="test");
+        appendServiceManagerDeps(dep, cfg.serviceManager);
+        new XmlComment(dep, "Remaining test dependencies go here."); 
+    }
+
+    // dispatch basis
+    def appendServiceManagerDeps(XmlElement dep, ServiceManager mgr) {
+    }
+
+    def appendServiceManagerDeps(XmlElement dep, SpringCloudStream mgr) {
         appendDependency(dep, "org.springframework", "spring-test", scope="test");
         appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
         appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", scope="test", type="test-jar", classifier="test-binder");
-        new XmlComment(dep, "Remaining test dependencies go here."); 
+    }
+
+    def getStarterMainClass(ServiceManager mgr) {
+        "";
+    }
+
+    def getStarterMainClass(SpringCloudStream mgr) {
+        "de.iip_ecosphere.platform.examples.SpringStartup";
     }
 
 }
