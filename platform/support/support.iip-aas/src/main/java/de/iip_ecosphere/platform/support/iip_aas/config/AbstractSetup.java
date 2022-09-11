@@ -22,6 +22,8 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+
 /**
  * Basic class for a YAML-based component setup. Implementing classes must have a public no-arg constructor.
  * Each property requires a public getter and setter in Java Bean Style. 
@@ -63,13 +65,9 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, String filename) throws IOException {
-        String fname = filename;
-        if (!fname.startsWith("/")) {
-            fname = "/" + fname; 
-        }
-        InputStream in = AbstractSetup.class.getResourceAsStream(fname);
+        InputStream in = ResourceLoader.getResourceAsStream(filename);
         if (null == in) {
-            throw new IOException("Cannot read " + fname);
+            throw new IOException("Cannot read " + filename);
         }
         return readFromYaml(cls, in);  
     }
