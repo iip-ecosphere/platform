@@ -60,13 +60,15 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         new XmlComment(dep, "Your other plugins extending/overriding the parent build plugins go here or after.");
         XmlElement execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
         XmlElement execPluginExecs = appendExecutionsParent(execPlugin);
-        
+
+        String testClasspathFnExclusions = "${transportProtocolModule(config)}-${projectVersion}.jar";
         for (MeshElement elt: nodes) {
             String clsName = getClsName(elt); 
             XmlElement exec = new XmlElement(execPluginExecs, "execution");
             new XmlElement(exec, "id", "${clsName}Test");
             XmlElement execCfg = new XmlElement(exec, "configuration");
             new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
+            new XmlElement(execCfg, "classpathFilenameExclusions", testClasspathFnExclusions);
             new XmlElement(execCfg, "classpathScope", "test");
         }
         XmlElement exec = new XmlElement(execPluginExecs, "execution");

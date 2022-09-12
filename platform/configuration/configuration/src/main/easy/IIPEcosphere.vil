@@ -237,7 +237,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
             if (needsDataUnitJson(no.impl)) {
                 Path testResourcesSrc = "${appRoot}/src/test/resources";
-                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.yml.tmpl", elt=no);
+                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
             }
         }
     }
@@ -477,11 +477,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
-            if (not(noDeps)) {
+            /*if (not(noDeps)) {
                 vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
                      elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, 
                      nodes=nodes, serializers=javaSerializers);
-            }
+            }*/
             mbs.add(m);
         }
         if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
