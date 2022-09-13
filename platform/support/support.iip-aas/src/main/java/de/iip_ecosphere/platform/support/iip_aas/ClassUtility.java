@@ -146,7 +146,7 @@ public class ClassUtility {
             if (builder.isNew()) {
                 for (Field f: type.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
-                        addTypeSubModelElement(builder, ATTRIBUTE_PREFIX + fixId(f.getName()), f.getType());
+                        addTypeSubModelElement(builder, fixId(ATTRIBUTE_PREFIX + f.getName()), f.getType());
                     }
                 }
                 if (Object.class != type.getSuperclass()) {
