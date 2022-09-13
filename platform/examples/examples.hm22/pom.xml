@@ -211,10 +211,33 @@
 		                    </configuration>
 		                </execution>
                         <execution>
-                            <id>action-decider</id>
+                            <id>ActionDeciderTest</id>
                             <configuration>
-                                <!-- test.de.iip_ecosphere.platform.examples.hm22.ActionDeciderMain -->
                                 <mainClass>iip.nodes.ActionDeciderTest</mainClass>
+                                <classpathScope>test</classpathScope>
+                                <classpathFilenameExclusions>transport.spring.amqp-0.4.0-SNAPSHOT.jar</classpathFilenameExclusions>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>CamImageSourceTest</id>
+                            <configuration>
+                                <mainClass>iip.nodes.CamImageSourceTest</mainClass>
+                                <classpathScope>test</classpathScope>
+                                <classpathFilenameExclusions>transport.spring.amqp-0.4.0-SNAPSHOT.jar</classpathFilenameExclusions>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>AppAasTest</id>
+                            <configuration>
+                                <mainClass>iip.nodes.AppAasTest</mainClass>
+                                <classpathScope>test</classpathScope>
+                                <classpathFilenameExclusions>transport.spring.amqp-0.4.0-SNAPSHOT.jar</classpathFilenameExclusions>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>KiFamilyExampleTest</id>
+                            <configuration>
+                                <mainClass>iip.nodes.KiFamilyExampleTest</mainClass>
                                 <classpathScope>test</classpathScope>
                                 <classpathFilenameExclusions>transport.spring.amqp-0.4.0-SNAPSHOT.jar</classpathFilenameExclusions>
                             </configuration>
