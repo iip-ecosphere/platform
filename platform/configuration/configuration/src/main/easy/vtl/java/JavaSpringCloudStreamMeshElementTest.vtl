@@ -344,7 +344,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             inTypes.add(t.type);
         }
         sequenceOf(MeshElement) pred = predecessors(elt);
-        for (MeshElement p: pred) {
+        for (MeshElement p: pred->sortedBy(n|n.name)) {
             for (IOType predOut : p.impl.output) {
                 if (inTypes.includes(predOut.type)) {
                     String conn = getMethodSuffixId(getMethodSuffix(p, toTypeName(predOut), outType(p, predOut)), p);
@@ -557,7 +557,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
-                for (String d : destinations.get(k)) {
+                for (String d : destinations.get(k).toSequence()->sortedBy(n|n)) { // sortedBy for testing
                     if (d == "*") {
                         useNativeEncoding = true;
                     } else {

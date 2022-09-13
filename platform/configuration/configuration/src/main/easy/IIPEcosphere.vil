@@ -154,7 +154,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         }
                     };
                 };
-                elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
                 vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
     
@@ -209,6 +209,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         elements.add(no);
                     }
                 }
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
 
                 String appVersion = getAppMvnVersion(a);
