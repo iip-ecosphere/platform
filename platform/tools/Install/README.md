@@ -2,8 +2,13 @@
 
 This project contains a dependencies POM to install the basic parts of the platform so that a configuration via [configuration.configuration](../configuration/configuration/README.md) becomes possible as long as there is no UI. In essence, this will instantiate the platform server component, the ECS runtime, the service manager and an example service mesh.
 
-The details are described in the platform handbook. For short:
-  * Run `mvn install` in the folder `platformDependencies`.
+The details are described in the platform handbook. 
+
+For running the platform as well as for supporting the development of the platform, you need the platform dependencies:
+
+* Run `mvn install` in the folder `platformDependencies`. 
+
+If you also want to install/execute the platform, also execute
   * Run `mvn package -DskipTests` in the *main folder* of the install package.
   * Modify `src/main/easy/InstallTest.ivml` in particular to reflect your IP addresses.
   * Run `mvn exec:java` in the *main folder* of the install package.
