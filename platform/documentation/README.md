@@ -7,8 +7,8 @@
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 
 ## Guidelines
-* There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand 
-  how existing and new parts are related.
+* There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
+* Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
 * **Java projects** are created with Eclipse (2020-12-R). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters. 
 * For now, we use **JDK 8** in order to be compliant with Edge devices. In particular, for the lower layers that shall be used on edge devices, code must be executable on JDK 8. For higher layers, this limitation may be relaxed. To achieve exchangeable projects across development installations, use in Eclipse the execution environment ``JavaSE-1.8`` as JRE system library. This may be relaxed in future. To be on the safe side, install a recent (open) JDK 1.8 and associated it in Eclipse to JavaSE-1.8 so that only the JDK 1.8 library is available, i.e., no newer operations. 
 * Use **Javadoc** to describe the parts and pieces as well as their contract and intention. We assume that parameters of reference types are passed in with instances unless the documentation indicates that null (in Javadoc in bold font) can be used.

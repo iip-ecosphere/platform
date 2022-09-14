@@ -2,7 +2,7 @@
 
 This project contains a dependencies POM to install the basic parts of the platform so that a configuration via [configuration.configuration](../configuration/configuration/README.md) becomes possible as long as there is no UI. In essence, this will instantiate the platform server component, the ECS runtime, the service manager and an example service mesh.
 
-The details are described in the platform handbook. 
+The details are described in the platform handbook. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.
 
 For running the platform as well as for supporting the development of the platform, you need the platform dependencies:
 
