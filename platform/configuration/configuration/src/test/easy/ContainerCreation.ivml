@@ -79,21 +79,21 @@ project ContainerCreation {
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(rec1)}}
     };
-    
+        
     Service myTransformerService = PythonService {
     	id = "SimpleTransformer",
         name = "Simple Data Transformer",
         description = "",
         ver = "0.1.0",
         deployable = true,
-        asynchronous = false,
+        asynchronous = true,	
         //class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleTransformer3Impl",
         //artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        //dependencies = {{name="PythonMesh2", version="1"}},
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
-        output = {{type=refBy(rec1)}},
-        dependencies = {refBy(PYTHON39), refBy(ScipPy141), refBy(NumPy1201), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}   
-   
+        output = {{type=refBy(rec1)}}, 
+        dependencies = {refBy(PYTHON39), refBy(ScipPy141), refBy(NumPy1201), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
     };
     
     PythonDependency ScipPy141 = {
@@ -175,7 +175,7 @@ project ContainerCreation {
         //name = "Simple Mesh Testing App",
         ver = "0.1.0",
         description = "",
-        createContainer = false,
+        createContainer = true,
         services = {refBy(myMesh)}        
     };
     
@@ -209,6 +209,12 @@ project ContainerCreation {
         impl = refBy(myReceiverService)
     };
     
+    // ---------------- device ----------------
+    
+    EcsDevice device = {
+    	containerVariant = "1_joined"
+    };
+    
     // ---------- generation setup ------------
     
     sharedInterfaces = true;
@@ -240,6 +246,7 @@ project ContainerCreation {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        device;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

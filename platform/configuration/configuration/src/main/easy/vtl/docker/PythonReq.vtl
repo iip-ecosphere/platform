@@ -8,7 +8,8 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
         
         for (PythonService pyService : services) {          	
-        	setOf(Dependency) deps = pyService.dependencies;
+        	//setOf(Dependency) deps = pyService.dependencies;
+        	setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
         	for (PythonDependency d : deps) {
         		'${d.name} == ${d.version}'
         	}
