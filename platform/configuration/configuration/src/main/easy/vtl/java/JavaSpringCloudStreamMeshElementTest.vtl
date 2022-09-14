@@ -85,13 +85,19 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         *
         * @author EASy-Producer
         */
-        private static class DataUnit extends DataMapper.BaseDataUnit {
+        public static class DataUnit extends DataMapper.BaseDataUnit {
         
             ${getDataUnitAttributes(service)}
 
             ${getDataUnitGetters(service)}
             
             ${getDataUnitSetters(service)}
+            
+            @Override
+            public String toString() {
+                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
+                    de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+            }
             
         }
         
@@ -248,7 +254,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------- reusable methods -----------------
 
     def String getFileName(ServiceBase service) {
-        "testData-${toIdentifier(service.id)}.yml";
+        "testData-${toIdentifier(service.id)}.json";
     }
 
     def genMethods(MeshElement elt, ServiceBase service, String clsName) {
@@ -256,12 +262,24 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
 
     def genMethods(MeshSource elt, ServiceBase service, String clsName) {
+        String fileName = getFileName(service);
         '/**
         * Tests the source.
         *
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
+            InputStream in;
+            try {
+                in = new java.io.FileInputStream(
+                    System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}"));
+            } catch (IOException e) {
+                in = ResourceLoader.getResourceAsStream("${fileName}");
+            }
+            DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
+            ${genConsumerBindings(elt, service, "consumer")}
+            DataMapper.mapJsonData(in, DataUnit.class, consumer);
             ${processOutput(elt, service, nodes)}
         }
         '
@@ -316,7 +334,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     *
     * @param elt the mesh element to generate the test for (for dynamic dispatch)
     * @param service the mesh element implementing service to generate the test for (for dynamic dispatch)
-    * @param var the name of the variabe representing the TimeMappinConsumer
+    * @param var the name of the variable representing the TimeMappinConsumer
     */
     protected def genConsumerBindings(MeshElement elt, ServiceBase service, String var) {
         // generate consumer bindings. Synchronous handlers do the assert after sending, asynchronous handlers
@@ -326,7 +344,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             inTypes.add(t.type);
         }
         sequenceOf(MeshElement) pred = predecessors(elt);
-        for (MeshElement p: pred) {
+        for (MeshElement p: pred->sortedBy(n|n.name)) {
             for (IOType predOut : p.impl.output) {
                 if (inTypes.includes(predOut.type)) {
                     String conn = getMethodSuffixId(getMethodSuffix(p, toTypeName(predOut), outType(p, predOut)), p);
@@ -338,14 +356,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         if (not(service.asynchronous)) {
                             assert = "Assert.assertThat(target.receive().getPayload(), matcher);";
                         }
-                        '${var}.addHandler(${typeName}.class, d -> {
-                            Message<${typeName}> msg = MessageBuilder.withPayload(d).build();
+                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
+                            Message<${typeName}${typeAdd}> msg = MessageBuilder.withPayload(d).build();
                             source.send(msg);
                             ${assert|e}
                         });'
                     } else {
                         String senderId = p.impl.id;
-                        '${var}.addHandler(${typeName}.class, d -> {
+                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
                             Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
                         });'
                     }
@@ -539,7 +557,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
-                for (String d : destinations.get(k)) {
+                for (String d : destinations.get(k).toSequence()->sortedBy(n|n)) { // sortedBy for testing
                     if (d == "*") {
                         useNativeEncoding = true;
                     } else {

@@ -46,7 +46,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
             for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
-                for (String d : destinations.get(k)) {
+                for (String d : destinations.get(k).toSequence()->sortedBy(n|n)) { // sortedBy for testing
                     if (d == "*") {
                         useNativeEncoding = true;
                     } else {

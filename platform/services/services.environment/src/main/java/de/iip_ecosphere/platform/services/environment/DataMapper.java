@@ -145,7 +145,8 @@ public class DataMapper {
                     translator.accept(data);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LoggerFactory.getLogger(DataMapper.class).error("Cannot process {}: {}", instance, e.getMessage());
+                LoggerFactory.getLogger(DataMapper.class).error("Cannot process {}/{}: {}", instance, 
+                    getter.getName(), e.getMessage());
             }
         }
         
@@ -187,6 +188,9 @@ public class DataMapper {
                 MapperEntry<T> entry = mapping.get(cls);
                 if (entry != null) {
                     entry.setConsumer(cls, cons);
+                } else {
+                    LoggerFactory.getLogger(DataMapper.class).warn(
+                        "No access mapping for class {}. Handler will be ignored", cls.getName());
                 }
             }
         }

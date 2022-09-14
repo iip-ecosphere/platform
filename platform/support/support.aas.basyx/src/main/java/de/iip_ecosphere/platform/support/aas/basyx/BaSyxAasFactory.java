@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.IOException;
 
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.SubmodelElementIdShortBlacklist;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.https.HTTPSConnectorProvider;
@@ -191,6 +192,12 @@ public class BaSyxAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return new BaSyxPersistenceRecipe();
+    }
+
+    @Override
+    protected boolean needsIdFix(String id) {
+        // for now it's ok that it may mapply more global than just to submodel element
+        return SubmodelElementIdShortBlacklist.isBlacklisted(id);
     }
 
 }

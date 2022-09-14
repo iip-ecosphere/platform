@@ -338,7 +338,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              conns.add(conn); // TODO still needed?
                              conns.add(type); // TODO still needed?
                          }
-                         for (MeshElement target: nodes) {
+                         for (MeshElement target: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
                             if (not(done.includes(target))) {
                                 sequenceOf(IOType) types;
                                 for (IOType t : backward(target.impl.input)) {
@@ -378,7 +378,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
  
          // go over all possibilities, in particular for backward
          Boolean first = true;
-         for (MeshElement n: nodes) {
+         for (MeshElement n: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
              if (n != elt) {
                  for (IOType out : n.impl.output) {
                      for (IOType in: base.input) {

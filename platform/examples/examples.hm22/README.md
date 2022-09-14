@@ -33,16 +33,17 @@ The project contains an identity store (`src/main/resources/identityStore.yml`) 
 
 Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. 
 
-## Model modes and regression test
+## Model modes and regression tests
 
-The model is set to `flowTest`, i.e., the application is generated for (regression) testing with mocking services. For the real application used in the demonstration, change `flowTest` to false.
-
-Most tests are generated, not all are yet hooked in here. Connector tests work, service tests may not work until platform version 0.5.0.
+The model is set to `flowTest`, i.e., the application is generated for (regression) testing with mocking services. For the real application used in the demonstration, change `flowTest` to false. Depending on the test, test data is be in `src/test/resources`. Please start the broker before.
 
 - OPC UA input: `mvn -P App exec:java@plc-opc`
 - MDZH server `mvn -P App exec:java@mdzh-server``
-- Action decider: `mvn -P App exec:java@action-decider`
-- Full application standalone: `mvn -P App exec:java@app -Diip.app.hm22.mock.callRobot=false` does a single run-through with simulated OPC data. Requires MDZH server and broker to be started separately.
+- Cam image source: `mvn -P App exec:java@CamImageSourceTest`
+- KiFamilyExampleTest: `mvn -P App exec:java@KiFamilyExampleTest`
+- Action decider: `mvn -P App exec:java@ActionDeciderTest` may require `-Diip.app.hm22.mock.callRobot=false`
+- AppAasTest: `mvn -P App exec:java@AppAasTest`
+- Full application standalone: `mvn -P App exec:java@app -Diip.app.hm22.mock.callRobot=false` does a single run-through with simulated OPC data. Requires MDZH server and broker to be started before separately.
 
 ## Command line switches
 
