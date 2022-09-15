@@ -30,6 +30,20 @@ import org.slf4j.LoggerFactory;
  */
 public class MacIdProvider implements IdProvider {
 
+    /**
+     * Implements the provider descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MacIdProviderDescriptor implements IdProviderDescriptor {
+
+        @Override
+        public IdProvider createProvider() {
+            return new MacIdProvider();
+        }
+        
+    }
+    
     @Override
     public String provideId() {
         List<String> macAddresses = new ArrayList<String>();

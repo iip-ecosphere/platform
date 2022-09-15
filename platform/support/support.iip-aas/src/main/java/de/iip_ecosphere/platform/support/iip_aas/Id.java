@@ -43,13 +43,14 @@ public class Id {
     private static final String DEVICE_IP_AAS;
     
     static {
-        IdProvider provider;
+        IdProviderDescriptor provDesc;
         Optional<IdProviderDescriptor> desc = ServiceLoaderUtils.findFirst(IdProviderDescriptor.class);
         if (desc.isPresent()) {
-            provider = desc.get().createProvider();
+            provDesc = desc.get();
         } else {
-            provider = new MacIdProvider(); // fallback
+            provDesc = new MacIdProvider.MacIdProviderDescriptor(); // fallback
         }
+        IdProvider provider = provDesc.createProvider();
         String deviceId = null;
         String hostName = null;
         String ip = null;
