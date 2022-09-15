@@ -554,10 +554,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id);
         if (destinations.size() > 0) {
-            for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
+            for (String k : destinations.keys().asSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
-                for (String d : destinations.get(k).toSequence()->sortedBy(n|n)) { // sortedBy for testing
+                for (String d : destinations.get(k).asSequence()->sortedBy(n|n)) { // sortedBy for testing
                     if (d == "*") {
                         useNativeEncoding = true;
                     } else {

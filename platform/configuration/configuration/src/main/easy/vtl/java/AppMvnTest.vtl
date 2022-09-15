@@ -45,7 +45,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
      
         XmlElement plugins = createMavenBuildElement(profile, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
+        for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
             String id = tmp[0];
             String path = tmp[1];
