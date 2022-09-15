@@ -676,6 +676,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
         maven("${ecsRuntimeRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
@@ -688,6 +690,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // cfg test requires spring
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        deviceIdProviderJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
         maven("${serviceMgrRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
@@ -701,6 +705,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests);
         maven("${ecsServiceMgrRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
@@ -714,6 +720,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
         maven("${platformRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
@@ -728,6 +736,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaYamlTest", config, "${monitoringRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.monitoring.MonitoringSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
         maven("${monitoringRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
@@ -826,24 +836,20 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // ------------------- optional, alternative services ----------------------------
 
-    // TODO hook in
-    
     deviceIdProviderJsl(Path p, IIPEcosphere cfg) = {
-        String cls;
+        String cls = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$" + "MacIdProviderDescriptor";
         if (isDefined(cfg.deviceIdProvider) and cfg.deviceIdProvider <> null) {
             cls = cfg.deviceIdProvider.class;
-        } else {
-            cls = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider\\$MacIdProviderDescriptor";
         }
         vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor", descriptor=cls);
     }
     
     aasSemanticIdResolverJsl(Path p, IIPEcosphere cfg) = {
-        sequenceOf(String) desc;
+        sequenceOf(String) desc = {
+            "de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor", 
+            "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor"};
         if (isDefined(cfg.aasSemanticIdResolver) and cfg.aasSemanticIdResolver <> null) {
             desc = cfg.aasSemanticIdResolver->collect(r|r.class).asSequence();
-        } else {
-            desc = {"de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor", "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor"};
         }
         vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor", descriptors=desc);
     }
