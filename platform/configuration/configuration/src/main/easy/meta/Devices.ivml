@@ -87,7 +87,7 @@ project Devices {
     enum CpuBits {bit32, bit64};
     
     compound EcsDevice refines CComputer {
-        String id;
+        String id; // currently, we are a bit more open here; may be restricted in future
         EphemeralPort aasImplPort; // for container; if given, "override" port from transport
         CpuArchitecture cpu;
         CpuBits bits;
@@ -95,6 +95,8 @@ project Devices {
         setOf(String) requiredModules = {};
         String containerVariant = "1_joined";
     }
+    
+    Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
     
     compound PhoenixContactDevice refines EcsDevice {
         setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};

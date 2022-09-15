@@ -8,7 +8,7 @@ project Applications {
 
     compound Application {
         Id id;
-        NonEmptyString name;
+        NonEmptyNameString name;
         String description = "";
         IipVersion ver;
         Boolean snapshot = true;
@@ -20,13 +20,15 @@ project Applications {
         String cmdArg; // for now, comma separated
     }
     
+    Constraint appNamesUnique = allInstances(Application)->isUnique(a|a.name);
+    
     compound ServiceMesh {
         String description;
         setOf(refTo(MeshSource)) sources;
     }
     
     compound MeshElement {
-        NonEmptyString name;
+        NonEmptyNameString name;
         ServiceKind kind;
         refTo(ServiceBase) impl; // allow for family or service
         refTo(MeshElement) ensemble = null; // in same process as referenced, usually not; here not in service to facilitate service reuse
@@ -38,6 +40,8 @@ project Applications {
         name == impl.name; // propagate
         kind == impl.kind; // propagate
     }
+
+    Constraint meshElementsUnique = allInstances(MeshElement)->isUnique(e|e.name);
     
     // hint to requirements!
     compound MeshConnector refines CConnector {

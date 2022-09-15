@@ -126,7 +126,7 @@ project Services {
    abstract compound ServiceBase refines CDataComponent {
        Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
        Id id; // forward declaration
-       NonEmptyString name; // forward declaration
+       NonEmptyNameString name; // forward declaration
        ServiceKind kind;
        Boolean asynchronous = true;
        sequenceOf(IOType) input;
@@ -147,7 +147,8 @@ project Services {
        kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0 and isDefined(output) and fwdTypes(output).size() > 0;
        Constraint syncEqualIO = not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and fwdTypes(input).size() == fwdTypes(output).size();
    }
-   
+
+   Constraint serviceNamesUnique = allInstances(ServiceBase)->isUnique(s|s.name);
    def sequenceOf(IOType) fwdTypes(sequenceOf(IOType) types) = types->select(t|t.forward);
    def sequenceOf(IOType) bwdTypes(sequenceOf(IOType) types) = types->select(t|not(t.forward));
    
