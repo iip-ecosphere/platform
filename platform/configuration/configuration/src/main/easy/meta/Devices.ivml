@@ -83,6 +83,17 @@ project Devices {
     
     // ------------------ Devices --------------------------- 
     
+    abstract compound DeviceIdProvider {
+        NonEmptyString class;
+        ArtifactString artifact = ""; // built in
+    }
+    
+    compound MacDeviceIdProvider refines DeviceIdProvider {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$MacIdProviderDescriptor";
+    }
+    
+    DeviceIdProvider deviceIdProvider = MacDeviceIdProvider{}; // default if null
+    
     enum CpuArchitecture {x86, ARM};
     enum CpuBits {bit32, bit64};
     

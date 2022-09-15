@@ -823,5 +823,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
            }
         }
     }
+    
+    // ------------------- optional, alternative services ----------------------------
+
+    // TODO hook in
+    
+    deviceIdProviderJsl(Path p, IIPEcosphere cfg) = {
+        String cls;
+        if (isDefined(cfg.deviceIdProvider) and cfg.deviceIdProvider <> null) {
+            cls = cfg.deviceIdProvider.class;
+        } else {
+            cls = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider\\$MacIdProviderDescriptor";
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor", descriptor=cls);
+    }
+    
+    aasSemanticIdResolverJsl(Path p, IIPEcosphere cfg) = {
+        sequenceOf(String) desc;
+        if (isDefined(cfg.aasSemanticIdResolver) and cfg.aasSemanticIdResolver <> null) {
+            desc = cfg.aasSemanticIdResolver->collect(r|r.class).asSequence();
+        } else {
+            desc = {"de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor", "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor"};
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor", descriptors=desc);
+    }
 
 }

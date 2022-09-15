@@ -12,7 +12,8 @@ project DataTypes {
     typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
     typedef IipVersion NonEmptyString with (matches(IipVersion, "^\\d+(\\.\\d+)*$"));
     typedef Id NonEmptyString with (matches(Id, "^[^\\s*]+$")); // non whitespace
-    typedef NonEmptyNameString NonEmptyString with (matches(Id, "^[w ]+$")); // non whitespace
+    typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]-\\Q$_\\E]+$")); // non whitespace
+    typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
     
     abstract compound DataType {
         NonEmptyNameString name;

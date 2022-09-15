@@ -28,7 +28,7 @@ project Applications {
     }
     
     compound MeshElement {
-        NonEmptyNameString name;
+        String name; // no specific string, pulled up
         ServiceKind kind;
         refTo(ServiceBase) impl; // allow for family or service
         refTo(MeshElement) ensemble = null; // in same process as referenced, usually not; here not in service to facilitate service reuse

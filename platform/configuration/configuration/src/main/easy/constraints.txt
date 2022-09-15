@@ -5,4 +5,5 @@ constraints collection
  - connector service in/out types must be RecordTypes?
  - transport vs service protocol
  - ensemble -> no overlaps, no graph
- 
+ - selection for semanticId provider
+ - selection for deviceId provider

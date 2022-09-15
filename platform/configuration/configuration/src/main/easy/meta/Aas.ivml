@@ -22,7 +22,7 @@ project Aas {
     
     compound AasProtocolVabHttp refines AasProtocol {
     }
-    
+        
     // missing VAB-HTTPS
     
     AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
@@ -66,5 +66,32 @@ project Aas {
     isDefined(aasImplServer);
     Persistency aasPersistency = Persistency::INMEMORY;
     isDefined(aasPersistency);
+    
+    // ------------------------ semanticIds -------------------------------
+    
+    abstract compound AasSemanticIdResolver {
+        NonEmptyString class;
+        ArtifactString artifact = ""; // built in
+    }
+    
+    compound EclassYamlAasSemanticIdResolver refines AasSemanticIdResolver {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor";
+    }
+
+    compound AdminShellYamlAasSemanticIdResolver refines AasSemanticIdResolver {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor";
+    }
+    
+    compound EclassWebServiceSemanticIdResolver refines AasSemanticIdResolver {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.semanticId.eclass.EclassSemanticIdResolverDescriptor";
+        NonEmptyString artifact = "de.iip-ecosphere.platform:support.semanticId.eclass:" + iipVer; // built in
+        // requires user certificate in identityStore
+    }
+    
+    // may be null -> use this as default
+    setOf(AasSemanticIdResolver) aasSemanticIdResolver = {
+        EclassYamlAasSemanticIdResolver{},
+        AdminShellYamlAasSemanticIdResolver{}
+    };
     
 }

@@ -49,6 +49,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         XmlElement exs = new XmlElement(d, "exclusions");
         XmlElement ex = new XmlElement(exs, "exclusion");

@@ -44,6 +44,8 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
             appendDependency(dep, iipGroup, "platform", projectVersion);
             appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
         }
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

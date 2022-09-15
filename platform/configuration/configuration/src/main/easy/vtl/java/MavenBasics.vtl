@@ -423,5 +423,15 @@ template MavenBasics(Configuration config, FileArtifact target) {
             appendDependency(parent, "junit", "junit", "4.12", scope="test");
         }
     }
+    
+    // ---------------------------------------------------------------
+    
+    def addSemanticIdResolverDependencies(XmlElement parent, IIPEcosphere config) {
+        if (isDefined(config.aasSemanticIdResolver) and config.aasSemanticIdResolver <> null) {
+            for (AasSemanticIdResolver p: config.aasSemanticIdResolver) {
+                appendArtifact(parent, p.artifact);
+            }        
+        } // use the default builtin
+    }
 
 }
