@@ -58,7 +58,7 @@ project Services {
    ServiceProtocol serviceProtocol = ServiceProtocolAMQP {};
    
    // might be too strict, but its ok for now
-   //serviceProtocol.type == transportProtocol.type;
+   serviceProtocol.type == transportProtocol.type;
    
    isDefined(serviceProtocol);
 
