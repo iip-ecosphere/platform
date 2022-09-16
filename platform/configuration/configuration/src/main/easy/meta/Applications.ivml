@@ -57,6 +57,7 @@ project Applications {
         output == impl.output;
         
         kind == ServiceKind::SOURCE_SERVICE;
+        Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
     }
     
     abstract compound MeshInnerElement refines MeshElement {
@@ -70,6 +71,7 @@ project Applications {
         output == impl.output;
 
         kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
+        Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
     }
     
     compound MeshSink refines MeshInnerElement {
@@ -78,7 +80,39 @@ project Applications {
 
         kind == ServiceKind::SINK_SERVICE;
     }
+    
+    // output-input check, selection via dynamic dispatch, all relevant combinations needed due to type-specific setup 
+    // of i/o above; if not both sides are defined, propagate them along the service mesh; if propagation fails, mesh
+    // is anyway invalid; currently only check for unique type names 
+    
+    def Boolean typeCheck(MeshElement start, MeshElement end) = 
+        true;
+    
+    def Boolean typeCheck(MeshSource start, MeshSink end) =
+        if isDefined(start.output) and isDefined(end.input) then 
+            typeCheck(start.output, end.input) 
+        else 
+            start.output == end.input 
+        endif;
+         
+    def Boolean typeCheck(MeshSource start, MeshTransformer end) =
+        if isDefined(start.output) and isDefined(end.input) then 
+            typeCheck(start.output, end.input) 
+        else 
+            start.output == end.input 
+        endif;
+        
+    def Boolean typeCheck(MeshTransformer start, MeshSink end) =
+        if isDefined(start.output) and isDefined(end.input) then 
+            typeCheck(start.output, end.input) 
+        else 
+            start.output == end.input 
+        endif;
+    
+    def static Boolean typeCheck(sequenceOf(IOType) output, sequenceOf(IOType) input) =
+        overlaps(collectTypeInfo(output), collectTypeInfo(input)); // lazy check 
 
+    def static sequenceOf(String) collectTypeInfo(sequenceOf(IOType) types) = types->collect(t|t.name); // lazy check on type names as constrained to be unique
 
    // ------------------------------ platform trace -> AAS service -------------------
 
