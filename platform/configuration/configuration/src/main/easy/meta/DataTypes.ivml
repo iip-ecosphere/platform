@@ -19,7 +19,8 @@ project DataTypes {
         NonEmptyNameString name;
     }
     
-    Constraint dataTypeNamesUnique = allInstances(DataType)->isUnique(t|t.name);
+    // allow for unique selection on UI, not necessarily needed for code generation
+    Constraint dataTypeNamesUnique = allInstances(DataType)->isUnique(t|t.name); 
 
     // primitive data types in the sense of not refinable (via records)
     // name is used as fallback, new types shall override toTypeName(.) or cast(.) - if needed - in JavaBasics, 
@@ -165,19 +166,19 @@ project DataTypes {
     compound UnsignedInteger16TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger16TypeType UnsignedInteger16Type = {
-        name = "UInt16"
+        name = "UnsignedInt16"
     };
     
     compound UnsignedInteger32TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger32TypeType UnsignedInteger32Type = {
-       name = "UInt32"
+       name = "UnsignedInt32"
     };
     
     compound UnsignedInteger64TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger64TypeType UnsignedInteger64Type = {
-        name = "UInt64"
+        name = "UnsignedInt64"
     };
     
     compound ByteStringTypeType refines PrimitiveType {
