@@ -42,3 +42,5 @@ See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main
 ## Desirable
 
 Explaining slides, may be a video.
+
+An explaining overview slide is available here: https://github.com/iip-ecosphere/platform/examples/examples.rtsa/resources/Examples_RTSA.pdf 
