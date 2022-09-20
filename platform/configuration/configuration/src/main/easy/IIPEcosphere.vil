@@ -2,37 +2,13 @@ import JavaBasics;
 import JavaMapping;
 import Basics;
 import MeshBasics;
-
-// TODO services, dynamic; similar Kodex
-import Rtsa;
+import IIPEcosphereBase;
+insert IIPEcospherePart*;
 
 @advice(IIPEcosphere)
 vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
-    // preliminary!!! make it language-generic
-
-    // java packages, turned to paths below
-    String javaDatatypesPackage = "iip.datatypes";
-    String javaSerializersPackage = "iip.serializers";
-    String javaInterfacesPackage = "iip.interfaces";
-    String javaImplPackage = "iip.impl";
-    String javaStubsPackage = "iip.stubs";
-    String javaNodesPackage = "iip.nodes";
-    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
-    String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
-    String mvnProjectPySrcDir = "$" + "{project.basedir}/src/main/python";
-
-    Path ecsRuntimeRoot = "${target}/ecsRuntime";
-    Path serviceMgrRoot = "${target}/serviceMgr";
-    Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
-    Path platformRoot = "${target}/platform";
-    Path monitoringRoot = "${target}/monitoring";
-    Path mgtUiRoot = "${target}/mgtUi";
-    Path commonRoot = "${target}/common";
-    Path artifactsRoot = "${target}/artifacts";
-    Path brokerRoot = "${target}/broker";
-    String assemblyRel = "src/main/assembly";
-    String serviceArtifactsRel = "src/main/serviceArtifacts";
+    // Paths now in IIPEcosphereBase
     
     Boolean tests = true;
     Boolean mvnUpdate = false;
@@ -503,30 +479,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         artifacts.add(getArtifact(base)); // connectors are (currently) platform-supplied
     }
 
-    // RTSA (preliminary in here)
-    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        resources.add(rtsaResources()+"|"+rtsaBin(service));
-        resources.add(rtsaResources()+"|"+rtsaInstance(service));
-        artifacts.add(getArtifact(service));
-    }
-    
-    // KODEX (preliminary in here)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        IIPEcosphere cfg = config;
-        String serviceFolderName = toFolderName(no.impl.id);
-        String kodexServiceFolderName = "kodex_" + serviceFolderName;
-        Path path = "${appRoot}/${serviceArtifactsRel}";
-        path.mkdir();
-        vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
-        vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
-        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
-        vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
-        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
-        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
-        artifacts.add(getArtifact(service));
-    }
-
-    // Python (preliminary in here); copy integratable sources from the artifact    
     generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
@@ -801,57 +753,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         c = "${c}/extensions";
         c.mkdir();
         maven("${brokerRoot}", mvnUpdate);
-    }
-    
-    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="", String sysd="") = {
-        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
-        if (withJava8) {
-            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-        }
-        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
-        FileArtifact f = "${pathName}.sh";
-        f.setExecutable(false);
-        if (withJava8) {
-            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-            f = "${pathName}8.sh";
-            f.setExecutable(false);
-        }
-        if (pidName.length() > 0) {
-           String sName = pathName;
-           if (sysd <> "") {
-               sName = sysd;
-           }
-           vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, addJavaOpts=addJavaOpts);
-           if (withJava8) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
-           }
-           if (requires.length() > 0) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);
-               if (withJava8) {
-                   vilTemplateProcessor("LinuxSysd", config, "${sName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false, addJavaOpts=addJavaOpts);
-               }
-           }
-        }
-    }
-    
-    // ------------------- optional, alternative services ----------------------------
-
-    deviceIdProviderJsl(Path p, IIPEcosphere cfg) = {
-        String cls = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$" + "MacIdProviderDescriptor";
-        if (isDefined(cfg.deviceIdProvider) and cfg.deviceIdProvider <> null) {
-            cls = cfg.deviceIdProvider.class;
-        }
-        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor", descriptor=cls);
-    }
-    
-    aasSemanticIdResolverJsl(Path p, IIPEcosphere cfg) = {
-        sequenceOf(String) desc = {
-            "de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor", 
-            "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor"};
-        if (isDefined(cfg.aasSemanticIdResolver) and cfg.aasSemanticIdResolver <> null) {
-            desc = cfg.aasSemanticIdResolver->collect(r|r.class).asSequence();
-        }
-        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor", descriptors=desc);
     }
 
 }
