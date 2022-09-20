@@ -109,11 +109,6 @@ project Devices {
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
     
-    compound PhoenixContactDevice refines EcsDevice {
-        setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
-    }
-    
-    
     // --------------- constant freezes --------------------
     
     freeze {

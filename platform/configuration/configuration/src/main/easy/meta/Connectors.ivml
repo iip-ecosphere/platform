@@ -2,7 +2,7 @@ project Connectors {
 
     import DataTypes;
     import Transport;
-    import Services;
+    import ServicePart*;
     import Nameplate;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;

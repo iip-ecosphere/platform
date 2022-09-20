@@ -2,6 +2,7 @@ project Services {
 
    import MetaConcepts;
    import Devices;
+   import DevicePart*;
    import Resources;
    import Transport;
    import Nameplate;
@@ -188,61 +189,6 @@ project Services {
        String servicesPackageName = null; // use the default, helps in testing/mocking
        //dependency refinement removed -> system dependencies, use VIL dynamic dispatch 
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
-   }
-   
-   // ------------------------------- integrated KODEX service (-> own project, VIL?) -----------------------
-   
-   // initial, unclear, input missing
-   // https://heykodex.com/docs/actions/pseudonymization
-   enum KodexAction {
-       PseudonymizeMerengue, PseudonymizeHmac, PseudonymizeStructured
-   };
-   
-   // applies KodexAction to field
-   compound KodexFieldAction {
-       refTo(Field) field;
-       KodexAction action;
-       // initial, not nice
-       String type = ""; // for Structured
-       String format = ""; // for Structured
-       Boolean preservePrefixes = false; // for Structured
-       Integer typeIntMin = 0; // for Structured
-       Integer typeIntMax = 0; // for Structured
-   }
-   
-   // preliminary, own module as kind of "extension"?
-   compound KodexService refines CompleteService {
-       setOf(KodexFieldAction) actions;
-       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion ver = "0.7.0";
-       String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
-       NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
-           manufacturer = refBy(manufacturer_kiprotect)
-       };       // asynchronous true
-       // deployable may influcence integration type
-       // integration type: CMD, REST, CENTRAL
-       // TODO constraint all action fields must match input/output fieldsM actions must be defined
-       // TODO #input=#output -> _kip
-       // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
-   }
-   
-   // ------------------------------- integrated RapidMiner RTSA service (-> own project, VIL?) -----------------------
-   
-   // preliminary, own module as kind of "extension"?
-   compound RtsaService refines CompleteService {
-       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion rtsaVer = "0.14.5";
-       // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
-       String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
-       setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
-       NonEmptyString path;
-       NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "RTSA AI service@en",
-           manufacturer = refBy(manufacturer_rapidminer)
-       };
-       asynchronous == true; // always
-       // TODO constraint: flat input/output, not hierarchical
    }
    
    // ------------------------ families -----------------

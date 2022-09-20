@@ -1,0 +1,11 @@
+project DevicePartPhoenixContact {
+
+    import Devices;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    compound PhoenixContactDevice refines EcsDevice {
+        setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
+    }
+
+}
