@@ -5,6 +5,8 @@
 * [Guideline to open the projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * [Release guideline](../documentation/RELEASE.md)
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
+* [Guideline for platform installation under Windows](../documentation/INSTALL.md/Platform_Installation_Guide_for_Windows.pdf)
+* [Guideline for platform installation under Linux](../documentation/INSTALL.md/Platform_Installation_Guide_for_Linux.pdf)
 
 ## Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
