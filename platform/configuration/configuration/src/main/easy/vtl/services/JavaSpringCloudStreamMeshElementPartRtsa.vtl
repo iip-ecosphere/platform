@@ -1,0 +1,89 @@
+import Basics;
+import JavaBasics;
+import SpringBasics;
+import SpringCloudStreamBasics;
+import MeshBasics;
+import JavaConnector;
+import ServiceBasics;
+import JavaSpringCloudStreamMeshElementBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
+    
+    def initialService(MeshElement elt, RtsaService service, setOf(String) serviceVars) {
+        String clsName = "RtsaRestService";
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        IOType in = service.input.first();
+        String inType = toTypeName(in.type);
+        IOType out = service.output.first();
+        String outType = toTypeName(out.type);
+        serviceVars.add("service");
+        'service = new RtsaRestService(
+            new ${inType}InputTranslator(), 
+            new ${outType}OutputTranslator(), 
+            null, // via attachIngestor
+            serviceData);'
+    }
+    
+    def generateImports(RtsaService service) {
+        'import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.core.JsonProcessingException;'
+    }
+
+    def generateServiceAttribute(MeshElement elt, RtsaService service) {
+        'private RtsaRestService service;'
+    }
+
+    def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
+        if (getTypeAdd() <> "") {
+            'service.attachIngestor(${type}${getTypeAdd()}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+        }
+        'service.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+    }
+    
+    def getServiceType(MeshElement elt, RtsaService service) {
+        "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService";
+    }
+
+    def isBackward(sequenceOf(IOType) types, String type) {
+        Boolean bwd = false;
+        for (IOType t : types) {
+            if (t.type.name == type) {
+                bwd = not(t.forward);
+            }
+        }
+        bwd;
+    }
+
+    def generateAsyncProcessorBody(MeshElement proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+        String expr;
+        if (not(isBackward(service.input, type))) { // service is not prepared for this
+            expr = 'service.processQuiet(data)';
+        } else {
+            expr = '';
+        }
+        'return data -> ${genRcvProbe(service, expr, type, "data")};'
+    }
+    
+    // shall not be called, RTSA is so far always asynchronous
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
+        String expr = 'service.processQuiet(data)';
+        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
+    }
+
+    // shall not be called, RTSA is so far always asynchronous
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+        String expr = 'service.processQuiet(data)';
+        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
+    }    
+
+    def generateReceptionCallback(MeshProcessor elt, RtsaService service) {
+        String serviceId = "_" + toIdentifier(service.id);
+        '${generateTypeTranslators(elt, service, serviceId)}'
+    }
+    
+}
