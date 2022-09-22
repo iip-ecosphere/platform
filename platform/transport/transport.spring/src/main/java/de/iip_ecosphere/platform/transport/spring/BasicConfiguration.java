@@ -13,10 +13,16 @@
 package de.iip_ecosphere.platform.transport.spring;
 
 import java.io.File;
+import java.io.IOException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * Defines a basic TLS-prepared configuration for binders.
@@ -27,6 +33,7 @@ public class BasicConfiguration {
 
     private String host;
     private int port; // in test, consider overriding initializer for ephemeral port
+    private String keystoreKey;
     private File keystore;
     private String keyPassword;
     private String keyAlias;
@@ -56,9 +63,20 @@ public class BasicConfiguration {
      * 
      * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
      *   be <b>null</b> for none
+     * @deprecated use {@link #getKeystoreKey()} instead
      */
+    @Deprecated
     public File getKeystore() {
         return keystore;
+    }
+
+    /**
+     * Returns the optional identity key for the TLS keystore.
+     * 
+     * @return the identity key, <b>null</b> for none
+     */
+    public String getKeystoreKey() {
+        return keystoreKey;
     }
 
     /**
@@ -67,7 +85,9 @@ public class BasicConfiguration {
      * @return the TLS keystore password, may be <b>null</b> for none; the binder shall try a resolution
      *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
      *   fallback
+     * @deprecated use {@link #getKeystoreKey()} instead
      */
+    @Deprecated
     public String getKeyPassword() {
         return keyPassword;
     }
@@ -120,11 +140,22 @@ public class BasicConfiguration {
     }
     
     /**
+     * Changes the optional identity key for the TLS keystore.
+     * 
+     * @param keystoreKey the identity key, <b>null</b> for none
+     */
+    public void setKeystoreKey(String keystoreKey) {
+        this.keystoreKey = keystoreKey;
+    }
+    
+    /**
      * Returns the optional TLS keystore.
      * 
      * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
      *   be <b>null</b> for none
+     * @deprecated use {@link #setKeystoreKey(String)} instead
      */
+    @Deprecated
     public void setKeystore(File keystore) {
         this.keystore = keystore;
     }
@@ -135,7 +166,9 @@ public class BasicConfiguration {
      * @param keyPassword the TLS keystore password, may be <b>null</b> for none; the binder shall try a resolution
      *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
      *   fallback
+     * @deprecated use {@link #setKeystoreKey(String)} instead
      */
+    @Deprecated
     public void setKeyPassword(String keyPassword) {
         this.keyPassword = keyPassword;
     }
@@ -189,12 +222,62 @@ public class BasicConfiguration {
         TransportParameterBuilder builder = TransportParameterBuilder.newBuilder(getHost(), getPort());
         if (null != getKeystore()) {
             builder.setKeystore(getKeystore(), getKeyPassword());
+        }
+        builder.setKeystoreKey(getKeystoreKey());
+        if (useTls()) {
             if (null != getKeyAlias()) {
                 builder.setKeyAlias(getKeyAlias());
             }
             builder.setHostnameVerification(getHostnameVerification());
         }
         return builder;
+    }
+    
+    /**
+     * Returns whether the connector shall use TLS.
+     * 
+     * @return {@code true} for TLS enabled, {@code false} else
+     */
+    public boolean useTls() {
+        return null != getKeystore() || null != getKeystoreKey();
+    }
+
+    /**
+     * Helper method to determine a trust manager factory. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}.
+     * 
+     * @return the trust manager factory
+     * @throws IOException if creating the context or obtaining key information fails
+     */
+    public TrustManagerFactory createTrustManagerFactory() throws IOException {
+        TrustManagerFactory result;
+        if (null != getKeystoreKey()) {
+            result = SslUtils.createTrustManagerFactory(IdentityStore.getInstance().getKeystoreFile(getKeystoreKey()));
+        } else {
+            result = SslUtils.createTrustManagerFactory(getKeystore(), 
+                AbstractTransportConnector.getKeystorePassword(getKeyPassword()));
+        }
+        return result;
+    }
+
+    /**
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
+     * {@link TransportParameter#getKeystoreKey()} is given, else on 
+     * {@link SslUtils#createTlsContext(java.io.File, String, String)}.
+     * 
+     * @return the TLS context
+     * @throws IOException if creating the context or obtaining key information fails
+     */
+    public SSLContext createTlsContext() throws IOException {
+        SSLContext result;
+        if (null != getKeystoreKey()) {
+            result = IdentityStore.getInstance().createTlsContext(getKeystoreKey(), getKeyAlias());
+        } else {
+            result = SslUtils.createTlsContext(getKeystore(), 
+                AbstractTransportConnector.getKeystorePassword(getKeyPassword()), getKeyAlias());
+        }
+        return result;
     }
 
 }

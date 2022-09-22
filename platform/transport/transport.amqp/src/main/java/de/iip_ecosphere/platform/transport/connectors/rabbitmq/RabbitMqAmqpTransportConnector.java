@@ -161,10 +161,9 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
             factory.setUsername(params.getUser());
             factory.setPassword(params.getPassword());
         }
-        if (null != params.getKeystore()) {
+        if (useTls(params)) {
             try {                
-                factory.useSslProtocol(SslUtils.createTlsContext(params.getKeystore(), getKeystorePassword(params), 
-                    params.getKeyAlias()));
+                factory.useSslProtocol(createTlsContext(params));
                 tlsEnabled = true;
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error(
