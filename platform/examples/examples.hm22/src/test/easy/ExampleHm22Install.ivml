@@ -357,9 +357,8 @@ project ExampleHm22Install {
         samplingPeriod = samplingPeriod(500, 5000),
         mock = flowTest, 
         security = {
-            keystore = "k2.jks", // in classpath
             keyAlias = "device",
-            keystorePasswordKey = "edgeOpc:keystore",
+            keystoreKey = "edgeOpc:keystore",
             authenticationKey = "edgeOpc:4840",
             hostNameVerification = false   
         },
