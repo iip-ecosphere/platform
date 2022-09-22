@@ -72,6 +72,14 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         }
         vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor", descriptor=cls);
     }
+
+    identityStoreJsl(Path p, IIPEcosphere cfg) = {
+        String cls = "de.iip_ecosphere.platform.support.identities.YamlIdentityStore$" + "YamlIdentityStoreDescriptor";
+        if (isDefined(cfg.identityStore) and cfg.identityStore <> null) {
+            cls = cfg.identityStore.class;
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.identities.IdentityStoreDescriptor", descriptor=cls);
+    }
     
     aasSemanticIdResolverJsl(Path p, IIPEcosphere cfg) = {
         sequenceOf(String) desc = {

@@ -139,6 +139,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
                 assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
+                identityStoreJsl(resourcesSrc, cfg);
     
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
@@ -191,6 +192,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
                 vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                identityStoreJsl(testResourcesSrc, cfg);
                 
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
@@ -629,6 +631,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
         maven("${ecsRuntimeRoot}", mvnUpdate);
@@ -643,6 +646,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
         maven("${serviceMgrRoot}", mvnUpdate);
@@ -658,6 +662,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
         deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests);
         maven("${ecsServiceMgrRoot}", mvnUpdate);
@@ -673,6 +678,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
         maven("${platformRoot}", mvnUpdate);
@@ -689,6 +695,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
         maven("${monitoringRoot}", mvnUpdate);

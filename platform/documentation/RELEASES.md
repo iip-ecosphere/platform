@@ -23,7 +23,6 @@ In progress:
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
-* Specify keystore via identityStore [#74](https://github.com/iip-ecosphere/platform/issues/74)
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -31,6 +30,7 @@ New features:
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
 * [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
 * [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
+* [#74](https://github.com/iip-ecosphere/platform/issues/74): Specify keystore via identityStore
 
 Improvements:
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python

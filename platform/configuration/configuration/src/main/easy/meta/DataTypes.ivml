@@ -274,6 +274,17 @@ project DataTypes {
         Boolean hostNameVerification = false;        
     } 
     
+    abstract compound IdentityStore {
+        NonEmptyString class;
+        ArtifactString artifact = ""; // built in
+    }
+    
+    compound YamlFileIdentityStore refines IdentityStore {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.identities.YamlIdentityStore$YamlIdentityStoreDescriptor";
+    }
+    
+    IdentityStore identityStore = YamlFileIdentityStore{}; // default if null
+    
     // -------------------------------- freeze fixed stuff ----------------------------------------
     
     // freeze all primitives

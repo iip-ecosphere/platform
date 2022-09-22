@@ -81,7 +81,7 @@ project Devices {
         setOf(refTo(Dependency)) dependencies = {};
     }
     
-    // ------------------ Devices --------------------------- 
+    // ------------------ DeviceId --------------------------- 
     
     abstract compound DeviceIdProvider {
         NonEmptyString class;
@@ -93,6 +93,8 @@ project Devices {
     }
     
     DeviceIdProvider deviceIdProvider = MacDeviceIdProvider{}; // default if null
+
+    // ------------------ Devices --------------------------- 
     
     enum CpuArchitecture {x86, ARM};
     enum CpuBits {bit32, bit64};
