@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -125,9 +126,15 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             LoggerFactory.getLogger(getClass()).info("Hint: AnyEndpoint has id token: {} with token data {}", 
                 tok.getType(), tok.getTokenData() != null && tok.getTokenData().length > 0);
         }
-        if (null != param.getKeystore()) {
-            LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS: {} with password {}", param.getKeystore(), 
-                param.getKeystorePassword() != null && param.getKeystorePassword().length() > 0);
+        if (AbstractConnector.useTls(param)) {
+            if (param.getKeystoreKey() != null) {
+                LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS via identity store key {}", 
+                    param.getKeystoreKey());
+            } else {
+                LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS: {} with password {}", 
+                    param.getKeystore(), param.getKeystorePassword() != null 
+                    && param.getKeystorePassword().length() > 0);
+            }
         }
         // setup mock output
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
