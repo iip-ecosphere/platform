@@ -140,7 +140,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
     protected void connectImpl(ConnectorParameter params) throws IOException {
         try {
             String broker;
-            if (params.getKeystore() != null) {
+            if (useTls(params)) {
                 broker = "ssl://";
             } else {
                 broker = "tcp://";
@@ -154,10 +154,9 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
             connOpts.setCleanStart(true);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
-            if (null != params.getKeystore()) {
+            if (useTls(params)) {
                 try {                
-                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                        params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
+                    connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());
                     connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
                     tlsEnabled = true;
                 } catch (IOException e) {

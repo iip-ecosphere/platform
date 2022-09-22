@@ -95,6 +95,7 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.net.SslUtils;
@@ -274,11 +275,18 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         } catch (ExecutionException | InterruptedException e) {
             LOGGER.info("Cannot adjust endpoint of {}. Staying with original.", getEndpointUrl(params));
         }
-        if (null != params.getKeystore()) {
+        if (useTls(params)) {
             try {
-                LOGGER.info("Opening keystore {} with password ({})", params.getKeystore(), 
-                    params.getKeystorePassword() != null && params.getKeystorePassword().length() > 0);
-                KeyStore keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
+                KeyStore keystore;
+                if (params.getKeystoreKey() != null) {
+                    LOGGER.info("Opening keystore via identity store key {}", params.getKeystoreKey());
+                    keystore = IdentityStore.getInstance().getKeystoreFile(params.getKeystoreKey());
+                } else {
+                    LOGGER.info("Opening keystore {} with password ({})", params.getKeystore(), 
+                        params.getKeystorePassword() != null && params.getKeystorePassword().length() > 0);
+                    keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
+                }
+                
                 String alias = params.getKeyAlias();
                 if (null == alias) {
                     try {
@@ -293,7 +301,13 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                         null == cert ? null : cert.getType() + "/" + cert.getClass().getName());
                     if (cert instanceof X509Certificate) {
                         try {
-                            Key key = keystore.getKey(alias, params.getKeystorePassword().toCharArray());
+                            Key key;
+                            if (null != params.getKeystoreKey()) {
+                                key = IdentityStore.getInstance().getKeystoreKey(
+                                    params.getKeystoreKey(), keystore, alias);
+                            } else {
+                                key = keystore.getKey(alias, params.getKeystorePassword().toCharArray());
+                            }
                             LOGGER.info("Private key for alias {} is private key ({}) of type {}", alias, 
                                 key instanceof PrivateKey, null == key ? null : key.getClass().getName());
                             if (key instanceof PrivateKey) {

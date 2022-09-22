@@ -19,6 +19,7 @@ import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USE
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -242,7 +243,8 @@ public class SecureSetup extends ServerSetup {
     public ConnectorParameter getConnectorParameter() {
         String alias = "opcuaTest";
         String pw = "abcd1234";
-        File f = new File(FileUtils.getTempDirectory(), "iip-opcua.jks");
+        // write keystore into maven test classes directory to be loaded via classloader/identity store
+        File f = new File("target/test-classes/iip-opcua.jks");
         f.delete();
         f.deleteOnExit();
         try {
@@ -257,6 +259,20 @@ public class SecureSetup extends ServerSetup {
             e.printStackTrace(System.out);
             f = null;
         }
+        // write temporary identity store pointing to generated keystore in classpath
+        try {
+            PrintStream idStore = new PrintStream(new FileOutputStream("target/test-classes/identityStore.yml"));
+            idStore.println("identities:");
+            idStore.println("  \"mqttKeyStore\":");
+            idStore.println("    type: USERNAME");
+            idStore.println("    tokenData: " + pw);
+            idStore.println("    tokenEncryptionAlgorithm: UTF-8");
+            idStore.println("    file: iip-opcua.jks");
+            idStore.close();
+        } catch (IOException e) {
+            System.out.println("Cannot write temporary identity store: " + e.getMessage());
+        }
+        
         //Map<String, IdentityToken> identityToken = new HashMap<String, IdentityToken>();
         // discovery on https port uses HTTPS schema!!!
         return ConnectorParameterBuilder.newBuilder("localhost", getHttpsPort(), Schema.HTTPS)
@@ -264,7 +280,7 @@ public class SecureSetup extends ServerSetup {
             .setApplicationInformation("urn:eclipse:milo:examples:client", "eclipse milo opc-ua client")
             //.setIdentities(identityToken) // unclear, the example also has none. May require creating IdentityTokens
             .setKeyAlias(alias)
-            .setKeystore(f, pw)
+            .setKeystoreKey("mqttKeyStore")
             .setNotificationInterval(1000) // test waits for that
             .build();
     }
