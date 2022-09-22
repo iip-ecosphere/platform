@@ -97,16 +97,16 @@ public class YamlIdentityStore extends IdentityStore {
                     source = f.getAbsolutePath();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(YamlIdentityFile.class)
-                        .info("Cannot load identityStore.yml: {}", e.getMessage());
+                        .info("Cannot load {}: {}", resource, e.getMessage());
                 }
             } else {
                 in = null;
             }
         }
         if (null != in) {
-            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading identityStore.yml from {}", source);
+            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading {} from {}", resource, source);
         } else {
-            LoggerFactory.getLogger(YamlIdentityFile.class).warn("identityStore.yml not found!");
+            LoggerFactory.getLogger(YamlIdentityFile.class).warn("{} not found!", resource);
         }
         return in;
     }

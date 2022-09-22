@@ -14,13 +14,18 @@ package de.iip_ecosphere.platform.support.identities;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 
 /**
  * Pluggable identity store mapping abstract names to tokens. Use abstract names in the configuration model and a
@@ -110,8 +115,8 @@ public abstract class IdentityStore {
         throws IOException;
 
     /**
-     * Returns the key manager(s) for an identity key with the (see {@link KeyManagerFactory#getAlgorithm()} default 
-     * key manager factory algorithm).
+     * Returns the key manager(s) for an identity key with the (see {@link KeyManagerFactory#getDefaultAlgorithm()} 
+     * default key manager factory algorithm).
      * 
      * @param identity the identity (key) to return the key manager(s) for
      * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
@@ -121,6 +126,60 @@ public abstract class IdentityStore {
      */
     public KeyManager[] getKeyManagers(String identity, String... fallback) throws IOException {
         return getKeyManagers(identity, KeyManagerFactory.getDefaultAlgorithm(), fallback);
+    }
+
+    /**
+     * Returns a SSL/TlS context for the given {@code identity} with default key manager algorithm (see 
+     * {@link KeyManagerFactory#getDefaultAlgorithm()}) and default context algorithm 
+     * (see {@link SslUtils#DEFAULT_CONTEXT_ALG}).
+     * 
+     * @param identity the identity (key) to return the keystore password and the key manager(s) for
+     * @param keyAlias the alias that the key manager shall support, may be <b>null</b> for none 
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the created SSL/TLS context
+     * @throws IOException if creating/reading/opening a specified keystore/key manager fails
+     * @see #getKeystoreFile(String, String...)
+     * @sse #getKeyManagers(String, String, String...)
+     */
+    public SSLContext createTlsContext(String identity, String keyAlias, String... fallback) throws IOException {
+        return createTlsContext(identity, KeyManagerFactory.getDefaultAlgorithm(), keyAlias, 
+            SslUtils.DEFAULT_CONTEXT_ALG, fallback);
+    }
+    
+    /**
+     * Returns a SSL/TlS context for the given {@code identity}. The identity must allow for obtaining an password
+     * and a keystore.
+     * 
+     * @param identity the identity (key) to return the keystore password and the key manager(s) for
+     * @param algorithm the key manager factory algorithm (see {@link KeyManagerFactory})
+     * @param keyAlias the alias that the key manager shall support, may be <b>null</b> for none 
+     * @param contextAlg the algorithm to initialize the SSL context with (see {@link SslUtils} for constants)
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the created SSL/TLS context
+     * @throws IOException if creating/reading/opening a specified keystore/key manager fails
+     * @see #getKeystoreFile(String, String...)
+     * @sse #getKeyManagers(String, String, String...)
+     */
+    public SSLContext createTlsContext(String identity, String algorithm, String keyAlias, 
+        String contextAlg, String... fallback) throws IOException {
+        SSLContext ctx = null;
+        KeyStore ks = getKeystoreFile(identity, fallback);
+        if (null != ks) {
+            try {
+                TrustManagerFactory tmf = SslUtils.createTrustManagerFactory(ks);
+                KeyManager[] kms = getKeyManagers(identity, algorithm, fallback);
+                if (null != keyAlias) {
+                    kms = SslUtils.createProjectingKeyManagers(keyAlias, kms);
+                }
+                ctx = SSLContext.getInstance(contextAlg);
+                ctx.init(kms, tmf.getTrustManagers(), null);
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new IOException(e);
+            }
+        }
+        return ctx;
     }
     
 }
