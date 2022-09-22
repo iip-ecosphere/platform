@@ -28,6 +28,7 @@ import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -67,7 +68,24 @@ public class BaSyxRegistry implements Registry {
 
     @Override
     public Aas retrieveAas(String identifier) throws IOException {
-        return obtainAas(Tools.translateIdentifier(identifier, ""));
+        Aas result = null;
+        IIdentifier id = null;
+        if (null != identifier) {
+            if ((identifier.startsWith(Schema.HTTP.toUri()) || identifier.startsWith(Schema.HTTPS.toUri()))) {
+                List<AASDescriptor> descs = registry.lookupAll();
+                for (int d = 0; null == id && d < descs.size(); d++) {
+                    if (identifier.equals(descs.get(d).getFirstEndpoint())) { // map is unclear
+                        id = descs.get(d).getIdentifier();
+                    }
+                }
+            } else {
+                id = Tools.translateIdentifier(identifier, "");
+            }
+            if (null != id) {
+                result = obtainAas(id);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -193,9 +211,9 @@ public class BaSyxRegistry implements Registry {
     @Override
     public String getEndpoint(Aas aas) {
         String result = null;
-        if (aas instanceof BaSyxAas) {
+        if (aas instanceof AbstractAas) {
             try {
-                AASDescriptor desc = registry.lookupAAS(((BaSyxAas) aas).getAas().getIdentification());
+                AASDescriptor desc = registry.lookupAAS(((AbstractAas<?>) aas).getAas().getIdentification());
                 result = desc.getFirstEndpoint();
             } catch (ProviderException e) {
             }
