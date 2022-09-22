@@ -16,13 +16,19 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * Provides a reusable base of a {@link Connector} implementation using the {@link ProtocolAdapter}. Call 
@@ -95,6 +101,37 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
                 
             };
         } 
+    }
+    
+    /**
+     * Returns whether the connector shall use TLS.
+     * 
+     * @param params the transport parameters
+     * @return {@code true} for TLS enabled, {@code false} else
+     */
+    public static boolean useTls(ConnectorParameter params) {
+        return null != params.getKeystore() || null != params.getKeystoreKey();
+    }
+    
+    /**
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
+     * {@link TransportParameter#getKeystoreKey()} is given, else on 
+     * {@link SslUtils#createTlsContext(java.io.File, String, String)}.
+     * 
+     * @param params the connector parameters
+     * @return the TLS context
+     * @throws IOException if creating the context or obtaining key information fails
+     */
+    protected SSLContext createTlsContext(ConnectorParameter params) throws IOException {
+        SSLContext result;
+        if (null != params.getKeystoreKey()) {
+            result = IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
+        } else {
+            result = SslUtils.createTlsContext(params.getKeystore(), 
+                AbstractTransportConnector.getKeystorePassword(params.getKeystorePassword()), params.getKeyAlias());
+        }
+        return result;
     }
     
     /**
