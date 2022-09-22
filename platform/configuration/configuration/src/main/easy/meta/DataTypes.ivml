@@ -267,9 +267,10 @@ project DataTypes {
 
     // might be split up, with alternatives    
     compound SecuritySettings refines AuthenticationSettings {
-        NonEmptyString keystore; 
+        String keystoreKey; // key for keystore and password in identityStore        
+        String keystore;            // legacy now covered by keystoreKey
         NonEmptyString keyAlias; 
-        NonEmptyString keystorePasswordKey; // key in identityStore
+        String keystorePasswordKey; // legacy now covered by keystoreKey, key in identityStore
         Boolean hostNameVerification = false;        
     } 
     

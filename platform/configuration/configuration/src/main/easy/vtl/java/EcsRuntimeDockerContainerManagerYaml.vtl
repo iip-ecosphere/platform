@@ -81,7 +81,9 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             if (isDefined(sec.keystore) and sec.keystore <> "") {
                 'keystore: ${sec.keystore}'
             }
-            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
+            if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
+                'keystoreKey: ${sec.keystoreKey}'
+            } else if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
                 'keystorePassword: ${sec.keystorePasswordKey}'
             }
             if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
