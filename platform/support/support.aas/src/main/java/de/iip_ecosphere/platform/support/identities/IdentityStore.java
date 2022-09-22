@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.identities;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -181,5 +182,34 @@ public abstract class IdentityStore {
         }
         return ctx;
     }
+
+    /**
+     * Returns a key from a keystore. 
+     * 
+     * @param identity the identity (key) to return the keystore password and the key manager(s) for
+     * @param keyAlias the alias that the key manager shall support, may be <b>null</b> for none 
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the key
+     * @throws IOException if creating/reading/opening a specified keystore/key manager fails
+     */
+    public Key getKeystoreKey(String identity, String keyAlias, String... fallback) throws IOException {
+        return getKeystoreKey(identity, null, keyAlias, fallback);
+    }
+
+    /**
+     * Returns a key from a keystore. 
+     * 
+     * @param identity the identity (key) to return the keystore password and the key manager(s) for
+     * @param keystore an already known keystore matching to {@code identity}, may be <b>null</b> if the store shall 
+     *     retrieve a keystore
+     * @param keyAlias the alias that the key manager shall support, may be <b>null</b> for none 
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the key
+     * @throws IOException if creating/reading/opening a specified keystore/key manager fails
+     */
+    public abstract Key getKeystoreKey(String identity, KeyStore keystore, String keyAlias, String... fallback) 
+        throws IOException;
     
 }
