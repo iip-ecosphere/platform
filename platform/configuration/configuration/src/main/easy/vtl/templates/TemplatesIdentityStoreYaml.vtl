@@ -7,17 +7,17 @@ template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, St
     }
 
     def String transportProtocolEntry(TransportProtocolAMQP proto) {
-        '"amqp": 
-          type: USERNAME
-          userName: user
-          tokenData: pwd
-          tokenEncryptionAlgorithm: UTF-8'
+        '  "amqp": 
+             type: USERNAME
+             userName: user
+             tokenData: pwd
+             tokenEncryptionAlgorithm: UTF-8'
     }
 	
     def main(IIPEcosphere config, FileArtifact target, String appName) {
         'name: ${appName}
-         identities:
-         ${transportProtocolEntry(config.transportProtocol)}'
+        identities:
+        ${transportProtocolEntry(config.transportProtocol)}'
     }
 	
 }
