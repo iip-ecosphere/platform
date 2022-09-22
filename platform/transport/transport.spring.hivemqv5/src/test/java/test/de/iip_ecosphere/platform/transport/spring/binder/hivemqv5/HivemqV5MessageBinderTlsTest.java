@@ -15,6 +15,11 @@ package test.de.iip_ecosphere.platform.transport.spring.binder.hivemqv5;
 import java.io.File;
 
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -26,6 +31,10 @@ import de.iip_ecosphere.platform.transport.spring.binder.hivemqv5.HivemqV5Config
  * 
  * @author Holger Eichelberger, SSE
  */
+@SpringBootTest
+@TestPropertySource(locations = "classpath:test.properties")
+@ContextConfiguration(initializers = HivemqV5MessageBinderTest.Initializer.class)
+@RunWith(SpringRunner.class)
 public class HivemqV5MessageBinderTlsTest extends HivemqV5MessageBinderTest {
 
     /**
@@ -40,8 +49,7 @@ public class HivemqV5MessageBinderTlsTest extends HivemqV5MessageBinderTest {
         if (null != client) { // called again, reset client in binder
             HivemqV5Configuration cfg = client.getConfiguration();
             cfg.setPort(addr.getPort());
-            cfg.setKeystore(getKeystore());
-            cfg.setKeyPassword(getKeystorePassword());
+            cfg.setKeystoreKey(getKeystoreKey());
             client.createClient(cfg);
         }
     }

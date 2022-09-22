@@ -31,7 +31,6 @@ import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3ClientBuilder;
 
-import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
@@ -114,7 +113,7 @@ public class HivemqV3Client {
                 .serverHost(config.getHost())
                 .serverPort(config.getPort())
                 .automaticReconnect().applyAutomaticReconnect();
-            if (null != config.getKeystore()) {
+            if (config.useTls()) {
                 try {
                     HostnameVerifier verifier = null; // use HTTPS
                     if (!config.getHostnameVerification()) {
@@ -127,8 +126,7 @@ public class HivemqV3Client {
                         };
                     }                    
                     MqttClientSslConfig sslConfig = MqttClientSslConfig.builder()
-                        .trustManagerFactory(SslUtils.createTrustManagerFactory(config.getKeystore(), 
-                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword())))
+                        .trustManagerFactory(config.createTrustManagerFactory())
                         .hostnameVerifier(verifier) // currently by default
                         .build();
                     builder.sslConfig(sslConfig);

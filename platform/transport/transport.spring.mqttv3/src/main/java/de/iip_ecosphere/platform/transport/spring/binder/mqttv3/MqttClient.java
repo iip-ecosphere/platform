@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
@@ -167,12 +166,10 @@ public class MqttClient {
                 connOpts.setCleanSession(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
-                if (config.getKeystore() != null) {
+                if (config.useTls()) {
                     try {
                         connOpts.setHttpsHostnameVerificationEnabled(config.getHostnameVerification());
-                        connOpts.setSocketFactory(SslUtils.createTlsContext(config.getKeystore(), 
-                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword()), 
-                            config.getKeyAlias()).getSocketFactory());
+                        connOpts.setSocketFactory(config.createTlsContext().getSocketFactory());
                     } catch (IOException e) {
                         LOGGER.error("TLS setup failed " + e.getMessage() + ". Trying plaintext.");
                     }

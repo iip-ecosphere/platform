@@ -82,9 +82,9 @@ public class MqttV5MessageBinderTest {
             TestPropertyValues
                 .of("mqtt.port=" + addr.getPort())
                 .applyTo(applicationContext);
-            if (null == MqttClient.getLastInstance() && null != getKeystore()) {
+            if (null == MqttClient.getLastInstance() && null != getKeystoreKey()) {
                 TestPropertyValues
-                    .of("mqtt.keystore=" + getKeystore(), "mqtt.keyPassword=" + getKeystorePassword(), 
+                    .of("mqtt.keystoreKey=" + getKeystoreKey(), 
                         "mqtt.keyAlias=" + TestHiveMqServer.KEY_ALIAS, "mqtt.schema=ssl")
                     .applyTo(applicationContext);
             }            
@@ -102,21 +102,12 @@ public class MqttV5MessageBinderTest {
     }
 
     /**
-     * Returns the keystore if {@link #secCfg} is set.
+     * Returns the keystore key if {@link #secCfg} is set.
      * 
-     * @return the keystore, <b>null</b> if {@link #secCfg} is <b>null</b>
+     * @return the keystore key, <b>null</b> if {@link #secCfg} is <b>null</b>
      */
-    protected static File getKeystore() {
-        return null == secCfg ? null : new File(secCfg, "client-trust-store.jks");
-    }
-    
-    /**
-     * Returns the keystore password if {@link #secCfg} is set.
-     * 
-     * @return the keystore password, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static String getKeystorePassword() {
-        return null == secCfg ? null : TestHiveMqServer.TRUSTSTORE_PASSWORD;
+    protected static String getKeystoreKey() {
+        return null == secCfg ? null : "mqttKeyStore";
     }
     
     /**
@@ -146,7 +137,7 @@ public class MqttV5MessageBinderTest {
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
-                tpBuilder.setKeystore(new File(secCfg, "client-trust-store.jks"), getKeystorePassword());
+                tpBuilder.setKeystoreKey(getKeystoreKey());
                 tpBuilder.setActionTimeout(3000); // Jenkins, 1 ms is not sufficient
             }
             infra.connect(tpBuilder.build());

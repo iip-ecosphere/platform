@@ -30,7 +30,7 @@
         <incoming-limit>0</incoming-limit>
     </throttling>
     <general>
-        <update-check-enabled>true</update-check-enabled>
+        <update-check-enabled>false</update-check-enabled>
     </general>
 
 </hivemq>

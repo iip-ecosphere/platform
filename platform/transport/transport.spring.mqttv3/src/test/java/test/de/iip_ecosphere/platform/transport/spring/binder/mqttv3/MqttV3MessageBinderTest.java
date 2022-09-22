@@ -81,9 +81,9 @@ public class MqttV3MessageBinderTest {
             TestPropertyValues
                 .of("mqtt.port=" + addr.getPort())
                 .applyTo(applicationContext);
-            if (null == MqttClient.getLastInstance() && null != getKeystore()) {
+            if (null == MqttClient.getLastInstance() && null != getKeystoreKey()) {
                 TestPropertyValues
-                    .of("mqtt.keystore=" + getKeystore(), "mqtt.keyPassword=" + getKeystorePassword(), 
+                    .of("mqtt.keystoreKey=" + getKeystoreKey(), 
                         "mqtt.schema=ssl", "mqtt.actionTimeout=3000")
                     .applyTo(applicationContext);
             }            
@@ -101,21 +101,12 @@ public class MqttV3MessageBinderTest {
     }
 
     /**
-     * Returns the keystore if {@link #secCfg} is set.
+     * Returns the keystore key if {@link #secCfg} is set.
      * 
-     * @return the keystore, <b>null</b> if {@link #secCfg} is <b>null</b>
+     * @return the keystore key , <b>null</b> if {@link #secCfg} is <b>null</b>
      */
-    protected static File getKeystore() {
-        return null == secCfg ? null : new File(secCfg, "keystore.jks");
-    }
-    
-    /**
-     * Returns the keystore password if {@link #secCfg} is set.
-     * 
-     * @return the keystore password, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static String getKeystorePassword() {
-        return null == secCfg ? null : TestMoquetteServer.KEYSTORE_PASSWORD;
+    protected static String getKeystoreKey() {
+        return null == secCfg ? null : "mqttKeyStore";
     }
     
     /**
@@ -148,7 +139,7 @@ public class MqttV3MessageBinderTest {
                 .newBuilder(addr.getHost(), addr.getPort())
                 .setApplicationId("infra");
             if (null != secCfg) {
-                tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
+                tpBuilder.setKeystoreKey(getKeystoreKey()); 
                 tpBuilder.setActionTimeout(3000);
             }
             infra.connect(tpBuilder.build());            

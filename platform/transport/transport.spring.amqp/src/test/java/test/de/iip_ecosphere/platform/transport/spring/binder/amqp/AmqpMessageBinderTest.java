@@ -81,21 +81,12 @@ public class AmqpMessageBinderTest {
     }
 
     /**
-     * Returns the keystore if {@link #secCfg} is set.
+     * Returns the keystore key if {@link #secCfg} is set.
      * 
-     * @return the keystore, <b>null</b> if {@link #secCfg} is <b>null</b>
+     * @return the keystore key, <b>null</b> if {@link #secCfg} is <b>null</b>
      */
-    protected static File getKeystore() {
-        return null == secCfg ? null : new File(secCfg, "keystore.jks");
-    }
-    
-    /**
-     * Returns the keystore password if {@link #secCfg} is set.
-     * 
-     * @return the keystore password, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static String getKeystorePassword() {
-        return null == secCfg ? null : TestQpidServer.KEYSTORE_PASSWORD;
+    protected static String getKeystoreKey() {
+        return null == secCfg ? null : "amqpKeystore";
     }
     
     /**
@@ -121,9 +112,9 @@ public class AmqpMessageBinderTest {
             TestPropertyValues
                 .of("amqp.port=" + addr.getPort())
                 .applyTo(applicationContext);
-            if (null == AmqpClient.getLastInstance() && null != getKeystore()) {
+            if (null == AmqpClient.getLastInstance() && null != getKeystoreKey()) {
                 TestPropertyValues
-                    .of("amqp.keystore=" + getKeystore(), "amqp.keyPassword=" + getKeystorePassword())
+                    .of("amqp.keystoreKey=" + getKeystoreKey())
                     .applyTo(applicationContext);
             }
         }
@@ -153,7 +144,7 @@ public class AmqpMessageBinderTest {
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
             if (null != secCfg) {
-                tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
+                tpBuilder.setKeystoreKey(getKeystoreKey()); 
             }
             infra.connect(tpBuilder.build());
             infra.setReceptionCallback("amqpBinder", new ReceptionCallback<String>() {
