@@ -86,7 +86,7 @@ public class AmqpMessageBinderTest {
      * @return the keystore key, <b>null</b> if {@link #secCfg} is <b>null</b>
      */
     protected static String getKeystoreKey() {
-        return null == secCfg ? null : "amqpKeystore";
+        return null == secCfg ? null : "amqpKeyStore";
     }
     
     /**
