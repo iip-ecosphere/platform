@@ -33,6 +33,7 @@ public class TransportParameter {
     private File keystore;
     private String keyPassword;
     private String keyAlias;
+    private String keystoreKey;
     private boolean hostnameVerification = false;
     private String authenticationKey; // will replace user/password #22
     private String user; // preliminary, AMQP
@@ -178,10 +179,23 @@ public class TransportParameter {
          *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
          *   fallback
          * @return <b>this</b>
+         * @deprecated use {@link #setKeystoreKey(String)} instead
          */
+        @Deprecated
         public TransportParameterBuilder setKeystore(File keystore, String password) {
             instance.keystore = keystore;
             instance.keyPassword = password;
+            return this;
+        }
+
+        /**
+         * Sets up the optional TLS keystore key to be obtained from {@link IdentityStore}.
+         * 
+         * @param keystoreKey the (logical) key to access the keystore (<b>null</b> for none)
+         * @return <b>this</b>
+         */
+        public TransportParameterBuilder setKeystoreKey(String keystoreKey) {
+            instance.keystoreKey = keystoreKey;
             return this;
         }
 
@@ -346,7 +360,9 @@ public class TransportParameter {
      * 
      * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
      *   be <b>null</b> for none
+     * @deprecated access the keystore via {@link #getKeystoreKey()}
      */
+    @Deprecated
     public File getKeystore() {
         return keystore;
     }
@@ -357,9 +373,20 @@ public class TransportParameter {
      * @return the TLS keystore password, may be <b>null</b> for none; the transport connector shall try a resolution
      *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
      *   fallback
+     * @deprecated access the keystore via {@link #getKeystoreKey()}
      */
+    @Deprecated
     public String getKeystorePassword() {
         return keyPassword;
+    }
+    
+    /**
+     * Returns the optional key to access the TLS keystore key to be obtained from {@link IdentityStore}.
+     * 
+     * @return the (logical) key to access the keystore, may be <b>null</b> for none
+     */
+    public String getKeystoreKey() {
+        return keystoreKey;
     }
     
     /**

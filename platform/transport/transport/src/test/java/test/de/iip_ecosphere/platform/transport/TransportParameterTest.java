@@ -55,6 +55,7 @@ public class TransportParameterTest {
         Assert.assertEquals("app", params.getApplicationId());
         Assert.assertEquals(false, params.getAutoApplicationId());
         Assert.assertEquals(1236, params.getKeepAlive());
+        Assert.assertEquals(null, params.getKeystoreKey());
         Assert.assertEquals(null, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(MqttQoS.EXACTLY_ONCE, params.getMqttQoS());
@@ -72,10 +73,12 @@ public class TransportParameterTest {
         String alias = "alias";
         TransportParameter params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
+            .setKeystoreKey(null)
             .setKeystore(null, null)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(null, params.getKeystoreKey());
         Assert.assertEquals(null, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
@@ -83,11 +86,13 @@ public class TransportParameterTest {
         
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
+            .setKeystoreKey("myKeystore")
             .setKeystore(keystore, null)
             .setHostnameVerification(false)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals("myKeystore", params.getKeystoreKey());
         Assert.assertEquals(keystore, params.getKeystore());
         Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
@@ -95,12 +100,14 @@ public class TransportParameterTest {
 
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
+            .setKeystoreKey("myKeystore")
             .setKeystore(keystore, passwd)
             .setKeyAlias(alias)
             .setHostnameVerification(true)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals("myKeystore", params.getKeystoreKey());
         Assert.assertEquals(keystore, params.getKeystore());
         Assert.assertEquals(passwd, params.getKeystorePassword());
         Assert.assertEquals(alias, params.getKeyAlias());

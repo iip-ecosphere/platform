@@ -17,11 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -69,6 +72,37 @@ public abstract class AbstractTransportConnector implements TransportConnector {
             }
         } 
         return keyPasswd;
+    }
+    
+    /**
+     * Returns whether the connector shall use TLS.
+     * 
+     * @param params the transport parameters
+     * @return {@code true} for TLS enabled, {@code false} else
+     */
+    protected boolean useTls(TransportParameter params) {
+        return null != params.getKeystore() || null != params.getKeystoreKey();
+    }
+
+    /**
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
+     * {@link TransportParameter#getKeystoreKey()} is given, else on 
+     * {@link SslUtils#createTlsContext(java.io.File, String, String)}.
+     * 
+     * @param params the transport parameters
+     * @return the TLS context
+     * @throws IOException if creating the context or obtaining key information fails
+     */
+    protected SSLContext createTlsContext(TransportParameter params) throws IOException {
+        SSLContext result;
+        if (null != params.getKeystoreKey()) {
+            result = IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
+        } else {
+            result = SslUtils.createTlsContext(params.getKeystore(), getKeystorePassword(params), 
+                params.getKeyAlias());
+        }
+        return result;
     }
 
     /**
