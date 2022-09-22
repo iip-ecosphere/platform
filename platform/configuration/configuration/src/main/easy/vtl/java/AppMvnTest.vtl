@@ -15,6 +15,12 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
             gId = "${iipGroup}.apps";
         }
         String projectVersion = config.iipVer;
+        Boolean hasPython = false;
+        for (MeshElement elt: nodes) {
+            if (elt.impl.isKindOf(PythonService)) {
+                hasPython = true;
+            }
+        }        
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "${appName}Services", "${appName}-services", "${appDescription}");
@@ -78,6 +84,18 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         XmlElement execArgs = new XmlElement(execCfg, "arguments");
         new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
         new XmlElement(execCfg, "classpathScope", "test");
+        
+        if (hasPython) {
+            exec = new XmlElement(execPluginExecs, "execution");
+            new XmlElement(exec, "id", "py-test");
+            new XmlElement(new XmlElement(exec, "goals"), "goal", "java");
+            execCfg = new XmlElement(exec, "configuration");
+            execArgs = new XmlElement(execCfg, "arguments");
+            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/main/python/services/ExamplePythonService.py");
+            new XmlElement(execArgs, "argument", "1");
+            new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonSyntaxTest");
+            new XmlElement(execCfg, "classpathScope", "test");
+        }
         
         dep = createDependencies(project);
         new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");

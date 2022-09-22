@@ -5,9 +5,18 @@ import MeshBasics;
 template TemplatesEclipseReadme(IIPEcosphere config, FileArtifact target, String appName, sequenceOf(MeshElement) nodes) {
 
     def genTestExecutions(sequenceOf(MeshElement) nodes) {
+        Boolean hasPython = false;
         for (MeshElement elt: nodes) {
             String clsName = getClsName(elt); 
+            if (elt.impl.isKindOf(PythonService)) {
+                hasPython = true;
+            }
             ' - `mvn -P App exec:java@${clsName}Test` executes the service/connector test for `${clsName}`'
+        }
+        if (hasPython) {
+            '- `mvn -P App exec:java@py-test` tests for python syntax.'
+        } else {
+            ''
         }
     }
 	
