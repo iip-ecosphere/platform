@@ -256,7 +256,7 @@ public class YamlIdentityStore extends IdentityStore {
      */
     private IdentityInformation resolveForKeystore(String identity, String... fallback) {
         IdentityInformation info = resolveWithLogging(identity, fallback);
-        if (!isOkForKeystore(info)) {
+        if (info != null && !isOkForKeystore(info)) {
             if (TokenType.USERNAME != info.getType()) {
                 LoggerFactory.getLogger(getClass()).warn(
                     "Keystore information found for {} (with fallbacks {}), but type is not USERNAME",
