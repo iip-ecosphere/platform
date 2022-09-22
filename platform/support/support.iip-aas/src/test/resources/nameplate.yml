@@ -1,0 +1,12 @@
+manufacturerName: Universitaet Hildesheim@DE
+manufacturerProductDesignation: IIP-Ecosphere plattform test device@DE
+address:
+  department: Software Systems Engineering@DE
+  street: Universitaetsplatz 1@DE
+  zipCode: 31141@DE
+  cityTown: Hildesheim@DE
+services:
+  - key: opcua
+    port: 4840
+  - key: mqtt
+    port: 1883
