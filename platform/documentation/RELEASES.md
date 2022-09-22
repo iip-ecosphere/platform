@@ -1,27 +1,39 @@
 # IIP-Ecosphere platform: Releases
 
+### At the horizon (Spring 2023):
+
+Planned:
+* Cleanup user/password/keystore in code [#58](https://github.com/iip-ecosphere/platform/issues/58)
+
 ### Next release (Winter 2022):
 
 Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
-* More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
-* Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
-* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
+
+In progress:
+* Improve configuration mode, e.g., constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
+* Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+* Specify keystore via identityStore [#74](https://github.com/iip-ecosphere/platform/issues/74)
 
-Improvements:
+New features:
+* [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
+* [#64](https://github.com/iip-ecosphere/platform/issues/64): Device specific measurement plugins controlled via configuration model 
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
 * [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
 * [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
+
+Improvements:
+* [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
