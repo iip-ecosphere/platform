@@ -27,7 +27,8 @@ public interface Registry {
      * Retrieves an AAS.
      * 
      * @param identifier the identifier of the AAS (may be <b>null</b> or empty for an identification based on 
-     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for 
+     *    others, or as an endpoint if it starts with {@code http://} or {@code https://})
      * @return the AAS (may be <b>null</b> if the AAS does not exist)
      * @throws IOException if accessing the AAS fails for some reason
      */

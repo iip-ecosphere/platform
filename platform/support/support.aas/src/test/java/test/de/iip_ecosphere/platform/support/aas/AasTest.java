@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -350,7 +351,8 @@ public class AasTest {
      */
     private static void queryAas(TestMachine machine) throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
-        Aas aas = factory.obtainRegistry(AAS_SERVER_REGISTRY).retrieveAas(URN_AAS);
+        Registry reg = factory.obtainRegistry(AAS_SERVER_REGISTRY);
+        Aas aas = reg.retrieveAas(URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(2, aas.getSubmodelCount());
         Submodel subm = aas.submodels().iterator().next();
@@ -419,6 +421,11 @@ public class AasTest {
         Assert.assertNull(subm.getSubmodelElementCollection("conn_coll3").getSubmodelElementCollection("cc3_1"));
         
         aas.accept(new AasPrintVisitor()); // assert the accepts
+        
+        Aas aas2 = reg.retrieveAas(reg.getEndpoint(aas));
+        Assert.assertNotNull(aas2);
+        Assert.assertEquals(aas2.getIdShort(), aas.getIdShort());
+        Assert.assertNull(reg.retrieveAas("http://me.here.de/aas"));
     }
 
     /**
