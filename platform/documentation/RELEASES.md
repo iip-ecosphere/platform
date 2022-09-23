@@ -3,13 +3,15 @@
 ### At the horizon (Spring 2023):
 
 Planned:
+* Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
+
+In progress:
 * Cleanup user/password/keystore in code [#58](https://github.com/iip-ecosphere/platform/issues/58)
 
 ### Next release (Winter 2022):
 
 Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
-* Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
@@ -31,6 +33,7 @@ New features:
 * [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
 * [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
 * [#74](https://github.com/iip-ecosphere/platform/issues/74): Specify keystore via identityStore
+* Ad-hoc device connectivity via device AAS (initial)
 
 Improvements:
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
