@@ -22,9 +22,7 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -98,7 +96,6 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
-import de.iip_ecosphere.platform.support.net.SslUtils;
 
 /**
  * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -277,15 +274,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
         if (useTls(params)) {
             try {
-                KeyStore keystore;
-                if (params.getKeystoreKey() != null) {
-                    LOGGER.info("Opening keystore via identity store key {}", params.getKeystoreKey());
-                    keystore = IdentityStore.getInstance().getKeystoreFile(params.getKeystoreKey());
-                } else {
-                    LOGGER.info("Opening keystore {} with password ({})", params.getKeystore(), 
-                        params.getKeystorePassword() != null && params.getKeystorePassword().length() > 0);
-                    keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
-                }
+                LOGGER.info("Opening keystore via identity store key {}", params.getKeystoreKey());
+                KeyStore keystore = IdentityStore.getInstance().getKeystoreFile(params.getKeystoreKey());
                 
                 String alias = params.getKeyAlias();
                 if (null == alias) {
@@ -301,13 +291,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                         null == cert ? null : cert.getType() + "/" + cert.getClass().getName());
                     if (cert instanceof X509Certificate) {
                         try {
-                            Key key;
-                            if (null != params.getKeystoreKey()) {
-                                key = IdentityStore.getInstance().getKeystoreKey(
-                                    params.getKeystoreKey(), keystore, alias);
-                            } else {
-                                key = keystore.getKey(alias, params.getKeystorePassword().toCharArray());
-                            }
+                            Key key = IdentityStore.getInstance().getKeystoreKey(
+                                params.getKeystoreKey(), keystore, alias);
                             LOGGER.info("Private key for alias {} is private key ({}) of type {}", alias, 
                                 key instanceof PrivateKey, null == key ? null : key.getClass().getName());
                             if (key instanceof PrivateKey) {
@@ -316,7 +301,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                                 configBuilder.setKeyPair(new KeyPair(cert.getPublicKey(), null)); // unsure, shall work
                             }
                             configBuilder.setCertificate((X509Certificate) cert);
-                        } catch (UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                        } catch (IOException e) {
                             LOGGER.error("Cannot read private key alias '{}': {}: Trying without TLS.", alias, 
                                 e.getMessage());
                         }                    
@@ -330,7 +315,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
             } catch (IOException | KeyStoreException e) {
                 LOGGER.error("Cannot read from keystore '{}': {} Trying without TLS.", 
-                    params.getKeystore(), e.getMessage());
+                    params.getKeystoreKey(), e.getMessage());
             }
         }
         return configBuilder;
