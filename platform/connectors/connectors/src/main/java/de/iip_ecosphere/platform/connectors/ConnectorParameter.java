@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.
@@ -73,6 +74,7 @@ public class ConnectorParameter {
     private String keyAlias;
     private boolean hostnameVerification = false;
     private CacheMode cacheMode = CacheMode.NONE;
+    private NameplateSetup.Service service;
     
     /**
      * Builds a connector parameter object.
@@ -127,6 +129,17 @@ public class ConnectorParameter {
          */
         public static ConnectorParameterBuilder newBuilder(ServerAddress addr) {
             return newBuilder(addr.getHost(), addr.getPort(), addr.getSchema());
+        }
+
+        /**
+         * Sets the optional service information to select upon.
+         * 
+         * @param service the device service information the connector shall connect to
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setService(NameplateSetup.Service service) {
+            instance.service = service;
+            return this;
         }
         
         /**
@@ -491,6 +504,15 @@ public class ConnectorParameter {
      */
     public CacheMode getCacheMode() {
         return cacheMode;
+    }
+
+    /**
+     * Returns the device service information this connector shall connect to.
+     * 
+     * @return the device service information, may be <b>null</b>
+     */
+    public NameplateSetup.Service getService() {
+        return service;
     }
 
 }
