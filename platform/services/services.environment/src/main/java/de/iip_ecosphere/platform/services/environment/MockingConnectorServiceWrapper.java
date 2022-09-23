@@ -127,14 +127,8 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                 tok.getType(), tok.getTokenData() != null && tok.getTokenData().length > 0);
         }
         if (AbstractConnector.useTls(param)) {
-            if (param.getKeystoreKey() != null) {
-                LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS via identity store key {}", 
-                    param.getKeystoreKey());
-            } else {
-                LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS: {} with password {}", 
-                    param.getKeystore(), param.getKeystorePassword() != null 
-                    && param.getKeystorePassword().length() > 0);
-            }
+            LoggerFactory.getLogger(getClass()).info("Hint: Aiming for TLS via identity store key {}", 
+                param.getKeystoreKey());
         }
         // setup mock output
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
