@@ -146,6 +146,11 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.mqtt</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
         <artifactId>connectors.aas</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
