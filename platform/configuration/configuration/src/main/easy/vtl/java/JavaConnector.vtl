@@ -535,7 +535,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def getConnectorDeviceServiceKey(Connector conn) {
         if (isDefined(conn.deviceServiceKey)) {
-            "${conn.deviceServiceKey}";
+            '"${conn.deviceServiceKey}"';
         } else {
             "null";
         }
