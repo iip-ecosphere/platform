@@ -29,10 +29,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -58,6 +60,9 @@ public class NameplateSetup {
     public static final String SUBMODEL_SERVICES = "services";
     public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_PORT = "port";
+    public static final String PROPERTY_HOST = "host";
+    public static final String PROPERTY_NETMASK = "netmask";
+    public static final String PROPERTY_VERSION = "version";
     
     private String manufacturerName;
     private String manufacturerProductDesignation;
@@ -95,6 +100,9 @@ public class NameplateSetup {
         
         private String key;
         private int port;
+        private String host;
+        private String netmask;
+        private Version version;
         
         /**
          * Returns the unique logical key within this device to access this service.
@@ -131,7 +139,79 @@ public class NameplateSetup {
         public void setPort(int port) {
             this.port = port;
         }
-        
+
+        /**
+         * Returns the IP address/name of the hosting device. If none was specified, 
+         * {@link NetUtils#getOwnIP(String)} is called with {@link #getNetmask()}.
+         * 
+         * @return the IP address/name
+         */
+        public String getHost() {
+            if (null == host) {
+                host = NetUtils.getOwnIP(netmask);
+            }
+            return host;
+        }
+
+        /**
+         * Defines the IP address/name of the hosting device. [snakeyaml]
+         * 
+         * @param host the IP address/name to set
+         */
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        /**
+         * Returns the optional netmask to enable a safe detection in {@link #getHost()} if
+         * no host was given.
+         * 
+         * @return the netmask (may be <b>null</b>)
+         */
+        public String getNetmask() {
+            return netmask;
+        }
+
+        /**
+         * Defines the optional netmask.
+         * 
+         * @param netmask the netmask to set
+         */
+        public void setNetmask(String netmask) {
+            this.netmask = netmask;
+        }
+
+        /**
+         * Returns the optional service/protocol version offered.
+         * 
+         * @return the version (may be <b>null</b>)
+         */
+        public Version getVersion() {
+            return version;
+        }
+
+        /**
+         * Defines the optional service/protocol version offered.
+         * 
+         * @param version the version to set
+         */
+        public void setVersion(String version) {
+            if (null == version) {
+                this.version = null;
+            } else {
+                this.version = new Version(version);
+            }
+        }
+
+        /**
+         * Defines the optional service/protocol version offered.
+         * 
+         * @param version the version to set
+         */
+        public void setVersion(Version version) {
+            this.version = version;
+        }
+
     }
 
     /**
@@ -159,6 +239,23 @@ public class NameplateSetup {
      */
     public String getManufacturerProductDesignation() {
         return manufacturerProductDesignation;
+    }
+
+    /**
+     * Returns the (first specified) service with the given {@link key}.
+     * 
+     * @param key the key
+     * @return the service, may be <b>null</b> for none
+     */
+    public Service getService(String key) {
+        Service svc = null;
+        for (Service s : getServices()) {
+            if (s.getKey().equals(key)) {
+                svc = s;
+                break;
+            }
+        }
+        return svc;
     }
     
     /**
@@ -305,6 +402,15 @@ public class NameplateSetup {
                         smcb.createPropertyBuilder(PROPERTY_PORT)
                             .setValue(Type.INTEGER, s.getPort())
                             .build();
+                        smcb.createPropertyBuilder(PROPERTY_HOST)
+                            .setValue(Type.STRING, s.getHost())
+                            .build();
+                        smcb.createPropertyBuilder(PROPERTY_NETMASK)
+                            .setValue(Type.STRING, s.getNetmask())
+                            .build();
+                        smcb.createPropertyBuilder(PROPERTY_VERSION)
+                            .setValue(Type.STRING, null == s.getVersion() ? null : s.getVersion().toString())
+                            .build();
                         smcb.build();
                     }
                 }
@@ -366,20 +472,9 @@ public class NameplateSetup {
         for (SubmodelElement elt : sub.submodelElements()) {
             if (elt instanceof SubmodelElementCollection) {
                 SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                String key = null;
+                String key = getStringProperty(coll, PROPERTY_KEY);
                 Integer port = null;
-                Property p = coll.getProperty(PROPERTY_KEY);
-                if (null != p) {
-                    try {
-                        Object val = p.getValue();
-                        if (val instanceof String) {
-                            key = (String) val;
-                        }
-                    } catch (ExecutionException e) {
-                        
-                    }
-                }
-                p = coll.getProperty(PROPERTY_PORT);
+                Property p = coll.getProperty(PROPERTY_PORT);
                 if (null != p) {
                     try {
                         Object val = p.getValue();
@@ -394,11 +489,104 @@ public class NameplateSetup {
                     Service svc = new Service();
                     svc.setKey(key);
                     svc.setPort(port);
+                    svc.setHost(getStringProperty(coll, PROPERTY_HOST));
+                    svc.setNetmask(getStringProperty(coll, PROPERTY_NETMASK));
+                    svc.setVersion(getStringProperty(coll, PROPERTY_VERSION));
                     result.add(svc);
                 }
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the value of a string property.
+     * 
+     * @param coll the collection to take the property from
+     * @param idShort the short id of the property
+     * @return the value or <b>null</b>
+     */
+    private static String getStringProperty(SubmodelElementCollection coll, String idShort) {
+        String result = null;
+        Property p = coll.getProperty(idShort);
+        if (null != p) {
+            try {
+                Object val = p.getValue();
+                if (val instanceof String) {
+                    result = (String) val;
+                }
+            } catch (ExecutionException e) {
+                
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Resolves the nameplate setup from the IIP-Ecosphere platform AAS via the device id.
+     * 
+     * @return the nameplate setup, may be <b>null</b> if there is none
+     * @throws IOException if resolving the AASs fails for some reason
+     */
+    public static NameplateSetup resolveFromAas() throws IOException {
+        NameplateSetup result = null;
+        String address = null;
+        Aas aas = AasPartRegistry.retrieveIipAas();
+        if (null != aas) {
+            Submodel resSub = aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES);
+            if (null != resSub) {
+                SubmodelElementCollection device = resSub.getSubmodelElementCollection(Id.getDeviceIdAas());
+                Property prop = device.getProperty(AasPartRegistry.NAME_PROP_DEVICE_AAS);
+                if (null != prop) {
+                    try {
+                        address = (String) prop.getValue();
+                    } catch (ExecutionException e) {
+                        LoggerFactory.getLogger(NameplateSetup.class).warn(
+                            "Cannot read value of AAS my device entry: {}", e.getMessage());
+                    }
+                }
+            }
+        }
+        if (null != address) {
+            aas = resolve(address);
+            result = readFromAas(aas);
+        }
+        return result;
+    }
+
+    /**
+     * Resolves the service with the given {@code key} from the IIP-Ecosphere platform AAS.
+     * 
+     * @param key the key of the service to resolve, may be <b>null</b> and leads to <b>null</b>
+     * @return the service, may be <b>null</b> for none
+     */
+    public static Service resolveServiceFromAas(String key) {
+        Service result = null;
+        if (null != key) {
+            try {
+                NameplateSetup np = NameplateSetup.resolveFromAas();
+                if (null != np) {
+                    result = np.getService(key);
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(NameplateSetup.class).warn(
+                    "Cannot resolve service {}: {}", key, e.getMessage());
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Resolves an {@code identifier} ({@link #getDeviceAasAddress()}, {@link #getURN()}) to the 
+     * respective AAS.
+     * 
+     * @param identifier the identifier, URN, URL to resolve
+     * @return the resolved AAS or <b>null</b> for none
+     */
+    public static Aas resolve(String identifier) throws IOException {
+        Registry reg = AasFactory.getInstance().obtainRegistry(
+            AasPartRegistry.getSetup().getRegistryEndpoint());
+        return reg.retrieveAas(identifier);
     }
 
 }
