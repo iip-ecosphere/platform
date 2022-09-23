@@ -586,9 +586,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
                 'String keystoreKey = "${sec.keystoreKey}";'
             } 
-            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
-                'IdentityToken kTok = IdentityStore.getInstance().getToken("${sec.keystorePasswordKey}", true);' 
-            }
         }
     }
     
@@ -601,9 +598,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
                 '.setKeystoreKey(keystoreKey)'
             } 
-            if (isDefined(sec.keystore) and sec.keystore <> "") {
-                '.setKeystore(new File("${sec.keystore}"), kTok.getTokenDataAsString())'
-            }
             if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
                 '.setKeyAlias("${sec.keyAlias}")'
             }

@@ -228,6 +228,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                     AssignmentState.USER_ASSIGNED);
             } catch (ValueDoesNotMatchTypeException | ConfigurationException e) {
                 history.rollback();
+                throw new ExecutionException(e.getMessage(), null);
             }
         }
         ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg.getConfiguration(), null, null);
@@ -246,6 +247,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             throw new ExecutionException(text, null);
         } else {
             history.commit();
+            // TODO write model!            
         }
         return "";
     }

@@ -17,9 +17,7 @@ project Transport {
     	ProtocolType type;
     	String globalHost = "localhost"; // ignored for local, only for global
     	Port port = 8883; // preliminary, needed for AMQP tests
-        SecuritySettings security = null; // will replace user/password #22
-    	String user = ""; // preliminary, needed for AMQP tests
-    	String password = ""; // preliminary, needed for AMQP tests
+        SecuritySettings security = null;
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {
