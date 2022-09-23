@@ -185,6 +185,7 @@ project Connectors {
        SecuritySettings security = null;
        Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
        CacheMode cacheMode = CacheMode::NONE;
+       String deviceServiceKey;
 
        fwdTypes(output).size() < 2;
        fwdTypes(input).size() < 2;
@@ -202,12 +203,14 @@ project Connectors {
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
-        String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
-        String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
-        NameplateInfo nameplateInfo = {
+       String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
+       String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
+       Port port = 4840;
+       String deviceServiceKey = "opcua";
+       NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "Generic OPC UA connector@en",
            manufacturer = refBy(manufacturer_sse)
-        };
+       };
    }
 
    compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
@@ -224,21 +227,36 @@ project Connectors {
    }
    
    compound MqttV3Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
-        String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
-        String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
-        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic MQTT v3 connector@en",
-           manufacturer = refBy(manufacturer_sse)
-        };
+       String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
+       String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
+       Port port = 1883;
+       String deviceServiceKey = "mqttv3";
+       NameplateInfo nameplateInfo = {
+          manufacturerProductDesignation = "Generic MQTT v3 connector@en",
+          manufacturer = refBy(manufacturer_sse)
+       };
    }
    
    compound MqttV5Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
-        String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
-        String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
-        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic MQTT v5 connector@en",
-           manufacturer = refBy(manufacturer_sse)
-        };
+       String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
+       String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
+       Port port = 1883;
+       String deviceServiceKey = "mqttv5";
+       NameplateInfo nameplateInfo = {
+          manufacturerProductDesignation = "Generic MQTT v5 connector@en",
+          manufacturer = refBy(manufacturer_sse)
+       };
+   }
+
+   compound MqttConnector refines ChannelConnector { // fixed template types see JavaConnector.vtl
+       String class = "de.iip_ecosphere.platform.connectors.mqtt.MqttConnectorFactory";
+       String artifact ="de.iip-ecosphere.platform:connectors.mqtt:";
+       Port port = 1883;
+       String deviceServiceKey = "mqtt";
+       NameplateInfo nameplateInfo = {
+          manufacturerProductDesignation = "Generic MQTT connector@en",
+          manufacturer = refBy(manufacturer_sse)
+       };
    }
     
 }

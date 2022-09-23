@@ -516,6 +516,30 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             default: "CacheMode.NONE"
         }
     }
+    
+    def getConnectorPort(Connector conn) {
+        if (isDefined(conn.port)) {
+            conn.port;
+        } else {
+            -1;
+        }
+    }
+
+    def getConnectorHost(Connector conn) {
+        if (isDefined(conn.host)) {
+            "${conn.host}";
+        } else {
+            "";
+        }
+    }
+
+    def getConnectorDeviceServiceKey(Connector conn) {
+        if (isDefined(conn.deviceServiceKey)) {
+            "${conn.deviceServiceKey}";
+        } else {
+            "null";
+        }
+    }
 
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
@@ -525,8 +549,16 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         */
         public static ConnectorParameter createConnectorParameter() {
             ${generateConnectorParamSecurityDecls(conn)|e}
+            String host = "${getConnectorHost(conn)}";
+            int port = ${getConnectorPort(conn)};
+            NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
+            if (null != svc) { // device has precedence
+                host = svc.getHost();
+                port = svc.getPort();
+            }
             return ConnectorParameter.ConnectorParameterBuilder
-                .newBuilder("${conn.host}", ${conn.port})
+                .newBuilder(host, port)
+                .setService(svc)
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
                 .setCacheMode(${getCacheMode(conn)})
                 ${generateEndpointPath(conn)|e}

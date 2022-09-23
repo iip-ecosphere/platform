@@ -484,15 +484,17 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars) {
-        String connGen = getConnectorGenerics(conn, false);
+        String connGen = getConnectorGenerics(conn, true);
         String clsName = getClsName(elt);
         serviceVars.add("service");
-        '${conn.class}${connGen} conn = 
-            new ${conn.class}<>(createConnectorAdapter());
+        'ConnectorParameter param = createConnectorParameter();
+        Connector${connGen} conn = ConnectorFactory.createConnector(
+            "${conn.class}", () -> param, 
+            createConnectorAdapter());
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
-            () -> createConnectorParameter());
+            () -> param);
         service.setReceptionCallback(new ConnectorReceptionCallback());'
     }
     
@@ -1029,7 +1031,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
-        import de.iip_ecosphere.platform.support.iip_aas.Id;
+        import de.iip_ecosphere.platform.support.iip_aas.*;
         import de.iip_ecosphere.platform.transport.Transport;
         import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;
@@ -1042,6 +1044,8 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.services.environment.spring.Starter;
         import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+        import de.iip_ecosphere.platform.connectors.Connector;
+        import de.iip_ecosphere.platform.connectors.ConnectorFactory;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter;
         import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
         import de.iip_ecosphere.platform.connectors.types.*;
