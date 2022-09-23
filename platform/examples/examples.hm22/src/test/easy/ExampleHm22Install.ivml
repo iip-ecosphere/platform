@@ -80,8 +80,9 @@ project ExampleHm22Install {
     transportProtocol = TransportProtocolAMQP {
         port = 8883,
         globalHost = platformServer,
-        user = "user",
-        password = "pwd"
+        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+            authenticationKey = "amqp"
+        }
     };
     
     serviceProtocol = ServiceProtocolAMQP {};
@@ -383,6 +384,7 @@ project ExampleHm22Install {
         registryHost = carAasServer,
         registryPort = 9989,
         registryPath = "registry",
+        mock = flowTest, 
         
         input = {{type=refBy(MdzhInput)}},
         output = {{type=refBy(MdzhOutput)}},
