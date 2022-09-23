@@ -72,7 +72,7 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_RESOURCE = "resource";
     public static final String NAME_PROP_RUNTIME_NAME = "runtimeName";
     public static final String NAME_PROP_RUNTIME_VERSION = "runtimeVersion";
-    public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
+    public static final String NAME_PROP_DEVICE_AAS = AasPartRegistry.NAME_PROP_DEVICE_AAS;
     
     public static final String NAME_PROP_OPERATING_SYSTEM = "OS"; // IDTA
     public static final String NAME_PROP_CPU_ARCHITECTURE = "CPU_Architecture"; // IDTA

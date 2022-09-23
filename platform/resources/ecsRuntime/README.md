@@ -67,6 +67,27 @@ The ECS runtime may create an AAS with nameplate for the actual device. As curre
 
 Via the JSL for `DeviceAasProviderDescriptor` the actual approach may be determined. By default, we use a first matching device AAS provider searching either for the Yaml or the AASX file mentioned above. Other approaches may be utilized via JSL.
 
+Structure of a Yaml extended nameplate file:
+
+    manufacturerName: <String>
+    manufacturerProductDesignation: <String>
+    productImage: <Path on Classpath>
+    manufacturerLogo: <Path on Classpath>
+    address:
+        department: <String>
+        street: <String>
+        zipCode: <String>
+        cityTown: <String>
+    services:
+        - key: <String>
+          port: <Integer>
+          host: <String>
+          netmask: <String>
+          version: <Version>
+        - ...
+
+A service declaration has a uniqe `key` to be used from the configuration model. It declares the port and the `host` (e.g., if the device has multiple IPs) of the service. The `host` is optional and if not given the actual IP address is used, taking `netmask` as selector into account. A device service may have a version, e.g., for MQTT, which can be taken into account to dynamically select the matching platform connector implementation. 
+
 ## Running
 
 This component must be bundled with further, e.g., upper layer components which pair themselves via JLS, in particular `LifecycleHandler`. To start this component, please use the functions of the `LifecycleHandler` or the default starter classes defined there.

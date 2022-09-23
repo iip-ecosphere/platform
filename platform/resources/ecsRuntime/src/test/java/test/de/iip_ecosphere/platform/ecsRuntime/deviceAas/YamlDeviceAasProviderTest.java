@@ -12,12 +12,17 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
+import java.io.IOException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.YamlDeviceAasProvider;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
+
 import org.junit.Assert;
 
 /**
@@ -45,15 +50,21 @@ public class YamlDeviceAasProviderTest extends AbstractDeviceProviderTest {
     
     /**
      * Tests the provider.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
-    public void testProvider() {
+    public void testProvider() throws IOException {
         DeviceAasProvider instance = new YamlDeviceAasProvider();
         String address = instance.getDeviceAasAddress();
         Assert.assertTrue(null != address && address.length() > 0); // there is an AAS
         Assert.assertTrue(instance.getIdShort().length() > 0);
         Assert.assertTrue(instance.getURN().length() > 0);
+
         System.out.println(address);
+        Assert.assertNotNull(NameplateSetup.resolve(instance.getURN()));
+        Aas aas = NameplateSetup.resolve(address);
+        Assert.assertNotNull(aas);
     }
 
 }

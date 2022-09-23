@@ -17,7 +17,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.ecsRuntime.deviceAas.AasxDeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.FirstMatchingDeviceAasProvider;
 
@@ -45,7 +44,7 @@ public class FirstMatchingDeviceAasProviderTest extends AbstractDeviceProviderTe
     }
 
     /**
-     * Tests {@link AasxDeviceAasProvider}.
+     * Tests {@link FirstMatchingDeviceAasProvider}.
      */
     @Test
     public void testProvider() {
