@@ -433,10 +433,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             // Mesh-Info
             Path meshInfo = "${appRoot}/../mesh-info.yml";
             vilTemplateProcessor("MeshInfo", config, meshInfo);
-
+            
             // InstalledDependencies
             Path instDep = "${appRoot}/../installedDependencies.yml";
-            vilTemplateProcessor("InstalledDependencies", config, instDep, isPython=isPythonService);
+            vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
         }
     }
     

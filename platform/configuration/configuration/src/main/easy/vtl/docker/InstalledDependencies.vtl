@@ -3,14 +3,34 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template InstalledDependencies(IIPEcosphere config, FileArtifact target, Integer isPython) {
+template InstalledDependencies(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
 	
-    def main(IIPEcosphere config, FileArtifact target, Integer isPython) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
         'locations: '
-        
         if (isPython == 1) {
-            '    PYTHON: /usr/local/bin/python'
+            
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            for (PythonService pyService : services) {
+                setOf(Dependency) deps = pyService.dependencies;
+                for (Dependency s : deps) {
+                    if (genDependency(s) == 'PYTHON2') {
+                        '    PYTHON2: /usr/local/bin/python'
+                    } else if (genDependency(s) == 'PYTHON3') {
+                        '    PYTHON3: /usr/local/bin/python'
+                    } else if (genDependency(s) == 'PYTHON39') {
+                        '    PYTHON3: /usr/local/bin/python'
+                    } 
+                }
+            }
         }
         '    JAVA99: /opt/openjdk-16/bin/java'
+    }
+    
+    def genDependency(Dependency d) {
+        '';
+    }
+    
+    def genDependency(SystemDependency d) {
+        '${d.key}';
     }
 }
