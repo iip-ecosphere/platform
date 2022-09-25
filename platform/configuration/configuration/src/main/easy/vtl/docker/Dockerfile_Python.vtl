@@ -1,0 +1,75 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
+        
+        'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+        'COPY requirements.txt requirements.txt'
+        
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+        for (PythonService pyService : services) {
+            setOf(Dependency) deps = pyService.dependencies;
+            for (Dependency s : deps) {
+                if (genDependency(s) == 'PYTHON2') {
+                    'COPY --from=python:2.7.10 / /'
+                    'RUN python2 -m pip install -r requirements.txt'
+                } else if (genDependency(s) == 'PYTHON3') {
+                    'COPY --from=python:3.8-slim-buster / /'
+                    'RUN python3 -m pip install -r requirements.txt'
+                } else if (genDependency(s) == 'PYTHON39') {
+                    'COPY --from=python:3.9-slim-buster / /'
+                    'RUN python3 -m pip install -r requirements.txt'
+                } 
+            }
+        }
+        ''
+        'WORKDIR /app'
+        ''
+        '# Broker'
+        'COPY broker/brokerJars/ brokerJars'
+        'COPY broker/src/ src'
+        'COPY broker/broker.sh broker.sh'
+        ''
+        '# App'
+        'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+        ''
+        if (containerType == 1) {
+            '# ECS and Service Manager'
+            'COPY ecsSvcJars/ ecsSvcJars'
+            'COPY common/ common'
+            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
+        
+        } else if (containerType == 2) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+            ''
+            '# ECS'
+            'COPY ecsJars/ ecsJars'
+            'COPY ecs.sh ecs.sh'
+        } else if (containerType == 3) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+        }
+        ''		
+        '# Running the script'
+        'COPY wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
+        'CMD ./wrapper_script.sh'
+    }
+    
+    def genDependency(Dependency d) {
+        '';
+    }
+    
+    def genDependency(SystemDependency d) {
+        '${d.key}';
+    }
+}

@@ -340,99 +340,96 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             setOf(EcsDevice) devices = EcsDevice.allInstances();
             for (EcsDevice d : devices) {
             
-				if (d.containerVariant == "1_joined") {
-					// Dockerfile
-					if (isPythonService == 0) {
-						// JAVA         
-						Path df = "${appRoot}/../Dockerfile.txt";
-						vilTemplateProcessor("Dockerfile_2", config, df, elements=elements, app=a);
-						df.rename("Dockerfile");
-					} else {
-						// JAVA & PYTHON
-						Path req = "${appRoot}/../requirements.txt";
-						vilTemplateProcessor("PythonReq", config, req, elements=elements);              
+                if (d.containerType == 1) {
+                    if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");   
+                    } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);
+                        
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                    }
 
-						Path df = "${appRoot}/../Dockerfile.txt";
-						vilTemplateProcessor("DockerfilePy_2", config, df, elements=elements, app=a);
-						df.rename("Dockerfile");
-					}
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
 
-					// Create image 
-					Path b = "${appRoot}/../";
-					Path d = "${appRoot}/../Dockerfile";
-					String imageId = dockerBuildImage(b, d, "variante_1_joined/image:01");
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../Dockerfile";
+                    String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
+                }
+                
+                if (d.containerType == 2) {
+                     if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                     } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
 
-					// Remove image
-					dockerRemoveImage(imageId);
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                    }
+
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
+
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../Dockerfile";
+                    String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
 				}	
 
-				if (d.containerVariant == "1_separate") {
-					// Dockerfile
-					if (isPythonService == 0) {
-						// JAVA         
-						Path df = "${appRoot}/../Dockerfile.txt";
-						vilTemplateProcessor("Dockerfile_1", config, df, elements=elements, app=a);
-						df.rename("Dockerfile");        
-					} else {
-						// JAVA & PYTHON
-						Path req = "${appRoot}/../requirements.txt";
-						vilTemplateProcessor("PythonReq", config, req, elements=elements);              
+                if (d.containerType == 3) {
+  					
+                    // Container with ECS
+                    Path df = "${appRoot}/../Dockerfile.txt";
+                    vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
+                    df.rename("ecs.Dockerfile");
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../ecs.Dockerfile";
+                    String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
+                    
+                    // Container with ServiceMgr and App
+                    if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../app.Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=3);
+                        df.rename("app.Dockerfile");      
+                    } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
 
-						Path df = "${appRoot}/../Dockerfile.txt";
-						vilTemplateProcessor("DockerfilePy_1", config, df, elements=elements, app=a);
-						df.rename("Dockerfile");
-					}
-
-					// Wrapper-Skript 
-					Path ws = "${appRoot}/../wrapper_script.sh";
-					vilTemplateProcessor("WrapperScript_1", config, ws); 
-
-					// Create image 
-					Path b = "${appRoot}/../";
-					Path d = "${appRoot}/../Dockerfile";
-					String imageId = dockerBuildImage(b, d, "variante_1_separate/image:01");
-
-					// Remove image
-					dockerRemoveImage(imageId);
-				}	
-
-				if (d.containerVariant == "2") {
-					// Container with ECS
-					Path df = "${appRoot}/../Dockerfile.txt";
-					vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
-					df.rename("ecs.Dockerfile");
-					Path b = "${appRoot}/../";
-					Path d = "${appRoot}/../ecs.Dockerfile";
-					String ecs_imageId = dockerBuildImage(b, d, "variante_2/ecs");
-
-					// Container with ServiceMgr and App
-					// Dockerfile
-					if (isPythonService == 0) {
-						// JAVA         
-						Path df = "${appRoot}/../Dockerfile.txt";
-						vilTemplateProcessor("Dockerfile_3_app", config, df, elements=elements, app=a);
-						df.rename("app.Dockerfile");      
-					 } else {
-						// JAVA & PYTHON
-						Path req = "${appRoot}/../requirements.txt";
-						vilTemplateProcessor("PythonReq", config, req, elements=elements);              
-
-						Path df2 = "${appRoot}/../app.Dockerfile.txt";
-						vilTemplateProcessor("DockerfilePy_3_app", config, df2, elements=elements, app=a);
-						df2.rename("app.Dockerfile");
-					 }
-
-					 // Create image 
-					 Path b2 = "${appRoot}/../";
-					 Path d2 = "${appRoot}/../app.Dockerfile";
-					 String app_imageId = dockerBuildImage(b2, d2, "variante_2/app");  
-
-					 // Remove images
-					 dockerRemoveImage(ecs_imageId);
-					 dockerRemoveImage(app_imageId);
-		    	}
-	    	}
-    	}
+                        Path df2 = "${appRoot}/../app.Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df2, elements=elements, app=a, containerType=3);
+                        df2.rename("app.Dockerfile");
+                     }
+                     
+                     // Wrapper-Skript 
+                     Path ws = "${appRoot}/../wrapper_script.sh";
+                     vilTemplateProcessor("WrapperScript", config, ws, containerType=3);
+                     
+                     // Create image 
+                     Path b2 = "${appRoot}/../";
+                     Path d2 = "${appRoot}/../app.Dockerfile";
+                     String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                     
+                }
+            }
+        }
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
