@@ -325,7 +325,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
-    
+                
         if (a.createContainer) {
             
             // Checking if there is any PythonService in app
@@ -429,6 +429,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                      
                 }
             }
+            
+            // Mesh-Info
+            Path meshInfo = "${appRoot}/../mesh-info.yml";
+            vilTemplateProcessor("MeshInfo", config, meshInfo);
+
+            // InstalledDependencies
+            Path instDep = "${appRoot}/../installedDependencies.yml";
+            vilTemplateProcessor("InstalledDependencies", config, instDep, isPython=isPythonService);
         }
     }
     

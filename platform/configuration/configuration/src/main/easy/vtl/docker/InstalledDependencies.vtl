@@ -1,0 +1,16 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template InstalledDependencies(IIPEcosphere config, FileArtifact target, Integer isPython) {
+	
+    def main(IIPEcosphere config, FileArtifact target, Integer isPython) {
+        'locations: '
+        
+        if (isPython == 1) {
+            '    PYTHON: /usr/local/bin/python'
+        }
+        '    JAVA99: /opt/openjdk-16/bin/java'
+    }
+}
