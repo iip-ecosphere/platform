@@ -45,6 +45,7 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     HeartbeatWatcherTest.class,
     DefaultServiceImplTest.class,
     
+    TransportLoggerTests.class,
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
 })

@@ -1,0 +1,4 @@
+transport:
+    host: localhost
+    port: 8883
+    authenticationKey: amqp
