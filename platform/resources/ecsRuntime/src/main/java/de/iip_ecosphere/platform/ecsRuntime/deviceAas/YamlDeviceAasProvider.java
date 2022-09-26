@@ -12,9 +12,13 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
+import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.ecsRuntime.Monitor;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -90,7 +94,12 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
 
             try {
                 NameplateSetup nSetup = NameplateSetup.obtainNameplateSetup(); 
-                aas = nSetup.createAas(urn, id);
+                aas = nSetup.createAas(urn, id, ab -> {
+                    SubmodelBuilder smb = ab.createSubmodelBuilder("metrics", null);
+                    MetricsAasConstructor.addProviderMetricsToAasSubmodel(smb, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
+                        Id.getDeviceId(), EcsFactory.getSetup().getTransport());
+                    smb.build();
+                });
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Device AAS cannot be createed: : {}", e.getMessage());
             }
