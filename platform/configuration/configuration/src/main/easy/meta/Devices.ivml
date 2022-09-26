@@ -106,8 +106,13 @@ project Devices {
         CpuBits bits;
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {};
-        String containerVariant = "1_joined";
+        Integer containerType = 1;
     }
+    
+    // container types:
+    // 1 - one container: ecs + svc + app
+    // 2 - one container: ecsSvc + app
+    // 3 - 1st container: ecs, 2nd container: svc + app
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
     

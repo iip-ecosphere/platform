@@ -213,7 +213,7 @@ project ContainerCreation {
     // ---------------- device ----------------
     
     EcsDevice device = {
-    	containerVariant = "1_joined"
+        containerType = 1
     };
     
     // ---------- generation setup ------------

@@ -1,0 +1,24 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template MeshInfo(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+        'id: '
+        'name: '
+        'version: '
+        'dockerImageName: '
+        'dockerImageZipfile: '
+        'env:'
+        '    - IIP_PORT=\\${port}'
+        'exposedPorts:'
+        '    - \\${port}/TCP'
+        '    - 22/UDP'
+        '    - 80'
+        '    - 8080/DEFAULT'
+        'networkMode: host'
+        'dood: true'
+    }
+}
