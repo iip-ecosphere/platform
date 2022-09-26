@@ -4,7 +4,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
-* Developer support: Platform configuration goes AAS, generated implementation templates
+* Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
 * Platform release 0.4.0 (2022/09/02)
 * AI-based Code for HM'22/TddT'22 as public platform example/regression test.
 * Successful presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
@@ -75,3 +75,19 @@ The following layers and components of the IIP-Ecosphere are available in this p
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
 ![IIP-Ecosphere](logo.png)
+
+
+
+Powered by
+
+<img src="https://www.eclipse.org/basyx/img/basyxlogo.png" alt="BaSyx" width="200"/> 
+<img src="https://iot.eclipse.org/iot-logo-social.png" alt="Eclipse IoT" width="100"/> 
+<img src="https://www.docker.com/wp-content/uploads/2022/05/Docker_Temporary_Image_Google_Blue_1080x1080_v1.png" alt="Docker" width="100"/> 
+<img src="https://prometheus.io/assets/favicons/android-chrome-192x192.png" alt="Prometheus Monitoring" width="100"/>
+<br/>
+
+<img src="https://spring.io/images/spring-logo-9146a4d3298760c2e7e49595184e1975.svg" alt="Spring Cloud Stream" width="200"/> 
+<img src="https://maven.apache.org/images/maven-logo-black-on-white.png" alt="Maven" width="200"/> 
+<img src="https://sse.uni-hildesheim.de/media/_migrated/pics/EASy_Logo_02.png" alt="EASy-Producer" width="100"/> 
+
+IIP-Ecosphere would like to thank all utilized technologies and frameworks for the helpful contributions to the Open Source community.

@@ -34,6 +34,7 @@ New features:
 * [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
 * [#74](https://github.com/iip-ecosphere/platform/issues/74): Specify keystore via identityStore
 * Ad-hoc device connectivity via device AAS (initial)
+* [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
 
 Improvements:
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
