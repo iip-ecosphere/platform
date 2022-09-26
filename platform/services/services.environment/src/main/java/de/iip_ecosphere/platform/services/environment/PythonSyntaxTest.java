@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -18,6 +19,8 @@ public class PythonSyntaxTest {
      * If pyflakes is installed, assumed to be true.
      */
     private static boolean pyflakesExists = true;
+    
+    private static List<File> pythonFiles = new ArrayList<File>();
     
     /**
      * Runs a python command on CLI to evaluate the python service script on build
@@ -40,14 +43,14 @@ public class PythonSyntaxTest {
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
         
         //Assuming that the args[0] is the directory of the python services, lists the files separately
-        String[] allFiles = getAllPythonServices(args[0]); 
+        getAllPythonServices(args[0]); 
         
         String output = "";
         String errorLine = "";
-        for (String s : allFiles) {
-            System.out.println("Testing: " + s + " in " + args[0]);
+        for (File f : pythonFiles) {
+            System.out.println("Testing: " + f.getAbsolutePath());
             if (pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes", (args[0] + "/" + s)}; 
+                String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes",  f.getAbsolutePath()}; 
                 output += runPythonTest(cmd);
                 if (output.contains("No module named")) {
                     pyflakesExists = !output.contains("pyflakes");
@@ -55,7 +58,7 @@ public class PythonSyntaxTest {
 
             } 
             if (!pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "py_compile", (args[0] + "/" + s)};
+                String[] cmd = {pythonExecutable.getName(), "-m", "py_compile", f.getAbsolutePath()};
                 output += runPythonTest(cmd);
             }
         }
@@ -119,17 +122,19 @@ public class PythonSyntaxTest {
     /**
      * Give a list of files in a directory.
      * @param directory the path to the directory as String.
-     * @return Array with all different files in the directory.
      */
-    public static String[] getAllPythonServices(String directory) {
-        String[] allServices = null;
-        
+    public static void getAllPythonServices(String directory) {
         File file = new File(directory);
         if (file.isDirectory()) {
-            allServices = file.list();
+            for (File f : file.listFiles()) {
+                if (f.isDirectory()) {
+                    getAllPythonServices(f.getAbsolutePath());  
+                } else if (f.getAbsolutePath().endsWith(".py")) {
+                    pythonFiles.add(f);
+                }
+            }
         } else {
-            allServices = new String[] {directory}; //in case we got a specific file.
+            pythonFiles.add(file);
         }
-        return allServices;
     }
 }
