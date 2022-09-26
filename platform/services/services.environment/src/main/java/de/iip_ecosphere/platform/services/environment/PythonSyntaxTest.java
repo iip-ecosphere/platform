@@ -14,7 +14,11 @@ import java.util.concurrent.ExecutionException;
  * @author Alexander Weber
  */
 public class PythonSyntaxTest {
-
+    /**
+     * If pyflakes is installed, assumed to be true.
+     */
+    private static boolean pyflakesExists = true;
+    
     /**
      * Runs a python command on CLI to evaluate the python service script on build
      * time.
@@ -34,55 +38,65 @@ public class PythonSyntaxTest {
         File pythonExecutable = PythonUtils.getPythonExecutable();
 
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
+        
+        //Assuming that the args[0] is the directory of the python services, lists the files separately
+        String[] allFiles = getAllPythonServices(args[0]); 
+        
+        String output = "";
+        String errorLine = "";
+        for (String s : allFiles) {
+            System.out.println("Testing: " + s + " in " + args[0]);
+            if (pyflakesExists) {
+                String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes", (args[0] + "/" + s)}; 
+                output += runPythonTest(cmd);
+                if (output.contains("No module named")) {
+                    pyflakesExists = !output.contains("pyflakes");
+                }
 
+            } 
+            if (!pyflakesExists) {
+                String[] cmd = {pythonExecutable.getName(), "-m", "py_compile", (args[0] + "/" + s)};
+                output += runPythonTest(cmd);
+            }
+        }
+        
+        if (output.length() > 0) {
+
+            boolean failure = false;
+            String[] outputs = output.split("\n");
+            for (String line : outputs) {
+                // Unused import are not supposed to fail the build
+                if (!line.contains("import")) {
+                    failure = true;
+                    errorLine = line;
+                }
+            }
+            if (failure && args[1].equals("1")) {
+                throw new ExecutionException(errorLine, null);
+            }
+        }
         //Run the command to check the scrips!
-        String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes", args[0]};
+    }
+    /**
+     * Running the syntax check for the python Files.
+     * @param cmd  the command to run, either utilising pyflaks or py_compile
+     * @return The output to add to the other outputs
+     */
+    public static String runPythonTest(String[] cmd) {
+        Process process;
+        String output = "";
         try {
-            Process process = Runtime.getRuntime().exec(cmd);
-            String output = "";
-            String errorLine = "";
+            process = Runtime.getRuntime().exec(cmd);
             output = readProcessOutput(process.getInputStream());
             output += readProcessOutput(process.getErrorStream());
-            boolean flakesInstalled = true;
             // only test if error is due to missing pyflakes!
-            if (output.contains("No module named")) {
-                flakesInstalled = !output.contains("pyflakes");
-            }
-
             process.waitFor();
-
-            System.out.println(output);
-            if (!flakesInstalled) { // backup try! should be in every python
-                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> Fallback test not as thorough");
-                String[] backup = {pythonExecutable.getName(), "-m", "py_compile", args[0]};
-                process = Runtime.getRuntime().exec(backup);
-                output = readProcessOutput(process.getInputStream());
-                output += readProcessOutput(process.getErrorStream());
-                System.out.println("Error: " + output);
-            }
-            process.waitFor(); // Wait for the process to complete
-            if (output.length() > 0) {
-
-                boolean failure = false;
-                String[] outputs = output.split("\n");
-                for (String line : outputs) {
-                    // Unused import are not supposed to fail the build
-                    if (!line.contains("import")) {
-                        failure = true;
-                        errorLine = line;
-                    }
-                }
-                if (failure && args[1].equals("1")) {
-                    throw new ExecutionException(errorLine, null);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("I/O problem: " + e.getMessage());
-        } catch (InterruptedException e) {
-            System.out.println("Test interrupted: " + e.getMessage());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
+        return output;
     }
-
+    
     /**
      * Shall take in input stream of processes to collect console output.
      * 
@@ -101,5 +115,21 @@ public class PythonSyntaxTest {
         }
         return output.toString();
     }
-
+    
+    /**
+     * Give a list of files in a directory.
+     * @param directory the path to the directory as String.
+     * @return Array with all different files in the directory.
+     */
+    public static String[] getAllPythonServices(String directory) {
+        String[] allServices = null;
+        
+        File file = new File(directory);
+        if (file.isDirectory()) {
+            allServices = file.list();
+        } else {
+            allServices = new String[] {directory}; //in case we got a specific file.
+        }
+        return allServices;
+    }
 }
