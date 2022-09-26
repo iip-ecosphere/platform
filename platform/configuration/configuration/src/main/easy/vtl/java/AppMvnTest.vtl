@@ -91,7 +91,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
             new XmlElement(new XmlElement(exec, "goals"), "goal", "java");
             execCfg = new XmlElement(exec, "configuration");
             execArgs = new XmlElement(execCfg, "arguments");
-            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/main/python/services/ExamplePythonService.py");
+            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/main/python/services");
             new XmlElement(execArgs, "argument", "1");
             new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonSyntaxTest");
             new XmlElement(execCfg, "classpathScope", "test");
