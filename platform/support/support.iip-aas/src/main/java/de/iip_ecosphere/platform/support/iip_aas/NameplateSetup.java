@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -362,9 +363,10 @@ public class NameplateSetup {
      * 
      * @param urn the URN of the AAS to create
      * @param id the id short to create
+     * @param further further build steps on the AAS, may be <b>null</b>
      * @return the AAS
      */
-    public Aas createAas(String urn, String id) {
+    public Aas createAas(String urn, String id, Consumer<AasBuilder> further) {
         AasFactory factory = AasFactory.getInstance();
         Aas aas = null;
         try {
@@ -415,6 +417,9 @@ public class NameplateSetup {
                     }
                 }
                 sub.build();
+                if (null != further) {
+                    further.accept(aasBuilder);
+                }
                 aas = aasBuilder.build();
                 AasPartRegistry.remoteDeploy(CollectionUtils.addAll(new ArrayList<Aas>(), aas));
             } catch (IOException | DatatypeConfigurationException e1) {

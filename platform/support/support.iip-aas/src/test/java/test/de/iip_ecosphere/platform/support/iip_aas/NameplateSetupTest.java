@@ -37,7 +37,7 @@ public class NameplateSetupTest {
     @Test
     public void testNameplateSetup() throws IOException {
         NameplateSetup init = NameplateSetup.obtainNameplateSetup();
-        Aas aas = init.createAas("urn:::AAS:::a1234#", "a1234");
+        Aas aas = init.createAas("urn:::AAS:::a1234#", "a1234", a -> { });
         NameplateSetup setup = NameplateSetup.readFromAas(aas);
         Assert.assertNotNull(setup);
         // TODO further asserts
