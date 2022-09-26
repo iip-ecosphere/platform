@@ -47,6 +47,7 @@ Typical build steps:
  Also input files (see `src/test/resources`) require renaming and adjustments.
  - `mvn -P App exec:java@app` runs the full application with all services locally without the platform. If you want to 
  implement individual services, this execution renders useless.
+ - `mvn -P App exec:java@transportLogger` runs the transport logger with default setup in the context of this application.
  ${genTestExecutions(nodes)}
  '
     }

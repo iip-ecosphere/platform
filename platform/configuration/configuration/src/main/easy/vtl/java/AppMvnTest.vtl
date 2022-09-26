@@ -85,6 +85,15 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
         new XmlElement(execCfg, "classpathScope", "test");
         
+        exec = new XmlElement(execPluginExecs, "execution");
+        new XmlElement(exec, "id", "transportLogger");
+        XmlElement execCfg = new XmlElement(exec, "configuration");
+        new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.TransportLogger");
+        XmlElement execArgs = new XmlElement(execCfg, "arguments");
+        new XmlElement(execArgs, "argument", "--traces=true");
+        new XmlElement(execArgs, "argument", "--status=true");
+        new XmlElement(execCfg, "classpathScope", "test");
+        
         if (hasPython) {
             exec = new XmlElement(execPluginExecs, "execution");
             new XmlElement(exec, "id", "py-test");
