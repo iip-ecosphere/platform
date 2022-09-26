@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.connectors;
 
-import java.io.File;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Schema;
@@ -69,8 +68,6 @@ public class ConnectorParameter {
     private int notificationInterval = DEFAULT_NOTIFICATION_INTERVAL;
     private int keepAlive = DEFAULT_KEEP_ALIVE;
     private String keystoreKey;
-    private File keystore;
-    private String keyPassword;
     private String keyAlias;
     private boolean hostnameVerification = false;
     private CacheMode cacheMode = CacheMode.NONE;
@@ -238,23 +235,6 @@ public class ConnectorParameter {
          */
         public ConnectorParameterBuilder setKeystoreKey(String keystoreKey) {
             instance.keystoreKey = keystoreKey;
-            return this;
-        }
-
-        /**
-         * Sets up optional TLS encryption details.
-         * 
-         * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
-         *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
-         *   implementation, e.g., PKCS12 may not work with all forms
-         * @param password the TLS keystore, may be <b>null</b> for none
-         * @return <b>this</b>
-         * @deprecated use {@link #setKeystoreKey(String)} instead
-         */
-        @Deprecated
-        public ConnectorParameterBuilder setKeystore(File keystore, String password) {
-            instance.keystore = keystore;
-            instance.keyPassword = password;
             return this;
         }
 
@@ -456,29 +436,6 @@ public class ConnectorParameter {
         return keystoreKey;
     }
 
-    /**
-     * Returns the optional TLS keystore.
-     * 
-     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
-     *   be <b>null</b> for none
-     * @deprecated use {@link #getKeystoreKey()} instead
-     */
-    @Deprecated
-    public File getKeystore() {
-        return keystore;
-    }
-
-    /**
-     * Returns the password for the optional TLS keystore.
-     * 
-     * @return the TLS keystore, may be <b>null</b> for none
-     * @deprecated use {@link #getKeystoreKey()} instead
-     */
-    @Deprecated
-    public String getKeystorePassword() {
-        return keyPassword;
-    }
-    
     /**
      * Returns the alias of the key in {@link #getKeystore()} to use.
      * 
