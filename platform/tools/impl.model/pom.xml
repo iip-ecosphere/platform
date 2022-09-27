@@ -26,6 +26,10 @@
     </dependency>
   </dependencies>
 
+  <properties>
+        <ivml.file>Test</ivml.file>
+  </properties>
+  
   <build>
     <plugins>
        <plugin>
@@ -69,7 +73,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>Test</argument>
+                         <argument>${ivml.file}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateAppsNoDeps</argument>
@@ -82,7 +86,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>Test</argument>
+                         <argument>${ivml.file}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateApps</argument>
