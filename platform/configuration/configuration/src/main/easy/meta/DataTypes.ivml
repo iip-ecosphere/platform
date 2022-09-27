@@ -72,6 +72,13 @@ project DataTypes {
 
     typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);
 
+    def Boolean isFlatDataType(DataType type) = 
+        true;
+
+    def Boolean isFlatDataType(RecordType type) = 
+        type.fields->forAll(f|not(f.isKindOf(RecordType)));
+
+
     // defining the basic type; if further ones are added, adjust the basic vtls in the generation
     // do not change the names!
     compound IntegerTypeType refines NumericPrimitiveType {

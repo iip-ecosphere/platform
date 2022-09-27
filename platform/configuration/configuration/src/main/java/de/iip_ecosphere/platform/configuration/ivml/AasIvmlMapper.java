@@ -12,9 +12,12 @@
 
 package de.iip_ecosphere.platform.configuration.ivml;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -22,6 +25,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -39,8 +43,10 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.IvmlDatatypeVisitor;
 import net.ssehub.easy.varModel.model.ModelQueryException;
+import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
@@ -212,8 +218,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @return <b>null</b>
      * @throws ExecutionException if changing values fails
      */
-    private Object changeValues(Map<String, String> values) throws ExecutionException {
+    private synchronized Object changeValues(Map<String, String> values) throws ExecutionException {
         Configuration cfg = cfgSupplier.get();
+        Set<Project> projects = new HashSet<>();
         Map<String, IDecisionVariable> vars = new HashMap<>();
         for (String varName: values.keySet()) {
             vars.put(varName, getVariable(cfg, varName));
@@ -223,9 +230,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         for (Map.Entry<String, String> ent: values.entrySet()) {
             IDecisionVariable var = vars.get(ent.getKey());
             // ent.getKey may have to be parsed before
+            AbstractVariable decl = var.getDeclaration();
             try {
-                var.setValue(ValueFactory.createValue(var.getDeclaration().getType(), ent.getKey()), 
+                var.setValue(ValueFactory.createValue(decl.getType(), ent.getKey()), 
                     AssignmentState.USER_ASSIGNED);
+                projects.add(decl.getProject());
             } catch (ValueDoesNotMatchTypeException | ConfigurationException e) {
                 history.rollback();
                 throw new ExecutionException(e.getMessage(), null);
@@ -247,9 +256,49 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             throw new ExecutionException(text, null);
         } else {
             history.commit();
+            for (Project p: projects) {
+                @SuppressWarnings("unused")
+                File f = getIvmlFile(p);
+                //ConfigurationSaver
+                // write 
+            }
             // TODO write model!            
         }
         return "";
+    }
+    
+    /**
+     * Returns the filename/path for {@code p}.
+     * 
+     * @param project the project
+     * @return the filename/path
+     */
+    private File getIvmlFile(Project project) {
+        String projectName = project.getName();
+        String subpath;
+        if (projectName.startsWith("ServiceMeshPart")) {
+            subpath = "meshes";
+        } else if (projectName.startsWith("ApplicationPart")) {
+            subpath = "apps";
+        } else {
+            subpath = null;
+        }
+        return createIvmlConfigPath(subpath, project);
+    }
+    
+    /**
+     * Creates an IVML configuration (not meta-model) model path with {@code subpath} and for project {@code p}.
+     *  
+     * @param subpath the subpath, may be <b>null</b> for none
+     * @param project the project to create the path for
+     * @return the file name/path
+     */
+    private File createIvmlConfigPath(String subpath, Project project) {
+        File result = ConfigurationSetup.getSetup().getEasyProducer().getIvmlConfigFolder();
+        if (subpath != null) {
+            result = new File(result, subpath);
+        }
+        return new File(result, project.getName() + ".ivml");
     }
     
     /**
@@ -276,7 +325,8 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @return <b>null</b> always
      * @throws ExecutionException if setting the graph structure fails
      */
-    private Object setGraph(String qualifiedVarName, String format, String value) throws ExecutionException {
+    private synchronized Object setGraph(String qualifiedVarName, String format, String value) 
+        throws ExecutionException {
         GraphFormat gFormat = getGraphFormat(format);
         IDecisionVariable var = getVariable(qualifiedVarName);
         IvmlGraph graph = gFormat.fromString(value, graphMapper.getGraphFactory(), this);

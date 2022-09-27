@@ -9,7 +9,11 @@ template Rtsa(Configuration config, FileArtifact target) {
     }
 
     def String rtsaBin(RtsaService service) {
-        "RTSA-" + service.rtsaVer + ".zip";
+        if (service.selfContained) {
+            "";
+        } else {
+            "RTSA-" + service.rtsaVer + ".zip";
+        }
     }
     
     def String rtsaInstance(RtsaService service) {
