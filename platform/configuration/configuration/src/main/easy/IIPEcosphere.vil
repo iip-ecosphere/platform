@@ -227,7 +227,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path assemblyPath = "${appRoot}/src/main/assembly";
         assemblyPath.mkdir();
         vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
-        assemblies.add("python|${assemblyPath}/python.xml|package|${mvnProjectBuildDir}/classes|");
+        assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
     }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------

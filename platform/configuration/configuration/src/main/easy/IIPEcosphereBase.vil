@@ -17,7 +17,8 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     String javaNodesPackage = "iip.nodes";
     String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
     String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
-    String mvnProjectPySrcDir = "$" + "{project.basedir}/src/main/python";
+    String mvnProjectBaseDir = "$" + "{project.basedir}";
+    String mvnProjectPySrcDir = "${mvnProjectBaseDir}/src/main/python";
 
     Path ecsRuntimeRoot = "${target}/ecsRuntime";
     Path serviceMgrRoot = "${target}/serviceMgr";
