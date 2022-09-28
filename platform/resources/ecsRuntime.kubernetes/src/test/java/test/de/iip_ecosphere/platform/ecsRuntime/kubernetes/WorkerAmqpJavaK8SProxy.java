@@ -144,9 +144,7 @@ public class WorkerAmqpJavaK8SProxy {
             public void run() {
                 try {
                     TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
-                    
                     ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
-        
                         @Override
                         public TransportConnector createConnector() {
                             return new FakeAuthConnector();
@@ -156,7 +154,6 @@ public class WorkerAmqpJavaK8SProxy {
                         public String getName() {
                             return FakeAuthConnector.NAME;
                         }
-        
                     });
                     
                     TransportParameterConfigurer configurer = null;
@@ -166,7 +163,10 @@ public class WorkerAmqpJavaK8SProxy {
                             
                             @Override
                             public void configure(TransportParameterBuilder builder) {
-                                builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                                builder.setAuthenticationKey("amqp");
+                                builder.setKeystoreKey("amqpKeyStore");
+//                                builder.setKeystore(new File(secCfg, "keystore.jks"), 
+//                                                        TestQpidServer.KEYSTORE_PASSWORD);
                             }
                         };
                     }
@@ -234,7 +234,10 @@ public class WorkerAmqpJavaK8SProxy {
                     
                     @Override
                     public void configure(TransportParameterBuilder builder) {
-                        builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                        builder.setAuthenticationKey("amqp");
+                        builder.setKeystoreKey("amqpKeyStore");
+//                        builder.setKeystore(new File(secCfg, "keystore.jks"), 
+//                                                TestQpidServer.KEYSTORE_PASSWORD);
                     }
                 };
             }
