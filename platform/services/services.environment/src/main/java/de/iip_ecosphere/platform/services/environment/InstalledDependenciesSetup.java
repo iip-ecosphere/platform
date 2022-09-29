@@ -14,13 +14,17 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Provides access to installed dependencies on the actual resource, e.g., the location of a specific Java version
@@ -35,6 +39,8 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  */
 public class InstalledDependenciesSetup extends AbstractSetup {
 
+    public static final String PROPERTY_PATH = "iip.installedDeps";
+    
     /**
      * Just the name of the default configuration file, no extension, no path.
      */
@@ -129,17 +135,28 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     }
     
     /**
-     * Reads the given yaml file. [for testing]
+     * Reads the given yaml file via the {@link ResourceLoader}, taking into account the system property 
+     * {@link #PROPERTY_PATH} or the current directory as additional resource folder. [for testing]
      * 
      * @param fileName the file to read
      * @return the setup instance, if not found the default instance
      */
     public static InstalledDependenciesSetup readFromYaml(String fileName) {
-        try {
-            return readFromYaml(InstalledDependenciesSetup.class, fileName);
-        } catch (IOException e) {
-            return new InstalledDependenciesSetup();
+        InstalledDependenciesSetup result = null;
+        InputStream in = ResourceLoader.getResourceAsStream(fileName, 
+            new FolderResourceResolver(System.getProperty(PROPERTY_PATH, ".")));
+        if (null != in) {
+            try {
+                result = readFromYaml(InstalledDependenciesSetup.class, in);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(InstalledDependenciesSetup.class).warn(
+                    "Cannot read '{}': {}. Falling back to default instance", fileName, e.getMessage());
+            }
         }
+        if (null == result) {
+            result = new InstalledDependenciesSetup();
+        }
+        return result;
     }
     
     /**
