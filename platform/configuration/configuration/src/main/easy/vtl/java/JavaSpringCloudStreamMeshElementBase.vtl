@@ -211,7 +211,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def attachIngestors(MeshElement elt, ServiceBase base) {
-        processIngestors(elt, base, nodes, ", #CONNS#");
+        processIngestors(elt, base, nodes, ", #CONNS#", true, familyInterface == "");
     }
     
     //specialization of MeshBasics, requires indirection for insert-import; does not work with override
@@ -781,6 +781,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def attachIngestors(MeshElement elt, ServiceFamily base) {
+        '${processIngestors(elt, base, nodes, ", #CONNS#", false, true)}'
         'service.initService();'
     }
     

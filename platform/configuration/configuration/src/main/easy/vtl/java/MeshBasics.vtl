@@ -314,11 +314,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
  
      // requires generateDataMethods to be called before
-     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder) {
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder, Boolean genSend, Boolean genReceive) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
          mapOf(String, setOf(String)) ings = {};
-         if (not(base.isKindOf(Connector))) { 
+         if (not(base.isKindOf(Connector)) and genSend) { 
              setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
              for (IOType t: backward(base.output)) {
                  outBack.add(t.type);
@@ -378,22 +378,24 @@ template MeshBasics(Configuration config, FileArtifact target) {
          }
  
          // go over all possibilities, in particular for backward
-         Boolean first = true;
-         for (MeshElement n: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
-             if (n != elt) {
-                 for (IOType out : n.impl.output) {
-                     for (IOType in: base.input) {
-                         // if types are equal and both are backward, n is async or n is a connector sending to elt
-                         if (in.type == out.type and ( 
-                             (not(in.forward) and not(out.forward)) or // anyway ingest/transport
-                             (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
-                             (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
-
-                             String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
-                             if (not(conns.includes(conn))) {
-                                 result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
-                                 first = false;
-                                 conns.add(conn);
+         if (genReceive) {
+             Boolean first = true;
+             for (MeshElement n: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
+                 if (n != elt) {
+                     for (IOType out : n.impl.output) {
+                         for (IOType in: base.input) {
+                             // if types are equal and both are backward, n is async or n is a connector sending to elt
+                             if (in.type == out.type and ( 
+                                 (not(in.forward) and not(out.forward)) or // anyway ingest/transport
+                                 (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
+                                 (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
+    
+                                 String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
+                                 if (not(conns.includes(conn))) {
+                                     result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
+                                     first = false;
+                                     conns.add(conn);
+                                 }
                              }
                          }
                      }

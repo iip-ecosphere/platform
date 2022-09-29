@@ -36,7 +36,10 @@ public class EasySetup {
     public void reset() {
         base = new File(".");
         genTarget = new File("gen");
-        ivmlMetaModelFolder = new File("src/main/easy"); 
+        ivmlMetaModelFolder = new File("model");
+        if (!ivmlMetaModelFolder.exists()) {
+            ivmlMetaModelFolder = new File("src/main/easy");
+        }
         ivmlConfigFolder = null;
         ivmlModelName = PLATFORM_META_MODEL_NAME;
     }
@@ -71,7 +74,7 @@ public class EasySetup {
     /**
      * Returns the IVML folder containing the platform meta model as well as the VIL and VTL scripts.
      * 
-     * @return the IVML folder folder, by default {@code src/main/easy}.
+     * @return the IVML folder folder, by default {@code model} if it exists or {@code src/main/easy}.
      */
     public File getIvmlMetaModelFolder() {
         return ivmlMetaModelFolder;
