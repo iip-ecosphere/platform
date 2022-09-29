@@ -7,7 +7,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
         
-        'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+        'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         'COPY requirements.txt requirements.txt'
         
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
