@@ -21,8 +21,6 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter.CloseAc
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
-import java.io.File;
-
 import org.junit.Assert;
 
 /**
@@ -56,8 +54,6 @@ public class TransportParameterTest {
         Assert.assertEquals(false, params.getAutoApplicationId());
         Assert.assertEquals(1236, params.getKeepAlive());
         Assert.assertEquals(null, params.getKeystoreKey());
-        Assert.assertEquals(null, params.getKeystore());
-        Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(MqttQoS.EXACTLY_ONCE, params.getMqttQoS());
         Assert.assertEquals(CloseAction.NONE, params.getCloseAction());
     }
@@ -68,48 +64,37 @@ public class TransportParameterTest {
     @Test
     public void testTransportTlsParameter() {
         ServerAddress addr = new ServerAddress(Schema.IGNORE, "local", 1234);
-        File keystore = new File("./keystore.jks");
-        String passwd = "abc";
         String alias = "alias";
         TransportParameter params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystoreKey(null)
-            .setKeystore(null, null)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals(null, params.getKeystoreKey());
-        Assert.assertEquals(null, params.getKeystore());
-        Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
         Assert.assertFalse(params.getHostnameVerification());
         
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystoreKey("myKeystore")
-            .setKeystore(keystore, null)
             .setHostnameVerification(false)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals("myKeystore", params.getKeystoreKey());
-        Assert.assertEquals(keystore, params.getKeystore());
-        Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
         Assert.assertFalse(params.getHostnameVerification());
 
         params = TransportParameter.TransportParameterBuilder
             .newBuilder(addr)
             .setKeystoreKey("myKeystore")
-            .setKeystore(keystore, passwd)
             .setKeyAlias(alias)
             .setHostnameVerification(true)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
         Assert.assertEquals("myKeystore", params.getKeystoreKey());
-        Assert.assertEquals(keystore, params.getKeystore());
-        Assert.assertEquals(passwd, params.getKeystorePassword());
         Assert.assertEquals(alias, params.getKeyAlias());
         Assert.assertTrue(params.getHostnameVerification());
     }

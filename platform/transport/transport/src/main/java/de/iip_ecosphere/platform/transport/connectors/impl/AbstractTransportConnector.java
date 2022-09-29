@@ -43,45 +43,13 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     private TransportParameter params;
 
     /**
-     * Tries to resolve {@link TransportParameter#getKeystorePassword()} as key in {@link IdentityStore} using
-     * token data of a username token if found or {@link TransportParameter#getKeystorePassword()} as fallback.
-     * 
-     * @param params the transport parameter to return the keystore password for
-     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
-     */
-    public static String getKeystorePassword(TransportParameter params) {
-        return getKeystorePassword(params.getKeystorePassword());
-    }
-
-    /**
-     * Tries to resolve {@code keystorePassword} as key in {@link IdentityStore} using
-     * token data of a username token if found or {@code keystorePassword} as fallback.
-     * 
-     * @param keystorePassword the transport parameter to return the keystore password for
-     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
-     */
-    public static String getKeystorePassword(String keystorePassword) {
-        String keyPasswd = keystorePassword;
-        IdentityToken tok = IdentityStore.getInstance().getToken(keystorePassword);
-        if (tok != null) {
-            if (IdentityToken.TokenType.USERNAME == tok.getType()) {
-                keyPasswd = tok.getTokenDataAsString();
-            } else {
-                LoggerFactory.getLogger(AbstractTransportConnector.class).info("Cannot handle identity token type {}. "
-                    + "Using plaintext keystore password as fallback.", tok.getType());
-            }
-        } 
-        return keyPasswd;
-    }
-    
-    /**
      * Returns whether the connector shall use TLS.
      * 
      * @param params the transport parameters
      * @return {@code true} for TLS enabled, {@code false} else
      */
     protected boolean useTls(TransportParameter params) {
-        return null != params.getKeystore() || null != params.getKeystoreKey();
+        return null != params.getKeystoreKey();
     }
 
     /**
@@ -95,14 +63,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @throws IOException if creating the context or obtaining key information fails
      */
     protected SSLContext createTlsContext(TransportParameter params) throws IOException {
-        SSLContext result;
-        if (null != params.getKeystoreKey()) {
-            result = IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
-        } else {
-            result = SslUtils.createTlsContext(params.getKeystore(), getKeystorePassword(params), 
-                params.getKeyAlias());
-        }
-        return result;
+        return IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
     }
 
     /**
