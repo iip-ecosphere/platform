@@ -437,7 +437,7 @@ public class ConnectorParameter {
     }
 
     /**
-     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * Returns the alias of the key in {@link #getKeystoreKey()} to use.
      * 
      * @return the alias or <b>null</b> for none/first match
      */
