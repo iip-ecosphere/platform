@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -99,6 +100,12 @@ public class FakeProperty extends FakeElement implements Property {
         @Override
         public Object getValue() throws ExecutionException {
             return instance.getValue();
+        }
+
+        @Override
+        public PropertyBuilder setDescription(LangString... description) {
+            // we just ignore this here
+            return this;
         }
         
     }
