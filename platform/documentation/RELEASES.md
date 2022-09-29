@@ -5,9 +5,6 @@
 Planned:
 * Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
 
-In progress:
-* Cleanup user/password/keystore in code [#58](https://github.com/iip-ecosphere/platform/issues/58)
-
 ### Next release (Winter 2022):
 
 Planned:
@@ -38,6 +35,7 @@ New features:
 
 Improvements:
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
+* [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
