@@ -7,7 +7,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
 
-        'FROM openjdk:16-alpine3.13'  // TODO Java-Version & CPU
+        'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         'WORKDIR /app'
         ''
         'COPY wrapper_script.sh wrapper_script.sh'
@@ -43,7 +43,6 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             'COPY serviceMgr.sh serviceMgr.sh'
         }    	
         ''
-        'RUN apk update && apk add bash'
         'RUN chmod 777 wrapper_script.sh'
         'CMD ./wrapper_script.sh'
     }

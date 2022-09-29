@@ -10,7 +10,9 @@ template WrapperScript(IIPEcosphere config, FileArtifact target, Integer contain
         ''
         'bash broker.sh &'
         'sleep 4;'
-        if (containerType == 1) {
+        if (containerType == 0) {
+            'bash ecs.sh'
+        } else if (containerType == 1) {
             'bash ecsServiceMgr.sh'
         } else if (containerType == 2) {
             'bash ecs.sh'
@@ -18,6 +20,6 @@ template WrapperScript(IIPEcosphere config, FileArtifact target, Integer contain
             'bash serviceMgr.sh'
         } else if (containerType == 3) {
             'bash serviceMgr.sh'
-        }   
+        } 
     }
 }

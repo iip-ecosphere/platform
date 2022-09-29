@@ -325,7 +325,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
-                
+    
         if (a.createContainer) {
             
             // Checking if there is any PythonService in app
@@ -398,6 +398,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     Path df = "${appRoot}/../Dockerfile.txt";
                     vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
                     df.rename("ecs.Dockerfile");
+                    
+                    Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=0);
+                    
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../ecs.Dockerfile";
                     String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
