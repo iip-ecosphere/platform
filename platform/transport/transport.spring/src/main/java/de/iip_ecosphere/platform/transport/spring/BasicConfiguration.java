@@ -22,7 +22,6 @@ import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
-import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * Defines a basic TLS-prepared configuration for binders.
@@ -220,9 +219,6 @@ public class BasicConfiguration {
      */
     protected TransportParameterBuilder createTransportParameterBuilder() {
         TransportParameterBuilder builder = TransportParameterBuilder.newBuilder(getHost(), getPort());
-        if (null != getKeystore()) {
-            builder.setKeystore(getKeystore(), getKeyPassword());
-        }
         builder.setKeystoreKey(getKeystoreKey());
         if (useTls()) {
             if (null != getKeyAlias()) {
@@ -250,14 +246,7 @@ public class BasicConfiguration {
      * @throws IOException if creating the context or obtaining key information fails
      */
     public TrustManagerFactory createTrustManagerFactory() throws IOException {
-        TrustManagerFactory result;
-        if (null != getKeystoreKey()) {
-            result = SslUtils.createTrustManagerFactory(IdentityStore.getInstance().getKeystoreFile(getKeystoreKey()));
-        } else {
-            result = SslUtils.createTrustManagerFactory(getKeystore(), 
-                AbstractTransportConnector.getKeystorePassword(getKeyPassword()));
-        }
-        return result;
+        return SslUtils.createTrustManagerFactory(IdentityStore.getInstance().getKeystoreFile(getKeystoreKey()));
     }
 
     /**
@@ -270,14 +259,7 @@ public class BasicConfiguration {
      * @throws IOException if creating the context or obtaining key information fails
      */
     public SSLContext createTlsContext() throws IOException {
-        SSLContext result;
-        if (null != getKeystoreKey()) {
-            result = IdentityStore.getInstance().createTlsContext(getKeystoreKey(), getKeyAlias());
-        } else {
-            result = SslUtils.createTlsContext(getKeystore(), 
-                AbstractTransportConnector.getKeystorePassword(getKeyPassword()), getKeyAlias());
-        }
-        return result;
+        return IdentityStore.getInstance().createTlsContext(getKeystoreKey(), getKeyAlias());
     }
 
 }
