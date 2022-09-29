@@ -70,11 +70,16 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         YamlProcess sSpec = getProcessSpec();
 
         File rtsaPath = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/rtsa"));
+        File origRtsaPath = rtsaPath;
+        rtsaPath = checkNesting(rtsaPath);
         String javaKey = isFakeRtsa(rtsaPath) 
             ? InstalledDependenciesSetup.getJavaKey() // fake shall (soon) run with any java
             : InstalledDependenciesSetup.KEY_JAVA_8; // fixed restriction for RTSA - do not change!
         File exe = InstalledDependenciesSetup.location(javaKey);
         home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
+        if (!origRtsaPath.equals(rtsaPath)) {
+            home = checkNesting(home);
+        }
         home = getResolvedFile(home);
         
         List<String> args = new ArrayList<>();
@@ -102,6 +107,34 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
             networkPortKey = null;
         }
         return super.stop();
+    }
+    
+    /**
+     * If the RTSA is differently packaged, i.e., not directly in main rather than in a single folder, use that folder.
+     * 
+     * @param rtsaPath the RTSA path
+     * @return {@code rtsaPath} or the single directory nested in {@code rtsaPath}
+     */
+    private static File checkNesting(File rtsaPath) {
+        File result = rtsaPath;
+        File bin = new File(rtsaPath, "bin");
+        if (!bin.exists()) {
+            File[] files = rtsaPath.listFiles();
+            if (null != files) {
+                File dir = null;
+                int dirCount = 0;
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        dirCount++;
+                        dir = f;
+                    }
+                }
+                if (dirCount == 1) {
+                    result = dir;
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -193,6 +226,8 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     @Override
     protected void handleInputStream(InputStream in) { // better via Spring Tomcat?
         new Thread(new Runnable() {
+
+            @Override
             public void run() {
                 while (getState() == ServiceState.STARTING || (null != proc && proc.isAlive())) {
                     Scanner sc = new Scanner(in);
@@ -209,12 +244,13 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
                     }
                     sc.close();
                     try {
-                        setState(ServiceState.STOPPED);
+                        setState(getState() == ServiceState.RUNNING ? ServiceState.STOPPED : ServiceState.FAILED);
                     } catch (ExecutionException e) {
                         LoggerFactory.getLogger(getClass()).error(e.getMessage());
                     }
                 }
             }
+            
         }).start();
     }
     
