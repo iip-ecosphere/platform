@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -439,8 +441,10 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      */
     private void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
         if (variableFilter.test(var)) {
-            String varName = var.getDeclaration().getName();
-            IDatatype varType = var.getDeclaration().getType();
+            AbstractVariable decl = var.getDeclaration();
+            String varName = decl.getName();
+            IDatatype varType = decl.getType();
+            String lang = Locale.getDefault().getLanguage();
             if (TypeQueries.isCompound(varType)) {
                 SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
@@ -458,6 +462,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                     mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
                 }
                 varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("size")))
+                    .setDescription(new LangString(decl.getComment(), lang))
                     .setValue(Type.INTEGER, var.getNestedElementsCount())
                     .build();
                 varBuilder.build();

@@ -9,7 +9,6 @@ project ServicePartRtsa {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        IipVersion rtsaVer = "0.14.5";
        // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
-       Boolean selfContained = false; // or in special cases, just take <name>-<version>.zip
        String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
        setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
        NonEmptyString path;
