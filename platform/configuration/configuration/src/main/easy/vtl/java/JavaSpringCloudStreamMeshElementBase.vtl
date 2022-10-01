@@ -830,9 +830,25 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
             for (ConnectorInputHandler h: conn.inputHandlers) {
                 String typeName = toTypeName(h.type);
+                String handleVar = "${firstToLowerCase(typeName)}Handler";
+                String connGen = getConnectorGenerics(conn, true);
+                String clsName = getClsName(elt);
                 'private ${serviceType} handle${typeName}(${serviceType} service, ${typeName} data) {
-                    if (null != ${firstToLowerCase(typeName)}Handler) {
-                        ${firstToLowerCase(typeName)}Handler.received(data, service.getConnector());
+                    if (null != ${handleVar}) {
+                        String newCls = ${handleVar}.getNewConnectorClass(data);
+                        if (null != newCls && newCls.length() > 0) {
+                            ConnectorParameter param = createConnectorParameter();
+                            Connector${connGen} conn = ConnectorFactory.createConnector(
+                                newCls, () -> param, createConnectorAdapter());
+                            if (null != conn) {
+                                conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
+                                ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
+                                service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
+                                    () -> param);
+                                service.setReceptionCallback(new ConnectorReceptionCallback());
+                            }
+                        }
+                        ${handleVar}.received(data, service.getConnector());
                     }
                     return service;
                 }'
