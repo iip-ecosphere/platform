@@ -292,10 +292,12 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             IOType t = tps[0];
             forward = t.forward;
         }
-        if (forward) {
+        if (forward or type == getFirstTypeName(conn.input)) {
             expr = '${fallbackToNull(src, "${sel}.send(data)", false)}';
         } else {
             expr = sel;
+        }
+        if (not(forward)) {
             if (methodName.startsWith("create")) {
                 methodName = "process" + methodName.substring(6);
             }
