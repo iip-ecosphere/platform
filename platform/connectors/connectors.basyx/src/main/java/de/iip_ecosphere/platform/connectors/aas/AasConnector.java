@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.PatternTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -365,8 +366,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     
     @Override
     public void trigger(ConnectorTriggerQuery query) {
-        if (query instanceof AasPatternTriggerQuery) {
-            AasPatternTriggerQuery q = (AasPatternTriggerQuery) query;
+        if (query instanceof PatternTriggerQuery) {
+            PatternTriggerQuery q = (PatternTriggerQuery) query;
             Map<String, Aas> connectedAAS = new HashMap<String, Aas>();
             int count = 0;
             while (inPolling.get() && count < 30) {
