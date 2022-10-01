@@ -841,11 +841,20 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                             Connector${connGen} conn = ConnectorFactory.createConnector(
                                 newCls, () -> param, createConnectorAdapter());
                             if (null != conn) {
-                                conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
-                                ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
-                                service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
-                                    () -> param);
-                                service.setReceptionCallback(new ConnectorReceptionCallback());
+                                try {
+                                    // as experiment, simple form, no switching strategy for now
+                                    conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
+                                    ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
+                                    ${serviceType} oldService = service;
+                                    ${serviceType} newService 
+                                        = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, () -> param);
+                                    newService.setReceptionCallback(new ConnectorReceptionCallback());
+                                    newService.setState(ServiceState.STARTING);
+                                    service = newService;
+                                    oldService.setState(ServiceState.STOPPING);
+                                } catch (ExecutionException e) {
+                                    System.out.println("Cannot switch connector: " + e.getMessage());
+                                }
                             }
                         }
                         ${handleVar}.received(data, service.getConnector());
