@@ -28,7 +28,8 @@ import org.junit.runners.Suite;
     TextLineFormatterTest.class,
     JsonOutputFormatterTest.class, 
     ConnectorEventUtilsTest.class,
-    ConnectorFactoryTest.class
+    ConnectorFactoryTest.class,
+    PatternTriggerQueryTest.class
 })
 public class AllTests {
 }
