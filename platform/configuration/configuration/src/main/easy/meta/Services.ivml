@@ -220,7 +220,7 @@ project Services {
         // same kind
         // same parameter
         // requires??
-        selector <> null implies selectorTypeOk(selector, self);
+        Constraint familySelectorOk = selector <> null implies selectorTypeOk(selector, self);
         members->forAll(m|m.asynchronous = self.asynchronous);
    }
    

@@ -160,6 +160,11 @@ project Connectors {
        String artifact; // may be empty -> same as connector (or other known artifact)
     }
     
+    // prepared for polymorphic handler types hierarchy
+    // handler type must be in input types, otherwise handler is useless (no problem, but also no effect)
+    def Boolean handlerOk(ConnectorInputHandler handler, Connector conn) = 
+        conn.input->exists(t|t.type == handler.type);
+    
     // ------------------------ connector types --------------------------
       
     enum CacheMode {NONE, HASH, EQUALS};
@@ -178,6 +183,7 @@ project Connectors {
        refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
        setOf(ConnectorInputHandler) inputHandlers = {};
+       Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
        
        NonEmptyString host = "localhost";
        Port port;
@@ -187,10 +193,10 @@ project Connectors {
        CacheMode cacheMode = CacheMode::NONE;
        String deviceServiceKey;
 
-       fwdTypes(output).size() < 2;
-       fwdTypes(input).size() < 2;
-       kind == ServiceKind.SOURCE_SERVICE;
-       deployable == true;
+       Constraint connectorOutputSize = fwdTypes(output).size() < 2;
+       Constraint connectorInputSize = fwdTypes(input).size() < 2;
+       Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE;
+       Constraint connectorDeployability = deployable == true;
    }
    
    compound ChannelConnector refines Connector {

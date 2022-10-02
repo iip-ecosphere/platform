@@ -1,9 +1,2 @@
 constraints collection
- [x] type names must not start with *, uniqueness of names
- [x] names shall not have strange characters
-  - in/out type compliance rules unclear (AI service discussion)
-  - connector service in/out types must be RecordTypes?
-  - transport vs service protocol
   - ensemble -> no overlaps, no graph
- [x] selection for semanticId provider
- [x] selection for deviceId provider
