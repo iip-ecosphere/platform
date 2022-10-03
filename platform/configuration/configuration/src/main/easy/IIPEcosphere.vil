@@ -341,6 +341,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             for (EcsDevice d : devices) {
             
                 if (d.containerType == 1) {
+                
                     if (isPythonService == 0) {
                         // JAVA         
                         Path df = "${appRoot}/../Dockerfile.txt";
@@ -355,7 +356,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
                         df.rename("Dockerfile");
                     }
-
+					
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
                     vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
@@ -367,7 +368,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType);
+                    //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType); TODO 
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=1);
+                    
                 }
                 
                 if (d.containerType == 2) {
@@ -397,7 +400,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType);
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=2);
 				}	
 
                 if (d.containerType == 3) {
@@ -448,12 +451,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=3);
                      
                 }
+                
             }
-                   
+                
+                
+            /*   
             // InstalledDependencies
             Path instDep = "${appRoot}/../installedDependencies.yml";
             vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
-            
+            */
         }
         
     }
