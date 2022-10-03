@@ -325,7 +325,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
-    
+
         if (a.createContainer) {
             
             // Checking if there is any PythonService in app
@@ -364,6 +364,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../Dockerfile";
                     String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType);
                 }
                 
                 if (d.containerType == 2) {
@@ -390,10 +394,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../Dockerfile";
                     String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType);
 				}	
 
                 if (d.containerType == 3) {
-  					
+
                     // Container with ECS
                     Path df = "${appRoot}/../Dockerfile.txt";
                     vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
@@ -405,6 +413,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../ecs.Dockerfile";
                     String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
+                    
+                    // Mesh-Info
+                    Path meshInfoEcs = "${appRoot}/../mesh-info-ecs.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=0);
                     
                     // Container with ServiceMgr and App
                     if (isPythonService == 0) {
@@ -420,28 +432,30 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         Path df2 = "${appRoot}/../app.Dockerfile.txt";
                         vilTemplateProcessor("Dockerfile_Python", config, df2, elements=elements, app=a, containerType=3);
                         df2.rename("app.Dockerfile");
-                     }
+                    }
                      
-                     // Wrapper-Skript 
-                     Path ws = "${appRoot}/../wrapper_script.sh";
-                     vilTemplateProcessor("WrapperScript", config, ws, containerType=3);
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=3);
                      
-                     // Create image 
-                     Path b2 = "${appRoot}/../";
-                     Path d2 = "${appRoot}/../app.Dockerfile";
-                     String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                    // Create image 
+                    Path b2 = "${appRoot}/../";
+                    Path d2 = "${appRoot}/../app.Dockerfile";
+                    String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=3);
                      
                 }
             }
-            
-            // Mesh-Info
-            Path meshInfo = "${appRoot}/../mesh-info.yml";
-            vilTemplateProcessor("MeshInfo", config, meshInfo);
-            
+                   
             // InstalledDependencies
             Path instDep = "${appRoot}/../installedDependencies.yml";
             vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
+            
         }
+        
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------

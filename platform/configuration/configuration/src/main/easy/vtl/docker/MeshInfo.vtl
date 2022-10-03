@@ -3,14 +3,28 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MeshInfo(IIPEcosphere config, FileArtifact target) {
+template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
 	
-    def main(IIPEcosphere config, FileArtifact target) {
-        'id: '
-        'name: '
-        'version: '
-        'dockerImageName: '
-        'dockerImageZipfile: '
+    def main(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
+        if (containerType == 0) {
+            'id: ECS'
+            'name: ECS'
+            'version: ${getAppMvnVersion(app)}'
+            'dockerImageName: ECS:${getAppMvnVersion(app)}'
+            'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
+        } else if (containerType == 3) {
+            'id: ${getAppMvnName(app)}_NoECS'
+            'name: ${getAppMvnName(app)}'
+            'version: ${getAppMvnVersion(app)}'
+            'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
+            'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
+        } else {
+            'id: ${getAppMvnName(app)}_ECS'
+            'name: ${getAppMvnName(app)}'
+            'version: ${getAppMvnVersion(app)}'
+            'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
+            'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
+        }
         'env:'
         '    - IIP_PORT=\\${port}'
         'exposedPorts:'
