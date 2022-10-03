@@ -32,7 +32,8 @@ import org.junit.runners.Suite;
     FallbackLoggerTest.class,
     
     DataflowGraphFormatTest.class,
-    AasIvmlMapperTest.class
+    AasIvmlMapperTest.class,
+    CommentTests.class
 })
 public class AllTests {
 }

@@ -37,8 +37,9 @@ project Applications {
             Integer pos_y = -1;
         }
         
-        name == impl.name; // propagate
-        kind == impl.kind; // propagate
+        Constraint implName = name == impl.name; // propagate
+        Constraint implKind = kind == impl.kind; // propagate
+        Constraint ensembleOk = ensemble <> null implies (ensemble <> refBy(self) and not(ensemble.ensemble <> null)); // no self-loops, max 1-chains
     }
 
     Constraint meshElementsUnique = allInstances(MeshElement)->isUnique(e|e.name);
@@ -48,15 +49,13 @@ project Applications {
         refTo(MeshElement) next;
     }
     
-    // TODO graph validation -> QM
-    
     compound MeshSource refines MeshElement {
         setOf(refTo(MeshConnector)) next;
         Integer pollInterval = 1000; //in ms, ignored if negative or asynchronous
         sequenceOf(IOType) output;
-        output == impl.output;
-        
-        kind == ServiceKind::SOURCE_SERVICE;
+
+        Constraint sourceOut = output == impl.output;
+        Constraint sourceKind = kind == ServiceKind::SOURCE_SERVICE;
         Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
     }
     
@@ -67,18 +66,18 @@ project Applications {
     compound MeshProcessor refines MeshInnerElement {
         sequenceOf(IOType) input;
         sequenceOf(IOType) output;
-        input == impl.input;
-        output == impl.output;
 
-        kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
+        Constraint procIn = input == impl.input;
+        Constraint procOut = output == impl.output;
+        Constraint procKind = kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
         Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
     }
     
     compound MeshSink refines MeshInnerElement {
         sequenceOf(IOType) input;
-        input == impl.input;
-
-        kind == ServiceKind::SINK_SERVICE;
+        
+        Constraint sinkIn = input == impl.input;
+        Constraint sinkKind = kind == ServiceKind::SINK_SERVICE;
     }
     
     // output-input check, selection via dynamic dispatch, all relevant combinations needed due to type-specific setup 
@@ -95,25 +94,20 @@ project Applications {
             start.output == end.input 
         endif;
          
-    def Boolean typeCheck(MeshSource start, MeshTransformer end) =
+    def Boolean typeCheck(MeshSource start, MeshProcessor end) =
         if isDefined(start.output) and isDefined(end.input) then 
             typeCheck(start.output, end.input) 
         else 
             start.output == end.input 
         endif;
         
-    def Boolean typeCheck(MeshTransformer start, MeshSink end) =
+    def Boolean typeCheck(MeshProcessor start, MeshSink end) =
         if isDefined(start.output) and isDefined(end.input) then 
             typeCheck(start.output, end.input) 
         else 
             start.output == end.input 
         endif;
     
-    def static Boolean typeCheck(sequenceOf(IOType) output, sequenceOf(IOType) input) =
-        overlaps(collectTypeInfo(output), collectTypeInfo(input)); // lazy check 
-
-    def static sequenceOf(String) collectTypeInfo(sequenceOf(IOType) types) = types->collect(t|t.name); // lazy check on type names as constrained to be unique
-
    // ------------------------------ platform trace -> AAS service -------------------
 
    // data ignored for now, only tracing   

@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +26,7 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
+import de.iip_ecosphere.platform.configuration.ModelInfo;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -444,7 +444,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = decl.getType();
-            String lang = Locale.getDefault().getLanguage();
+            String lang = ModelInfo.getLocale().getLanguage();
             if (TypeQueries.isCompound(varType)) {
                 SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
@@ -462,7 +462,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                     mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
                 }
                 varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("size")))
-                    .setDescription(new LangString(decl.getComment(), lang))
+                    .setDescription(new LangString(ModelInfo.getCommentSafe(decl), lang))
                     .setValue(Type.INTEGER, var.getNestedElementsCount())
                     .build();
                 varBuilder.build();
