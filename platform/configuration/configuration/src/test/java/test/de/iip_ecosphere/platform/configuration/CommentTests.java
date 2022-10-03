@@ -48,7 +48,7 @@ public class CommentTests {
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
         StatisticsVisitor vis = new StatisticsVisitor();
-        vis.setNoCommentConsumer(v -> missing.add(v.getQualifiedName() + "="));
+        vis.setNoCommentConsumer(v -> missing.add(v.getQualifiedName() + " = "));
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Assert.assertNotNull(cfg);
         vis.visitConfiguration(cfg);

@@ -1,2 +1,10 @@
-Services::serializerDefined = The serializer mechanism must be defined.
-Services::transportProtocol = The transport protocol
+Transport::serializerDefined = The serializer mechanism must be defined.
+Transport::transportProtocol = The transport protocol
+Transport::TransportProtocol::globalHost = The host name of the platform clobal communication server/broker, by default "localhost"
+Transport::TransportProtocol::port = The communication port where to reach the communication server/broker, by default 8883.
+Transport::TransportProtocol::security = The security settings of the protocol.
+Transport::TransportProtocol::type = The type of the protocol to enable comparisons.
+Transport::TransportProtocolAMQP::type = The redefined protocol type for AMQP assigning a default value.
+Transport::TransportProtocolMQTTv3::type = The redefined protocol type for MQTT assigning a default value.
+Transport::TransportProtocolMQTTv5::type = The redefined protocol type for MQTT assigning a default value.
+Transport::serializer = The serializer defining the transport wire format, by default JSON.
