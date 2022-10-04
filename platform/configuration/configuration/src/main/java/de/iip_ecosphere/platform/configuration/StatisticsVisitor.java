@@ -17,12 +17,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import net.ssehub.easy.varModel.confModel.AbstractConfigurationStatisticsVisitor;
+import net.ssehub.easy.varModel.confModel.IConfigurationElement;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.AttributeAssignment;
 import net.ssehub.easy.varModel.model.ModelElement;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 
 /**
  * Implements an extended statistics visitor.
@@ -82,12 +84,25 @@ public class StatisticsVisitor extends AbstractConfigurationStatisticsVisitor {
         }
     }
 
+    /**
+     * Returns whether the parent of {@code variable} is a container.
+     * 
+     * @param variable the variable
+     * @return {@code true} if the parent is a container, {@code false} else
+     */
+    private static boolean isParentContainer(IDecisionVariable variable) {
+        IConfigurationElement elt = variable.getParent();
+        return null == elt.getDeclaration() ? false : TypeQueries.isContainer(elt.getDeclaration().getType());
+    }
+
     @Override
     protected void specialTreatment(IDecisionVariable variable) {
         AbstractVariable decl = variable.getDeclaration();
         Project prj = decl.getProject();
         if (ModelInfo.isMetaProject(prj)) {
-            specialTreatment(decl);
+            if (!isParentContainer(variable)) {
+                specialTreatment(decl);
+            }
             if (!done.contains(prj)) {
                 done.add(prj);
                 for (int e = 0; e < prj.getElementCount(); e++) {

@@ -62,12 +62,15 @@ public class CommentTests {
         Statistics stat = vis.getStatistics();
         lcd.shutdown();
         setup.getEasyProducer().reset();
-        System.out.println("metaVars: " + stat.getMetaVars() + " metaVars (commented): " + stat.getMetaVarsWithComment()
-            + " vars: " + stat.noOfVariables());
+        System.out.println("metaVars: " + stat.getMetaVars() + ", metaVars (commented): " 
+            + stat.getMetaVarsWithComment() + ", used vars: " + stat.noOfVariables() 
+            + ", constraints: " + stat.noOfConstraintInstances());
         for (String s: missing) {
             System.out.println(s);
         }
-        //Assert.assertEquals(stat.getMetaVars(), stat.getMetaVarsWithComment());
+        //Assert.assertEquals("There are variables without comment/description in respective .text file for the "
+        //    + "actual locale. For affected variable names to be fixed, please see above.", stat.getMetaVars(), 
+        //    stat.getMetaVarsWithComment());
     }
 
 }

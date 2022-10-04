@@ -12,18 +12,22 @@ project Aas {
     // AAS implementation protocols - extensible in code, enum not sufficient here
 
     abstract compound AasProtocol {
+        AasSchema schema;
     }
     
     compound AasProtocolDefault refines AasProtocol {
+        AasSchema schema = AasSchema::TCP; // as implemented
     }
     
     compound AasProtocolVabTcp refines AasProtocol {
+        AasSchema schema = AasSchema::TCP;
     }
     
     compound AasProtocolVabHttp refines AasProtocol {
+        AasSchema schema = AasSchema::HTTP;
     }
         
-    // missing VAB-HTTPS
+    // TODO missing VAB-HTTPS -> keystoreKey
     
     AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
     isDefined(aasProtocol);
@@ -51,7 +55,7 @@ project Aas {
     // host "127.0.0.1" replaced by host IP if possible
     compound ImplAddress refines EphemeralServerAddress {
         AasProtocol protocol = aasProtocol;
-        AasSchema schema = AasSchema::HTTP; // TODO link to protocol
+        AasSchema schema = aasProtocol.schema;
         NonEmptyString host = "127.0.0.1";
         Boolean devicesAsEphemeral = true; // eases testing, may conflict with open container port
         String netmask = "";

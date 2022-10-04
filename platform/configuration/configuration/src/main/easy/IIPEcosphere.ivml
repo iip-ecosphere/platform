@@ -13,7 +13,7 @@ project IIPEcosphere {
     String javaExe = javaExeDflt; // symlink in instDir
     String artifactsFolder = "artifacts";
     String artifactsUriPrefix = "";
-    String modelBaseFolder = "."; // base folder for metaModel folder and modelFolder
+    String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
     String metaModelFolder = "src/main/easy";
     String configFolder = null;
     String genTarget = "gen";
