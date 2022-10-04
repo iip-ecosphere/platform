@@ -117,6 +117,9 @@ project Services {
        Boolean forward = true;
    }
    
+   def Boolean isFlatDataType(IOType type) = 
+        isFlatDataType(type, type);
+   
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
    enum TraceKind {NONE, TRACE, LOG, SYSOUT};
