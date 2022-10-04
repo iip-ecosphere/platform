@@ -24,7 +24,7 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
- * A MAC-based ID provider.
+ * A MAC-based device ID provider.
  * 
  * @author Holger Eichelberger, SSE
  */
