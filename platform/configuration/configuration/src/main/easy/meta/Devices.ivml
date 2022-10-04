@@ -91,6 +91,10 @@ project Devices {
     compound MacDeviceIdProvider refines DeviceIdProvider {
         NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$MacIdProviderDescriptor";
     }
+
+    compound HostnameDeviceIdProvider refines DeviceIdProvider {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.HostnameIdProvider$HostnameIdProviderDescriptor";
+    }
     
     DeviceIdProvider deviceIdProvider = MacDeviceIdProvider{}; // default if null
 
