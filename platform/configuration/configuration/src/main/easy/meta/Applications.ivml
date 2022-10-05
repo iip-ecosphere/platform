@@ -88,25 +88,16 @@ project Applications {
         true;
     
     def Boolean typeCheck(MeshSource start, MeshSink end) =
-        if isDefined(start.output) and isDefined(end.input) then 
-            typeCheck(start.output, end.input) 
-        else 
-            start.output == end.input 
-        endif;
+        typeCheck(start.output, end.input); 
          
     def Boolean typeCheck(MeshSource start, MeshProcessor end) =
-        if isDefined(start.output) and isDefined(end.input) then 
-            typeCheck(start.output, end.input) 
-        else 
-            start.output == end.input 
-        endif;
+        typeCheck(start.output, end.input); 
         
     def Boolean typeCheck(MeshProcessor start, MeshSink end) =
-        if isDefined(start.output) and isDefined(end.input) then 
-            typeCheck(start.output, end.input) 
-        else 
-            start.output == end.input 
-        endif;
+        typeCheck(start.output, end.input); 
+
+    def Boolean typeCheck(sequenceOf(IOType) start, sequenceOf(IOType) end) = 
+        fwdTypes(start)->collect(IOType t|t.type.name).overlaps(fwdTypes(end)->collect(IOType t|t.type.name));
     
    // ------------------------------ platform trace -> AAS service -------------------
 
