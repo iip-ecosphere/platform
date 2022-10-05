@@ -104,7 +104,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_ARTIFACT = "artifact";
     public static final String NAME_PROP_TOPLEVEL = "topLevel";
     public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
-    public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
+    public static final String NAME_PROP_DEVICE_AAS = AasPartRegistry.NAME_PROP_DEVICE_AAS;
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_START_WITH_OPTS = "startServiceWithOptions";

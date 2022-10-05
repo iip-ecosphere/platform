@@ -29,6 +29,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.iip_ecosphere.platform.support.TimeUtils;
+
 /**
  * Maps data from a stream to input instances for a service. This class is intended as a basis for testing (here 
  * avoiding the test scope for generated code). The idea is that all input types are represented as attributes of a 
@@ -38,6 +40,59 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Holger Eichelberger, SSE
  */
 public class DataMapper {
+    
+    /**
+    * Base class to represent all potential inputs to the service and the JSON input format.
+    * Just defines the meta attributes (thus $ prefixes), needs to be refined with actual attributes 
+    * by using class.
+    *
+    * @author Holger Eichelberger, SSE
+    */
+    public abstract static class BaseDataUnit {
+        
+        // checkstyle: stop names check
+    
+        private int $period = 0;
+        private int $repeats = 0;
+        
+        /**
+         * Returns the delay period between this and the next data unit.
+         *
+         * @return the period in ms, use default/last value if zero or negative
+         */
+        public int get$Period() {
+            return $period;
+        }
+
+        /**
+         * Returns the number of repeats of this data unit.
+         *
+         * @return the number of repeats, negative for infinite
+         */
+        public int get$Repeats() {
+            return $repeats;
+        }
+
+        /**
+        * Changes the delay period between this and the next data unit.
+        *
+        * @param $period the period in ms, default/last value if zero or negative
+        */
+        public void set$Period(int $period) {
+            this.$period = $period;
+        }
+
+        /**
+         * Changes the number of repeats of this data unit.
+         *
+         * @param the number of repeats, negative for infinite
+         */
+        public void set$Repeats(int $repeats) {
+            this.$repeats = $repeats;
+        }
+
+        // checkstyle: resume names check
+    }
     
     /**
      * Implements a mapper entry for {@code MappingConsumer}.
@@ -90,7 +145,8 @@ public class DataMapper {
                     translator.accept(data);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LoggerFactory.getLogger(DataMapper.class).error("Cannot process {}: {}", instance, e.getMessage());
+                LoggerFactory.getLogger(DataMapper.class).error("Cannot process {}/{}: {}", instance, 
+                    getter.getName(), e.getMessage());
             }
         }
         
@@ -132,6 +188,9 @@ public class DataMapper {
                 MapperEntry<T> entry = mapping.get(cls);
                 if (entry != null) {
                     entry.setConsumer(cls, cons);
+                } else {
+                    LoggerFactory.getLogger(DataMapper.class).warn(
+                        "No access mapping for class {}. Handler will be ignored", cls.getName());
                 }
             }
         }
@@ -145,6 +204,48 @@ public class DataMapper {
             }
         }
         
+    }
+    
+    /**
+     * Extended {@link MappingConsumer} to take {@link BaseDataUnit#$period} and {@link BaseDataUnit#$repeats} into 
+     * account.
+     * 
+     * @param <B> the mapped type
+     * @author Holger Eichelberger, SSE
+     */
+    public static class BaseMappingConsumer <B extends BaseDataUnit> extends DataMapper.MappingConsumer<B> {
+    
+        private int period;
+        
+        /**
+         * Creates a timed mapping consumer.
+         * 
+         * @param cls the type used for data input
+         * @param period the initial time period between two tuples, usually 0
+         */
+        public BaseMappingConsumer(Class<B> cls, int period) {
+            super(cls);
+            this.period = period;
+        }
+    
+        @Override
+        public void accept(B value) {
+            boolean endless = value.get$Repeats() < 0;
+            boolean once = value.get$Repeats() == 0;
+            int count = 0;
+            while (endless || once || count < value.get$Repeats()) {
+                super.accept(value);
+                period = value.get$Period();
+                if (period > 0) {
+                    TimeUtils.sleep(period);
+                }
+                count++;
+                if (once) {
+                    break;
+                }
+            }
+        }
+     
     }
     
     /**

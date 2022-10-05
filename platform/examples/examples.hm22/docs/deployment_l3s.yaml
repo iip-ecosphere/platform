@@ -1,0 +1,22 @@
+application: TddT22 demonstration application (L3S)
+id: TddT22-L3S
+appId: Hm22App
+version: 0.1.0
+description: 2 services on AXC, rest on server
+artifact: file:///services/DemonstrationAppHM22-0.1.0-SNAPSHOT-bin.jar 
+parallelize: false
+onUndeployRemoveArtifact: true
+ensembles:
+  PlcNextOpcConn: CamSource
+assignments:
+  - resource: a6C4B90180204
+    services:
+      - MdzhAasConn
+      - myKiFamily
+      - AppAas
+      - ActionDecider
+  - resource: A8741D0D23ED
+    services:
+      - CamSource
+      - PlcNextOpcConn
+

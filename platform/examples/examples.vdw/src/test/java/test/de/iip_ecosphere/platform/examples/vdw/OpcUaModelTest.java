@@ -71,9 +71,9 @@ public class OpcUaModelTest {
         }
 
         @Override
-        protected void configure(ConfigurationSetup setup) {
+        public void configure(ConfigurationSetup setup) {
             super.configure(setup);
-            EasySetup easySetup = setup.getEasySetup();
+            EasySetup easySetup = setup.getEasyProducer();
             easySetup.setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
             File modelFolder;
             String folder = System.getProperty("easyModelFolder", null);

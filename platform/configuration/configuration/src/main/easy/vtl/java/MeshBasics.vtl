@@ -30,6 +30,22 @@ template MeshBasics(Configuration config, FileArtifact target) {
         result;
     }
     
+    def DataType getFirstType(sequenceOf(IOType) types) {
+        if (types.size() > 0) {
+            IOType t = types.get(0);
+            t.type;
+        }    
+    }
+    
+    def getFirstTypeName(sequenceOf(IOType) types) {
+        DataType dt = getFirstType(types);
+        if (dt <> null) {
+            dt.name;
+        } else {
+            "Object";
+        }
+    }
+    
     // -------------------------------------------- suffixes -------------------------------
 
     def String getOutName(MeshElement elt, String inType) {
@@ -272,7 +288,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
     
     def setOf(MeshConnector) nextConnectors(MeshElement elt) {
-        {};
+        setOf(MeshConnector) res = {};
+        res;
     }
 
     def setOf(MeshConnector) nextConnectors(MeshSource source) {
@@ -297,11 +314,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
  
      // requires generateDataMethods to be called before
-     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder) {
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder, Boolean genSend, Boolean genReceive) {
          String result = ""; // ugly workaround for EASy bug
          setOf(String) conns = {};
          mapOf(String, setOf(String)) ings = {};
-         if (not(base.isKindOf(Connector))) { 
+         if (not(base.isKindOf(Connector)) and genSend) { 
              setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
              for (IOType t: backward(base.output)) {
                  outBack.add(t.type);
@@ -322,7 +339,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              conns.add(conn); // TODO still needed?
                              conns.add(type); // TODO still needed?
                          }
-                         for (MeshElement target: nodes) {
+                         for (MeshElement target: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
                             if (not(done.includes(target))) {
                                 sequenceOf(IOType) types;
                                 for (IOType t : backward(target.impl.input)) {
@@ -361,22 +378,24 @@ template MeshBasics(Configuration config, FileArtifact target) {
          }
  
          // go over all possibilities, in particular for backward
-         Boolean first = true;
-         for (MeshElement n: nodes) {
-             if (n != elt) {
-                 for (IOType out : n.impl.output) {
-                     for (IOType in: base.input) {
-                         // if types are equal and both are backward, n is async or n is a connector sending to elt
-                         if (in.type == out.type and ( 
-                             (not(in.forward) and not(out.forward)) or // anyway ingest/transport
-                             (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
-                             (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
-
-                             String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
-                             if (not(conns.includes(conn))) {
-                                 result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
-                                 first = false;
-                                 conns.add(conn);
+         if (genReceive) {
+             Boolean first = true;
+             for (MeshElement n: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
+                 if (n != elt) {
+                     for (IOType out : n.impl.output) {
+                         for (IOType in: base.input) {
+                             // if types are equal and both are backward, n is async or n is a connector sending to elt
+                             if (in.type == out.type and ( 
+                                 (not(in.forward) and not(out.forward)) or // anyway ingest/transport
+                                 (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
+                                 (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
+    
+                                 String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
+                                 if (not(conns.includes(conn))) {
+                                     result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
+                                     first = false;
+                                     conns.add(conn);
+                                 }
                              }
                          }
                      }
@@ -413,5 +432,70 @@ template MeshBasics(Configuration config, FileArtifact target) {
         }
         '${result}'
     }
+    
+    // ------------------------------ testing data format --------------------------------------
+    
+    def needsDataUnitJson(ServiceBase service) {
+        service.input.size() > 0;
+    }
+    
+    def getDataUnitJson(ServiceBase service, String typeAdd) {
+        String result = "{";
+        for (IOType in: service.input) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            String typeName = toTypeName(in);
+            String implTypeName = toImplTypeName(in, typeAdd);
+            String attributeName = firstToLowerCase(toTypeName(in));
+            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
+        }
+        result + ', "\\$period": p, "\\$repeats": r}';
+    }
+    
+    protected def getDataUnitJson(Connector conn, String typeAdd) {
+        DataType outType = getFirstType(conn.output);
+        getDataTypeJson(outType);
+    }
+    
+    protected def getDataTypeJson(DataType type) {
+        ''
+    }
+    
+    protected def getDataTypeJson(RecordType type) {
+        String result = "{";
+        for (Field f: type.fields) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
+        }
+        result + "}";
+    }
+    
+    protected def getFieldValueJson(DataType type, Field f) {
+        if (f.optional) {
+            'o';
+        } else {
+            'm';
+        }
+    }
+    
+    protected def getFieldValueJson(RecordType type, Field f) {
+        getDataTypeJson(type);
+    }
+    
+    protected def toImplTypeName(IOType type, String typeAdd) {
+        toImplTypeName(type.type, typeAdd);
+    }
+    
+    protected def toImplTypeName(DataType type, String typeAdd) {
+        toTypeName(type);
+    }
+
+    protected def toImplTypeName(RecordType type, String typeAdd) {
+        toTypeName(type) + typeAdd;
+    }
+    
     
 }

@@ -34,4 +34,14 @@ public interface ConnectorInputHandler<T> {
      */
     public void received(T data, EventHandlingConnector connector);
 
+    /**
+     * Called to query for a runtime change of the connector class on the given data.
+     * 
+     * @param data the data
+     * @return the class name of the compatible new connector class, may be null (default) or empty for none
+     */
+    public default String getNewConnectorClass(T data) {
+        return null;
+    }
+    
 }

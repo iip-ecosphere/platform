@@ -44,7 +44,7 @@ public class ConfigurationSetup extends AbstractSetup {
      * 
      * @return the setup
      */
-    public EasySetup getEasySetup() {
+    public EasySetup getEasyProducer() {
         return easyProducer;
     }
 
@@ -53,7 +53,7 @@ public class ConfigurationSetup extends AbstractSetup {
      * 
      * @param easyProducer the storage setup
      */
-    public void setEasySetup(EasySetup easyProducer) {
+    public void setEasyProducer(EasySetup easyProducer) {
         this.easyProducer = easyProducer;
     }
     

@@ -1,0 +1,2 @@
+UI::managementUi=Defines the UI frontend type.
+UI::AngularManagementUI::port=UI frontend network port. Defines the network port on which the Angular Web frontend of the IIP-Ecosphere platform is being served.

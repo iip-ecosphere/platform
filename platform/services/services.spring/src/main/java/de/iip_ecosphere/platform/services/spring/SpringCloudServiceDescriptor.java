@@ -122,6 +122,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             mgr.releasePort(key);
         }
         portKeys.clear();
+        adminAddr = null;
     }
 
     /**
@@ -177,7 +178,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         if (null == ensembleLeader) {
             NetworkManager mgr = NetworkManagerFactory.getInstance();
             Map<String, String> appProps = new HashMap<String, String>();
-            AppDefinition def = new AppDefinition(getId(), appProps);
 
             Map<String, String> deployProps = new HashMap<String, String>();
             Resource res = new FileSystemResource(getArtifact().getJar());
@@ -193,6 +193,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             if (null != config.getJavaOpts()) {
                 cmdLine.addAll(config.getJavaOpts());
             }
+            ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
+            appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
             adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
             serviceProtocol = config.getServiceProtocol();
             cmdLine.addAll(service.getCmdArg(adminAddr.getPort(), serviceProtocol));
@@ -228,6 +230,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             }
             Starter.addAppEnvironment(cmdLine);
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
+            AppDefinition def = new AppDefinition(getId(), appProps);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;

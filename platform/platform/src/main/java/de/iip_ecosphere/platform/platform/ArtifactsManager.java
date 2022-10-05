@@ -457,45 +457,64 @@ public class ArtifactsManager {
      * if the artifact was known. Does not add artifacts twice.
      * 
      * @param path the path to the artifact, ignored if <b>null</b>
-     * @param accessUri the access URI for the devices, if <b>null</b> taken from path
+     * @param accessUri the access URI for devices, if <b>null</b> taken from path
      * @return the artifact (or <b>null</b> if none was created/added)
      */
     public Artifact artifactCreated(Path path, URI accessUri) {
-        String folder = PlatformSetup.getInstance().getArtifactsFolder().toPath().normalize().toString();
         Artifact result = null;
         if (null != path && path.toFile().exists()) {
             LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file created: {}", path);
             Path pn = path.normalize();
             if (!artifactPaths.containsKey(pn)) {
-                File file = path.toFile();
-                String name = file.getName();
-                if (null == accessUri) {
-                    String prefix = PlatformSetup.getInstance().getArtifactsUriPrefix();
-                    if (prefix != null && prefix.length() > 0) {
-                        String fPath = removeLeadingFileSeps(makeRelative(folder, path));
-                        try {
-                            accessUri = new URI(removeTrailingFileSeps(prefix) + "/" + fPath.replace('\\', '/'));
-                        } catch (URISyntaxException e) {
-                            LoggerFactory.getLogger(ArtifactsManager.class)
-                                .warn("While creating artifact {}: {}", path, e.getMessage());
-                        }
-                    }
-                    if (null == accessUri) {
-                        accessUri = file.toURI(); // fallback
-                    }
+                result = createArtifactInfo(path, accessUri);
+                if (null != result) {
+                    artifacts.put(result.getId(), result);
+                    artifactPaths.put(pn, result);
+                    PlatformAas.notifyArtifactCreated(result);
                 }
-                if (name.endsWith(".zip") || name.endsWith(".jar")) { // could be a service artifact
-                    result = createForZip(path, accessUri);
-                }
-                if (name.endsWith(".yml") || name.endsWith(".yaml")) { // could be a container descriptor
-                    result = createForYaml(file, accessUri);
+            } else { // even if modified on disk, on Debian this leads to a creation event
+                artifactModified(path);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Tries to create an artifact information instance for the given path.
+     * 
+     * @param path the path to the artifact
+     * @param accessUri the access URI for devices, if <b>null</b> taken from path
+     * @return the create artifact information instance, may be <b>null</b> if none can be created, e.g., syntax 
+     *     wrong or simple semantic checks indicate missing information
+     * @see #createForYaml(File, URI)
+     * @see #createForZip(Path, URI)
+     */
+    private Artifact createArtifactInfo(Path path, URI accessUri) {
+        Artifact result = null;
+        File file = path.toFile();
+        String name = file.getName();
+        if (null == accessUri) {
+            String prefix = PlatformSetup.getInstance().getArtifactsUriPrefix();
+            if (prefix != null && prefix.length() > 0) {
+                String folder = PlatformSetup.getInstance().getArtifactsFolder().toPath().normalize().toString();
+                String fPath = removeLeadingFileSeps(makeRelative(folder, path));
+                try {
+                    accessUri = new URI(removeTrailingFileSeps(prefix) + "/" + fPath.replace('\\', '/'));
+                } catch (URISyntaxException e) {
+                    LoggerFactory.getLogger(ArtifactsManager.class)
+                        .warn("While creating artifact {}: {}", path, e.getMessage());
                 }
             }
-            if (null != result) {
-                artifacts.put(result.getId(), result);
-                artifactPaths.put(pn, result);
-                PlatformAas.notifyArtifactCreated(result);
+            if (null == accessUri) {
+                accessUri = file.toURI(); // fallback
             }
+        }
+        // could be turned into plugins, extensibility
+        if (name.endsWith(".zip") || name.endsWith(".jar")) { // could be a service artifact
+            result = createForZip(path, accessUri);
+        }
+        if (name.endsWith(".yml") || name.endsWith(".yaml")) { // could be a container descriptor
+            result = createForYaml(file, accessUri);
         }
         return result;
     }
@@ -545,7 +564,7 @@ public class ArtifactsManager {
      * Tries to create an artifact instance for a ZIP/JAR file.
      * 
      * @param path the path to the file
-     * @param accessUri the access URI for the devices
+     * @param accessUri the access URI the devices
      * @return the artifact, may be <b>null</b> if none can be created
      */
     private Artifact createForZip(Path path, URI accessUri) {
@@ -592,7 +611,7 @@ public class ArtifactsManager {
             try {
                 ServiceDeploymentPlan plan = ServiceDeploymentPlan.readFromYaml(
                     ServiceDeploymentPlan.class, new FileInputStream(file));
-                if (plan.getAssignments().size() > 0) {
+                if (plan.getAssignments().size() > 0 && !plan.isDisabled()) {
                     result = new DeploymentPlanArtifact(plan, accessUri);
                     LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}",
                         file.getAbsoluteFile(), accessUri);
@@ -617,8 +636,19 @@ public class ArtifactsManager {
             Path pn = path.normalize();
             result = artifactPaths.get(pn);
             if (null != result) {
-                LoggerFactory.getLogger(ArtifactsManager.class).info("Artifact file modified: {}", path);
-                PlatformAas.notifyArtifactModified(result);
+                Artifact newArtifact = createArtifactInfo(path, null);
+                if (null != newArtifact) {
+                    // there is a new artifact, replace it in artifacts/artifactsPath and notify the AAS as modified
+                    result = newArtifact;
+                    artifacts.put(result.getId(), result);
+                    artifactPaths.put(pn, result);
+                    LoggerFactory.getLogger(ArtifactsManager.class).info("Artifact file modified: {}", path);
+                    PlatformAas.notifyArtifactModified(result);
+                } else {
+                    // not really but we cannot make an instance out of it; may be an intermediary modification 
+                    // state. Delete it until modified again
+                    artifactDeleted(path);
+                }
             }
         }
         return result;

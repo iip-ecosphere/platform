@@ -76,16 +76,14 @@ public class PahoMqttv5ConnectorTest extends AbstractSerializingConnectorTest {
             
             @Override
             public void configure(ConnectorParameterBuilder builder) {
-                builder.setKeystore(new File(getConfigDir(), "client-trust-store.jks"), 
-                    TestHiveMqServer.KEYSTORE_PASSWORD);
+                builder.setKeystoreKey("mqttKeyStore");
                 builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
             }
             
             @Override
             public void configure(TransportParameterBuilder builder) {
-                builder.setKeystore(new File(getConfigDir(), "client-trust-store.jks"), 
-                        TestHiveMqServer.KEYSTORE_PASSWORD);
-                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                builder.setKeystoreKey("mqttKeyStore");
+                builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
             }
 
         };

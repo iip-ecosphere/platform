@@ -1,0 +1,54 @@
+import Basics;
+import JavaBasics;
+import SpringBasics;
+import SpringCloudStreamBasics;
+import MeshBasics;
+import JavaConnector;
+import ServiceBasics;
+import JavaSpringCloudStreamMeshElementBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
+    
+    def initialService(MeshElement elt, TraceToAasService service, setOf(String) serviceVars) {
+        String clsName = "TraceToAasService";
+        serviceVars.add("service");
+        '${getYamlServiceFragment("serviceData", clsName, "${service.id}", appVar="app")};\n'
+        'service = new TraceToAasService(app, serviceData);'
+    }
+    
+    def generateImports(TraceToAasService service) {
+        'import de.iip_ecosphere.platform.services.environment.services.TraceToAasService;
+        import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
+        import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;'
+    }
+
+    def generateServiceAttribute(MeshElement elt, TraceToAasService service) {
+        'private TraceToAasService service;'
+    }
+    
+    def getServiceType(MeshElement elt, TraceToAasService service) {
+        "de.iip_ecosphere.platform.services.environment.services.TraceToAasService";
+    }
+
+    def generateAsyncProcessorBody(MeshElement proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+        'return data -> {}; // ignore, shall not be called'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+        'return data -> null; // ignore, shall not be called'
+    }
+
+    def genIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, TraceToAasService service) {
+    }
+    
+    def generateSinkMethodBody(MeshSink snk, TraceToAasService service, String methodName, String methodSuffixWithServiceId, String type) {
+        'return data -> {}; // ignore'
+    }
+    
+}

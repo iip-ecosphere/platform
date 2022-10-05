@@ -4,18 +4,23 @@ project DataTypes {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    NonEmptyString iipVer = "0.4.0-SNAPSHOT"; // Maven version of platform
+    NonEmptyString iipVer = "0.5.0-SNAPSHOT"; // Maven version of platform
     
     typedef EphemeralPort Integer with (EphemeralPort >= -1 and EphemeralPort <= 65535);
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
     typedef Port EphemeralPort with (Port >= 0);
     typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
     typedef IipVersion NonEmptyString with (matches(IipVersion, "^\\d+(\\.\\d+)*$"));
-    typedef Id NonEmptyString with (matches(Id, "^\\S+$")); // non whitespace
+    typedef Id NonEmptyString with (matches(Id, "^[^\\s*]+$")); // non whitespace
+    typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]-\\Q$_\\E]+$")); // non whitespace
+    typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
     
     abstract compound DataType {
-        NonEmptyString name;
+        NonEmptyNameString name;
     }
+    
+    // allow for unique selection on UI, not necessarily needed for code generation
+    Constraint dataTypeNamesUnique = allInstances(DataType)->isUnique(t|t.name); 
 
     // primitive data types in the sense of not refinable (via records)
     // name is used as fallback, new types shall override toTypeName(.) or cast(.) - if needed - in JavaBasics, 
@@ -31,7 +36,7 @@ project DataTypes {
     }
     
     compound EnumLiteral {
-        NonEmptyString name;
+        NonEmptyNameString name;
         Integer ordinal;
         String description = "";
     }
@@ -49,6 +54,7 @@ project DataTypes {
     compound RecordType refines CDataProperty, DataType {
         String path = "";
         Fields fields;
+        Constraint fieldNamesUnique = fields->isUnique(l|l.name);
     }
     
     const Integer CACHE_ALWAYS = -1;
@@ -56,7 +62,7 @@ project DataTypes {
     
     compound Field {
         assign(bindingTime = BindingTime::specify) to { // may require staged freezing
-            NonEmptyString name;
+            NonEmptyNameString name;
             refTo(DataType) type;
             String description = "";
             Boolean optional = false;
@@ -65,6 +71,13 @@ project DataTypes {
     }
 
     typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);
+
+    def Boolean isFlatDataType(DataType type) = 
+        true;
+
+    def Boolean isFlatDataType(RecordType type) = 
+        type.fields->forAll(Field f|not(f.isKindOf(RecordType)));
+
 
     // defining the basic type; if further ones are added, adjust the basic vtls in the generation
     // do not change the names!
@@ -160,19 +173,19 @@ project DataTypes {
     compound UnsignedInteger16TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger16TypeType UnsignedInteger16Type = {
-        name = "UInt16"
+        name = "UnsignedInt16"
     };
     
     compound UnsignedInteger32TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger32TypeType UnsignedInteger32Type = {
-       name = "UInt32"
+       name = "UnsignedInt32"
     };
     
     compound UnsignedInteger64TypeType refines NumericPrimitiveType {
     }
     UnsignedInteger64TypeType UnsignedInteger64Type = {
-        name = "UInt64"
+        name = "UnsignedInt64"
     };
     
     compound ByteStringTypeType refines PrimitiveType {
@@ -261,11 +274,21 @@ project DataTypes {
 
     // might be split up, with alternatives    
     compound SecuritySettings refines AuthenticationSettings {
-        NonEmptyString keystore; 
+        String keystoreKey;         // -> keystore in identityStore        
         NonEmptyString keyAlias; 
-        NonEmptyString keystorePasswordKey; // key in identityStore
         Boolean hostNameVerification = false;        
     } 
+    
+    abstract compound IdentityStore {
+        NonEmptyString class;
+        ArtifactString artifact = ""; // built in
+    }
+    
+    compound YamlFileIdentityStore refines IdentityStore {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.identities.YamlIdentityStore$YamlIdentityStoreDescriptor";
+    }
+    
+    IdentityStore identityStore = YamlFileIdentityStore{}; // default if null
     
     // -------------------------------- freeze fixed stuff ----------------------------------------
     

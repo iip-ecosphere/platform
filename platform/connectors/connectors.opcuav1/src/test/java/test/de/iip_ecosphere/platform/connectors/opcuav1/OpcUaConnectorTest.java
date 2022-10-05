@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import test.de.iip_ecosphere.platform.connectors.opcuav1.simpleMachineNamespace.Namespace;
 
 /**
- * Tests the OPC UA connector (not secure, polling.
+ * Tests the OPC UA connector (not secure, polling).
  * 
  * @author Holger Eichelberger, SSE
  */

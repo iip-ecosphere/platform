@@ -89,5 +89,11 @@ public interface SystemMetrics {
      * @return CPU temperature in degrees centigrade (invalid = {@link #INVALID_CELSIUS_TEMPERATURE})
      */
     public float getCpuTemperature();
+    
+    /**
+     * Closes this metrics plugin, e.g., if resources have to be freed.
+     */
+    public default void close() {
+    }
 
 }

@@ -79,7 +79,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
         this.qos = params.getMqttQoS().value();
         try {
             String broker;
-            if (params.getKeystore() != null) {
+            if (useTls(params)) {
                 broker = "ssl://";
             } else {
                 broker = "tcp://";
@@ -92,10 +92,9 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             connOpts.setMaxInflight(1000); // preliminary, default 10
-            if (null != params.getKeystore()) {
+            if (useTls(params)) {
                 try {                
-                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                        getKeystorePassword(params), params.getKeyAlias()).getSocketFactory());
+                    connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());
                     connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
                     tlsEnabled = true;
                 } catch (IOException e) {

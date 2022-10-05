@@ -100,6 +100,7 @@ public class AasxDeviceAasProvider extends DeviceAasProvider {
                         identifier = a.getIdentification();
                         idShort = aas.getIdShort();
                     }
+                    // TODO, on the right AAS, run MetricsAasConstructor.addProviderMetricsToAasSubmodel
                     try {
                         AasPartRegistry.retrieveAas(a.getIdentification());
                     } catch (IOException e) {

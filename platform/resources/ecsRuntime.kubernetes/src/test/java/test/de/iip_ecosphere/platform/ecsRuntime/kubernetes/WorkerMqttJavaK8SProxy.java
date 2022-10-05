@@ -151,9 +151,11 @@ public class WorkerMqttJavaK8SProxy {
                             
                             @Override
                             public void configure(TransportParameterBuilder builder) {
-                                builder.setKeystore(new File(secCfg, "client-trust-store.jks"),
-                                        TestHiveMqServer.KEYSTORE_PASSWORD);
+                                builder.setKeystoreKey("mqttKeyStore");
+//                              builder.setKeystore(new File(secCfg, "client-trust-store.jks"), 
+//                                        TestHiveMqServer.KEYSTORE_PASSWORD);
                                 builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                                builder.setActionTimeout(3000);
                             }
                         };
                     }
@@ -208,9 +210,11 @@ public class WorkerMqttJavaK8SProxy {
                     
                     @Override
                     public void configure(TransportParameterBuilder builder) {
-                        builder.setKeystore(new File(secCfg, "client-trust-store.jks"),
-                                TestHiveMqServer.KEYSTORE_PASSWORD);
+                        builder.setKeystoreKey("mqttKeyStore");
+//                      builder.setKeystore(new File(secCfg, "client-trust-store.jks"), 
+//                                TestHiveMqServer.KEYSTORE_PASSWORD);
                         builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                        builder.setActionTimeout(3000);
                     }
                 };
             }

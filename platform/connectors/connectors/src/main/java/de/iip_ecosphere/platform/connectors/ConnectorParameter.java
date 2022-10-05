@@ -12,12 +12,13 @@
 
 package de.iip_ecosphere.platform.connectors;
 
-import java.io.File;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.
@@ -32,6 +33,29 @@ public class ConnectorParameter {
     public static final int DEFAULT_NOTIFICATION_INTERVAL = 1000;
     public static final int DEFAULT_KEEP_ALIVE = 2000;
     
+    /**
+     * Modes for caching data avoiding repeated ingestion.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum CacheMode {
+        
+        /**
+         * No caching, the default.
+         */
+        NONE,
+        
+        /**
+         * Based on the hash value.
+         */
+        HASH,
+        
+        /**
+         * Based on a deep value comparison.
+         */
+        EQUALS
+    }
+    
     private Map<String, IdentityToken> identityToken;
     private Schema schema = DEFAULT_SCHEMA;
     private int port;
@@ -43,10 +67,11 @@ public class ConnectorParameter {
     private String applicationDescription = "";
     private int notificationInterval = DEFAULT_NOTIFICATION_INTERVAL;
     private int keepAlive = DEFAULT_KEEP_ALIVE;
-    private File keystore;
-    private String keyPassword;
+    private String keystoreKey;
     private String keyAlias;
     private boolean hostnameVerification = false;
+    private CacheMode cacheMode = CacheMode.NONE;
+    private NameplateSetup.Service service;
     
     /**
      * Builds a connector parameter object.
@@ -101,6 +126,17 @@ public class ConnectorParameter {
          */
         public static ConnectorParameterBuilder newBuilder(ServerAddress addr) {
             return newBuilder(addr.getHost(), addr.getPort(), addr.getSchema());
+        }
+
+        /**
+         * Sets the optional service information to select upon.
+         * 
+         * @param service the device service information the connector shall connect to
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setService(NameplateSetup.Service service) {
+            instance.service = service;
+            return this;
         }
         
         /**
@@ -190,19 +226,15 @@ public class ConnectorParameter {
             instance.identityToken = identityToken;
             return this;
         }
-
+        
         /**
-         * Sets up optional TLS encryption details.
+         * Sets up the optional TLS keystore key to be obtained from {@link IdentityStore}.
          * 
-         * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
-         *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
-         *   implementation, e.g., PKCS12 may not work with all forms
-         * @param password the TLS keystore, may be <b>null</b> for none
+         * @param keystoreKey the (logical) key to access the keystore (<b>null</b> for none)
          * @return <b>this</b>
          */
-        public ConnectorParameterBuilder setKeystore(File keystore, String password) {
-            instance.keystore = keystore;
-            instance.keyPassword = password;
+        public ConnectorParameterBuilder setKeystoreKey(String keystoreKey) {
+            instance.keystoreKey = keystoreKey;
             return this;
         }
 
@@ -218,13 +250,26 @@ public class ConnectorParameter {
         }
         
         /**
-         * Returns whether TLS hostname verification shall be performed.
+         * Defines whether TLS hostname verification shall be performed.
          * 
          * @param hostnameVerification {@code false} for no verification, {@code true} else
          * @return <b>this</b>
          */
         public ConnectorParameterBuilder setHostnameVerification(boolean hostnameVerification) {
             instance.hostnameVerification = hostnameVerification;
+            return this;
+        }
+
+        /**
+         * Defines the cache mode.
+         * 
+         * @param cacheMode the cache mode
+         * @return <b>this</b>
+         */
+        public ConnectorParameterBuilder setCacheMode(CacheMode cacheMode) {
+            if (null != cacheMode) {
+                instance.cacheMode = cacheMode;
+            }
             return this;
         }
 
@@ -381,28 +426,18 @@ public class ConnectorParameter {
     public boolean getAutoApplicationId() {
         return autoApplicationId;
     }
-
-    /**
-     * Returns the optional TLS keystore.
-     * 
-     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
-     *   be <b>null</b> for none
-     */
-    public File getKeystore() {
-        return keystore;
-    }
-
-    /**
-     * Returns the password for the optional TLS keystore.
-     * 
-     * @return the TLS keystore, may be <b>null</b> for none
-     */
-    public String getKeystorePassword() {
-        return keyPassword;
-    }
     
     /**
-     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * Returns the optional key to access the TLS keystore key to be obtained from {@link IdentityStore}.
+     * 
+     * @return the (logical) key to access the keystore, may be <b>null</b> for none
+     */
+    public String getKeystoreKey() {
+        return keystoreKey;
+    }
+
+    /**
+     * Returns the alias of the key in {@link #getKeystoreKey()} to use.
      * 
      * @return the alias or <b>null</b> for none/first match
      */
@@ -417,6 +452,24 @@ public class ConnectorParameter {
      */
     public boolean getHostnameVerification() {
         return hostnameVerification;
+    }
+    
+    /**
+     * Returns the cache mode.
+     * 
+     * @return the cache mode
+     */
+    public CacheMode getCacheMode() {
+        return cacheMode;
+    }
+
+    /**
+     * Returns the device service information this connector shall connect to.
+     * 
+     * @return the device service information, may be <b>null</b>
+     */
+    public NameplateSetup.Service getService() {
+        return service;
     }
 
 }

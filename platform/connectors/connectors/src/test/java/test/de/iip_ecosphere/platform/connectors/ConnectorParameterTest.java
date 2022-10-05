@@ -12,7 +12,6 @@
 
 package test.de.iip_ecosphere.platform.connectors;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +49,6 @@ public class ConnectorParameterTest {
         Assert.assertEquals(ConnectorParameter.DEFAULT_SCHEMA, params.getSchema());
         Assert.assertEquals(ConnectorParameter.DEFAULT_KEEP_ALIVE, params.getKeepAlive());
         Assert.assertEquals(ConnectorParameter.DEFAULT_NOTIFICATION_INTERVAL, params.getNotificationInterval());
-        Assert.assertNull(params.getKeystore());
         Assert.assertNull(params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT));
     }
     
@@ -60,42 +58,31 @@ public class ConnectorParameterTest {
     @Test
     public void testTransportTlsParameter() {
         ServerAddress addr = new ServerAddress(Schema.IGNORE, "local", 1234);
-        File keystore = new File("./keystore.jks");
-        String passwd = "abc";
         String alias = "alias";
         ConnectorParameter params = ConnectorParameterBuilder
             .newBuilder(addr)
-            .setKeystore(null, null)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
-        Assert.assertEquals(null, params.getKeystore());
-        Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
         Assert.assertFalse(params.getHostnameVerification());
         
         params = ConnectorParameterBuilder
             .newBuilder(addr)
-            .setKeystore(keystore, null)
             .setHostnameVerification(false)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
-        Assert.assertEquals(keystore, params.getKeystore());
-        Assert.assertEquals(null, params.getKeystorePassword());
         Assert.assertEquals(null, params.getKeyAlias());
         Assert.assertFalse(params.getHostnameVerification());
 
         params = ConnectorParameterBuilder
             .newBuilder(addr)
-            .setKeystore(keystore, passwd)
             .setKeyAlias(alias)
             .setHostnameVerification(true)
             .build();
         Assert.assertEquals(addr.getHost(), params.getHost());
         Assert.assertEquals(addr.getPort(), params.getPort());
-        Assert.assertEquals(keystore, params.getKeystore());
-        Assert.assertEquals(passwd, params.getKeystorePassword());
         Assert.assertEquals(alias, params.getKeyAlias());
         Assert.assertTrue(params.getHostnameVerification());
     }

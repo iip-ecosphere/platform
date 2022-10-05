@@ -54,5 +54,7 @@ See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main
 
 ## Desirable
 
-* Explaining slides, may be a video.
+* Explaining slides, may be a video. 
 * Explicit Python dependencies to be considered during automated Container generation.
+
+An explaining overview slide is available [here](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/docs/Examples_Python.pdf)

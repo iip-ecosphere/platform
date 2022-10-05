@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
- * Provides the system metrics instance to use.
+ * Provides the system metrics instance to use. This class installs a shutdown hook on {@link SystemMetrics#close()}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -60,6 +60,7 @@ public class SystemMetricsFactory {
                 desc = new DefaultSystemMetricsDescriptor();
             }
             instance = desc.createInstance();
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.close()));
         } 
         return instance;
     }

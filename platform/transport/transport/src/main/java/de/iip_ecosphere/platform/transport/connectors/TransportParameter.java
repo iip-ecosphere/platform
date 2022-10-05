@@ -10,8 +10,6 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport.connectors;
 
-import java.io.File;
-
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
@@ -30,13 +28,10 @@ public class TransportParameter {
     private String applicationId = "";
     private boolean autoApplicationId = true;
     private int keepAlive = 2000; 
-    private File keystore;
-    private String keyPassword;
     private String keyAlias;
+    private String keystoreKey;
     private boolean hostnameVerification = false;
     private String authenticationKey; // will replace user/password #22
-    private String user; // preliminary, AMQP
-    private String password; // preliminary, AMQP
     private MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
     private CloseAction closeAction = CloseAction.UNSUBSCRIBE;
     
@@ -155,33 +150,13 @@ public class TransportParameter {
         }
 
         /**
-         * Sets plain user information. Preliminary!!!
+         * Sets up the optional TLS keystore key to be obtained from {@link IdentityStore}.
          * 
-         * @param user the user name
-         * @param password the password
-         * @return <b>this</b>
-         * @deprecated #22, use {@link #setAuthenticationKey(String)} instead
-         */
-        public TransportParameterBuilder setUser(String user, String password) {
-            instance.user = user;
-            instance.password = password;
-            return this;
-        }
-
-        /**
-         * Sets up optional TLS encryption details.
-         * 
-         * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore),
-         *   may be <b>null</b> for none; validity of the type of keystore may depend on the transport connector 
-         *   implementation, e.g., PKCS12 may not work with all forms
-         * @param password the TLS keystore, may be <b>null</b> for none; the transport connector shall try a resolution
-         *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
-         *   fallback
+         * @param keystoreKey the (logical) key to access the keystore (<b>null</b> for none)
          * @return <b>this</b>
          */
-        public TransportParameterBuilder setKeystore(File keystore, String password) {
-            instance.keystore = keystore;
-            instance.keyPassword = password;
+        public TransportParameterBuilder setKeystoreKey(String keystoreKey) {
+            instance.keystoreKey = keystoreKey;
             return this;
         }
 
@@ -322,48 +297,16 @@ public class TransportParameter {
     }
     
     /**
-     * Returns the password. [preliminary]
+     * Returns the optional key to access the TLS keystore key to be obtained from {@link IdentityStore}.
      * 
-     * @return the password (may be <b>null</b>, to be ignored then)
-     * @deprecated #22, use {@link #getAuthenticationKey()} instead
+     * @return the (logical) key to access the keystore, may be <b>null</b> for none
      */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Returns the user name. [preliminary]
-     * 
-     * @return the user name (may be <b>null</b>, to be ignored then)
-     * @deprecated #22, use {@link #getAuthenticationKey()} instead
-     */
-    public String getUser() {
-        return user;
+    public String getKeystoreKey() {
+        return keystoreKey;
     }
     
     /**
-     * Returns the optional TLS keystore.
-     * 
-     * @return the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
-     *   be <b>null</b> for none
-     */
-    public File getKeystore() {
-        return keystore;
-    }
-
-    /**
-     * Returns the password for the optional TLS keystore.
-     * 
-     * @return the TLS keystore password, may be <b>null</b> for none; the transport connector shall try a resolution
-     *   via the {@link IdentityStore} to obtain a password token before using it as a plaintext password as 
-     *   fallback
-     */
-    public String getKeystorePassword() {
-        return keyPassword;
-    }
-    
-    /**
-     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * Returns the alias of the key in {@link #getKeystoreKey()} to use.
      * 
      * @return the alias or <b>null</b> for none/first match
      */

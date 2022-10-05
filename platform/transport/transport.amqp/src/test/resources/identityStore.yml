@@ -4,3 +4,8 @@ identities:
         userName: user
         tokenData: pwd
         tokenEncryptionAlgorithm: UTF-8
+    "amqpKeyStore":
+        type: USERNAME
+        tokenData: a1234567
+        tokenEncryptionAlgorithm: UTF-8
+        file: src/test/secCfg/keystore.jks

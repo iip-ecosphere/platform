@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
@@ -300,7 +301,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
      * @return the path to the servlet
      */
     protected String addServlet(String id, Servlet servlet) {
-        String path = "/" + id;
+        String path = getPath(id);
         Wrapper newWrapper = context.createWrapper();
         newWrapper.setName(id);
         newWrapper.setLoadOnStartup(1);
@@ -308,6 +309,29 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         context.addChild(newWrapper);
         context.addServletMappingDecoded(path + "/*", id);
         return path;
+    }
+    
+    /**
+     * Returns the servlet mapping path.
+     * 
+     * @param id the servlet id
+     * @return the mapping path
+     */
+    private String getPath(String id) {
+        return "/" + id;
+    }
+    
+    /**
+     * Removes the given servlet from the server container.
+     * 
+     * @param id the servlet id
+     */
+    protected void removeServlet(String id) {
+        Container container = context.findChild(id);
+        if (null != container) {
+            context.removeServletMapping(getPath(id));
+            context.removeChild(container);
+        }
     }
 
     /**
@@ -365,6 +389,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
         @Override
         protected void dispose() {
+            removeServlet(getId());
             servlet.destroy();
             super.dispose();
         }

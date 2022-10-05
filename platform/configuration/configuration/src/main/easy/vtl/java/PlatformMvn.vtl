@@ -20,8 +20,15 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
-        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
+        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        if (monitoring) {
+            // conflicts on Linux with Tomcat
+            XmlElement e = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+            new XmlElement(e, "groupId", "org.apache.tomcat");
+            new XmlElement(e, "artifactId", "tomcat-catalina");
+        } else {
+            appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
+        }
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         if (monitoring) {
             if (config.platformMonitoring.isKindOf(PrometheusPlatformMonitoring)) {
@@ -37,6 +44,8 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
             appendDependency(dep, iipGroup, "platform", projectVersion);
             appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
         }
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

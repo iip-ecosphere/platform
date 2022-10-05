@@ -3,6 +3,10 @@
 template UiAngularPom(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
+    String ipInConfig = "http://192.168.0.199:9001";
+    EndpointAddress aasServer = config.aasServer;
+    String schema = aasServer.schema.getStringValue();
+    String ipReplacement = "${toLowerCase(schema)}://${aasServer.host}:${aasServer.port}";
     '<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
         <artifactId>MgtUi</artifactId>
@@ -58,6 +62,26 @@ template UiAngularPom(IIPEcosphere config, FileArtifact target) {
                     </execution>
                   </executions>
               </plugin>
+              
+              <!-- Somehow, UI does not read IP; replace it in compiled version -->
+              <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <phase>prepare-package</phase>
+                    <configuration>
+                      <tasks>
+                        <replace token="${ipInConfig}" value="${ipReplacement}" dir="dist/iipes-web">                                 
+                          <include name="main.*.js"/>
+                        </replace>
+                      </tasks>
+                    </configuration>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>              
           </plugins>
         </build>
       

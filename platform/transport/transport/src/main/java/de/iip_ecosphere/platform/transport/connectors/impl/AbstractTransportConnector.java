@@ -17,11 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
@@ -40,35 +43,27 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     private TransportParameter params;
 
     /**
-     * Tries to resolve {@link TransportParameter#getKeystorePassword()} as key in {@link IdentityStore} using
-     * token data of a username token if found or {@link TransportParameter#getKeystorePassword()} as fallback.
+     * Returns whether the connector shall use TLS.
      * 
-     * @param params the transport parameter to return the keystore password for
-     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
+     * @param params the transport parameters
+     * @return {@code true} for TLS enabled, {@code false} else
      */
-    public static String getKeystorePassword(TransportParameter params) {
-        return getKeystorePassword(params.getKeystorePassword());
+    protected boolean useTls(TransportParameter params) {
+        return null != params.getKeystoreKey();
     }
 
     /**
-     * Tries to resolve {@code keystorePassword} as key in {@link IdentityStore} using
-     * token data of a username token if found or {@code keystorePassword} as fallback.
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
+     * {@link TransportParameter#getKeystoreKey()} is given, else on 
+     * {@link SslUtils#createTlsContext(java.io.File, String, String)}.
      * 
-     * @param keystorePassword the transport parameter to return the keystore password for
-     * @return the keystore password, either from {@link IdentityStore} or as fallback from {@code params}
+     * @param params the transport parameters
+     * @return the TLS context
+     * @throws IOException if creating the context or obtaining key information fails
      */
-    public static String getKeystorePassword(String keystorePassword) {
-        String keyPasswd = keystorePassword;
-        IdentityToken tok = IdentityStore.getInstance().getToken(keystorePassword);
-        if (tok != null) {
-            if (IdentityToken.TokenType.USERNAME == tok.getType()) {
-                keyPasswd = tok.getTokenDataAsString();
-            } else {
-                LoggerFactory.getLogger(AbstractTransportConnector.class).info("Cannot handle identity token type {}. "
-                    + "Using plaintext keystore password as fallback.", tok.getType());
-            }
-        } 
-        return keyPasswd;
+    protected SSLContext createTlsContext(TransportParameter params) throws IOException {
+        return IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
     }
 
     /**

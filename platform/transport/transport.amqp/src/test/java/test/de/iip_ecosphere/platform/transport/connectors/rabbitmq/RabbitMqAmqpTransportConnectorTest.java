@@ -82,7 +82,7 @@ public class RabbitMqAmqpTransportConnectorTest {
             @Override
             public void configure(TransportParameterBuilder builder) {
                 builder.setAuthenticationKey("amqp");
-                builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                builder.setKeystoreKey("amqpKeyStore");
             }
         });        
         TestQpidServer.setConfigDir(null);

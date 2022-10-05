@@ -99,6 +99,8 @@ public class SpringAsyncServiceBase {
                 icb.callback = result;
                 icb.channel = channel;
                 callbacks.add(icb);
+                LoggerFactory.getLogger(getClass()).info("Installed transport callback for type {} with routingKey {}", 
+                    cls.getName(), routingKey);
             } catch (IOException e) {
                 result = null;
                 LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to data on {}. {}", 
@@ -144,10 +146,9 @@ public class SpringAsyncServiceBase {
     }
 
     /**
-     * Called at end of lifecycle to get rid of callbacks.
+     * Detach all callbacks.
      */
-    @PreDestroy
-    public void destroy() {
+    public void detach() {
         TransportConnector conn = Transport.getConnector();
         if (null != conn) { // well, should be there
             for (InstalledCallback icb : callbacks) {
@@ -162,6 +163,14 @@ public class SpringAsyncServiceBase {
             LoggerFactory.getLogger(getClass()).warn("No transport setup, cannot unregister callbacks.");
         }
         callbacks.clear();
+    }
+    
+    /**
+     * Called at end of lifecycle to get rid of callbacks.
+     */
+    @PreDestroy
+    public void destroy() {
+        detach();
         Transport.releaseConnector();
     }
 

@@ -1,5 +1,8 @@
 eclipse.preferences.version=1
 encoding//src/main/java=Cp1252
+encoding//src/main/proto=UTF-8
 encoding//src/main/resources=UTF-8
 encoding//src/test/java=Cp1252
+encoding//target/generated-sources/protobuf/grpc-java=Cp1252
+encoding//target/generated-sources/protobuf/java=Cp1252
 encoding/<project>=UTF-8

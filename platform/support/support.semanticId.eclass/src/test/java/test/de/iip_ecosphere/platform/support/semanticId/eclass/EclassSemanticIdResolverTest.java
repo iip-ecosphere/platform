@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.semanticId.eclass;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,6 +22,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult.DefaultNaming;
+import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.support.semanticId.eclass.EclassSemanticIdResolver;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.TranslatableLabel;
@@ -32,27 +34,50 @@ import de.iip_ecosphere.platform.support.semanticId.eclass.model.TranslatableLab
  */
 public class EclassSemanticIdResolverTest {
     
+    private static final String IRDI_UNIT_DEGREES_CELSIUS = "0173-1#05-AAA567#004";
+
     /**
-     * Template test.
+     * Tests the resolution. Through the test in the resolver, we feed the resolver with structurally valid IRDIs.
      */
     @Test
-    public void testApp() {
+    public void testResolution() {
+        if (new File("./resources.ipr").exists() || new File("./resources").exists()) {
+            // we can only test against Eclass if there is a certificate
+            
+            EclassSemanticIdResolver resolver = new EclassSemanticIdResolver();
+            SemanticIdResolutionResult res = resolver.resolveSemanticId(IRDI_UNIT_DEGREES_CELSIUS);
+            
+            Assert.assertNotNull(res);
+            Assert.assertEquals(IRDI_UNIT_DEGREES_CELSIUS, res.getSemanticId());
+            
+            // for now, let's see what Eclass webservice returns
+            Assert.assertNotNull(res.getKind());
+            Assert.assertNotNull(res.getPublisher());
+            Assert.assertNotNull(res.getRevision());
+            Assert.assertNotNull(res.getVersion());
+            Assert.assertNotNull(res.getNaming());
+        }
+    }
+    
+    /**
+     * Instance creation operations.
+     */
+    @Test
+    public void testInstance() {
         // shall be there via JSL
         Assert.assertTrue(SemanticIdResolver.hasResolver(EclassSemanticIdResolver.class));
         
-        final String irdiUnitDegreesCelsius = "0173-1#05-AAA567#004";
-        
         // not fully testable, as certificate cannot be added here and Eclass API throws timeouts  
         EclassSemanticIdResolver resolver = new EclassSemanticIdResolver();
-        Assert.assertTrue(resolver.isResponsible(irdiUnitDegreesCelsius));
+        Assert.assertTrue(resolver.isResponsible(IRDI_UNIT_DEGREES_CELSIUS));
         Assert.assertFalse(resolver.isResponsible("0173-1#05#AAA567-004"));
         Assert.assertFalse(resolver.isResponsible("abba"));
         
-        DefaultSemanticIdResolutionResult res = EclassSemanticIdResolver.createInstance(irdiUnitDegreesCelsius);
+        DefaultSemanticIdResolutionResult res = EclassSemanticIdResolver.createInstance(IRDI_UNIT_DEGREES_CELSIUS);
         Assert.assertNotNull(res);
-        Assert.assertEquals(irdiUnitDegreesCelsius, res.getSemanticId());
-        Assert.assertNotNull(irdiUnitDegreesCelsius, res.getKind());
-        Assert.assertNotNull(irdiUnitDegreesCelsius, res.getPublisher());
+        Assert.assertEquals(IRDI_UNIT_DEGREES_CELSIUS, res.getSemanticId());
+        Assert.assertNotNull(res.getKind());
+        Assert.assertNotNull(res.getPublisher());
         Assert.assertEquals("1", res.getRevision());
         Assert.assertEquals("4", res.getVersion());
         

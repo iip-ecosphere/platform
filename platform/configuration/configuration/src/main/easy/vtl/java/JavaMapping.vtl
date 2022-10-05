@@ -200,6 +200,16 @@ template JavaMapping(Configuration config, FileArtifact target) {
     
     // ---------------------------------------------------------------
     
+    def String deviceIdProviderModule(IIPEcosphere config) {
+        if (isDefined(config.deviceIdProvider) and config.deviceIdProvider <> null) {
+            config.deviceIdProvider.artifact;
+        } else {
+            ""; // use the default builtin
+        }
+    }
+    
+    // ---------------------------------------------------------------
+    
     def String deviceRegistryModule(IIPEcosphere config) {
         deviceRegistryModule(config.deviceRegistry);
     }

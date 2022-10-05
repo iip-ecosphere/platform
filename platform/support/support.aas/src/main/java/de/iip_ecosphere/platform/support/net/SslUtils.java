@@ -40,6 +40,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+
 /**
  * Some basic SSL helper methods.
  * 
@@ -71,6 +73,12 @@ public class SslUtils {
      * Generic TLS algorithm for {@link #createTlsContext(File, String, String, String)}.
      */
     public static final String CONTEXT_ALG_TLS = "TLS";
+    
+    /**
+     * Defines the default context algorithm for {@link #createTlsContext(File, String, String, String)}, here 
+     * {@link #CONTEXT_ALG_TLS}.
+     */
+    public static final String DEFAULT_CONTEXT_ALG = CONTEXT_ALG_TLS;
 
     /**
      * Returns the keystore type based on the file name extension.
@@ -111,7 +119,7 @@ public class SslUtils {
             try {
                 String keystoreType = getKeystoreType(store);
                 tks = KeyStore.getInstance(keystoreType);
-                InputStream stream = SslUtils.class.getClassLoader().getResourceAsStream(store.toString());
+                InputStream stream = ResourceLoader.getResourceAsStream(store.toString());
                 if (null == stream) {
                     stream = new FileInputStream(store);    
                 }
@@ -173,7 +181,7 @@ public class SslUtils {
 
     /**
      * Creates a TLS SSL context from the given {@code trustStore} for a certain {@code alias} using 
-     * {@link #CONTEXT_ALG_TLS}.
+     * {@link #DEFAULT_CONTEXT_ALG}.
      * 
      * @param trustStore the truststore (must be a JKS with SunX509)
      * @param storePass the password of the truststore, may be <b>null</b> for none
@@ -183,7 +191,7 @@ public class SslUtils {
      * @see #createTlsContext(File, String, String, String)
      */
     public static SSLContext createTlsContext(File trustStore, String storePass, String alias) throws IOException {
-        return createTlsContext(trustStore, storePass, alias, CONTEXT_ALG_TLS);
+        return createTlsContext(trustStore, storePass, alias, DEFAULT_CONTEXT_ALG);
     }
     
     /**
@@ -230,44 +238,79 @@ public class SslUtils {
             try {
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 kmf.init(ks, null == storePass ? null : storePass.toCharArray());
-    
-                final X509KeyManager origKm = (X509KeyManager) kmf.getKeyManagers()[0];
-    
-                X509KeyManager km = new X509KeyManager() {
-                    public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
-                        return alias;
-                    }
-    
-                    public X509Certificate[] getCertificateChain(String alias) {
-                        return origKm.getCertificateChain(alias);
-                    }
-    
-                    @Override
-                    public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-                        return origKm.chooseClientAlias(null, issuers, socket);
-                    }
-    
-                    @Override
-                    public String[] getClientAliases(String keyType, Principal[] issuers) {
-                        return origKm.getClientAliases(keyType, issuers);
-                    }
-    
-                    @Override
-                    public PrivateKey getPrivateKey(String alias) {
-                        return origKm.getPrivateKey(alias);
-                    }
-    
-                    @Override
-                    public String[] getServerAliases(String keyType, Principal[] issuers) {
-                        return origKm.getServerAliases(keyType, issuers);
-                    }
-    
-                };
-                kms = new KeyManager[] {km};
+                kms = createProjectingKeyManagers(alias, kmf.getKeyManagers());
             } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException  e) {
                 throw new IOException(e);
             }
         }
+        return kms;
+    }
+    
+    /**
+     * Returns projecting key manager(s) that react on the given alias.
+     * 
+     * @param alias the alias to project to
+     * @param mgrs the key managers to select from
+     * @return the projecting key manager(s)
+     */
+    public static KeyManager[] createProjectingKeyManagers(String alias, KeyManager[] mgrs) {
+        KeyManager[] kms = null;
+
+        X509KeyManager tmp = null;
+        X509KeyManager fallback = null;
+        // select one that knows the alias, already determine a fallback (the first as before)
+        for (KeyManager m: mgrs) {
+            if (m instanceof X509KeyManager) {
+                X509KeyManager xkm = (X509KeyManager) m;
+                if (null == fallback) {
+                    fallback = xkm;
+                }
+                if (null != xkm.getPrivateKey(alias)) {
+                    tmp = xkm;
+                }
+            }
+        }
+        if (null == tmp) {
+            tmp = fallback;
+        }
+        if (null != tmp) {
+            final X509KeyManager origKm = tmp;
+            X509KeyManager km = new X509KeyManager() {
+                
+                public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+                    return alias;
+                }
+    
+                public X509Certificate[] getCertificateChain(String alias) {
+                    return origKm.getCertificateChain(alias);
+                }
+    
+                @Override
+                public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+                    return origKm.chooseClientAlias(null, issuers, socket);
+                }
+    
+                @Override
+                public String[] getClientAliases(String keyType, Principal[] issuers) {
+                    return origKm.getClientAliases(keyType, issuers);
+                }
+    
+                @Override
+                public PrivateKey getPrivateKey(String alias) {
+                    return origKm.getPrivateKey(alias);
+                }
+    
+                @Override
+                public String[] getServerAliases(String keyType, Principal[] issuers) {
+                    return origKm.getServerAliases(keyType, issuers);
+                }
+    
+            };
+            kms = new KeyManager[] {km};
+        } else {
+            kms = new KeyManager[0];
+        }
+        
         return kms;
     }
 

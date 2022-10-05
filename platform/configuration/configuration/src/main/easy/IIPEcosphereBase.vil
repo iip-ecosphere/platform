@@ -1,0 +1,95 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+
+@advice(IIPEcosphere)
+vilScript IIPEcosphereBase (Project source, Configuration config, Project target) {
+
+    // preliminary!!! make it language-generic
+
+    // java packages, turned to paths below
+    String javaDatatypesPackage = "iip.datatypes";
+    String javaSerializersPackage = "iip.serializers";
+    String javaInterfacesPackage = "iip.interfaces";
+    String javaImplPackage = "iip.impl";
+    String javaStubsPackage = "iip.stubs";
+    String javaNodesPackage = "iip.nodes";
+    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
+    String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
+    String mvnProjectBaseDir = "$" + "{project.basedir}";
+    String mvnProjectPySrcDir = "${mvnProjectBaseDir}/src/main/python";
+
+    Path ecsRuntimeRoot = "${target}/ecsRuntime";
+    Path serviceMgrRoot = "${target}/serviceMgr";
+    Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
+    Path platformRoot = "${target}/platform";
+    Path monitoringRoot = "${target}/monitoring";
+    Path mgtUiRoot = "${target}/mgtUi";
+    Path commonRoot = "${target}/common";
+    Path artifactsRoot = "${target}/artifacts";
+    Path brokerRoot = "${target}/broker";
+    String assemblyRel = "src/main/assembly";
+    String serviceArtifactsRel = "src/main/serviceArtifacts";
+
+
+    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="", String sysd="") = {
+        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
+        if (withJava8) {
+            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
+        }
+        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
+        FileArtifact f = "${pathName}.sh";
+        f.setExecutable(false);
+        if (withJava8) {
+            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
+            f = "${pathName}8.sh";
+            f.setExecutable(false);
+        }
+        if (pidName.length() > 0) {
+           String sName = pathName;
+           if (sysd <> "") {
+               sName = sysd;
+           }
+           vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, addJavaOpts=addJavaOpts);
+           if (withJava8) {
+               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
+           }
+           if (requires.length() > 0) {
+               vilTemplateProcessor("LinuxSysd", config, "${sName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);
+               if (withJava8) {
+                   vilTemplateProcessor("LinuxSysd", config, "${sName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false, addJavaOpts=addJavaOpts);
+               }
+           }
+        }
+    }
+    
+    // ------------------- optional, alternative services ----------------------------
+
+    deviceIdProviderJsl(Path p, IIPEcosphere cfg) = {
+        String cls = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$" + "MacIdProviderDescriptor";
+        if (isDefined(cfg.deviceIdProvider) and cfg.deviceIdProvider <> null) {
+            cls = cfg.deviceIdProvider.class;
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor", descriptor=cls);
+    }
+
+    identityStoreJsl(Path p, IIPEcosphere cfg) = {
+        String cls = "de.iip_ecosphere.platform.support.identities.YamlIdentityStore$" + "YamlIdentityStoreDescriptor";
+        if (isDefined(cfg.identityStore) and cfg.identityStore <> null) {
+            cls = cfg.identityStore.class;
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.identities.IdentityStoreDescriptor", descriptor=cls);
+    }
+    
+    aasSemanticIdResolverJsl(Path p, IIPEcosphere cfg) = {
+        sequenceOf(String) desc = {
+            "de.iip_ecosphere.platform.support.iip_aas.EclassYamlSemanticIdResolverDescriptor", 
+            "de.iip_ecosphere.platform.support.iip_aas.AdminShellYamlSemanticIdResolverDescriptor"};
+        if (isDefined(cfg.aasSemanticIdResolver) and cfg.aasSemanticIdResolver <> null) {
+            desc = cfg.aasSemanticIdResolver->collect(r|r.class).asSequence();
+        }
+        vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor", descriptors=desc);
+    }
+
+}

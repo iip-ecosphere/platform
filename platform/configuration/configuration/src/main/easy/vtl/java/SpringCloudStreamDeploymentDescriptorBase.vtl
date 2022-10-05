@@ -1,0 +1,478 @@
+import Basics;
+import JavaBasics;
+import MavenBasics;
+import JavaMapping;
+import MeshBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) extends MeshBasics {
+
+    Boolean returnType = false;
+    Boolean inputType = false;
+
+    def generateServices(sequenceOf(MeshElement) elements) {
+        for (MeshElement elt: elements) {
+            '${generateService(elt, elt.impl, true, "")}'
+        }
+    }
+    
+    def generateService(MeshElement elt, ServiceBase service, Boolean topLevel, String familyId) {
+    }
+    
+    /*
+    * Maps the configured protocol into the spring protocol binder configuration key.
+    */
+    def getProtocolKey() {
+        IIPEcosphere cfg = config;
+        switch (cfg.serviceProtocol.type) {
+            ProtocolType::Mqttv3 : "mqtt",
+            ProtocolType::Mqttv5 : "mqtt",
+            default: "amqp"
+        }
+    }
+
+    /*
+    * Maps the given service protocol into the spring protocol binder configuration key.
+    */
+    def getProtocolKey(ServiceProtocol prot) {
+    }
+
+    def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel, String familyId) {
+        String famId = family.id;
+        '- id: ${family.id}
+          name: ${family.name}
+          description: ${family.description}
+          version: 0.0.1
+          kind: ${family.kind}
+          topLevel: ${topLevel}
+          cmdArg: 
+            - --iip.port=\\${port}
+            - --iip.protocol=\\${protocol}
+            ${generateAppOpt()|e}
+          relations:
+            - endpoint:
+                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
+                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
+            ${generateRelations(elt)|e}
+          ${generateEnsemble(elt, family, familyId)|e}'
+        for (Service m : family.members) {
+            '${generateService(elt, m, false, famId)}'
+        }
+    }
+
+    def generateService(MeshElement elt, Service service, Boolean topLevel, String familyId) {
+        '- id: ${service.id}
+          name: ${service.name}
+          version: ${service.ver}
+          description: ${service.description}
+          deployable: ${service.deployable}
+          kind: ${service.kind}
+          topLevel: ${topLevel}
+          cmdArg: 
+            - --iip.port=\\${port}
+            - --iip.protocol=\\${protocol}
+            ${generateMemLimitOpt(service)|e}
+            ${generateAppOpt()|e}
+          relations:
+            - endpoint:
+                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
+                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
+            ${generateRelations(elt)|e}
+          ${generateProcess(elt, service)|e}
+          ${generateEnsemble(elt, service, familyId)|e}'
+    }
+        
+    def generateEnsemble(MeshElement elt, ServiceBase service, String familyId) {
+       if (familyId <> "") {
+           'ensembleWith: ${familyId}'
+       } else if (elt.ensemble <> null) {
+           'ensembleWith: ${elt.ensemble.impl.id}'
+       } else {
+           ''
+       }
+    }
+    
+    def generateProcess(MeshElement elt, Service service) {
+        ''
+    }
+
+    def generateProcess(MeshElement elt, PythonService service) {
+        String id = toFolderName(service.id);
+        'process: 
+            homePath: \\${tmp}/${id}/python
+            ${pythonExecutable(service)|e}
+            executablePath: \\${tmp}/${id}/python
+            artifacts:
+              - /python_${id}.zip
+            cmdArg:
+              - --mode
+              - console
+              - --modulesPath
+              - \\${tmp}/${id}/python
+              - --servicesPackage
+              - ${pythonServicesPackageName(service)}
+              - --sid
+              - ${service.id}
+              ${pythonDataArg(service)|e}
+            started: true'
+    }
+    
+    def pythonServicesPackageName(PythonService service) {
+        if (service.servicesPackageName <> null) {
+            '${service.servicesPackageName}'
+        } else {
+            'services'
+        }
+    }
+    
+    def pythonDataArg(PythonService service) {
+        if (service.integrationMode == PythonIntegrationMode::console_oneShot) {
+            "--data"
+        } else {
+            ""
+        }
+    }
+    
+    def pythonExecutable(PythonService service) {
+        if (isDefined(service.entrypointModule) and service.entrypointModule.length() > 0) {
+            "executable: ${service.entrypointModule}"
+        } else {
+            ""
+        }
+    }
+    
+    def generateAppOpt() {
+        if (isDefined(app.cmdArg) and app.cmdArg.length() > 0) { // EASY-bug
+            sequenceOf(String) tmp = app.cmdArg.split(",");
+            for (String a: tmp) {
+                "- ${a}"
+            }
+        }
+    }
+    
+    def generateMemLimitOpt(Service service) {
+        String opt = toJvmMemLimitOpt(service.memLimit);
+        if (opt.length() > 0) {
+            "- ${opt}"
+        } else {
+            "";
+        }
+    }
+    
+    def generateRelations(MeshElement elt) {
+    }
+
+    def generateRelations(MeshSource elt) {
+        generateRelations(elt, elt.next);
+    }
+
+    def generateRelations(MeshInnerElement elt) {
+        generateRelations(elt, elt.next);
+    }
+    
+    def String substNewlines(String str, String subst) {
+        str.replace("\r", "").replace("\n", subst);
+    }
+    
+    def String trimTrailingComma(String str) {
+        if (str.length() > 1 and str.endsWith(",")) {
+            str = str.substring(0, str.length() - 1);
+        } 
+        if (str.length() > 1 and str.startsWith(",")) {
+            str = str.substring(1);
+        } 
+        str;
+    }
+
+    def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
+        String res = "";
+        for (MeshConnector c: nextConnectors(elt)) {
+            MeshElement target = c.next;
+            res = appendNL(res, generateConnections(elt, target, "OUT", "-out-0", target.impl.id));
+        }
+        for (MeshElement e: elements) {
+            if (e <> elt) {
+                res = appendNL(res, generateConnections(e, elt, "IN", "-in-0", e.impl.id));
+            }
+        }
+        '${res}'
+    }
+    
+    // -> basics after impact check
+    def String appendNL(String text1, String text2) {
+        if (text1.length() > 0) {
+            if (text2.length() > 0) {
+                text1 + "\n" + text2;
+            } else {
+                text1;
+            }
+        } else {
+            text2;
+        }
+    }
+    
+    def generateConnections(MeshElement start, MeshElement end, String dir, String connSuffix, String service) {
+        String res = "";
+        for (IOType out : start.impl.output) {
+            for (IOType in: end.impl.input) {
+                if (in.type == out.type and (
+                    nextConnectors(start)->collect(c|c.next).includes(end) or // configured forward conn 
+                    (not(in.forward) and not(out.forward)))) { // configured backward conn
+                    res = appendNL(res, generateConnection(start, end, out, dir, connSuffix, service));
+                 }
+             }
+         }
+         if (dir == "IN") { // backwards
+             for (IOType in : start.impl.input) {
+                for (IOType out: end.impl.output) {
+                    if (in.type == out.type and (not(in.forward) and not(out.forward))) {
+                        res = appendNL(res, generateConnection(end, start, out, "OUT", "-out-0", service));
+                    }
+                }
+             }
+         }
+         res;
+    }
+    
+    def Boolean isAsyncSource(MeshElement elt) {
+        false;
+    }
+    
+    def Boolean isAsyncSource(MeshSource elt) {
+        elt.impl.asynchronous == true and elt.impl.isKindOf(Connector);
+    }
+    
+    def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service) {
+        String res = "";
+        String typeName = toTypeName(type.type);
+        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, getOutName(end, type.type)), end);
+        String func = conn;
+        if (dir == "OUT") {
+            if (isAsyncSource(start)) {
+                func = "";
+            } else {
+                func = getMethodSuffixId(getMethodSuffix(start, typeName, getOutName(start, type.type)), start);
+            }
+        } else {
+            func = conn;
+        }
+        if (not(type.forward)) {
+            if (conn.startsWith("create")) {
+                conn = "process" + conn.substring(6);
+            }
+        }
+        res = appendNL(res, 
+          "- channel: ${conn}${connSuffix}\n" +
+          "  direction: ${dir}\n" +
+          "  id: ${start.impl.id} -> ${end.impl.id}\n" +
+          "  type: ${typeName}\n" + 
+          "  function: ${func}");
+        if (service <> "") {
+            res = res + 
+            "\n  service: ${service}";
+        }
+        res;
+    }
+    
+    /*def generateRelations1(MeshElement elt, setOf(MeshConnector) conns) {
+        String res = "";
+        String tmp = substNewlines(generateDataMethods(elt, true), ",");
+        sequenceOf(String) eltM = tmp.split(",");
+        for (String eltMet: eltM) {
+            returnType = true;
+            inputType = true;
+            String eltType = trimTrailingComma(substNewlines(generateDataMethods(elt, true), ","));
+            returnType = false;
+            if (res.length() > 0) {
+                res = res + "\n";
+            }
+            res = res + 
+        '- channel: ${eltMet}-out-0
+          direction: OUT
+          type: ${eltType}';
+            if (conns.size() > 0) {
+                for (MeshConnector conn : conns, "\n") {
+                    MeshInnerElement next = conn.next;
+                    tmp = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
+                    sequenceOf(String) nextM = tmp.split(",");
+                    for (String nextMeth: nextM) {
+                        returnType = true;
+                        inputType = true;
+                        String nextType = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
+                        returnType = false;
+                        if (res.length() > 0) {
+                            res = res + "\n";
+                        }
+                        res = res + 
+        '- channel: ${nextMeth}-in-0
+          id: ${conn.name}
+          service: ${next.impl.id}
+          direction: IN
+          type: ${nextType}';
+                    }
+                }
+            }
+        }
+        '${res}'
+    }*/
+
+    // -------------------------- mesh basics refinement, extract stream names ---------------------------------
+
+    // TODO check removal
+    def generateSelect(String inType, String outType, String methodSuffixWithServiceId) {
+        if (returnType) {
+            if (inputType) {
+                inType + ",";
+            } else {
+                outType + ",";
+            }
+        } else {
+            methodSuffixWithServiceId + ",";
+        }
+    }
+
+    // TODO check removal
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateSelect(type, type, methodSuffixWithServiceId);
+    } 
+
+    // TODO check removal
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateSelect(type, type, methodSuffixWithServiceId);
+    } 
+
+    // TODO check removal
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+        generateSelect(inType, outType, methodSuffixWithServiceId);
+    } 
+    
+    // TODO check removal
+    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        generateSelect(type, type, methodSuffixWithServiceId);
+    } 
+    
+    // ----------------------------------- types -----------------------------------
+    
+    def generateTypes(sequenceOf(MeshElement) elements) {
+        setOf(DataType) types = {};
+        for (MeshElement elt: elements) {
+            collectTypes(elt, types);
+        }
+        if (types.size() > 0) {
+            'types:
+                ${generateTypes(types)}'
+        }
+    }
+    
+    def generateTypes(setOf(DataType) types) {
+        for (RecordType type: types->selectByType(RecordType)->sortedBy(t|t.name)) {
+            '${generateType(type)}'
+        }
+    }
+    
+    def generateType(DataType type) {
+        ''
+    }
+
+    def generateType(RecordType type) {
+        '- name: ${toTypeName(type)}'
+        if (type.fields.size() > 0) {
+            '  fields:
+                ${generateFields(type.fields)}'
+        }
+    }
+    
+    def generateFields(Fields fields) {
+        for (Field f: fields) {
+            '- name: ${f.name}
+              type: ${toTypeName(f.type)}'
+        }
+    }
+    
+    def collectTypes(MeshElement elt, setOf(DataType) types) {
+        collectServiceTypes(elt.impl, types);
+    }
+
+    // just take everything, input/output may be backward/async also for sources, sinks
+    def collectServiceTypes(ServiceBase base, setOf(DataType) types) {
+        collectIOTypes(base.input, types);
+        collectIOTypes(base.output, types);
+    }
+    
+    def collectIOTypes(sequenceOf(IOType) declTypes, setOf(DataType) types) {
+        for (IOType t: declTypes) {
+            collectType(t.type, types);
+        }        
+    }
+    
+    def collectType(DataType type, setOf(DataType) types) {
+    } 
+
+    def collectType(RecordType type, setOf(DataType) types) {
+        types.add(type);
+        for (Field f: type.fields) {
+            types.add(f.type);
+        }
+    }
+    
+    def generateAppSetup(ServiceBase service) {
+        '\n'
+    }
+
+    def generateAppSetup(Service service) {
+        if (isDefined(service.nameplateInfo) and service.nameplateInfo <> null) {
+            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo, indent=2);
+        } else {
+            ''
+        }
+    } 
+    
+    def generateAppSetup(Application app) {
+        if (isDefined(app.nameplateInfo) and app.nameplateInfo <> null) {
+            generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo);
+        } else {
+            ''
+        }
+    } 
+    
+    def generateAppSetup(String id, String name, String ver, NameplateInfo p, String prefix = "", Integer indent = 0) {
+        'application:
+          id: ${id}
+          name: ${name}
+          version: ${ver}
+          ${generateNameplateInfoSetup(p, prefix, indent)|e}'
+    }
+    
+    def generateNameplateInfoSetup(NameplateInfo p, String prefix, Integer indent) {
+        if (p <> null) {
+            Manufacturer m = p.manufacturer;
+            ManufacturerAddress ad = m.address;
+            '${prefix}manufacturerName: ${m.manufacturerName}
+            manufacturerProductDesignation: ${p.manufacturerProductDesignation}
+            manufacturerLogo: ${m.manufacturerLogo}
+            productImage: ${p.productImage}
+            address:
+              department: ${ad.department}
+              street: ${ad.street}
+              zipCode: ${ad.zipCode}
+              cityTown: ${ad.cityTown}' | indent;
+        } else {
+            ''
+        }
+    }
+
+    // ----------------------------------- main -----------------------------------
+    
+    def main(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
+        'id: ${app.id}
+        name: ${app.name}
+        version: ${app.ver}
+        ${generateAppSetup(app)}
+        ${generateTypes(elements)}
+        services:
+           ${generateServices(elements)}
+        '
+    }
+
+}

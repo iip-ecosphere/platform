@@ -148,6 +148,8 @@ def console(a, data, sId):
                 process(input(), sId)
             except EOFError as e:
                 break
+            # prevent active waiting, sleep for 5m
+            time.sleep(5/1000)
 
 ## further modes go here
 

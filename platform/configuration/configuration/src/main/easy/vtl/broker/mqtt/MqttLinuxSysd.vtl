@@ -24,6 +24,8 @@ template MqttLinuxSysd(Configuration config, FileArtifact target) {
         Type=simple
         Restart=on-failure
         KillMode=control-group
+        Requires=network.target
+        After=network.target
         ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer ${port}
         
         [Install]

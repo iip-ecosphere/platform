@@ -49,9 +49,9 @@ import static spark.Spark.delete;
  * intended to easily adjust the behavior rather than doing coding/requiring a build process.
  * 
  * Format of the spec.yml:
- * path: <String>
+ * path: &lt;String&gt;
  * mappings:
- *   <String>: <String>
+ *   &lt;String&gt;: &lt;String&gt;
  *  
  * The path indicates the desired REST path/endpoint attached to the base path "services/"
  * The mappings relate a field name to a function specification. As function specification, we currently offer 
@@ -196,7 +196,7 @@ public class FakeRtsa {
          * Reads the YAML specification file "spec.yml" in the deployment file.
          * 
          * @param in the input stream
-         * @throws IOException
+         * @throws IOException if reading the specification fails due to I/O problems
          */
         private void readSpec(InputStream in) throws IOException {
             if (null == in) {

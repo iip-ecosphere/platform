@@ -40,8 +40,7 @@ public class HivemqV3MessageBinderTlsTest extends HivemqV3MessageBinderTest {
         if (null != client) { // called again, reset client in binder
             HivemqV3Configuration cfg = client.getConfiguration();
             cfg.setPort(addr.getPort());
-            cfg.setKeystore(getKeystore());
-            cfg.setKeyPassword(getKeystorePassword());
+            cfg.setKeystoreKey(getKeystoreKey());
             client.createClient(cfg);
         }
     }

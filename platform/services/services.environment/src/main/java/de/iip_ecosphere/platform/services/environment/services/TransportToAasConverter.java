@@ -316,6 +316,7 @@ public abstract class TransportToAasConverter<T> {
         // remove outdated ones
         long now = System.currentTimeMillis();
         if (now - lastCleanup > cleanupTimeout) {
+            LoggerFactory.getLogger(getClass()).info("Cleaning up Trace AAS.");
             long timestamp = now - timeout;
             Submodel sm = aas.getSubmodel(submodelIdShort);
             List<SubmodelElement> delete = new ArrayList<>();
@@ -405,7 +406,7 @@ public abstract class TransportToAasConverter<T> {
             if (null != conn) {
                 conn.setReceptionCallback(transportStream, callback);
             } else {
-                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace recors.");
+                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
             }
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());

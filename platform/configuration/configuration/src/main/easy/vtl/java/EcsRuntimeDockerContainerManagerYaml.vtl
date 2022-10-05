@@ -78,11 +78,8 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 'authenticationKey: ${sec.authenticationKey}'
             }
-            if (isDefined(sec.keystore) and sec.keystore <> "") {
-                'keystore: ${sec.keystore}'
-            }
-            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
-                'keystorePassword: ${sec.keystorePasswordKey}'
+            if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
+                'keystoreKey: ${sec.keystoreKey}'
             }
             if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
                 'keyAlias: ${sec.keyAlias}'
@@ -91,20 +88,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
                 'hostnameVerification: ${sec.hostNameVerification}'
             }
         } else {
-            if (userPwdFallback) {
-                String usr = "";
-                if (isDefined(tp.user)) {
-                    usr = 'user: ${tp.user}';
-                }
-                String pw = "";
-                if (isDefined(tp.password)) {
-                    pw = 'password: ${tp.password}';
-                }
-                '${usr|e}
-                ${pw|e}'
-            } else {
-                ''
-            }
+            ''
         }
     }
     

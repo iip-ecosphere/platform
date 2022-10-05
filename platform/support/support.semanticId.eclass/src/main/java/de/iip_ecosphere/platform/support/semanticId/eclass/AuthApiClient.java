@@ -12,16 +12,18 @@
 
 package de.iip_ecosphere.platform.support.semanticId.eclass;
 
-import java.util.List;
-import java.util.Map;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
-import org.slf4j.LoggerFactory;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiClient;
-import de.iip_ecosphere.platform.support.semanticId.eclass.handler.Pair;
-import de.iip_ecosphere.platform.support.semanticId.eclass.handler.auth.Authentication;
-import de.iip_ecosphere.platform.support.semanticId.eclass.handler.auth.HttpBasicAuth;
 
 /**
  * Implements a REST client that can work with {@link IdentityToken}.
@@ -31,32 +33,39 @@ import de.iip_ecosphere.platform.support.semanticId.eclass.handler.auth.HttpBasi
  */
 public class AuthApiClient extends ApiClient {
 
-    private Authentication auth;
+    private static SSLContext context;
 
     /**
-     * Sets the identity token.
+     * Defines the SSL context. Call before instantiation.
      * 
-     * @param token the token
+     * @param ctx the context
      */
-    public void setIdentityToken(IdentityToken token) {
-        switch (token.getType()) {
-        case USERNAME:
-            HttpBasicAuth basicAuth = new HttpBasicAuth();
-            basicAuth.setUsername(token.getUserName());
-            basicAuth.setPassword(token.getTokenDataAsString());
-            auth = basicAuth;
-            break;
-        default:
-            LoggerFactory.getLogger(AuthApiClient.class).error("Cannot handle: {}. Disabling authentication", 
-                token.getType());
-            break;
-        }
+    static void setSslContext(SSLContext ctx) {
+        context = ctx;
     }
-
+    
     @Override
-    public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams) {
-        if (null != auth) {
-            auth.applyToParams(queryParams, headerParams);
+    protected Client buildHttpClient(boolean debugging) {
+        if (null != context) {
+            final ClientConfig clientConfig = new ClientConfig();
+            clientConfig.register(MultiPartFeature.class);
+            clientConfig.register(json);
+            clientConfig.register(JacksonFeature.class);
+            clientConfig.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true);
+            if (debugging) {
+                clientConfig.register(new LoggingFeature(java.util.logging.Logger
+                            .getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), 
+                            java.util.logging.Level.INFO, 
+                            LoggingFeature.Verbosity.PAYLOAD_ANY, 1024 * 50 /* Log payloads up to 50K */));
+                clientConfig.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY);
+                // Set logger to ALL
+                java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME)
+                    .setLevel(java.util.logging.Level.ALL);
+            }
+            performAdditionalClientConfiguration(clientConfig);
+            return ClientBuilder.newBuilder().withConfig(clientConfig).sslContext(context).build();
+        } else {
+            return super.buildHttpClient(debugging);
         }
     }
 

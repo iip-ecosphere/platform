@@ -1,0 +1,18 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+import Rtsa;
+
+@advice(IIPEcosphere)
+vilScript IIPEcospherePartRtsa (Project source, Configuration config, Project target) {
+
+    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        resources.add(rtsaResources()+"|"+rtsaBin(service));
+        resources.add(rtsaResources()+"|"+rtsaInstance(service));
+        artifacts.add(getArtifact(service));
+    }
+
+}

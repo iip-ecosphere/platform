@@ -2,11 +2,16 @@
 
 This project contains a dependencies POM to install the basic parts of the platform so that a configuration via [configuration.configuration](../configuration/configuration/README.md) becomes possible as long as there is no UI. In essence, this will instantiate the platform server component, the ECS runtime, the service manager and an example service mesh.
 
-The details are described in the platform handbook. For short:
-  * Run `mvn install` in `platformDependencies`.
-  * Run `mvn package -DskipTests` in the main folder of the package.
+The details are described in the platform handbook. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.
+
+For running the platform as well as for supporting the development of the platform, you need the platform dependencies:
+
+* Run `mvn install` in the folder `platformDependencies`. 
+
+If you also want to install/execute the platform, also execute
+  * Run `mvn package -DskipTests` in the *main folder* of the install package.
   * Modify `src/main/easy/InstallTest.ivml` in particular to reflect your IP addresses.
-  * Run `mvn exec:java`
+  * Run `mvn exec:java` in the *main folder* of the install package.
   * Copy the created artifacts in `gen` (`broker`, `ecsJars`, `ecs.*`, `serviceMgr`, `serviceMgr.*`, `SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar`) to the target machines.
   * Start the broker, e.g., using `broker` (sh or bat) on the "server" and the "device" machine(s).
   * Run `platform` (sh or bat) on the "server" machine.

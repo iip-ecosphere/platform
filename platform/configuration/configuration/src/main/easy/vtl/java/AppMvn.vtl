@@ -49,6 +49,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         XmlElement exs = new XmlElement(d, "exclusions");
         XmlElement ex = new XmlElement(exs, "exclusion");
@@ -57,7 +59,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         ex = new XmlElement(exs, "exclusion");
         new XmlElement(ex, "groupId", "org.apache.tomcat");
         new XmlElement(ex, "artifactId", "tomcat-catalina");
-        for (String art : artifacts.toSequence()->sortedBy(a|a)) { // sortedBy for testing
+        for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
         d = appendDependency(dep, "org.glassfish", "jakarta.el");
@@ -74,7 +76,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        for (String ass: assemblies.toSequence()->sortedBy(a|a)) { // sortedBy for testing
+        for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
             String id = tmp[0];
             String path = tmp[1];
@@ -92,7 +94,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
 
         XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         mapOf(String, XmlElement) goalItems = {}; 
-        for (String bin: bins.toSequence()->sortedBy(b|b)) { // sortedBy for testing
+        for (String bin: bins.asSequence()->sortedBy(b|b)) { // sortedBy for testing
             sequenceOf(String) tmp = bin.split("\\|"); // escape |, splits into chars
             String artifact = tmp[0];
             String classifier = tmp[1];
@@ -112,7 +114,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
         XmlElement rExecs = appendExecutionsParent(depPlugin);
         if (resources.size() > 0) {
             mapOf(String, sequenceOf(String)) resMap = {};
-            for (String res: resources.toSequence()->sortedBy(b|b)) { // sortedBy for testing
+            for (String res: resources.asSequence()->sortedBy(b|b)) { // sortedBy for testing
                 sequenceOf(String) tmp = res.split("\\|"); // escape |, splits into chars
                 String srcDir = tmp[0];
                 String file = tmp[1];
@@ -121,7 +123,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) artif
                 }
                 resMap.get(srcDir).add(file);
             }
-            for (String res: resMap.keys().toSequence()->sortedBy(b|b)) { // sortedBy for testing
+            for (String res: resMap.keys().asSequence()->sortedBy(b|b)) { // sortedBy for testing
                 appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
             }
         }

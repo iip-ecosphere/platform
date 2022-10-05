@@ -238,9 +238,9 @@ public abstract class MeterRepresentation implements Meter {
                 JsonObject measurement = measurements.getJsonObject(i);
                 if (null != measurement) {
                     String statistics = measurement.getString("statistic");
-                    valueFound = Statistic.VALUE.name().equals(statistics);
-                    countFound = Statistic.COUNT.name().equals(statistics);
-                    totalTimeFound = Statistic.TOTAL_TIME.name().equals(statistics);
+                    valueFound |= Statistic.VALUE.name().equals(statistics);
+                    countFound |= Statistic.COUNT.name().equals(statistics);
+                    totalTimeFound |= Statistic.TOTAL_TIME.name().equals(statistics);
                 }
             }
         }

@@ -1,0 +1,31 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesEclipseProject(IIPEcosphere config, FileArtifact target, String appName) {
+	
+    def main(IIPEcosphere config, FileArtifact target, String appName) {
+    '<?xml version="1.0" encoding="UTF-8"?>
+    <projectDescription>
+        <name>${appName}</name>
+        <comment></comment>
+        <projects>
+        </projects>
+        <buildSpec>
+            <buildCommand>
+                <name>org.eclipse.jdt.core.javabuilder</name>
+                <arguments>
+                </arguments>
+            </buildCommand>
+            <buildCommand>
+                <name>org.eclipse.m2e.core.maven2Builder</name>
+                <arguments>
+                </arguments>
+            </buildCommand>
+        </buildSpec>
+        <natures>
+            <nature>org.eclipse.jdt.core.javanature</nature>
+            <nature>org.eclipse.m2e.core.maven2Nature</nature>
+        </natures>
+    </projectDescription>'
+    }
+	
+}

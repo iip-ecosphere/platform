@@ -32,7 +32,8 @@ import org.junit.runners.Suite;
     PlatformAasTest.class,
     AbstractSetupTest.class,
     CmdLineTest.class,
-    YamlSemanticIdResolverDescriptorTest.class
+    YamlSemanticIdResolverDescriptorTest.class,
+    NameplateSetupTest.class
 })
 public class AllTests {
 }

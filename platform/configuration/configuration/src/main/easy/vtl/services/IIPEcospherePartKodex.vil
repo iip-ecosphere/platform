@@ -1,0 +1,25 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+@advice(IIPEcosphere)
+vilScript IIPEcospherePartKodex (Project source, Configuration config, Project target) {
+
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        IIPEcosphere cfg = config;
+        String serviceFolderName = toFolderName(no.impl.id);
+        String kodexServiceFolderName = "kodex_" + serviceFolderName;
+        Path path = "${appRoot}/${serviceArtifactsRel}";
+        path.mkdir();
+        vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
+        vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
+        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
+        vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
+        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
+        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
+        artifacts.add(getArtifact(service));
+    }
+
+}

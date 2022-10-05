@@ -47,6 +47,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         import org.springframework.boot.SpringBootConfiguration;
         import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.context.TestPropertySource;
         import org.springframework.test.context.junit4.SpringRunner;
         import org.springframework.beans.factory.annotation.*;
         import org.springframework.integration.support.MessageBuilder;
@@ -84,59 +85,20 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         *
         * @author EASy-Producer
         */
-        private static class DataUnit {
+        public static class DataUnit extends DataMapper.BaseDataUnit {
         
-            private int \\$period = 0;
             ${getDataUnitAttributes(service)}
 
             ${getDataUnitGetters(service)}
             
-            /**
-            * Returns the delay period between this and the next data unit.
-            *
-            * @return the period in ms, use default/last value if zero or negative
-            */
-            public int get\\$Period() {
-                return \\$period;
-            }
-
             ${getDataUnitSetters(service)}
-        
-            /**
-            * Changes the delay period between this and the next data unit.
-            *
-            * @param \\$period the period in ms, default/last value if zero or negative
-            */
-            public void set\\$Period(int \\$period) {
-                this.\\$period = \\$period;
+            
+            @Override
+            public String toString() {
+                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
+                    de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
             }
             
-        }
-        
-        /**
-        * Extended data mapper taking {@link DataUnit#\\$period} into account.
-        */
-        private class TimedMappingConsumer extends DataMapper.MappingConsumer<DataUnit> {
-        
-            private int period = getInitialPeriod();
-        
-            /**
-             * Creates a timed mapping consumer.
-             */
-            public TimedMappingConsumer() {
-                super(DataUnit.class);
-            }
-        
-        
-            @Override
-            public void accept(DataUnit value) {
-                super.accept(value);
-                period = value.get\\$Period();
-                if (period > 0) {
-                    TimeUtils.sleep(period);
-                }
-            }
-         
         }
         
         ${genMatcher(elt, service, clsName)|e}'
@@ -200,82 +162,24 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def genMatcher(MeshSink elt, ServiceBase service, String clsName) {
         ''
     }
-    
-    protected def toImplTypeName(IOType type) {
-        toImplTypeName(type.type);
-    }
-    
-    protected def toImplTypeName(DataType type) {
-        toTypeName(type);
-    }
-
-    protected def toImplTypeName(RecordType type) {
-        toTypeName(type) + typeAdd;
-    }
-    
+        
     protected def getDataUnitAttributes(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 'private ${implTypeName} ${attributeName};
                 '
             }
         }
     }
-    
-    protected def getDataUnitJson(ServiceBase service) {
-        String result = "{";
-        for (IOType in: service.input) {
-            if (result.length() > 1) {
-                 result = result + ", ";
-            }
-            String typeName = toTypeName(in);
-            String implTypeName = toImplTypeName(in);
-            String attributeName = firstToLowerCase(toTypeName(in));
-            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
-        }
-        result + ", \\$period=p}";
-    }
-    
-    protected def getDataUnitJson(Connector conn) {
-        DataType outType = getFirstType(conn.output);
-        getDataTypeJson(outType);
-    }
-    
-    protected def getDataTypeJson(DataType type) {
-        ''
-    }
-    
-    protected def getDataTypeJson(RecordType type) {
-        String result = "{";
-        for (Field f: type.fields) {
-            if (result.length() > 1) {
-                 result = result + ", ";
-            }
-            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
-        }
-        result + "}";
-    }
-    
-    protected def getFieldValueJson(DataType type, Field f) {
-        if (f.optional) {
-            'o';
-        } else {
-            'm';
-        }
-    }
-    
-    protected def getFieldValueJson(RecordType type, Field f) {
-        getDataTypeJson(type);
-    }
 
     protected def getDataUnitGetters(ServiceBase service) {
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Returns ${attributeName}.
@@ -294,7 +198,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         if (service.input.size() > 0) { // EASY bug
             for (IOType in: service.input) {
                 String typeName = toTypeName(in);
-                String implTypeName = toImplTypeName(in);
+                String implTypeName = toImplTypeName(in, typeAdd);
                 String attributeName = firstToLowerCase(toTypeName(in));
                 '/**
                 * Changes ${attributeName}. [required by Jackson]
@@ -350,7 +254,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     // ------------------- reusable methods -----------------
 
     def String getFileName(ServiceBase service) {
-        "testData-${toIdentifier(service.id)}.yml";
+        "testData-${toIdentifier(service.id)}.json";
     }
 
     def genMethods(MeshElement elt, ServiceBase service, String clsName) {
@@ -358,12 +262,24 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
 
     def genMethods(MeshSource elt, ServiceBase service, String clsName) {
+        String fileName = getFileName(service);
         '/**
         * Tests the source.
         *
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
+            InputStream in;
+            try {
+                in = new java.io.FileInputStream(
+                    System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}"));
+            } catch (IOException e) {
+                in = ResourceLoader.getResourceAsStream("${fileName}");
+            }
+            DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
+            ${genConsumerBindings(elt, service, "consumer")}
+            DataMapper.mapJsonData(in, DataUnit.class, consumer);
             ${processOutput(elt, service, nodes)}
         }
         '
@@ -381,11 +297,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             try (ConfigurableApplicationContext context = new SpringApplicationBuilder(
                 TestChannelBinderConfiguration.getCompleteConfiguration())
                     .web(WebApplicationType.NONE)
-                    .run(${genDynamicProperties(elt, service, clsName)})) {
+                    .run()) {
                 InputDestination source = context.getBean(InputDestination.class);
                 OutputDestination target = context.getBean(OutputDestination.class);
             
-                TimedMappingConsumer consumer = new TimedMappingConsumer();
+                DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                    new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
                 ${genConsumerBindings(elt, service, "consumer")}
                 DataMapper.mapJsonData(in, DataUnit.class, consumer);
                 ${processOutput(elt, service, nodes)}
@@ -417,7 +334,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     *
     * @param elt the mesh element to generate the test for (for dynamic dispatch)
     * @param service the mesh element implementing service to generate the test for (for dynamic dispatch)
-    * @param var the name of the variabe representing the TimeMappinConsumer
+    * @param var the name of the variable representing the TimeMappinConsumer
     */
     protected def genConsumerBindings(MeshElement elt, ServiceBase service, String var) {
         // generate consumer bindings. Synchronous handlers do the assert after sending, asynchronous handlers
@@ -427,7 +344,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             inTypes.add(t.type);
         }
         sequenceOf(MeshElement) pred = predecessors(elt);
-        for (MeshElement p: pred) {
+        for (MeshElement p: pred->sortedBy(n|n.name)) {
             for (IOType predOut : p.impl.output) {
                 if (inTypes.includes(predOut.type)) {
                     String conn = getMethodSuffixId(getMethodSuffix(p, toTypeName(predOut), outType(p, predOut)), p);
@@ -439,14 +356,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         if (not(service.asynchronous)) {
                             assert = "Assert.assertThat(target.receive().getPayload(), matcher);";
                         }
-                        '${var}.addHandler(${typeName}.class, d -> {
-                            Message<${typeName}> msg = MessageBuilder.withPayload(d).build();
+                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
+                            Message<${typeName}${typeAdd}> msg = MessageBuilder.withPayload(d).build();
                             source.send(msg);
                             ${assert|e}
                         });'
                     } else {
                         String senderId = p.impl.id;
-                        '${var}.addHandler(${typeName}.class, d -> {
+                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
                             Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
                         });'
                     }
@@ -614,7 +531,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     
     def genDynamicProperties(MeshElement elt, ServiceBase service, String clsName) {
         String result = "";
-        String sep = ",\n                        ";
+        String sep = ",\n    ";
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
@@ -637,10 +554,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id);
         if (destinations.size() > 0) {
-            for (String k : destinations.keys().toSequence()->sortedBy(e|e)) { // sortedBy for testing
+            for (String k : destinations.keys().asSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
-                for (String d : destinations.get(k)) {
+                for (String d : destinations.get(k).asSequence()->sortedBy(n|n)) { // sortedBy for testing
                     if (d == "*") {
                         useNativeEncoding = true;
                     } else {
@@ -650,9 +567,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         dst = dst + d;
                     }
                 }
-                result = appendWithSeparator(result, sep, '"--spring.cloud.stream.bindings.${k}.destination=${dst}"');
+                result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.destination=${dst}"');
                 if (useNativeEncoding) {
-                    result = appendWithSeparator(result, sep, '"--spring.cloud.stream.bindings.${k}.useNativeEncoding=true"');
+                    result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.useNativeEncoding=true"');
                 }
             }
         }
@@ -661,25 +578,27 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         pollNodes.add(elt);
         Integer pollInterval = calcPollerInterval(pollNodes);
         if (pollInterval > 0) {
-            result = appendWithSeparator(result, sep, '"--spring.cloud.stream.poller.fixedDelay=${pollInterval}"');
+            result = appendWithSeparator(result, sep, '"spring.cloud.stream.poller.fixedDelay=${pollInterval}"');
         }
-        result = appendWithSeparator(result, sep, '"--spring.cloud.function.definition=${semicolonList(functions)}"');
+        result = appendWithSeparator(result, sep, '"spring.cloud.function.definition=${semicolonList(functions)}"');
         for (MeshElement e : nodes->sortedBy(n|n.impl.id)) { // sorting for testing tests
             String sId = toIdentifier(e.impl.id);
-            result = appendWithSeparator(result, sep, '"--iip.service.${sId}=${e == elt}"');
+            result = appendWithSeparator(result, sep, '"iip.service.${sId}=${e == elt}"');
         }
         result;
     }
 
     // ------------------- main method ----------------------
     
-    def genClassAnnotations(MeshElement elt, ServiceBase service) {
+    def genClassAnnotations(MeshElement elt, ServiceBase service, String clsName) {
         '@SpringBootTest(classes = iip.Starter.class)
         @ImportAutoConfiguration(TestChannelBinderConfiguration.class)
+        @TestPropertySource(properties = {
+            ${genDynamicProperties(elt, service, clsName)}})
         @RunWith(SpringRunner.class)'
     }
 
-    def genClassAnnotations(MeshElement elt, Connector conn) {
+    def genClassAnnotations(MeshElement elt, Connector conn, String clsName) {
         ''
     }
 
@@ -691,11 +610,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * The input data file is a JSON file, one data unit per line, following a generic structure per data unit. 
         * A data unit consists of one optional object entry per input type of the service under test (attribute name
         * is the type name with first character in small case) - the contents of the same structure as defined in the
-        * configuration model. The structure for this service is: {@code ${getDataUnitJson(service)}}. Depending
+        * configuration model. The structure for this service is: {@code ${getDataUnitJson(service, typeAdd)}}. Depending
         * on your data type definitions in the model, individual fields may be mandatory (indicated by <i>m</i>), 
         * optional (indicated by <i>o</i>) or nested fields (not indicated further). "\\$period" is 
         * an optional generic entry that defines the delay period <i>p</i> between the actual
-        * and the next data entry (if unspecified the initial value is {@link #getInitialPeriod()}.'
+        * and the next data entry (if unspecified the initial value is {@link #getInitialPeriod()}.
+        * "\\$repeats" is the number of repeats of the specifying line (0: none, positive: #repeats, negative: endless).'
     }
 
     def genClassComment(MeshElement elt, Connector conn, String fileName) {
@@ -789,7 +709,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         *
         * @author EASy-Producer
         */        
-        ${genClassAnnotations(elt, elt.impl)|e}
+        ${genClassAnnotations(elt, elt.impl, clsName)|e}
         public class ${clsName}Test ${genExtends(elt, elt.impl)}{
         
             ${genAttributes(elt, elt.impl, clsName)|e}
@@ -801,7 +721,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             /**
             * Creates an instance and registers the application serializers.
             */
-            protected ${clsName}Test() {
+            public ${clsName}Test() {
                 ${generateSerializerRegistration(serializers)}
             }
             

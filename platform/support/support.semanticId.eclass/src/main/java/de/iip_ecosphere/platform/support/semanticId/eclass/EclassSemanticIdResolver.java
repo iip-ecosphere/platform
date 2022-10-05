@@ -13,6 +13,9 @@
 package de.iip_ecosphere.platform.support.semanticId.eclass;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,7 +23,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +36,6 @@ import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.support.semanticId.eclass.api.EclassJsonReadServicesApi;
 import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiException;
-import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiResponse;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.ReadProperty;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.ReadUnit;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.TranslatableLabel;
@@ -51,7 +54,6 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
     private EclassJsonReadServicesApi eclassApi;
     private boolean disabled = false;
     private Map<String, DefaultSemanticIdResolutionResult> cache = Collections.synchronizedMap(new HashMap<>());
-    private String userNameKey = System.getProperty("iip.eclass.authenticationKey", "eclassUser");
     private String keystoreKey = System.getProperty("iip.eclass.keystoreKey", "eclassCert");
     private Locale preferredLanguage = new Locale(
         System.getProperty("iip.eclass.locale", Locale.getDefault().toString()));
@@ -75,23 +77,42 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
     private void initialize() {
         if (null == eclassApi) {
             try {
-                IdentityToken tok = IdentityStore.getInstance().getToken(userNameKey);
-                KeyManager[] mgrs = IdentityStore.getInstance().getKeyManagers(keystoreKey);
+                IdentityStore iStore = IdentityStore.getInstance();
+                IdentityToken tok = iStore.getToken(keystoreKey);
                 if (null == tok) {
                     LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
-                        "No authentication token for '{}'. Disabling this resolver.", userNameKey);
-                    disabled = true;
-                } else if (null == mgrs || mgrs.length == 0) {
-                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
-                        "No key managers for '{}'. Disabling this resolver.", keystoreKey);
+                        "No authentication token for '{}'. Disabling this resolver.", keystoreKey);
                     disabled = true;
                 } else {
+                    InputStream keyStoreStream = iStore.getKeystoreAsStream(keystoreKey);
+                    if (null != keyStoreStream) {
+                        try {                    
+                            KeyStore keyStores = KeyStore.getInstance("PKCS12"); // EClass cert default
+                            char[] pw = tok.getTokenDataAsCharArray();
+                            if (null == pw) {
+                                pw = "".toCharArray(); // EClass default, if not set up otherwise
+                            }
+                            keyStores.load(keyStoreStream, pw);
+                            // Eclass cert default -> SHA256
+                            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                            keyManagerFactory.init(keyStores, pw);
+                            SSLContext context = SSLContext.getInstance("TLS");
+                            context.init(keyManagerFactory.getKeyManagers(), null, null);
+                            AuthApiClient.setSslContext(context);
+                        } catch (GeneralSecurityException e) {
+                            LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
+                                "Cannot load certificate. Disabling this resolver.", e.getMessage());
+                            disabled = true;
+                        }
+                    } else {
+                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
+                            "No keystore stream found. Disabling this resolver.");
+                        disabled = true;
+                    }
                     EclassJsonReadServicesApi api = new EclassJsonReadServicesApi();
                     AuthApiClient apiClient = new AuthApiClient();
                     api.setApiClient(apiClient);
                     apiClient.setBasePath("https://eclass-cdp.com/");
-                    apiClient.setKeyManagers(mgrs);
-                    apiClient.setIdentityToken(tok);
                     eclassApi = api;
                 }
             } catch (IOException e) {
@@ -194,28 +215,29 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                 String prefLang = preferredLanguage.toString();
                 // may be there is a way to get the type/kind out??
                 try {
-                    ApiResponse<ReadUnit> res = eclassApi.jsonapiV1UnitsIrdiGetWithHttpInfo(semanticId, prefLang, 
-                        "false");
-                    if (res.getStatusCode() == 200 && res.getData() != null) {
-                        ReadUnit data = res.getData();
+                    ReadUnit res = eclassApi.jsonapiV1UnitsIrdiGet(semanticId, prefLang, "false");
+                    if (res != null) {
                         result = createInstance(semanticId);
                         // no access to revision, version, description; just guessing/parsing
-                        result.setNamingTyped(createNaming(data.getShortName(), data.getPreferredName()));
+                        result.setNamingTyped(createNaming(res.getShortName(), res.getPreferredName()));
                     }
                 } catch (ApiException e) {
-                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {}", e.getMessage());
+                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
+                        e.getMessage(), e.getCode(), e.getResponseBody());
                 }
                 if (null == result) {
                     try {
-                        ApiResponse<ReadProperty> res = eclassApi.jsonapiV1PropertiesIrdiGetWithHttpInfo(semanticId, 
+                        ReadProperty res = eclassApi.jsonapiV1PropertiesIrdiGet(semanticId, 
                             prefLang, "false");
-                        if (res.getStatusCode() == 200 && res.getData() != null) {
-                            ReadProperty data = res.getData();
+                        if (res != null) {
                             result = createInstance(semanticId);
-                            result.setNamingTyped(createNaming(null, data.getPreferredName()));
+                            result.setNamingTyped(createNaming(null, res.getPreferredName()));
                         }
                     } catch (ApiException e) {
-                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {}", e.getMessage());
+                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
+                            e.getMessage(), e.getCode(), e.getResponseBody());
+                    } catch (IllegalArgumentException e) {
+                        
                     }
                 }
             }

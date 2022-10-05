@@ -379,6 +379,11 @@ project SerializerConfig1 {
     
     sharedInterfaces = true;
     // default sharedArtifact, not used in testing
+    modelBaseFolder = "../../.."; // gen/test/SerializerConfig1
+    metaModelFolder = "src/main/easy";
+    configFolder = "src/test/easy";
+    genTarget = ".";
+    modelName = "SerializerConfig1";
 
     // ------------ freezing ------------------
     
@@ -387,6 +392,11 @@ project SerializerConfig1 {
         sharedArtifact;
         platformMonitoring;
         managementUi;
+        modelBaseFolder;
+        metaModelFolder;
+        configFolder;
+        genTarget;
+        modelName;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

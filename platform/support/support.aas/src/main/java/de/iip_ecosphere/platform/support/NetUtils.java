@@ -84,11 +84,37 @@ public class NetUtils {
                         break;
                     }
                 }
-            } catch (SocketException e) {
-            } catch (PatternSyntaxException e) {
+            } catch (SocketException | PatternSyntaxException e) {
+                // ignore, care for your input
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns whether {@code host} is one of the addresses of this computer.
+     * 
+     * @param host the IP address/host name to look for
+     * @return {@code true} if {@code host} is one of the own addresses, {@code false} else
+     */
+    public static boolean isOwnAddress(String host) {
+        boolean isOwn = false;
+        try {
+            InetAddress givenHost = InetAddress.getByName(host);
+            Enumeration<NetworkInterface> ifs = NetworkInterface.getNetworkInterfaces();
+            while (!isOwn && ifs.hasMoreElements()) {
+                NetworkInterface ni = ifs.nextElement();
+                for (InterfaceAddress addr : ni.getInterfaceAddresses()) {
+                    if (addr.getAddress().equals(givenHost)) {
+                        isOwn = true;
+                        break;
+                    }
+                }
+            }
+        } catch (SocketException | UnknownHostException e) {
+            // ignore, care for your input
+        }
+        return isOwn;
     }
     
     /**

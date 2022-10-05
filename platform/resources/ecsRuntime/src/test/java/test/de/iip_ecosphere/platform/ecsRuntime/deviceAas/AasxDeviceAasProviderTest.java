@@ -13,11 +13,15 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
 import org.junit.Test;
+
+import java.io.IOException;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.AasxDeviceAasProvider;
+import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 
 /**
  * Tests {@link AasxDeviceAasProvider}.
@@ -44,9 +48,11 @@ public class AasxDeviceAasProviderTest extends AbstractDeviceProviderTest {
 
     /**
      * Tests {@link AasxDeviceAasProvider}.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
-    public void testProvider() {
+    public void testProvider() throws IOException {
         AasxDeviceAasProvider provider = new AasxDeviceAasProvider();
         String address = provider.getDeviceAasAddress();
         
@@ -58,6 +64,10 @@ public class AasxDeviceAasProviderTest extends AbstractDeviceProviderTest {
         Assert.assertTrue(address.length() > 0);
         Assert.assertNotNull(provider.getIdShort());
         Assert.assertNotNull(provider.getURN());
+
+        System.out.println(address);
+        Assert.assertNotNull(NameplateSetup.resolve(provider.getURN()));
+        Assert.assertNotNull(NameplateSetup.resolve(address));
     }
 
 }

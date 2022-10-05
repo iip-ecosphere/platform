@@ -22,9 +22,7 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -94,9 +92,10 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
-import de.iip_ecosphere.platform.support.net.SslUtils;
 
 /**
  * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -206,8 +205,15 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      * @return the endpoint URL
      */
     private String getEndpointUrl(ConnectorParameter params) {
-        return "opc." + params.getSchema().toUri() + params.getHost() + ":" + params.getPort() 
-            + "/" + params.getEndpointPath();
+        String schema;
+        if (Schema.TCP == params.getSchema()) {
+            schema = "opc." + params.getSchema().toUri();
+        } else {
+            schema = params.getSchema().toUri();
+        }
+        return schema + params.getHost() + ":" + params.getPort() + "/" + params.getEndpointPath();
+//        return "opc." + params.getSchema().toUri() + params.getHost() + ":" + params.getPort() 
+//            + "/" + params.getEndpointPath();
     }
     
     @Override
@@ -226,8 +232,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                  );
                 client.connect().get();
                 LOGGER.info("OPC UA connected to {}", endpointURL);
-            } catch (UaException | InterruptedException | ExecutionException e) { // also for interrupted
+            } catch (UaException | InterruptedException | ExecutionException  e) { // also for interrupted
                 client = null;
+                LOGGER.info("OPC UA connection failed: {}", e.getMessage());
                 throw new IOException(e);
             }
         }
@@ -265,9 +272,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         } catch (ExecutionException | InterruptedException e) {
             LOGGER.info("Cannot adjust endpoint of {}. Staying with original.", getEndpointUrl(params));
         }
-        if (null != params.getKeystore()) {
+        if (useTls(params)) {
             try {
-                KeyStore keystore = SslUtils.openKeyStore(params.getKeystore(), params.getKeystorePassword());
+                LOGGER.info("Opening keystore via identity store key {}", params.getKeystoreKey());
+                KeyStore keystore = IdentityStore.getInstance().getKeystoreFile(params.getKeystoreKey());
+                
                 String alias = params.getKeyAlias();
                 if (null == alias) {
                     try {
@@ -276,24 +285,29 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                         // ignore, alias == null
                     }
                 }
-
                 if (null != alias) {
                     Certificate cert = keystore.getCertificate(alias);
+                    LOGGER.info("Certificate for alias {} is of type {}", alias, 
+                        null == cert ? null : cert.getType() + "/" + cert.getClass().getName());
                     if (cert instanceof X509Certificate) {
-                        configBuilder.setCertificate((X509Certificate) cert);
-                        try {                
-                            Key key = keystore.getKey(alias, params.getKeystorePassword().toCharArray());
+                        try {
+                            Key key = IdentityStore.getInstance().getKeystoreKey(
+                                params.getKeystoreKey(), keystore, alias);
+                            LOGGER.info("Private key for alias {} is private key ({}) of type {}", alias, 
+                                key instanceof PrivateKey, null == key ? null : key.getClass().getName());
                             if (key instanceof PrivateKey) {
                                 configBuilder.setKeyPair(new KeyPair(cert.getPublicKey(), (PrivateKey) key));
                             } else {
                                 configBuilder.setKeyPair(new KeyPair(cert.getPublicKey(), null)); // unsure, shall work
                             }
-                        } catch (UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                            configBuilder.setCertificate((X509Certificate) cert);
+                        } catch (IOException e) {
                             LOGGER.error("Cannot read private key alias '{}': {}: Trying without TLS.", alias, 
                                 e.getMessage());
                         }                    
                     } else {
-                        LOGGER.error("Certificate for alias '{}' is not of type X509. Trying without TLS.", alias);
+                        LOGGER.error("Certificate for alias '{}' is not of type X509 ({}). Is keystore type "
+                            + "supported? Trying without TLS.", alias, cert);
                     }
                 } else {
                     LOGGER.error("No certificate found, no alias given. Trying without TLS.");
@@ -301,7 +315,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
             } catch (IOException | KeyStoreException e) {
                 LOGGER.error("Cannot read from keystore '{}': {} Trying without TLS.", 
-                    params.getKeystore(), e.getMessage());
+                    params.getKeystoreKey(), e.getMessage());
             }
         }
         return configBuilder;

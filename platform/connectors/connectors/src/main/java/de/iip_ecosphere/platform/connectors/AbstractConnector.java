@@ -16,13 +16,18 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 
 /**
  * Provides a reusable base of a {@link Connector} implementation using the {@link ProtocolAdapter}. Call 
@@ -46,6 +51,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private TimerTask pollTask;
     private ConnectorParameter params;
     private boolean enablePolling = true; // enable by default
+    private Object cache;
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default selector for the first adapter.
@@ -94,6 +100,30 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
                 
             };
         } 
+    }
+    
+    /**
+     * Returns whether the connector shall use TLS.
+     * 
+     * @param params the transport parameters
+     * @return {@code true} for TLS enabled, {@code false} else
+     */
+    public static boolean useTls(ConnectorParameter params) {
+        return null != params.getKeystoreKey();
+    }
+    
+    /**
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
+     * {@link TransportParameter#getKeystoreKey()} is given, else on 
+     * {@link SslUtils#createTlsContext(java.io.File, String, String)}.
+     * 
+     * @param params the connector parameters
+     * @return the TLS context
+     * @throws IOException if creating the context or obtaining key information fails
+     */
+    protected SSLContext createTlsContext(ConnectorParameter params) throws IOException {
+        return IdentityStore.getInstance().createTlsContext(params.getKeystoreKey(), params.getKeyAlias());
     }
     
     /**
@@ -269,10 +299,39 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      */
     protected CO received(O data, boolean notifyCallback) throws IOException {
         CO result = selector.selectSouthOutput(data).adaptOutput(data);
-        if (null != callback && notifyCallback) {
+        if (null != callback && notifyCallback && checkCache(data)) {
             callback.received(result);
         }
         return result;
+    }
+    
+    /**
+     * Checks the cache if configured. Override with {@code true} if not needed.
+     * 
+     * @param data the data to send
+     * @return {@code true} for sending {@code data}, {@code false} for not sending {@code data}
+     */
+    protected boolean checkCache(Object data) {
+        boolean send = true;
+        if (null != data) {
+            switch (params.getCacheMode()) {
+            case HASH:
+                if (null == cache || cache.hashCode() == data.hashCode()) {
+                    send = true;
+                    cache = data;
+                }
+                break;
+            case EQUALS:
+                if (null == cache || cache.equals(data)) {
+                    send = true;
+                    cache = data;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        return send;
     }
     
     @Override

@@ -297,6 +297,8 @@ public class SpringCloudServiceManager
                     ServiceDescriptor leaderDesc = mgr.getService(leader);
                     if (ensDesc instanceof SpringCloudServiceDescriptor && ensDesc.isTopLevel()
                         && (leaderDesc == null || leaderDesc instanceof SpringCloudServiceDescriptor)) {
+                        LOGGER.info("Changing ensemble leader of {} to {}", ensDesc.getId(), 
+                            leaderDesc == null ? null : leaderDesc.getId());
                         ((SpringCloudServiceDescriptor) ensDesc).setEnsembleLeader(
                             (SpringCloudServiceDescriptor) leaderDesc);
                     }
@@ -312,7 +314,7 @@ public class SpringCloudServiceManager
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
-        LOGGER.info("Starting services " + Arrays.toString(serviceIds));
+        LOGGER.info("Starting services {} (options {})", Arrays.toString(serviceIds), options);
         SpringCloudServiceSetup config = getConfig();
         int step = 0;
         handleFamilyProcesses(serviceIds, true);
@@ -324,6 +326,7 @@ public class SpringCloudServiceManager
             if (null == service) {
                 errors.add("No service for id '" + sId + "' known.");
             } else {
+                LOGGER.info("Preparing {} for start", sId);
                 String[] sIdEns = serviceAndEnsemble(sId, serviceIds);
                 List<String> externalServiceArgs = new ArrayList<>(commonServiceArgs);
                 // adjust spring function definition from application.yml if subset of services shall be started 
@@ -332,7 +335,7 @@ public class SpringCloudServiceManager
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
-                    LOGGER.info("Starting " + sId + " with " + req.getCommandlineArguments());
+                    LOGGER.info("Starting " + sId);
                     String dId = deployer.deploy(req);
                     waitFor(dId, null, s -> null == s || s == DeploymentState.deploying);
                     LOGGER.info("Started " + dId + ": " + deployer.status(dId));

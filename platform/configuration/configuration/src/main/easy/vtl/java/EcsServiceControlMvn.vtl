@@ -26,6 +26,8 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, springGroup, "spring-boot-starter-web");
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

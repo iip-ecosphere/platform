@@ -1,0 +1,22 @@
+application: TddT22 demonstration application (AI on AXC)
+id: TddT22-AXC
+appId: Hm22App
+version: 0.1.0
+description: AI service on AXC, rest on server
+artifact: file:///services/DemonstrationAppHM22-0.1.0-SNAPSHOT-bin.jar 
+parallelize: false
+onUndeployRemoveArtifact: true
+ensembles:
+  PlcNextOpcConn: CamSource
+assignments:
+  - resource: a6C4B90180204
+    services:
+      - MdzhAasConn
+      - AppAas
+      - ActionDecider
+      - CamSource
+      - PlcNextOpcConn
+  - resource: A8741D0D23ED
+    services:
+      - myKiFamily
+

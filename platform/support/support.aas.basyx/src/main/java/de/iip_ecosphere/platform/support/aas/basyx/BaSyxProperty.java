@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -104,6 +105,14 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         public PropertyBuilder setValue(Type type, Object value) {
             setType(type);
             return setValue(value);
+        }
+        
+        @Override
+        public PropertyBuilder setDescription(LangString... description) {
+            for (LangString d: description) {
+                property.getDescription().add(Tools.translate(d));
+            }
+            return this;
         }
 
         @Override

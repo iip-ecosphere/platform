@@ -33,7 +33,6 @@ import com.rabbitmq.client.DeliverCallback;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.AMQP.Queue;
 
-import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
@@ -143,11 +142,9 @@ public class AmqpClient {
                     factory.setUsername(config.getUser());
                     factory.setPassword(config.getPassword());
                 }
-                if (null != config.getKeystore()) {
+                if (config.useTls()) {
                     try {                
-                        factory.useSslProtocol(SslUtils.createTlsContext(config.getKeystore(), 
-                            AbstractTransportConnector.getKeystorePassword(config.getKeyPassword()), 
-                            config.getKeyAlias()));
+                        factory.useSslProtocol(config.createTlsContext());
                     } catch (IOException e) {
                         LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
                     }

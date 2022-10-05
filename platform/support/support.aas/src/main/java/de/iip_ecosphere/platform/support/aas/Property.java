@@ -50,6 +50,14 @@ public interface Property extends Element, DataElement {
         public SubmodelElementContainerBuilder getParentBuilder();
         
         /**
+         * Sets the description in terms of language strings.
+         * 
+         * @param description the description
+         * @return <b>this</b>
+         */
+        public PropertyBuilder setDescription(LangString... description);
+        
+        /**
          * Sets the type of the property (seems to be optional).
          * 
          * @param type the type

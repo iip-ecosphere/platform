@@ -9,7 +9,7 @@ REM run this script
 REM goto https://oss.sonatype.org/#welcome, staging repositories, deiip-ecosphere...*, close for check/deploy
 
 setlocal ENABLEDELAYEDEXPANSION
-SET VERSION=0.3.0
+SET VERSION=0.4.0
 SET TARGET=https://oss.sonatype.org/service/local/staging/deploy/maven2
 SET REPO=ossrh-iip
 SET DEPLOYCMD=mvn gpg:sign-and-deploy-file -Durl=%TARGET% -DrepositoryId=%REPO%

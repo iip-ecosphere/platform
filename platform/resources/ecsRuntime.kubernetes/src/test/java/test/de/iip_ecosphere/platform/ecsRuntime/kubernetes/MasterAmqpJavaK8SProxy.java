@@ -152,7 +152,9 @@ public class MasterAmqpJavaK8SProxy {
                 
                 @Override
                 public void configure(TransportParameterBuilder builder) {
-                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                    builder.setAuthenticationKey("amqp");
+                    builder.setKeystoreKey("amqpKeyStore");
+//                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
                 }
             };
         } else {
@@ -211,7 +213,9 @@ public class MasterAmqpJavaK8SProxy {
                 
                 @Override
                 public void configure(TransportParameterBuilder builder) {
-                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
+                    builder.setAuthenticationKey("amqp");
+                    builder.setKeystoreKey("amqpKeyStore");
+//                    builder.setKeystore(new File(secCfg, "keystore.jks"), TestQpidServer.KEYSTORE_PASSWORD);
                 }
             };
         } else {

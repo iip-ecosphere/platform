@@ -71,8 +71,8 @@ public class PlatformInstantiator {
          * 
          * @param setup the setup instance
          */
-        protected void configure(ConfigurationSetup setup) {
-            EasySetup easySetup = setup.getEasySetup();
+        public void configure(ConfigurationSetup setup) {
+            EasySetup easySetup = setup.getEasyProducer();
             easySetup.setIvmlModelName(ivmlModelName);
             if (null != modelFolder) {
                 easySetup.setIvmlConfigFolder(modelFolder);
@@ -107,7 +107,7 @@ public class PlatformInstantiator {
          * 
          * @return the descriptor
          */
-        protected ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+        public ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
             return new ConfigurationLifecycleDescriptor();
         }
         
@@ -169,7 +169,7 @@ public class PlatformInstantiator {
             configurer.handleExecutionException(e);
         } finally {
             lcd.shutdown();
-            setup.getEasySetup().reset();
+            setup.getEasyProducer().reset();
         }
     }
     

@@ -10,7 +10,6 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.transport;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.Assert;
@@ -182,24 +181,6 @@ public class AbstractTransportConnectorTest {
             Assert.assertNull(e);
             return false;
         }));
-    }
-    
-    /**
-     * Tests {@link AbstractTransportConnector#getKeystorePassword}.
-     */
-    @Test
-    public void testGetKeystorePassword() {
-        TransportParameter p = TransportParameter.TransportParameterBuilder.newBuilder("", 0)
-            .setKeystore(new File("."), "amqp")
-            .build();
-        String pwd = AbstractTransportConnector.getKeystorePassword(p);
-        Assert.assertNotNull(pwd);
-        Assert.assertTrue(!"amqp".equals(pwd));
-
-        // fallback
-        pwd = AbstractTransportConnector.getKeystorePassword("xyz");
-        Assert.assertNotNull(pwd);
-        Assert.assertTrue("xyz".equals(pwd));
     }
     
 }

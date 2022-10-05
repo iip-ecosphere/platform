@@ -2,6 +2,7 @@ project Services {
 
    import MetaConcepts;
    import Devices;
+   import DevicePart*;
    import Resources;
    import Transport;
    import Nameplate;
@@ -58,7 +59,7 @@ project Services {
    ServiceProtocol serviceProtocol = ServiceProtocolAMQP {};
    
    // might be too strict, but its ok for now
-   //serviceProtocol.type == transportProtocol.type;
+   serviceProtocol.type == transportProtocol.type;
    
    isDefined(serviceProtocol);
 
@@ -116,6 +117,9 @@ project Services {
        Boolean forward = true;
    }
    
+   def Boolean isFlatDataType(IOType type) = 
+        isFlatDataType(type, type);
+   
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
    enum TraceKind {NONE, TRACE, LOG, SYSOUT};
@@ -126,7 +130,7 @@ project Services {
    abstract compound ServiceBase refines CDataComponent {
        Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
        Id id; // forward declaration
-       NonEmptyString name; // forward declaration
+       NonEmptyNameString name; // forward declaration
        ServiceKind kind;
        Boolean asynchronous = true;
        sequenceOf(IOType) input;
@@ -136,17 +140,20 @@ project Services {
        refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
        Boolean monitorRcvCount = true;
        Boolean monitorSentCount = true;
+       Boolean monitorProcessingTime = true;
        TraceKind traceRcv = TraceKind::NONE;
        TraceKind traceSent = TraceKind::NONE;
        setOf(refTo(Dependency)) dependencies = {};
        NameplateInfo nameplateInfo;
 
-       kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
-       kind == ServiceKind.SINK_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0;
-       kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0 and isDefined(output) and fwdTypes(output).size() > 0;
+       Constraint sourceTypesOk = kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
+       Constraint sinkTypesOk = kind == ServiceKind.SINK_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0;
+       Constraint transTypesOk = kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0 and isDefined(output) and fwdTypes(output).size() > 0;
        Constraint syncEqualIO = not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and fwdTypes(input).size() == fwdTypes(output).size();
    }
-   
+
+   Constraint serviceIdsUnique = allInstances(ServiceBase)->isUnique(s|s.id);
+   Constraint serviceNamesUnique = allInstances(ServiceBase)->isUnique(s|s.name);
    def sequenceOf(IOType) fwdTypes(sequenceOf(IOType) types) = types->select(t|t.forward);
    def sequenceOf(IOType) bwdTypes(sequenceOf(IOType) types) = types->select(t|not(t.forward));
    
@@ -170,7 +177,7 @@ project Services {
        isDefined(class); // must be defined, not necessarily with a value
        isDefined(artifact); // must be defined, not necessarily with a value
        
-       JavaVersion javaVersion; // minimum requirement, todo remove
+       JavaVersion javaVersion; // minimum requirement, todo remove and to be unified with Java System dependency
    }
    
    // ------------------------------- python (integrated) services -----------------
@@ -186,61 +193,6 @@ project Services {
        String servicesPackageName = null; // use the default, helps in testing/mocking
        //dependency refinement removed -> system dependencies, use VIL dynamic dispatch 
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
-   }
-   
-   // ------------------------------- integrated KODEX service (-> own project, VIL?) -----------------------
-   
-   // initial, unclear, input missing
-   // https://heykodex.com/docs/actions/pseudonymization
-   enum KodexAction {
-       PseudonymizeMerengue, PseudonymizeHmac, PseudonymizeStructured
-   };
-   
-   // applies KodexAction to field
-   compound KodexFieldAction {
-       refTo(Field) field;
-       KodexAction action;
-       // initial, not nice
-       String type = ""; // for Structured
-       String format = ""; // for Structured
-       Boolean preservePrefixes = false; // for Structured
-       Integer typeIntMin = 0; // for Structured
-       Integer typeIntMax = 0; // for Structured
-   }
-   
-   // preliminary, own module as kind of "extension"?
-   compound KodexService refines CompleteService {
-       setOf(KodexFieldAction) actions;
-       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion ver = "0.7.0";
-       String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
-       NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
-           manufacturer = refBy(manufacturer_kiprotect)
-       };       // asynchronous true
-       // deployable may influcence integration type
-       // integration type: CMD, REST, CENTRAL
-       // TODO constraint all action fields must match input/output fieldsM actions must be defined
-       // TODO #input=#output -> _kip
-       // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
-   }
-   
-   // ------------------------------- integrated RapidMiner RTSA service (-> own project, VIL?) -----------------------
-   
-   // preliminary, own module as kind of "extension"?
-   compound RtsaService refines CompleteService {
-       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion rtsaVer = "0.14.5";
-       // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
-       String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
-       setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
-       NonEmptyString path;
-       NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "RTSA AI service@en",
-           manufacturer = refBy(manufacturer_rapidminer)
-       };
-       asynchronous == true; // always
-       // TODO constraint: flat input/output, not hierarchical
    }
    
    // ------------------------ families -----------------
@@ -262,18 +214,17 @@ project Services {
         family.input->exists(t|t.type == selector.type) or family.output->exists(t|t.type == selector.type);
    
    compound ServiceFamily refines ServiceBase, CFamily {
-        String description = ""; // TODO Constraint: must be configured
+        String description = "";
         setOf(refTo(Service)) members; // refinement
         Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
         FamilyMemberSelector selector;
-        kind == members.asSequence().first().kind; // propagate
-        // TODO interface check
-        // members must be same, synch or async; same deployable
-        // same kind
-        // same parameter
-        // requires??
-        selector <> null implies selectorTypeOk(selector, self);
-        members->forAll(m|m.asynchronous = self.asynchronous);
+        Constraint familyKind = kind == members.asSequence().first().kind; // propagate
+        Constraint familySelectorOk = selector <> null implies selectorTypeOk(selector, self);
+        Constraint familyAllSync = members->forAll(m|m.asynchronous = self.asynchronous);
+        Constraint familyAllDeployable = members->collect(m|m.deployable).toSet().size() < 2;
+        Constraint familyParameterOk = members->forAll(m|m.parameters = self.parameters);
+        Constraint familyInputOk = members->forAll(m|m.input = self.input);
+        Constraint familyOutputOk = members->forAll(m|m.output = self.output);
    }
    
 }

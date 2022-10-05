@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="services" default="maven" basedir=".">
+<project name="semanticId.eclass" default="maven" basedir=".">
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-services" pomFile="pom.xml" jarFolder="target" artifactPattern="services-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-services" pomFile="pom.xml" jarFolder="target" artifactPattern="support.semanticId.eclass-*.*.*.jar" />
 	</target>
 </project>

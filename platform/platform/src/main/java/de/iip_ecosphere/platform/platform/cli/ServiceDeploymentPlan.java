@@ -159,6 +159,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private boolean parallelize = false;
     private boolean onUndeployRemoveArtifact = true;
     private Map<String, String> ensembles = new HashMap<>();
+    private boolean disabled = false;
 
     /**
      * Returns the name of the application.
@@ -221,6 +222,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public boolean isParallelize() {
         return parallelize;
+    }
+
+    /**
+     * Returns whether the plan is disabled in the sense that it shall not be shown on an UI.
+     * 
+     * @return {@code true} for disabled, {@code false} else
+     */
+    public boolean isDisabled() {
+        return disabled;
     }
     
     /**
@@ -338,6 +348,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public void setParallelize(boolean parallelize) {
         this.parallelize = parallelize;
+    }
+
+    /**
+     * Changes whether the plan shall be considered disabled (on UI). [required by SnakeYaml]
+     * 
+     * @param disabled {@code true} for disabled, {@code false} else
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
     /**

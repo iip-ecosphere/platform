@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
  <artifactId>support.aas</artifactId>
@@ -8,7 +8,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.4.0-SNAPSHOT</version>
+     <version>0.5.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -37,4 +37,21 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <testResources>
+        <testResource>
+            <!-- transport-tests is intended as basis for other tests - dangerous - may lead to inclusion
+                of test identity store even in apps -->
+            <directory>src/test/resources</directory>
+            <excludes>
+                <exclude>identityStore.yml</exclude>
+                <exclude>keystore.jks</exclude>
+            </excludes>
+            <filtering>false</filtering>
+        </testResource>
+    </testResources>
+ </build>
+
+
 </project>

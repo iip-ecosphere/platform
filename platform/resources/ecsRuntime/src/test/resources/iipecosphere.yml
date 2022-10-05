@@ -1,8 +1,7 @@
 transport:
     host: localhost
     port: 8883
-    password: pwd
-    user: user
+    authenticationKey: amqp
 netMgr:
     lowPort: 1025
     highPort: 65535

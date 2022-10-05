@@ -1,25 +1,43 @@
 # IIP-Ecosphere platform: Releases
 
-### Next release (fall 2022):
+### At the horizon (Spring 2023):
+
+Planned:
+* Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
+
+### Next release (Winter 2022):
+
 Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
-* More required model constraints [#52](https://github.com/iip-ecosphere/platform/issues/64)
-* Component upgrades: Spring [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
-
-### Next release (August 2022, TddT'22):
+* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
+* Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
+* Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
+* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
+* UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
-* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
-* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
-* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
-* Device specific measurement plugins [#51](https://github.com/iip-ecosphere/platform/issues/51) controlled via configuration model [#64](https://github.com/iip-ecosphere/platform/issues/64)
+* Improve configuration mode, e.g., constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
-* Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
-* Platform component heartbeat: [#62](https://github.com/iip-ecosphere/platform/issues/62)
-* UI progress reporting: [#70](https://github.com/iip-ecosphere/platform/issues/70)
-* UI server improvements: [#73](https://github.com/iip-ecosphere/platform/issues/73)
-* Increasing number of semanticIDs in platform AAS, along with [#63](https://github.com/iip-ecosphere/platform/issues/63) and extensible semanticId resolution [#68](https://github.com/iip-ecosphere/platform/issues/68) as well as use in UI
+* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
+* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+
+New features:
+* [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
+* [#64](https://github.com/iip-ecosphere/platform/issues/64): Device specific measurement plugins controlled via configuration model 
+* [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
+* [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
+* [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
+* [#74](https://github.com/iip-ecosphere/platform/issues/74): Specify keystore via identityStore
+* Ad-hoc device connectivity via device AAS (initial)
+* [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
+
+Improvements:
+* [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
+* [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
+
+### Version 0.4.0 (2022/09/02, TddT'22):
 
 New features:
 * Allowing to change service ensembles on demand via deployment plans.
@@ -30,8 +48,12 @@ New features:
 * [#48](https://github.com/iip-ecosphere/platform/issues/48): Start of a platform-integrated library with basic data processing functionalities (based on the HM'22 demonstrator)
 * [#32](https://github.com/iip-ecosphere/platform/issues/32): Take over functionality from HM'22 example into platform, here `PythonSupport` (now `service.environment` `ProcessSupport`).
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Config model provides software information about devices to steer container creation.
-* [#77](https://github.com/iip-ecosphere/platform/issues/77): Initial semantic ID resolver based on ECLASS catalogue.
+* [#68](https://github.com/iip-ecosphere/platform/issues/68): Increasing number of semanticIDs in platform AAS and extensible semanticId resolution 
+* [#77](https://github.com/iip-ecosphere/platform/issues/77): Semantic ID resolver based on ECLASS catalogue web service.
 * Ability to mock connectors in applications for testing. Data to be provided to the application is loaded from connector-specific JSON file.
+* Initial Java-side (optional) time monitoring of service execution.
+* Explicit control of management port assignment in Spring Service execution to mitigate re-deployment limitations.
+* HM'22/TddT'22 source code as example [#83](https://github.com/iip-ecosphere/platform/issues/83)
 
 Improvements:
 * [#30](https://github.com/iip-ecosphere/platform/issues/30): Redirect Python stdout in service environment console mode to allow for `print` in service without affecting console communication.
@@ -58,6 +80,7 @@ Improvements:
 * Improvements of service execution: [#50](https://github.com/iip-ecosphere/platform/issues/50)
 * Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
 * [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
+* [#73](https://github.com/iip-ecosphere/platform/issues/73): UI server improvements
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

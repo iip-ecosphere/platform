@@ -12,33 +12,24 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
-import de.iip_ecosphere.platform.ecsRuntime.NameplateSetup;
-import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.ecsRuntime.Monitor;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Registry;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
+import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
@@ -99,43 +90,26 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
         if (null == aasAddress) {
             String id = getIdShort();
             String urn = getURN();
-
-            AasFactory factory = AasFactory.getInstance();
             Aas aas = null;
+
             try {
-                aas = AasPartRegistry.retrieveAas(urn);
+                NameplateSetup nSetup = NameplateSetup.obtainNameplateSetup(); 
+                aas = nSetup.createAas(urn, id, ab -> {
+                    SubmodelBuilder smb = ab.createSubmodelBuilder("metrics", null);
+                    MetricsAasConstructor.addProviderMetricsToAasSubmodel(smb, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
+                        Id.getDeviceId(), EcsFactory.getSetup().getTransport());
+                    smb.build();
+                });
             } catch (IOException e) {
-                // not there, ok
-                try {
-                    NameplateSetup nSetup = obtainNameplateSetup(); 
-                    AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                    TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(null);
-                    GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-                        nSetup.getManufacturerName(), 
-                        LangString.create(nSetup.getManufacturerProductDesignation()), "", "");
-                    PlatformAas.createAddress(giBuilder, nSetup.getAddress()); // inofficial, not in Generic Frame
-                    AasUtils.resolveImage(nSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-                        (n, r, m) -> giBuilder.addProductImageFile(n, r, m));
-                    AasUtils.resolveImage(nSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
-                        (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
-                    giBuilder.build();
-                    final GregorianCalendar now = new GregorianCalendar();
-                    XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
-                    FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(cal);
-                    fiBuilder.build();
-                    tdBuilder.createTechnicalPropertiesBuilder().build();
-                    tdBuilder.createProductClassificationsBuilder().build();
-                    tdBuilder.build();
-                    aas = aasBuilder.build();
-                    AasPartRegistry.remoteDeploy(CollectionUtils.addAll(new ArrayList<Aas>(), aas));
-                } catch (IOException | DatatypeConfigurationException e1) {
-                    LoggerFactory.getLogger(getClass()).error("Creating nameplate AAS: {}", e.getMessage());
-                }
+                LoggerFactory.getLogger(getClass()).error("Device AAS cannot be createed: : {}", e.getMessage());
             }
+
             if (null != aas) {
                 try {
+                    AasFactory factory = AasFactory.getInstance();
                     Registry reg = factory.obtainRegistry(AasPartRegistry.getSetup().getRegistryEndpoint());
                     aasAddress = reg.getEndpoint(aas);
+                    LoggerFactory.getLogger(getClass()).info("Device AAS address for {}/{}: {}", id, urn, aasAddress);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Obtaining factory/endpoint: {}", e.getMessage());
                 }

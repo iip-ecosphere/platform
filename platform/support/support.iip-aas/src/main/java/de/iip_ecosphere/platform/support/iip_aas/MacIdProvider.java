@@ -24,12 +24,26 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
- * A MAC-based ID provider.
+ * A MAC-based device ID provider.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class MacIdProvider implements IdProvider {
 
+    /**
+     * Implements the provider descriptor.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MacIdProviderDescriptor implements IdProviderDescriptor {
+
+        @Override
+        public IdProvider createProvider() {
+            return new MacIdProvider();
+        }
+        
+    }
+    
     @Override
     public String provideId() {
         List<String> macAddresses = new ArrayList<String>();

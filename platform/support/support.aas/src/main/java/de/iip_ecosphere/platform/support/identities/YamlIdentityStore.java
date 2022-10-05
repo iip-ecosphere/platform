@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +64,7 @@ public class YamlIdentityStore extends IdentityStore {
      */
     public YamlIdentityStore() {
         data = YamlIdentityFile.load(resolve("identityStore.yml")); // can cope with null
+        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore {}", data.getName());
     }
     
     /**
@@ -96,16 +98,16 @@ public class YamlIdentityStore extends IdentityStore {
                     source = f.getAbsolutePath();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(YamlIdentityFile.class)
-                        .info("Cannot load identityStore.yml: {}", e.getMessage());
+                        .info("Cannot load {}: {}", resource, e.getMessage());
                 }
             } else {
                 in = null;
             }
         }
         if (null != in) {
-            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading identityStore.yml from {}", source);
+            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading {} from {}", resource, source);
         } else {
-            LoggerFactory.getLogger(YamlIdentityFile.class).warn("identityStore.yml not found!");
+            LoggerFactory.getLogger(YamlIdentityFile.class).warn("{} not found!", resource);
         }
         return in;
     }
@@ -143,8 +145,8 @@ public class YamlIdentityStore extends IdentityStore {
         IdentityInformation info = resolve(identity, fallback);
         if (null == info) {
             LoggerFactory.getLogger(getClass()).warn(
-                "No identity information found for {} (with fallbacks {})", 
-                    identity, fallback);
+                "No identity information found for {} in store {} (with fallbacks {})", 
+                    identity, data.getName(), fallback);
         }
         return info;
     }
@@ -178,54 +180,110 @@ public class YamlIdentityStore extends IdentityStore {
             result = builder.build();
         } else {
             LoggerFactory.getLogger(getClass()).warn(
-                "No identity information found for {} (with fallbacks {}). Using anonymous token: {}", 
-                identity, fallback, defltAnonymous);
+                "No identity information found for {} (with fallbacks {}) in store {}. Using anonymous token: {}", 
+                identity, fallback, data.getName(), defltAnonymous);
         }
+        return result;
+    }
+    
+    @Override
+    public InputStream getKeystoreAsStream(String identity, String... fallback) {
+        InputStream result = null;
+        IdentityInformation info = resolveForKeystore(identity, fallback);
+        if (isOkForKeystore(info)) {
+            try {
+                URI uri = new URI(info.getFile());
+                File f = UriResolver.resolveToFile(uri, null);
+                if (null != f && f.exists()) {
+                    result = new FileInputStream(f);
+                }
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                // ignore, we just figure out whether it could be an URI
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Resolving key file {} failed: {}. Falling back to resource resolution.", 
+                        info.getFile(), e.getMessage());
+            }
+            if (null == result) {
+                result = resolve(info.getFile());
+            }
+        } 
         return result;
     }
 
     @Override
     public KeyStore getKeystoreFile(String identity, String... fallback) throws IOException {
         KeyStore result = null;
+        IdentityInformation info = resolveForKeystore(identity, fallback);
+        if (isOkForKeystore(info)) {
+            try {
+                InputStream stream = getKeystoreAsStream(identity, fallback);
+                String keystoreType = SslUtils.getKeystoreType(info.getFile());
+                result = KeyStore.getInstance(keystoreType);
+                result.load(stream, info.getTokenData().toCharArray());
+                stream.close();
+            } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
+                throw new IOException(e);
+            }
+        } 
+        return result;
+    }
+
+    @Override
+    public Key getKeystoreKey(String identity, KeyStore keystore, String alias, String... fallback) throws IOException {
+        Key key = null;
+        IdentityInformation info = resolveForKeystore(identity, fallback);
+        if (isOkForKeystore(info)) {
+            if (null == keystore) {
+                keystore = getKeystoreFile(identity, fallback);
+            }
+            try {
+                key = keystore.getKey(alias, info.getTokenData().toCharArray());
+            } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e) {
+                throw new IOException(e.getMessage());
+            }
+        }
+        return key;
+    }
+
+    /**
+     * Resolves the requested {@link IdentityInformation} for obtaining a keystore and logs if none was found.
+     * 
+     * @param identity the identity (key) to return the information instance for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the identity information or <b>null</b>
+     */
+    private IdentityInformation resolveForKeystore(String identity, String... fallback) {
         IdentityInformation info = resolveWithLogging(identity, fallback);
-        if (null != info) {
-            if (TokenType.USERNAME != info.getType() && null != info.getTokenData()) {
+        if (info != null && !isOkForKeystore(info)) {
+            if (TokenType.USERNAME != info.getType()) {
                 LoggerFactory.getLogger(getClass()).warn(
-                    "Keystore information found for {} (with fallbacks {}), but type is not USERNAME/has no token data",
+                    "Keystore information found for {} (with fallbacks {}), but type is not USERNAME",
+                        identity, fallback);
+            } else if (null == info.getTokenData()) {
+                LoggerFactory.getLogger(getClass()).warn(
+                    "Keystore information found for {} (with fallbacks {}) with type USERNAME but it has no token data",
                         identity, fallback);
             } else if (null == info.getFile()) {
                 LoggerFactory.getLogger(getClass()).warn(
                     "Keystore information found for {} (with fallbacks {}), but no keystore file specified", 
                         identity, fallback);
-            } else {
-                try {
-                    InputStream stream = null;
-                    try {
-                        URI uri = new URI(info.getFile());
-                        File f = UriResolver.resolveToFile(uri, null);
-                        if (null != f && f.exists()) {
-                            stream = new FileInputStream(f);
-                        }
-                    } catch (URISyntaxException | IllegalArgumentException e) {
-                        // ignore, we just figure out whether it could be an URI
-                    } catch (IOException e) {
-                        LoggerFactory.getLogger(getClass()).warn(
-                            "Resolving key file {} failed: {}. Falling back to resource resolution.", 
-                                info.getFile(), e.getMessage());
-                    }
-                    if (null == stream) {
-                        stream = resolve(info.getFile());
-                    }
-                    String keystoreType = SslUtils.getKeystoreType(info.getFile());
-                    result = KeyStore.getInstance(keystoreType);
-                    result.load(stream, info.getTokenData().toCharArray());
-                    stream.close();
-                } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
-                    throw new IOException(e);
-                }
-            }                
-        } 
-        return result;
+            }
+        }
+        return info;
+    }
+    
+    /**
+     * Checks the identity information to load a keystore. To be used after 
+     * {@link #resolveForKeystore(String, String...)}
+     * 
+     * @param info the information
+     * @return {@code true} for ok, {@code false} else
+     */
+    private boolean isOkForKeystore(IdentityInformation info) {
+        return (null != info && TokenType.USERNAME == info.getType() && null != info.getTokenData() 
+            && null != info.getFile());
     }
 
     @Override

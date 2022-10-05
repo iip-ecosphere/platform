@@ -41,19 +41,21 @@ template MavenBasics(Configuration config, FileArtifact target) {
     }
     
     def appendArtifact(XmlElement parent, String artifact, String dfltVersion="", Boolean createDepElt=true) {
+        XmlElement res;
         sequenceOf(String) artList = artifact.split(":");
         if (artList.size() == 2) { // groupId:artifactId
-            appendDependency(parent, artList[0], artList[1], dfltVersion, createDepElt=createDepElt);
+            res = appendDependency(parent, artList[0], artList[1], dfltVersion, createDepElt=createDepElt);
         }
         if (artList.size() == 3) { // groupId:artifactId:version
-            appendDependency(parent, artList[0], artList[1], artList[2], createDepElt=createDepElt);
+            res = appendDependency(parent, artList[0], artList[1], artList[2], createDepElt=createDepElt);
         }
         if (artList.size() == 4) { // groupId:artifactId:type:version
-            appendDependency(parent, artList[0], artList[1], artList[3], artList[2], createDepElt=createDepElt);
+            res = appendDependency(parent, artList[0], artList[1], artList[3], artList[2], createDepElt=createDepElt);
         }
         if (artList.size() == 5) { // groupId:artifactId:type:classifier:version
-            appendDependency(parent, artList[0], artList[1], artList[4], artList[2], createDepElt=createDepElt, classifier=artList[3]);
+            res = appendDependency(parent, artList[0], artList[1], artList[4], artList[2], createDepElt=createDepElt, classifier=artList[3]);
         }
+        res;
     }
     
     // creates the Maven attributes for the project itself. The parent is the <project> node as e.g. returned by createMavenRoot
@@ -127,6 +129,21 @@ template MavenBasics(Configuration config, FileArtifact target) {
 
     def appendGoal(XmlElement execution, String goal) {
         new XmlElement(new XmlElement(execution, "goals"), "goal", goal);
+    }
+    
+    def appendExclusions(XmlElement dep) {
+        new XmlElement(dep, "exclusions");
+    }
+    
+    def appendExclusion(XmlElement excls, String groupId, String artifactId) {
+        XmlElement e = new XmlElement(excls, "exclusion");
+        new XmlElement(e, "groupId", groupId);
+        new XmlElement(e, "artifactId", artifactId);
+        e;
+    }
+    
+    def appendSingleExclusion(XmlElement dep, String groupId, String artifactId) {
+        appendExclusion(appendExclusions(dep), groupId, artifactId);
     }
     
     // ---------------------------------- maven jar plugin ------------------------------------------------------
@@ -405,6 +422,16 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (includeJUnit) {
             appendDependency(parent, "junit", "junit", "4.12", scope="test");
         }
+    }
+    
+    // ---------------------------------------------------------------
+    
+    def addSemanticIdResolverDependencies(XmlElement parent, IIPEcosphere config) {
+        if (isDefined(config.aasSemanticIdResolver) and config.aasSemanticIdResolver <> null) {
+            for (AasSemanticIdResolver p: config.aasSemanticIdResolver) {
+                appendArtifact(parent, p.artifact);
+            }        
+        } // use the default builtin
     }
 
 }

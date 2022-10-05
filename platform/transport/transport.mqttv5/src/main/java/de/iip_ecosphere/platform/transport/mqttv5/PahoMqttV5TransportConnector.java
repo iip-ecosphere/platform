@@ -94,7 +94,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
         this.qos = params.getMqttQoS().value();
         try {
             String broker;
-            if (params.getKeystore() != null) {
+            if (useTls(params)) {
                 broker = "ssl://";
             } else {
                 broker = "tcp://";
@@ -106,11 +106,10 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
             connOpts.setCleanStart(false);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
-            if (null != params.getKeystore()) {
+            if (useTls(params)) {
                 try {
                     connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
-                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                        getKeystorePassword(params), params.getKeyAlias()).getSocketFactory());
+                    connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());
                     tlsEnabled = true;
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 

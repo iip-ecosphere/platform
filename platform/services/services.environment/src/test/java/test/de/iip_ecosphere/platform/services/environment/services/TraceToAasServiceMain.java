@@ -132,9 +132,9 @@ public class TraceToAasServiceMain {
         TransportSetup transSetup = new TransportSetup();
         transSetup.setHost("localhost");
         transSetup.setPort(broker.getPort());
-        transSetup.setUser("user"); // preliminary in here
-        transSetup.setPassword("pwd");
+        transSetup.setAuthenticationKey("amqp"); 
         setup.setTransport(transSetup);
+        Transport.setTransportSetup(() -> setup.getTransport());
     }
     
     /**

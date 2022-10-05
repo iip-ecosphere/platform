@@ -1,0 +1,711 @@
+project ExampleHm22Install {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Boolean flowTest = true; // switch to true for flow testing, changes fqn class names
+    
+    // ------------------------ mocking/testing helper -----------------------------
+
+    def String fqnClassName(String simpleClassName) =
+        if flowTest then 
+          "de.iip_ecosphere.platform.examples.hm22.mock." + simpleClassName
+        else 
+          "de.iip_ecosphere.platform.examples.hm22." + simpleClassName 
+        endif;
+
+    def String pythonServicePackageName() =
+        if flowTest then 
+          "servicesMock"
+        else 
+          "services"
+        endif;
+        
+    def Integer samplingPeriod(Integer period, Integer mocking) = 
+        if flowTest then 
+          mocking
+        else 
+          period
+        endif;
+
+    def String networkAddress(String primary, String mocking) =
+        if flowTest then 
+          mocking
+        else 
+          primary
+        endif;
+        
+    def String appCmdArg(String primary, String mocking) = 
+        if flowTest then 
+          mocking
+        else 
+          primary
+        endif;
+
+    // ------------------------ network addresses -----------------------------
+
+    String platformServer = networkAddress("192.168.2.1", "127.0.0.1"); // 147.172.178.145
+    String carAasServer = networkAddress("192.168.2.1", "127.0.0.1"); // 147.172.178.145
+    String opcUaServer = networkAddress("192.168.2.10", "192.168.2.10");
+    String camIP = networkAddress("192.168.2.21", "127.0.0.1");
+    String robotIP = networkAddress("192.168.2.21", "127.0.0.1");
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = platformServer,
+        serverHost = "localhost" // allow Tomcat to serve all IPs
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = platformServer,
+        serverHost = "localhost", // allow Tomcat to serve all IPs
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        globalHost = platformServer,
+        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+            authenticationKey = "amqp"
+        }
+    };
+    
+    serviceProtocol = ServiceProtocolAMQP {};
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8885,
+        region = "local"
+    };
+    
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{
+        port = 8885    
+    };
+
+    // --------------------- monitoring ---------------------------
+    
+    platformMonitoring = PrometheusPlatformMonitoring {
+        schema = PrometheusSchema::HTTP,
+        host = platformServer,
+        port = 9090,
+        running = false,
+        exporterPort = -1, // ephemeral
+        exporterHost = "127.0.0.1",
+        exporterRunning = false,
+        alertMgrPort = 9091,
+        alertMgrHost = platformServer,
+        alertMgrRunning = false,
+        scrapeInterval = 1000,
+        scrapeTimeout = 1000
+    };
+    
+    // ------------------------- UI -------------------------------
+    
+    managementUi = AngularManagementUI {
+        port = 4200
+    };
+
+    // ------------ data types ------------------
+
+    RecordType PlcOutput = {
+        name = "PlcOutput",
+        path = "Objects/PLCnext/Arp.Plc.Eclr",
+        fields = {
+            Field {
+                name = "HW_StartProcess",
+                type = refBy(BooleanType),
+                optional = true, // yet not there
+                cachingTime = CACHE_NONE 
+            }, Field {
+                name = "HW_SwitchAi",
+                type = refBy(BooleanType),
+                optional = true, // yet not there
+                cachingTime = CACHE_NONE 
+            }, Field {
+                name = "PC_ReadyForRequest",
+                type = refBy(BooleanType), 
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "PC_RobotBusyOperating",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "PC_RobotBusyOperatingAddInfo",
+                type = refBy(ShortType),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+
+    RecordType PlcInput = {
+        name = "PlcInput",
+        path = "Objects/PLCnext/Arp.Plc.Eclr",
+        fields = {
+            Field {
+                // TODO here we require a display name or so "PC_RequestOperation#"
+                name = "PC_RequestOperation",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "PC_StartOperation",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PC_GoToBasePosition",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PC_CarScanResultNegative",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PC_CarScanResultPositive",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PC_QrCodeDetected",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "PC_Quit",
+                type = refBy(BooleanType)
+            }
+        }
+    };
+
+    RecordType MdzhOutput = { 
+        name = "MdzhOutput",
+        path = "ProductData",
+        fields = {
+            Field {
+                name = "ProductId",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "HardwareRevision",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Windows",
+                type = refBy(IntegerType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "TiresColor",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Pattern",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "EngravingText",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Thickness",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Weight",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Length",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+
+    RecordType MdzhInput = {
+        name = "MdzhInput",
+        fields = {
+            // we do not write anything to MDZH
+        }
+    };
+
+    RecordType ImageInput = {
+        name = "ImageInput",
+        fields = {
+            Field {
+                name = "image",
+                type = refBy(StringBase64Type)
+            }, Field {
+                name = "productId",
+                type = refBy(StringType)
+            }, Field {
+                name = "qrCodeDetected",
+                type = refBy(BooleanType)
+            }
+        }
+    };
+
+    RecordType AiResult = {
+        name = "AiResult",
+        fields = {
+            Field {
+                name = "oneWindowConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "twoWindowsConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "threeWindowsConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "productId",
+                type = refBy(StringType)
+            }, Field {
+                name = "wheelColour",
+                type = refBy(StringType)
+            }, Field {
+                name = "engraving",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "engravingConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "scratch",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "scratchConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "image",
+                type = refBy(StringBase64Type)
+            }
+        }
+    };
+
+    RecordType DecisionResult = {
+        name = "DecisionResult",
+        fields = {
+            Field {
+                name = "io",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "ioReason", // 0 = io, 1 = scratch, 2 = win diff, 3 = color diff, 4 = engraving diff, 5 = no scratch, but also no product data
+                type = refBy(IntegerType)
+            }, Field {
+                name = "numWindows",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "numWindowsConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "scratch",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "scratchConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "wheelColour",
+                type = refBy(StringType)
+            }, Field {
+                name = "engraving",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "engravingConfidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "productId",
+                type = refBy(StringType)
+            }, Field {
+                name = "image",
+                type = refBy(StringBase64Type)
+            }
+        }
+    };
+
+    RecordType Command = {
+        name = "Command",
+        fields = {
+            Field {
+                name = "command",
+                type = refBy(StringType)
+            }, Field {
+                name = "stringParam",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    // ------------ individual, reusable services ------------------
+    
+    // TODO sampling period   -> set in connector parameters, connector.useNotifications(false)  
+    OpcUaV1Connector myPlcOpcUaConn = {
+        id = "PlcNextOpcConn",
+        name = "PLCnext OPC connector",
+        description = "",
+        ver = "0.1.0",
+        host = opcUaServer,
+        port = 4840,
+        samplingPeriod = samplingPeriod(500, 5000),
+        mock = flowTest, 
+        security = {
+            keyAlias = "device",
+            keystoreKey = "edgeOpc:keystore",
+            authenticationKey = "edgeOpc:4840",
+            hostNameVerification = false   
+        },
+        
+        input = {{type=refBy(PlcInput)}}, //, forward=false
+        output = {{type=refBy(PlcOutput)}},
+        inInterface = refBy(PlcInput),
+        outInterface = refBy(PlcOutput),
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    AasConnector myMdzhAasConn = {
+        id = "MdzhAasConn",
+        name = "MDZH AAS connector",
+        description = "",
+        ver = "0.1.0",
+        host = carAasServer,
+        idShortSpec = "iri:.*car.*",
+        port = 9989,
+        samplingPeriod = samplingPeriod(10000, 10000),
+        registryHost = carAasServer,
+        registryPort = 9989,
+        registryPath = "registry",
+        mock = flowTest, 
+        
+        input = {{type=refBy(MdzhInput)}},
+        output = {{type=refBy(MdzhOutput)}},
+        inInterface = refBy(MdzhInput), 
+        outInterface = refBy(MdzhOutput),
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service mySourceService = JavaService {
+        id = "CamSource",
+        name = "Cam Image Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'22 Cam input source@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        class = fqnClassName("CamSource"), //"de.iip_ecosphere.platform.examples.hm22.CamSource",
+        artifact = "de.iip-ecosphere.platform:examples.hm22:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(ImageInput)}},
+        input = {{type=refBy(Command), forward=false}},
+        parameter = {
+          StringParameter {
+            name="camIP", 
+            defaultValue=camIP
+          },IntegerParameter {
+            name="camPort", 
+            defaultValue=4242
+          }
+        },
+        dependencies = {refBy(PYTHON39), refBy(NumPy1201), refBy(Pillow), refBy(OpenCVPython45564), refBy(Pyzbar)},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service myPythonAi = PythonService {
+        id = "PythonAi",
+        name = "Python-based AI",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'22 NN AI@en",
+            manufacturer = refBy(manufacturer_l3s)
+        },
+        servicesPackageName = pythonServicePackageName(),
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        artifact = "de.iip-ecosphere.platform:examples.hm22:" + iipVer,
+        dependencies = {refBy(PYTHON39), refBy(ScipPy141), refBy(NumPy1201), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    PythonDependency ScipPy141 = {
+       name = "scipy",
+       version = "1.4.1"
+    };
+
+    PythonDependency NumPy1201 = {
+       name = "numpy",
+       version = "1.20.1"
+    };
+
+    LinuxSystemDependency libzbar = {
+        name = "libzbar0"
+    };
+
+    PythonDependency Pyzbar = {
+       name = "pyzbar",
+       version = "0.1.9",
+       dependencies = {refBy(libzbar)}
+    };
+    
+    // probably this needs a system dependency, don't remember
+    
+    PythonDependency Tflite_Runtime28 = {
+       name = "tflite_runtime",
+       version = "2.8"
+    };
+
+    PythonDependency Pandas135 = {
+       name = "pandas",
+       version = "1.3.5"
+    };
+    
+    PythonDependency Sklearn = {
+       name = "sklearn",
+       version = "0.0"
+    };
+    
+    PythonDependency Pillow = {
+       name = "Pillow",
+       version = "9.1.0"
+    };
+    
+    PythonDependency KreasApplications108 = {
+       name = "Keras-Applications",
+       version = "1.0.8"
+    };
+    
+    PythonDependency Psutil = {
+       name = "psutil",
+       version = "5.9.0"
+    };
+    
+    PythonDependency Glob2 = {
+       name = "glob2",
+       version = "0.7"
+    };
+    
+    PythonDependency OpenCVPython45564 = {
+       name = "opencv-python",
+       version = "4.5.5.64"
+    };
+    
+    // incomplete
+    
+    Service myRtsaService = RtsaService {
+        id = "myRtsa",
+        name = "myRtsa example",
+        description = "RapidMiner AI",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        path = "iip_basic/score_v1",
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    ServiceFamily myKiServiceFamily = ServiceFamily {
+        members = {refBy(myPythonAi), refBy(myRtsaService)},
+        selector = ServiceSelectorBasedFamilyMemberSelector{
+            type=refBy(Command), 
+            artifact="de.iip-ecosphere.platform:examples.hm22:" + iipVer,
+            class="de.iip_ecosphere.platform.examples.hm22.AiServiceSelector"},
+        id = "myKiFamily",
+        name = "KI family example",
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'22 AI service family@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        description = "",
+        asynchronous = true,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    LinuxCommandBasedSystemDependency rosNoeticNinjemysDependency = {
+        installCommands = {
+            "sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main\" > /etc/apt/sources.list.d/ros-latest.list'",
+            "sudo apt install curl",
+            "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -",
+            "sudo apt update",
+            "sudo apt install ros-noetic-ros-base"},
+        bashSetups = {
+            "source /opt/ros/noetic/setup.bash"}
+    };
+    
+    Service myDeciderService = JavaService {
+        id = "ActionDecider",
+        name = "ActionDecider",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true, // due to I/O type/entry difference 
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'22 AI decider@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        dependencies = {refBy(rosNoeticNinjemysDependency)},
+        class = fqnClassName("ActionDecider"),
+        artifact = "de.iip-ecosphere.platform:examples.hm22:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(AiResult)}, {type=refBy(PlcOutput)}, {type=refBy(MdzhOutput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(DecisionResult)}, {type=refBy(Command), forward=false}}, //, {type=refBy(PlcInput), forward=false}
+        dependencies = {refBy(PYTHON39)}, // for fallback robot control
+        parameter = {
+          StringParameter {
+            name="robotIP", 
+            defaultValue=robotIP
+          }, BooleanParameter {
+            name="usePlc", 
+            defaultValue=false
+          }
+        },
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    Service myReceiverService = JavaService {
+        id = "AppAas",
+        name = "AppAas",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'22 App Nameplate@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        //class = fqnClassName("AppAas"), // for now for testing
+        class = "de.iip_ecosphere.platform.examples.hm22.mock.AppAas",
+        artifact = "de.iip-ecosphere.platform:examples.hm22:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(DecisionResult)}},
+        output = {{type=refBy(Command), forward=false}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "Hm22App",
+        name = "Demonstration App HM22",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)},
+        cmdArg = appCmdArg("", "-Diip.app.hm22.mock.callRobot=false")
+    };
+    
+    ServiceMesh myMesh = {
+        description = "HM22 demo mesh",
+        sources = {refBy(myImgSource), refBy(myPlcOpc), refBy(myMdzhAas)}
+    };
+    
+    MeshSource myPlcOpc = {
+       impl = refBy(myPlcOpcUaConn),
+       next = {refBy(myPlcOpcUaConnMyDecider)}
+    };
+
+    MeshConnector myPlcOpcUaConnMyDecider = {
+        name = "OPC Source->Decider",
+        next = refBy(myDecider)
+    };
+    
+    MeshSource myMdzhAas = {
+       impl = refBy(myMdzhAasConn),
+       next = {refBy(myMdyzAasConnMyDecider)}
+    };
+    
+    MeshConnector myMdyzAasConnMyDecider = {
+        name = "MDZH AAS->Decider",
+        next = refBy(myDecider)
+    };
+    
+    MeshSource myImgSource = {
+       impl = refBy(mySourceService),
+       next = {refBy(myConnMySourceMyAi)},
+       ensemble = refBy(myPlcOpc)
+    };
+
+    MeshConnector myConnMySourceMyAi = {
+        name = "Img Source->Ai",
+        next = refBy(myAi)
+    };
+
+    MeshProcessor myAi = {
+        impl = refBy(myKiServiceFamily),
+        next = {refBy(myConnMyAiMyDecider)}
+    };
+
+    MeshConnector myConnMyAiMyDecider = {
+        name = "Ai->Decider",
+        next = refBy(myDecider)
+    };
+
+    MeshProcessor myDecider = {
+        impl = refBy(myDeciderService),
+        next = {refBy(myConnMyDeciderMyReceiver)}
+    };
+
+    MeshConnector myConnMyDeciderMyReceiver = {
+        name = "Decider->Receiver",
+        next = refBy(myReceiver)
+    };
+    
+    MeshSink myReceiver = {
+       impl = refBy(myReceiverService)
+    };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.ExampleHm22AppInterfaces:" + iipVer; // for testing all-in-one
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring; // preliminary no monitoring
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

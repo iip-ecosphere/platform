@@ -145,7 +145,13 @@ project SerializerConfig1Old {
         inInterface = refBy(myConnMachineIn), 
         outInterface = refBy(myConnMachineOut),
         traceRcv = TraceKind::TRACE,
-        traceSent = TraceKind::TRACE,        
+        traceSent = TraceKind::TRACE,
+        security = {
+            keyAlias = "device",
+            keystoreKey = "myOpc:keystore",
+            authenticationKey = "myOpc:auth",
+            hostNameVerification = false   
+        },
         operations = {
           FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[0]), 
             operation=AddDataTranslationOperation{

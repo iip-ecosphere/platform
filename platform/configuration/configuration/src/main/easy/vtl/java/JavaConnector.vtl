@@ -62,22 +62,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
     }
-
-    def DataType getFirstType(sequenceOf(IOType) types) {
-        if (types.size() > 0) {
-            IOType t = types.get(0);
-            t.type;
-        }    
-    }
-    
-    def getFirstTypeName(sequenceOf(IOType) types) {
-        DataType dt = getFirstType(types);
-        if (dt <> null) {
-            dt.name;
-        } else {
-            "Object";
-        }
-    }
     
     // dispatch basis: return the adapter type for a non-channel connector; monitoring - return the type name for the 
     // monitoring wrapper
@@ -483,7 +467,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         
             @Override
             public void received(${coType} data) {
-                metrics.increaseCounter("service.sent"); 
+                MetricsProvider.increaseCounterBy(serviceSent, 1.0);
                 Transport.send(c -> c.asyncSend("${conn.id}_${coType}", data), "${conn.id}"${connectionIds});
             }
         
@@ -524,6 +508,38 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
         '.setEndpointPath("${url}")'
     }
+    
+    def getCacheMode(Connector conn) {
+        switch (conn.cacheMode) {
+            CacheMode::HASH : "CacheMode.HASH",
+            CacheMode::EQUALS : "CacheMode.EQUALS",
+            default: "CacheMode.NONE"
+        }
+    }
+    
+    def getConnectorPort(Connector conn) {
+        if (isDefined(conn.port)) {
+            conn.port;
+        } else {
+            -1;
+        }
+    }
+
+    def getConnectorHost(Connector conn) {
+        if (isDefined(conn.host)) {
+            "${conn.host}";
+        } else {
+            "";
+        }
+    }
+
+    def getConnectorDeviceServiceKey(Connector conn) {
+        if (isDefined(conn.deviceServiceKey)) {
+            '"${conn.deviceServiceKey}"';
+        } else {
+            "null";
+        }
+    }
 
     def generateConnectorParameter(Connector conn, Application app) {
         '/**
@@ -533,9 +549,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         */
         public static ConnectorParameter createConnectorParameter() {
             ${generateConnectorParamSecurityDecls(conn)|e}
+            String host = "${getConnectorHost(conn)}";
+            int port = ${getConnectorPort(conn)};
+            NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
+            if (null != svc) { // device has precedence
+                host = svc.getHost();
+                port = svc.getPort();
+            }
             return ConnectorParameter.ConnectorParameterBuilder
-                .newBuilder("${conn.host}", ${conn.port})
+                .newBuilder(host, port)
+                .setService(svc)
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
+                .setCacheMode(${getCacheMode(conn)})
                 ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
                 ${generateNotificationInterval(conn)|e}
@@ -558,9 +583,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 identities.put(ConnectorParameter.ANY_ENDPOINT, tok);
                 identities.put("opc.tcp://${conn.host}:${conn.port}", tok);'
             }
-            if (isDefined(sec.keystorePasswordKey) and sec.keystorePasswordKey <> "") {
-                'IdentityToken kTok = IdentityStore.getInstance().getToken("${sec.keystorePasswordKey}", true);' 
-            }
+            if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
+                'String keystoreKey = "${sec.keystoreKey}";'
+            } 
         }
     }
     
@@ -570,9 +595,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
                 '.setIdentities(identities)'
             }
-            if (isDefined(sec.keystore) and sec.keystore <> "") {
-                '.setKeystore(new File("${sec.keystore}"), kTok.getTokenDataAsString())'
-            }
+            if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
+                '.setKeystoreKey(keystoreKey)'
+            } 
             if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
                 '.setKeyAlias("${sec.keyAlias}")'
             }

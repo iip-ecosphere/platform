@@ -79,7 +79,7 @@
     "name" : "default",
     "type" : "JSON",
     "defaultVirtualHostNode" : "true",
-    "virtualHostInitialConfiguration" : "{\"type\":\"BDB\",\"nodeAutoCreationPolicies\":[{\"pattern\":\".*\",\"createdOnPublish\":\"true\",\"createdOnConsume\":\"true\",\"nodeType\":\"queue\"}]}"
+    "virtualHostInitialConfiguration" : "{\"type\":\"Memory\",\"nodeAutoCreationPolicies\":[{\"pattern\":\".*\",\"createdOnPublish\":\"true\",\"createdOnConsume\":\"true\",\"nodeType\":\"queue\"}]}"
   } ],
   "plugins" : [ {
     "type" : "MANAGEMENT-HTTP",

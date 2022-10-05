@@ -92,6 +92,8 @@ This setup uses port `8883` for the AMQP broker, `9001` for the Platform Asset A
 
 ### Installation from scratch
 
+Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
+
 **Prepare the operating system.** For the next steps in this section, we assume a Ubuntu 20.4.1 Linux installed on two machines (assuming 147.172.178.145 as “server” and 147.172.178.143 as “device”, we will adjust the IP addresses in the fourth step). Install unzip, Java JDK  and maven (version 3.6.3), docker (version 20.10.2):
 
      ~$ sudo apt install unzip

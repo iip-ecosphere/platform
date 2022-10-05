@@ -345,9 +345,9 @@ class CliBackend {
         @Override
         public void run() {
             try {
-                println(getMessagePrefix());
+                println(getMessagePrefix(true));
                 client.startService(options, serviceIds);
-                println(getMessagePrefix() + ": Done.");
+                println(getMessagePrefix(false) + ": Done.");
             } catch (ExecutionException e) {
                 exception = e;
             }
@@ -356,10 +356,15 @@ class CliBackend {
         /**
          * Returns a message prefix composed of {@link #resourceId} and {@link #serviceIds}.
          * 
+         * @param withOptions emit also the options
          * @return the prefix
          */
-        private String getMessagePrefix() {
-            return "On " + resourceId + " while starting " + Arrays.toString(serviceIds);
+        private String getMessagePrefix(boolean withOptions) {
+            String result = "On " + resourceId + " starting " + Arrays.toString(serviceIds);
+            if (withOptions) {
+                result += " with options " + options;
+            }
+            return result;
         }
         
         /**
@@ -369,7 +374,7 @@ class CliBackend {
          * @see #getMessagePrefix()
          */
         private String getExceptionMessage() {
-            return null == exception ? null : getMessagePrefix() + ": " + exception.getMessage();
+            return null == exception ? null : getMessagePrefix(false) + ": " + exception.getMessage();
         }
         
     }

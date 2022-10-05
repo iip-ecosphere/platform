@@ -516,17 +516,29 @@ public abstract class AasFactory {
         }
         return creator.createProtocolServerBuilder(port, kstore);
     }
+
+    /**
+     * Returns whether this specific factory/implementation requires a short id fix in addition
+     * to the fixes required by the AAS specification.
+     * 
+     * @param id the id short to test
+     * @return {@code true} if it needs a fix, {@code false} else
+     */
+    protected boolean needsIdFix(String id) {
+        return false;
+    }
     
     /**
      * Modifies a given {@code id} so that it fits the needs of the implementation.
      * 
      * @param id the id
      * @return the fixed id
+     * @see #needsIdFix(String)
      */
-    public String fixId(String id) { // generic code for AAS Spec, may be overridden
+    public String fixId(String id) { // generic code for AAS Spec, may be overridden/extended
         String result = id;
         if (id != null && id.length() > 0) {
-            if (!Character.isAlphabetic(id.charAt(0))) {
+            if (!Character.isAlphabetic(id.charAt(0)) || needsIdFix(id)) {
                 id = "a" + id;
             }
             result = "";

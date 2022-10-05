@@ -19,6 +19,7 @@ import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USE
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
+import de.iip_ecosphere.platform.support.Schema;
 
 /**
  * Describes a secure setup.
@@ -123,7 +125,7 @@ public class SecureSetup extends ServerSetup {
      */
     private void setupServer() throws ExecutionException {
         try {
-            File securityTempDir = new File(System.getProperty("java.io.tmpdir"), "security");
+            securityTempDir = new File(System.getProperty("java.io.tmpdir"), "security");
             FileUtils.deleteDirectory(securityTempDir);
             if (!securityTempDir.exists() && !securityTempDir.mkdirs()) {
                 throw new Exception("unable to create security temp dir: " + securityTempDir);
@@ -144,6 +146,7 @@ public class SecureSetup extends ServerSetup {
             certificateValidator =
                 new DefaultServerCertificateValidator(trustListManager);
     
+            LoggerFactory.getLogger(getClass()).info("Generating RSA KeyPair length 2048");
             httpsKeyPair = SelfSignedCertificateGenerator.generateRsaKeyPair(2048);
     
             SelfSignedHttpsCertificateBuilder httpsCertificateBuilder 
@@ -240,26 +243,44 @@ public class SecureSetup extends ServerSetup {
     public ConnectorParameter getConnectorParameter() {
         String alias = "opcuaTest";
         String pw = "abcd1234";
-        File f = new File(FileUtils.getTempDirectory(), "iip-opcua.jks");
+        // write keystore into maven test classes directory to be loaded via classloader/identity store
+        File f = new File("target/test-classes/iip-opcua.jks");
         f.delete();
         f.deleteOnExit();
         try {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keystore.load(null, pw.toCharArray()); // initialize the keystore
             keystore.setCertificateEntry(alias, clientCertificate);
             FileOutputStream fos = new FileOutputStream(f);
             keystore.store(fos, pw.toCharArray());
             fos.close();
         } catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
             System.out.println("Client keystore exception: " + e.getMessage());
+            e.printStackTrace(System.out);
             f = null;
         }
+        // write temporary identity store pointing to generated keystore in classpath
+        try {
+            PrintStream idStore = new PrintStream(new FileOutputStream("target/test-classes/identityStore.yml"));
+            idStore.println("identities:");
+            idStore.println("  \"mqttKeyStore\":");
+            idStore.println("    type: USERNAME");
+            idStore.println("    tokenData: " + pw);
+            idStore.println("    tokenEncryptionAlgorithm: UTF-8");
+            idStore.println("    file: iip-opcua.jks");
+            idStore.close();
+        } catch (IOException e) {
+            System.out.println("Cannot write temporary identity store: " + e.getMessage());
+        }
+        
         //Map<String, IdentityToken> identityToken = new HashMap<String, IdentityToken>();
-        return ConnectorParameterBuilder.newBuilder("localhost", getHttpsPort())
+        // discovery on https port uses HTTPS schema!!!
+        return ConnectorParameterBuilder.newBuilder("localhost", getHttpsPort(), Schema.HTTPS)
             .setEndpointPath(getPath())
             .setApplicationInformation("urn:eclipse:milo:examples:client", "eclipse milo opc-ua client")
             //.setIdentities(identityToken) // unclear, the example also has none. May require creating IdentityTokens
             .setKeyAlias(alias)
-            .setKeystore(f, pw)
+            .setKeystoreKey("mqttKeyStore")
             .setNotificationInterval(1000) // test waits for that
             .build();
     }

@@ -30,8 +30,9 @@ project SimpleMeshContainer {
     
     transportProtocol = TransportProtocolAMQP {
         port = 8883,
-        user = "user",
-        password = "pwd"
+        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+            authenticationKey = "amqp"
+        }
     };
     
     serviceProtocol = ServiceProtocolAMQP {};

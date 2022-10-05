@@ -1,0 +1,23 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, String appName) {
+	
+	def String transportProtocolEntry(TransportProtocol proto) {
+        "";
+    }
+
+    def String transportProtocolEntry(TransportProtocolAMQP proto) {
+        '  "amqp": 
+             type: USERNAME
+             userName: user
+             tokenData: pwd
+             tokenEncryptionAlgorithm: UTF-8'
+    }
+	
+    def main(IIPEcosphere config, FileArtifact target, String appName) {
+        'name: ${appName}
+        identities:
+        ${transportProtocolEntry(config.transportProtocol)}'
+    }
+	
+}

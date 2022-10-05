@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import org.junit.Assert;
@@ -65,29 +66,23 @@ public class TransportSetupTest {
     @Test
     public void testSetup() throws IOException {
         Setup setup = AbstractSetup.readFromYaml(Setup.class, 
-            TransportSetupTest.class.getResourceAsStream("/test.yml"));
+            ResourceLoader.getResourceAsStream("/test.yml", ResourceLoader.MAVEN_RESOLVER));
         Assert.assertNotNull(setup);
         
         TransportSetup transport = setup.getTransport();
         Assert.assertNotNull(transport);
         Assert.assertEquals("me.de", transport.getHost());
         Assert.assertEquals(1234, transport.getPort());
-        Assert.assertEquals("pass", transport.getPassword());
-        Assert.assertEquals("user", transport.getUser());
         
         TransportSetup copy = transport.copy();
         Assert.assertNotNull(copy);
         Assert.assertEquals("me.de", copy.getHost());
         Assert.assertEquals(1234, copy.getPort());
-        Assert.assertEquals("pass", copy.getPassword());
-        Assert.assertEquals("user", copy.getUser());
         
         TransportParameter param = transport.createParameter();
         Assert.assertNotNull(param);
         Assert.assertEquals("me.de", param.getHost());
         Assert.assertEquals(1234, param.getPort());
-        Assert.assertEquals("pass", param.getPassword());
-        Assert.assertEquals("user", param.getUser());
     }
 
 }

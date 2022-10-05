@@ -1,22 +1,22 @@
 # IIP-Ecosphere platform 
 
-The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
-
+The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts for easy-to-use AI. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
 ## News
 
-* Preparation of platform demonstrator for [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
+* Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
+* Platform release 0.4.0 (2022/09/02)
+* AI-based Code for HM'22/TddT'22 as public platform example/regression test.
+* Successful presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
 * Successful presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
-* Code of both demonstrators shall become available as platform example around/after TddT'22.
-* Platform release 0.3.0 (2022/06/4)
 
 ## Documentation
 
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
-  * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
-  * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
+  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.7047640) [link may be updated some days after platform releases]
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
-  * The IIP-Ecosphere [platform handbook](https://doi.org/10.5281/zenodo.6620882) [link may be updated some days after platform releases]
+  * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
+  * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
@@ -36,10 +36,10 @@ The platform consists of some core and many alternative components. We use a Con
 The following layers and components of the IIP-Ecosphere are available in this platform:
 * Managed [Platform dependencies](https://github.com/iip-ecosphere/platform/tree/main/platform/platformDependencies/README.md) (parent POM)
 * [Support Layer](https://github.com/iip-ecosphere/platform/tree/main/platform/support/README.md) (with links to contained parts)
-    * [Asset Administration Shell (AAS) abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basyx/README.md) with Visitor, communication protocol support and useful recipes for deployment and I/O
+    * [Asset Administration Shell (AAS) abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basyx/README.md) with Visitor, communication protocol support and useful recipes for deployment and I/O. Further, extensible identity management and semantic id resolution.
     * [Default Basyx AAS client abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basxy/README.md) implementation for [Eclipse Basyx](https://www.eclipse.org/basyx/)
     * [Default Basyx AAS server abstraction](https://github.com/iip-ecosphere/platform/tree/main/platform/support.aas.basxy/README.md) implementation for [Eclipse Basyx](https://www.eclipse.org/basyx/)
-    * [AAS support](https://github.com/iip-ecosphere/platform/tree/main/platform/support.iip-aas/README.md) functionality for the IIP-Ecosphere platform
+    * [AAS support](https://github.com/iip-ecosphere/platform/tree/main/platform/support.iip-aas/README.md) functionality for the IIP-Ecosphere platform, including extensible mechanisms for uniform device ids.
 * Transport Layer
     * [Transport component](https://github.com/iip-ecosphere/platform/tree/main/platform/transport/README.md) (with links to contained parts)
          * Transport connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
@@ -75,3 +75,19 @@ The following layers and components of the IIP-Ecosphere are available in this p
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
 ![IIP-Ecosphere](logo.png)
+
+
+
+Powered by (selection of used tools/frameworks)
+
+<a href="https://www.eclipse.org/basyx"><img src="https://www.eclipse.org/basyx/img/basyxlogo.png" alt="BaSyx" width="200"/></a> 
+<a href="https://iot.eclipse.org"><img src="https://iot.eclipse.org/iot-logo-social.png" alt="Eclipse IoT" width="100"/></a> 
+<a href="https://www.docker.com"><img src="https://www.docker.com/wp-content/uploads/2022/05/Docker_Temporary_Image_Google_Blue_1080x1080_v1.png" alt="Docker" width="100"/></a> 
+<a href="https://prometheus.io"><img src="https://prometheus.io/assets/favicons/android-chrome-192x192.png" alt="Prometheus Monitoring" width="100"/></a>
+<br/>
+
+<a href="https://spring.io"><img src="https://spring.io/images/spring-logo-9146a4d3298760c2e7e49595184e1975.svg" alt="Spring Cloud Stream" width="200"/></a> 
+<a href="https://maven.apache.org"><img src="https://maven.apache.org/images/maven-logo-black-on-white.png" alt="Maven" width="200"/></a> 
+<a href="https://sse.uni-hildesheim.de"><img src="https://sse.uni-hildesheim.de/media/_migrated/pics/EASy_Logo_02.png" alt="EASy-Producer" width="100"/></a> 
+
+IIP-Ecosphere would like to thank all utilized technologies and frameworks for the helpful contributions to the Open Source community.

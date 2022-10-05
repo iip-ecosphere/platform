@@ -16,8 +16,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.LifecycleHandler;
+import de.iip_ecosphere.platform.support.iip_aas.HostnameIdProvider;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.IdProvider;
+import de.iip_ecosphere.platform.support.iip_aas.IdProviderDescriptor;
 import test.de.iip_ecosphere.platform.support.LifecycleHandlerTest;
 
 /**
@@ -37,6 +39,25 @@ public class IdTest2 {
         LifecycleHandler.startup(args);
         Assert.assertEquals("a789", Id.getDeviceId());
         Assert.assertNotNull("a789", Id.getDeviceIdAas()); // same as we start with character
+    }
+    
+    /**
+     * Tests {@link HostnameIdProvider}.
+     */
+    @Test
+    public void testHostnameIdProvider() {
+        IdProviderDescriptor desc = new HostnameIdProvider.HostnameIdProviderDescriptor();
+        
+        IdProvider provider = desc.createProvider();
+        Assert.assertNotNull(provider);
+        
+        provider.allowsConsoleOverride(); // does not matter, don't fix to true here
+        String id = provider.provideId();
+        Assert.assertNotNull(id);
+        Assert.assertTrue(id.length() > 0);
+        
+        String id2 = provider.provideId();
+        Assert.assertEquals(id, id2); // shall remain stable
     }
 
 }

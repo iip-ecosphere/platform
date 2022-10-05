@@ -1,39 +1,17 @@
 import JavaBasics;
 import JavaMapping;
 import Basics;
-
-// TODO services, dynamic; similar Kodex
-import Rtsa;
+import MeshBasics;
+import IIPEcosphereBase;
+insert IIPEcospherePart*;
 
 @advice(IIPEcosphere)
 vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
-    // preliminary!!! make it language-generic
-
-    // java packages, turned to paths below
-    String javaDatatypesPackage = "iip.datatypes";
-    String javaSerializersPackage = "iip.serializers";
-    String javaInterfacesPackage = "iip.interfaces";
-    String javaImplPackage = "iip.impl";
-    String javaStubsPackage = "iip.stubs";
-    String javaNodesPackage = "iip.nodes";
-    String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
-    String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
-    String mvnProjectPySrcDir = "$" + "{project.basedir}/src/main/python";
-
-    Path ecsRuntimeRoot = "${target}/ecsRuntime";
-    Path serviceMgrRoot = "${target}/serviceMgr";
-    Path ecsServiceMgrRoot = "${target}/ecsServiceMgr";
-    Path platformRoot = "${target}/platform";
-    Path monitoringRoot = "${target}/monitoring";
-    Path mgtUiRoot = "${target}/mgtUi";
-    Path commonRoot = "${target}/common";
-    Path artifactsRoot = "${target}/artifacts";
-    Path brokerRoot = "${target}/broker";
-    String assemblyRel = "src/main/assembly";
-    String serviceArtifactsRel = "src/main/serviceArtifacts";
+    // Paths now in IIPEcosphereBase
     
     Boolean tests = true;
+    Boolean mvnUpdate = false;
     
     main(Project source, Configuration config, Project target) = {
         generatePlatform(source, config, target); // first for container
@@ -67,7 +45,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
-        setOf(Application) applications = Application.allInstances(); // VTL interference?
+        setOf(Application) applications = Application.allInstances();
         
         setOf(String) javaSerializers = {};
         setOf(String) artifacts = {};
@@ -152,7 +130,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                         }
                     };
                 };
-                elements = elements->sortedBy(n|n.name).toSequence(); // for testing, toSequence() shall not be needed :/
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
                 vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
     
@@ -161,6 +139,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
                 assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
+                identityStoreJsl(resourcesSrc, cfg);
     
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
@@ -172,14 +151,83 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
-                vilTemplateProcessor("AppMvnTest", config, "${target}/test-pom.xml", nodes=elements, appName=appName, appVersion=appVersion, appDescription="Test POM example", tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
-                maven("${appRoot}", true);
+                maven("${appRoot}", mvnUpdate);
 
                 generateServiceContainer(appRoot, config, a, elements);
             }
+            
+            Boolean withTemplate = true; // preliminary
+            if (withTemplate) {
+                appRoot = "${target}/templates/eclipse/impl.${appName}";
+                appRoot.mkdir();
+                javaSrc = "${appRoot}/src/main/java";
+                javaSrc.mkdir();
+                javaTestSrc = "${appRoot}/src/test/java";
+                javaTestSrc.mkdir();
+                pySrc = "${appRoot}/src/main/python";
+                resourcesSrc = "${appRoot}/src/main/resources";
+                resourcesSrc.mkdir();
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
+                testResourcesSrc.mkdir();
+                
+                vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
+
+                setOf(String) assemblies = {}; 
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                sequenceOf(MeshElement) elements = {};
+                for (ServiceMesh n : a.services) {
+                    setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    for (MeshElement no : nodes) {
+                        generateTemplateElements(appRoot, config, no, no.impl, assemblies);
+                        elements.add(no);
+                    }
+                }
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
+                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
+
+                String appVersion = getAppMvnVersion(a);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                identityStoreJsl(testResourcesSrc, cfg);
+                
+                zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
+            }
         };
+    }
+
+    // ------------------------------------------ generating apps: generating template code -----------------------------------
+    
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(String) assemblies) = {
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies) = {
+        // do nothing, everything is here already generically in place
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies) = {
+        if (service.class <> "") {
+            JavaPath jp = service.class;
+            Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
+            p.mkdir();
+            vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
+            if (needsDataUnitJson(no.impl)) {
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
+                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
+            }
+        }
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies) = {
+        String clsName = asTypeName(no.name);
+        vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services");
+        Path assemblyPath = "${appRoot}/src/main/assembly";
+        assemblyPath.mkdir();
+        vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
+        assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
     }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
@@ -277,7 +325,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // initial, depends on container strategies
     generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
-        
+
         if (a.createContainer) {
             
             // Checking if there is any PythonService in app
@@ -289,39 +337,131 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 }
             }
             
-            // Dockerfile
-            if (isPythonService == 0) {
-                // JAVA
+            setOf(EcsDevice) devices = EcsDevice.allInstances();
+            for (EcsDevice d : devices) {
+            
+                if (d.containerType == 1) {
                 
-                Path df = "${appRoot}/../Dockerfile.txt";
-                vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a);
-                df.rename("Dockerfile");
-                            
-            } else {
-                // JAVA & PYTHON
+                    if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");   
+                    } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);
+                        
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                    }
+					
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
+
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../Dockerfile";
+                    String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType); TODO 
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=1);
+                    
+                }
                 
-                Path req = "${appRoot}/../requirements.txt";
-                vilTemplateProcessor("PythonReq", config, req, elements=elements);              
-                
-                Path df = "${appRoot}/../Dockerfile.txt";
-                vilTemplateProcessor("DockerfilePy", config, df, elements=elements, app=a);
-                df.rename("Dockerfile");
+                if (d.containerType == 2) {
+                     if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                     } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
+
+                        Path df = "${appRoot}/../Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
+                        df.rename("Dockerfile");
+                    }
+
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
+
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../Dockerfile";
+                    String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=2);
+				}	
+
+                if (d.containerType == 3) {
+
+                    // Container with ECS
+                    Path df = "${appRoot}/../Dockerfile.txt";
+                    vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
+                    df.rename("ecs.Dockerfile");
+                    
+                    Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=0);
+                    
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../ecs.Dockerfile";
+                    String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
+                    
+                    // Mesh-Info
+                    Path meshInfoEcs = "${appRoot}/../mesh-info-ecs.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=0);
+                    
+                    // Container with ServiceMgr and App
+                    if (isPythonService == 0) {
+                        // JAVA         
+                        Path df = "${appRoot}/../app.Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=3);
+                        df.rename("app.Dockerfile");      
+                    } else {
+                        // JAVA & PYTHON
+                        Path req = "${appRoot}/../requirements.txt";
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
+
+                        Path df2 = "${appRoot}/../app.Dockerfile.txt";
+                        vilTemplateProcessor("Dockerfile_Python", config, df2, elements=elements, app=a, containerType=3);
+                        df2.rename("app.Dockerfile");
+                    }
+                     
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=3);
+                     
+                    // Create image 
+                    Path b2 = "${appRoot}/../";
+                    Path d2 = "${appRoot}/../app.Dockerfile";
+                    String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                    
+                    // Mesh-Info
+                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=3);
+                     
+                }
                 
             }
-            
-            // Wrapper-Skript 
-            Path ws = "${appRoot}/../wrapper_script.sh";
-            vilTemplateProcessor("WrapperScript", config, ws); 
-            
-            // Create image 
-            Path b = "${appRoot}/../";
-            Path d = "${appRoot}/../Dockerfile";
-            String imageId = dockerBuildImage(b, d, "testapp:01");  
-            
-            // Remove image
-            dockerRemoveImage(imageId);
-            
+                
+                
+            /*   
+            // InstalledDependencies
+            Path instDep = "${appRoot}/../installedDependencies.yml";
+            vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
+            */
         }
+        
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
@@ -345,11 +485,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
             vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
                  elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
-            if (not(noDeps)) {
+            /*if (not(noDeps)) {
                 vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
                      elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, 
                      nodes=nodes, serializers=javaSerializers);
-            }
+            }*/
             mbs.add(m);
         }
         if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
@@ -370,30 +510,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         artifacts.add(getArtifact(base)); // connectors are (currently) platform-supplied
     }
 
-    // RTSA (preliminary in here)
-    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        resources.add(rtsaResources()+"|"+rtsaBin(service));
-        resources.add(rtsaResources()+"|"+rtsaInstance(service));
-        artifacts.add(getArtifact(service));
-    }
-    
-    // KODEX (preliminary in here)    
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        IIPEcosphere cfg = config;
-        String serviceFolderName = toFolderName(no.impl.id);
-        String kodexServiceFolderName = "kodex_" + serviceFolderName;
-        Path path = "${appRoot}/${serviceArtifactsRel}";
-        path.mkdir();
-        vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
-        vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
-        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
-        vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
-        bins.add("de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer+"|bin|${mvnProjectBuildDir}/classes|kodex.zip|zip|copy");
-        assemblies.add("${kodexServiceFolderName}|${assemblyRel}/${kodexServiceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|${kodexServiceFolderName}");
-        artifacts.add(getArtifact(service));
-    }
-
-    // Python (preliminary in here); copy integratable sources from the artifact    
     generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
@@ -477,7 +593,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
-        maven("${appRoot}", true);
+        maven("${appRoot}", mvnUpdate);
 
         artifacts.add(cfg.sharedArtifact);
     }
@@ -543,9 +659,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsRuntimeMvn", config, "${ecsRuntimeRoot}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests);
-        maven("${ecsRuntimeRoot}", true);
-        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
+        maven("${ecsRuntimeRoot}", mvnUpdate);
+        generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
             cfg.containerManager.memLimit)), sysd="${target}/iip-ecs");
         
         serviceMgrRoot.mkdir();
@@ -555,9 +674,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         // cfg test requires spring
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
-        maven("${serviceMgrRoot}", true);
-        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "ecs.service", 
+        maven("${serviceMgrRoot}", mvnUpdate);
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
 
         ecsServiceMgrRoot.mkdir();
@@ -568,23 +690,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsServiceControlMvn", config, "${ecsServiceMgrRoot}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests);
-        maven("${ecsServiceMgrRoot}", true);
+        maven("${ecsServiceMgrRoot}", mvnUpdate);
         generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
-        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml", modelName=getName(config));
         vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
-        maven("${platformRoot}", true);
-        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "", withJava8=false,
-            sysd="${target}/iip-platform");
+        maven("${platformRoot}", mvnUpdate);
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
+            withJava8=false, sysd="${target}/iip-platform");
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
 
         // preliminary, as long as BaSyx conflicts with Tomcat
@@ -595,9 +723,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("JavaYamlTest", config, "${monitoringRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.monitoring.MonitoringSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
-        maven("${monitoringRoot}", true);
-        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "", 
+        maven("${monitoringRoot}", mvnUpdate);
+        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
             withJava8=false, sysd="${target}/iip-monitoring");
  
         artifactsRoot.mkdir();
@@ -605,13 +736,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
 
         mgtUiRoot.mkdir();
         vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
-        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service");
+        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service", 
+            requires="iip-platform.service", after="iip-platform.service");
         vilTemplateProcessor("UiAngularLinux", config, "${target}/mgtUi.sh");
         FileArtifact f = "${target}/mgtUi.sh";
         f.setExecutable(false);
         vilTemplateProcessor("UiAngularExpress", config, "${mgtUiRoot}/server.js");
         vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
-        maven("${mgtUiRoot}", true);
+        maven("${mgtUiRoot}", mvnUpdate);
         p = "${mgtUiRoot}/dist/iipes-web/assets/config";
         p.mkdir();
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
@@ -633,7 +765,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         Path c = "${brokerRoot}/src/test";
         c.mkdir();
         vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
-        maven("${brokerRoot}", true);
+        maven("${brokerRoot}", mvnUpdate);
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
@@ -656,38 +788,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
         c = "${c}/extensions";
         c.mkdir();
-        maven("${brokerRoot}", true);
-    }
-    
-    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="", String sysd="") = {
-        vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
-        if (withJava8) {
-            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-        }
-        vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
-        FileArtifact f = "${pathName}.sh";
-        f.setExecutable(false);
-        if (withJava8) {
-            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-            f = "${pathName}8.sh";
-            f.setExecutable(false);
-        }
-        if (pidName.length() > 0) {
-           String sName = pathName;
-           if (sysd <> "") {
-               sName = sysd;
-           }
-           vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, addJavaOpts=addJavaOpts);
-           if (withJava8) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
-           }
-           if (requires.length() > 0) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);
-               if (withJava8) {
-                   vilTemplateProcessor("LinuxSysd", config, "${sName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false, addJavaOpts=addJavaOpts);
-               }
-           }
-        }
+        maven("${brokerRoot}", mvnUpdate);
     }
 
 }

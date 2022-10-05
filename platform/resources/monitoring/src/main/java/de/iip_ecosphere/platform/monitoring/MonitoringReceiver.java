@@ -102,11 +102,11 @@ public abstract class MonitoringReceiver {
         public void received(StatusMessage msg) {
             notifyStatusReceived(msg);
             String id = msg.getDeviceId();
-            if (ActionTypes.REMOVED == msg.getAction() && ComponentTypes.SERVICE != msg.getComponentType()) {
+            if (ActionTypes.REMOVED == msg.getAction() && ComponentTypes.DEVICE == msg.getComponentType()) {
                 Exporter exporter = registry.remove(id);
-                notifyExporterRemoved(exporter);
                 if (null != exporter) {
                     exporter.dispose();
+                    notifyExporterRemoved(exporter);
                 }
             } else {
                 obtainExporter(id).validate();

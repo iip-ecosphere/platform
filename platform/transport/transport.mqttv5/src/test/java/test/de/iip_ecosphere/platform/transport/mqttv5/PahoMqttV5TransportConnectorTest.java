@@ -62,7 +62,8 @@ public class PahoMqttV5TransportConnectorTest {
             
             @Override
             public void configure(TransportParameterBuilder builder) {
-                builder.setKeystore(new File(secCfg, "client-trust-store.jks"), TestHiveMqServer.KEYSTORE_PASSWORD);
+                builder.setKeystoreKey("mqttKeyStore");
+                //builder.setKeystore(new File(secCfg, "client-trust-store.jks"), TestHiveMqServer.KEYSTORE_PASSWORD);
                 builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
             }
         });
