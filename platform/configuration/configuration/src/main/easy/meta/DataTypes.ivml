@@ -76,7 +76,7 @@ project DataTypes {
         true;
 
     def Boolean isFlatDataType(RecordType type) = 
-        type.fields->forAll(f|not(f.isKindOf(RecordType)));
+        type.fields->forAll(Field f|not(f.isKindOf(RecordType)));
 
 
     // defining the basic type; if further ones are added, adjust the basic vtls in the generation

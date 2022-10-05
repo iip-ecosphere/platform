@@ -221,10 +221,10 @@ project Services {
         Constraint familyKind = kind == members.asSequence().first().kind; // propagate
         Constraint familySelectorOk = selector <> null implies selectorTypeOk(selector, self);
         Constraint familyAllSync = members->forAll(m|m.asynchronous = self.asynchronous);
-        Constraint familyAllDeployable = members->forAll(m|m.deployable = self.deployable);
-        Constraint familyParameterOk = members->forAll(m.parameters = self.parameters);
-        Constraint familyInputOk = members->forAll(m.input = self.input);
-        Constraint familyOutputOk = members->forAll(m.output = self.output);
+        Constraint familyAllDeployable = members->collect(m|m.deployable).toSet().size() < 2;
+        Constraint familyParameterOk = members->forAll(m|m.parameters = self.parameters);
+        Constraint familyInputOk = members->forAll(m|m.input = self.input);
+        Constraint familyOutputOk = members->forAll(m|m.output = self.output);
    }
    
 }
