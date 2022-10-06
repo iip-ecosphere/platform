@@ -68,9 +68,9 @@ public class CommentTests {
         for (String s: missing) {
             System.out.println(s);
         }
-        //Assert.assertEquals("There are variables without comment/description in respective .text file for the "
-        //    + "actual locale. For affected variable names to be fixed, please see above.", stat.getMetaVars(), 
-        //    stat.getMetaVarsWithComment());
+        Assert.assertEquals("There are variables without comment/description in respective .text file for the "
+            + "actual locale. For affected variable names to be fixed, please see above.", stat.getMetaVars(), 
+            stat.getMetaVarsWithComment());
     }
 
 }

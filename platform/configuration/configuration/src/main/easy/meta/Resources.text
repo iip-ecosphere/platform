@@ -1,14 +1,12 @@
-Resources::DeviceMgtStorage::accessKey = Access information for the device management storage.
+Resources::DeviceMgtStorage::authenticationKey = Logical name to access authentication information from identity store.
 Resources::DeviceMgtStorage::configStorage = Defines the package store information containing device configurations.
 Resources::DeviceMgtStorage::host = Hostname or IP of the server providing access to the device management storage.
 Resources::DeviceMgtStorage::port = Network port of the server providing access to the device management storage.
 Resources::DeviceMgtStorage::region = Geographical region of the device management storage, in particular if located in a cloud (default "local").
 Resources::DeviceMgtStorage::runtimeStorage = Defines the package store information containing runtime configurations. 
-Resources::DeviceMgtStorage::secretAccessKey = Secret access information for the device management storage.
-Resources::DeviceMgtStorageServer::accessKey = Access information for the device management storage server.
+Resources::DeviceMgtStorageServer::authenticationKey = Logical name to access authentication information from identity store.
 Resources::DeviceMgtStorageServer::path = Hostname or IP of the server providing access to the device management storage server.
 Resources::DeviceMgtStorageServer::port = Network port of the server providing access to the device management storage server.
-Resources::DeviceMgtStorageServer::secretAccessKey = Secret access information for the device management storage server.
 Resources::NoDeviceMgtStorageServer::port = Fixed value for no/ephemeral network port if no device management storage shall be used (default -1).
 Resources::PackageStore::bucket = Bucket name in the storage.
 Resources::PackageStore::packageDescriptor = Descriptor file name containing information on how to load/process the data.

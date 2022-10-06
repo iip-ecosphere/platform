@@ -21,6 +21,7 @@ project Applications {
     }
     
     Constraint appNamesUnique = allInstances(Application)->isUnique(a|a.name);
+    Constraint appIdUnique = allInstances(Application)->isUnique(a|a.id);
     
     compound ServiceMesh {
         String description;
