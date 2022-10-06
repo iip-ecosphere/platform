@@ -1,0 +1,28 @@
+/*
+ * AAS nameplate for KIPROTECT.
+ * Although IIP-Ecosphere partner, factored out for demonstration and due to AGPL license of KODEX (see license 
+ * limitations in platform handbook).
+ */
+project NameplatePartKiprotect {
+
+    import NameplateBase;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Manufacturer manufacturer_kiprotect = {
+        manufacturerName = "KIPROTECT@de",
+        manufacturerLogo = "",
+        address = {
+            department = "KIPROTECT@de",
+            street = "Bismarckstr. 10-12@de",
+            zipCode = "10625@de",
+            cityTown = "Berlin@de"
+        }
+    };
+        
+    // unconditional "constant" freeze
+    freeze {
+      .;
+    };
+    
+}

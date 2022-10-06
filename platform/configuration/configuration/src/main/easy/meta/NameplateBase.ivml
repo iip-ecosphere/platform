@@ -1,0 +1,34 @@
+/*
+ * Simplified AAS nameplate information to construct AAS nameplates for software artifacts.
+ */
+project NameplateBase {
+
+    import DataTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    typedef AasLocalizedString String; // text@lang
+    typedef AasResource String; // URL or local -> resources
+    
+    compound NameplateInfo {
+        AasLocalizedString productImage = ""; // URL or local -> resources
+        AasResource manufacturerProductDesignation = "";
+        refTo(Manufacturer) manufacturer;
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound Manufacturer {
+        AasLocalizedString manufacturerName = "";
+        AasResource manufacturerLogo = ""; // URL or local -> resources
+        ManufacturerAddress address; // ref really needed?
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound ManufacturerAddress {
+        AasLocalizedString department = "";
+        AasLocalizedString street = "";
+        AasLocalizedString zipCode = "";
+        AasLocalizedString cityTown = "";
+    }
+   
+}
