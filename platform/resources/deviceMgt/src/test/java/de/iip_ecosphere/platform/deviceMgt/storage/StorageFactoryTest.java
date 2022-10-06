@@ -42,8 +42,7 @@ public class StorageFactoryTest {
         packageStorageSetup.setRegion("us-west-2");
         packageStorageSetup.setEndpoint("endpoint");
         packageStorageSetup.setBucket("bucket");
-        packageStorageSetup.setAccessKey("access_key");
-        packageStorageSetup.setSecretAccessKey("secret_access_key");
+        packageStorageSetup.setAuthenticationKey("access_key");
         packageStorageSetup.setPackageDescriptor("runtime.yml");
         packageStorageSetup.setPackageFilename("runtime.zip");
         packageStorageSetup.setPrefix("runtimes/");
@@ -53,8 +52,7 @@ public class StorageFactoryTest {
         configsStorageSetup.setEndpoint("endpoint");
         configsStorageSetup.setRegion("us-west-1");
         configsStorageSetup.setBucket("bucket");
-        configsStorageSetup.setAccessKey("access_key");
-        configsStorageSetup.setSecretAccessKey("secret_access_key");
+        configsStorageSetup.setAuthenticationKey("access_key");
         configsStorageSetup.setPackageDescriptor("config.yml");
         configsStorageSetup.setPackageFilename("config.zip");
         configsStorageSetup.setPrefix("configs/");

@@ -21,8 +21,7 @@ public class PackageStorageSetup {
 
     private String endpoint;
     private String region = "";
-    private String accessKey;
-    private String secretAccessKey;
+    private String authenticationKey;
     private String bucket;
     private String prefix;
     private String packageDescriptor;
@@ -91,41 +90,21 @@ public class PackageStorageSetup {
     }
 
     /**
-     * Get the accessKey.
+     * Get the authentication key pointing to the identity store.
      *
-     * @return the accessKey
+     * @return the authentication key
      */
-    public String getAccessKey() {
-        return accessKey;
-    }
-
-
-    /**
-     * Set the accessKey. [required by SnakeYaml]
-     *
-     * @param accessKey the accessKey
-     */
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
+    public String getAuthenticationKey() {
+        return authenticationKey;
     }
 
     /**
-     * Get the secretAccessKey.
+     * Set the authentication key pointing to the identity store. [required by SnakeYaml]
      *
-     * @return the secretAccessKey
+     * @param authenticationKey the authentication key
      */
-    public String getSecretAccessKey() {
-        return secretAccessKey;
-    }
-
-
-    /**
-     * Set the secretAccessKey. [required by SnakeYaml]
-     *
-     * @param secretAccessKey the secretAccessKey
-     */
-    public void setSecretAccessKey(String secretAccessKey) {
-        this.secretAccessKey = secretAccessKey;
+    public void setAuthenticationKey(String authenticationKey) {
+        this.authenticationKey = authenticationKey;
     }
 
     /**

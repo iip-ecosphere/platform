@@ -23,9 +23,8 @@ public class StorageServerSetup {
     
     private int port = -1;
     private File path;
-    private String accessKey;
-    private String secretAccessKey;
-
+    private String authenticationKey;
+    
     /**
      * Get the server port.
      *
@@ -63,40 +62,21 @@ public class StorageServerSetup {
     }
 
     /**
-     * Get the accessKey.
+     * Get the authentication key pointing to the identity store.
      *
-     * @return the accessKey
+     * @return the authentication key
      */
-    public String getAccessKey() {
-        return accessKey;
+    public String getAuthenticationKey() {
+        return authenticationKey;
     }
 
     /**
-     * Set the accessKey. [required by SnakeYaml]
+     * Set the authentication key pointing to the identity store. [required by SnakeYaml]
      *
-     * @param accessKey the accessKey
+     * @param authenticationKey the authentication key
      */
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    /**
-     * Get the secretAccessKey.
-     *
-     * @return the secretAccessKey
-     */
-    public String getSecretAccessKey() {
-        return secretAccessKey;
-    }
-
-
-    /**
-     * Set the secretAccessKey. [required by SnakeYaml]
-     *
-     * @param secretAccessKey the secretAccessKey
-     */
-    public void setSecretAccessKey(String secretAccessKey) {
-        this.secretAccessKey = secretAccessKey;
+    public void setAuthenticationKey(String authenticationKey) {
+        this.authenticationKey = authenticationKey;
     }
 
 }
