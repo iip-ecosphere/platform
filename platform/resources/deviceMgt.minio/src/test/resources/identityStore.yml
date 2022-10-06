@@ -1,0 +1,6 @@
+identities:
+    "minio": 
+        type: USERNAME
+        userName: minio_access_key
+        tokenData: minio_secret_access_key
+        tokenEncryptionAlgorithm: UTF-8
