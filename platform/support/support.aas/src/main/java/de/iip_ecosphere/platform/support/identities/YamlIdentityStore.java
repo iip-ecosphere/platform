@@ -220,7 +220,8 @@ public class YamlIdentityStore extends IdentityStore {
                 InputStream stream = getKeystoreAsStream(identity, fallback);
                 String keystoreType = SslUtils.getKeystoreType(info.getFile());
                 result = KeyStore.getInstance(keystoreType);
-                result.load(stream, info.getTokenData().toCharArray());
+                char[] pw = null == info.getTokenData() ? null : info.getTokenData().toCharArray();
+                result.load(stream, pw);
                 stream.close();
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
                 throw new IOException(e);
@@ -282,8 +283,7 @@ public class YamlIdentityStore extends IdentityStore {
      * @return {@code true} for ok, {@code false} else
      */
     private boolean isOkForKeystore(IdentityInformation info) {
-        return (null != info && TokenType.USERNAME == info.getType() && null != info.getTokenData() 
-            && null != info.getFile());
+        return (null != info && TokenType.USERNAME == info.getType() && null != info.getFile());
     }
 
     @Override
