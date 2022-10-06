@@ -11,8 +11,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
             'storageServer:
                 port: ${s.port}
                 path: "${s.path}"
-                accessKey: ${s.accessKey}
-                secretAccessKey: ${s.secretAccessKey}'
+                authenticationKey: ${s.authenticationKey}'
         } else {
             ''
         }
@@ -22,8 +21,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         '${topKey}:
             endpoint: "http://${s.host}:${s.port}"
             region: ${s.region}
-            accessKey: ${s.accessKey}
-            secretAccessKey: ${s.secretAccessKey}
+            authenticationKey: ${s.authenticationKey}
             bucket: ${p.bucket}
             prefix: ${p.prefix}
             packageDescriptor: ${p.packageDescriptor}
