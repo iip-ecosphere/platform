@@ -12,10 +12,15 @@
 
 package de.iip_ecosphere.platform.deviceMgt.minio;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import io.minio.MinioClient;
 
 /**
@@ -66,13 +71,25 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
             return null;
         }
 
-        MinioClient minioClient = MinioClient.builder()
+        MinioClient.Builder minioClientBuilder = MinioClient.builder()
             .endpoint(storageSetup.getEndpoint())
-            .region(storageSetup.getRegion())
-            .credentials(storageSetup.getAccessKey(),
-                storageSetup.getSecretAccessKey())
-            .build();
-        return new S3PackageStorage(minioClient,
+            .region(storageSetup.getRegion());
+        String authKey = storageSetup.getAuthenticationKey();
+        if (null != authKey && authKey.length() > 0) {
+            IdentityToken tok = IdentityStore.getInstance().getToken(authKey);
+            if (null != tok) {
+                if (TokenType.USERNAME == tok.getType()) {
+                    minioClientBuilder.credentials(tok.getUserName(), tok.getTokenDataAsString());
+                } else {
+                    LoggerFactory.getLogger(getClass()).warn("Identity token for key {} is of type {}. Only USERNAME "
+                        + "tokens are supported. Trying without authentication.", authKey, tok.getType());
+                }
+            } else {
+                LoggerFactory.getLogger(getClass()).warn("No identity token for key {} found. "
+                    + "Trying without authentication.", authKey);
+            }
+        }
+        return new S3PackageStorage(minioClientBuilder.build(),
             storageSetup.getBucket(),
             storageSetup.getPrefix(),
             storageSetup.getPackageDescriptor(),

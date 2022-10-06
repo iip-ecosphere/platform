@@ -12,15 +12,20 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.AnonymousAWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 
 /**
  * A S3StorageFactoryDescriptor is a service provider for
@@ -40,14 +45,33 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
 
         // TODO make region part of storageSetup
         EndpointConfiguration endCfg = new EndpointConfiguration(storageSetup.getEndpoint(), storageSetup.getRegion());
-        AmazonS3 client = AmazonS3ClientBuilder
+        AmazonS3ClientBuilder clientBuilder = AmazonS3ClientBuilder
             .standard()
             .withPathStyleAccessEnabled(true)
-            .withEndpointConfiguration(endCfg)
-            .withCredentials(new AWSStaticCredentialsProvider(
-                 new BasicAWSCredentials(storageSetup.getAccessKey(), storageSetup.getSecretAccessKey())))
-            .build();
-        return new S3PackageStorage(client,
+            .withEndpointConfiguration(endCfg);
+
+        String authKey = storageSetup.getAuthenticationKey();
+        if (null != authKey && authKey.length() > 0) {
+            IdentityToken tok = IdentityStore.getInstance().getToken(authKey, true);
+            if (null != tok) {
+                if (TokenType.USERNAME == tok.getType()) {
+                    clientBuilder.withCredentials(new AWSStaticCredentialsProvider(
+                        new BasicAWSCredentials(tok.getUserName(), tok.getTokenDataAsString())));
+                } else if (TokenType.ANONYMOUS == tok.getType()) {
+                    clientBuilder.withCredentials(new AWSStaticCredentialsProvider(
+                            new AnonymousAWSCredentials()));
+                } else { // more might be supported...
+                    LoggerFactory.getLogger(getClass()).warn("Identity token for key {} is of type {}. Only USERNAME "
+                        + "tokens are supported. Trying without authentication.", authKey, tok.getType());
+                }
+            } else {
+                LoggerFactory.getLogger(getClass()).warn("No identity token for key {} found. "
+                    + "Trying without authentication.", authKey);
+            }
+        }
+
+        
+        return new S3PackageStorage(clientBuilder.build(),
             storageSetup.getBucket(),
             storageSetup.getPrefix(),
             storageSetup.getPackageDescriptor(),

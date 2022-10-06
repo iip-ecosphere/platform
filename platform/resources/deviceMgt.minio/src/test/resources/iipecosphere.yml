@@ -1,7 +1,6 @@
 runtimeStorage:
     endpoint: "http://localhost:9001"
-    accessKey: "minio_access_key"
-    secretAccessKey: "minio_secret_access_key"
+    authenticationKey: "minio"
     bucket: "storage"
     prefix: "runtimes/"
     packageDescriptor: "runtime.yml"
@@ -9,8 +8,7 @@ runtimeStorage:
 
 configStorage:
     endpoint: "http://localhost:9001"
-    accessKey: "minio_access_key"
-    secretAccessKey: "minio_secret_access_key"
+    authenticationKey: "minio"
     bucket: "storage"
     prefix: "configs/"
     packageDescriptor: "config.yml"
