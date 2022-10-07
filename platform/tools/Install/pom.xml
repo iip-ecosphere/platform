@@ -7,6 +7,10 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.5.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+      <iip.resources>resources</iip.resources>
+  </properties>
 
   <!-- required for container building on github when release is not already in Mvn central -->  
   <repositories>       
@@ -91,6 +95,12 @@
               <argument>src/main/easy</argument>
               <argument>gen</argument>
            </arguments>
+           <systemProperties>
+              <systemProperty>
+                <key>iip.resources</key>
+                <value>${project.basedir}/${iip.resources}</value>
+              </systemProperty>
+           </systemProperties>
          </configuration>
        </plugin>
     </plugins>
