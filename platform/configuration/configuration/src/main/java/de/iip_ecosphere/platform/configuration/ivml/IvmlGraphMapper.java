@@ -222,7 +222,7 @@ public interface IvmlGraphMapper {
      * @param graph the graph structure representation
      * @throws ExecutionException if {@code graph} cannot be written back
      */
-    public void synchronize(IDecisionVariable var, IvmlGraph graph) throws ExecutionException;
+    //public void synchronize(IDecisionVariable var, IvmlGraph graph) throws ExecutionException;
 
     /**
      * Returns the factory to use to crate graphs.

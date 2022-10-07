@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultEdge;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultGraph;
@@ -199,11 +197,6 @@ public class ConfigurationAas implements AasContributor {
                 result = new GraphWalker(var).getResult();
             }
             return result;
-        }
-        
-        @Override
-        public void synchronize(IDecisionVariable var, IvmlGraph graph) throws ExecutionException {
-            LoggerFactory.getLogger(ConfigurationAas.class).warn("Graph writing/sync is currently not supported");
         }
 
         @Override

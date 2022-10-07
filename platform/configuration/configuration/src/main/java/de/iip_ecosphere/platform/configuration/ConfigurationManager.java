@@ -140,6 +140,23 @@ public class ConfigurationManager {
     }
     
     /**
+     * Reloads the model.
+     */
+    public static void reload() {
+        if (null != executor) {
+            try {
+                executor.discardLocations();
+                executor.setupLocations();
+                executor.loadIvmlModel();
+            } catch (ModelManagementException e) {
+                getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
+            }
+        } else {
+            getLogger().error("No executor, cannot reload EASy-Producer models");
+        }
+    }
+    
+    /**
      * Returns the IVML configuration.
      * 
      * @return the configuration
