@@ -52,6 +52,7 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
     SemanticIdResolverTest.class,
+    TaskRegistryTests.class,
     
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
     
