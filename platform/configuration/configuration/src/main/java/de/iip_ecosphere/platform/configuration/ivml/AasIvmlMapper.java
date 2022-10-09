@@ -46,9 +46,9 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
-import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.uni_hildesheim.sse.ConstraintSyntaxException;
+import de.uni_hildesheim.sse.ModelUtility;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.ChangeHistory;
@@ -64,6 +64,7 @@ import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
 import net.ssehub.easy.varModel.cst.Variable;
+import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.Constraint;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
@@ -73,7 +74,6 @@ import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
-import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.filter.ConstraintSeparator;
@@ -235,24 +235,71 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             new JsonResultWrapper(a -> getGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1))));
         sBuilder.defineOperation(OP_SET_GRAPH, 
             new JsonResultWrapper(a ->  
-                setGraph(JsonUtils.fromJson(AasUtils.readString(a, 0), AppInfo.class), 
-                    AasUtils.readString(a, 1), AasUtils.readString(a, 2), AasUtils.readString(a, 3))
+                setGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1), AasUtils.readString(a, 2), 
+                    AasUtils.readString(a, 3), AasUtils.readString(a, 4))
             ));
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
-                AasUtils.readMap(a, 0, null))));
+                AasUtils.readString(a, 2))));
         sBuilder.defineOperation(OP_DELETE_VARIABLE, 
             new JsonResultWrapper(a -> deleteVariable(AasUtils.readString(a))));
     }
+    
+    /**
+     * Changes the value of the decision variable {@code var} by parsing {@code expression} and evaluating 
+     * it through {@code eval}.
+     * 
+     * @param var the variable to change, may be a top-level variable and {@code expression} may be a compound 
+     *   value expression
+     * @param expression the IVML expression
+     * @param eval the expression evaluator to reuse, may be <b>null</b> to create a temporary one within
+     * @throws ExecutionException if parsing, evaluating or assigning fails
+     */
+    private void setValue(IDecisionVariable var, String expression, EvaluationVisitor eval) throws ExecutionException {
+        try {
+            ConstraintSyntaxTree cst = ModelUtility.INSTANCE.createExpression(
+                expression, var.getConfiguration().getProject());
+            if (null == eval) {
+                eval = new EvaluationVisitor();
+            }
+            eval.init(var.getConfiguration(), AssignmentState.USER_ASSIGNED, false, null);
+            eval.visit(cst);
+            Value val = eval.getResult();
+            eval.clear();
+            var.setValue(val, AssignmentState.USER_ASSIGNED);
+        } catch (ConfigurationException | ConstraintSyntaxException | CSTSemanticException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
 
     /**
-     * Changes a given set of values and performs reasoning before committing the values into the actual configuration.
+     * Changes the value of the variable declaration {@code var} by parsing {@code expression}.
+     * 
+     * @param var the variable to change, may be a top-level variable and {@code expression} may be a compound 
+     *   value expression
+     * @param expression the IVML expression
+     * @throws ExecutionException if parsing, evaluating or assigning fails
+     */
+    private void setValue(AbstractVariable var, String expression) throws ExecutionException {
+        try {
+            Configuration cfg = cfgSupplier.get();
+            ConstraintSyntaxTree cst = ModelUtility.INSTANCE.createExpression(
+                expression, cfg.getConfiguration().getProject());
+            var.setValue(cst);
+        } catch (ValueDoesNotMatchTypeException | ConstraintSyntaxException | CSTSemanticException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Changes a given set of values and performs reasoning before committing the values into the 
+     * actual configuration. [public for testing]
      * 
      * @param values the values, given as qualified IVML variables names mapped to serialized values
      * @return <b>null</b>
      * @throws ExecutionException if changing values fails
      */
-    private synchronized Object changeValues(Map<String, String> values) throws ExecutionException {
+    public synchronized Object changeValues(Map<String, String> values) throws ExecutionException {
         Configuration cfg = cfgSupplier.get();
         Set<Project> projects = new HashSet<>();
         Map<String, IDecisionVariable> vars = new HashMap<>();
@@ -261,17 +308,14 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         }
         ChangeHistory history = cfg.getChangeHistory();
         history.start();
+        EvaluationVisitor eval = new EvaluationVisitor();
         for (Map.Entry<String, String> ent: values.entrySet()) {
             IDecisionVariable var = vars.get(ent.getKey());
-            // ent.getKey may have to be parsed before
-            AbstractVariable decl = var.getDeclaration();
             try {
-                var.setValue(ValueFactory.createValue(decl.getType(), ent.getValue()), 
-                    AssignmentState.USER_ASSIGNED);
-                projects.add(decl.getProject());
-            } catch (ValueDoesNotMatchTypeException | ConfigurationException e) {
+                setValue(var, ent.getValue(), eval);
+            } catch (ExecutionException e) {
                 history.rollback();
-                throw new ExecutionException(e.getMessage(), null);
+                throw e;
             }
         }
         ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg.getConfiguration(), null, null);
@@ -286,6 +330,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 text += msg.getStatus();
                 text += ": ";
                 text += msg.getDetailedDescription();
+                if (msg.getConflictsCount() > 0) {
+                    for (int i = 0; i < msg.getConflictsCount(); i++) {
+                        text += msg.getConflictLabels().get(i) + ". ";
+                    }
+                }
             }
             throw new ExecutionException(text, null);
         } else {
@@ -336,14 +385,14 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
     
     /**
-     * Returns a graph structure in IVML.
+     * Returns a graph structure in IVML. [public for testing]
      * 
      * @param varName the IVML variable holding the graph
      * @param format the format of the graph to return 
      * @return the graph in the specified {@code format}
      * @throws ExecutionException if reading the graph structure fails
      */
-    private String getGraph(String varName, String format) throws ExecutionException {
+    public String getGraph(String varName, String format) throws ExecutionException {
         GraphFormat gFormat = getGraphFormat(format);
         IDecisionVariable var = getVariable(varName);
         IvmlGraph graph = graphMapper.getGraphFor(var);
@@ -351,24 +400,25 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
 
     /**
-     * Changes a graph structure in IVML.
+     * Changes a graph structure in IVML. [public for testing]
      * 
-     * @param appInfo the configured information of the application
+     * @param appName the configured name of the application
+     * @param appValueEx the application value as IVML expression
      * @param meshName the configured name of the service mesh
      * @param format the format of the graph
      * @param value the value
      * @return <b>null</b> always
      * @throws ExecutionException if setting the graph structure fails
      */
-    private synchronized Object setGraph(AppInfo appInfo, String meshName, String format, String value) 
-        throws ExecutionException {
+    public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
+        String value) throws ExecutionException {
         GraphFormat gFormat = getGraphFormat(format);
         IvmlGraph graph = gFormat.fromString(value, graphMapper.getGraphFactory(), this);
         
         try {
             ModelResults results = new ModelResults();
-            createMeshProject(appInfo, meshName, graph, results);
-            createAppProject(appInfo, results);
+            createMeshProject(appName, meshName, graph, results);
+            createAppProject(appName, appValueEx, results);
 
             Map<Project, CopiedFile> copies = new HashMap<>();
             File meshFile = getIvmlFile(results.meshProject);
@@ -484,8 +534,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             if (msg.length() > 0) {
                 throw new ExecutionException("Cannot restore model: " + msg, null);
             }
-            ConfigurationManager.reload(); // use original?
+            ConfigurationManager.reload();
             throwIfFails(res, false);
+            // TODO update AAS
         }
     }
     
@@ -503,142 +554,22 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
 
     /**
-     * Represents application information.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    static class AppInfo {
-        
-        private String id;
-        private String name;
-        private String description;
-        private String version;
-        private boolean snapshot;
-        private NameplateSetup nameplate = new NameplateSetup();
-        
-        /**
-         * Returns the id.
-         * 
-         * @return the id
-         */
-        public String getId() {
-            return id;
-        }
-        
-        /**
-         * Changes the id.
-         * 
-         * @param id the id to set
-         */
-        public void setId(String id) {
-            this.id = id;
-        }
-        
-        /**
-         * Returns the name.
-         * 
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-        
-        /**
-         * Changes the name.
-         * 
-         * @param name the name to set
-         */
-        public void setName(String name) {
-            this.name = name;
-        }
-        
-        /**
-         * String returns the description.
-         * 
-         * @return the description
-         */
-        public String getDescription() {
-            return description;
-        }
-        
-        /**
-         * Changes the description.
-         * 
-         * @param description the description to set
-         */
-        public void setDescription(String description) {
-            this.description = description;
-        }
-        
-        /**
-         * Returns the version.
-         * 
-         * @return the version
-         */
-        public String getVersion() {
-            return version;
-        }
-        
-        /**
-         * Changes the version.
-         * 
-         * @param version the version to set
-         */
-        public void setVersion(String version) {
-            this.version = version;
-        }
-        
-        /**
-         * Returns whether it shall be a snapshot.
-         * 
-         * @return shall it be a snapshot
-         */
-        public boolean getSnapshot() {
-            return snapshot;
-        }
-        
-        /**
-         * Changes the snapshot property.
-         * 
-         * @param snapshot the snapshot to set
-         */
-        public void setSnapshot(boolean snapshot) {
-            this.snapshot = snapshot;
-        }
-        
-        /**
-         * Returns the nameplate information.
-         * 
-         * @return the nameplate
-         */
-        public NameplateSetup getNameplate() {
-            return nameplate;
-        }
-        
-        /**
-         * Sets the nameplate information.
-         * 
-         * @param nameplate the nameplate to set
-         */
-        public void setNameplate(NameplateSetup nameplate) {
-            this.nameplate = nameplate;
-        } 
-        
-    }
-
-    /**
      * Writes an application project with the given new mesh variable.
      * 
-     * @param appInfo the application info
+     * @param appName the application name
+     * @param appValueEx the IVML value expression for the application
      * @param results collected result information
+     * @throws ModelQueryException if IVML types/variables cannot be found
+     * @throws ModelManagementException if IVML types/variables cannot be found
+     * @throws ExecutionException if the application value cannot be set
      */
-    private static void createAppProject(AppInfo appInfo, ModelResults results) 
-        throws ModelQueryException, ModelManagementException {
+    private void createAppProject(String appName, String appValueEx, ModelResults results) 
+        throws ModelQueryException, ModelManagementException, ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Project root = cfg.getProject();
         IDatatype applicationType = ModelQuery.findType(root, "Application", null);
         
-        String appProjectName = "ApplicationPart" + toIdentifierFirstUpper(appInfo.getName());
+        String appProjectName = "ApplicationPart" + toIdentifierFirstUpper(appName);
         results.appProject = ModelQuery.findProject(root, appProjectName);
         results.meshProject.addImport(new ProjectImport("Applications"));
         List<Object> meshes = new ArrayList<Object>();
@@ -653,7 +584,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                         ContainerValue cValue = (ContainerValue) val;
                         for (int v = 0; v < cValue.getElementSize(); v++) {
                             Value mVal = cValue.getElement(v);
-                            if (isRefWithName(appInfo.getName(), cfg, mVal)) {
+                            if (isRefWithName(appName, cfg, mVal)) {
                                 replaced = true;
                                 meshes.add(results.meshVar);
                             } else {
@@ -670,16 +601,8 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             
         results.appProject = new Project(appProjectName);
         DecisionVariableDeclaration appVar = new DecisionVariableDeclaration(
-            toIdentifier(appInfo.getName()), applicationType, results.appProject);
-        List<Object> values = new ArrayList<>();
-        addValue(values, "id", appInfo.getId());
-        addValue(values, "name", appInfo.getName());
-        addValue(values, "description", appInfo.getDescription()); 
-        addValue(values, "ver", appInfo.getVersion());
-        addValue(values, "snapshot", appInfo.getSnapshot());
-        addListValue(values, "services", meshes);
-        // TODO nameplate info
-        setValue(appVar, values);
+            toIdentifier(appName), applicationType, results.appProject);
+        setValue(appVar, appValueEx);
     }
 
     /**
@@ -727,18 +650,18 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     /**
      * Creates a mesh project for {@code graph}.
      * 
-     * @param appInfo the application information
+     * @param appName the application name
      * @param meshName the mesh name
      * @param graph
      * @param results
-     * @throws ModelQueryException
-     * @throws ModelManagementException
+     * @throws ModelQueryException if IVML types/variables cannot be found
+     * @throws ModelManagementException if IVML types/variables cannot be found
      */
-    private static void createMeshProject(AppInfo appInfo, String meshName, IvmlGraph graph, ModelResults results) 
+    private void createMeshProject(String appName, String meshName, IvmlGraph graph, ModelResults results) 
          throws ModelQueryException, ModelManagementException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Project root = cfg.getProject();
-        results.meshProject = new Project("ServiceMeshPart" + toIdentifierFirstUpper(appInfo.getName()) 
+        results.meshProject = new Project("ServiceMeshPart" + toIdentifierFirstUpper(appName) 
             + toIdentifierFirstUpper(meshName));
         results.meshProject.addImport(new ProjectImport("Applications"));
         IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
@@ -938,39 +861,22 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
 
     /**
-     * Creates an IVML variable.
+     * Creates an IVML variable. [public for testing]
      * 
      * @param varName the IVML variable name
      * @param type the (qualified) IVML type
-     * @param value the value
+     * @param valueEx the value as IVML expression 
      * @return <b>null</b> always
      * @throws ExecutionException if creating the variable fails
      */
-    private Object createVariable(String varName, String type, Map<String, String> value) throws ExecutionException {
+    public Object createVariable(String varName, String type, String valueEx) throws ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
             IDatatype t = ModelQuery.findType(root, type, null);
             if (null != t) {
                 DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, root);
-                if (t instanceof Compound) {
-                    Compound tc = (Compound) t;
-                    List<Object> values = new ArrayList<>();
-                    for (Map.Entry<String, String> ent : value.entrySet()) {
-                        try {
-                            DecisionVariableDeclaration slot = tc.getElement(ent.getKey());
-                            if (null == slot) {
-                                throw new ExecutionException("No such slot: " + ent.getKey(), null);
-                            }
-                            addValue(values, ent.getKey(), ValueFactory.createValue(slot.getType(), ent.getValue()));
-                        } catch (ValueDoesNotMatchTypeException e) {
-                            throw new ExecutionException(e.getMessage(), null);
-                        }
-                    }
-                    setValue(var, values);
-                } else {
-                    throw new ExecutionException("No such variable: " + varName, null);
-                }
+                setValue(var, valueEx);
             } else {
                 throw new ExecutionException("No such type " + t, null);
             }
@@ -984,13 +890,14 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
 
     /**
-     * Deletes an IVML variable. In case of a graph, this may subsequently delete further variables.
+     * Deletes an IVML variable. In case of a graph, this may subsequently delete further 
+     * variables. [public for testing]
      * 
      * @param varName the qualified IVML variable name to delete
      * @return <b>null</b> always
      * @throws ExecutionException if creating the variable fails
      */
-    private Object deleteVariable(String varName) throws ExecutionException {
+    public Object deleteVariable(String varName) throws ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -1050,7 +957,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      */
     private void addOperations(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
         smBuilder.createOperationBuilder(OP_CHANGE_VALUES)
-            .addInputVariable("values", Type.STRING)
+            .addInputVariable("valueExprs", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CHANGE_VALUES))
             .build(Type.NONE);
         smBuilder.createOperationBuilder(OP_GET_GRAPH)
@@ -1059,8 +966,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             .setInvocable(iCreator.createInvocable(OP_GET_GRAPH))
             .build(Type.STRING);
         smBuilder.createOperationBuilder(OP_SET_GRAPH)
-            .addInputVariable("application", Type.STRING)
-            .addInputVariable("serviceMesh", Type.STRING)
+            .addInputVariable("appName", Type.STRING)
+            .addInputVariable("appValExpr", Type.STRING)
+            .addInputVariable("serviceMeshName", Type.STRING)
             .addInputVariable("format", Type.STRING)
             .addInputVariable("val", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_SET_GRAPH))
@@ -1068,7 +976,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)
-            .addInputVariable("val", Type.STRING)
+            .addInputVariable("valExpr", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CREATE_VARIABLE))
             .build(Type.NONE);
         smBuilder.createOperationBuilder(OP_DELETE_VARIABLE)

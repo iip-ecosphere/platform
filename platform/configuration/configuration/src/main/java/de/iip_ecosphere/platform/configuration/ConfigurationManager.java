@@ -69,7 +69,7 @@ public class ConfigurationManager {
             }
             Transport.sendStatus(
                 new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
-                    .withProgress(steps / maxSteps));
+                    .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
         }
         
         @Override

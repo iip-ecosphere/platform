@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.configuration.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.StatisticsVisitor;
 import de.iip_ecosphere.platform.configuration.StatisticsVisitor.Statistics;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -42,15 +43,8 @@ public class CommentTests {
     public void testComments() {
         SortedSet<String> missing = new TreeSet<>();
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
-        InstantiationConfigurer configurer = new InstantiationConfigurer(EasySetup.PLATFORM_META_MODEL_NAME, 
-            setup.getEasyProducer().getIvmlMetaModelFolder(), new File("gen")) {
-
-            @Override
-            protected boolean cleanOutputFolder() {
-                return false; // we just use the configurer, we do not generate
-            }
-
-        };
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(EasySetup.PLATFORM_META_MODEL_NAME, 
+            setup.getEasyProducer().getIvmlMetaModelFolder(), new File("gen"));
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
