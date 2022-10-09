@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -72,8 +72,8 @@ public class AasIvmlMapperTest {
      * 
      * @throws IOException if copying fails
      */
-    @BeforeClass
-    public static void setup() throws IOException {
+    @Before
+    public void setup() throws IOException {
         EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
         origBase = ep.getBase();
         origIvmlMeta = ep.getIvmlMetaModelFolder();
@@ -81,9 +81,9 @@ public class AasIvmlMapperTest {
         origIvmlModelName = ep.getIvmlModelName();
         
         setupIvmlFiles();
-        ep.setBase(origBase);
+        ep.setBase(ivmlFolder);
         ep.setIvmlMetaModelFolder(ivmlFolder);
-        ep.setIvmlConfigFolder(origBase);
+        ep.setIvmlConfigFolder(ivmlFolder);
         ep.setIvmlModelName("TestConfiguration");
     }
     
@@ -102,6 +102,8 @@ public class AasIvmlMapperTest {
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
         org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/SimpleMesh.ivml"), 
             new File(ivmlFolder, "SimpleMesh.ivml"));
+        org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/CommonSetup.ivml"), 
+                new File(ivmlFolder, "CommonSetup.ivml"));
         org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/TestConfiguration.ivml"), 
             new File(ivmlFolder, "TestConfiguration.ivml"));
     }
@@ -109,8 +111,8 @@ public class AasIvmlMapperTest {
     /**
      * Cleans up after the tests.
      */
-    @AfterClass
-    public static void shutdown() {
+    @After
+    public void shutdown() {
         EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
         ep.setBase(origBase);
         ep.setIvmlMetaModelFolder(origIvmlMeta);

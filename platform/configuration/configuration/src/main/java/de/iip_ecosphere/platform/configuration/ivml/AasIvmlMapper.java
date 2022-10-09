@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
+import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.ModelInfo;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
@@ -313,6 +314,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             IDecisionVariable var = vars.get(ent.getKey());
             try {
                 setValue(var, ent.getValue(), eval);
+                projects.add(var.getDeclaration().getProject());
             } catch (ExecutionException e) {
                 history.rollback();
                 throw e;
@@ -377,7 +379,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @return the file name/path
      */
     private File createIvmlConfigPath(String subpath, Project project) {
-        File result = ConfigurationSetup.getSetup().getEasyProducer().getIvmlConfigFolder();
+        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+        File result = ep.getIvmlConfigFolder();
+        if (null == result || result.toString().equals(".")) {
+            result = ep.getBase();
+        }
         if (subpath != null) {
             result = new File(result, subpath);
         }
@@ -468,6 +474,16 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 Files.copy(copy.toPath(), original.toPath(), StandardCopyOption.REPLACE_EXISTING);                
             }
         }
+        
+        /**
+         * Cleans up unneeded copies.
+         */
+        private void clean() {
+            if (null != copy) {
+                copy.delete();
+            }
+        }
+        
     }
     
     /**
@@ -536,8 +552,12 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             }
             ConfigurationManager.reload();
             throwIfFails(res, false);
-            // TODO update AAS
+        } else {
+            for (CopiedFile c : copies.values()) {
+                c.clean();
+            }
         }
+        // TODO update AAS
     }
     
     /**
