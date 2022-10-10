@@ -211,7 +211,7 @@ public class Transport {
         }
 
         /**
-         * Sends information about a processing status.
+         * Sends information about a processing status. Attaches the actual task data if available.
          * 
          * @param componentId the component id
          * @param step the step [0; max]
@@ -224,7 +224,8 @@ public class Transport {
             String subDescription) {
             StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, componentId, Id.getDeviceId())
                 .withDescription(description)
-                .withSubDescription(subDescription);
+                .withSubDescription(subDescription)
+                .withTask();
             send(c -> msg.send(c), "progress status");
         }
 

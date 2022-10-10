@@ -35,8 +35,18 @@ public enum ActionTypes implements ActionType {
     REMOVED,
     
     /**
-     * Something is being processed.
+     * Something is being processed. Taskid shall be set.
      */
-    PROCESS
+    PROCESS,
+    
+    /**
+     * Result of an asynchronous operation. Taskid shall be set.
+     */
+    RESULT,
+    
+    /**
+     * Failure of an asynchronous operation. Taskid shall be set.
+     */
+    ERROR
 
 }
