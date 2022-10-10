@@ -54,6 +54,7 @@ public class TaskUtils {
             } catch (Throwable e) {
                 Transport.sendProcessStatus(componentId, ActionTypes.RESULT, e.getMessage());
             }
+            TaskRegistry.stopTask(data.getId());
         }).start();
         return data.getId();        
     }

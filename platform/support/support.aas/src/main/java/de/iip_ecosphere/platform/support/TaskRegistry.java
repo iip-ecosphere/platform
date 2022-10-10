@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class TaskRegistry {
 
-    public static final TaskData NO_TASK = new TaskData().setStatus(TaskStatus.UNKNOWN);
+    public static final TaskData NO_TASK = new TaskData("").setStatus(TaskStatus.UNKNOWN);
     private static long timeout = 2 * 60 * 1000;
     private static Map<String, TaskData> idToData = new HashMap<>();
     private static Map<Long, TaskData> threadToData = new HashMap<>();
@@ -55,10 +55,16 @@ public class TaskRegistry {
         
         /**
          * Creates an instance, sets the id and turns the status to {@link TaskStatus#RUNNING}.
+         * 
+         * @param taskId a given task id, <b>null</b> for generate one
          */
-        private TaskData() {
+        private TaskData(String taskId) {
             threadId = Thread.currentThread().getId();
-            id = String.valueOf(System.currentTimeMillis()) + String.valueOf(threadId);
+            if (null != taskId) {
+                id = taskId;
+            } else {
+                id = String.valueOf(System.currentTimeMillis()) + String.valueOf(threadId);
+            }
             setStatus(TaskStatus.RUNNING);
         }
         
@@ -125,14 +131,36 @@ public class TaskRegistry {
     }
 
     /**
+     * Registers a new task on the current task.
+     * 
+     * @param taskId a given task id, e.g., when passed in through distributed execution, <b>null</b> for generate one
+     * @return the task data of the new task
+     */
+    public static TaskData registerTask(String taskId) {
+        return registerTask(Thread.currentThread(), taskId);
+    }
+
+    /**
      * Registers a new task for the given {@code thread}, turning a still running one 
      * into {@link TaskStatus#SUPPRESSED}.
      * 
      * @param thread the thread to register the task for
      * @return the task data of the new task
      */
-    public static synchronized TaskData registerTask(Thread thread) {
-        TaskData data = new TaskData();
+    public static TaskData registerTask(Thread thread) {
+        return registerTask(thread, null);
+    }
+
+    /**
+     * Registers a new task for the given {@code thread}, turning a still running one 
+     * into {@link TaskStatus#SUPPRESSED}.
+     * 
+     * @param thread the thread to register the task for
+     * @param taskId a given task id, e.g., when passed in through distributed execution, <b>null</b> for generate one
+     * @return the task data of the new task
+     */
+    public static synchronized TaskData registerTask(Thread thread, String taskId) {
+        TaskData data = new TaskData(taskId);
         long current = thread.getId();
         TaskData old = threadToData.remove(current);
         // not for idToData, keep for requests until cleanup

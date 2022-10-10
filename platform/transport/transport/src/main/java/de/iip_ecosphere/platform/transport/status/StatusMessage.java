@@ -261,7 +261,7 @@ public class StatusMessage {
      * @see #withTask(TaskData, Object)
      */
     public StatusMessage withTask(TaskData data) {
-        return withTask(data);
+        return withTask(data, null);
     }
     
     /**
