@@ -337,12 +337,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 if (null == subpath) { // if it is one of the "writable" wildcard imports
                     target = root;
                 }
+                removeConstraintsForVariable(target, varDecl);
                 Constraint c = new Constraint(
                     createExpression(varDecl.getName() + "=" + ent.getValue(), target), target);
                 target.add(c);
-                
                 projects.add(target);
-                // TODO clean up constraints before
             } catch (CSTSemanticException e) {
                 history.rollback();
                 throw new ExecutionException(e);
@@ -924,6 +923,16 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             AbstractVariable var = ModelQuery.findVariable(root, varName, null);
             if (null != var) {
                 Project prj = var.getProject();
+                String subpath = getIvmlSubpath(prj);
+                if (subpath != null || prj == root) {
+                    removeConstraintsForVariable(prj, var);
+                    prj.removeElement(var);
+                    ReasoningResult res = ConfigurationManager.validateAndPropagate();
+                    throwIfFails(res, true);
+                    saveTo(prj, getIvmlFile(prj));
+                } else {
+                    throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
+                }
                 ConstraintSeparator sep = new ConstraintSeparator(prj);
                 for (Constraint c : sep.getAssingmentConstraints()) {
                     ConstraintSyntaxTree op = ((OCLFeatureCall) c.getConsSyntax()).getOperand();
@@ -933,10 +942,6 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                         }
                     }
                 }
-                prj.removeElement(var);
-                ReasoningResult res = ConfigurationManager.validateAndPropagate();
-                throwIfFails(res, true);
-                saveTo(prj, getIvmlFile(prj));
             } else {
                 throw new ExecutionException("Cannot find variable " + varName, null);
             }
@@ -944,6 +949,24 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             throw new ExecutionException(e);
         }
         return null;
+    }
+    
+    /**
+     * Removes assignment constraints for a given {@code var}.
+     *  
+     * @param prj the project to start searching for constraints within
+     * @param var the variable to remove constraints for
+     */
+    private void removeConstraintsForVariable(Project prj, AbstractVariable var) {
+        ConstraintSeparator sep = new ConstraintSeparator(prj);
+        for (Constraint c : sep.getAssingmentConstraints()) {
+            ConstraintSyntaxTree op = ((OCLFeatureCall) c.getConsSyntax()).getOperand();
+            if (op instanceof Variable) {
+                if (((Variable) op).getVariable() == var) {
+                    c.getProject().removeElement(c);
+                }
+            }
+        }
     }
 
     /**
