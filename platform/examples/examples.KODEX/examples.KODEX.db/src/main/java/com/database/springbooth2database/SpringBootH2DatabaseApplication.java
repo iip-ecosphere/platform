@@ -32,7 +32,7 @@ public class SpringBootH2DatabaseApplication {
 	    
 		SpringApplication.run(SpringBootH2DatabaseApplication.class, args);
 		
-		new H2jdbcCreateTable().CreateTimeSeriesTable(DBServerPort);
+		new H2jdbcCreateTable().CreateTimeSeriesTable(dbServerPort);
 	}
 
 }
