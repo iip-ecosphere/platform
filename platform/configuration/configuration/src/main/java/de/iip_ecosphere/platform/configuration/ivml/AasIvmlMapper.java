@@ -61,7 +61,6 @@ import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.CSTSemanticException;
-import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
 import net.ssehub.easy.varModel.cst.Variable;
@@ -82,7 +81,6 @@ import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
-import net.ssehub.easy.varModel.model.values.ValueFactory;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
 
 /**
@@ -256,10 +254,10 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @param eval the expression evaluator to reuse, may be <b>null</b> to create a temporary one within
      * @throws ExecutionException if parsing, evaluating or assigning fails
      */
+    @SuppressWarnings("unused")
     private void setValue(IDecisionVariable var, String expression, EvaluationVisitor eval) throws ExecutionException {
         try {
-            ConstraintSyntaxTree cst = ModelUtility.INSTANCE.createExpression(
-                expression, var.getConfiguration().getProject());
+            ConstraintSyntaxTree cst = createExpression(expression, var.getConfiguration().getProject());
             if (null == eval) {
                 eval = new EvaluationVisitor();
             }
@@ -268,7 +266,27 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             Value val = eval.getResult();
             eval.clear();
             var.setValue(val, AssignmentState.USER_ASSIGNED);
-        } catch (ConfigurationException | ConstraintSyntaxException | CSTSemanticException e) {
+        } catch (ConfigurationException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Creates an IVML expression syntax tree for {@code expression}.
+     * 
+     * @param expression the expression
+     * @param scope the resolution scope, may be <b>null</b> for the root project
+     * @return the syntax tree
+     * @throws ExecutionException if the expression cannot be created, e.g., due to syntactic or semantic errors
+     */
+    private ConstraintSyntaxTree createExpression(String expression, Project scope) throws ExecutionException {
+        try {
+            if (null == scope) {
+                Configuration cfg = cfgSupplier.get();
+                scope = cfg.getConfiguration().getProject();
+            }
+            return ModelUtility.INSTANCE.createExpression(expression, scope);
+        } catch (ConstraintSyntaxException | CSTSemanticException e) {
             throw new ExecutionException(e.getMessage(), null);
         }
     }
@@ -284,17 +302,17 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     private void setValue(AbstractVariable var, String expression) throws ExecutionException {
         try {
             Configuration cfg = cfgSupplier.get();
-            ConstraintSyntaxTree cst = ModelUtility.INSTANCE.createExpression(
-                expression, cfg.getConfiguration().getProject());
+            ConstraintSyntaxTree cst = createExpression(expression, cfg.getConfiguration().getProject());
             var.setValue(cst);
-        } catch (ValueDoesNotMatchTypeException | ConstraintSyntaxException | CSTSemanticException e) {
+        } catch (ValueDoesNotMatchTypeException | CSTSemanticException e) {
             throw new ExecutionException(e.getMessage(), null);
         }
     }
 
     /**
      * Changes a given set of values and performs reasoning before committing the values into the 
-     * actual configuration. [public for testing]
+     * actual configuration. For compounds/containers it is advisable to assign complete values to avoid
+     * illegal re-assignments. [public for testing]
      * 
      * @param values the values, given as qualified IVML variables names mapped to serialized values
      * @return <b>null</b>
@@ -302,6 +320,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      */
     public synchronized Object changeValues(Map<String, String> values) throws ExecutionException {
         Configuration cfg = cfgSupplier.get();
+        Project root = cfg.getConfiguration().getProject();
         Set<Project> projects = new HashSet<>();
         Map<String, IDecisionVariable> vars = new HashMap<>();
         for (String varName: values.keySet()) {
@@ -309,12 +328,24 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         }
         ChangeHistory history = cfg.getChangeHistory();
         history.start();
-        EvaluationVisitor eval = new EvaluationVisitor();
         for (Map.Entry<String, String> ent: values.entrySet()) {
             IDecisionVariable var = vars.get(ent.getKey());
             try {
-                setValue(var, ent.getValue(), eval);
-                projects.add(var.getDeclaration().getProject());
+                AbstractVariable varDecl = var.getDeclaration();
+                Project target = varDecl.getProject();
+                String subpath = getIvmlSubpath(target);
+                if (null == subpath) { // if it is one of the "writable" wildcard imports
+                    target = root;
+                }
+                Constraint c = new Constraint(
+                    createExpression(varDecl.getName() + "=" + ent.getValue(), target), target);
+                target.add(c);
+                
+                projects.add(target);
+                // TODO clean up constraints before
+            } catch (CSTSemanticException e) {
+                history.rollback();
+                throw new ExecutionException(e);
             } catch (ExecutionException e) {
                 history.rollback();
                 throw e;
@@ -353,12 +384,12 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
     
     /**
-     * Returns the filename/path for {@code p}.
+     * Returns the IVML subpath for the given project.
      * 
      * @param project the project
-     * @return the filename/path
+     * @return the subpath, may be <b>null</b> for a top-level project
      */
-    private File getIvmlFile(Project project) {
+    private String getIvmlSubpath(Project project) {
         String projectName = project.getName();
         String subpath;
         if (projectName.startsWith("ServiceMeshPart")) {
@@ -368,7 +399,17 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         } else {
             subpath = null;
         }
-        return createIvmlConfigPath(subpath, project);
+        return subpath;
+    }
+    
+    /**
+     * Returns the filename/path for {@code p}.
+     * 
+     * @param project the project
+     * @return the filename/path
+     */
+    private File getIvmlFile(Project project) {
+        return createIvmlConfigPath(getIvmlSubpath(project), project);
     }
     
     /**
@@ -676,9 +717,10 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @param results
      * @throws ModelQueryException if IVML types/variables cannot be found
      * @throws ModelManagementException if IVML types/variables cannot be found
+     * @throws ExecutionException if setting IVML values fails
      */
     private void createMeshProject(String appName, String meshName, IvmlGraph graph, ModelResults results) 
-         throws ModelQueryException, ModelManagementException {
+         throws ModelQueryException, ModelManagementException, ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Project root = cfg.getProject();
         results.meshProject = new Project("ServiceMeshPart" + toIdentifierFirstUpper(appName) 
@@ -692,8 +734,8 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         IDatatype applicationType = ModelQuery.findType(root, "Application", null);
         Map<String, IDecisionVariable> services = collectServices(cfg, serviceType);
         Map<IvmlGraphNode, DecisionVariableDeclaration> nodeMap = new HashMap<>();
-        Map<DecisionVariableDeclaration, List<Object>> valueMap = new HashMap<>();
-        List<Object> sources = new ArrayList<>();
+        Map<DecisionVariableDeclaration, String> valueMap = new HashMap<>();
+        List<DecisionVariableDeclaration> sources = new ArrayList<>();
         for (IvmlGraphNode n : graph.nodes()) {
             IDatatype type;
             if (n.getInEdgesCount() == 0) {
@@ -705,17 +747,18 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             }
             DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(n.getName(), type, 
                 results.meshProject);
-            List<Object> values = new ArrayList<Object>();
-            addValue(values, "x_pos", n.getXPos());
-            addValue(values, "y_pos", n.getYPos());
-            addValue(values, "impl", findServiceVar(services, n.getName()));
-            valueMap.put(nodeVar, values);
+            String nodeValEx = "{x_pos=" + n.getXPos() 
+                + ",y_pos=" + n.getYPos() 
+                + ",impl=" + findServiceVar(services, n.getName()).getName()
+                + ",next = {";
+            valueMap.put(nodeVar, nodeValEx);
             results.meshProject.add(nodeVar);
             nodeMap.put(n, nodeVar);
             if (type == sourceType) {
                 sources.add(nodeVar);
             }
         }
+        boolean first = true;
         for (IvmlGraphNode n: graph.nodes()) {
             for (IvmlGraphEdge e: n.outEdges()) {
                 String edgeName = e.getName();
@@ -724,23 +767,32 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 }
                 DecisionVariableDeclaration edgeVar = new DecisionVariableDeclaration(
                     edgeName, connectorType, results.meshProject);
-                List<Object> values = new ArrayList<>();
-                addValue(values, "name", edgeName);
-                addValue(values, "next", nodeMap.get(e.getEnd()));
-                setValue(edgeVar, values);
-                List<Object> startNodeValues = valueMap.get(nodeMap.get(n));
-                addListValue(startNodeValues, "next", nodeMap.get(n));
+                DecisionVariableDeclaration end = nodeMap.get(e.getEnd());
+                String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + end.getName() + ")}";
+                setValue(edgeVar, valueEx);
+                String startNodeValueEx = valueMap.get(nodeMap.get(n));
+                if (!first) {
+                    startNodeValueEx += ",";
+                }
+                startNodeValueEx += "refTo(" + nodeMap.get(n).getName() + ")";
+                valueMap.put(nodeMap.get(n), startNodeValueEx);
+                first = false;
             }
         }
         for (IvmlGraphNode n: graph.nodes()) {
             DecisionVariableDeclaration nodeVar = nodeMap.get(n);
-            setValue(nodeVar, valueMap.get(nodeVar)); 
+            setValue(nodeVar, valueMap.get(nodeVar) + "}}"); 
         }
         results.meshVar = new DecisionVariableDeclaration(toIdentifier(meshName), applicationType, results.meshProject);
-        List<Object> values = new ArrayList<>();
-        addValue(values, "description", meshName);
-        addListValue(values, "sources", sources);
-        setValue(results.meshVar, values);
+        String meshValEx = "{description=\"" + meshName + "\", sources={";
+        for (int s = 0; s < sources.size(); s++) {
+            if (s > 0) {
+                meshValEx += ", ";
+            }
+            meshValEx += "refTo(" + sources.get(s).getName() + ")";
+        }
+        meshValEx += "}}";
+        setValue(results.meshVar, meshValEx);
     }
 
     /**
@@ -785,60 +837,6 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             result = cVar.getDeclaration();
         }
         return result;
-    }
-
-    /**
-     * Adds a list value to a (temporary) IVML default variables list.
-     * 
-     * @param values the values to be modified as side effect
-     * @param name the name of the variable
-     * @param value the actual value
-     */
-    @SuppressWarnings("unchecked")
-    private static void addListValue(List<Object> values, String name, Object value) {
-        List<Object> list = null;
-        int pos = -1;
-        for (int i = 0; i < values.size(); i = i + 2) {
-            if (name.equals(values.get(i))) {
-                pos = i + 1;
-                if (values.get(pos) instanceof List) {
-                    list = (List<Object>) values.get(pos);
-                }
-            }
-        }
-        if (list == null) {
-            list = new ArrayList<>();
-            addValue(values, name, list);
-        }
-        list.add(value);
-    }
-
-    /**
-     * Adds a value to a (temporary) IVML default variables list.
-     * 
-     * @param values the values to be modified as side effect
-     * @param name the name of the variable
-     * @param value the actual value
-     */
-    private static void addValue(List<Object> values, String name, Object value) {
-        values.add(name);
-        values.add(value);
-    }
-
-    /**
-     * Sets a value represented as list on the given decision variable.
-     * 
-     * @param var the variable
-     * @param values the values
-     */
-    private static void setValue(DecisionVariableDeclaration var, List<Object> values) {
-        try {
-            // inner lists to array for value factory?
-            Object[] val = values.toArray();
-            var.setValue(new ConstantValue(ValueFactory.createValue(var.getType(), val))); 
-        } catch (ValueDoesNotMatchTypeException | CSTSemanticException e) {
-            LoggerFactory.getLogger(AasIvmlMapper.class).error("Turning graph to IVML: {}", e.getMessage());
-        }
     }
 
     @Override
@@ -896,6 +894,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             IDatatype t = ModelQuery.findType(root, type, null);
             if (null != t) {
                 DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, root);
+                root.add(var);
                 setValue(var, valueEx);
             } else {
                 throw new ExecutionException("No such type " + t, null);
@@ -911,7 +910,8 @@ public class AasIvmlMapper implements DecisionVariableProvider {
 
     /**
      * Deletes an IVML variable. In case of a graph, this may subsequently delete further 
-     * variables. [public for testing]
+     * variables. IVML reference to a variable shall be cleaned up before. Left-over references shall
+     * lead to a syntax error and to no modification of the model. [public for testing]
      * 
      * @param varName the qualified IVML variable name to delete
      * @return <b>null</b> always

@@ -100,12 +100,12 @@ public class AasIvmlMapperTest {
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"));
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
-        org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/SimpleMesh.ivml"), 
-            new File(ivmlFolder, "SimpleMesh.ivml"));
-        org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/CommonSetup.ivml"), 
-                new File(ivmlFolder, "CommonSetup.ivml"));
-        org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/TestConfiguration.ivml"), 
-            new File(ivmlFolder, "TestConfiguration.ivml"));
+        String[] testFileNames = {"SimpleMesh.ivml", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml", 
+            "TestConfiguration.ivml"};
+        for (String n : testFileNames) {
+            org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/" + n), 
+                new File(ivmlFolder, n));
+        }
     }
     
     /**
@@ -302,18 +302,17 @@ public class AasIvmlMapperTest {
         Map<String, String> values = new HashMap<String, String>();
         values.put("instDir", "\"/home/iip\""); // IVML expression
         values.put("javaExe", "\"/usr/local/java\""); // IVML expression
-        values.put("aasServer.path", "\"myAas\"");
-        values.put("aasImplServer.devicesAsEphemeral", "false");
+        // do not overwrite already frozen variable
+        values.put("deviceIdProvider", "HostnameDeviceIdProvider{class=\"a.b.C\", artifact=\"mg.art:art:1.2.3\"}");
         mapper.changeValues(values);
         
         assertStringVar("/home/iip", mapper.getVariable("instDir"));
         assertStringVar("/usr/local/java", mapper.getVariable("javaExe"));
-        Assert.assertNotNull(mapper.getVariable("aasServer"));
-        assertStringVar("myAas", mapper.getVariable("aasServer").getNestedElement("path"));
-        assertStringVar("myAas", mapper.getVariable("aasServer.path"));
-        assertBooleanVar(false, mapper.getVariable("aasImplServer.devicesAsEphemeral"));
+        Assert.assertNotNull(mapper.getVariable("deviceIdProvider"));
+        assertStringVar("a.b.C", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
+        assertStringVar("mg.art:art:1.2.3", mapper.getVariable("deviceIdProvider.artifact"));
         
-        assertIvmlFileChange("TestConfiguration", true, "instDir", "javaExe", "aasServer", "aasImplServer");
+        assertIvmlFileChange("TestConfiguration", false, "instDir", "javaExe", "deviceIdProvider");
     
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -346,7 +345,7 @@ public class AasIvmlMapperTest {
      * 
      * @throws IOException if copying/resetting files fails
      */
-    @Ignore("Untested")
+    @Ignore("untested")
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
@@ -366,7 +365,7 @@ public class AasIvmlMapperTest {
             + "output={{type=rec1}}}";
         
         mapper.createVariable("test1", "JavaService", valueEx);
-        assertIvmlFileChange("TestConfiguration", true, "test1");
+        assertIvmlFileChange("TestConfiguration", false, "test1");
         
         mapper.deleteVariable("test1");
         assertIvmlFileChange("TestConfiguration", true, "test1");
@@ -392,11 +391,24 @@ public class AasIvmlMapperTest {
      * @param expected the expected value
      * @param var the variable
      */
+    @SuppressWarnings("unused")
     private void assertBooleanVar(boolean expected, IDecisionVariable var) {
         Assert.assertNotNull(var);
         Assert.assertEquals(expected, IvmlUtils.getBooleanValue(var, !expected));
     }
-    
+
+    /**
+     * Asserts that {@code var} has the {@code expected} Boolean value.
+     * 
+     * @param expected the expected value
+     * @param var the variable
+     */
+    @SuppressWarnings("unused")
+    private void assertIntVar(int expected, IDecisionVariable var) {
+        Assert.assertNotNull(var);
+        Assert.assertEquals(expected, IvmlUtils.getIntValue(var, -1));
+    }
+
     /**
      * Very simple check that an IVML file was changed and contains expected strings.
      * 
