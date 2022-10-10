@@ -211,7 +211,7 @@ public class Transport {
         }
 
         /**
-         * Sends information about a processing status.
+         * Sends information about a processing status. Attaches the actual task data if available.
          * 
          * @param componentId the component id
          * @param step the step [0; max]
@@ -224,7 +224,22 @@ public class Transport {
             String subDescription) {
             StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, componentId, Id.getDeviceId())
                 .withDescription(description)
-                .withSubDescription(subDescription);
+                .withSubDescription(subDescription)
+                .withTask();
+            send(c -> msg.send(c), "progress status");
+        }
+        
+        /**
+         * Sends information about finalizing a task-based process. Attaches the actual task data if available.
+         * 
+         * @param componentId the component id
+         * @param type shall be {@link ActionTypes#RESULT} or {@link ActionTypes#ERROR}
+         * @param result a serializable result, may be <b>null</b> 
+         */
+        public void sendProcessStatus(String componentId, ActionTypes type, Object result) {
+            StatusMessage msg = new StatusMessage(type, componentId, Id.getDeviceId())
+                .withTask()
+                .withResult(result);
             send(c -> msg.send(c), "progress status");
         }
 
@@ -573,6 +588,17 @@ public class Transport {
         globalTransport.sendProcessStatus(componentId, step, max, description, subDescription);
     }
 
+    /**
+     * Sends information about finalizing a task-based process (global). Attaches the actual task data if available.
+     * 
+     * @param componentId the component id
+     * @param type shall be {@link ActionTypes#RESULT} or {@link ActionTypes#ERROR}
+     * @param result a serializable result, may be <b>null</b> 
+     */
+    public static void sendProcessStatus(String componentId, ActionTypes type, Object result) {
+        globalTransport.sendProcessStatus(componentId, type, result);
+    }
+    
     /**
      * Sends a status message (global). Calls {@link #createConnector()} to obtain
      * a connector instance on demand. Caches messages if no connector is available.

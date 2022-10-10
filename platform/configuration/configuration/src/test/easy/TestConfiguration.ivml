@@ -1,0 +1,14 @@
+project TestConfiguration {
+
+    // represents a top-level platform configuration when managed by the platform itself
+    // so far, only used in tests
+
+    import CommonSetup; 
+    import ApplicationPart*;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    freeze {
+        .;
+    }
+}

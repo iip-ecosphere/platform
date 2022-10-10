@@ -418,4 +418,64 @@ definitions:
       en:
         name: °C
         structuredName: degree Celsius
-        description: temperature unit named after Anders Celsous with a scale defined by two fixpoints, the temperatures of freezing/cooking water at normal pressure (air pressure of 1 013,25 hPa)
+        description: temperature unit named after Anders Celsius with a scale defined by two fixpoints, the temperatures of freezing/cooking water at normal pressure (air pressure of 1 013,25 hPa)
+  - semanticId: 0173-1#02-AAQ832#005
+    version: 5
+    revision: 1
+    naming:
+      de: 
+        name: Adresse
+        structuredName: Adresse
+        description: Adressinformationen zu einem Geschäftspartner
+      en:
+        name: Address
+        structuredName: Address
+        description: Address information for a business partner
+  - semanticId: 0173-1#02-AAO127#003
+    version: 3
+    revision: 1
+    naming:
+      de: 
+        name: Abteilung
+        structuredName: Abteilung
+        description: administrative Abteilung einer Organisation, in der ein Geschäftspartner vertreten ist
+      en:
+        name: department
+        structuredName: department
+        description: administrative department of an organization in which a business partner is represented
+  - semanticId: 0173-1#02-AAO128#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Straße
+        structuredName: Straße
+        description: Straßenname und Hausnummer
+      en:
+        name: street
+        structuredName: street
+        description: street name and house number
+  - semanticId: 0173-1#02-AAO129#002
+    version: 2
+    revision: 1
+    naming:
+      de: 
+        name: Postleitzahl
+        structuredName: Postleitzahl
+        description: Postleitzahl der Anschrift
+      en:
+        name: Postal code
+        structuredName: Postal code
+        description: Postal code of the address
+  - semanticId: 0173-1#02-AAO132#002
+    version: 2
+    revision: 1
+    naming:
+      de:
+        name: Ort
+        structuredName: Ort
+        description: Ortsangabe
+      en:
+        name: location
+        structuredName: location
+        description: location

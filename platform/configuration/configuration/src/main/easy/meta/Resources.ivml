@@ -31,8 +31,7 @@ project Resources {
         NonEmptyString host = "localhost";
         NonEmptyEphemeralPort port = 8884;
         NonEmptyString region = "local";
-        String accessKey = "";
-        String secretAccessKey = ""; // preliminary
+        String authenticationKey = "";
         PackageStore runtimeStorage = {
             bucket = "iip",
             prefix = "ecs",
@@ -62,8 +61,7 @@ project Resources {
    abstract compound DeviceMgtStorageServer {
         NonEmptyEphemeralPort port = 8884;
         String path = ""; // in memory for now, TODO temporary
-        String accessKey = "";
-        String secretAccessKey = ""; // preliminary
+        String authenticationKey = "";
    }
    
    // one default compound to state that there shall be no device mgt server 

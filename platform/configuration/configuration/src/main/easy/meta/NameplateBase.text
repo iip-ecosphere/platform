@@ -1,0 +1,10 @@
+NameplateBase::Manufacturer::address = Address of the manufacturer (localized string, text@lang).
+NameplateBase::Manufacturer::manufacturerLogo = Location of the manufacturer logo, either URL or classpath resource, empty for none.
+NameplateBase::Manufacturer::manufacturerName = Name of the manufacturer (localized string, text@lang).
+NameplateBase::ManufacturerAddress::cityTown = City/town of the address of the manufacturer (localized string, text@lang).
+NameplateBase::ManufacturerAddress::department = Responsible department in the address of the manufacturer (localized string, text@lang).
+NameplateBase::ManufacturerAddress::street = Street in the address of the manufacturer (localized string, text@lang).
+NameplateBase::ManufacturerAddress::zipCode = ZIP code in the address of the manufacturer (localized string, text@lang).
+NameplateBase::NameplateInfo::manufacturer = Structure describing the manufacturer.
+NameplateBase::NameplateInfo::manufacturerProductDesignation = Product designation (localized string, text@lang).
+NameplateBase::NameplateInfo::productImage = Location of the manufacturer logo, either URL or classpath resource, empty for none.

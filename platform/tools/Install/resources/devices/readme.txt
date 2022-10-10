@@ -1,0 +1,1 @@
+add here your device AAS yml files, AAS Package explorer files for devices (named by device id) as well as referenced pictures.

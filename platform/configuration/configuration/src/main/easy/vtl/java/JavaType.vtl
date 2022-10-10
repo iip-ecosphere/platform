@@ -131,6 +131,22 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     def genHashCode(String access, RecordType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
+    
+    def genHashCode(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    def genHashCode(String access, DateTimeTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    def genHashCode(String access, ByteStringTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    def genHashCode(String access, ObjectTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
 
     def genHashCode(String access, StringTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
@@ -155,6 +171,22 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     }
 
     def genEquals(String access, RecordType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+    
+    def genEquals(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    def genEquals(String access, DateTimeTypeType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    def genEquals(String access, ByteStringTypeType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    def genEquals(String access, ObjectTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 

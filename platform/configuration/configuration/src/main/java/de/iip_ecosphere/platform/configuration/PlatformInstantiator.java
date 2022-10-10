@@ -144,7 +144,32 @@ public class PlatformInstantiator {
         }
         
     }
-    
+
+    /**
+     * An instantiation configurer that does not clean the output folder.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class NonCleaningInstantiationConfigurer extends InstantiationConfigurer {
+
+        /**
+         * Creates a configurer instance.
+         * 
+         * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
+         * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
+         * @param outputFolder the output folder for code generation
+         */
+        public NonCleaningInstantiationConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
+            super(ivmlModelName, modelFolder, outputFolder);
+        }
+        
+        @Override
+        protected boolean cleanOutputFolder() {
+            return false;
+        }
+
+    }
+
     /**
      * Performs the platform instantiation.
      * 

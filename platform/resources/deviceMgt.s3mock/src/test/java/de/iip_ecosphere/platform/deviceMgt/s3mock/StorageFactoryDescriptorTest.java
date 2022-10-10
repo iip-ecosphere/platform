@@ -39,8 +39,7 @@ public class StorageFactoryDescriptorTest {
         PackageStorageSetup packageStorageSetup = new PackageStorageSetup();
         packageStorageSetup.setEndpoint("endpoint");
         packageStorageSetup.setBucket("bucket");
-        packageStorageSetup.setAccessKey("access_key");
-        packageStorageSetup.setSecretAccessKey("secret_access_key");
+        packageStorageSetup.setAuthenticationKey("access_key");
         packageStorageSetup.setPackageDescriptor("runtime.yml");
         packageStorageSetup.setPackageFilename("runtime.zip");
         packageStorageSetup.setPrefix("runtimes/");
@@ -49,8 +48,7 @@ public class StorageFactoryDescriptorTest {
         PackageStorageSetup configsStorageSetup = new PackageStorageSetup();
         configsStorageSetup.setEndpoint("endpoint");
         configsStorageSetup.setBucket("bucket");
-        configsStorageSetup.setAccessKey("access_key");
-        configsStorageSetup.setSecretAccessKey("secret_access_key");
+        configsStorageSetup.setAuthenticationKey("access_key");
         configsStorageSetup.setPackageDescriptor("config.yml");
         configsStorageSetup.setPackageFilename("config.zip");
         configsStorageSetup.setPrefix("configs/");

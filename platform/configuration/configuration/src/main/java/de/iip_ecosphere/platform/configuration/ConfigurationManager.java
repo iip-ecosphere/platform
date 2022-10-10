@@ -69,7 +69,7 @@ public class ConfigurationManager {
             }
             Transport.sendStatus(
                 new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
-                    .withProgress(steps / maxSteps));
+                    .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
         }
         
         @Override
@@ -136,6 +136,23 @@ public class ConfigurationManager {
                 }
             }
             initialized = true;
+        }
+    }
+    
+    /**
+     * Reloads the model.
+     */
+    public static void reload() {
+        if (null != executor) {
+            try {
+                executor.discardLocations();
+                executor.setupLocations();
+                executor.loadIvmlModel();
+            } catch (ModelManagementException e) {
+                getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
+            }
+        } else {
+            getLogger().error("No executor, cannot reload EASy-Producer models");
         }
     }
     

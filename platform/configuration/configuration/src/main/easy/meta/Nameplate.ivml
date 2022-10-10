@@ -1,29 +1,12 @@
+/*
+ * Basic AAS nameplates for manufacturers in IIP-Ecosphere (preliminary).
+ */
 project Nameplate {
 
-    import DataTypes;
+    import NameplateBase;
+    import NameplatePart*;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
-    
-    compound NameplateInfo {
-        String productImage = ""; // URL or local -> resources
-        String manufacturerProductDesignation = "";
-        refTo(Manufacturer) manufacturer;
-    }
-    
-    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
-    compound Manufacturer {
-        String manufacturerName = "";
-        String manufacturerLogo = ""; // URL or local -> resources
-        ManufacturerAddress address; // ref really needed?
-    }
-    
-    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
-    compound ManufacturerAddress {
-        String department = "";
-        String street = "";
-        String zipCode = "";
-        String cityTown = "";
-    }
     
     Manufacturer manufacturer_sse = {
         manufacturerName = "Universitaet Hildesheim@de",
@@ -44,28 +27,6 @@ project Nameplate {
             street = "Appelstraße 9a@de",
             zipCode = "30167@de",
             cityTown = "Hannover@de"
-        }
-    };
-
-    Manufacturer manufacturer_rapidminer = {
-        manufacturerName = "RapidMiner Germany@de",
-        manufacturerLogo = "",
-        address = {
-            department = "RapidMiner GmbH@de",
-            street = "Westfalendamm 87@de",
-            zipCode = "44141@de",
-            cityTown = "Dortmund@de"
-        }
-    };
-    
-    Manufacturer manufacturer_kiprotect = {
-        manufacturerName = "KIPROTECT@de",
-        manufacturerLogo = "",
-        address = {
-            department = "KIPROTECT@de",
-            street = "Bismarckstr. 10-12@de",
-            zipCode = "10625@de",
-            cityTown = "Berlin@de"
         }
     };
         

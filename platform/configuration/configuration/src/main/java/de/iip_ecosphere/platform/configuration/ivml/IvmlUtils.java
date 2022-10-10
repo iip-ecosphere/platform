@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.configuration.ivml;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
+import net.ssehub.easy.varModel.model.values.BooleanValue;
 import net.ssehub.easy.varModel.model.values.IntValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -77,6 +78,28 @@ public class IvmlUtils {
                 result = deflt;
             } else {
                 result = ((IntValue) val).getValue();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns a Boolean value from the given {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @param deflt the default value to return if no value can be obtained
+     * @return the value or {@code deflt}
+     */
+    public static boolean getBooleanValue(IDecisionVariable var, boolean deflt) {
+        boolean result;
+        if (var == null) {
+            result = deflt;
+        } else {
+            Value val = var.getValue();
+            if (!(val instanceof BooleanValue)) {
+                result = deflt;
+            } else {
+                result = ((BooleanValue) val).getValue();
             }
         }
         return result;

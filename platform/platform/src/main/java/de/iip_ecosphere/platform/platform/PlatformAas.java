@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -31,6 +33,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.transport.status.TaskUtils;
 
 /**
  * The platform AAS contributor, in particular for the available artifacts.
@@ -51,6 +54,11 @@ public class PlatformAas implements AasContributor {
     
     public static final String NAME_OPERATION_DEPLOY = "deployPlan";
     public static final String NAME_OPERATION_UNDEPLOY = "undeployPlan";
+    public static final String NAME_OPERATION_DEPLOY_ASYNC = "deployPlanAsync";
+    public static final String NAME_OPERATION_UNDEPLOY_ASYNC = "undeployPlanAsync";
+    public static final String NAME_OPERATION_GET_TASK_STATUS = "getTaskStatus";
+    
+    private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -67,6 +75,7 @@ public class PlatformAas implements AasContributor {
                 .build();
         }
         b.build();
+
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY))
@@ -75,6 +84,18 @@ public class PlatformAas implements AasContributor {
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
             .build(Type.NONE);
+        smB.createOperationBuilder(NAME_OPERATION_DEPLOY_ASYNC)
+            .addInputVariable("url", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY_ASYNC))
+            .build(Type.STRING);
+        smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_ASYNC)
+            .addInputVariable("url", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_ASYNC))
+            .build(Type.STRING);
+        smB.createOperationBuilder(NAME_OPERATION_GET_TASK_STATUS)
+            .addInputVariable("taskId", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_STATUS))
+            .build(Type.STRING);
         smB.build();
         
         aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build(); // just that it is there
@@ -90,6 +111,17 @@ public class PlatformAas implements AasContributor {
         sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY, new JsonResultWrapper(p -> { 
             return undeployPlan(AasUtils.readString(p));
         }));
+        sBuilder.defineOperation(NAME_OPERATION_DEPLOY_ASYNC, new JsonResultWrapper(p -> {
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> deployPlan(AasUtils.readString(q)), p);
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_ASYNC, new JsonResultWrapper(p -> {
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> undeployPlan(AasUtils.readString(q)), p);
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_GET_TASK_STATUS, new JsonResultWrapper(p -> {
+            TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
+            return data != null && data != TaskRegistry.NO_TASK ? data.getStatus().toString() : null;
+        }));
+        
     }
     
     /**

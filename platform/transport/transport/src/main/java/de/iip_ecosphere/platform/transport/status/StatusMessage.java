@@ -14,7 +14,10 @@ package de.iip_ecosphere.platform.transport.status;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 
 /**
@@ -37,6 +40,8 @@ public class StatusMessage {
     private int progress = -1;
     private String description = "";
     private String subDescription = "";
+    private String taskId;
+    private Object result;
 
     /**
      * Creates an empty status message. [deserialization]
@@ -235,6 +240,79 @@ public class StatusMessage {
      */
     public String getSubDescription() {
         return subDescription;
+    }
+
+    /**
+     * Adds task information if the actually running process were, e.g., initiated from the UI. Takes the registered
+     * task data for the actual thread from the {@link TaskRegistry}.
+     *  
+     * @return <b>this</b>
+     * @see #withTask(TaskData)
+     */
+    public StatusMessage withTask() {
+        return withTask(TaskRegistry.getTaskData());
+    }
+
+    /**
+     * Adds task information if the actually running process were, e.g., initiated from the UI. Does not attach results.
+     *  
+     * @param data the task data (from {@link TaskRegistry}
+     * @return <b>this</b>
+     * @see #withTask(TaskData, Object)
+     */
+    public StatusMessage withTask(TaskData data) {
+        return withTask(data, null);
+    }
+    
+    /**
+     * Adds task information if the actually running process were, e.g., initiated from the UI. 
+     *  
+     * @param data the task data (from {@link TaskRegistry}
+     * @param result the result (must be serializable, see {@link SerializerRegistry}) if {@link #getAction()} is 
+     *     {@link ActionTypes#RESULT} or information about an error/exception if {@link #getAction()} is 
+     *     {@link ActionTypes#ERROR}, may be <b>null</b> 
+     * @return <b>this</b>
+     * @see #withResult(Object)
+     */
+    public StatusMessage withTask(TaskData data, Object result) {
+        if (null != data && data != TaskRegistry.NO_TASK) {
+            this.taskId = data.getId();
+        }
+        return withResult(result);
+    }
+    
+    /**
+     * Sets the result of task-based processing. 
+     *  
+     * @param result the result (must be serializable, see {@link SerializerRegistry}) if {@link #getAction()} is 
+     *     {@link ActionTypes#RESULT} or information about an error/exception if {@link #getAction()} is 
+     *     {@link ActionTypes#ERROR}, may be <b>null</b> 
+     * @return <b>this</b>
+     */
+    public StatusMessage withResult(Object result) {
+        this.result = result;
+        return this;
+    }
+
+    /**
+     * Returns the task id this message is sent from within. Not all status messages have a task id, e.g., if the are
+     * not started from the UI as longer running task.
+     * 
+     * @return the task id, may be <b>null</b>
+     */
+    public String getTaskId() {
+        return taskId;
+    }
+    
+    /**
+     * Returns the result of task-based processing.
+     * 
+     * @return the result (must be serializable, see {@link SerializerRegistry}) if {@link #getAction()} is 
+     *     {@link ActionTypes#RESULT} or information about an error/exception if {@link #getAction()} is 
+     *     {@link ActionTypes#ERROR}, may be <b>null</b> 
+     */
+    public Object getResult() {
+        return result;
     }
 
 }
