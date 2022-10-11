@@ -75,8 +75,8 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
-import net.ssehub.easy.varModel.model.filter.ConstraintSeparator;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -292,6 +292,26 @@ public class AasIvmlMapper implements DecisionVariableProvider {
     }
 
     /**
+     * Creates an assignment of {@code valueEx} to {@code varDecl} and adds it to {@code prj}.
+     * 
+     * @param varDecl the variable declaration
+     * @param valueEx the IVML value expression
+     * @param prj the project to add the constraint to
+     * @return the created constraint
+     * @throws ExecutionException if creating the constraint fails
+     */
+    private Constraint createAssignment(AbstractVariable varDecl, String valueEx, Project prj) 
+        throws ExecutionException {
+        try {
+            Constraint c = new Constraint(createExpression(varDecl.getName() + "=" + valueEx, prj), prj);
+            prj.add(c);
+            return c;
+        } catch (CSTSemanticException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
      * Changes the value of the variable declaration {@code var} by parsing {@code expression}.
      * 
      * @param var the variable to change, may be a top-level variable and {@code expression} may be a compound 
@@ -301,8 +321,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      */
     private void setValue(AbstractVariable var, String expression) throws ExecutionException {
         try {
-            Configuration cfg = cfgSupplier.get();
-            ConstraintSyntaxTree cst = createExpression(expression, cfg.getConfiguration().getProject());
+            if (TypeQueries.isCompound(var.getType()) && expression.trim().startsWith("{")) {
+                expression = IvmlDatatypeVisitor.getUnqualifiedType(var.getType()) + expression;
+            } // container type may require special treatment
+            ConstraintSyntaxTree cst = createExpression(expression, var.getProject());
+            cst.inferDatatype();
             var.setValue(cst);
         } catch (ValueDoesNotMatchTypeException | CSTSemanticException e) {
             throw new ExecutionException(e.getMessage(), null);
@@ -338,13 +361,8 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                     target = root;
                 }
                 removeConstraintsForVariable(target, varDecl);
-                Constraint c = new Constraint(
-                    createExpression(varDecl.getName() + "=" + ent.getValue(), target), target);
-                target.add(c);
+                createAssignment(varDecl, ent.getValue(), target); 
                 projects.add(target);
-            } catch (CSTSemanticException e) {
-                history.rollback();
-                throw new ExecutionException(e);
             } catch (ExecutionException e) {
                 history.rollback();
                 throw e;
@@ -893,15 +911,18 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             IDatatype t = ModelQuery.findType(root, type, null);
             if (null != t) {
                 DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, root);
-                root.add(var);
                 setValue(var, valueEx);
+                root.add(var);
+                //alternative: in own constraint, remove setValue above; may be needed if t is container
+                //createAssignment(var, valueEx, root); 
+                cfg.createDecision(var);
             } else {
                 throw new ExecutionException("No such type " + t, null);
             }
             ReasoningResult res = ConfigurationManager.validateAndPropagate();
             throwIfFails(res, true);
             saveTo(root, getIvmlFile(root));
-        } catch (ModelQueryException e) {
+        } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }
         return null;
@@ -927,20 +948,12 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 if (subpath != null || prj == root) {
                     removeConstraintsForVariable(prj, var);
                     prj.removeElement(var);
+                    cfg.removeDecision(cfg.getDecision(var));
                     ReasoningResult res = ConfigurationManager.validateAndPropagate();
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
                 } else {
                     throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
-                }
-                ConstraintSeparator sep = new ConstraintSeparator(prj);
-                for (Constraint c : sep.getAssingmentConstraints()) {
-                    ConstraintSyntaxTree op = ((OCLFeatureCall) c.getConsSyntax()).getOperand();
-                    if (op instanceof Variable) {
-                        if (((Variable) op).getVariable() == var) {
-                            prj.removeElement(c);
-                        }
-                    }
                 }
             } else {
                 throw new ExecutionException("Cannot find variable " + varName, null);
@@ -958,12 +971,20 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @param var the variable to remove constraints for
      */
     private void removeConstraintsForVariable(Project prj, AbstractVariable var) {
-        ConstraintSeparator sep = new ConstraintSeparator(prj);
-        for (Constraint c : sep.getAssingmentConstraints()) {
-            ConstraintSyntaxTree op = ((OCLFeatureCall) c.getConsSyntax()).getOperand();
-            if (op instanceof Variable) {
-                if (((Variable) op).getVariable() == var) {
-                    c.getProject().removeElement(c);
+        // EASy ConstraintSeparator does not detect all forms of assignment constraints, e.g., compound init as arg
+        for (int e = 0; e < prj.getElementCount(); e++) {
+            ContainableModelElement elt = prj.getElement(e);
+            if (elt instanceof Constraint) {
+                Constraint c = (Constraint) elt;
+                ConstraintSyntaxTree cst = c.getConsSyntax();
+                if (cst instanceof OCLFeatureCall) {
+                    OCLFeatureCall call = (OCLFeatureCall) cst;
+                    if (OclKeyWords.ASSIGNMENT.equals(call.getOperation())) {
+                        if (call.getOperand() instanceof Variable 
+                            && (((Variable) call.getOperand()).getVariable() == var)) {
+                            c.getProject().removeElement(c);
+                        }
+                    }
                 }
             }
         }

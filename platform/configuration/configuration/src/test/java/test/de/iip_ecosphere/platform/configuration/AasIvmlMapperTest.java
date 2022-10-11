@@ -345,7 +345,6 @@ public class AasIvmlMapperTest {
      * 
      * @throws IOException if copying/resetting files fails
      */
-    @Ignore("untested")
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
@@ -353,7 +352,10 @@ public class AasIvmlMapperTest {
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance();
 
-        String valueEx = "{id=\"SimpleSource\"," 
+        mapper.createVariable("rec1", "RecordType", "{}");
+
+        String valueEx = "{"
+            + "id=\"SimpleSource\"," 
             + "name=\"Simple Data Source\","
             + "description=\"\","
             + "ver=\"0.1.0\","
@@ -362,10 +364,11 @@ public class AasIvmlMapperTest {
             + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl\","
             + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
             + "kind=ServiceKind::SOURCE_SERVICE,"
-            + "output={{type=rec1}}}";
+            + "output={{type=rec1}}"
+            + "}";
         
         mapper.createVariable("test1", "JavaService", valueEx);
-        assertIvmlFileChange("TestConfiguration", false, "test1");
+        assertIvmlFileChange("TestConfiguration", false, "test1", "rec1");
         
         mapper.deleteVariable("test1");
         assertIvmlFileChange("TestConfiguration", true, "test1");
