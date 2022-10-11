@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.BooleanValue;
@@ -37,6 +38,17 @@ public class IvmlUtils {
     public static boolean isOfCompoundType(IDecisionVariable var, String typeName) {
         IDatatype type = var.getDeclaration().getType();
         return TypeQueries.isCompound(type) && typeName.equals(type.getName());
+    }
+
+    /**
+     * Returns a nested variable, returning <b>null</b> if {@code var} is null.
+     * 
+     * @param var the variable
+     * @param nested the name of the nested variable
+     * @return the nested variable or <b>null</b>
+     */
+    public static IDecisionVariable getNestedSafe(IDecisionVariable var, String nested) {
+        return null == var ? null : var.getNestedElement(nested);
     }
     
     /**
@@ -103,6 +115,17 @@ public class IvmlUtils {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the name of {@code var} taking <b>null</b> into account.
+     * 
+     * @param var the variable
+     * @param dflt the default if {@code var} is <b>null</b>
+     * @return the name or {@code dflt}
+     */
+    public static String getVarNameSafe(AbstractVariable var, String dflt) {
+        return null == var ? dflt : var.getName();
     }
 
 }

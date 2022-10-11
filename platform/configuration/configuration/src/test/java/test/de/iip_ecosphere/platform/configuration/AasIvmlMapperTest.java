@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -23,7 +24,6 @@ import java.util.function.Consumer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationAas;
@@ -35,6 +35,9 @@ import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
+import de.iip_ecosphere.platform.configuration.ivml.DefaultEdge;
+import de.iip_ecosphere.platform.configuration.ivml.DefaultGraph;
+import de.iip_ecosphere.platform.configuration.ivml.DefaultNode;
 import de.iip_ecosphere.platform.configuration.ivml.GraphFormat;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
@@ -322,19 +325,71 @@ public class AasIvmlMapperTest {
      * Tests the set graph function.
      * 
      * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if setting graphs fails
      */
-    @Ignore("Incomplete")
     @Test
-    public void testSetGraph() throws IOException {
+    public void testSetGraph() throws IOException, ExecutionException {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        @SuppressWarnings("unused")
-        AasIvmlMapper mapper = getInstance();
+        DrawflowGraphFormat drawflowFormat = new DrawflowGraphFormat();
         
-        // modify, create
-        // get GraphString from artificial IvmlGraph
-        // TODO setGraph
+        DefaultGraph graph = new DefaultGraph(null);
+        DefaultNode n1 = new DefaultNode(null);
+        n1.setName("src");
+        graph.addNode(n1);
+        DefaultNode n2 = new DefaultNode(null);
+        n2.setName("Sink");
+        n2.setImpl("snk");
+        graph.addNode(n2);
+        DefaultEdge e1 = new DefaultEdge(null, n1, n2);
+        n1.addEdge(e1);
+        n2.addEdge(e1);
+        
+        AasIvmlMapper mapper = getInstance();
+        mapper.addGraphFormat(drawflowFormat);
+        
+        mapper.createVariable("rec1", "RecordType", "{}");
+        String valueEx = "{"
+            + "id=\"SimpleSource\"," 
+            + "name=\"Simple Data Source\","
+            + "description=\"\","
+            + "ver=\"0.1.0\","
+            + "deployable=true,"
+            + "asynchronous=true,"
+            + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl\","
+            + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
+            + "kind=ServiceKind::SOURCE_SERVICE,"
+            + "output={{type=rec1}}"
+            + "}";
+        mapper.createVariable("src", "JavaService", valueEx);
+        valueEx = "{"
+            + "id=\"SimpleSink\"," 
+            + "name=\"Simple Data Sink\","
+            + "description=\"\","
+            + "ver=\"0.1.0\","
+            + "deployable=true,"
+            + "asynchronous=true,"
+            + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSinkImpl\","
+            + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
+            + "kind=ServiceKind::SINK_SERVICE,"
+            + "input={{type=rec1}}"
+            + "}";
+        mapper.createVariable("snk", "JavaService", valueEx);
+        
+        valueEx = "{"
+            + "id=\"myApp\","
+            + "name=\"name\","
+            + "description=\"\","
+            + "ver=\"0.1.0\""
+            + "}";
+        mapper.setGraph("myApp", valueEx, "myMesh", drawflowFormat.getName(), drawflowFormat.toString(graph));
+
+        assertIvmlFileChange("meshes/ServiceMeshPartMyAppMyMesh", false, "myMesh");
+        assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
+
+        // TODO modify graph
+        // TODO delete graph
         
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -345,7 +400,6 @@ public class AasIvmlMapperTest {
      * 
      * @throws IOException if copying/resetting files fails
      */
-    @Ignore("untested")
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
@@ -353,7 +407,10 @@ public class AasIvmlMapperTest {
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance();
 
-        String valueEx = "{id=\"SimpleSource\"," 
+        mapper.createVariable("rec1", "RecordType", "{}");
+
+        String valueEx = "{"
+            + "id=\"SimpleSource\"," 
             + "name=\"Simple Data Source\","
             + "description=\"\","
             + "ver=\"0.1.0\","
@@ -362,10 +419,11 @@ public class AasIvmlMapperTest {
             + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl\","
             + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
             + "kind=ServiceKind::SOURCE_SERVICE,"
-            + "output={{type=rec1}}}";
+            + "output={{type=rec1}}"
+            + "}";
         
         mapper.createVariable("test1", "JavaService", valueEx);
-        assertIvmlFileChange("TestConfiguration", false, "test1");
+        assertIvmlFileChange("TestConfiguration", false, "test1", "rec1");
         
         mapper.deleteVariable("test1");
         assertIvmlFileChange("TestConfiguration", true, "test1");
@@ -428,7 +486,7 @@ public class AasIvmlMapperTest {
                 if (invert) {
                     found = !found;
                 }
-                Assert.assertTrue(found);
+                Assert.assertTrue("Not found " + Arrays.toString(expected) + " in: " + contents, found);
             }
         } catch (IOException e) {
             Assert.fail("Cannot read " + file + ": " + e.getMessage());

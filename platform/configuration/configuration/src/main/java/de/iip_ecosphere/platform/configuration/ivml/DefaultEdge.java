@@ -18,7 +18,7 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * Default graph edge implementation. {@link #getName()} is bound against the nested variable 
- * {@code name}.
+ * {@link #getNameVarName()}. Shall serve for a more generic mapping, to be part of EASY-Producer, thus, customizable.
  * 
  * @author Holger Eichelberger, SSE
  */
