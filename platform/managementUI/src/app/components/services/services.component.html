@@ -1,37 +1,5 @@
 <div class="background">
-  <h1 *ngIf="resource && resource.idShort">Operations for {{ resource.idShort }}</h1>
-  <table>
-    <tr>
-      <td>
-        <div *ngIf="resource">
-          <div *ngFor="let basyxFunc of resource.value">
-            <div *ngIf="basyxFunc.invokable">
-              <div>
-                <button mat-raised-button (click)="showFuncInput(basyxFunc)">{{ basyxFunc.idShort }}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </td>
-      <td>
-        <div *ngIf="selectedBasyxFunc">
-          <div> {{ selectedBasyxFunc.idShort }}</div>
-          <div *ngFor="let func of selectedBasyxFunc.inputVariables; let i = index">
-            <p>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ func.value.idShort }}</mat-label>
-                <input [(ngModel)]=value[i].value.value matInput >
-              </mat-form-field>
-            </p>
-          </div>
-          <button mat-raised-button class="button" (click)="send()">Abschicken</button>
-          <p *ngIf="message"> {{message}}</p>
-        </div>
-      </td>
-    </tr>
-  </table>
-  <br>
-  <h1>Services <span *ngIf="resource && resource.idShort">for {{ resource.idShort }}</span></h1>
+  <h1>running Artifacts</h1>
   <div *ngIf="services && services.submodelElements">
     <div *ngFor="let element of services.submodelElements; let i = index">
       <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0">
@@ -59,7 +27,6 @@
       </mat-card>
     </div>
   </div>
-
   <h1>available Artifacts</h1>
   <div>
     <div *ngFor="let element of artifacts.submodelElements; let i = index">

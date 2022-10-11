@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
+import { PlatformResources, ResourceValue } from 'src/interfaces';
 
 @Component({
   selector: 'app-resources',
@@ -16,6 +16,8 @@ export class ResourcesComponent implements OnInit {
 
   errorSub: Subscription;
   errorMsg: string | undefined;
+
+  clicked: boolean = false;
 
   constructor(public http: HttpClient, public api: ApiService, public router: Router) {
     this.errorSub = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
@@ -40,7 +42,23 @@ export class ResourcesComponent implements OnInit {
   public async details(resource: ResourceValue[] | undefined) {
     let id: string | undefined = undefined;
     if(this.isArray(resource)){
-      console.log(resource);
+      const test = await resource?.find(item => item.idShort === "managedId");
+      if (test) {
+        id = test.value;
+      }
+    }
+    if (id) {
+      this.router.navigateByUrl("/resources/" + id);
+
+    } else {
+      console.log("ERROR: resource does not have a managedId");
+    }
+
+  }
+
+  public async details2(resource: ResourceValue[] | undefined) {
+    let id: string | undefined = undefined;
+    if(this.isArray(resource)){
       const test = await resource?.find(item => item.idShort === "managedId");
       if (test) {
         id = test.value;
@@ -49,7 +67,7 @@ export class ResourcesComponent implements OnInit {
     if (id) {
       this.router.navigateByUrl("/services/" + id);
     } else {
-      console.log("fail"); //TODO: error message
+      console.log("ERROR: resource does not have a managedId");
     }
 
   }

@@ -26,6 +26,8 @@ import { TidyPipe } from './pipes/tidy.pipe';
 import { EnvConfigService } from './services/env-config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DeploymentPlansComponent } from './components/deployment-plans/deployment-plans.component';
+import { ResourceDetailsComponent } from './components/resource-details/resource-details.component';
+import { OperationQueryComponent } from './components/resource-details/operation-query/operation-query.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { DeploymentPlansComponent } from './components/deployment-plans/deployme
     ServicesComponent,
     ConnectorTypesComponent,
     TidyPipe,
-    DeploymentPlansComponent
+    DeploymentPlansComponent,
+    ResourceDetailsComponent,
+    OperationQueryComponent
   ],
   imports: [
     BrowserModule,

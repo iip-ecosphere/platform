@@ -1,3 +1,5 @@
+
+
 export interface PlatformResources {
   submodelElements?: ResourceSubmodelElement[]
 }
@@ -12,6 +14,7 @@ export interface ResourceSubmodelElement {
 
 }
 
+//to be replaced by ResourceAttribute
 export interface ResourceValue {
   idShort?: string;
   kind?: string;
@@ -22,6 +25,46 @@ export interface ResourceValue {
   inputVariables?: any;
   outputVariables?: any;
   invokable?: any;
+}
+
+export interface Resource {
+  allowDuplicates: boolean;
+  idShort?: string;
+  identification?: any;
+  kind?: string;
+  valueType?: string;
+  value?: ResourceAttribute[];
+}
+
+//this is either an Attribute or a Function since both are stored in the same Array
+export interface ResourceAttribute {
+  idShort?: string;
+  kind?: string;
+  valueType?: string;
+  value?: any;
+  description?: any;
+  inoutputVariables?: any;
+  inputVariables?: InputVariable[];
+  outputVariables?: any;
+  invokable?: any;
+}
+
+export interface InputVariable {
+  modelType?: any;
+  value?: {
+    idShort?: string;
+    kind?: string;
+    valueType?: string;
+    value?: string;
+  }
+}
+
+export interface outputArgument {
+  value?: {
+    idShort?: string;
+    kind?: string;
+    value?: string;
+  }
 }
 
 export interface PlatformServices {
@@ -78,9 +121,4 @@ export interface platformResponse {
   outputArguments: outputArgument[];
 }
 
-export interface outputArgument {
-  value: {
-    idShort: string;
-    value: string;
-  }
-}
+

@@ -35,7 +35,6 @@ export class ApiService {
 
   public async getResources() {
     this.resources = await this.getData('aas/submodels/resources/submodel') as PlatformResources;
-    console.log(this.resources);
     return this.resources;
   }
 
@@ -46,7 +45,6 @@ export class ApiService {
 
   public async getArtifacts() {
     const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformResources;
-    console.log(Data);
     return Data;
   }
 
@@ -62,6 +60,8 @@ export class ApiService {
   }
 
   public async executeFunction(resource: string, basyxFunc: string, params: any) {
+    console.log(resource + '  ' + basyxFunc);
+    console.log(params);
     let response;
     try {
       response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/resources/submodel/submodelElements/" + resource + "/" + basyxFunc + "/invoke"

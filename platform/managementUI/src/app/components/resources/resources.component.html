@@ -2,17 +2,14 @@
 <div *ngIf="errorMsg"> Please check CORS and reload the page</div>
 <div *ngIf="Data && Data.submodelElements">
   <div *ngFor="let element of Data.submodelElements">
-    <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0">
-      <mat-card-title>{{ element.idShort }}</mat-card-title>
-      <mat-card-content>
-        <div *ngFor="let element2 of element.value">
-          <div *ngIf="!element2.invokable">
-            <span class="shortId">{{ element2.idShort }}: </span>
-            <span *ngIf="element2.value"> {{ element2.value | tidy}} </span>
-          </div>
-        </div>
-        <button mat-raised-button class="button" (click)="details(element.value)">Details</button>
-      </mat-card-content>
-    </mat-card>
+    <div *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'">
+      <mat-card tabindex="0" [class.contentBox]="!clicked" (click)="clicked = !clicked">
+        <mat-card-title><button mat-raised-button class="button" (click)="details(element.value)">{{ element.idShort }}</button></mat-card-title>
+        <mat-card-content>
+
+        </mat-card-content>
+      </mat-card>
+    </div>
+
   </div>
 </div>

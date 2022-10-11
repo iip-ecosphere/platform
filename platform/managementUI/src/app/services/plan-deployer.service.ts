@@ -61,8 +61,11 @@ export class PlanDeployerService {
     this.sub = response?.subscribe((dep: platformResponse) => {
       this.status.executionState = dep.executionState;
       let i = 0;
+      console.log(dep);
       for(const message of dep.outputArguments) {
-        this.status.messages.push(dep.outputArguments[i].value.value);
+        if(message.value) {
+          this.status.messages.push(message.value.value as string);
+        }
         i++;
       }
       this.emitter.next(this.status);

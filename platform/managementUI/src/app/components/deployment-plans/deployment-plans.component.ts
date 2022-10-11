@@ -28,7 +28,7 @@ export class DeploymentPlansComponent implements OnInit {
 
   constructor(public api: ApiService, private deployer: PlanDeployerService) {
     this.messageSub = this.deployer.emitter.subscribe((status: { executionState: string,messages: string[]}) => {this.status = status});
-  
+
   }
 
   async ngOnInit() {
@@ -59,7 +59,6 @@ export class DeploymentPlansComponent implements OnInit {
        }
       const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
-      console.log(response);
       //this.subscription = response?.subscribe((dep: platformResponse) => {this.updateMessage(dep)});
 
       //this.openSnackbar(response.outputArguments);
