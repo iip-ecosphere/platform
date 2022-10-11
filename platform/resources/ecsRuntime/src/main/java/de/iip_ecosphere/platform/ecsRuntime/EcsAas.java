@@ -81,11 +81,14 @@ public class EcsAas implements AasContributor {
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
+    public static final String NAME_OP_CONTAINER_ADD_TASK = "addContainerAsTask";
     public static final String NAME_OP_CONTAINER_UNDEPLOY = "undeployContainer";
     public static final String NAME_OP_CONTAINER_UPDATE = "updateContainer";
     public static final String NAME_OP_CONTAINER_MIGRATE = "migrateContainer";
     public static final String NAME_OP_CONTAINER_STOP = "stopContainer";
+    public static final String NAME_OP_CONTAINER_STOP_TASK = "stopContainerAsTask";
     public static final String NAME_OP_CONTAINER_START = "startContainer";
+    public static final String NAME_OP_CONTAINER_START_TASK = "startContainerAsTask";
 
     public static final String NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS = "createRemoteConnectionCredentials";
     
@@ -96,12 +99,9 @@ public class EcsAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ContainerManager mgr = EcsFactory.getContainerManager();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        // ensure that containers collection exists
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false).build(); 
-
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false).build(); // ensure exist
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), 
             false, false);
-        
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
         MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
             Id.getDeviceId(), EcsFactory.getSetup().getTransport());
@@ -110,7 +110,6 @@ public class EcsAas implements AasContributor {
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
-        
         SystemMetrics sysM = SystemMetricsFactory.getSystemMetrics();
         jB.createPropertyBuilder(NAME_PROP_OPERATING_SYSTEM)
             .setValue(Type.STRING, sysM.getOsName())
@@ -125,7 +124,6 @@ public class EcsAas implements AasContributor {
         jB.createPropertyBuilder(NAME_PROP_GPU_CAPACITY)
             .setValue(Type.INTEGER, sysM.getNumGpuCores())
             .build();
-        
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
             .setValue(Type.STRING, "defaultEcsRuntime")
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
@@ -142,26 +140,31 @@ public class EcsAas implements AasContributor {
             .addOutputVariable("username", Type.STRING)
             .addOutputVariable("password", Type.STRING)
             .build();
-        
         if (null != mgr) {
             jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
                 .setValue(Type.STRING, mgr.getContainerSystemVersion())
                 .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
                 .build();
-    
             createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
+            createIdOp(jB, NAME_OP_CONTAINER_START_TASK, iCreator, "taskId");
             createIdOp(jB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");
             createIdOp(jB, NAME_OP_CONTAINER_UPDATE, iCreator, "location");
             createIdOp(jB, NAME_OP_CONTAINER_UNDEPLOY, iCreator);
             createIdOp(jB, NAME_OP_CONTAINER_STOP, iCreator);
+            createIdOp(jB, NAME_OP_CONTAINER_STOP_TASK, iCreator, "taskId");
             createIdOp(jB, NAME_OP_GET_STATE, iCreator);
             jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
                 .addInputVariable("url", Type.STRING)
                 .addOutputVariable("result", Type.STRING)
                 .build();
+            jB.createOperationBuilder(NAME_OP_CONTAINER_ADD_TASK)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD_TASK)))
+                .addInputVariable("url", Type.STRING)
+                .addInputVariable("taskId", Type.STRING)
+                .addOutputVariable("result", Type.STRING)
+                .build();
         }
-
         jB.build();
 
         if (null != mgr) {
@@ -193,6 +196,12 @@ public class EcsAas implements AasContributor {
                 return null;
             }
         ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_START_TASK), 
+            new JsonResultWrapper(p -> {
+                EcsFactory.getContainerManager().startContainer(readString(p)); 
+                return null;
+            }, p -> readString(p, 1)
+        ));
         sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_MIGRATE), 
             new JsonResultWrapper(p -> { 
                 EcsFactory.getContainerManager().migrateContainer(readString(p), readString(p, 1)); 
@@ -217,6 +226,12 @@ public class EcsAas implements AasContributor {
                 return null;
             }
         ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_STOP_TASK), 
+            new JsonResultWrapper(p -> { 
+                EcsFactory.getContainerManager().stopContainer(readString(p)); 
+                return null;
+            }, p -> readString(p, 1)
+        ));
         sBuilder.defineOperation(getQName(NAME_OP_GET_STATE), 
             new JsonResultWrapper(p -> { 
                 return EcsFactory.getContainerManager().getState(readString(p)); 
@@ -227,6 +242,11 @@ public class EcsAas implements AasContributor {
             new JsonResultWrapper(p -> { 
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_ADD_TASK), 
+            new JsonResultWrapper(p -> { 
+                return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
+            }, p -> readString(p, 1)
         ));
         
         sBuilder.defineOperation(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS),
