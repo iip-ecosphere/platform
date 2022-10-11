@@ -30,14 +30,26 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
 
     private static final long serialVersionUID = 6531890963314078947L;
     private ExceptionFunction func;
-    
+    private OperationCompletedListener listener;
+
     /**
      * Creates a wrapper object.
      * 
      * @param func a function that may throw an exception.
      */
     public JsonResultWrapper(ExceptionFunction func) {
+        this(func, null);
+    }
+
+    /**
+     * Creates a wrapper object.
+     * 
+     * @param func a function that may throw an exception.
+     * @param listener optional operation completed listener
+     */
+    public JsonResultWrapper(ExceptionFunction func, OperationCompletedListener listener) {
         this.func = func;
+        this.listener = listener;
     }
 
     /**
@@ -152,8 +164,14 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         try {
             Object funcRes = func.apply(param);
             result = new Result(null == funcRes ? null : funcRes.toString());
+            if (null != listener) {
+                listener.operationCompleted();
+            }
         } catch (Exception e) { // including AasExecutionException
             result = new Result(e);
+            if (null != listener) {
+                listener.operationFailed();
+            }
         }
         return toJson(result);
     }
@@ -235,6 +253,25 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         } catch (Throwable t) {
             throw new ExecutionException(t.getMessage(), t);
         }
+    }
+    
+    /**
+     * Allows to track operations.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface OperationCompletedListener {
+        
+        /**
+         * Called when an operation is completed.
+         */
+        public void operationCompleted();
+
+        /**
+         * Called when an operation failed due to an exception.
+         */
+        public void operationFailed();
+
     }
 
 }
