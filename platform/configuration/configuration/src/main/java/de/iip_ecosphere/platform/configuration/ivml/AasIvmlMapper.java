@@ -575,6 +575,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @throws ExecutionException if writing fails
      */
     private static void saveTo(Project prj, File file) throws ExecutionException {
+        file.getParentFile().mkdirs();
         try (FileWriter fWriter = new FileWriter(file)) {
             IVMLWriter writer = new IVMLWriter(fWriter);
             prj.accept(writer);
@@ -630,6 +631,27 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         private Project appProject;
         
     }
+    
+    /**
+     * Adds an import statement, if needed, temporarily resolved to be able to create expressions and constraints.
+     * 
+     * @param target the target project where to add the import to
+     * @param imp the imported name, may be a wildcard
+     * @param root the root project where to resolve projects from
+     * @param res already resolved project, takes precedence over resolving {@code imp} from {@code root}; use to 
+     *     temporarily resolve wildcard imports with one concrete project
+     * @throws ModelManagementException if resolving/setting the resolved project fails
+     */
+    private static void addImport(Project target, String imp, Project root, Project res) 
+        throws ModelManagementException {
+        ProjectImport i = new ProjectImport(imp);
+        if (null == res) {
+            i.setResolved(ModelQuery.findProject(root, imp));
+        } else {
+            i.setResolved(res);
+        }
+        target.addImport(i);
+    }
 
     /**
      * Writes an application project with the given new mesh variable.
@@ -649,7 +671,11 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         
         String appProjectName = "ApplicationPart" + toIdentifierFirstUpper(appName);
         results.appProject = ModelQuery.findProject(root, appProjectName);
-        results.meshProject.addImport(new ProjectImport("Applications"));
+        if (null == results.appProject) {
+            results.appProject = new Project(appProjectName);
+        }
+        addImport(results.appProject, "Applications", root, null);
+        addImport(results.appProject, "ServiceMeshPart*", root, results.meshProject);
         List<Object> meshes = new ArrayList<Object>();
         boolean replaced = false;
         if (results.appProject != null) {
@@ -677,9 +703,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             meshes.add(results.meshVar);
         }
             
-        results.appProject = new Project(appProjectName);
         DecisionVariableDeclaration appVar = new DecisionVariableDeclaration(
             toIdentifier(appName), applicationType, results.appProject);
+        results.appProject.add(appVar);
         setValue(appVar, appValueEx);
     }
 
@@ -742,14 +768,14 @@ public class AasIvmlMapper implements DecisionVariableProvider {
         Project root = cfg.getProject();
         results.meshProject = new Project("ServiceMeshPart" + toIdentifierFirstUpper(appName) 
             + toIdentifierFirstUpper(meshName));
-        results.meshProject.addImport(new ProjectImport("Applications"));
+        addImport(results.meshProject, "Applications", root, null);
         IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
         IDatatype transformerType = ModelQuery.findType(root, "MeshTransformer", null);
         IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
         IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
         IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
-        IDatatype applicationType = ModelQuery.findType(root, "Application", null);
-        Map<String, IDecisionVariable> services = collectServices(cfg, serviceType);
+        IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
+        ServiceMap services = collectServices(cfg, serviceType);
         Map<IvmlGraphNode, DecisionVariableDeclaration> nodeMap = new HashMap<>();
         Map<DecisionVariableDeclaration, String> valueMap = new HashMap<>();
         List<DecisionVariableDeclaration> sources = new ArrayList<>();
@@ -764,9 +790,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             }
             DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(n.getName(), type, 
                 results.meshProject);
-            String nodeValEx = "{x_pos=" + n.getXPos() 
-                + ",y_pos=" + n.getYPos() 
-                + ",impl=" + findServiceVar(services, n.getName()).getName()
+            String nodeValEx = "{pos_x=" + n.getXPos() 
+                + ",pos_y=" + n.getYPos() 
+                + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
             results.meshProject.add(nodeVar);
@@ -776,14 +802,18 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             }
         }
         boolean first = true;
+        int edgeCounter = 0;
         for (IvmlGraphNode n: graph.nodes()) {
             for (IvmlGraphEdge e: n.outEdges()) {
                 String edgeName = e.getName();
+                String edgeVarName = toIdentifier(edgeName);
                 if (null == edgeName || edgeName.length() == 0) {
                     edgeName = n.getName() + " -> " + e.getEnd().getName();
+                    edgeVarName = "edge_" + edgeCounter++;
                 }
                 DecisionVariableDeclaration edgeVar = new DecisionVariableDeclaration(
-                    edgeName, connectorType, results.meshProject);
+                    edgeVarName, connectorType, results.meshProject);
+                results.meshProject.add(edgeVar);
                 DecisionVariableDeclaration end = nodeMap.get(e.getEnd());
                 String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + end.getName() + ")}";
                 setValue(edgeVar, valueEx);
@@ -791,7 +821,7 @@ public class AasIvmlMapper implements DecisionVariableProvider {
                 if (!first) {
                     startNodeValueEx += ",";
                 }
-                startNodeValueEx += "refTo(" + nodeMap.get(n).getName() + ")";
+                startNodeValueEx += "refBy(" + edgeVarName + ")";
                 valueMap.put(nodeMap.get(n), startNodeValueEx);
                 first = false;
             }
@@ -800,18 +830,62 @@ public class AasIvmlMapper implements DecisionVariableProvider {
             DecisionVariableDeclaration nodeVar = nodeMap.get(n);
             setValue(nodeVar, valueMap.get(nodeVar) + "}}"); 
         }
-        results.meshVar = new DecisionVariableDeclaration(toIdentifier(meshName), applicationType, results.meshProject);
+        results.meshVar = new DecisionVariableDeclaration(toIdentifier(meshName), meshType, results.meshProject);
+        results.meshProject.add(results.meshVar);
         String meshValEx = "{description=\"" + meshName + "\", sources={";
         for (int s = 0; s < sources.size(); s++) {
             if (s > 0) {
                 meshValEx += ", ";
             }
-            meshValEx += "refTo(" + sources.get(s).getName() + ")";
+            meshValEx += "refBy(" + sources.get(s).getName() + ")";
         }
         meshValEx += "}}";
         setValue(results.meshVar, meshValEx);
     }
-
+    
+    /**
+     * A "map" holding names/id to service mappings.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ServiceMap {
+        
+        private Map<String, IDecisionVariable> nameToService = new HashMap<>();
+        private Map<String, IDecisionVariable> idToService = new HashMap<>();
+        
+        /**
+         * Returns a service by id or by configured name.
+         * 
+         * @param svc the service id/name
+         * @return the resolved service, may be <b>null</b>
+         */
+        public IDecisionVariable getService(String svc) {
+            IDecisionVariable result = nameToService.get(svc);
+            if (null == result) {
+                result = idToService.get(svc);
+            }
+            return result;
+        }
+        
+        /**
+         * Adds a service.
+         * 
+         * @param var the configured variable representing the service
+         */
+        private void add(IDecisionVariable var) {
+            String name = var.getDeclaration().getName(); // just fallback
+            name = IvmlUtils.getStringValue(var.getNestedElement("name"), name);
+            if (null != name) {
+                nameToService.put(name, var);
+            }
+            String id = IvmlUtils.getStringValue(var.getNestedElement("id"), name);
+            if (null != id) {
+                idToService.put(id, var);
+            }
+        }
+        
+    }
+    
     /**
      * Collects all declared services.
      * 
@@ -819,22 +893,14 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @param serviceType the IVML data type used to select services
      * @return a mapping between service names and configured IVML variables
      */
-    private static Map<String, IDecisionVariable> collectServices(net.ssehub.easy.varModel.confModel.Configuration cfg, 
+    private static ServiceMap collectServices(net.ssehub.easy.varModel.confModel.Configuration cfg, 
         IDatatype serviceType) {
-        Map<String, IDecisionVariable> result = new HashMap<>();
+        ServiceMap result = new ServiceMap();
         Iterator<IDecisionVariable> iter = cfg.iterator();
         while (iter.hasNext()) {
             IDecisionVariable cVar = iter.next();
             if (serviceType.isAssignableFrom(cVar.getDeclaration().getType())) {
-                String name = cVar.getDeclaration().getName(); // just fallback
-                IDecisionVariable nameVar = cVar.getNestedElement("name");
-                if (null != nameVar) {
-                    Object nameVal = getValue(nameVar);
-                    if (null != nameVal) {
-                        name = nameVal.toString(); // is AAS value, i.e., String
-                    }
-                }
-                result.put(name, cVar);
+                result.add(cVar);
             }
         }
         return result;
@@ -847,9 +913,9 @@ public class AasIvmlMapper implements DecisionVariableProvider {
      * @param name the service name to search for
      * @return the service IVML variable, or <b>null</b> for not found
      */
-    private static AbstractVariable findServiceVar(Map<String, IDecisionVariable> services, String name) {
+    private static AbstractVariable findServiceVar(ServiceMap services, String name) {
         AbstractVariable result = null;
-        IDecisionVariable cVar = services.get(name);
+        IDecisionVariable cVar = services.getService(name);
         if (null != cVar) {
             result = cVar.getDeclaration();
         }

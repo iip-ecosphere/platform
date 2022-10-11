@@ -112,55 +112,23 @@ public class ConfigurationAas implements AasContributor {
         
         @Override
         public String getName() {
-            IDecisionVariable var = getVariable();
-            String result = IvmlUtils.getStringValue(var.getNestedElement("name"), null);
-            if (null == result) {
-                var = Configuration.dereference(var.getNestedElement("impl"));
-                result = IvmlUtils.getStringValue(var.getNestedElement("name"), "");
+            String result = super.getName();
+            if (null == result || result.length() == 0) {
+                result = getImpl();
             }
             return result;
         }
 
         @Override
-        public int getXPos() {
-            return IvmlUtils.getIntValue(getVariable().getNestedElement("pos_x"), INVALID_POSITION);
+        protected String getXPosVarName() {
+            return "pos_x";
         }
 
         @Override
-        public int getYPos() {
-            return IvmlUtils.getIntValue(getVariable().getNestedElement("pos_y"), INVALID_POSITION);
+        protected String getYPosVarName() {
+            return "pos_y";
         }
 
-        @Override
-        public int getWidth() {
-            return INVALID_SIZE;
-        }
-
-        @Override
-        public int getHeight() {
-            return INVALID_SIZE;
-        }
-
-        @Override
-        public void setXPos(int xPos) {
-            // TODO
-        }
-
-        @Override
-        public void setYPos(int yPos) {
-            // TODO
-        }
-
-        @Override
-        public void setWidth(int width) {
-            // TODO
-        }
-
-        @Override
-        public void setHeight(int height) {
-            // TODO
-        }
-        
     }
 
     /**

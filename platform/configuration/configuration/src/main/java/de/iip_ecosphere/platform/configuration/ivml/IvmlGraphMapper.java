@@ -119,6 +119,13 @@ public interface IvmlGraphMapper {
         public int getHeight();
         
         /**
+         * Returns the configured name the implementing service. Fallback if not given is {@link #getName()}.
+         * 
+         * @return the variable name
+         */
+        public String getImpl();
+        
+        /**
          * Changes the left position of the node. May be ignored by the graph reader/writer.
          * 
          * @param xPos the left position, invalid if negative
@@ -152,7 +159,14 @@ public interface IvmlGraphMapper {
          * @param edge the edge
          */
         public void addEdge(IvmlGraphEdge edge);
-        
+
+        /**
+         * Changes the IVML variable name of the implementing service.
+         * 
+         * @param impl changes the variable name
+         */
+        public void setImpl(String impl);
+
         /**
          * Returns the edges ending at this node.
          * 
