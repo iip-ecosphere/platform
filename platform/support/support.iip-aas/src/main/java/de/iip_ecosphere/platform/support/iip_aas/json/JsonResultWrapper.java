@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.iip_ecosphere.platform.support.TaskRegistry;
+
 /**
  * Uniform way to represent results of AAS operations that may fail.
  * 
@@ -31,6 +33,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
     private static final long serialVersionUID = 6531890963314078947L;
     private ExceptionFunction func;
     private OperationCompletedListener listener;
+    private Function<Object[], String> taskIdSupplier;
 
     /**
      * Creates a wrapper object.
@@ -38,7 +41,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
      * @param func a function that may throw an exception.
      */
     public JsonResultWrapper(ExceptionFunction func) {
-        this(func, null);
+        this(func, null, null);
     }
 
     /**
@@ -48,8 +51,31 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
      * @param listener optional operation completed listener
      */
     public JsonResultWrapper(ExceptionFunction func, OperationCompletedListener listener) {
+        this(func, listener, null);
+    }
+
+    /**
+     * Creates a wrapper object.
+     * 
+     * @param func a function that may throw an exception.
+     * @param taskIdSupplier optional task id to track via {@link TaskRegistry}
+     */
+    public JsonResultWrapper(ExceptionFunction func, Function<Object[], String> taskIdSupplier) {
+        this(func, null, taskIdSupplier);
+    }
+
+    /**
+     * Creates a wrapper object.
+     * 
+     * @param func a function that may throw an exception.
+     * @param listener optional operation completed listener
+     * @param taskIdSupplier optional task id to track via {@link TaskRegistry}
+     */
+    public JsonResultWrapper(ExceptionFunction func, OperationCompletedListener listener, 
+        Function<Object[], String> taskIdSupplier) {
         this.func = func;
         this.listener = listener;
+        this.taskIdSupplier = taskIdSupplier;
     }
 
     /**
@@ -161,16 +187,29 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
     @Override
     public Object apply(Object[] param) {
         Result result;
+        String taskId = null;
+        if (null != taskIdSupplier) {
+            taskId = taskIdSupplier.apply(param);
+        }
         try {
+            if (null != taskId) {
+                TaskRegistry.registerTask(taskId);
+            }
             Object funcRes = func.apply(param);
             result = new Result(null == funcRes ? null : funcRes.toString());
             if (null != listener) {
                 listener.operationCompleted();
             }
+            if (null != taskId) {
+                TaskRegistry.stopTask(taskId);
+            }
         } catch (Exception e) { // including AasExecutionException
             result = new Result(e);
             if (null != listener) {
                 listener.operationFailed();
+            }
+            if (null != taskId) {
+                TaskRegistry.stopTask(taskId);
             }
         }
         return toJson(result);
