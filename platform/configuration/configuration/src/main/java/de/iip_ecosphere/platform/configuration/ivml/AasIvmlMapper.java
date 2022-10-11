@@ -29,6 +29,8 @@ import de.iip_ecosphere.platform.configuration.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.ModelInfo;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
@@ -44,6 +46,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
+import de.iip_ecosphere.platform.transport.status.TaskUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
@@ -80,16 +83,23 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_DELETE_GRAPH = "deleteGraph";
     public static final String OP_CREATE_VARIABLE = "createVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
+    public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
+    public static final String OP_GEN_APPS = "genAppsAsync";
     
     public static final Predicate<IDecisionVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getDeclaration().getType());
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     
+    private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
+    private static final String PRJ_NAME_ALLSERVICES = "AllServices";
+    private static final String PRJ_NAME_ALLTYPES = "AllTypes";
+    private static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
+
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
     private Predicate<IDecisionVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
-    private OperationCompletedListener opListener;
+    private OperationCompletedListener aasOpListener;
     
     /**
      * Creates a mapper with default settings, e.g., short ids for meta IVML information are
@@ -109,7 +119,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             throw new IllegalArgumentException("cfgSupplier must not be null");
         }
         this.cfgSupplier = cfgSupplier;
-        this.opListener = opListener;
+        this.aasOpListener = opListener;
     }
     
     /**
@@ -191,32 +201,111 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             new JsonResultWrapper(a -> {
                 changeValues(AasUtils.readMap(a, 0, null));
                 return null;
-            }, opListener)
+            }, aasOpListener)
         );
         sBuilder.defineOperation(OP_GET_GRAPH, 
-            new JsonResultWrapper(a -> getGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), opListener));
+            new JsonResultWrapper(a -> getGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
+                aasOpListener));
         sBuilder.defineOperation(OP_SET_GRAPH, 
             new JsonResultWrapper(a ->  
                 setGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1), AasUtils.readString(a, 2), 
-                    AasUtils.readString(a, 3), AasUtils.readString(a, 4)), opListener
+                    AasUtils.readString(a, 3), AasUtils.readString(a, 4)), 
+                aasOpListener
             ));
         sBuilder.defineOperation(OP_DELETE_GRAPH, 
             new JsonResultWrapper(a ->  
-                deleteGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), opListener
+                deleteGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
+                aasOpListener
             ));
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> {
                 createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), AasUtils.readString(a, 2));
                 return null;
-            }, opListener)
+            }, aasOpListener)
         );
         sBuilder.defineOperation(OP_DELETE_VARIABLE, 
             new JsonResultWrapper(a -> {
                 deleteVariable(AasUtils.readString(a));
                 return null;
-            }, opListener)
+            }, aasOpListener)
+        );
+        sBuilder.defineOperation(OP_GEN_APPS, 
+            new JsonResultWrapper(a -> {
+                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                    p -> instantiate(createInstantiationConfigurer(false)));
+            })
+        );
+        sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
+            new JsonResultWrapper(a -> {
+                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                    p -> instantiate(createInstantiationConfigurer(true)));
+            })
         );
     }
+    
+    /**
+     * Instantiates according to the given {@code configurer}.
+     * 
+     * @param configurer the configurer
+     * @return <b>null</b>
+     * @throws ExecutionException when the instantiation fails
+     */
+    private Object instantiate(InstantiationConfigurer configurer) throws ExecutionException {
+        PlatformInstantiator.instantiate(configurer);
+        return null;
+    }
+    
+    /**
+     * Creates an instantiation configurer from {@link ConfigurationSetup} to create application code.
+     * 
+     * @param noDeps do a no-deps generation or do a full generation
+     * @return the configurer
+     */
+    private InstantiationConfigurer createInstantiationConfigurer(boolean noDeps) {
+        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+        InstantiationConfigurer result = new InstantiationConfigurer(
+            ep.getIvmlModelName(), getIvmlConfigFolder(ep), ep.getGenTarget());
+        if (noDeps) {
+            result.setStartRuleName("generateAppsNoDeps");
+        } else {
+            result.setStartRuleName("generateApps");
+        }
+        return result;
+    }
+
+    @Override
+    protected Project getVariableTarget(Project root, IDatatype type) {
+        Project result = null;
+        if (null != type) {
+            try {
+                IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
+                if (null != serviceType && serviceType.isAssignableFrom(type)) {
+                    result = ModelQuery.findProject(root, PRJ_NAME_ALLSERVICES);
+                } else {
+                    IDatatype dataType = ModelQuery.findType(root, "DataType", null);
+                    if (null != dataType && dataType.isAssignableFrom(type)) {
+                        result = ModelQuery.findProject(root, PRJ_NAME_ALLTYPES);
+                    }
+                }
+            } catch (ModelQueryException e) {
+                LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                    "Cannot find type. Target of new variable will be the root project. {}", e.getMessage());
+            }
+        }
+        if (null == result) {
+            result = root;
+        }
+        return result;
+    }
+    
+    @Override
+    protected boolean isAllowedForModification(Project prj) {
+        String name = prj.getName();
+        return PRJ_NAME_ALLTYPES.equals(name) 
+            || PRJ_NAME_ALLSERVICES.equals(name) 
+            || PRJ_NAME_TECHSETUP.equals(name);
+    }
+
     
     @Override
     protected String getIvmlSubpath(Project project) {
@@ -231,14 +320,25 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return subpath;
     }
-    
-    @Override
-    protected File createIvmlConfigPath(String subpath, Project project) {
-        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+
+    /**
+     * Returns the actual IVML config folder.
+     * 
+     * @param ep the EASy setup instance
+     * @return the config folder
+     */
+    private File getIvmlConfigFolder(EasySetup ep) {
         File result = ep.getIvmlConfigFolder();
         if (null == result || result.toString().equals(".")) {
             result = ep.getBase();
         }
+        return result;
+    }
+    
+    @Override
+    protected File createIvmlConfigPath(String subpath, Project project) {
+        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+        File result = getIvmlConfigFolder(ep);
         if (subpath != null) {
             result = new File(result, subpath);
         }
@@ -552,10 +652,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else {
                 type = transformerType; // TODO Probe service
             }
-            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(n.getName(), type, 
+            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration("node_" + n.getName(), type, 
                 results.meshProject);
-            String nodeValEx = "{pos_x=" + n.getXPos() 
-                + ",pos_y=" + n.getYPos() 
+            String nodeValEx = "{pos_x=" + n.getXPos() + ",pos_y=" + n.getYPos() 
                 + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
@@ -570,10 +669,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         for (IvmlGraphNode n: graph.nodes()) {
             for (IvmlGraphEdge e: n.outEdges()) {
                 String edgeName = e.getName();
-                String edgeVarName = toIdentifier(edgeName);
+                String edgeVarName = "conn_" + toIdentifier(edgeName);
                 if (null == edgeName || edgeName.length() == 0) {
                     edgeName = n.getName() + " -> " + e.getEnd().getName();
-                    edgeVarName = "edge_" + edgeCounter++;
+                    edgeVarName = "conn_" + edgeCounter++;
                 }
                 DecisionVariableDeclaration edgeVar = new DecisionVariableDeclaration(
                     edgeVarName, connectorType, results.meshProject);
@@ -726,6 +825,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("varName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_VARIABLE))
             .build(Type.NONE);
+        smBuilder.createOperationBuilder(OP_GEN_APPS)
+            .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
+            .build(Type.STRING);
+        smBuilder.createOperationBuilder(OP_GEN_APPS_NO_DEPS)
+            .setInvocable(iCreator.createInvocable(OP_GEN_APPS_NO_DEPS))
+            .build(Type.STRING);
     }
     
     /**

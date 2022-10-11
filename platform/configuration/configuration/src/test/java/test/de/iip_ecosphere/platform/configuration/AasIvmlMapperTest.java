@@ -399,6 +399,8 @@ public class AasIvmlMapperTest {
             + "}";
         mapper.setGraph("myApp", valueEx, "myMesh", drawflowFormat.getName(), drawflowFormat.toString(graph));
 
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", false, "src", "snk");
         assertIvmlFileChange("meshes/ServiceMeshPartMyAppMyMesh", false, "myMesh", "src", "Sink");
         assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
 
@@ -441,10 +443,12 @@ public class AasIvmlMapperTest {
             + "}";
         
         mapper.createVariable("test1", "JavaService", valueEx);
-        assertIvmlFileChange(MODEL_NAME, false, "test1", "rec1");
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", false, "test1");
         
         mapper.deleteVariable("test1");
-        assertIvmlFileChange(MODEL_NAME, true, "test1");
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", true, "test1");
 
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes

@@ -1,6 +1,6 @@
 project AllServices {
 
-    import IIPEcosphere; 
+    import AllTypes; 
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     

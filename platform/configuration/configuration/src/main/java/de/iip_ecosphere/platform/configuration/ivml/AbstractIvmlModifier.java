@@ -142,6 +142,17 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     }
     
     /**
+     * Returns whether the given project is allowed for modification (other than root).
+     * 
+     * @param prj the project
+     * @return {@code true} allowed, {@code false} else
+     * @see #getVariableTarget(Project, IDatatype)
+     */
+    protected boolean isAllowedForModification(Project prj) {
+        return false; 
+    }
+    
+    /**
      * Deletes an IVML variable. In case of a graph, this may subsequently delete further 
      * variables. IVML reference to a variable shall be cleaned up before. Left-over references shall
      * lead to a syntax error and to no modification of the model. [public for testing]
@@ -157,7 +168,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             if (null != var) {
                 Project prj = var.getProject();
                 String subpath = getIvmlSubpath(prj);
-                if (subpath != null || prj == root) {
+                if (subpath != null || prj == root || isAllowedForModification(prj)) {
                     removeConstraintsForVariable(prj, var);
                     prj.removeElement(var);
                     IDecisionVariable dVar = cfg.getDecision(var);
@@ -227,6 +238,19 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     }
 
     /**
+     * Returns the target for a variable to be created.
+     * 
+     * @param root the root project (may be used as default)
+     * @param type the actual type of the variable to be created, may be <b>null</b> then anyway no variable will 
+     *     be created
+     * @return the target project
+     * @see #isAllowedForModification(Project prj)
+     */
+    protected Project getVariableTarget(Project root, IDatatype type) {
+        return root;
+    }
+
+    /**
      * Creates an IVML variable. [public for testing]
      * 
      * @param varName the IVML variable name
@@ -239,12 +263,13 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         Project root = cfg.getProject();
         try {
             IDatatype t = ModelQuery.findType(root, type, null);
+            Project target = getVariableTarget(root, t);
             if (null != t) {
-                DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, root);
+                DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, target);
                 setValue(var, valueEx);
-                root.add(var);
+                target.add(var);
                 //alternative: in own constraint, remove setValue above; may be needed if t is container
-                //createAssignment(var, valueEx, root); 
+                //createAssignment(var, valueEx, target); 
                 IDecisionVariable dVar = cfg.createDecision(var);
                 notifyChange(dVar, ConfigurationChangeType.CREATED);
             } else {
@@ -252,7 +277,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             }
             ReasoningResult res = validateAndPropagate();
             throwIfFails(res, true);
-            saveTo(root, getIvmlFile(root));
+            saveTo(target, getIvmlFile(target));
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }
