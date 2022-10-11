@@ -39,7 +39,6 @@ import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*
  */
 public class ServicesAasClient extends SubmodelElementsCollectionClient implements ServicesClient {
 
-    
     /**
      * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
      * {@link ServicesAas#NAME_SUBMODEL_RESOURCES resources}.
@@ -220,6 +219,28 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
             result = null;
         }
         return result;
+    }
+
+    @Override
+    public void startServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_TASK)
+            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
+    }
+
+    @Override
+    public void startServiceAsTask(String taskId, Map<String, String> options, String... serviceId)
+        throws ExecutionException {
+        if (null == options) {
+            options = new HashMap<>();
+        }
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_WITH_OPTS_TASK)
+            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId), writeMap(options)));
+    }
+
+    @Override
+    public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
+        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
+            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
     }
     
 }

@@ -64,6 +64,8 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
  */
 public class AasIvmlMapperTest {
     
+    private static final String MODEL_NAME = "PlatformConfiguration";
+    
     private static File ivmlFolder;
     private static File origBase;
     private static File origIvmlMeta;
@@ -87,7 +89,7 @@ public class AasIvmlMapperTest {
         ep.setBase(ivmlFolder);
         ep.setIvmlMetaModelFolder(ivmlFolder);
         ep.setIvmlConfigFolder(ivmlFolder);
-        ep.setIvmlModelName("TestConfiguration");
+        ep.setIvmlModelName(MODEL_NAME);
     }
     
     /**
@@ -103,10 +105,21 @@ public class AasIvmlMapperTest {
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"));
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
-        String[] testFileNames = {"SimpleMesh.ivml", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml", 
-            "TestConfiguration.ivml"};
-        for (String n : testFileNames) {
-            org.apache.commons.io.FileUtils.copyFile(new File("src/test/easy/" + n), 
+        copy("src/test/easy/", "SimpleMesh.ivml", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml");
+        copy("src/main/easy/cfg", "PlatformConfiguration.ivml", "TechnicalSetup.ivml", "AllTypes.ivml", 
+            "AllServices.ivml");
+    }
+    
+    /**
+     * Copies files given by their simple names within the same {@code baseFolder} into {@link #ivmlFolder}.
+     * 
+     * @param baseFolder the base folder
+     * @param fileNames the file names
+     * @throws IOException if copying fails
+     */
+    private static void copy(String baseFolder, String... fileNames) throws IOException {
+        for (String n : fileNames) {
+            org.apache.commons.io.FileUtils.copyFile(new File(baseFolder, n), 
                 new File(ivmlFolder, n));
         }
     }
@@ -233,7 +246,8 @@ public class AasIvmlMapperTest {
     private AasIvmlMapper getInstance() {
         Configuration cfg = ConfigurationManager.getVilConfiguration();
         Assert.assertNotNull("No configuration available", cfg);
-        return new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper());
+        // TODO no listeners for now
+        return new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), null, null); 
     }
     
     /**
@@ -276,7 +290,7 @@ public class AasIvmlMapperTest {
      */
     @Test
     public void testGetVariable() throws ExecutionException {
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance();
@@ -297,7 +311,7 @@ public class AasIvmlMapperTest {
      */
     @Test
     public void testChangeValues() throws ExecutionException, IOException {
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance();
@@ -315,21 +329,21 @@ public class AasIvmlMapperTest {
         assertStringVar("a.b.C", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
         assertStringVar("mg.art:art:1.2.3", mapper.getVariable("deviceIdProvider.artifact"));
         
-        assertIvmlFileChange("TestConfiguration", false, "instDir", "javaExe", "deviceIdProvider");
+        assertIvmlFileChange(MODEL_NAME, false, "instDir", "javaExe", "deviceIdProvider");
     
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }
 
     /**
-     * Tests the set graph function.
+     * Tests the set/delete graph functions.
      * 
      * @throws IOException if copying/resetting files fails
      * @throws ExecutionException if setting graphs fails
      */
     @Test
-    public void testSetGraph() throws IOException, ExecutionException {
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
+    public void testChangeGraph() throws IOException, ExecutionException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         DrawflowGraphFormat drawflowFormat = new DrawflowGraphFormat();
@@ -385,11 +399,17 @@ public class AasIvmlMapperTest {
             + "}";
         mapper.setGraph("myApp", valueEx, "myMesh", drawflowFormat.getName(), drawflowFormat.toString(graph));
 
-        assertIvmlFileChange("meshes/ServiceMeshPartMyAppMyMesh", false, "myMesh");
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", false, "src", "snk");
+        assertIvmlFileChange("meshes/ServiceMeshPartMyAppMyMesh", false, "myMesh", "src", "Sink");
         assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
 
-        // TODO modify graph
-        // TODO delete graph
+        mapper.deleteGraph("myApp", "myMesh");
+        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyMesh").exists());
+        assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
+        mapper.deleteGraph("myApp", null);
+        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyMesh").exists());
+        Assert.assertFalse(resolveIvmlFile("apps/ApplicationPartMyApp").exists());
         
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -402,7 +422,7 @@ public class AasIvmlMapperTest {
      */
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("TestConfiguration", 
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance();
@@ -423,10 +443,12 @@ public class AasIvmlMapperTest {
             + "}";
         
         mapper.createVariable("test1", "JavaService", valueEx);
-        assertIvmlFileChange("TestConfiguration", false, "test1", "rec1");
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", false, "test1");
         
         mapper.deleteVariable("test1");
-        assertIvmlFileChange("TestConfiguration", true, "test1");
+        assertIvmlFileChange("AllTypes", false, "rec1");
+        assertIvmlFileChange("AllServices", true, "test1");
 
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -468,6 +490,19 @@ public class AasIvmlMapperTest {
     }
 
     /**
+     * Composes an (expected) IVML file name.
+     * 
+     * @param file the file name, may contain paths
+     * @return the file object
+     */
+    private File resolveIvmlFile(String file) {
+        if (!file.endsWith(".ivml")) {
+            file = file + ".ivml";
+        }
+        return new File(ivmlFolder, file);
+    }
+
+    /**
      * Very simple check that an IVML file was changed and contains expected strings.
      * 
      * @param file the file to check, within {@code #ivmlFolder}
@@ -479,7 +514,7 @@ public class AasIvmlMapperTest {
             file = file + ".ivml";
         }
         try {
-            String contents = org.apache.commons.io.FileUtils.readFileToString(new File(ivmlFolder, file), 
+            String contents = org.apache.commons.io.FileUtils.readFileToString(resolveIvmlFile(file), 
                 Charset.defaultCharset());
             for (String e : expected) {
                 boolean found = contents.contains(e);

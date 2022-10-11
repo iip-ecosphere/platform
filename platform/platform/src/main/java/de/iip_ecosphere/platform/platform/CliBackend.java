@@ -49,6 +49,8 @@ import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ServiceResou
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -346,7 +348,12 @@ class CliBackend {
         public void run() {
             try {
                 println(getMessagePrefix(true));
-                client.startService(options, serviceIds);
+                TaskData data = TaskRegistry.getTaskData();
+                if (null != data) {
+                    client.startServiceAsTask(data.getId(), options, serviceIds);
+                } else {
+                    client.startService(options, serviceIds);
+                }
                 println(getMessagePrefix(false) + ": Done.");
             } catch (ExecutionException e) {
                 exception = e;
@@ -489,7 +496,12 @@ class CliBackend {
                     String[] services = a.getServicesAsArray();
                     ArrayUtils.reverse(services);
                     println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
-                    client.stopService(services);
+                    TaskData data = TaskRegistry.getTaskData();
+                    if (null != data) {
+                        client.stopServiceAsTask(data.getId(), services);
+                    } else {
+                        client.stopService(services);
+                    }
                 }
             }
             if (p.isOnUndeployRemoveArtifact()) {

@@ -261,6 +261,19 @@ public class CliTest {
         public SubmodelElementCollection getArtifacts() {
             return null;
         }
+
+        @Override
+        public void startServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
+        }
+
+        @Override
+        public void startServiceAsTask(String taskId, Map<String, String> options, String... serviceId)
+            throws ExecutionException {
+        }
+
+        @Override
+        public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
+        }
         
     }
 
@@ -334,6 +347,19 @@ public class CliTest {
         @Override
         public Integer getRuntimeVersion() throws ExecutionException {
             return null;
+        }
+
+        @Override
+        public String addContainerAsTask(String taskId, URI location) throws ExecutionException {
+            return null;
+        }
+
+        @Override
+        public void startContainerAsTask(String taskId, String id) throws ExecutionException {
+        }
+
+        @Override
+        public void stopContainerAsTask(String taskId, String id) throws ExecutionException {
         }
         
     }

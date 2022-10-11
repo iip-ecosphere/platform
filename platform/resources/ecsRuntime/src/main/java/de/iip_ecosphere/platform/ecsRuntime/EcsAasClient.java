@@ -130,4 +130,19 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Ec
         return getSubmodel().getSubmodelElementCollection(EcsAas.NAME_COLL_CONTAINERS);
     }
 
+    @Override
+    public String addContainerAsTask(String taskId, URI location) throws ExecutionException {
+        return fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_ADD_TASK).invoke(location.toString(), taskId));
+    }
+
+    @Override
+    public void startContainerAsTask(String taskId, String id) throws ExecutionException {
+        fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_START_TASK).invoke(id, taskId));
+    }
+
+    @Override
+    public void stopContainerAsTask(String taskId, String id) throws ExecutionException {
+        fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_STOP_TASK).invoke(id, taskId));
+    }
+
 }

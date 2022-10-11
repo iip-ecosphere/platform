@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
+import java.util.concurrent.ExecutionException;
+
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
@@ -27,5 +30,35 @@ public interface EcsClient extends ContainerOperations, DeviceManagementOperatio
      * @return the containers collection, may be <b>null</b>
      */
     public SubmodelElementCollection getContainers();
+    
+    /**
+     * Like {@link #addContainer(String)} but tracked by a {@code taskId}.
+     * 
+     * @param taskId the task id to report on
+     * @param location the location from where to download the container, e.g., an URL
+     * @return the id of the container
+     * @throws ExecutionException in case that adding the container fails for some reason
+     */
+    public String addContainerAsTask(String taskId, URI location) throws ExecutionException;
+
+    /**
+     * Like {@link #startContainer(String)} but tracked by a {@code taskId}.
+     * 
+     * @param taskId the task id to report on
+     * @param id the id of the container
+     * @throws ExecutionException in case that starting the container fails for some reason
+     */
+    public void startContainerAsTask(String taskId, String id) throws ExecutionException;
+    
+    /**
+     * Like {@link #stopContainer(String)} but tracked by a {@code taskId}.
+     * 
+     * @param taskId the task id to report on
+     * @param id the id of the container to stop, or as fallback the canonical URI of the container descriptor used 
+     *     for adding
+     * @throws ExecutionException if stopping the container fails
+     */
+    public void stopContainerAsTask(String taskId, String id) throws ExecutionException;
+
     
 }
