@@ -12,11 +12,17 @@
 
 package de.iip_ecosphere.platform.configuration;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
+import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper.AasChange;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultEdge;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultGraph;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultNode;
@@ -26,12 +32,17 @@ import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.configuration.ivml.AbstractIvmlModifier.ConfigurationChangeListener;
+import de.iip_ecosphere.platform.configuration.ivml.AbstractIvmlModifier.ConfigurationChangeType;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
@@ -40,12 +51,13 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConfigurationAas implements AasContributor {
+public class ConfigurationAas implements AasContributor, ConfigurationChangeListener, OperationCompletedListener {
 
     public static final String NAME_SUBMODEL = "Configuration"; 
     private static final GraphFactory GRAPH_FACTORY = new IipGraphFactory();
     
     private AasIvmlMapper mapper;
+    private transient List<AasChange> aasChanges = new ArrayList<>();
 
     /**
      * Implements a factory for the graph elements used.
@@ -261,7 +273,7 @@ public class ConfigurationAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), new IipGraphMapper());
+        mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), new IipGraphMapper(), this, this);
         mapper.mapByType(smB, iCreator);
         mapper.addGraphFormat(new DrawflowGraphFormat());
         smB.build();
@@ -281,6 +293,40 @@ public class ConfigurationAas implements AasContributor {
     @Override
     public boolean isValid() {
         return true;
+    }
+  
+    /**
+     * Clears all remaining AAS changes.
+     */
+    private void clearAasChanges() {
+        aasChanges.clear();
+    }
+
+    @Override
+    public void configurationChanged(IDecisionVariable var, ConfigurationChangeType type) {
+        aasChanges.add(new AasChange(var, type));
+    }
+
+    @Override
+    public void operationCompleted() {
+        try {
+            Aas aas = AasPartRegistry.retrieveIipAas();
+            Submodel sm = aas.getSubmodel(NAME_SUBMODEL);
+            SubmodelBuilder smB = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
+            for (AasChange c : aasChanges) {
+                c.apply(mapper, sm, smB);
+            }
+            smB.build();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(ConfigurationAas.class).error(
+                "While modifying configuration AAS: {}", e.getMessage());
+        }
+        clearAasChanges();
+    }
+
+    @Override
+    public void operationFailed() {
+        clearAasChanges();
     }
 
 }
