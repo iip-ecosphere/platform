@@ -107,7 +107,9 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_DEVICE_AAS = AasPartRegistry.NAME_PROP_DEVICE_AAS;
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
     public static final String NAME_OP_SERVICE_START = "startService";
+    public static final String NAME_OP_SERVICE_START_TASK = "startServiceAsTask";
     public static final String NAME_OP_SERVICE_START_WITH_OPTS = "startServiceWithOptions";
+    public static final String NAME_OP_SERVICE_START_WITH_OPTS_TASK = "startServiceWithOptionsAsTask";
     public static final String NAME_OP_SERVICE_ACTIVATE = "activateService";
     public static final String NAME_OP_SERVICE_PASSIVATE = "passivateService";
     public static final String NAME_OP_SERVICE_MIGRATE = "migrateService";
@@ -115,6 +117,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_SWITCH = "switchToService";
     public static final String NAME_OP_SERVICE_RECONF = "reconfigureService";
     public static final String NAME_OP_SERVICE_STOP = "stopService";
+    public static final String NAME_OP_SERVICE_STOP_TASK = "stopServiceAsTask";
     public static final String NAME_OP_SERVICE_GET_STATE = "getServiceSate";
     public static final String NAME_OP_SERVICE_SET_STATE = "setServiceSate";
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
@@ -133,7 +136,9 @@ public class ServicesAas implements AasContributor {
         
             // probably relevant ops only
             createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_START_TASK, iCreator, "taskId");
             createIdOp(jB, NAME_OP_SERVICE_START_WITH_OPTS, iCreator, "options");
+            createIdOp(jB, NAME_OP_SERVICE_START_WITH_OPTS_TASK, iCreator, "taskId", "options");
             createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
@@ -141,6 +146,7 @@ public class ServicesAas implements AasContributor {
             createIdOp(jB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
             createIdOp(jB, NAME_OP_SERVICE_RECONF, iCreator, "values");
             createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_STOP_TASK, iCreator, "taskId");
             createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
             
@@ -286,7 +292,6 @@ public class ServicesAas implements AasContributor {
                 return null;
             }
         ));
-
         sBuilder.defineOperation(getQName(NAME_OP_ARTIFACT_ADD), 
             new JsonResultWrapper(p -> { 
                 return ServiceFactory.getServiceManager().addArtifact(readUri(p, 0, EMPTY_URI)); 
@@ -297,6 +302,33 @@ public class ServicesAas implements AasContributor {
                 ServiceFactory.getServiceManager().removeArtifact(readString(p)); 
                 return null;
             }
+        ));
+        contributeTaskTo(sBuilder);
+    }
+
+    /**
+     * Further operation contributions.
+     * 
+     * @param sBuilder the server protocol builder
+     */
+    private void contributeTaskTo(ProtocolServerBuilder sBuilder) {
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START_TASK), 
+            new JsonResultWrapper(p -> {
+                ServiceFactory.getServiceManager().startService(readStringArray(p, 0)); 
+                return null;
+            }, p -> readString(p, 1) // taskId
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_START_WITH_OPTS_TASK), 
+            new JsonResultWrapper(p -> {
+                ServiceFactory.getServiceManager().startService(readMap(p, 2, null), readStringArray(p, 0)); 
+                return null;
+            }, p -> readString(p, 1) // taskId
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_STOP_TASK), 
+            new JsonResultWrapper(p -> { 
+                ServiceFactory.getServiceManager().stopService(readStringArray(p, 0)); 
+                return null;
+            }, p -> readString(p, 1) // taskId
         ));
     }
 
