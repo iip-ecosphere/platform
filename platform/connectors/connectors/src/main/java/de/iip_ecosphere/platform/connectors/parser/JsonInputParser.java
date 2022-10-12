@@ -14,10 +14,7 @@ package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +25,6 @@ import com.jsoniter.any.Any.EntryIterator;
 import com.jsoniter.spi.JsonException;
 
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
-import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
@@ -357,6 +353,15 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
+        public byte toByte(Any data) throws IOException {
+            try {
+                return (byte) data.toInt();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
+        }
+
+        @Override
         public long toLong(Any data) throws IOException {
             try {
                 return data.toLong();
@@ -429,18 +434,17 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
+        public byte[] toByteArray(Any data) throws IOException {
+            byte[] dta = new byte[data.size()];
+            for (int j = 0; j < dta.length; j++) {
+                dta[j] = (byte) data.get(j).toInt();
+            }
+            return dta; // exception?
+        }
+
+        @Override
         public Object toObject(Any data) throws IOException {
             return null; // preliminary
-        }
-        
-        @Override
-        public Date toDate(Any data, String format) throws IOException {
-            SimpleDateFormat f = FormatCache.getDateFormatter(format);
-            try {
-                return f.parse(data.toString());
-            } catch (ParseException e) {
-                throw new IOException(e);
-            }
         }
         
     }

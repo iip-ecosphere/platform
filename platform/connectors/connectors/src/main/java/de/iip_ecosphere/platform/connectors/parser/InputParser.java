@@ -13,9 +13,10 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
+import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.serialization.IipEnum;
 
@@ -185,6 +186,15 @@ public interface InputParser<T> {
     public interface InputConverter<T> {
 
         /**
+         * Converts parsed data returned by {@link ParseResult} to byte.
+         * 
+         * @param data the obtained data
+         * @return the converted integer
+         * @throws IOException if conversion fails
+         */
+        public byte toByte(T data) throws IOException;
+
+        /**
          * Converts parsed data returned by {@link ParseResult} to integer.
          * 
          * @param data the obtained data
@@ -266,15 +276,38 @@ public interface InputParser<T> {
         public double[] toDoubleArray(T data) throws IOException;
 
         /**
+         * Converts parsed data returned by {@link ParseResult} to a byte array.
+         * 
+         * @param data the obtained data
+         * @return the converted double array
+         * @throws IOException if conversion fails
+         */
+        public byte[] toByteArray(T data) throws IOException;
+
+        /**
          * Converts parsed data returned by {@link ParseResult} to a date representation.
          * 
          * @param data the obtained data
-         * @param format the target date format (see {@link SimpleDateFormat})
+         * @param format the target date format (see {@link FormatCache})
          * @return the converted date
          * @throws IOException if conversion fails
          */
-        public Date toDate(T data, String format) throws IOException;
+        public default Date toDate(T data, String format) throws IOException {
+            return FormatCache.parse(data.toString(), format);
+        }
         
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a date representation.
+         * 
+         * @param data the obtained data
+         * @param format the target date format (see {@link FormatCache})
+         * @return the converted date
+         * @throws IOException if conversion fails
+         */
+        public default LocalDateTime toLocalDateTime(T data, String format) throws IOException {
+            return FormatCache.toLocalDateTime(toDate(data, format));
+        }
+
         /**
          * Converts parsed data returned by {@link ParseResult} to an instance of {@code enumType}. Primarily, a 
          * conversion to {@link #toInteger(Object)} and {@link IipEnum#getModelOrdinal()} is performed. If this fails, 

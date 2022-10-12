@@ -13,11 +13,7 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
 
 /**
@@ -31,6 +27,15 @@ public class ConverterFromString implements InputConverter<String> {
     public int toInteger(String data) throws IOException {
         try {
             return Integer.parseInt(data);
+        } catch (NumberFormatException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public byte toByte(String data) throws IOException {
+        try {
+            return Byte.parseByte(data);
         } catch (NumberFormatException e) {
             throw new IOException(e);
         }
@@ -88,6 +93,11 @@ public class ConverterFromString implements InputConverter<String> {
     }
 
     @Override
+    public byte[] toByteArray(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
+    @Override
     public double[] toDoubleArray(String data) throws IOException {
         throw new IOException("currently not implemented");
     }
@@ -95,16 +105,6 @@ public class ConverterFromString implements InputConverter<String> {
     @Override
     public Object toObject(String data) throws IOException {
         throw new IOException("currently not implemented");
-    }
-
-    @Override
-    public Date toDate(String data, String format) throws IOException {
-        SimpleDateFormat f = FormatCache.getDateFormatter(format);
-        try {
-            return f.parse(data);
-        } catch (ParseException e) {
-            throw new IOException(e);
-        }
     }
 
 }

@@ -274,7 +274,7 @@ public class ConnectorsAasTest {
     /**
      * Tests the connectors AAS.
      * 
-     * throws IOException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
     public void testAas() throws IOException {

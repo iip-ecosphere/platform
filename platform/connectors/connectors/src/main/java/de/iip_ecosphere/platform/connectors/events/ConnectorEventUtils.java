@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.connectors.events;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.support.ClassLoaderUtils;
 
 /**

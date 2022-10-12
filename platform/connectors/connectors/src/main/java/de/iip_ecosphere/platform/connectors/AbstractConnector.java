@@ -113,7 +113,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     }
     
     /**
-     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(TransportParameter)}
+     * Helper method to determine a SSL/TLS context. Apply only if {@link #useTls(ConnectorParameter)}
      * returns {@code true}. Relies on {@code IdentityStore#createTlsContext(String, String, String...)} if
      * {@link TransportParameter#getKeystoreKey()} is given, else on 
      * {@link SslUtils#createTlsContext(java.io.File, String, String)}.

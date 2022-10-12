@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.connectors.events;
 
+import de.iip_ecosphere.platform.connectors.AbstractConnector;
+
 /**
  * Basic connector interface providing access to event-relevant functionality.
  * 
@@ -30,7 +32,7 @@ public interface EventHandlingConnector {
      * Enable/disable polling (does not influence the polling timer).
      * 
      * @param enablePolling whether polling shall enabled
-     * @see #enableNotifications(boolean)
+     * @see AbstractConnector#enableNotifications(boolean)
      */
     public void enablePolling(boolean enablePolling);
 

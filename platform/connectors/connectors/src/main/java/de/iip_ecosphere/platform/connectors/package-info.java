@@ -6,7 +6,7 @@
  *    capabilities of the connector, e.g., to be dynamically taken up by the code generation</li>
  *  <li>{@link de.iip_ecosphere.platform.connectors.ConnectorParameter connector parameters} when connecting to a 
  *    server/broker (including some security information like 
- *    {@link de.iip_ecosphere.platform.connectors.IdentityToken}).
+ *    {@link de.iip_ecosphere.platform.support.identities.IdentityToken}).
  * </ul>
  * 
  * Some protocols like OPC or Asset Administration Shells (AAS) rely on an information model. Accessing this model in 

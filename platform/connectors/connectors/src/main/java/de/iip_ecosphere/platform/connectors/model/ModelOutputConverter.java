@@ -42,6 +42,11 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     }
 
     @Override
+    public Object fromByte(byte data) throws IOException {
+        return data;
+    }
+
+    @Override
     public Object fromLong(long data) throws IOException {
         return data;
     }
@@ -78,6 +83,11 @@ public class ModelOutputConverter implements OutputConverter<Object> {
 
     @Override
     public Object fromDoubleArray(double[] data) throws IOException {
+        return data;
+    }
+
+    @Override
+    public Object fromByteArray(byte[] data) throws IOException {
         return data;
     }
 

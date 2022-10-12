@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
@@ -49,6 +50,15 @@ public interface OutputFormatter<T> {
      * @author Holger Eichelberger, SSE
      */
     public interface OutputConverter<T> {
+
+        /**
+         * Converts data from byte to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromByte(byte data) throws IOException;
 
         /**
          * Converts data from int to the output format.
@@ -132,6 +142,15 @@ public interface OutputFormatter<T> {
         public T fromDoubleArray(double[] data) throws IOException;
 
         /**
+         * Converts data from a byte array to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromByteArray(byte[] data) throws IOException;
+
+        /**
          * Converts data from a date to the output format.
          * 
          * @param data the date
@@ -140,6 +159,18 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public T fromDate(Date data, String format) throws IOException;
+
+        /**
+         * Converts data from a date to the output format.
+         * 
+         * @param data the date
+         * @param format the target date format (see {@link SimpleDateFormat})
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public default T fromLocalDateTime(LocalDateTime data, String format) throws IOException {
+            return fromDate(FormatCache.toDate(data), format);
+        }
 
         /**
          * Converts data from an IIP enum literal to the output format using {@link IipEnum#getModelOrdinal()}.

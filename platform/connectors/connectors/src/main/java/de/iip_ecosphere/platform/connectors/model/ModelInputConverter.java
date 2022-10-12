@@ -13,13 +13,9 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
+import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
-
 
 /**
  * Input converter implementing the {@link ModelAccess} conversion conventions. An
@@ -42,6 +38,11 @@ public class ModelInputConverter implements InputConverter<Object> {
     @Override
     public int toInteger(Object data) throws IOException {
         return (int) data;
+    }
+
+    @Override
+    public byte toByte(Object data) throws IOException {
+        return (byte) data;
     }
 
     @Override
@@ -85,17 +86,8 @@ public class ModelInputConverter implements InputConverter<Object> {
     }
 
     @Override
-    public Date toDate(Object data, String format) throws IOException {
-        if (data instanceof String) {
-            SimpleDateFormat f = FormatCache.getDateFormatter(format);
-            try {
-                return f.parse((String) data);
-            } catch (ParseException e) {
-                throw new IOException(e);
-            }
-        } else {
-            return (Date) data;
-        }
+    public byte[] toByteArray(Object data) throws IOException {
+        return (byte[]) data; // unsure
     }
 
     @Override

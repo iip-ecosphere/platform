@@ -30,6 +30,8 @@ public class JsonInputParserTest {
     
     /**
      * Tests {@link JsonInputParser}.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
     public void testJsonInputParser() throws IOException {

@@ -177,7 +177,7 @@ public interface ModelAccess {
     public void monitor(int notificationInterval, String... qNames) throws IOException;
 
     /**
-     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...). Triggers a 
+     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...)}. Triggers a 
      * reception in the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}.
      * {@link ConnectorParameter#getNotificationInterval()} shall be used as default value if applicable.
      * [monitoring]
@@ -187,7 +187,7 @@ public interface ModelAccess {
     public void monitorModelChanges() throws IOException;
 
     /**
-     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...). Triggers a 
+     * Monitors generic model changes, in particular those not covered by {@link #monitor(String...)}. Triggers a 
      * reception in the connector. Intended to be used in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}.
      * [monitoring]
      *

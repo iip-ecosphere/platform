@@ -34,6 +34,8 @@ public class TextLineFormatterTest {
     
     /**
      * Tests the formatter.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
     public void testFormatter() throws IOException {
@@ -111,7 +113,7 @@ public class TextLineFormatterTest {
     }
 
     /**
-     * Tests {@link FormatterUtils#createInstance(ClassLoader, String, Class, String)}.
+     * Tests {@link FormatterUtils#createInstance(ClassLoader, String, String)}.
      */
     @Test
     public void testCreateInstance() {

@@ -184,7 +184,7 @@ public class TextLineParserTest {
     }
 
     /**
-     * Tests {@link ParserUtils#createInstance(ClassLoader, String, Class, String)}.
+     * Tests {@link ParserUtils#createInstance(ClassLoader, String, String)}.
      */
     @Test
     public void testCreateInstance() {

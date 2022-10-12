@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -40,6 +39,11 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
 
         @Override
         public IOConsumer<JsonGenerator> fromInteger(int data) throws IOException {
+            return g -> g.writeNumber(data);
+        }
+
+        @Override
+        public IOConsumer<JsonGenerator> fromByte(byte data) throws IOException {
             return g -> g.writeNumber(data);
         }
 
@@ -84,6 +88,17 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         }
 
         @Override
+        public IOConsumer<JsonGenerator> fromByteArray(byte[] data) throws IOException {
+            return g -> {
+                int[] tmp = new int[data.length];
+                for (int i = 0; i < data.length; i++) {
+                    tmp[i] = data[i];
+                }
+                g.writeArray(tmp, 0, tmp.length);
+            };
+        }
+
+        @Override
         public IOConsumer<JsonGenerator> fromObject(Object data) throws IOException {
             return g -> g.writeObject(data);
         }
@@ -91,8 +106,7 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         @Override
         public IOConsumer<JsonGenerator> fromDate(Date data, String format) throws IOException {
             return g -> {
-                SimpleDateFormat f = FormatCache.getDateFormatter(format);
-                g.writeString(f.format(data));
+                g.writeString(FormatCache.format(data, format));
             };
         }
 
