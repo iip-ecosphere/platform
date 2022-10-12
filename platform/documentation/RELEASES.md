@@ -18,7 +18,6 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
-* Improve configuration mode, e.g., constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
 * Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
 * Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
@@ -29,13 +28,17 @@ New features:
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
 * [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
 * [#89](https://github.com/iip-ecosphere/platform/issues/89): IVML configuration mapping into AAS
+* [#96](https://github.com/iip-ecosphere/platform/issues/96): Write back IVML models into managed structure, complementing [#89](https://github.com/iip-ecosphere/platform/issues/89)
 * [#74](https://github.com/iip-ecosphere/platform/issues/74): Specify keystore via identityStore
 * Ad-hoc device connectivity via device AAS (initial)
 * [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
+* [#96](https://github.com/iip-ecosphere/platform/issues/96): Hostname as device id (optional, not default)
 
 Improvements:
+* Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
 * [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
+* [#95](https://github.com/iip-ecosphere/platform/issues/96): Document IVML model/variables for UI
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
