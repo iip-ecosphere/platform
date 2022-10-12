@@ -291,7 +291,9 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     // -------------------------------------- formatter/parser conversion ------------------------------------ 
     
-        // preliminary... JavaBasics + ??
+    // convName is the infix of InputConverter/OutputFormatter conversion functions, e.g., toShort/fromShort
+    // types defined in JavaBasic must match these functions; confParam in particular for date must match also
+    
     def convName(DataType type) {
         ""
     }
@@ -299,6 +301,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // to/from will be prefixed, must map to method names in Input/OutputConverter
     def convName(PrimitiveType type) {
         "/* NOT DEFINED */"
+    }
+
+    def convName(ObjectTypeType type) {
+        "Object"
     }
 
     def convName(ShortTypeType type) {
@@ -343,35 +349,35 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
 	// Start - Added types OPC UA - by Ahmad
 	def convName(Integer16TypeType type) {
-         "short"
+         "Short"
     }
 
 	def convName(Integer32TypeType type) {
-         "int"
+         "Integer"
     }
     
     def convName(Integer64TypeType type) {
-         "long"
+         "Long"
     }
     
     def convName(SByteTypeType type) {
-         "byte"
+         "Byte"
     }
     
 	def convName(UnsignedInteger16TypeType type) {
-         "short"
+         "Short"
     }
 
 	def convName(UnsignedInteger32TypeType type) {
-         "int"
+         "Integer"
     }
     
     def convName(UnsignedInteger64TypeType type) {
-         "long"
+         "Long"
     }
     
     def convName(ByteStringTypeType type) {
-         "ByteString"
+         "ByteArray"
     }
     
     def convName(DateTimeTypeType type) {
@@ -401,7 +407,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def convParam(DataType type, Boolean convFrom) {
         "" // no param
     }
-    
+
+    def convParam(DateTimeTypeType type, Boolean convFrom) {
+        "\"ISO8601\""
+    }
+
     def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom) {
         "\"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
     }
