@@ -1,0 +1,7 @@
+name: TestTestApp
+identities:
+  "amqp": 
+     type: USERNAME
+     userName: user
+     tokenData: pwd
+     tokenEncryptionAlgorithm: UTF-8
