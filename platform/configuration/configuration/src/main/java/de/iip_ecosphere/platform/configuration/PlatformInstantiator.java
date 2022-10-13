@@ -16,6 +16,10 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import net.ssehub.easy.instantiation.core.model.common.ITraceFilter;
+import net.ssehub.easy.instantiation.core.model.common.NoTraceFilter;
+import net.ssehub.easy.instantiation.core.model.common.TopLevelExecutionTraceFilter;
+import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -199,6 +203,21 @@ public class PlatformInstantiator {
     }
     
     /**
+     * Tracing of language units and function executions but not deeper.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class FunctionLevelTraceFilter implements ITraceFilter {
+
+        @Override
+        public boolean isEnabled(LanguageElementKind kind) {
+            return kind == LanguageElementKind.FAILURE || kind == LanguageElementKind.LANGUAGE_UNIT 
+                || kind == LanguageElementKind.FUNCTION_EXECUTION;
+        }
+
+    }
+    
+    /**
      * Performs the platform instantiation.
      * 
      * @param args command line arguments
@@ -207,7 +226,6 @@ public class PlatformInstantiator {
      * default {@link InstantiationConfigurer}
      */
     public static void main(String[] args) throws ExecutionException {
-        // TODO very initial, unify command line arg handling
         if (args.length < 3 || args.length > 4 ) {
             System.out.println("IIP-Ecosphere platform instantiator");
             System.out.println("Following arguments are required:");
@@ -221,7 +239,16 @@ public class PlatformInstantiator {
             System.out.println("   - generateApps: app interfaces, apps with artifact dependencies");
             System.out.println("   - generateBroker: create a sample broker");
             System.out.println("   - generatePlatform: platform components only");
+            System.out.println("Optional: Output filtering -Diip.easy.tracing=ALL|FUNC|TOP, default TOP=toplevel");
         } else {
+            String tracing = System.getProperty("iip.easy.tracing", "TOP").toUpperCase();
+            ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
+            if ("FUNC".equals(tracing)) {
+                filter = new FunctionLevelTraceFilter();
+            } else if ("ALL".equals(tracing)) {
+                filter = NoTraceFilter.INSTANCE;
+            }
+            TracerFactory.setTraceFilter(filter);
             InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
             if (args.length == 4) {
                 c.setStartRuleName(args[3]);
