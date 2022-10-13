@@ -228,6 +228,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
         assemblyPath.mkdir();
         vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
         assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
+        if (needsDataUnitJson(no.impl)) {
+            Path testResourcesSrc = "${appRoot}/src/test/resources";
+            vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
+        }
     }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
