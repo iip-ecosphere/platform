@@ -39,6 +39,7 @@ public class IvmlRoutingTestTests extends IvmlTests {
         PlatformInstantiator.instantiate(
             genApps(new TestConfigurer("RoutingTest", new File("src/test/easy"), gen)));
         assertAllFiles(gen);
+        assertTemplateZip(gen, "impl.RoutingTestApp");
     }
     
 }

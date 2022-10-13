@@ -11,9 +11,15 @@ template JavaMeshElementTemplate(Configuration config, FileArtifact target, Mesh
     // called via produceForInputTypes/produceForOutputTypes
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
+        String comment;
+        if (elt.kind == ServiceKind::SINK_SERVICE) {
+            comment = "Store, emit, pass on your data here. This is the sink.";
+        } else {
+            comment = "call ingest<Type>(instance)";
+        }
         '@Override
         public void process${t.firstToUpperCase()}(${t} data) {
-            // TODO call ingest<Type>(instance)
+            // TODO ${comment}
         }'
     }
     

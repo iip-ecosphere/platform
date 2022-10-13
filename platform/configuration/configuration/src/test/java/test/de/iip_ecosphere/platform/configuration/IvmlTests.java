@@ -318,6 +318,18 @@ public abstract class IvmlTests {
     protected static File assertFile(File base, String name) {
         return assertFile(new File(base, name));
     }
+
+    /**
+     * Asserts the eclipse template ZIP file, usually indicating the the template generation was executed successfully.
+     * 
+     * @param gen the gen folder
+     * @param name the name of the project
+     * @return the actual asserted file
+     */
+    protected static File assertTemplateZip(File gen, String name) {
+        File f = new File(gen, "templates/eclipse/" + name + ".zip");
+        return assertFile(f);
+    }
     
     /**
      * Asserts that the specified file exists and has contents.

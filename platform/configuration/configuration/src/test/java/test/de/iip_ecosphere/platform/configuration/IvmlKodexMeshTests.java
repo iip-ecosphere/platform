@@ -66,6 +66,7 @@ public class IvmlKodexMeshTests extends IvmlTests {
         assertFile(srcMainAssembly, "kodex_pseudonymizer.xml");
         assertFile(srcMainAssembly, "python_kodexPythonService.xml");
         assertAllFiles(gen);
+        assertTemplateZip(gen, "impl.SimpleKodexTestingApp");
     }
     
 }
