@@ -155,7 +155,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                 
                 maven("${appRoot}", mvnUpdate);
 
-                generateServiceContainer(appRoot, config, a, elements);
+                generateServiceContainer(appRoot, cfg, a, elements);
             }
             
             Boolean withTemplate = true; // preliminary
@@ -327,13 +327,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
     
     // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
     
-    // initial, depends on container strategies
-    generateServiceContainer(Path appRoot, Configuration config, Application a, sequenceOf(MeshElement) elements) = {
+    // creates containers depending on container strategies
+    generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
 
+        ContainerManager mgr = config.containerManager;
         if (a.createContainer) {
             
             // Checking if there is any PythonService in app
-            Integer isPythonService = 0;        // 0 - false, 1 - true
+            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == CONTAINER_C1Ecs_C2Svc_App)
             for (MeshElement elem : elements) {
                 Service service = elem.impl;
                 if (service.isTypeOf(PythonService)) {
@@ -343,121 +344,78 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             setOf(EcsDevice) devices = EcsDevice.allInstances();
             for (EcsDevice d : devices) {
+
+                if (isPythonService == 1) {
+                    Path req = "${appRoot}/../requirements.txt";
+                    vilTemplateProcessor("PythonReq", config, req, elements=elements);
+                }
             
-                if (d.containerType == 1) {
-                
-                    if (isPythonService == 0) {
-                        // JAVA         
-                        Path df = "${appRoot}/../Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
-                        df.rename("Dockerfile");   
-                    } else {
-                        // JAVA & PYTHON
-                        Path req = "${appRoot}/../requirements.txt";
-                        vilTemplateProcessor("PythonReq", config, req, elements=elements);
-                        
-                        Path df = "${appRoot}/../Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
-                        df.rename("Dockerfile");
-                    }
-					
+                String dfName = createContainerBuildScript(mgr, a, elements, appRoot, containerType, isPythonService);
+                if (d.containerType == CONTAINER_Ecs_Svc_App) {
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
                     vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
 
                     // Create image 
                     Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../Dockerfile";
-                    String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
+                    Path d = "${appRoot}/../" + dfName;
+                    //String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
+                    String imageId = createContainerImage(mgr, b, d, "imagetype_1", "image", "01");
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
                     //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType); TODO 
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=1);
-                    
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_Ecs_Svc_App);
                 }
                 
-                if (d.containerType == 2) {
-                     if (isPythonService == 0) {
-                        // JAVA         
-                        Path df = "${appRoot}/../Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=d.containerType);
-                        df.rename("Dockerfile");
-                     } else {
-                        // JAVA & PYTHON
-                        Path req = "${appRoot}/../requirements.txt";
-                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
-
-                        Path df = "${appRoot}/../Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile_Python", config, df, elements=elements, app=a, containerType=d.containerType);
-                        df.rename("Dockerfile");
-                    }
-
+                if (d.containerType == CONTAINER_EcsSvc_App) {
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
                     vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
 
                     // Create image 
                     Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../Dockerfile";
-                    String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
+                    Path d = "${appRoot}/../" + dfName;
+                    //String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
+                    String imageId = createContainerImage(mgr, b, d, "imagetype_2", "image", "01");
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=2);
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_EcsSvc_App);
 				}	
 
-                if (d.containerType == 3) {
-
+                if (d.containerType == CONTAINER_C1Ecs_C2Svc_App) {
                     // Container with ECS
-                    Path df = "${appRoot}/../Dockerfile.txt";
-                    vilTemplateProcessor("Dockerfile_3_ecs", config, df, elements=elements, app=a);
-                    df.rename("ecs.Dockerfile");
+                    String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, containerType, -1);
                     
                     Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=0);
+                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=CONTAINER_Ecs);
                     
                     Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../ecs.Dockerfile";
-                    String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
+                    Path d = "${appRoot}/../" + ecsDfName;
+                    //String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
+                    String ecs_imageId = createContainerImage(mgr, b, d, "imagetype_3", "ecs", "01");
                     
                     // Mesh-Info
                     Path meshInfoEcs = "${appRoot}/../mesh-info-ecs.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=0);
+                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=CONTAINER_Ecs);
                     
                     // Container with ServiceMgr and App
-                    if (isPythonService == 0) {
-                        // JAVA         
-                        Path df = "${appRoot}/../app.Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile", config, df, elements=elements, app=a, containerType=3);
-                        df.rename("app.Dockerfile");      
-                    } else {
-                        // JAVA & PYTHON
-                        Path req = "${appRoot}/../requirements.txt";
-                        vilTemplateProcessor("PythonReq", config, req, elements=elements);              
-
-                        Path df2 = "${appRoot}/../app.Dockerfile.txt";
-                        vilTemplateProcessor("Dockerfile_Python", config, df2, elements=elements, app=a, containerType=3);
-                        df2.rename("app.Dockerfile");
-                    }
-                     
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=3);
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=CONTAINER_C1Ecs_C2Svc_App);
                      
                     // Create image 
                     Path b2 = "${appRoot}/../";
-                    Path d2 = "${appRoot}/../app.Dockerfile";
-                    String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                    Path d2 = "${appRoot}/../" + dfName;
+                    //String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
+                    String app_imageId = createContainerImage(mgr, b, d2, "imagetype_3", "app", "01");
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=3);
-                     
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_C1Ecs_C2Svc_App);
                 }
-                
             }
-                
                 
             /*   
             // InstalledDependencies
