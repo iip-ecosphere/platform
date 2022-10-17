@@ -78,7 +78,6 @@ public class TestSource extends SourceImpl {
                             temp.setRotSpe(Integer.valueOf(values[4]));
                             temp.setTorq(Float.valueOf(values[5]));
                             temp.setToolWear(Integer.valueOf(values[6]));
-                            temp.setTarget(Integer.valueOf(values[7]));
                             
                             prepInputs.add(temp);   
                         } else {
