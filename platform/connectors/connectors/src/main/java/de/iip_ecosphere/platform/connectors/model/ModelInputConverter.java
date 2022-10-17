@@ -47,7 +47,15 @@ public class ModelInputConverter implements InputConverter<Object> {
 
     @Override
     public long toLong(Object data) throws IOException {
-        return (long) data;
+        if (data.getClass() == Long.class) {
+            return (long) data;
+        } else if (data.getClass() == Integer.class) { // OPC declares long but Milo uses int
+            return (int) data;
+        } else if (data instanceof Number) { // just in case
+            return ((Number) data).longValue();
+        } else {
+            return 0; // no number???
+        }
     }
 
     @Override

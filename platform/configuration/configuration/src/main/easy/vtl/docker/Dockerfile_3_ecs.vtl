@@ -3,9 +3,9 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
     	
     	'FROM openjdk:13'  // TODO Java-Version & CPU
     	''

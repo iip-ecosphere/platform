@@ -40,6 +40,7 @@ public class IvmlSimpleMesh3Tests extends IvmlTests {
         File gen = new File("gen/tests/SimpleMesh3");
         PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)));
         assertAllFiles(gen);
+        assertTemplateZip(gen, "impl.SimpleMeshTestingApp3");
     }
     
 }

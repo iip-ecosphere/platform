@@ -91,5 +91,18 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         }
         vilTemplateProcessor("JavaServices", cfg, "${p}/META-INF/services/de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor", descriptors=desc);
     }
+    
+    // ---------------------------- containers ------------------------------
+    
+    // dispatch basis, creates container build script and returns file name
+    String createContainerBuildScript(ContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
+        Path appRoot, Integer contType, Integer isPythonService) = {
+        "";
+    }
+
+    // dispatch basis, build container image    
+    String createContainerImage(ContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
+        "";
+    }
 
 }

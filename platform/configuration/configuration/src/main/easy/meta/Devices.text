@@ -32,3 +32,7 @@ Devices::PythonDependency::version = Version of the required Python dependency.
 Devices::PythonDependency::dependencies = Further (system) dependencies, e.g., native libraries required by this Python dependency. 
 Devices::deviceIdProvider = Actual device ID provider. 
 Devices::ecsDeviceNamesUnique = The IDs of all devices must be unique. 
+Devices::CONTAINER_C1Ecs_C2Svc_App = Container strategy constant: Build two containers, one with the ECS-runtime, one with Service Manager/App dependencies.
+Devices::CONTAINER_Ecs = Internal constant: Build only one container with the ECS-runtime.
+Devices::CONTAINER_EcsSvc_App = Container strategy constant: Build one containers with ECS-runtime/Service Manager and App dependencies.
+Devices::CONTAINER_Ecs_Svc_App = Container strategy constant: Build one containers with ECS-runtime, service Manager and App dependencies. 

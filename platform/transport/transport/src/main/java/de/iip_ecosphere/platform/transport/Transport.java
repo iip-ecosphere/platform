@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -53,6 +54,7 @@ public class Transport {
     private static TransportInstance localTransport = globalTransport;
     private static Set<String> globalRoutingKeys = new HashSet<>();
     private static final boolean DEBUG = false; // for now, the "traditional" non-logging way
+    private static final long QUEUE_MSG_TIMEOUT = TimeUnit.MINUTES.toMillis(30); 
     
     /**
      * An instance of the transport.
@@ -65,6 +67,7 @@ public class Transport {
         private boolean stayOffline = false;
         private Queue<IOConsumer<TransportConnector>> queue = new ConcurrentLinkedDeque<>();
         private Supplier<TransportSetup> transportSupplier;
+        private long lastQueuedMsg = 0;
 
         /**
          * Creates a transport instance without transport setup information (for deferred setup). 
@@ -172,8 +175,13 @@ public class Transport {
                 }
             } else {
                 queue.add(sender);
-                LoggerFactory.getLogger(Transport.class).error(
-                    "Cannot sent {} message now. Queued message until connector becomes available.", kind);
+                long now = System.currentTimeMillis();
+                if (lastQueuedMsg == 0 || now - lastQueuedMsg > QUEUE_MSG_TIMEOUT) {
+                    LoggerFactory.getLogger(Transport.class).error(
+                        "Cannot sent {} message now. Queued message until connector becomes available. "
+                        + "Not reporting for {} ms.", kind);
+                    lastQueuedMsg = now;
+                }
             }
         }
 

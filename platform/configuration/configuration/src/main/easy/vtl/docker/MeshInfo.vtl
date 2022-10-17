@@ -6,13 +6,13 @@ import JavaBasics;
 template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
 	
     def main(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
-        if (containerType == 0) {
+        if (containerType == CONTAINER_Ecs) {
             'id: ECS'
             'name: ECS'
             'version: ${getAppMvnVersion(app)}'
             'dockerImageName: ECS:${getAppMvnVersion(app)}'
             'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
-        } else if (containerType == 3) {
+        } else if (containerType == CONTAINER_C1Ecs_C2Svc_App) {
             'id: ${getAppMvnName(app)}_NoECS'
             'name: ${getAppMvnName(app)}'
             'version: ${getAppMvnVersion(app)}'
