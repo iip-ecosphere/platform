@@ -1,4 +1,4 @@
-project ExampleTestGeneration {
+project WorkshopApp {
 
     import IIPEcosphere;
     import DataTypes;

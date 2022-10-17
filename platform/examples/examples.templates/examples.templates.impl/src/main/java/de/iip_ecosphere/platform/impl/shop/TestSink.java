@@ -30,7 +30,7 @@ public class TestSink extends SinkImpl {
 
     @Override
     public void processNewOutput(NewOutput data) {
-        System.out.println("OUT: " + data.getResult());
+        System.out.println("Output: " + data.getResult());
     }
                 
     

@@ -11,6 +11,10 @@
      <artifactId>platformDependencies</artifactId>
      <version>0.5.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+      <ivml.file>WorkshopApp</ivml.file>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -69,7 +73,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>ExampleTestGeneration</argument>
+                         <argument>${ivml.file}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateAppsNoDeps</argument>
@@ -82,7 +86,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>ExampleTestGeneration</argument>
+                         <argument>${ivml.file}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateApps</argument>

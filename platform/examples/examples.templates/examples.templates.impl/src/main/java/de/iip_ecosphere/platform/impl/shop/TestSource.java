@@ -1,7 +1,6 @@
 package de.iip_ecosphere.platform.impl.shop;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,9 +49,9 @@ public class TestSource extends SourceImpl {
             result = prepInputs.get(ran.nextInt(1999));
             System.out.println(">>>>" + result);
         }
-        
         return result;
     }
+    
     /**
      * Takes the .csv containing the test data set from the training and reads it in.
      * The read values will be aggregated in a list of TestInputs for the transport.
@@ -96,6 +95,5 @@ public class TestSource extends SourceImpl {
             }      
         }   
     }    
-    
     
 }
