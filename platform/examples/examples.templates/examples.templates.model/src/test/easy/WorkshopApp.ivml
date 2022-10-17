@@ -1,4 +1,4 @@
-project ExampleTestGeneration {
+project WorkshopApp {
 
     import IIPEcosphere;
     import DataTypes;
@@ -75,9 +75,6 @@ project ExampleTestGeneration {
             }, Field {
                 name = "toolWear",
                 type = refBy(IntegerType)
-            }, Field {
-                name = "target",
-                type = refBy(IntegerType)
             }
         }
     };
@@ -118,8 +115,8 @@ project ExampleTestGeneration {
         description = "",
         ver = "0.1.0",
         deployable = true,
-		traceRcv = TraceKind::LOG,
-        traceSent = TraceKind::LOG,
+		traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
         input = {{type=refBy(NewInput)}},
         output = {{type=refBy(NewOutput)}},
         artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + iipVer,
@@ -132,8 +129,8 @@ project ExampleTestGeneration {
         description = "",
         ver = "0.1.0",
         deployable = true,
-		traceRcv = TraceKind::LOG,
-        traceSent = TraceKind::LOG,
+		traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
         class = "de.iip_ecosphere.platform.impl.shop.TestSink",
         artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,

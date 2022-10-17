@@ -5,6 +5,7 @@
     <name>TestTestApp-services</name>
     <description>Implementation of TestTestApp</description>
     <groupId>de.iip-ecosphere.platform.apps</groupId>
+    <version>0.1.0-SNAPSHOT</version>
     <parent>
         <groupId>de.iip-ecosphere.platform</groupId>
         <artifactId>platformDependencies</artifactId>
