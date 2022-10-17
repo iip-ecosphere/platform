@@ -90,6 +90,8 @@ import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
+import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
+import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Schema;
@@ -519,6 +521,42 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     }
     
     /**
+     * Specialized model input converter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class OpcInputConverter extends ModelInputConverter {
+        
+        @Override
+        public long toLong(Object data) throws IOException {
+            if (data.getClass() == Long.class) {
+                return (long) data;
+            } else if (data.getClass() == Integer.class) { // OPC declares long but Milo uses int
+                return (int) data;
+            } else if (data instanceof Number) { // just in case
+                return ((Number) data).longValue();
+            } else {
+                return 0; // no number???
+            }
+        }
+        
+    }
+    
+    /**
+     * Specialized model output converter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class OpcOutputConverter extends ModelOutputConverter {
+        
+        /*@Override
+        public Object fromLong(long data) throws IOException {
+            return data; // unsure, does it need int?
+        }*/
+        
+    }
+    
+    /**
      * Implements the model access for OPC UA.
      * 
      * @author Holger Eichelberger, SSE
@@ -529,6 +567,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         private NodeCacheEntry base;
         private String basePath;
         private OpcUaModelAccess parent;
+        private OpcInputConverter inputConverter = new OpcInputConverter();
+        private OpcOutputConverter outputConverter = new OpcOutputConverter();
         
         /**
          * Creates the instance and binds the listener to the creating connector instance.
@@ -565,6 +605,24 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         public String getQSeparator() {
             return SEPARATOR_STRING;
         }
+        
+        /**
+         * Returns the input converter instance.
+         * 
+         * @return the input converter
+         */
+        public ModelInputConverter getInputConverter() {
+            return inputConverter;
+        }
+
+        /**
+         * Returns the output converter instance.
+         * 
+         * @return the output converter
+         */
+        public ModelOutputConverter getOutputConverter() {
+            return outputConverter;
+        }        
 
         @Override
         public Object call(String qName, Object... args) throws IOException {
