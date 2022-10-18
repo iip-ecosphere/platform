@@ -13,6 +13,16 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     Integer nestedStepCount = 0;
     mapOf(Field, Integer) cachingTimes = {};
     
+    // path name customization
+    
+    def getFieldNameForPath(Field field) {
+        field.name;
+    }
+
+    /*def getFieldNameForPath(UAFieldType field) {
+        field.browseName;
+    }*/
+    
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
     // dispatch basis
     def String getMachineOutputTypeName(Connector conn) {
@@ -228,12 +238,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     protected def genFieldAccessInt(String path, Field field, Boolean set, String setEnd, String value, String indexes, Integer nestedCount) {
        String p;
        if (optWithStepIn) {
-           p = field.name;
+           p = getFieldNameForPath(field);
            if (nestedCount == 0 and topPath <> "") {
                p = topPath + "/" + p;
            }
        } else {
-           p = path + "/" + field.name;
+           p = path + "/" + getFieldNameForPath(field);
        }
        if (set) {
            if (not(genFrom)) {
@@ -277,9 +287,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (not(genFrom) and optWithStepIn) {
             String path = topPath;
             if (nestedStepCount == 0 and path.length() > 0) {
-                path = path + "/" + field.name;
+                path = path + "/" + getFieldNameForPath(field.name);
             } else {
-                path = field.name;
+                path = getFieldNameForPath(field.name);
             }
             nestedStepCount = nestedStepCount + 1;
             '\n\naccess = access.stepInto("${path}");' !<CR>;

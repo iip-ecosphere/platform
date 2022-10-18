@@ -1,3 +1,5 @@
+import Basics;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template PythonBasics(Configuration config, FileArtifact target) {
@@ -11,6 +13,7 @@ template PythonBasics(Configuration config, FileArtifact target) {
     }
 
     def String asIdentifier(String s) {
+        String tmp = substNonIdCharacters(s);
         s.replace(" ", "").replace("$","D").toIdentifier();
     }
 

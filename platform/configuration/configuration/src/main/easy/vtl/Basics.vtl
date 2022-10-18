@@ -2,7 +2,27 @@
 @indent(indentation = 4, additional = 0)
 template Basics(Configuration config, FileArtifact target) {
 	
+	/**
+	* Generic function to substitute characters that are typically not allowed in programming 
+	* language identifiers by respective character sequences.
+	*
+	* input: string
+	* output: potentially modified string
+	*/
+	def String substNonIdCharacters(String s) {
+	    // don't replace $ or "." here -> Java
+	    String tmp = s.replace("<", "Lt").replace(">", "Rt");
+	    tmp.toIdentifier();
+	}
+
+    /**
+    * Turns a string into a folder name.
+    *
+    * input: string
+    * output: potentially modified string
+    */
 	def String toFolderName(String s) {
+	    // potentially incomplete, no substNoIdCharacters here for now
         s.firstToLowerCase().toIdentifier();
     }
     

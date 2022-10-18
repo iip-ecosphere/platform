@@ -1,0 +1,216 @@
+project OpcUaDataTypes {
+
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+
+    enum NodeClass {UAObject, UAObjectType, UAVariable, UAVariableType, UADataType};
+
+    compound NodeId {
+	Integer nameSpaceIndex;
+	Integer identifier;
+    };
+
+    typedef OpcLocalizedText String; //  with (matches(NonEmptyNameString, "^[\\w \\[\\]-\\Q$_\\E]+$")); // non whitespace	
+	//typedef OpcLocalizedTextTypeType StringTypeType;
+	
+    compound OpcLocalizedTextTypeType refines StringTypeType {
+    }
+    OpcLocalizedTextTypeType opcLocalizedTextType = {
+		name = "LocalizedText"
+    };
+    
+    compound opcUnknownDataTypeType refines ObjectTypeType {
+    };
+    
+	opcUnknownDataTypeType opcUnknownDataType = {
+		name = "UnknownDataType"
+    };
+
+    compound UnsignedInteger32ArrayTypeType refines IntegerArrayTypeType {
+    }
+    UnsignedInteger32ArrayTypeType UnsignedInteger32ArrayType = {
+        name = "uint32[]",
+        type = refBy(Integer32Type)
+    };
+
+    compound GuidTypeType refines PrimitiveType {
+		UnsignedInteger32TypeType data1;
+		UnsignedInteger16TypeType data2;
+		UnsignedInteger16TypeType data3;
+		ByteStringTypeType data4;
+    };
+
+    GuidTypeType opcGuidType = { // = fehlt
+		name = "Guid"
+    };
+
+    compound IdTypeType refines EnumType {
+    }  
+
+    IdTypeType opcIdType = { // = fehlt
+        name = "IdType",
+	
+		literals = {
+	    	EnumLiteral {
+                name = "Numeric",
+                ordinal = 0,
+                description = "Numeric value"
+            }, EnumLiteral {
+                name = "String",
+                ordinal = 1,
+                description = "String value"
+            }, EnumLiteral {
+                name = "Guid", // ""
+                ordinal = 2,
+                description = "Globally unique identifier"
+            }, EnumLiteral {
+                name = "Opaque", // ""
+                ordinal = 3,
+                description = "Namespace specific format"
+	    }
+        }
+    }; // ;
+
+    compound UnsignedIntegerTypeType refines PrimitiveType {
+    }
+    UnsignedIntegerTypeType opcUnsignedIntegerType = {
+	name = "UnsignedInteger"
+    };
+    
+    compound NumberTypeType refines PrimitiveType {
+    }
+    NumberTypeType opcNumberType = {
+	name = "Number"
+    };
+
+    compound NumericRangeTypeType refines PrimitiveType {
+        String range;
+    }
+    NumericRangeTypeType opcNumericRangeType = {
+		name = "NumericRange"
+    };
+
+    compound RangeTypeType refines PrimitiveType {
+        Real lowestValue; // Double -> Real
+		Real highestValue;
+    }
+    RangeTypeType opcRangeType = {
+	name = "Range"
+    };
+
+    compound EUInformationTypeType refines PrimitiveType {
+        String namespaceUri;
+		Integer32TypeType unitId;
+		String displayName;
+		OpcLocalizedText description; //name@language
+    }
+
+    EUInformationTypeType opcEUInformationType = {
+	name = "EUInformation"
+    };
+    
+    compound UtcTimeTypeType refines PrimitiveType {
+    }
+    UtcTimeTypeType opcUtcTimeType = {
+	name = "UtcTime"
+    };
+
+    compound ArgumentTypeType refines PrimitiveType {
+    }
+    ArgumentTypeType opcArgumentType = {
+	name = "Argument"
+    };
+
+    compound StructureTypeType refines PrimitiveType {
+    }
+    StructureTypeType opcStructureType = {
+	name = "Structure"
+    };
+
+    compound UABaseType refines RecordType {
+        self.isTypeOf(UABaseType) implies fields.size() == 0;
+        	NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+    }
+
+    compound UAObjectType refines UABaseType {
+		UAObjectFields fields;
+    }
+
+    compound UARootObjectType refines UAObjectType {
+    	refTo(DataType) type;
+    }
+
+    compound UARootObjectTypeType refines UABaseType {
+	String documentation;
+    }
+
+    compound UAFieldType refines Field {
+		NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+    }
+
+
+    //-----> Fields auch für Variablen? Variablen können Variablen enthalten!
+
+    compound UAVariableType refines UAFieldType {
+		Integer accessLevel; // Type
+		Integer valueRank; // Type
+		Integer arrayDimensions; // Type
+    }
+
+    compound UAEnumType refines EnumType {
+	NodeId nodeId;
+	NodeClass nodeClass;
+	String browseName;
+	String displayName;
+	OpcLocalizedText description;
+	String documentation;
+    }
+    
+    compound DataLiteral {
+        NonEmptyNameString name;
+        refTo(DataType) type;
+        String description = "";
+    }
+
+    compound UADataType refines PrimitiveType {
+		NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+		String documentation;
+        sequenceOf(DataLiteral) literals;
+	Constraint dataLiteralNamesUnique = literals->isUnique(l|l.name);
+    }
+
+    typedef UAObjectFields sequenceOf(UAFieldType) with (UAObjectFields->collect(f|f.name).hasDuplicates() == false);
+
+
+    
+    // freeze all primitives
+    freeze {
+	UnsignedInteger32ArrayType;
+	opcLocalizedTextType;
+    	opcGuidType;
+	opcIdType;
+	opcUnsignedIntegerType;
+	opcNumberType;
+	opcNumericRangeType;
+	opcRangeType;
+	opcEUInformationType;
+	opcUtcTimeType;
+	opcArgumentType;
+	opcStructureType;
+    };
+    
+}

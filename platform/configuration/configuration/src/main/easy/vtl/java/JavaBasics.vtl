@@ -1,13 +1,15 @@
+import Basics;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template JavaBasics(Configuration config, FileArtifact target) {
 
     def String asIdentifier(String s) {
-        s.toIdentifier();
+        substNonIdCharacters(s);
     }
 
     def String asMethodNameSuffix(String s) {
-        s.firstToUpperCase().toIdentifier();
+        substNonIdCharacters(s.firstToUpperCase());
     }
     
     def String asTypeName(String s) {

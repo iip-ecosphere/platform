@@ -1,6 +1,6 @@
 project Connectors {
 
-    import DataTypes;
+    import OpcUaDataTypes;
     import Transport;
     import Services;
     import ServicePart*;
