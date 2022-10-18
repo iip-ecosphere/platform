@@ -23,18 +23,18 @@ template PythonEnum(Configuration config, FileArtifact target, EnumType type) {
          
             ${literals(type)|e}
 
-            def valueByModelOrdinal(modelOrdinal : int) -> ${clsName}:
-                """Returns an enum literal via its model ordinal.
+        def valueByModelOrdinal(modelOrdinal : int) -> ${clsName}:
+            """Returns an enum literal via its model ordinal.
                 
-                   Parameter:
-                     - modelOrdinal: the desired ordinal value
-                   Returns:
-                     - the enum literal or null"""
+               Parameter:
+                 - modelOrdinal: the desired ordinal value
+               Returns:
+                 - the enum literal or null"""
 
-                for l in ${clsName}:
-                    if l.value == modelOrdinal:
-                        return l
-                return null'
+            for l in ${clsName}:
+                if l.value == modelOrdinal:
+                    return l
+            return null'
     }
     
 }
