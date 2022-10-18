@@ -287,9 +287,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (not(genFrom) and optWithStepIn) {
             String path = topPath;
             if (nestedStepCount == 0 and path.length() > 0) {
-                path = path + "/" + getFieldNameForPath(field.name);
+                path = path + "/" + getFieldNameForPath(field);
             } else {
-                path = getFieldNameForPath(field.name);
+                path = getFieldNameForPath(field);
             }
             nestedStepCount = nestedStepCount + 1;
             '\n\naccess = access.stepInto("${path}");' !<CR>;
