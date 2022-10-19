@@ -21,9 +21,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.LoggerFactory;
 
 /**
  * Caches formatter instances.
@@ -69,14 +71,20 @@ public class FormatCache {
         Date result = null;
         if (data instanceof Date) {
             result = (Date) data;
+        } else if (data instanceof DateTime) {
+            result = ((DateTime) data).toDate();
+        } else if (data instanceof LocalDateTime) {
+            result = toDate((LocalDateTime) data);
         } else {
             String tmp = null == data ? "" : data.toString();
+            LoggerFactory.getLogger(FormatCache.class).warn("Fallback, converting to String from {} {}", 
+                data == null ? null : data.getClass().getName(), data); // TODO preliminary!
             if (ISO8601_FORMAT.equals(format)) {
                 result = ISO8601_FORMATTER.parseLocalDate(tmp).toDate();
             } else {
                 SimpleDateFormat f = FormatCache.getDateFormatter(format);
                 try {
-                    return f.parse((String) data);
+                    return f.parse(tmp);
                 } catch (ParseException e) {
                     throw new IOException(e);
                 }
@@ -137,8 +145,8 @@ public class FormatCache {
             result = null;
         } else {
             result = java.util.Date
-            .from(date.atZone(ZoneId.systemDefault())
-            .toInstant());
+                .from(date.atZone(ZoneId.systemDefault())
+                .toInstant());
         }
         return result;
     }

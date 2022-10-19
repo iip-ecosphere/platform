@@ -293,7 +293,7 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public default Date toDate(T data, String format) throws IOException {
-            return FormatCache.parse(data.toString(), format);
+            return FormatCache.parse(data, format);
         }
         
         /**
