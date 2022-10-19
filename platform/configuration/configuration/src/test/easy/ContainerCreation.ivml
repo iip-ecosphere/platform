@@ -213,7 +213,7 @@ project ContainerCreation {
     // ---------------- device ----------------
     
     EcsDevice device = {
-        containerType = CONTAINER_Ecs_Svc_App
+        containerType = ContainerType::Ecs_Svc_App
     };
     
     // ---------- generation setup ------------

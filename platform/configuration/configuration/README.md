@@ -60,4 +60,4 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
-**For snapshots:** EASy-Producer 1.3.4-SNAPSHOT built on **2022/10/05** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.4-SNAPSHOT built on **2022/10/19** or newer is required. Use `mvn -U exec:java ...`

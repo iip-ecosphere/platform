@@ -3,22 +3,29 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
+template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType) {
 	
-    def main(IIPEcosphere config, FileArtifact target, Application app, Integer containerType) {
-        if (containerType == CONTAINER_Ecs) {
+    def main(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType) {
+println("MESH1 " + containerType+" "+ContainerType::Ecs);
+        if (containerType == ContainerType::Ecs) {
+        }
+println("MESH0.1");
+        if (containerType == ContainerType::Ecs) {
+println("MESH2");
             'id: ECS'
             'name: ECS'
             'version: ${getAppMvnVersion(app)}'
             'dockerImageName: ECS:${getAppMvnVersion(app)}'
             'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
-        } else if (containerType == CONTAINER_C1Ecs_C2Svc_App) {
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
+println("MESH3");
             'id: ${getAppMvnName(app)}_NoECS'
             'name: ${getAppMvnName(app)}'
             'version: ${getAppMvnVersion(app)}'
             'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
         } else {
+println("MESH4");
             'id: ${getAppMvnName(app)}_ECS'
             'name: ${getAppMvnName(app)}'
             'version: ${getAppMvnVersion(app)}'

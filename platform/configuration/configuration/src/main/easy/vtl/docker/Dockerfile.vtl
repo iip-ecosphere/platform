@@ -3,9 +3,9 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
+template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Integer containerType) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType) {
 
         'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         'WORKDIR /app'
@@ -20,13 +20,13 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
         'COPY broker/src/ src'
         'COPY broker/broker.sh broker.sh'
         ''
-        if (containerType ==CONTAINER_Ecs_Svc_App1) {
+        if (containerType == ContainerType::Ecs_Svc_App1) {
             '# ECS and Service Manager'
             'COPY ecsSvcJars/ ecsSvcJars'
             'COPY common/ common'
             'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
             
-        } else if (containerType == CONTAINER_EcsSvc_App) {
+        } else if (containerType == ContainerType::EcsSvc_App) {
     	    '# Service Manager'
             'COPY svcJars/ svcJars'
             'COPY common/ common'
@@ -36,7 +36,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             'COPY ecsJars/ ecsJars'
             'COPY ecs.sh ecs.sh'
         
-        } else if (containerType == CONTAINER_C1Ecs_C2Svc_App) {
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             '# Service Manager'
             'COPY svcJars/ svcJars'
             'COPY common/ common'

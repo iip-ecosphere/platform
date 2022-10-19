@@ -5,13 +5,13 @@ import MeshBasics;
 import IIPEcosphereBase;
 
 @advice(IIPEcosphere)
-vilScript IIPEcospherePartDocker (Project source, Configuration config, Project target) {
+vilScript IIPEcospherePartDocker (Project source, Configuration config, Project target) extends IIPEcosphereBase {
 
     String createContainerBuildScript(DockerContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
-        Path appRoot, Integer contType, Integer isPythonService) = {
+        Path appRoot, ContainerType contType, Integer isPythonService) = {
         String vtlFile;
         String targetFile;
-        if (contType == CONTAINER_Ecs_Svc_App) {
+        if (contType == ContainerType::Ecs_Svc_App) {
             if (isPythonService == 0) {
                 // JAVA         
                 vtlFile = "Dockerfile";
@@ -23,7 +23,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
             }
         }
                 
-        if (contType == CONTAINER_EcsSvc_App) {
+        if (contType == ContainerType::EcsSvc_App) {
              if (isPythonService == 0) {
                 // JAVA         
                 vtlFile = "Dockerfile";
@@ -35,7 +35,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
             }
         }   
 
-        if (contType == CONTAINER_C1Ecs_C2Svc_App) {
+        if (contType == ContainerType::C1Ecs_C2Svc_App) {
             if (isPythonService == -1) { // Container with ECS
                 vtlFile = "Dockerfile_3_ecs";
                 targetFile = "ecs.Dockerfile";   

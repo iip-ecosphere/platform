@@ -91,6 +91,7 @@ public abstract class IvmlSerializerConfigTests extends IvmlTests {
         assertFile(srcMainAssembly, "pythonInterfaces.xml");
 
         extractPythonServiceEnv(srcMainPython);
+        pythonSourceCodeCheck(srcMainPython, "datatypes/IdType.py");
         pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1.py");
         if (!old) {
             pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1Impl.py");

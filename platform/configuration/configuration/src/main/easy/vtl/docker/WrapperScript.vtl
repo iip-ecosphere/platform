@@ -2,23 +2,23 @@ import Basics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template WrapperScript(IIPEcosphere config, FileArtifact target, Integer containerType) {
+template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
 
-    def main(IIPEcosphere config, FileArtifact target, Integer containerType) {
+    def main(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
        	
         '#!/bin/bash'
         ''
         'bash broker.sh &'
         'sleep 4;'
-        if (containerType == CONTAINER_Ecs) {
+        if (containerType == ContainerType::Ecs) {
             'bash ecs.sh'
-        } else if (containerType == CONTAINER_Ecs_Svc_App) {
+        } else if (containerType == ContainerType::Ecs_Svc_App) {
             'bash ecsServiceMgr.sh'
-        } else if (containerType == CONTAINER_EcsSvc_App) {
+        } else if (containerType == ContainerType::EcsSvc_App) {
             'bash ecs.sh'
             'sleep 7;'
             'bash serviceMgr.sh'
-        } else if (containerType == CONTAINER_C1Ecs_C2Svc_App) {
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             'bash serviceMgr.sh'
         } 
     }

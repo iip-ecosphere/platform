@@ -6,7 +6,7 @@ import IIPEcosphereBase;
 insert IIPEcospherePart*;
 
 @advice(IIPEcosphere)
-vilScript IIPEcosphere (Project source, Configuration config, Project target) {
+vilScript IIPEcosphere (Project source, Configuration config, Project target) extends IIPEcosphereBase {
 
     // Paths now in IIPEcosphereBase
     
@@ -344,17 +344,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
             
             setOf(EcsDevice) devices = EcsDevice.allInstances();
             for (EcsDevice d : devices) {
+                ContainerType cntType = d.containerType;
 
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
                     vilTemplateProcessor("PythonReq", config, req, elements=elements);
                 }
             
-                String dfName = createContainerBuildScript(mgr, a, elements, appRoot, d.containerType, isPythonService);
-                if (d.containerType == CONTAINER_Ecs_Svc_App) {
+                String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService);
+                if (cntType == ContainerType::Ecs_Svc_App) {
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
 
                     // Create image 
                     Path b = "${appRoot}/../";
@@ -364,14 +365,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=d.containerType); TODO 
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_Ecs_Svc_App);
+                    //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=cntType); TODO 
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App);
                 }
                 
-                if (d.containerType == CONTAINER_EcsSvc_App) {
+                if (cntType == ContainerType::EcsSvc_App) {
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=d.containerType); 
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
 
                     // Create image 
                     Path b = "${appRoot}/../";
@@ -381,15 +382,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_EcsSvc_App);
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::EcsSvc_App);
 				}	
 
-                if (d.containerType == CONTAINER_C1Ecs_C2Svc_App) {
+                if (cntType == ContainerType::C1Ecs_C2Svc_App) {
                     // Container with ECS
                     String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, containerType, -1);
                     
                     Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=CONTAINER_Ecs);
+                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
                     
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + ecsDfName;
@@ -398,12 +399,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfoEcs = "${appRoot}/../mesh-info-ecs.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=CONTAINER_Ecs);
+                    vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs);
                     
                     // Container with ServiceMgr and App
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=CONTAINER_C1Ecs_C2Svc_App);
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=ContainerType::C1Ecs_C2Svc_App);
                      
                     // Create image 
                     Path b2 = "${appRoot}/../";
@@ -413,7 +414,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) {
                     
                     // Mesh-Info
                     Path meshInfo = "${appRoot}/../mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=CONTAINER_C1Ecs_C2Svc_App);
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App);
                 }
             }
                 

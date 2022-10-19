@@ -108,10 +108,12 @@ project Devices {
     enum CpuBits {bit32, bit64};
     
     // container types:
-    const Integer CONTAINER_Ecs = 0; // 0 - just ecs (used only internally, prevent by constraint)
-    const Integer CONTAINER_Ecs_Svc_App = 1; // 1 - one container: ecs + svc + app
-    const Integer CONTAINER_EcsSvc_App = 2; // 2 - one container: ecsSvc + app
-    const Integer CONTAINER_C1Ecs_C2Svc_App = 3; // 3 - 1st container: ecs, 2nd container: svc + app
+    enum ContainerType {
+        Ecs, // 0 - just ecs (used only internally, prevent by constraint)
+        Ecs_Svc_App, // 1 - one container: ecs + svc + app
+        EcsSvc_App, // 2 - one container: ecsSvc + app
+        C1Ecs_C2Svc_App // 3 - 1st container: ecs, 2nd container: svc + app
+    };
     
     compound EcsDevice refines CComputer {
         String id; // currently, we are a bit more open here; may be restricted in future
@@ -120,7 +122,8 @@ project Devices {
         CpuBits bits;
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {};
-        Integer containerType = CONTAINER_Ecs_Svc_App;
+        ContainerType containerType = ContainerType::Ecs_Svc_App;
+        containerType <> ContainerType::Ecs; // internal
     }
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
