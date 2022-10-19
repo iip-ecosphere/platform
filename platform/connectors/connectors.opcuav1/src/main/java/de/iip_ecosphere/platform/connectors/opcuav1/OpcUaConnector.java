@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.connectors.opcuav1;
 
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -26,6 +27,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -88,6 +90,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
@@ -155,6 +158,17 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     private static final String FIELD_BINARY_ENCODING_ID = "BINARY_ENCODING_ID";
     private OpcUaClient client;
     private ConnectorParameter params;
+    
+    static { // preliminary
+        FormatCache.registerConverter(new FormatCache.AbstractDateConverter<DateTime>(DateTime.class) {
+
+            @Override
+            public Date toDate(DateTime data) {
+                return data.getJavaDate();
+            }
+            
+        });
+    }
 
     /**
      * The descriptor of this connector (see META-INF/services).
