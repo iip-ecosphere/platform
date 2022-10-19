@@ -21,7 +21,9 @@ import org.apache.commons.lang.SystemUtils;
  */
 public class Docker {
 
-    private String dockerHost = SystemUtils.IS_OS_WINDOWS ? "http://localhost:2375" : "unix:///var/run/docker.sock";
+    // http://localhost:2375 does not seem to work although discussed as solution
+    private String dockerHost = SystemUtils.IS_OS_WINDOWS 
+        ? "unix:///var/run/docker.sock" : "unix:///var/run/docker.sock";
     private String dockerImageYamlFilename = "image-info.yml";
     private boolean deleteWhenUndeployed = false;
     private String downloadDirectory;

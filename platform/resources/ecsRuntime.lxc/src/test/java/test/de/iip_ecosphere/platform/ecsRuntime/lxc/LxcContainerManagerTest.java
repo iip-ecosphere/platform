@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
  * 
  * @author Monika Staciwa, SSE
  */
-public class DockerContainerManagerTest {
+public class LxcContainerManagerTest {
         
     /**
      * Template test.

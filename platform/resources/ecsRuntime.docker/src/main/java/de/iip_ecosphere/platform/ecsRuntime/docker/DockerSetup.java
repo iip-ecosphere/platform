@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DockerConfiguration extends EcsSetup {
+public class DockerSetup extends EcsSetup {
 
     private Docker docker = new Docker();
 
@@ -45,18 +45,18 @@ public class DockerConfiguration extends EcsSetup {
     }
     
     /**
-    * Reads a {@link DockerConfiguration} instance from a {@link AbstractSetup#DEFAULT_FNAME} in the 
+    * Reads a {@link DockerSetup} instance from a {@link AbstractSetup#DEFAULT_FNAME} in the 
     * root folder of the jar/classpath. 
     *
     * @return configuration instance
     */
-    public static DockerConfiguration readFromYaml() {
-        DockerConfiguration result;
+    public static DockerSetup readFromYaml() {
+        DockerSetup result;
         try {
-            return EcsSetup.readConfiguration(DockerConfiguration.class);
+            return EcsSetup.readConfiguration(DockerSetup.class);
         } catch (IOException e) {
-            LoggerFactory.getLogger(DockerConfiguration.class).error("Reading configuration: " + e.getMessage());
-            result = new DockerConfiguration();
+            LoggerFactory.getLogger(DockerSetup.class).error("Reading configuration: " + e.getMessage());
+            result = new DockerSetup();
         }
         return result;
     }

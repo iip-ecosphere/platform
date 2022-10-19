@@ -29,7 +29,7 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DockerContainerDescriptorTest {
+public class LxcContainerDescriptorTest {
     
     /**
      * Tests reading descriptors.

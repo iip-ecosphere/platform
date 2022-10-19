@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    DockerConfigurationTest.class,
+    DockerSetupTest.class,
     DockerContainerManagerTest.class,
     DockerContainerDescriptorTest.class
 })

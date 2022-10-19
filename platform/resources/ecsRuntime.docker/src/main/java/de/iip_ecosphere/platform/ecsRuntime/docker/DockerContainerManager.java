@@ -55,7 +55,7 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
  */
 public class DockerContainerManager extends AbstractContainerManager<DockerContainerDescriptor> {
 
-    private static DockerConfiguration config = DockerConfiguration.readFromYaml();
+    private static DockerSetup config = DockerSetup.readFromYaml();
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerContainerManager.class);
     
     // don't change name of outer/inner class
@@ -88,7 +88,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         LOGGER.info("Adding container at " + location + "...");
         try {
             FactoryDescriptor factory = new FactoryDescriptor();
-            DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
+            DockerSetup config = (DockerSetup) factory.getConfiguration();
             String downloadDirectory = config.getDocker().getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);
             
@@ -218,7 +218,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
      *     configuration setup cannot be applied, e.g., a Linux socket path on Windows
      */
     public DockerClient getDockerClient() {
-        DockerConfiguration config = DockerConfiguration.readFromYaml();
+        DockerSetup config = DockerSetup.readFromYaml();
         String dockerhost = config.getDocker().getDockerHost();
         DockerClientConfig standardConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerhost).build(); 
@@ -295,7 +295,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         
         // Removing image from download directory
         FactoryDescriptor factory = new FactoryDescriptor();
-        DockerConfiguration config = (DockerConfiguration) factory.getConfiguration();
+        DockerSetup config = (DockerSetup) factory.getConfiguration();
         if (config.getDocker().getDeleteWhenUndeployed()) {
             File downloadedImageZipfile = new File(container.getDownloadedImageZipfile());
             if (downloadedImageZipfile.exists()) {

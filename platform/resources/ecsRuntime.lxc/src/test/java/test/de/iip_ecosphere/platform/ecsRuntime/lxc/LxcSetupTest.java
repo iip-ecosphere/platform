@@ -10,31 +10,31 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.ecsRuntime.docker;
+package test.de.iip_ecosphere.platform.ecsRuntime.lxc;
 
 import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.ecsRuntime.docker.DockerConfiguration;
+import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcSetup;
 
 /**
- * Tests {@link DockerConfiguration}.
+ * Tests {@link LxcSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DockerConfigurationTest {
+public class LxcSetupTest {
     
     /**
      * Tests the configuration.
      */
     @Test
     public void testConfiguration() throws IOException {
-        DockerConfiguration cfg = DockerConfiguration.readFromYaml();
+        LxcSetup cfg = LxcSetup.readFromYaml();
         Assert.assertNotNull(cfg);
-        Assert.assertNotNull(cfg.getDocker().getDockerHost());
-        Assert.assertTrue(cfg.getDocker().getDockerHost().length() > 0);
+        Assert.assertNotNull(cfg.getLxc().getDockerHost());
+        Assert.assertTrue(cfg.getLxc().getDockerHost().length() > 0);
     }
 
 }
