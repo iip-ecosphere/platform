@@ -1,0 +1,5 @@
+id: 01
+name: test-container
+version: 1.0
+dockerImageName: arvindr226/alpine-ssh
+dockerImageZipfile: alpine-ssh-image.tar.gz

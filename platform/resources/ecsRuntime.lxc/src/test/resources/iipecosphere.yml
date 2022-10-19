@@ -1,0 +1,4 @@
+docker:
+    dockerHost: unix:///var/run/docker.sock
+    dockerImageYamlFilename: image-info.yml
+    deleteWhenUndeployed: False

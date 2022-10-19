@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>ecsRuntime.lxc</artifactId>
+  <packaging>jar</packaging>
+  <name>ECS runtime (LXC)</name>
+  <description>The LXC extension of the ECS runtime of the IIP-Ecosphere platform.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.5.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>ecsRuntime</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <!-- NO dependency to de.iip-ecosphere.platform.services!! -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>    
+    <!-- Docker API Client -->
+    <dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-core</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
+	<!-- Docker API Client -->
+	<dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-transport</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
+	<!-- Docker API Client -->
+	<dependency>
+    	<groupId>com.github.docker-java</groupId>
+    	<artifactId>docker-java-transport-httpclient5</artifactId>
+    	<version>3.2.7</version>
+	</dependency>
+  </dependencies>
+
+</project>
