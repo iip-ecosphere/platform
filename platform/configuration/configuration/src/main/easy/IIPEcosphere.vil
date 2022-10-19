@@ -387,7 +387,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 if (cntType == ContainerType::C1Ecs_C2Svc_App) {
                     // Container with ECS
-                    String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, containerType, -1);
+                    String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1);
                     
                     Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
                     vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
