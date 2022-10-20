@@ -63,16 +63,41 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         return setupSupplier.get();
     }
     
-    @Override
-    public void startup(String[] args) {
-        int port = CmdLine.getIntArg(args, PARAM_IIP_PORT, -1);
-        if (port < 0 && System.getenv(PARAM_IIP_PORT) != null) {
-            try {
-                port = Integer.parseInt(System.getenv(PARAM_IIP_PORT));
-            } catch (NumberFormatException e) {
-                // ignore
+    /**
+     * Returns the name of a command line/system environment parameter overriding {@link #PARAM_IIP_PORT}.
+     * 
+     * @return the name of the parameter, <b>null</b> for none (default)
+     */
+    protected String getOverridePortArg() {
+        return null;
+    }
+    
+    /**
+     * Returns the port value, either from args or from the system environment.
+     * 
+     * @param args the command line arguments
+     * @param arg the parameter name to search for
+     * @param init the initial value, a already known port if chained, usually {@code -1}
+     * @return the port, may be {@code -1} for none
+     */
+    private int getPort(String[] args, String arg, int init) {
+        int port = init;
+        if (null != arg && port < 0) {
+            port = CmdLine.getIntArg(args, arg, -1);
+            if (port < 0 && System.getenv(arg) != null) {
+                try {
+                    port = Integer.parseInt(System.getenv(arg));
+                } catch (NumberFormatException e) {
+                    // ignore
+                }
             }
         }
+        return port;
+    }
+    
+    @Override
+    public void startup(String[] args) {
+        int port = getPort(args, PARAM_IIP_PORT, getPort(args, getOverridePortArg(), -1));
         if (port > 0) {
             setupSupplier.get().getImplementation().setPort(port);
             LoggerFactory.getLogger(getClass()).info("Using port " + port + " for the AAS implementation server.");
