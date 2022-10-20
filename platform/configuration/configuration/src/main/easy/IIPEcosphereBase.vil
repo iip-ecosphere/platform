@@ -96,7 +96,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     
     // dispatch basis, creates container build script and returns file name
     String createContainerBuildScript(ContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
-        Path appRoot, ContainerType contType, Integer isPythonService) = {
+        Path appRoot, ContainerType contType, Integer isPythonService, EcsDevice device) = {
         "";
     }
 

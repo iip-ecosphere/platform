@@ -1,13 +1,15 @@
 import Basics;
 import JavaBasics;
+import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType) {
+template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
 
         'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
+        '${containerSettings(config, containerType, device)}'
         'WORKDIR /app'
         ''
         'COPY wrapper_script.sh wrapper_script.sh'

@@ -1,11 +1,12 @@
 import Basics;
 import JavaBasics;
+import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType) {
+template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType, EcsDevice device) {
 	
-    def main(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType) {
+    def main(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType, EcsDevice device) {
         if (containerType == ContainerType::Ecs) {
             'id: ECS'
             'name: ECS'
@@ -25,10 +26,21 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
             'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
         }
-        'env:'
-        '    - IIP_PORT=\\${port}'
+        Boolean useEphemeralPort = not(useFixedPort(config, device));
+        if (useEphemeralPort) { // else instantiated into Dockerfile
+            'env:'
+            '    - iip.port=\\${port}'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                '    - iip.port.svgMgr=\\${port_1}'
+            }
+        }
         'exposedPorts:'
-        '    - \\${port}/TCP'
+        if (useEphemeralPort) {
+            '    - \\${port}/TCP'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                '    - iip.port.svgMgr=\\${port_1}'
+            }
+        }
         '    - 22/UDP'
         '    - 80'
         '    - 8080/DEFAULT'

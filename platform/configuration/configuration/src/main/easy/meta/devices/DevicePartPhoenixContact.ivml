@@ -6,6 +6,7 @@ project DevicePartPhoenixContact {
     
     compound PhoenixContactDevice refines EcsDevice {
         setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
+        String containerName = "plcNext";
     }
 
 }

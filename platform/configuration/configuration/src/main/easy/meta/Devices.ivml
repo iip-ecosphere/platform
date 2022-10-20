@@ -18,7 +18,10 @@ project Devices {
     };
 
     compound LxcContainerManager refines ContainerManager {
-        // open, unclear what is missing -> cf. Devices.text!
+        // so far, code is copied from Lxc; open, unclear what is missing -> cf. Devices.text!
+        NonEmptyString dockerHost;
+        NonEmptyString lxcImageYamlFilename = "image-info.yml";
+        Boolean deleteWhenUndeployed = false;
     };
     
     ContainerManager containerManager = DockerContainerManager {
@@ -123,10 +126,15 @@ project Devices {
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {};
         ContainerType containerType = ContainerType::Ecs_Svc_App;
-        containerType <> ContainerType::Ecs; // internal
+        Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
+
+        Boolean isContainerTemplate = true; // currently for easing transition
+        String containerName = "dflt"; // the default containers without device-specific adjustments
+        Constraint noInternalContainerName = containerName <> "ecs";
     }
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
+    // container names unique does currently not work as the same can be used in various instances
     
     // --------------- constant freezes --------------------
     

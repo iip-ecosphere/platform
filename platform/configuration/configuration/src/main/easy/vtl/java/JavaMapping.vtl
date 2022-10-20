@@ -48,6 +48,10 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String containerManagerModule(DockerContainerManager mgr) {
         "ecsRuntime.docker";
     }
+
+    def String containerManagerModule(LxcContainerManager mgr) {
+        "ecsRuntime.lxc";
+    }
     
     def String containerManagerCfgClass(IIPEcosphere cfg) {
         containerManagerCfgClass(cfg.containerManager);
@@ -60,6 +64,10 @@ template JavaMapping(Configuration config, FileArtifact target) {
 
     def String containerManagerCfgClass(DockerContainerManager mgr) {
         "de.iip_ecosphere.platform.ecsRuntime.docker.DockerSetup";
+    }
+
+    def String containerManagerCfgClass(LxcContainerManager mgr) {
+        "de.iip_ecosphere.platform.ecsRuntime.lxc.DockerSetup";
     }
     
     // --------------------------------------------------------------

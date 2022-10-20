@@ -8,11 +8,11 @@ import IIPEcosphereBase;
 vilScript IIPEcospherePartDocker (Project source, Configuration config, Project target) extends IIPEcosphereBase {
 
     String createContainerBuildScript(DockerContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
-        Path appRoot, ContainerType contType, Integer isPythonService) = {
+        Path appRoot, ContainerType contType, Integer isPythonService, EcsDevice device) = {
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
-        
+		
         if (contType == ContainerType::Ecs_Svc_App) {
             if (isPythonService == 0) {
                 // JAVA         
@@ -53,7 +53,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
             }
         }
                 
-        vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType);
+        vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
         df.rename(targetFile);
         targetFile;
     }

@@ -16,7 +16,6 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
-        DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
         Integer aasImplServerPort = aasImplServer.port;
         String aasImplServerHost = aasImplServer.host;
         String aasImplNetmask = aasImplServer.netmask;
@@ -25,7 +24,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             aasImplServerHost = "127.0.0.1";
         }
         if (withDocker) {
-        '${produceDocker(config)}'
+        '${produceContainerMgr(config.containerManager)}'
         }
         'aas:
           server:
@@ -47,12 +46,22 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
           ${serverHost(aasServer)|e}
           ${produceAasPersistence(aasPersistence)|e}'
     }
+
+    def produceContainerMgr(ContainerManager containerManager) {
+        ''
+    }
     
-    def produceDocker(IIPEcosphere config) {
-        DockerContainerManager containerManager = config.containerManager; // prerequisite for this template
+    def produceContainerMgr(DockerContainerManager containerManager) {
         'docker:
             dockerHost: ${containerManager.dockerHost}
             dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
+            deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+    }
+
+    def produceContainerMgr(LxcContainerManager containerManager) {
+        'lxc:
+            dockerHost: ${containerManager.dockerHost}
+            lxcImageYamlFilename: ${containerManager.lxcImageYamlFilename}
             deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
     }
     

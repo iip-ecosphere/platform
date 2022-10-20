@@ -1,0 +1,42 @@
+import JavaBasics;
+import Basics;
+
+@advice(IIPEcosphere)
+template DockerBasics(Configuration config, FileArtifact target) {
+
+    def brokerSettings(TransportProtocol protocol) {
+        ''
+    }
+
+    def brokerSettings(TransportProtocolAMQP protocol) {
+        'ENV QPID_WORK=/tmp/qpidwork'
+    }
+
+    def containerSettings(IIPEcosphere cfg, ContainerType containerType, EcsDevice device) {
+        '${brokerSettings(cfg.transportProtocol)|e}'   
+        if (useFixedPort(cfg, device)) {
+            Integer port;
+            if (isDefined(device.aasImplPort) and device.aasImplPort <> null) {
+                port = device.aasImplPort;
+            } else {
+                port = cfg.aasImplServer.port;
+            }
+            ''
+            'ENV iip.port=${port}'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                'ENV iip.port.svgMgr=${port + 1}'
+            }
+            'EXPOSE ${port}'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                'EXPOSE ${port + 1}'
+            }
+        } else {
+            ''
+        }
+    }
+    
+    def Boolean useFixedPort(IIPEcosphere cfg, EcsDevice device) {
+        not(cfg.aasImplServer.devicesAsEphemeral);
+    }
+
+}
