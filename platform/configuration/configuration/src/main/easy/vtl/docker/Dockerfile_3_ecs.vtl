@@ -11,6 +11,9 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
     	'FROM openjdk:13'  // TODO Java-Version & CPU
     	'${containerSettings(config, containerType, device)}'
     	''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+    	''
     	'# ECS and Service Manager'
     	'COPY ecsJars/ ecsJars'
     	'COPY common/ common'

@@ -10,6 +10,10 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
 
         'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         '${containerSettings(config, containerType, device)}'
+        ''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+        ''
         'WORKDIR /app'
         ''
         'COPY wrapper_script.sh wrapper_script.sh'

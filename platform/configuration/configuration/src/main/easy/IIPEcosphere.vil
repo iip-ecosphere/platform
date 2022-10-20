@@ -350,6 +350,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path req = "${appRoot}/../requirements.txt";
                     vilTemplateProcessor("PythonReq", config, req, elements=elements);
                 }
+
+                Path instDep = "${appRoot}/../installedDependencies.yml";
+                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
             
                 String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
                 if (cntType == ContainerType::Ecs_Svc_App) {
@@ -417,12 +420,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
                 }
             }
-                
-            /*   
-            // InstalledDependencies
-            Path instDep = "${appRoot}/../installedDependencies.yml";
-            vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
-            */
         }
         
     }

@@ -4,33 +4,18 @@ import JavaBasics;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template InstalledDependencies(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
+
+    // this is just a listing of locations where (potentially conflicting) programs have been installed int
+    // the container system, e.g., PYTHON2 (unused) and PYTHON3 or JDK11, JDK13 and JDK8 (RTSA)
+    
+    // if there is a python service, we currently install a python 3 (standard location) and by default JAVA13 (-> RTSA!)
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
         'locations: '
         if (isPython == 1) {
-            
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-            for (PythonService pyService : services) {
-                setOf(Dependency) deps = pyService.dependencies;
-                for (Dependency s : deps) {
-                    if (genDependency(s) == 'PYTHON2') {
-                        '    PYTHON2: /usr/local/bin/python'
-                    } else if (genDependency(s) == 'PYTHON3') {
-                        '    PYTHON3: /usr/local/bin/python'
-                    } else if (genDependency(s) == 'PYTHON39') {
-                        '    PYTHON3: /usr/local/bin/python'
-                    } 
-                }
-            }
+            '    PYTHON3: /usr/local/bin/python'
         }
         '    JAVA13: /opt/openjdk-13/bin/java'
     }
     
-    def genDependency(Dependency d) {
-        '';
-    }
-    
-    def genDependency(SystemDependency d) {
-        '${d.key}';
-    }
 }
