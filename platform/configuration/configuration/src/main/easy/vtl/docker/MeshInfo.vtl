@@ -7,23 +7,25 @@ import DockerBasics;
 template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType, EcsDevice device) {
 	
     def main(IIPEcosphere config, FileArtifact target, Application app, ContainerType containerType, EcsDevice device) {
+        String appName = app.name.toIdentifier();
+        String deviceName = device.containerName.toIdentifier();
         if (containerType == ContainerType::Ecs) {
             'id: ECS'
             'name: ECS'
-            'version: ${getAppMvnVersion(app)}'
-            'dockerImageName: ECS:${getAppMvnVersion(app)}'
+            'version: ${app.ver}'
+            'dockerImageName: ${appName}/ecs:${app.ver}'
             'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
-            'id: ${getAppMvnName(app)}_NoECS'
+            'id: ${appName}_${deviceName}_NoECS'
             'name: ${getAppMvnName(app)}'
-            'version: ${getAppMvnVersion(app)}'
-            'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
+            'version: ${app.ver}'
+            'dockerImageName: ${appName}/${deviceName}:${app.ver}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
         } else {
-            'id: ${getAppMvnName(app)}_ECS'
+            'id: ${appName}_${deviceName}_ECS'
             'name: ${getAppMvnName(app)}'
-            'version: ${getAppMvnVersion(app)}'
-            'dockerImageName: ${getAppMvnName(app)}:${getAppMvnVersion(app)}'
+            'version: ${app.ver}'
+            'dockerImageName: ${appName}/${deviceName}:${app.ver}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
         }
         Boolean useEphemeralPort = not(useFixedPort(config, device));
@@ -42,8 +44,6 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
             }
         }
         '    - 22/UDP'
-        '    - 80'
-        '    - 8080/DEFAULT'
         'networkMode: host'
         'dood: true'
     }

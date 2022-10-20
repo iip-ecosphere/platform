@@ -330,6 +330,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // creates containers depending on container strategies
     generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
 
+        String artifactsFolder = config.artifactsFolder;
+        if (artifactsFolder == config.artifactsFolderDflt) { // default is in appRoot
+            artifactsFolder = "${appRoot}/../${artifactsFolder}";
+        }
+        
         ContainerManager mgr = config.containerManager;
         if (a.createContainer) {
             
@@ -342,9 +347,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
             }
             
+            String appName = a.name.toIdentifier();
             setOf(EcsDevice) devices = EcsDevice.allInstances();
             for (EcsDevice device : devices->select(d|d.isContainerTemplate)) {
                 ContainerType cntType = device.containerType;
+                String deviceName = device.containerName.toIdentifier();
+                String filePrefix = "${appName}_${deviceName}_";
 
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
@@ -363,11 +371,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    //String imageId = dockerBuildImage(b, d, "imagetype_1/image:01");
                     String imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
-                    // Mesh-Info
-                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
                     //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=cntType); TODO 
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App, device=device);
                 }
@@ -380,11 +387,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    //String imageId = dockerBuildImage(b, d, "imagetype_2/image:01");
                     String imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
-                    // Mesh-Info
-                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::EcsSvc_App, device=device);
 				}	
 
@@ -397,11 +403,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + ecsDfName;
-                    //String ecs_imageId = dockerBuildImage(b, d, "imagetype_3/ecs:01");
                     String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
                     
-                    // Mesh-Info
-                    Path meshInfoEcs = "${appRoot}/../mesh-info-ecs.yml";
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
                     vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
                     
                     // Container with ServiceMgr and App
@@ -412,11 +417,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b2 = "${appRoot}/../";
                     Path d2 = "${appRoot}/../" + dfName;
-                    //String app_imageId = dockerBuildImage(b, d2, "imagetype_3/app:01");
                     String app_imageId = createContainerImage(mgr, b, d2, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
-                    // Mesh-Info
-                    Path meshInfo = "${appRoot}/../mesh-info.yml";
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
                 }
             }

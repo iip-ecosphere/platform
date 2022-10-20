@@ -1,3 +1,4 @@
+IIPEcosphere::artifactsFolderDflt = Default relative or absolute folder containing service artifacts, deployment plans and container descriptors for download.
 IIPEcosphere::artifactsFolder = Relative or absolute folder containing service artifacts, deployment plans and container descriptors for download.
 IIPEcosphere::artifactsUriPrefix = URI prefix to be prepended before artifactsFolder to make artifacts downloadable.
 IIPEcosphere::instDir = IIP-Ecosphere platform installation folder (default see instDirDflt).

@@ -11,7 +11,8 @@ project IIPEcosphere {
     String instDir = instDirDflt; // linux/system.d only; values taken as default if not frozen
     const String javaExeDflt = "/opt/iip/java";
     String javaExe = javaExeDflt; // symlink in instDir
-    String artifactsFolder = "artifacts";
+    String artifactsFolderDflt = "artifacts";
+    String artifactsFolder = artifactsFolderDflt;
     String artifactsUriPrefix = "";
     String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
     String metaModelFolder = "src/main/easy";
@@ -26,5 +27,6 @@ project IIPEcosphere {
     freeze {
         instDirDflt;
         javaExeDflt;
+        artifactsFolderDflt;
     }
 }
