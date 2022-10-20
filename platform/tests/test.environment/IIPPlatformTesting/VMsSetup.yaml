@@ -1,0 +1,131 @@
+VMware Path: C:\Program Files (x86)\VMware\VMware Player\vmrun
+VMs Path: C:\Users\alamoush\Documents\Virtual Machines\
+Setup:
+    TestMgrOS                 : Linux
+    CopyVMs                   : False
+    StartVMs                  : False
+    MoveScripts               : True
+    InstallPrerequisite       : False
+    EcsSvcMgrContainers       : True
+    InstallPlatform           : True
+    DockerRegistryCerts       : False
+    RunDockerRegistry         : False
+    PushEcsSvcMgrContainers   : False
+    GetPlatformFiles          : False
+    PullRunEcsContainer       : False
+    StopEcsContainer          : False
+    DistrPlatformFiles        : False
+    DistrDockerRegistryCerts  : False
+    StartPlatfrom             : False
+    DevicesJoinPlatform       : False
+    DevicesJoinByEcsContainer : False
+    DevicesLeavePlatform      : False
+    DevicesLeaveByEcsContainer: False
+    StopPlatfrom              : False
+    StopVMs                   : False
+    DownloadExamples          : False
+    RunExamples               : False
+Examples:
+  - Name        : examples.KODEX
+    Included    : False
+    Redownload  : True
+    Compile     : Normal
+    Test        : True
+  - Name        : examples.python
+    Included    : False
+    Redownload  : True
+    Compile     : Normal
+    Test        : True
+  - Name        : examples.rtsa
+    Included    : False
+    Redownload  : True
+    Compile     : Normal
+    Test        : True
+  - Name        : examples.vdw
+    Included    : False
+    Redownload  : True
+    Compile     : Connector
+    Test        : False
+Machines:
+  - Name           : Server 147.172.178.145 Platform
+    IP             : 147.172.178.145
+    Username       : iis_ecouser
+    Password       : $$e_iisecoPW2
+    Role           : Server
+    OS             : Linux
+    Included       : True
+    DeviceID       : TestEnvSer001
+    DockerRegistry : True
+  - Name           : Server 147.172.178.147 Device02
+    IP             : 147.172.178.147
+    Username       : iis_ecouser
+    Password       : $$e_iisecoPW2
+    Role           : Device
+    OS             : Linux
+    Included       : False
+    DeviceID       : TestEnvDev02
+    DockerRegistry : False
+  - Name           : Server 147.172.178.148 Device03
+    IP             : 147.172.178.148
+    Username       : iis_ecouser
+    Password       : $$e_iisecoPW2
+    Role           : Device
+    OS             : Linux
+    Included       : False
+    DeviceID       : TestEnvDev03
+    DockerRegistry : False
+  - Name           : Server 147.172.178.149 Device04
+    IP             : 147.172.178.149
+    Username       : iis_ecouser
+    Password       : $$e_iisecoPW2
+    Role           : Device
+    OS             : Linux
+    Included       : False
+    DeviceID       : TestEnvDev04
+    DockerRegistry : False
+  - Name           : Ubuntu 20.04.3 IIP Platform
+    IP             : 192.168.81.245
+    Username       : osboxes
+    Password       : osboxes.org
+    Role           : Server
+    OS             : Linux
+    Included       : False
+    DeviceID       : LinSer000001
+    DockerRegistry : False
+  - Name           : Ubuntu 20.04.3 IIP Platform Device
+    IP             : 192.168.81.243
+    Username       : osboxes
+    Password       : osboxes.org
+    Role           : Device
+    OS             : Linux
+    Included       : False
+    DeviceID       : LinDev000002
+    DockerRegistry : False
+  - Name           : Win 10 IIP Platform Server
+    IP             : 192.168.81.151
+    Username       : IEUser
+    Password       : Passw0rd!
+    Role           : Server
+    OS             : Win
+    Included       : False
+    DeviceID       : WinSer000001
+    DockerRegistry : False
+  - Name           : Win 10 IIP Platform Device
+    IP             : 192.168.81.150
+    Username       : IEUser
+    Password       : Passw0rd!
+    Role           : Device
+    OS             : Win
+    Included       : False
+    DeviceID       : WinDev000002
+    DockerRegistry : False
+  - Name           : Win 10 IIP Platform Device 2
+    IP             : 192.168.81.144
+    Username       : IEUser
+    Password       : Passw0rd!
+    Role           : Device
+    OS             : Win
+    Included       : False
+    DeviceID       : WinDev000003
+    DockerRegistry : False
+       
