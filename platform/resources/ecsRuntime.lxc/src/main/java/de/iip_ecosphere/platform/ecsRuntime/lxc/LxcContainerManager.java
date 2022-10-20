@@ -122,17 +122,23 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
             
             // Creating Docker container
             int port = 0;
-            if (container.requiresPort()) {
+            if (container.requiresPort(LxcContainerDescriptor.PORT_PLACEHOLDER)) {
                 // may be gone until used, limit then netMgr ports in setup
                 NetworkManager netMgr = NetworkManagerFactory.getInstance();
                 port = netMgr.obtainPort(container.getNetKey()).getPort();
+            }
+            int port1 = 0;
+            if (container.requiresPort(LxcContainerDescriptor.PORT_PLACEHOLDER_1)) {
+                // may be gone until used, limit then netMgr ports in setup
+                NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                port1 = netMgr.obtainPort(container.getNetKey1()).getPort();
             }
             String dockerImageName = getImageName(container);
             String containerName = container.getName().trim().replaceAll("\\s", "_");
             LOGGER.info("Creating container " + dockerImageName + " " + containerName);
             CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
                 .withName(containerName);
-            configure(cmd, port, container);
+            configure(cmd, port, port1, container);
             cmd.exec(); 
             
             // Getting Docker id
@@ -170,14 +176,15 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
      * 
      * @param cmd the command instance
      * @param port the port number for the AAS implementation server
+     * @param port1 the second optional port number for the AAS implementation server
      * @param container the container descriptor
      */
-    private void configure(CreateContainerCmd cmd, int port, LxcContainerDescriptor container) {
-        List<String> env = container.instantiateEnv(port);
+    private void configure(CreateContainerCmd cmd, int port, int port1, LxcContainerDescriptor  container) {
+        List<String> env = container.instantiateEnv(port, port1);
         if (env.size() > 0) {
             cmd.withEnv(env);
         }
-        List<ExposedPort> exPorts = container.instantiateExposedPorts(port);
+        List<ExposedPort> exPorts = container.instantiateExposedPorts(port, port1);
         if (exPorts.size() > 0) {
             cmd.withExposedPorts(exPorts);
         }
@@ -282,9 +289,13 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         LxcContainerDescriptor container = getContainer(id, "id", "undeploy");
         String dockerId = container.getDockerId();
 
-        if (container.requiresPort()) {
+        if (container.requiresPort(LxcContainerDescriptor.PORT_PLACEHOLDER)) {
             NetworkManager netMgr = NetworkManagerFactory.getInstance();
             netMgr.releasePort(container.getNetKey());
+        }
+        if (container.requiresPort(LxcContainerDescriptor.PORT_PLACEHOLDER_1)) {
+            NetworkManager netMgr = NetworkManagerFactory.getInstance();
+            netMgr.releasePort(container.getNetKey1());
         }
         
         DockerClient dockerClient = getDockerClient();

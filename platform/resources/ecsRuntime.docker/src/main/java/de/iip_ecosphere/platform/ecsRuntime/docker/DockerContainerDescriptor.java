@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 public class DockerContainerDescriptor extends BasicContainerDescriptor {
     
     public static final String PORT_PLACEHOLDER = "${port}";
+    public static final String PORT_PLACEHOLDER_1 = "${port_1}";
     private static int instanceCount = 0;
 
     // internal
@@ -147,13 +148,16 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
     /**
      * Instantiates the exposed by the container.
      * @param port to replace {@link #PORT_PLACEHOLDER}
+     * @param port1 to replace {@link #PORT_PLACEHOLDER_1}
      * @return the exposed ports
      */
-    public List<ExposedPort> instantiateExposedPorts(int port) {
+    public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
         ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
         String tmpPort = String.valueOf(port);
+        String tmpPort1 = String.valueOf(port1);
         for (String e: exposedPorts) {
             String tmp = e.replace(PORT_PLACEHOLDER, tmpPort);
+            tmp = tmp.replace(PORT_PLACEHOLDER_1, tmpPort1);
             int pos = tmp.indexOf('/');
             String iPort;
             String iProtocol;
@@ -327,32 +331,35 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
     /**
      * Returns the substituted environment variable settings to start the container.
      * @param port the port to substitute {@link #PORT_PLACEHOLDER} 
+     * @param port1 the port to substitute {@link #PORT_PLACEHOLDER_1} 
      * @return the instantiated environment variable settings 
      */
-    public List<String> instantiateEnv(int port) {
+    public List<String> instantiateEnv(int port, int port1) {
         List<String> result = new ArrayList<String>();
         for (String s : env) {
-            result.add(s.replace(PORT_PLACEHOLDER, String.valueOf(port)));
+            result.add(s.replace(PORT_PLACEHOLDER, String.valueOf(port))
+                .replace(PORT_PLACEHOLDER_1, String.valueOf(port1)));
         }
         return result;
     }
 
     /**
-     * Returns whether a dynamic port for {@link #PORT_PLACEHOLDER} is required.
+     * Returns whether a dynamic port for a placeholder is required.
      * 
+     * @param placeholder the name of the placeholder
      * @return {@code true} for dynamic port, {@code false} else
      */
-    public boolean requiresPort() {
+    public boolean requiresPort(String placeholder) {
         boolean result = false;
         for (String s : env) {
-            if (s.contains(PORT_PLACEHOLDER)) {
+            if (s.contains(placeholder)) {
                 result = true;
                 break;
             }
         }
         if (!result) {
             for (String e : exposedPorts) {
-                if (e.contains(PORT_PLACEHOLDER)) {
+                if (e.contains(placeholder)) {
                     result = true;
                     break;
                 }
@@ -369,6 +376,15 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
      */
     public String getNetKey() {
         return Id.getDeviceId() + "_" + dockerImageName + "_" + instance;
+    }
+
+    /**
+     * Returns the key for the network manager.
+     * 
+     * @return the key
+     */
+    public String getNetKey1() {
+        return Id.getDeviceId() + "_" + dockerImageName + "_1_" + instance;
     }
 
     /**

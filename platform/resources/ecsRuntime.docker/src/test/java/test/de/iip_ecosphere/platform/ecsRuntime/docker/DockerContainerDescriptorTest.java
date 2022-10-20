@@ -50,14 +50,14 @@ public class DockerContainerDescriptorTest {
         Assert.assertEquals("serviceMgr.tar.gz", desc.getDockerImageZipfile());
         Assert.assertEquals(1, desc.getEnv().size());
         Assert.assertEquals("IIP_PORT=${port}", desc.getEnv().get(0));
-        Assert.assertEquals(1, desc.instantiateEnv(1234).size());
-        Assert.assertEquals("IIP_PORT=1234", desc.instantiateEnv(1234).get(0));
+        Assert.assertEquals(1, desc.instantiateEnv(1234, 0).size());
+        Assert.assertEquals("IIP_PORT=1234", desc.instantiateEnv(1234, 0).get(0));
         Assert.assertEquals(4, desc.getExposedPorts().size());
         Assert.assertEquals("${port}/TCP", desc.getExposedPorts().get(0));
         Assert.assertEquals("22/UDP", desc.getExposedPorts().get(1));
         Assert.assertEquals("80", desc.getExposedPorts().get(2));
         Assert.assertEquals("8080/DEFAULT", desc.getExposedPorts().get(3));
-        List<ExposedPort> exp = desc.instantiateExposedPorts(1235);
+        List<ExposedPort> exp = desc.instantiateExposedPorts(1235, 0);
         Assert.assertEquals(4, exp.size());
         Assert.assertEquals(1235, exp.get(0).getPort());
         Assert.assertEquals(InternetProtocol.TCP, exp.get(0).getProtocol());
@@ -67,7 +67,7 @@ public class DockerContainerDescriptorTest {
         Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(2).getProtocol());
         Assert.assertEquals(8080, exp.get(3).getPort());
         Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(3).getProtocol());
-        Assert.assertTrue(desc.requiresPort());
+        Assert.assertTrue(desc.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER));
         Assert.assertTrue(desc.getDood());
         Assert.assertTrue(desc.getAttachStdIn());
         Assert.assertFalse(desc.getPrivileged()); // not required
