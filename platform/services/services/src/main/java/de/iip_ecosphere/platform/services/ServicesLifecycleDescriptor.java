@@ -35,6 +35,11 @@ public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor 
     public String getPidFileName() {
         return "iip-serviceMgr.pid";
     }
+
+    @Override
+    protected String getOverridePortArg() {
+        return PARAM_IIP_PORT + "svcMgr";
+    }
     
     @Override
     public void startup(String[] args) {
