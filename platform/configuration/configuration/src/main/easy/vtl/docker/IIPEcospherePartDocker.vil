@@ -11,6 +11,8 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         Path appRoot, ContainerType contType, Integer isPythonService) = {
         String vtlFile;
         String targetFile;
+        Path df = "${appRoot}/../app.Dockerfile.txt";
+        
         if (contType == ContainerType::Ecs_Svc_App) {
             if (isPythonService == 0) {
                 // JAVA         
@@ -39,6 +41,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
             if (isPythonService == -1) { // Container with ECS
                 vtlFile = "Dockerfile_3_ecs";
                 targetFile = "ecs.Dockerfile";   
+                df = "${appRoot}/../app.Dockerfile.Ecs";
             } else if (isPythonService == 0) { // Container with ServiceMgr and App
                 // JAVA         
                 vtlFile = "Dockerfile";
@@ -50,7 +53,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
             }
         }
                 
-        Path df = "${appRoot}/../app.Dockerfile.txt";
         vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType);
         df.rename(targetFile);
         targetFile;
