@@ -2,6 +2,7 @@ import JavaBasics;
 import JavaMapping;
 import Basics;
 import MeshBasics;
+import DockerBasics;
 import IIPEcosphereBase;
 
 @advice(IIPEcosphere)
@@ -59,7 +60,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
     }
     
     String createContainerImage(DockerContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
-        dockerBuildImage(base, buildFile, registry + "/" + repository + ":" + tag);
+        dockerBuildImage(base, buildFile, toDockerImageName(registry, repository, tag));
     }
 
 }

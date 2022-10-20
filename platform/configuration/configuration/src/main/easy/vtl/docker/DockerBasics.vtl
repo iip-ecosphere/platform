@@ -38,5 +38,13 @@ template DockerBasics(Configuration config, FileArtifact target) {
     def Boolean useFixedPort(IIPEcosphere cfg, EcsDevice device) {
         not(cfg.aasImplServer.devicesAsEphemeral);
     }
+    
+    def toDockerImageName(String repo, String registry, String tag) {
+        toDockerImageName("${repo}/${registry}:${tag}");
+    }
+    
+    def toDockerImageName(String name) {
+        name.toLowerCase();
+    }
 
 }
