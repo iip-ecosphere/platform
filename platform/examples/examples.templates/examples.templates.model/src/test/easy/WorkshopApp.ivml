@@ -104,7 +104,7 @@ project WorkshopApp {
 		traceRcv = TraceKind::LOG,
         traceSent = TraceKind::LOG,
         class = "de.iip_ecosphere.platform.impl.shop.TestSource",   //Package of class in project
-        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + iipVer,
+        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + appVersion(myApp),
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(NewInput)}}
     };
@@ -119,7 +119,7 @@ project WorkshopApp {
         traceSent = TraceKind::SYSOUT,
         input = {{type=refBy(NewInput)}},
         output = {{type=refBy(NewOutput)}},
-        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + iipVer,
+        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + appVersion(myApp),
         dependencies = {refBy(PYTHON39)}
     };
 
@@ -132,7 +132,7 @@ project WorkshopApp {
 		traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT,
         class = "de.iip_ecosphere.platform.impl.shop.TestSink",
-        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + iipVer,
+        artifact = "de.iip-ecosphere.platform.apps:TestTestAppServices:" + appVersion(myApp),
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(NewOutput)}}
     };
