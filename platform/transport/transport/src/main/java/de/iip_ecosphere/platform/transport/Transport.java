@@ -179,7 +179,7 @@ public class Transport {
                 if (lastQueuedMsg == 0 || now - lastQueuedMsg > QUEUE_MSG_TIMEOUT) {
                     LoggerFactory.getLogger(Transport.class).error(
                         "Cannot sent {} message now. Queued message until connector becomes available. "
-                        + "Not reporting for {} ms.", kind);
+                        + "Not reporting for {} ms.", kind, QUEUE_MSG_TIMEOUT);
                     lastQueuedMsg = now;
                 }
             }
