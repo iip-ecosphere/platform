@@ -558,9 +558,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         public byte toByte(Object data) throws IOException {
             if (data.getClass() == Byte.class) {
                 return (byte) data;
-            } else if (data.getClass() == Integer.class) { // OPC declares byte but Milo uses int
-                return (byte) data;
-            } else if (data instanceof Number) { // just in case
+            } else if (data instanceof Number) { // OPC declares byte but Milo uses int, twice casting needed anyway
                 return ((Number) data).byteValue();
             } else {
                 return 0; // no number???
