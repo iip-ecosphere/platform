@@ -57,6 +57,7 @@ import oshi.software.os.OperatingSystem;
 public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunnablesService 
     implements MonitoringService {
 
+    private static boolean inheritIo = false;
     private TypeTranslator<I, String> inTrans;
     private TypeTranslator<String, O> outTrans;
     private Map<Class<?>, List<ReceptionCallback<?>>> callbacks = new HashMap<>();
@@ -340,6 +341,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      *     <b>null</b> for none
      * @return the created process instance
      * @throws IOException if process creation fails
+     * @see #setInheritIo(boolean)
      */
     public static Process createProcess(File exe, boolean byName, File dir, List<String> args, 
         Consumer<ProcessBuilder> customizer) throws IOException {
@@ -360,8 +362,24 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
         if (null != customizer) {
             customizer.accept(processBuilder);
         }
-        //processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
+        if (inheritIo) {
+            processBuilder.inheritIO(); // somehow does not work in Jenkins/Maven surefire testing
+        }
         return processBuilder.start();
+    }
+    
+    /**
+     * Sets the default value allow or preveting the inheritance of the IO setup for a process being created in 
+     * {@link #createProcess(File, boolean, File, List, Consumer)}.
+     * Typically switched off for conflicts with CI/surefire.
+     * 
+     * @param inherit allow/disable inheriting process IO setup
+     * @return the value of the flag before the call
+     */
+    public static boolean setInheritIo(boolean inherit) {
+        boolean orig = inheritIo;
+        inheritIo = inherit;
+        return orig;
     }
     
     /**
