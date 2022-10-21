@@ -653,7 +653,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
-        'JUnitCore junit = new JUnitCore();
+        'AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
+        JUnitCore junit = new JUnitCore();
         junit.addListener(new TextListener(System.out));
         junit.run(${clsName}Test.class);'
     }
@@ -806,7 +807,6 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             * @throws IOException shall not occur
             */
             public static void main(String[] args) throws IOException {
-                AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
                 cmdArgs = args;
                 ${genMain(elt, elt.impl, clsName)}
             }
