@@ -20,6 +20,9 @@ project Applications {
         String cmdArg; // for now, comma separated
     }
     
+    def String appVersion(Application a) = 
+       if (a.snapshot) then a.ver + "-SNAPSHOT" else a.ver endif;
+    
     Constraint appNamesUnique = allInstances(Application)->isUnique(a|a.name);
     Constraint appIdUnique = allInstances(Application)->isUnique(a|a.id);
     
