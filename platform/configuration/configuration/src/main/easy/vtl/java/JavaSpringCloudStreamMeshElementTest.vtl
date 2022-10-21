@@ -43,6 +43,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.transport.Transport;
         
         import java.io.InputStream;
+        
+        import org.slf4j.LoggerFactory;
+        
         import org.hamcrest.core.IsAnything;
 
         import org.springframework.boot.SpringBootConfiguration;
@@ -271,16 +274,21 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         public void testSource() throws IOException {
             InputStream in;
             try {
-                in = new java.io.FileInputStream(
-                    System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}"));
+                String fileName = System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}");
+                LoggerFactory.getLogger(getClass()).info("Opening {}", fileName);
+                in = new java.io.FileInputStream(fileName);
             } catch (IOException e) {
                 in = ResourceLoader.getResourceAsStream("${fileName}");
             }
-            DataMapper.BaseMappingConsumer<DataUnit> consumer = 
-                new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
-            ${genConsumerBindings(elt, service, "consumer")}
-            DataMapper.mapJsonData(in, DataUnit.class, consumer);
-            ${processOutput(elt, service, nodes)}
+            if (null != in) {
+                DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                    new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
+                ${genConsumerBindings(elt, service, "consumer")|e}
+                DataMapper.mapJsonData(in, DataUnit.class, consumer);
+                ${processOutput(elt, service, nodes)}
+            } else {
+                LoggerFactory.getLogger(getClass()).error("No test data found. Skipping test.");
+            }
         }
         '
     }
@@ -300,13 +308,26 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                     .run()) {
                 InputDestination source = context.getBean(InputDestination.class);
                 OutputDestination target = context.getBean(OutputDestination.class);
-            
+
+                iip.Starter.getSetup(); // force initializing Transport
                 DataMapper.BaseMappingConsumer<DataUnit> consumer = 
                     new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
                 ${genConsumerBindings(elt, service, "consumer")}
                 DataMapper.mapJsonData(in, DataUnit.class, consumer);
                 ${processOutput(elt, service, nodes)}
+                context.close();
+                detach();
+                LoggerFactory.getLogger(getClass()).info("Test done. Cooling down for 1s");
+                TimeUtils.sleep(1000);
             }
+        }
+        
+        /**
+        * After the test (class): If there are still service threads hanging around, get rid of them.
+        */      
+        @AfterClass
+        public static void after() {
+            System.exit(0); // no other way known so far, binders survive, not suitable for jUnit
         }
         
         /**
@@ -318,12 +339,17 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         public void testService() throws IOException {
             InputStream in;
             try {
-                in = new java.io.FileInputStream(
-                    System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}"));
+                String fileName = System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}");
+                LoggerFactory.getLogger(getClass()).info("Opening {}", fileName);
+                in = new java.io.FileInputStream(fileName);
             } catch (IOException e) {
                 in = ResourceLoader.getResourceAsStream("${fileName}");
             }
-            testService(in);
+            if (null != in) {
+                testService(in);
+            } else {
+                LoggerFactory.getLogger(getClass()).error("No test data found. Skipping test.");
+            }
         }
         '
     }
@@ -343,6 +369,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         for (IOType t: service.input) {
             inTypes.add(t.type);
         }
+        String result = ""; // double nested EASy bug :(
         sequenceOf(MeshElement) pred = predecessors(elt);
         for (MeshElement p: pred->sortedBy(n|n.name)) {
             for (IOType predOut : p.impl.output) {
@@ -356,20 +383,21 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         if (not(service.asynchronous)) {
                             assert = "Assert.assertThat(target.receive().getPayload(), matcher);";
                         }
-                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
+                        result = appendWithNewline(result, '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
                             Message<${typeName}${typeAdd}> msg = MessageBuilder.withPayload(d).build();
                             source.send(msg);
                             ${assert|e}
-                        });'
+                        });');
                     } else {
                         String senderId = p.impl.id;
-                        '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
+                        result = appendWithNewline(result, '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
                             Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
-                        });'
+                        });');
                     }
                 }
             }
         }
+        '${result}';
     }
     
     protected def genAssertPredicates(MeshElement elt, ServiceBase service, String clsName) {
@@ -778,6 +806,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             * @throws IOException shall not occur
             */
             public static void main(String[] args) throws IOException {
+                AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
                 cmdArgs = args;
                 ${genMain(elt, elt.impl, clsName)}
             }
