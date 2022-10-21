@@ -27,7 +27,7 @@ public class PythonSyntaxTest {
      * time.
      * 
      * @param args Args. No used.
-     * @throws InvalidSyntaxException In case the Python file is not well build
+     * @throws ExecutionException In case the Python file is not well build
      */
     public static void main(String[] args) throws ExecutionException {
         /*

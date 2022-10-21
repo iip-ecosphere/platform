@@ -60,7 +60,7 @@ public class DataMapper {
          *
          * @return the period in ms, use default/last value if zero or negative
          */
-        public int get$Period() {
+        public int get$period() {
             return $period;
         }
 
@@ -69,7 +69,7 @@ public class DataMapper {
          *
          * @return the number of repeats, negative for infinite
          */
-        public int get$Repeats() {
+        public int get$repeats() {
             return $repeats;
         }
 
@@ -78,16 +78,16 @@ public class DataMapper {
         *
         * @param $period the period in ms, default/last value if zero or negative
         */
-        public void set$Period(int $period) {
+        public void set$period(int $period) {
             this.$period = $period;
         }
 
         /**
          * Changes the number of repeats of this data unit.
          *
-         * @param the number of repeats, negative for infinite
+         * @param $repeats the number of repeats, negative for infinite
          */
-        public void set$Repeats(int $repeats) {
+        public void set$repeats(int $repeats) {
             this.$repeats = $repeats;
         }
 
@@ -137,17 +137,24 @@ public class DataMapper {
          * value of the {@link #getter} call. Exceptions are logged.
          * 
          * @param instance the data instance to accept/process
+         * @return {@code true} if {@code instance} was passed on to a translator, {@code false} else
          */
-        private void accept(T instance) {
+        private boolean accept(T instance) {
+            boolean accepted = false;
             try {
                 Object data = getter.invoke(instance);
                 if (null != data && null != translator) { // null is ok as data is alternative
                     translator.accept(data);
+                    accepted = true;
+                } else {
+                    LoggerFactory.getLogger(DataMapper.class).warn(
+                        "No data ({}) obtained from {} or no translator found ({})", data, instance, translator);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 LoggerFactory.getLogger(DataMapper.class).error("Cannot process {}/{}: {}", instance, 
                     getter.getName(), e.getMessage());
             }
+            return accepted;
         }
         
     }
@@ -198,8 +205,14 @@ public class DataMapper {
         @Override
         public void accept(T value) {
             if (null != value) {
+                boolean accepted = false;
                 for (MapperEntry<T> e: mapping.values()) {
-                    e.accept(value);
+                    accepted |= e.accept(value);
+                }
+                if (!accepted) {
+                    LoggerFactory.getLogger(DataMapper.class).warn(
+                        "Data {} was not processed further. {} mapper(s) available, but none reacted. If null, this "
+                        + "could be a standard sink and normal but not expected.", value, mapping.size());
                 }
             }
         }
@@ -227,15 +240,26 @@ public class DataMapper {
             super(cls);
             this.period = period;
         }
+        
+        /**
+         * Informs that data is available for testing and data ingestion may start.
+         * Default is output on System.out. May be overridden.
+         * 
+         * @param value the data value
+         */
+        protected void infoGotData(B value) {
+            LoggerFactory.getLogger(getClass()).info("Test data: {}", value);
+        }
     
         @Override
         public void accept(B value) {
-            boolean endless = value.get$Repeats() < 0;
-            boolean once = value.get$Repeats() == 0;
+            boolean endless = value.get$repeats() < 0;
+            boolean once = value.get$repeats() == 0;
             int count = 0;
-            while (endless || once || count < value.get$Repeats()) {
+            while (endless || once || count < value.get$repeats()) {
+                infoGotData(value);
                 super.accept(value);
-                period = value.get$Period();
+                period = value.get$period();
                 if (period > 0) {
                     TimeUtils.sleep(period);
                 }
