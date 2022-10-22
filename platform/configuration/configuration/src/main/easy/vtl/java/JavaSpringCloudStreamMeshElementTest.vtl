@@ -502,7 +502,16 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         @Test
         public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
             testService();
-            ${genAssertReceived()}            
+            ${genAssertReceived()}
+            Service svc = iip.Starter.getMappedService("${service.id}");
+            if (null != svc) {
+                try {
+                    LoggerFactory.getLogger(getClass()).info("Service autostop (test): ${service.id}");
+                    svc.setState(ServiceState.STOPPING);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(getClass()).error("Stopping service ${service.id}: {}", e.getMessage());
+                }
+            }
         }
         '
     }
@@ -653,7 +662,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
-        'AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
+        'iip.Starter.setServiceAutostart(true);
+        iip.Starter.setOnServiceAutostartAttachShutdownHook(false);
+        AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
         JUnitCore junit = new JUnitCore();
         junit.addListener(new TextListener(System.out));
         junit.run(${clsName}Test.class);'
@@ -713,6 +724,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import java.util.*;
         import java.util.function.*;
         import java.util.concurrent.BlockingQueue;
+        import java.util.concurrent.ExecutionException;
         
         import de.iip_ecosphere.platform.support.TimeUtils;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
