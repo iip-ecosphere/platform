@@ -49,7 +49,9 @@ public class Starter {
     private static ProtocolServerBuilder builder;
     private static Server server;
     private static Map<String, Integer> servicePorts = new HashMap<>();
+    private static Map<String, Service> mappedServices = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
+    private static boolean onServiceAutostartAttachShutdownHook = true;
     private static int transportPort = -1; // -1 -> use configured one
     private static String transportHost = null;
     private static boolean transportGlobal = false;
@@ -165,6 +167,36 @@ public class Starter {
     }
     
     /**
+     * Enables service autostart for the next services to be mapped. Disabled by default. Shall be called before 
+     * {@code #main(String[])}. Usually done when needed by platform during service lifecycle. [testing]
+     * 
+     * @param autostart {@code true} enables autostart, {@code false} disables autostart
+     */
+    public static void setServiceAutostart(boolean autostart) {
+        serviceAutostart = autostart;
+    }
+    
+    /**
+     * Enables/disable shutdown hooks on service autostarts for service autostops. Enabled by default. Shall be called 
+     * before {@code #main(String[])}. [testing]
+     * 
+     * @param hook {@code true} enables creation of shutdown hooks, {@code false} disables shutdown hooks on autostart
+     */
+    public static void setOnServiceAutostartAttachShutdownHook(boolean hook) {
+        onServiceAutostartAttachShutdownHook = hook;
+    }
+    
+    /**
+     * Returns service mapped by this starter. These are typically all services executed within the same JVM.
+     * 
+     * @param serviceId the serviceId, ignored if <b>null</b>
+     * @return the service if known, <b>null</b> else
+     */
+    public static Service getMappedService(String serviceId) {
+        return null == serviceId ? null : mappedServices.get(serviceId);
+    }
+    
+    /**
      * Parses command line arguments. Collects information for {@link #getServicePort(String)}.
      * 
      * @param args the arguments
@@ -184,7 +216,7 @@ public class Starter {
         if (transportPort > 0 || transportHost != null) {
             getSetup();
         }
-        serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, false);
+        serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);
         boolean found = false;
         for (String p : factory.getProtocols()) {
@@ -267,6 +299,7 @@ public class Starter {
      */
     public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart) {
         if (null != service && service.getId() != null) {
+            mappedServices.put(service.getId(), service);
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
@@ -275,14 +308,16 @@ public class Starter {
                 try {
                     getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
                     service.setState(ServiceState.STARTING);
-                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                        try {
-                            System.out.println("Service autostop: " + service.getId());
-                            service.setState(ServiceState.STOPPING);
-                        } catch (ExecutionException e) {
-                            getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
-                        }
-                    }));
+                    if (onServiceAutostartAttachShutdownHook) {
+                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                            try {
+                                System.out.println("Service autostop: " + service.getId());
+                                service.setState(ServiceState.STOPPING);
+                            } catch (ExecutionException e) {
+                                getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
+                            }
+                        }));
+                    }
                 } catch (ExecutionException e) {
                     getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
                 }

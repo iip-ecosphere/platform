@@ -54,6 +54,13 @@ public class StarterTest {
         Assert.assertEquals(-1, Starter.getServicePort("unknown"));
         Starter.start();
         Starter.shutdown();
+        
+        Assert.assertNull(Starter.getMappedService(null));
+        Assert.assertNull(Starter.getMappedService("xcy")); // unknown
+        Starter.setServiceAutostart(true);
+        Starter.setOnServiceAutostartAttachShutdownHook(false);
+        Starter.setOnServiceAutostartAttachShutdownHook(true);
+        Starter.setServiceAutostart(false);
     }
     
     /**
