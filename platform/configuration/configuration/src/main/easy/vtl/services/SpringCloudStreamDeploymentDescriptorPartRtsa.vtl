@@ -14,10 +14,13 @@ template SpringCloudStreamDeploymentDescriptorPartRtsa(Configuration config, Fil
     def generateProcess(MeshElement elt, RtsaService service) {
         String id = toFolderName(service.id);
         String bin = rtsaBin(service);
+        if (bin <> "") {
+            bin = "- /" + bin;
+        }
         String instance = rtsaInstance(service);
         'process: 
             artifacts:
-              - /${bin}
+              ${bin|e}
               - /${instance}
             homePath: \\${tmp}/${id}/rtsa
             executablePath: \\${tmp}/${id}/rtsa 
