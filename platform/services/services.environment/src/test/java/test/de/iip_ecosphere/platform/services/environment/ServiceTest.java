@@ -14,6 +14,8 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,6 +34,24 @@ public class ServiceTest {
         Service instance = AbstractService.createInstance(
             "test.de.iip_ecosphere.platform.services.environment.MyService", Service.class);
         Assert.assertNotNull(instance);
+    }
+    
+    /**
+     * Tests composing and splitting ids.
+     */
+    @Test
+    public void testComposedIds() {
+        String id = ServiceBase.composeId("sId", null);
+        Assert.assertEquals("sId", ServiceBase.getServiceId(id));
+        Assert.assertEquals("", ServiceBase.getApplicationId(id));
+
+        id = ServiceBase.composeId("sId", "");
+        Assert.assertEquals("sId", ServiceBase.getServiceId(id));
+        Assert.assertEquals("", ServiceBase.getApplicationId(id));
+
+        id = ServiceBase.composeId("sId", "aId");
+        Assert.assertEquals("sId", ServiceBase.getServiceId(id));
+        Assert.assertEquals("aId", ServiceBase.getApplicationId(id));
     }
     
 }
