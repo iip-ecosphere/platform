@@ -16,6 +16,7 @@ Services::ServiceProtocolMQTTv3hive = MQTTv3 service streaming protocol based on
 Services::ServiceProtocolMQTTv5hive = MQTTv5 service streaming protocol based on the HiveMq client.
 Services::serviceProtocol = The service/streaming data protocol
 Services::ServiceBase::syncEqualIO = Synchronous services must have same # of forward input/output types as they are mapped into functions. Consider an asynchronous service here.
+Services::ServiceBase::idOk = Application id must not contain @
 Services::BooleanParameter::defaultValue = Default/initial value of Boolean service parameter.
 Services::IntegerParameter::defaultValue = Default/initial value of Integer service parameter.
 Services::LongParameter::defaultValue = Default/initial value of Long service parameter.

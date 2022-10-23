@@ -18,6 +18,8 @@ project Applications {
         Boolean createContainer = false;
         Boolean debug = false;
         String cmdArg; // for now, comma separated
+        
+        Constraint idOk = matches(id, "^[^@]+$");
     }
     
     def String appVersion(Application a) = 

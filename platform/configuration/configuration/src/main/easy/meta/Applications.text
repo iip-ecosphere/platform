@@ -9,6 +9,7 @@ Applications::Application::nameplateInfo = Nameplate information on the manufact
 Applications::Application::services = Service mesh(es) making up the application.
 Applications::Application::snapshot = Shall the Maven application artifact be a snapshot or a release. 
 Applications::Application::ver = Version of application (numbers separated by a dot).
+Applications::Application::idOk = Application id must not contain @
 Applications::MeshConnector::next = The next service this connector is connecting to.
 Applications::MeshElement::ensemble = Optional leader service this service forms a process group with, e.g., to be started in the same JVM.
 Applications::MeshElement::ensembleOk = Service ensembles must be simple "trees of height 1", i.e., not form cycles or chains. 
