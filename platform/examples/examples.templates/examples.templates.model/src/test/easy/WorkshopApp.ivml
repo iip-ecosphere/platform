@@ -104,6 +104,10 @@ project WorkshopApp {
        version = "4.0"
     };
 
+    PythonDependency pyflakes250 = {
+       name = "pyflakes",
+       version = "2.5.0"
+    };
 
     // ------------ individual, reusable services ------------------
     
