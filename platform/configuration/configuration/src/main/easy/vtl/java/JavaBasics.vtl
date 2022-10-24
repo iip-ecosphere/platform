@@ -60,10 +60,6 @@ template JavaBasics(Configuration config, FileArtifact target) {
         "int";
     }
 
-    def String toTypeName(UInt16TypeType type) {
-        "int";
-    }
-
     def String toTypeName(LongTypeType type) {
         "long";
     }
@@ -137,6 +133,16 @@ template JavaBasics(Configuration config, FileArtifact target) {
 
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "java.util.Date";
+    }
+    
+    /**
+     * Returns whether typeName indicates a Java Object type that is known, from Java
+     * and (including String) can be considered as a "primitive".
+     */ 
+    def Boolean isPrimitive(String typeName) {
+        typeName=="Integer" or typeName=="Long" or typeName=="Float" or typeName=="Double"
+            or typeName=="Byte" or typeName=="Boolean" or typeName=="Char" or typeName=="Short"
+            or typeName=="String"; 
     }
     
     def String considerWrapper(String typeName) {

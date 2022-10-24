@@ -646,7 +646,11 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     
     def getServiceType(MeshElement elt, Connector conn) {
         isConnector = true;
-        "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
+        String cls = "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
+        if (isDefined(conn.mock) and conn.mock) {
+            cls = "Mocking" + cls;
+        }
+        cls;
     }
     
     def generateImports(ServiceBase base) {
@@ -833,6 +837,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 String handleVar = "${firstToLowerCase(typeName)}Handler";
                 String connGen = getConnectorGenerics(conn, true);
                 String clsName = getClsName(elt);
+                String connAccess = "service.getConnector()";
+                if (isDefined(conn.mock) and conn.mock) {
+                    connAccess = "service"; // mock can handle triggers as proxy
+                }
                 'private ${serviceType} handle${typeName}(${serviceType} service, ${typeName} data) {
                     if (null != ${handleVar}) {
                         String newCls = ${handleVar}.getNewConnectorClass(data);
@@ -857,7 +865,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                                 }
                             }
                         }
-                        ${handleVar}.received(data, service.getConnector());
+                        ${handleVar}.received(data, ${connAccess});
                     }
                     return service;
                 }'

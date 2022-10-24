@@ -378,19 +378,23 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                     String connId = springConnId(p.impl, conn, elt.impl);
                     String typeName = toTypeName(predOut);
                     String attributeName = firstToLowerCase(typeName);
+                    String fullTypeName = typeName;
+                    if (not(isPrimitive(fullTypeName))) {
+                        fullTypeName = typeName + typeAdd;
+                    }
                     if (connId <> "") {
                         String assert = "";
                         if (not(service.asynchronous)) {
                             assert = "Assert.assertThat(target.receive().getPayload(), matcher);";
                         }
-                        result = appendWithNewline(result, '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
-                            Message<${typeName}${typeAdd}> msg = MessageBuilder.withPayload(d).build();
+                        result = appendWithNewline(result, '${var}.addHandler(${fullTypeName}.class, d -> {
+                            Message<${fullTypeName}> msg = MessageBuilder.withPayload(d).build();
                             source.send(msg);
                             ${assert|e}
                         });');
                     } else {
                         String senderId = p.impl.id;
-                        result = appendWithNewline(result, '${var}.addHandler(${typeName}${typeAdd}.class, d -> {
+                        result = appendWithNewline(result, '${var}.addHandler(${fullTypeName}.class, d -> {
                             Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
                         });');
                     }
