@@ -130,5 +130,14 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * @param enableNotifications enable or disable notifications
      */
     public void enableNotifications(boolean enableNotifications);
+    
+    /**
+     * Returns the actual caching strategy class.
+     * 
+     * @return the strategy class
+     */
+    public default Class<? extends CachingStrategy> getCachingStrategyCls() {
+        return DefaultCachingStrategy.class;
+    }
 
 }
