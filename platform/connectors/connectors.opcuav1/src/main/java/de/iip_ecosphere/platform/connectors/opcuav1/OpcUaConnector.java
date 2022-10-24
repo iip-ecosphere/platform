@@ -564,7 +564,18 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 return 0; // no number???
             }  
         }
-        
+
+        @Override
+        public short toShort(Object data) throws IOException {
+            if (data.getClass() == Short.class) {
+                return (short) data;
+            } else if (data instanceof Number) { // OPC declares short but Milo uses int, twice casting needed anyway
+                return ((Number) data).shortValue();
+            } else {
+                return 0; // no number???
+            }  
+        }
+
     }
     
     /**
