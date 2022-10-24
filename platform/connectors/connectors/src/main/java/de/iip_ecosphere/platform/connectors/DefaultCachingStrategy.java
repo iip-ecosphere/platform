@@ -36,7 +36,7 @@ public class DefaultCachingStrategy implements CachingStrategy {
     
     @Override
     public boolean checkCache(Object data) {
-        boolean send = true;
+        boolean send = false;
         if (null != data) {
             switch (mode) {
             case HASH:
@@ -52,6 +52,7 @@ public class DefaultCachingStrategy implements CachingStrategy {
                 }
                 break;
             default:
+                send = true;
                 break;
             }
         }
@@ -60,7 +61,7 @@ public class DefaultCachingStrategy implements CachingStrategy {
     
     @Override
     public boolean checkCache(String key, Object data) {
-        boolean send = true;
+        boolean send = false;
         switch(mode) {    
         case HASH:
             send = checkCache(key, data, (o1, o2) -> o1.hashCode() == o2.hashCode());
@@ -69,6 +70,7 @@ public class DefaultCachingStrategy implements CachingStrategy {
             send = checkCache(key, data, (o1, o2) -> o1.equals(o2));
             break;
         default:
+            send = true;
             break;
         }
         return send;
