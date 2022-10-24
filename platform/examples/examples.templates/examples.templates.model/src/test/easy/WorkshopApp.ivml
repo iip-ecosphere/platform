@@ -82,15 +82,28 @@ project WorkshopApp {
     RecordType NewOutput = {
         name = "NewOutput",
         fields = {
-            Field {
-                name = "id",
-                type = refBy(IntegerType)
-            }, Field {
+        	Field {
                 name = "result",
                 type = refBy(DoubleType)
             }
         }
     };    
+    
+    PythonDependency skLearn0232 = {
+       name = "scikit-learn",
+       version = "0.23.2"
+    };
+
+    PythonDependency numpy1201 = {
+       name = "numpy",
+       version = "1.20.1"
+    };
+
+    PythonDependency pickle40 = {
+       name = "pickle",
+       version = "4.0"
+    };
+
 
     // ------------ individual, reusable services ------------------
     

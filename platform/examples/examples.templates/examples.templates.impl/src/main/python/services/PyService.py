@@ -4,7 +4,11 @@ from iip.Service import ServiceState
 from iip.Service import ServiceKind
 from datatypes.NewInput import NewInput
 from datatypes.NewOutput import NewOutput
+from datatypes.NewOutputImpl import NewOutputImpl
 from interfaces.PyServiceInterface import PyServiceInterface
+
+import numpy as np
+import pickle
 
 class PyService(PyServiceInterface):
     """Template service implementation for PyService
