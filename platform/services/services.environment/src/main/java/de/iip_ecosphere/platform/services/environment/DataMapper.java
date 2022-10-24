@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -318,18 +319,9 @@ public class DataMapper {
     public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons, 
         boolean failOnUnknownProperties, Supplier<Boolean> continueFunction) throws IOException {
         try {
-            ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
-            
-            JsonFactory jf = new JsonFactory();
-            JsonParser jp = jf.createParser(stream);
-            jp.setCodec(objectMapper);
-            jp.nextToken();
-
-            while (jp.hasCurrentToken() && (null == continueFunction || continueFunction.get())) {
-                T data = jp.readValueAs(cls);
-                jp.nextToken();
-                cons.accept(data);
+            IOIterator<T> iter = mapJsonDataToIterator(stream, cls, failOnUnknownProperties);
+            while (iter.hasNext() && (null == continueFunction || continueFunction.get())) {
+                cons.accept(iter.next());
             }
         } catch (JsonProcessingException e) {
             throw new IOException(e);
@@ -338,6 +330,83 @@ public class DataMapper {
                 stream.close();
             }
         }
+    }
+    
+    /**
+     * An iterator that can throw {@link IOException}.
+     * 
+     * @param <T> the type of element
+     * @author Holger Eichelberger, SSE
+     */
+    public interface IOIterator<T> {
+
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         *
+         * @return {@code true} if the iteration has more elements
+         */
+        public boolean hasNext() throws IOException;
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
+        public T next() throws IOException;
+        
+    }
+
+    /**
+     * Maps the data in {@code stream} to instances of {@code cls}, one instance per line, returned in terms of an 
+     * iterator. Ignores unknown attributes in {@code cls}.
+     *  
+     * @param <T> the type of data to read
+     * @param stream the stream to read (may be <b>null</b> for none)
+     * @param cls the type of data to read
+     * @return the data iterator
+     * @throws IOException if I/O or JSON parsing errors occur
+     */
+    public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls) throws IOException {
+        return mapJsonDataToIterator(stream, cls, false);
+    }
+    
+    /**
+     * Maps the data in {@code stream} to instances of {@code cls}, one instance per line, returned in terms of an 
+     * iterator. Ignores unknown attributes in {@code cls}.
+     *  
+     * @param <T> the type of data to read
+     * @param stream the stream to read (may be <b>null</b> for none)
+     * @param cls the type of data to read
+     * @param failOnUnknownProperties whether parsing shall be tolerant or not, the latter may be helpful for debugging
+     * @return the data iterator
+     * @throws IOException if I/O or JSON parsing errors occur
+     */
+    public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, 
+        boolean failOnUnknownProperties) throws IOException {
+        
+        ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
+        
+        JsonFactory jf = new JsonFactory();
+        JsonParser jp = jf.createParser(stream);
+        jp.setCodec(objectMapper);
+        jp.nextToken();
+        return new IOIterator<T>() {
+
+            @Override
+            public boolean hasNext() throws IOException {
+                return jp.hasCurrentToken();
+            }
+
+            @Override
+            public T next() throws IOException {
+                T data = jp.readValueAs(cls);
+                jp.nextToken();
+                return data;
+            }
+            
+        };
     }
 
 }

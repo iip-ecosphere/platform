@@ -22,12 +22,16 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.CachingStrategy;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.services.environment.DataMapper.IOIterator;
 
 /**
  * Mocks a {@link ConnectorServiceWrapper} by data in a JSON file through {@link DataMapper}.
@@ -39,7 +43,8 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServiceWrapper<O, I, CO, CI> {
+public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServiceWrapper<O, I, CO, CI> 
+    implements EventHandlingConnector {
 
     private Class<? extends CO> connectorOutType;
     private ReceptionCallback<CO> callback;
@@ -48,6 +53,8 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private boolean enableNotifications;
     private String fileName;
     private DataRunnable dataRunnable;
+    private CachingStrategy cachingStrategy;
+    private IOIterator<? extends CO> triggerIterator;
     
     /**
      * Creates a service wrapper instance.
@@ -61,6 +68,8 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         Supplier<ConnectorParameter> connParamSupplier) {
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
+        cachingStrategy = CachingStrategy.createInstance(connector.getCachingStrategyCls());
+        cachingStrategy.setCacheMode(connParamSupplier.get().getCacheMode());
         connectorOutType = connector.getConnectorOutputType();
         fileName = "testData-" + connector.getClass().getSimpleName() + "_" + connectorOutType.getSimpleName() + ".yml";
         // adjust to IIP-Ecosphere separated interface conventions
@@ -132,15 +141,29 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         }
         // setup mock output
         int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
-        DataMapper.mapJsonData(getDataStream(fileName), connectorOutType, d -> {
-            if (callback != null) {
-                LoggerFactory.getLogger(MockingConnectorServiceWrapper.class).info("Received {}", d);
-                callback.received(d);
+        DataMapper.mapJsonData(getDataStream(fileName), connectorOutType, d -> handleReceived(d, notifInterval));
+    }
+    
+    /**
+     * Handles received data.
+     * 
+     * @param data the data
+     * @param notifInterval the notification interval causing a sleep if data was sent, ignored if not positive
+     */
+    private void handleReceived(CO data, int notifInterval) {
+        if (callback != null) {
+            boolean send = cachingStrategy.checkCache(data);
+            LoggerFactory.getLogger(MockingConnectorServiceWrapper.class)
+                .info("Received {} passing on {}", data, send);
+            if (send) {
+                callback.received(data);
                 if (notifInterval > 0) {
                     TimeUtils.sleep(notifInterval);
                 }
             }
-        });
+        } else {
+            LoggerFactory.getLogger(getClass()).info("No callback for data");
+        }
     }
     
     /**
@@ -190,7 +213,9 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             }
             doSetState(ServiceState.RUNNING);
         } else if (ServiceState.STOPPING == state) {
-            dataRunnable.stop();
+            if (null != dataRunnable) {
+                dataRunnable.stop();
+            }
             dataRunnable = null;
             callback = null;
             doSetState(ServiceState.STOPPED);
@@ -241,6 +266,36 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      */
     public void setInputCallback(ReceptionCallback<CI> inputCallback) {
         this.inputCallback = inputCallback;
+    }
+
+    @Override
+    public void trigger() {
+        if (null == triggerIterator) {
+            LoggerFactory.getLogger(getClass()).info("Opening trigger resource: {}", fileName);
+            try {
+                triggerIterator = DataMapper.mapJsonDataToIterator(getDataStream(fileName), connectorOutType);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("While opening trigger resource {}: {}", 
+                    fileName, e.getMessage());
+            }
+        }
+        if (null != triggerIterator) {
+            try {
+                if (triggerIterator.hasNext()) {
+                    handleReceived(triggerIterator.next(), 0);
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("While processing trigger: {}", 
+                    fileName, e.getMessage());
+            }
+        } else {
+            LoggerFactory.getLogger(getClass()).info("Trigger received but no data. Ignoring");
+        }
+    }
+
+    @Override
+    public void trigger(ConnectorTriggerQuery query) {
+        trigger(); // preliminary, ignore query, take data from file
     }
         
 }
