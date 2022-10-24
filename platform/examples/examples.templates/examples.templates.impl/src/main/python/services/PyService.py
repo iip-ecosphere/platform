@@ -3,10 +3,10 @@ from iip.Version import Version
 from iip.Service import ServiceState
 from iip.Service import ServiceKind
 from datatypes.NewInput import NewInput
+from datatypes.NewInputImpl import NewInputImpl
 from datatypes.NewOutput import NewOutput
 from datatypes.NewOutputImpl import NewOutputImpl
 from interfaces.PyServiceInterface import PyServiceInterface
-
 import numpy as np
 import pickle
 
