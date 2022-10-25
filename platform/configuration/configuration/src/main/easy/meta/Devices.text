@@ -1,10 +1,14 @@
 Devices::containerManager = The container manager
+Devices::ContainerManager::authenticationKey = Authentication key for the container registry.
 Devices::DockerContainerManager::dockerHost = The operating-system specific docker host access, e.g., a device file name.
 Devices::DockerContainerManager::dockerImageYamlFilename = The name of the Yaml container descriptor file.
 Devices::DockerContainerManager::deleteWhenUndeployed = Delete containers when they are undeployed/not used. 
+Devices::DockerContainerManager::authenticationKey = Refined/default authentication key for Docker container registry.
+Devices::DockerContainerManager::registry = Writable container registry host/port information.
 Devices::LxcContainerManager::dockerHost = The operating-system specific docker host access, e.g., a device file name.
 Devices::LxcContainerManager::lxcImageYamlFilename = The name of the Yaml container descriptor file.
 Devices::LxcContainerManager::deleteWhenUndeployed = Delete containers when they are undeployed/not used. 
+Devices::LxcContainerManager::authenticationKey = Refined/default authentication key for LXC container registry.
 Devices::EcsDevice = An device for executing services
 Devices::EcsDevice::id = Device identification
 Devices::ContainerManager::memLimit = ECS-Runtime/Container manager memory limit for small devices in MBytes (default 0, none). 

@@ -7,6 +7,7 @@ project Devices {
         
     abstract compound ContainerManager {
        Integer memLimit = 0; // e.g., JVM memory limit in MBytes     
+       String authenticationKey;
          // - globally allocated hosts/ports
          // - global AAS location/URN/URI
     };
@@ -15,13 +16,17 @@ project Devices {
         NonEmptyString dockerHost;
         NonEmptyString dockerImageYamlFilename = "image-info.yml";
         Boolean deleteWhenUndeployed = false;
+        String registry = "";
+        String authenticationKey = "docker";
     };
 
     compound LxcContainerManager refines ContainerManager {
-        // so far, code is copied from Lxc; open, unclear what is missing -> cf. Devices.text!
+        // so far, code is copied from LXC; open, unclear what is missing -> cf. Devices.text!
         NonEmptyString dockerHost;
         NonEmptyString lxcImageYamlFilename = "image-info.yml";
         Boolean deleteWhenUndeployed = false;
+        // registry?
+        String authenticationKey = "lxc";
     };
     
     ContainerManager containerManager = DockerContainerManager {

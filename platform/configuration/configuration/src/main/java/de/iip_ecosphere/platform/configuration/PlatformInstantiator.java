@@ -15,7 +15,13 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import net.ssehub.easy.instantiation.core.model.common.ITraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.NoTraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.TopLevelExecutionTraceFilter;
@@ -23,6 +29,8 @@ import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.ModelQueryException;
 
 /**
  * Instantiates the platform using EASy-Producer.
@@ -192,6 +200,30 @@ public class PlatformInstantiator {
         }
         EasyExecutor.printReasoningMessages(rRes);
         configurer.validateReasoningResult(rRes);
+        
+        Configuration cfg = ConfigurationManager.getIvmlConfiguration();
+        final String containerAuthKeyDecName = "containerManager.authenticationKey";
+        try {
+            IDecisionVariable varAuthKey = cfg.getDecision(containerAuthKeyDecName, false);
+            String authKey = IvmlUtils.getStringValue(varAuthKey, "");
+            if (authKey.length() > 0) {
+                IdentityToken tok = IdentityStore.getInstance().getToken(authKey);
+                if (null != tok && TokenType.USERNAME == tok.getType()) {
+                    System.setProperty("iip.container.user." + authKey, tok.getUserName());
+                    System.setProperty("iip.container.password." + authKey, tok.getTokenDataAsString());
+                } else {
+                    LoggerFactory.getLogger(PlatformInstantiator.class).warn("No (username) identity token for key "
+                        + "'{}' found. Container deployment may fail", authKey);
+                }
+            } else {
+                LoggerFactory.getLogger(PlatformInstantiator.class).warn("No autentication key/value for decision "
+                    + "variable '{}' found. Container deployment may fail", containerAuthKeyDecName);
+            }
+        } catch (ModelQueryException e) {
+            LoggerFactory.getLogger(PlatformInstantiator.class).warn("No decision "
+                + "variable '{}' found. Container deployment may fail. {}", containerAuthKeyDecName, e.getMessage());
+        }
+        
         try {
             ConfigurationManager.instantiate(configurer.getStartRuleName()); // throws exception if it fails
         } catch (ExecutionException e) {

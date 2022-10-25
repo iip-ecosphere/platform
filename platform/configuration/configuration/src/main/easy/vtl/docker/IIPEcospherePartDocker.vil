@@ -60,7 +60,23 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
     }
     
     String createContainerImage(DockerContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
-        dockerBuildImage(base, buildFile, toDockerImageName(registry, repository, tag));
+        String id = dockerBuildImage(base, buildFile, toDockerImageName(registry, repository, tag));
+        if (isDefined(mgr.registry) and mgr.registry <> "") {
+            dockerPushImage(toDockerImageName(registry, repository, tag), mgr.registry, repository, tag);
+        }
+        id;
+    }
+    
+    loginContainerRegistry(DockerContainerManager mgr, String user, String password) = {
+        if (isDefined(mgr.registry) and mgr.registry <> "") {
+            dockerLogin(mgr.registry, user, password);
+        }
+    }
+
+    logoutContainerRegistry(DockerContainerManager mgr) = {
+        if (isDefined(mgr.registry) and mgr.registry <> "") {
+            dockerLogout(mgr.registry);
+        }
     }
 
 }

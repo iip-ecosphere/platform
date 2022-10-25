@@ -104,5 +104,11 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     String createContainerImage(ContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
         "";
     }
+    
+    loginContainerRegistry(ContainerManager mgr, String user, String password) = {
+    }
+
+    logoutContainerRegistry(ContainerManager mgr) = {
+    }
 
 }

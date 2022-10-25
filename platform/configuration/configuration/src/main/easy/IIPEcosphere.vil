@@ -337,6 +337,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         ContainerManager mgr = config.containerManager;
         if (a.createContainer) {
+            String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+            String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+            Boolean authenticate = regUser <> "" and regPwd <> "";
+            if (authenticate) {
+                loginContainerRegistry(mgr, regUser, regPwd);
+            }
             
             // Checking if there is any PythonService in app
             Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == CONTAINER_C1Ecs_C2Svc_App)
@@ -423,6 +429,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
                 }
+            }
+
+            if (authenticate) {
+                logoutContainerRegistry(mgr);
             }
         }
         
