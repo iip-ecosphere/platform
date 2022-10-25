@@ -323,7 +323,7 @@ public class Starter {
                 }
             }
         }  else {
-            if (setup.getNotifyServiceNull()) {
+            if (null == setup || setup.getNotifyServiceNull()) {
                 Throwable t = new Throwable("NO EXCEPTION/DEBUGGING: Service null or Service id null");
                 t.printStackTrace(System.out);
             }
