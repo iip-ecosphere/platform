@@ -258,6 +258,10 @@ public abstract class AbstractService implements Service {
             LoggerFactory.getLogger(AbstractService.class).warn("Cannot instantiate service of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
                 + ". Service '" + serviceId + "' will not be functional!");
+            if (e.getCause() != null) {
+                LoggerFactory.getLogger(AbstractService.class).warn("Cause: {}", e.getMessage(), e.getCause());
+                e.getCause().printStackTrace(System.out); // preliminary
+            }
         }
         return result;
     }
