@@ -338,7 +338,7 @@ public class Transport {
             }
             stayOffline = stayOff;
             if (stayOffline) {
-                LoggerFactory.getLogger(Transport.class).error(
+                LoggerFactory.getLogger(Transport.class).warn(
                      "Staying offline with status/monitoring messages from now on");
             }
         }
