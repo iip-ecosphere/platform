@@ -65,6 +65,7 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
         for (RecordType t: types) {
             String name = t.name;
             'from datatypes.${name} import ${name}'
+            'from datatypes.${name}Impl import ${name}Impl'
         }
     } 
 
