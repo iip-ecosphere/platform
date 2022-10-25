@@ -55,6 +55,8 @@ public class DefaultCachingStrategy implements CachingStrategy {
                 send = true;
                 break;
             }
+        } else {
+            send = true;
         }
         return send;
     }
