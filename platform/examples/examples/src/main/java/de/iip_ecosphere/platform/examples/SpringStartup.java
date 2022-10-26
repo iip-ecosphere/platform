@@ -37,6 +37,16 @@ public class SpringStartup {
     public static final String ARG_STOP = "iip.test.stop";
 
     /**
+     * Main program to start the application.
+     * 
+     * @param args the command line arguments; the first is the artifact file to start, the remaining is passed on 
+     *     to Spring
+     */
+    public static void main(String[] args) {
+        start(args);
+    }
+    
+    /**
      * Starts the application. Used from generated templates. Do not change signature.
      * 
      * @param args the command line arguments; the first is the artifact file to start, the remaining is passed on 
