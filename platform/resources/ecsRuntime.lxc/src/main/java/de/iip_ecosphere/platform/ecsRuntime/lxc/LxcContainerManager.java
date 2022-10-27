@@ -101,6 +101,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
             File imageInfo = UriResolver.resolveToFile(yamlURI, downloadDir);
             container = LxcContainerDescriptor.readFromYamlFile(imageInfo);
 
+            // in the mean time in Docker: optional authentication and docker pull (!)
             // Loading image
             String imageName = container.getDockerImageZipfile();
             int pos = pathToYaml.lastIndexOf('/');

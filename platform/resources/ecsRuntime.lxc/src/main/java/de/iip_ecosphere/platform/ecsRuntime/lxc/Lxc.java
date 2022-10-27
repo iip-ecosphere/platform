@@ -13,13 +13,15 @@ package de.iip_ecosphere.platform.ecsRuntime.lxc;
 
 import org.apache.commons.lang.SystemUtils;
 
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
+
 /**
  * Implements the docker specific configuration.
  * 
  * @author Monika Staciwa, SSE
  *
  */
-public class Lxc {
+public class Lxc extends AbstractManagerSetup {
     
     // TODO unify common parts with Docker -> ecsRuntime???
 

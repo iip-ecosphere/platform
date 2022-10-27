@@ -28,6 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.api.command.PullImageResultCallback;
+import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Info;
@@ -45,6 +48,9 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.net.UriResolver;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
@@ -81,6 +87,77 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         
     }
     
+    /**
+     * Tries to obtain an authentication config from {@link IdentityStore}.
+     * 
+     * @param authKey the authentication key, may be empty or <b>null</b> and is ignored then
+     * @param registry the registry to authenticate for
+     * @return the authentication config or <b>null</b> for none
+     */
+    private static AuthConfig getAuthConfig(String authKey, String registry) {
+        AuthConfig authConfig = null;
+        if (DockerSetup.isNotEmpty(authKey)) {
+            IdentityToken tok = IdentityStore.getInstance().getToken(authKey);
+            if (null == tok) {
+                LoggerFactory.getLogger(DockerContainerManager.class).warn("Cannot find identity token for {} "
+                    + "and registry {}. Falling back to no authentication.", authKey, registry);
+            } else if (tok.getType() == TokenType.USERNAME) {
+                authConfig = new AuthConfig()
+                    .withRegistryAddress(registry)
+                    .withUsername(tok.getUserName())
+                    .withPassword(tok.getTokenDataAsString());
+            } else {
+                LoggerFactory.getLogger(DockerContainerManager.class).warn("Token for {} is of type "
+                    + "{}. Can only handle USERNAME. Falling back to no authentication.", authKey, tok.getType());
+            }
+        }
+        return authConfig;
+    }
+    
+    /**
+     * Tries to pull the container if a registry is given.
+     * 
+     * @param setup the docker setup
+     * @param dockerClient the docker client instance to use
+     * @param container the actual container to load/add/pull
+     * @return the container id if it was pulled/is there
+     * @throws ExecutionException if pulling the container failed
+     */
+    private String tryPull(DockerSetup setup, DockerClient dockerClient, DockerContainerDescriptor container) 
+        throws ExecutionException {
+        String result = null;
+        Docker dockerCfg = setup.getDocker();
+        if (DockerSetup.isNotEmpty(dockerCfg.getRegistry())) {
+            String imageName = container.getDockerImageName();
+            if (imageName.length() > 0) {
+                boolean internalRegistry = false;
+                String registry = DockerContainerDescriptor.getRegistry(imageName); // R30.c
+                if (DockerSetup.isNotEmpty(dockerCfg.getRegistry()) && !DockerSetup.isNotEmpty(registry)) {
+                    registry = dockerCfg.getRegistry();
+                    internalRegistry = true;
+                }
+                PullImageCmd cmd = dockerClient.pullImageCmd(DockerContainerDescriptor.getRepository(imageName))
+                    .withRegistry(registry);
+                String tag = DockerContainerDescriptor.getTag(imageName);
+                if (DockerSetup.isNotEmpty(tag)) {
+                    cmd.withTag(tag);
+                }
+                AuthConfig authConfig = getAuthConfig(internalRegistry 
+                    ? dockerCfg.getAuthenticationKey() : registry, registry);
+                if (null != authConfig) {
+                    cmd.withAuthConfig(authConfig);
+                }
+                try {
+                    cmd.exec(new PullImageResultCallback()).awaitCompletion();
+                } catch (InterruptedException e) {
+                    throw new ExecutionException(e);
+                }
+                result = getDockerId(DockerContainerDescriptor.getRepository(imageName)); // unsure, with/out version
+            }
+        }
+        return result;
+    }
+    
     @Override
     public String addContainer(URI location) throws ExecutionException {
         String id = null;
@@ -88,61 +165,63 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         LOGGER.info("Adding container at " + location + "...");
         try {
             FactoryDescriptor factory = new FactoryDescriptor();
-            DockerSetup config = (DockerSetup) factory.getConfiguration();
-            String downloadDirectory = config.getDocker().getDownloadDirectory();
+            DockerSetup setup = (DockerSetup) factory.getConfiguration();
+            String downloadDirectory = setup.getDocker().getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);
             
             // Getting information about Docker image from image-info.yml
             String pathToYaml = location.toString();
             if (pathToYaml.endsWith("/")) {
-                pathToYaml += config.getDocker().getDockerImageYamlFilename();
+                pathToYaml += setup.getDocker().getDockerImageYamlFilename();
             }
             URI yamlURI = new URI(pathToYaml);
             File imageInfo = UriResolver.resolveToFile(yamlURI, downloadDir);
             container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
 
-            // Loading image
-            String imageName = container.getDockerImageZipfile();
-            int pos = pathToYaml.lastIndexOf('/');
-            String pathToImage = pathToYaml.substring(0, pos + 1) + imageName;
-            URI imageURI = new URI(pathToImage);
-            File image = UriResolver.resolveToFile(imageURI, downloadDir);
-            
-            String downloadedImageZipfile = image.getPath();
-            container.setDownloadedImageZipfile(downloadedImageZipfile);
-            
+            String dockerId = null;
             DockerClient dockerClient = getDockerClient();
             if (dockerClient == null) {
                 throwExecutionException("Adding container failed", "Could not connect to the Docker daemon");
             }
-            
-            LOGGER.info("Loading image for " + location + " from " + image);
-            InputStream in = new FileInputStream(image);
-            dockerClient.loadImageCmd(in).exec();
-            
-            // Creating Docker container
-            int port = 0;
-            if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER)) {
-                // may be gone until used, limit then netMgr ports in setup
-                NetworkManager netMgr = NetworkManagerFactory.getInstance();
-                port = netMgr.obtainPort(container.getNetKey()).getPort();
+
+            dockerId = tryPull(setup, dockerClient, container);
+            if (null == dockerId) { // fallback, try to load it directly via filename
+                // Loading image
+                String imageName = container.getDockerImageZipfile();
+                int pos = pathToYaml.lastIndexOf('/');
+                String pathToImage = pathToYaml.substring(0, pos + 1) + imageName;
+                URI imageURI = new URI(pathToImage);
+                File image = UriResolver.resolveToFile(imageURI, downloadDir);
+                String downloadedImageZipfile = image.getPath();
+                container.setDownloadedImageZipfile(downloadedImageZipfile);
+                LOGGER.info("Loading image for " + location + " from " + image);
+                InputStream in = new FileInputStream(image);
+                dockerClient.loadImageCmd(in).exec();
+                
+                // Creating Docker container
+                int port = 0;
+                if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER)) {
+                    // may be gone until used, limit then netMgr ports in setup
+                    NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                    port = netMgr.obtainPort(container.getNetKey()).getPort();
+                }
+                int port1 = 0;
+                if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER_1)) {
+                    // may be gone until used, limit then netMgr ports in setup
+                    NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                    port1 = netMgr.obtainPort(container.getNetKey1()).getPort();
+                }
+                String dockerImageName = getImageName(container);
+                String containerName = container.getName().trim().replaceAll("\\s", "_");
+                LOGGER.info("Creating container " + dockerImageName + " " + containerName);
+                CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
+                    .withName(containerName);
+                configure(cmd, port, port1, container);
+                cmd.exec(); 
+                
+                // Getting Docker id
+                dockerId = getDockerId(containerName);
             }
-            int port1 = 0;
-            if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER_1)) {
-                // may be gone until used, limit then netMgr ports in setup
-                NetworkManager netMgr = NetworkManagerFactory.getInstance();
-                port1 = netMgr.obtainPort(container.getNetKey1()).getPort();
-            }
-            String dockerImageName = getImageName(container);
-            String containerName = container.getName().trim().replaceAll("\\s", "_");
-            LOGGER.info("Creating container " + dockerImageName + " " + containerName);
-            CreateContainerCmd cmd = dockerClient.createContainerCmd(dockerImageName)
-                .withName(containerName);
-            configure(cmd, port, port1, container);
-            cmd.exec(); 
-            
-            // Getting Docker id
-            String dockerId = getDockerId(containerName);
             if (dockerId == null) {
                 throwExecutionException("Adding container failed", "The Docker container id is null.");
             }

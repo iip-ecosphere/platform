@@ -77,5 +77,27 @@ public class DockerContainerDescriptorTest {
         Assert.assertFalse(desc.getAttachStdErr());
         Assert.assertNotNull(desc.getUri());
     }
+    
+    /**
+     * Tests static image name functions.
+     */
+    @Test
+    public void testImageNameFunctions() {
+        Assert.assertEquals("", DockerContainerDescriptor.getRegistry("a/b:123"));
+        Assert.assertEquals("", DockerContainerDescriptor.getRegistry("a/b"));
+        Assert.assertEquals("host:123", DockerContainerDescriptor.getRegistry("host:123/a/b"));
+        Assert.assertEquals("host:123", DockerContainerDescriptor.getRegistry("host:123/a/b:123"));
+
+        Assert.assertEquals("123", DockerContainerDescriptor.getTag("a:123"));
+        Assert.assertEquals("123", DockerContainerDescriptor.getTag("a/b:123"));
+        Assert.assertEquals("", DockerContainerDescriptor.getTag("a/b"));
+        Assert.assertEquals("", DockerContainerDescriptor.getTag("host:123/a/b"));
+        Assert.assertEquals("123", DockerContainerDescriptor.getTag("host:123/a/b:123"));
+
+        Assert.assertEquals("a/b", DockerContainerDescriptor.getRepository("a/b:123"));
+        Assert.assertEquals("a/b", DockerContainerDescriptor.getRepository("a/b"));
+        Assert.assertEquals("a/b", DockerContainerDescriptor.getRepository("host:123/a/b"));
+        Assert.assertEquals("a/b", DockerContainerDescriptor.getRepository("host:123/a/b:123"));
+    }
 
 }

@@ -426,6 +426,71 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
     }
     
     /**
+     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * 
+     * @param imgName the image name
+     * @return the repository
+     */
+    public static String getRepository(String imgName) {
+        String result = imgName;
+        String tag = getTag(imgName);
+        if (DockerSetup.isNotEmpty(tag)) {
+            int pos = imgName.lastIndexOf(':');
+            if (pos > 0) {
+                result = imgName.substring(0, pos);
+            }
+        }
+        String reg = getRegistry(result);
+        if (DockerSetup.isNotEmpty(reg)) {
+            result = result.substring(reg.length() + 1);
+        }
+        return result;
+    }
+    
+    /**
+     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * 
+     * @param imgName the image name
+     * @return the repository
+     */
+    public static String getRegistry(String imgName) {
+        String result;
+        int pos = imgName.indexOf('/');
+        if (pos > 0) {
+            int lastPos = imgName.lastIndexOf('/');
+            if (pos != lastPos) {
+                result = imgName.substring(0, pos);
+            } else {
+                result = "";
+            }
+        } else {
+            result = "";
+        }
+        return result;
+    }
+
+    /**
+     * Turns a full container image name with optional registry, repository and version into its (version) tag.
+     * 
+     * @param imgName the image name
+     * @return the tag, may be empty
+     */
+    public static String getTag(String imgName) {
+        String result;
+        int pos = imgName.lastIndexOf('/'); // repo/registry before?
+        if (pos > 0) {
+            imgName = imgName.substring(pos + 1);
+        }
+        pos = imgName.lastIndexOf(':');
+        if (pos > 0) {
+            result = imgName.substring(pos + 1);
+        } else {
+            result = "";
+        }
+        return result;
+    }
+    
+    /**
      * Tests reading a Docker container file.
      * 
      * @param args arguments, first is taken as file name

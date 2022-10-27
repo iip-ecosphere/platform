@@ -13,13 +13,15 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import org.apache.commons.lang.SystemUtils;
 
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
+
 /**
  * Implements the docker specific configuration.
  * 
  * @author Monika Staciwa, SSE
  *
  */
-public class Docker {
+public class Docker extends AbstractManagerSetup {
 
     // http://localhost:2375 does not seem to work although discussed as solution
     private String dockerHost = SystemUtils.IS_OS_WINDOWS 
@@ -27,6 +29,7 @@ public class Docker {
     private String dockerImageYamlFilename = "image-info.yml";
     private boolean deleteWhenUndeployed = false;
     private String downloadDirectory;
+    private String registry;
     
     /**
      * Returns the docker host.
@@ -102,5 +105,23 @@ public class Docker {
         }
         return this.downloadDirectory;
     }
+
+    /**
+     * Returns the host/port of the docker registry to use.
+     * 
+     * @return the registry, e.g., localhost:5050
+     */
+    public String getRegistry() {
+        return registry;
+    }
     
+    /**
+     * Defines the host/port of the docker registry to use. [required by SnakeYaml]
+     * 
+     * @param registry the registry, e.g., localhost:5050
+     */
+    public void setRegistry(String registry) {
+        this.registry = registry;
+    }
+
 }
