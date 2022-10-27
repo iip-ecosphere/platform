@@ -94,15 +94,17 @@ project ContainerCreation {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec1)}}, 
-        dependencies = {refBy(PYTHON39), refBy(ScipPy141), refBy(NumPy1201), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
+        dependencies = {refBy(PYTHON39), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
     };
+    
+    // refBy(ScipPy141), refBy(NumPy1201), // fail, may require RUN apk add make automake gcc g++ subversion python3-dev 
     
     PythonDependency ScipPy141 = {
        name = "scipy",
        version = "1.4.1"
     };
 
-    PythonDependency NumPy1201 = {
+    PythonDependency NumPy1201 = { 
        name = "numpy",
        version = "1.20.1"
     };
