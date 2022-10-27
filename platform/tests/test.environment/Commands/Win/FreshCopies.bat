@@ -1,0 +1,1 @@
+copy /y "C:\Users\alamoush\Desktop\VMs\IIP Progress\FreshCopies\*" "C:\Users\alamoush\Desktop\VMs\IIP Progress"
