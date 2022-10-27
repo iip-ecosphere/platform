@@ -114,5 +114,15 @@ public class AbstractSetupTest {
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
     }
+    
+    /**
+     * Tests {@link AbstractSetup#isNotEmpty(String)}.
+     */
+    @Test
+    public void testIsNotEmpty() {
+        Assert.assertTrue(AbstractSetup.isNotEmpty("a"));
+        Assert.assertFalse(AbstractSetup.isNotEmpty(""));
+        Assert.assertFalse(AbstractSetup.isNotEmpty(null));
+    }
 
 }

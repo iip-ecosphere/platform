@@ -71,6 +71,16 @@ public abstract class AbstractSetup {
         }
         return readFromYaml(cls, in);  
     }
+    
+    /**
+     * Returns if a string is valid, i.e. not <b>null</b> and not empty.
+     *
+     * @param str the string
+     * @return {@code true} for valid and not empty, {@code false} else
+     */
+    public static boolean isNotEmpty(String str) {
+        return str != null && str.length() > 0;
+    }
 
     /**
      * Reads a instance from {@code in}. Unknown properties are ignored.
