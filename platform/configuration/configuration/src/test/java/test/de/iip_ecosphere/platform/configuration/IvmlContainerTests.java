@@ -39,6 +39,7 @@ public class IvmlContainerTests extends IvmlTests {
         File gen = new File("gen/tests/ContainerCreation");
         PlatformInstantiator.instantiate(new TestConfigurer("ContainerCreation", new File("src/test/easy"), gen));
         assertAllFiles(gen);
+        assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
     }
     
 }

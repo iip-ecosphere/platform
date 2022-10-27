@@ -56,6 +56,12 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             dockerHost: ${containerManager.dockerHost}
             dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
             deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+        if (isDefined(containerManager.registry) and containerManager.registry <> "") {
+        '    registry: ${containerManager.registry}'
+        }
+        if (isDefined(containerManager.authenticationKey) and containerManager.authenticationKey <> "") {
+        '    authenticationKey: ${containerManager.authenticationKey}'
+        }
     }
 
     def produceContainerMgr(LxcContainerManager containerManager) {

@@ -51,6 +51,7 @@ public class IvmlSerializerConfig1OldTests extends IvmlSerializerConfigTests {
         File srcMainPython = new File(srcMain, "python");
         pythonSourceCodeCheck(srcMainPython, "datatypes/TestType.py");
         pythonSourceCodeCheck(srcMainPython, "datatypes/MyTestEnum.py");
+        assertTemplateZip(gen, "impl.MyAppExampleOld");
     }
     
 }

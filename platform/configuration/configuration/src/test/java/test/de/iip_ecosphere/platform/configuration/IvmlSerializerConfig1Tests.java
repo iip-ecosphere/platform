@@ -48,5 +48,6 @@ public class IvmlSerializerConfig1Tests extends IvmlSerializerConfigTests {
         assertServiceManager(gen);
         assertPlatform(gen);
         assertAllFiles(gen);
+        assertTemplateZip(gen, "impl.MyAppExample");
     }    
 }
