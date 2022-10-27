@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
@@ -32,6 +33,36 @@ public class EcsSetup extends AasBasedSetup {
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
     private int monitoringUpdatePeriod = 2000;
     private boolean autoOnOffboarding = true;
+
+    /**
+     * Common settings for a container manager setup.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public abstract static class AbstractManagerSetup {
+        
+        private String authenticationKey;
+        
+        /**
+         * Returns the authentication key.
+         * 
+         * @return the authentication key pointing to the {@link IdentityStore}, may be empty or <b>null</b>
+         */
+        public String getAuthenticationKey() {
+            return authenticationKey;
+        }
+        
+        /**
+         * Defines the docker host. [required by SnakeYaml]
+         * 
+         * @param authenticationKey the authentication key pointing to the {@link IdentityStore}, may be 
+         *     empty or <b>null</b>
+         */
+        public void setAuthenticationKey(String authenticationKey) {
+            this.authenticationKey = authenticationKey;
+        }
+
+    }
 
     /**
      * Returns the monitoring update period.

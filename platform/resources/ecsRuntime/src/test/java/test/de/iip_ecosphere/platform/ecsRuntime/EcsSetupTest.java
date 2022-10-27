@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
+import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 
 /**
@@ -25,13 +26,16 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConfigurationTest {
+public class EcsSetupTest {
+    
+    private static class MySetup extends AbstractManagerSetup {
+    }
     
     /**
      * Tests the configuration.
      */
     @Test
-    public void testConfiguration() throws IOException {
+    public void testEcsSetup() throws IOException {
         // does not exist
         try {
             EcsSetup.readFromYaml(EcsSetup.class, "me.yml");
@@ -49,6 +53,10 @@ public class ConfigurationTest {
         NetworkManagerSetup netMgr = cfg.getNetMgr();
         Assert.assertEquals(1025, netMgr.getLowPort());
         Assert.assertEquals(65535, netMgr.getHighPort());
+        
+        MySetup ms = new MySetup();
+        ms.setAuthenticationKey("key");
+        Assert.assertEquals("key", ms.getAuthenticationKey());
     }
 
 }

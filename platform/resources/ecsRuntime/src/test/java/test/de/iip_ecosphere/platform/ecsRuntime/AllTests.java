@@ -22,7 +22,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     ContainerStateTest.class,
     BasicContainerDescriptorTest.class,
-    ConfigurationTest.class,
+    EcsSetupTest.class,
     ContainerManagerTest.class,
     EcsAasTest.class,
     test.de.iip_ecosphere.platform.ecsRuntime.deviceAas.AllTests.class
