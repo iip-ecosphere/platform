@@ -97,16 +97,22 @@ project ContainerCreation {
         dependencies = {refBy(PYTHON39), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
     };
     
-    // refBy(ScipPy141), refBy(NumPy1201), // fail, may require RUN apk add make automake gcc g++ subversion python3-dev 
+    // refBy(ScipPy141), refBy(NumPy1201), // fail, require SysPythonNative and still fail
+    
+    LinuxCommandBasedSystemDependency SysPythonNative = {
+        installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
+    };
     
     PythonDependency ScipPy141 = {
        name = "scipy",
-       version = "1.4.1"
+       version = "1.4.1", 
+       dependencies = {refBy(SysPythonNative)}
     };
 
     PythonDependency NumPy1201 = { 
        name = "numpy",
-       version = "1.20.1"
+       version = "1.20.1", 
+       dependencies = {refBy(SysPythonNative)}
     };
     
     PythonDependency Tflite_Runtime28 = {

@@ -46,5 +46,42 @@ template DockerBasics(Configuration config, FileArtifact target) {
     def toDockerImageName(String name) {
         name.toLowerCase();
     }
+    
+    def setOf(Dependency) collectDependencies(sequenceOf(MeshElement) elements) {
+        collectDependencies(elements->collect(e|e.impl));
+    }
+
+    def setOf(Dependency) collectDependencies(sequenceOf(ServiceBase) services) {
+        setOf(Dependency) result = {};
+        for (ServiceBase s: services) {
+            result = collectDependenciesSvc(s, result);
+        }
+        result;
+    }
+    
+    def setOf(Dependency) addDependenciesRec(setOf(Dependency) deps, setOf(Dependency) result) {
+         for (Dependency d: deps) {
+            result.add(d);
+             result = collectDependenciesDep(d, result);
+         }
+         result;
+    }
+
+    // allow for dynamic dispatch override
+    def setOf(Dependency) collectDependenciesSvc(ServiceBase service, setOf(Dependency) result) {
+         addDependenciesRec(service.dependencies, result);
+    }
+
+    // dynamic dispatch base
+    def setOf(Dependency) collectDependenciesDep(Dependency dep, setOf(Dependency) result) {
+        result.add(dep);
+        result;
+    }
+
+    // dynamic dispatch base
+    def setOf(Dependency) collectDependenciesDep(PythonDependency dep, setOf(Dependency) result) {
+        result.add(dep);
+        addDependenciesRec(dep.dependencies, result);
+    }
 
 }

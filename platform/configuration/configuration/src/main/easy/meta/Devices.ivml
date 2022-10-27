@@ -51,9 +51,9 @@ project Devices {
 
     // preliminary, to record that
     compound LinuxCommandBasedSystemDependency refines SystemDependency {
-        sequenceOf(String) downloads = {};
-        sequenceOf(String) installCommands = {};
-        sequenceOf(String) bashSetups = {};
+        sequenceOf(String) downloads = {}; // something to download before
+        sequenceOf(String) installCommands = {}; // plain shell commands
+        sequenceOf(String) bashSetups = {}; // like source some file to get the env right before
     }
 
     enum JavaVersion {jdk8, jdk11, jdk16}; 
