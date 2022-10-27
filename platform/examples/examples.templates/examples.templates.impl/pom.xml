@@ -149,6 +149,22 @@
                                     <classpathScope>test</classpathScope>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>PyServiceUnitTest</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>
+                                        <argument>${project.basedir}/src/test/python</argument>
+                                        <!-- made to enable different pyservice tests seperately  -->
+                                        <argument>pyTest.py</argument>
+                                        <argument>../../../../examples.templates.model</argument>
+                                    </arguments>
+                                    <mainClass>de.iip_ecosphere.platform.services.environment.PythonUnitTest</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>

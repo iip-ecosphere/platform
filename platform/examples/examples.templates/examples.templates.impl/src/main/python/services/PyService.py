@@ -26,9 +26,9 @@ class PyService(PyServiceInterface):
             with open ("services/trained_forest.pkl", "rb") as p:
                 self.clf = pickle.load(p)
         
-        print(data.__dict__)
+        print('Used Data ', data.__dict__)
         datare = np.array([[data.getType(), data.getAirTemp(), data.getProcTemp(), data.getRotSpe()
-                          , data.getTroq(), data.getToolWear()]])
+                          , data.getTorq(), data.getToolWear()]])
         result = None
         if (self.clf != None):
             result = self.clf.predict(datare) 
