@@ -18,9 +18,10 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
-* Distributed testing/evaluation environment: [#59](https://github.com/iip-ecosphere/platform/issues/59)
-* Generated service test frames [#36](https://github.com/iip-ecosphere/platform/issues/36)
-* Document example models [#54](https://github.com/iip-ecosphere/platform/issues/54)
+* [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
+* [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
+* [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
+* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -33,12 +34,14 @@ New features:
 * Ad-hoc device connectivity via device AAS (initial)
 * [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
 * [#96](https://github.com/iip-ecosphere/platform/issues/96): Hostname as device id (optional, not default)
+* [#36](https://github.com/iip-ecosphere/platform/issues/36): Generated service test frames
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
 * [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
 * [#95](https://github.com/iip-ecosphere/platform/issues/96): Document IVML model/variables for UI
+* [#54](https://github.com/iip-ecosphere/platform/issues/54): Document example models 
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
