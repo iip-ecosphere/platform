@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources, PlatformServices } from 'src/interfaces';
+import { PlatformResources, PlatformServices, ResourceValue } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -45,6 +45,11 @@ export class ApiService {
 
   public async getArtifacts() {
     const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformResources;
+    return Data;
+  }
+
+  public async getTechData() {
+    const Data = await this.getData('aas/submodels/platform/submodel/submodelElements') as ResourceValue[];
     return Data;
   }
 

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Subscription } from 'rxjs';
 import { platformResponse } from 'src/interfaces';
 import { EnvConfigService } from './env-config.service';
 
@@ -18,6 +18,7 @@ export class PlanDeployerService {
     executionState: "",
     messages: [""]
   }
+  isDone = false;
 
   emitter: BehaviorSubject<{ executionState: string,messages: string[]}>;
 
@@ -74,6 +75,16 @@ export class PlanDeployerService {
 
     }
     return response;
+  }
+
+  private async getStatus(url: string) {
+    let Data;
+    try {
+      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/aas/submodels/Status/submodel'));
+    } catch(e) {
+      console.log(e);
+    }
+    return Data;
   }
 
 }

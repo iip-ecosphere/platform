@@ -2,7 +2,16 @@
 <mat-toolbar style="background: RGB(35, 142, 183);">
   <img src="../assets/PlatformLogoBig.png" alt="Logo" class="logo">
   <span>  IIP Ecosphere Management UI</span>
+
+  <span style="flex: 1 1 auto"></span>
+
+  <div style="font-size:x-small;">
+    <p style="line-height: 0.5">Version: {{Data.version}}</p>
+    <p style="line-height: 0.5">Build-Id: {{Data.buildId}}</p>
+  </div>
+
 </mat-toolbar>
+
 
 <nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
   <a mat-tab-link [routerLink]="'resources'"> resources </a>
