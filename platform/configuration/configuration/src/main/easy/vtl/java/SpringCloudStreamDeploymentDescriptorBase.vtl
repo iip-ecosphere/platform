@@ -41,6 +41,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel, String familyId) {
         String famId = family.id;
         '- id: ${family.id}
+          applicationId: ${app.id}
           name: ${family.name}
           description: ${family.description}
           version: 0.0.1
@@ -63,6 +64,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
 
     def generateService(MeshElement elt, Service service, Boolean topLevel, String familyId) {
         '- id: ${service.id}
+          applicationId: ${app.id}
           name: ${service.name}
           version: ${service.ver}
           description: ${service.description}
