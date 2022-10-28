@@ -16,28 +16,16 @@ easyProducer:
   ivmlConfigFolder <String>
   ivmlModelName: <String>
   easyLogLevel: NORMAL|VERBOSE|EXTRA_VERBOSE
-
 serviceArtifactStorage:
-  endpoint: <String>
-  region: <String>
-  accessKey: <String>
-  secretAccessKey: <String>
-  bucket: <String>
-  prefix: <String>
-  packageDescriptor: <String>
-  packageFilename: <String>
-
+  ...
 containerImageStorage:
-  endpoint: <String>
-  region: <String>
-  accessKey: <String>
-  secretAccessKey: <String>
-  bucket: <String>
-  prefix: <String>
-  packageDescriptor: <String>
-  packageFilename: <String>
-  
+  ...
 ```
+
+The setup for this component defines the `base` folder for the model, which typically contains the meta-model folder `ivmlMetaModelFolder` (default `model`), the folder where the configuration of the actually installed platform and the running apps is located (`ivmlConfigFolder`, per default undefined, thus in `base`), the name of the top-level IVML file (per default `IIPEcosphere`, but usually the top-level model in `ivmlConfigFolder`) and a writable folder where to locate generated artifacts (`genTarget`). Further, the logging level of the underlying EASy-Producer toolset can be defined (by default `NORMAL`).
+
+The setup also may contain a `serviceArtifactStorage`and a `containerImageStorage` PackageStorageSetup specification from [deviceMgt](../../resources/deviceMgt/README.md), which are currently not used.
+
 
 ## Configuration model
 
