@@ -2,7 +2,9 @@
 
 ## Further documents 
 * Platform handbook via [Zenodo](https://doi.org/10.5281/zenodo.5168946) and the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). The links may become active/updated some days after a release.
-* [Guideline to open the projects and setup the environment](../documentation/Guideline.pdf?raw=true).
+* [Catalogue of formats employed by the platform](../documentation/FORMATS.md).
+* [Listing of typical procedures](../documentation/ACTIONS.md).
+* [Guideline to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * [Release guideline](../documentation/RELEASE.md)
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)

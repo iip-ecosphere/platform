@@ -22,6 +22,7 @@ In progress:
 * [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
+* [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -42,6 +43,7 @@ Improvements:
 * [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
 * [#95](https://github.com/iip-ecosphere/platform/issues/96): Document IVML model/variables for UI
 * [#54](https://github.com/iip-ecosphere/platform/issues/54): Document example models 
+* [#85](https://github.com/iip-ecosphere/platform/issues/85): Display of platform build information on the UI
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
