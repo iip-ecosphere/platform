@@ -32,6 +32,3 @@ Local catalog format for semanticId resolution:
         ...
 
 `semanticId` specifies the id to be resolved. `version` and `revision` is information that could be extracted from the semanticId but given here for generality. In naming, any number of languages (here `de` and `en`) can be listed with the name of the defined concept, the structured name and a description in the respective language. Further, `publisher` and `kind` (IRI, IRDI, ...) may be given or implicitly set as default values by the resolver implementation.
-
-**Missing**
-- IVML type mapping
