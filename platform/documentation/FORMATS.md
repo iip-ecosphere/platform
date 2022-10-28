@@ -12,8 +12,8 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 ## Setup files
 
 - [Management UI](../managementUI/README.md)
-- [Central platform services](../monitoring/monitoring.prometheus/README.md) with [configuration](../configuration/configuration/README.md) and possibly [monitoring](../monitoring/monitoring.prometheus/README.md)
-- Monitoring with [Prometheus](../monitoring/monitoring.prometheus/README.md)
+- [Central platform services](../platform/README.md) with [configuration](../configuration/configuration/README.md) and possibly [monitoring](../resources/monitoring.prometheus/README.md)
+- Monitoring with [Prometheus](../resources/monitoring.prometheus/README.md)
 - ECS runtime for [Docker](../resources/ecsRuntime.docker/README.md) and (in preparation) [LXC](../resources/ecsRuntime.lxc/README.md)
 - Service manager for [Spring](../services/services.spring/README.md)
 - Device/container software installation paths, aka [InstalledDependencies](../services/services.environment/README.md)
